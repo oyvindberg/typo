@@ -35,7 +35,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
     sql"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
           values (${Segment.paramSegment(unsaved.illustrationid)(IllustrationId.setter)}::int4, ${Segment.paramSegment(unsaved.diagram)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "illustrationid", "diagram", "modifieddate"::text
-       """.insertReturning(IllustrationRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using IllustrationRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, IllustrationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.illustration("illustrationid", "diagram", "modifieddate") FROM STDIN""", batchSize, unsaved)(IllustrationRow.text)
@@ -62,7 +62,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.illustration($names) values ($values) returning "illustrationid", "diagram", "modifieddate"::text"""
     }
-    q.insertReturning(IllustrationRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using IllustrationRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -73,13 +73,13 @@ class IllustrationRepoImpl extends IllustrationRepo {
     SelectBuilderSql("production.illustration", IllustrationFields.structure, IllustrationRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, IllustrationRow] = {
-    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration""".query(IllustrationRow.jdbcDecoder).selectStream
+    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration""".query(using IllustrationRow.jdbcDecoder).selectStream()
   }
   override def selectById(illustrationid: IllustrationId): ZIO[ZConnection, Throwable, Option[IllustrationRow]] = {
-    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ${Segment.paramSegment(illustrationid)(IllustrationId.setter)}""".query(IllustrationRow.jdbcDecoder).selectOne
+    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ${Segment.paramSegment(illustrationid)(IllustrationId.setter)}""".query(using IllustrationRow.jdbcDecoder).selectOne
   }
   override def selectByIds(illustrationids: Array[IllustrationId]): ZStream[ZConnection, Throwable, IllustrationRow] = {
-    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ANY(${Segment.paramSegment(illustrationids)(IllustrationId.arraySetter)})""".query(IllustrationRow.jdbcDecoder).selectStream
+    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ANY(${Segment.paramSegment(illustrationids)(IllustrationId.arraySetter)})""".query(using IllustrationRow.jdbcDecoder).selectStream()
   }
   override def update(row: IllustrationRow): ZIO[ZConnection, Throwable, Boolean] = {
     val illustrationid = row.illustrationid
@@ -102,6 +102,6 @@ class IllustrationRepoImpl extends IllustrationRepo {
           do update set
             "diagram" = EXCLUDED."diagram",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "illustrationid", "diagram", "modifieddate"::text""".insertReturning(IllustrationRow.jdbcDecoder)
+          returning "illustrationid", "diagram", "modifieddate"::text""".insertReturning(using IllustrationRow.jdbcDecoder)
   }
 }

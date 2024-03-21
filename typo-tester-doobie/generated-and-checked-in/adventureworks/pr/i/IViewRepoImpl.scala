@@ -18,6 +18,6 @@ class IViewRepoImpl extends IViewRepo {
     SelectBuilderSql("pr.i", IViewFields.structure, IViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, IViewRow] = {
-    sql"""select "id", "illustrationid", "diagram", "modifieddate"::text from pr.i""".query(IViewRow.read).stream
+    sql"""select "id", "illustrationid", "diagram", "modifieddate"::text from pr.i""".query(using IViewRow.read).stream
   }
 }

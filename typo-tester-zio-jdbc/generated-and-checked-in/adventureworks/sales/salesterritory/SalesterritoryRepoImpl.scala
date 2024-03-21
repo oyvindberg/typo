@@ -37,7 +37,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
     sql"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.territoryid)(SalesterritoryId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}, ${Segment.paramSegment(unsaved.group)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.salesytd)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.saleslastyear)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.costytd)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.costlastyear)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
-       """.insertReturning(SalesterritoryRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using SalesterritoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesterritoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesterritoryRow.text)
@@ -86,7 +86,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into sales.salesterritory($names) values ($values) returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(SalesterritoryRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using SalesterritoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -97,13 +97,13 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
     SelectBuilderSql("sales.salesterritory", SalesterritoryFields.structure, SalesterritoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalesterritoryRow] = {
-    sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory""".query(SalesterritoryRow.jdbcDecoder).selectStream
+    sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory""".query(using SalesterritoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(territoryid: SalesterritoryId): ZIO[ZConnection, Throwable, Option[SalesterritoryRow]] = {
-    sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory where "territoryid" = ${Segment.paramSegment(territoryid)(SalesterritoryId.setter)}""".query(SalesterritoryRow.jdbcDecoder).selectOne
+    sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory where "territoryid" = ${Segment.paramSegment(territoryid)(SalesterritoryId.setter)}""".query(using SalesterritoryRow.jdbcDecoder).selectOne
   }
   override def selectByIds(territoryids: Array[SalesterritoryId]): ZStream[ZConnection, Throwable, SalesterritoryRow] = {
-    sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory where "territoryid" = ANY(${Segment.paramSegment(territoryids)(SalesterritoryId.arraySetter)})""".query(SalesterritoryRow.jdbcDecoder).selectStream
+    sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory where "territoryid" = ANY(${Segment.paramSegment(territoryids)(SalesterritoryId.arraySetter)})""".query(using SalesterritoryRow.jdbcDecoder).selectStream()
   }
   override def update(row: SalesterritoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val territoryid = row.territoryid
@@ -147,6 +147,6 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
             "costlastyear" = EXCLUDED."costlastyear",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text""".insertReturning(SalesterritoryRow.jdbcDecoder)
+          returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text""".insertReturning(using SalesterritoryRow.jdbcDecoder)
   }
 }

@@ -37,7 +37,7 @@ object DeleteBuilder {
         Some(SqlFragment.deleteFrom(name)),
         params.where
           .map(w => w(structure.fields))
-          .reduceLeftOption(_ and _)
+          .reduceLeftOption(_.and(_))
           .map { where => sql" where " ++ where.render(counter) }
       ).flatten.reduce(_ ++ _)
     }

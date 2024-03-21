@@ -30,7 +30,7 @@ object TypoPoint {
     },
     "Array[org.postgresql.geometric.PGpoint]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoPoint]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoPoint]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoPoint]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -50,7 +50,7 @@ object TypoPoint {
     },
     "org.postgresql.geometric.PGpoint"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoPoint] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoPoint] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoPoint] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val x = jsonObj.get("x").toRight("Missing field 'x'").flatMap(_.as(JsonDecoder.double))
     val y = jsonObj.get("y").toRight("Missing field 'y'").flatMap(_.as(JsonDecoder.double))

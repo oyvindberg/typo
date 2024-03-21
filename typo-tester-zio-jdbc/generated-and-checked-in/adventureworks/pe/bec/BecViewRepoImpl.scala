@@ -18,6 +18,6 @@ class BecViewRepoImpl extends BecViewRepo {
     SelectBuilderSql("pe.bec", BecViewFields.structure, BecViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, BecViewRow] = {
-    sql"""select "id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from pe.bec""".query(BecViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from pe.bec""".query(using BecViewRow.jdbcDecoder).selectStream()
   }
 }

@@ -18,6 +18,6 @@ class SthViewRepoImpl extends SthViewRepo {
     SelectBuilderSql("sa.sth", SthViewFields.structure, SthViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SthViewRow] = {
-    sql"""select "id", "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sa.sth""".query(SthViewRow.read).stream
+    sql"""select "id", "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sa.sth""".query(using SthViewRow.read).stream
   }
 }

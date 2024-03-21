@@ -37,7 +37,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
     sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
           values (${Segment.paramSegment(unsaved.workorderid)(WorkorderId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.orderqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.scrappedqty)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.duedate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.scrapreasonid)(Setter.optionParamSetter(ScrapreasonId.setter))}::int2, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
-       """.insertReturning(WorkorderRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using WorkorderRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""", batchSize, unsaved)(WorkorderRow.text)
@@ -70,7 +70,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.workorder($names) values ($values) returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text"""
     }
-    q.insertReturning(WorkorderRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using WorkorderRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -81,13 +81,13 @@ class WorkorderRepoImpl extends WorkorderRepo {
     SelectBuilderSql("production.workorder", WorkorderFields.structure, WorkorderRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, WorkorderRow] = {
-    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder""".query(WorkorderRow.jdbcDecoder).selectStream
+    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder""".query(using WorkorderRow.jdbcDecoder).selectStream()
   }
   override def selectById(workorderid: WorkorderId): ZIO[ZConnection, Throwable, Option[WorkorderRow]] = {
-    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ${Segment.paramSegment(workorderid)(WorkorderId.setter)}""".query(WorkorderRow.jdbcDecoder).selectOne
+    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ${Segment.paramSegment(workorderid)(WorkorderId.setter)}""".query(using WorkorderRow.jdbcDecoder).selectOne
   }
   override def selectByIds(workorderids: Array[WorkorderId]): ZStream[ZConnection, Throwable, WorkorderRow] = {
-    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ANY(${Segment.paramSegment(workorderids)(WorkorderId.arraySetter)})""".query(WorkorderRow.jdbcDecoder).selectStream
+    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ANY(${Segment.paramSegment(workorderids)(WorkorderId.arraySetter)})""".query(using WorkorderRow.jdbcDecoder).selectStream()
   }
   override def update(row: WorkorderRow): ZIO[ZConnection, Throwable, Boolean] = {
     val workorderid = row.workorderid
@@ -128,6 +128,6 @@ class WorkorderRepoImpl extends WorkorderRepo {
             "duedate" = EXCLUDED."duedate",
             "scrapreasonid" = EXCLUDED."scrapreasonid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text""".insertReturning(WorkorderRow.jdbcDecoder)
+          returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text""".insertReturning(using WorkorderRow.jdbcDecoder)
   }
 }

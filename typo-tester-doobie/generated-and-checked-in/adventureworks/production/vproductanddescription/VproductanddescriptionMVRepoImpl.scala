@@ -18,6 +18,6 @@ class VproductanddescriptionMVRepoImpl extends VproductanddescriptionMVRepo {
     SelectBuilderSql("production.vproductanddescription", VproductanddescriptionMVFields.structure, VproductanddescriptionMVRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VproductanddescriptionMVRow] = {
-    sql"""select "productid", "name", "productmodel", "cultureid", "description" from production.vproductanddescription""".query(VproductanddescriptionMVRow.read).stream
+    sql"""select "productid", "name", "productmodel", "cultureid", "description" from production.vproductanddescription""".query(using VproductanddescriptionMVRow.read).stream
   }
 }

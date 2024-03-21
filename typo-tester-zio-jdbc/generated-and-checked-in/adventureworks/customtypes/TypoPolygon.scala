@@ -30,7 +30,7 @@ object TypoPolygon {
     },
     "Array[org.postgresql.geometric.PGpolygon]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoPolygon]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoPolygon]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoPolygon]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -51,7 +51,7 @@ object TypoPolygon {
     },
     "org.postgresql.geometric.PGpolygon"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoPolygon] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoPolygon] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoPolygon] = JsonDecoder[List[TypoPoint]].map(TypoPolygon.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoPolygon] = JsonEncoder[List[TypoPoint]].contramap(_.points)
   implicit def ordering(implicit O0: Ordering[List[TypoPoint]]): Ordering[TypoPolygon] = Ordering.by(_.points)

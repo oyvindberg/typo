@@ -24,6 +24,6 @@ class UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
             )
             select row."firstname", row."modifieddate"::text
             from row"""
-    sql.query(UpdatePersonReturningSqlRow.jdbcDecoder).selectStream
+    sql.query(using UpdatePersonReturningSqlRow.jdbcDecoder).selectStream()
   }
 }

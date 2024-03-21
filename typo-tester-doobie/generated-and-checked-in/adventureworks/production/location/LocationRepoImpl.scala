@@ -34,10 +34,10 @@ class LocationRepoImpl extends LocationRepo {
     sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
           values (${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.costrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.availability)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "locationid", "name", "costrate", "availability", "modifieddate"::text
-       """.query(LocationRow.read).unique
+       """.query(using LocationRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(LocationRow.text)
+    new FragmentOps(sql"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using LocationRow.text)
   }
   override def insert(unsaved: LocationRowUnsaved): ConnectionIO[LocationRow] = {
     val fs = List(
@@ -71,24 +71,24 @@ class LocationRepoImpl extends LocationRepo {
             returning "locationid", "name", "costrate", "availability", "modifieddate"::text
          """
     }
-    q.query(LocationRow.read).unique
+    q.query(using LocationRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, LocationRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(LocationRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using LocationRowUnsaved.text)
   }
   override def select: SelectBuilder[LocationFields, LocationRow] = {
     SelectBuilderSql("production.location", LocationFields.structure, LocationRow.read)
   }
   override def selectAll: Stream[ConnectionIO, LocationRow] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location""".query(LocationRow.read).stream
+    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location""".query(using LocationRow.read).stream
   }
   override def selectById(locationid: LocationId): ConnectionIO[Option[LocationRow]] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".query(LocationRow.read).option
+    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".query(using LocationRow.read).option
   }
   override def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ANY(${locationids})""".query(LocationRow.read).stream
+    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ANY(${locationids})""".query(using LocationRow.read).stream
   }
   override def update(row: LocationRow): ConnectionIO[Boolean] = {
     val locationid = row.locationid
@@ -121,6 +121,6 @@ class LocationRepoImpl extends LocationRepo {
             "availability" = EXCLUDED."availability",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "locationid", "name", "costrate", "availability", "modifieddate"::text
-       """.query(LocationRow.read).unique
+       """.query(using LocationRow.read).unique
   }
 }

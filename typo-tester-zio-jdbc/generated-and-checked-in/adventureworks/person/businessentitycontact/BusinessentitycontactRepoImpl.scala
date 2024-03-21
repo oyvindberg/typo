@@ -36,7 +36,7 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
     sql"""insert into person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.personid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.contacttypeid)(ContacttypeId.setter)}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
-       """.insertReturning(BusinessentitycontactRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using BusinessentitycontactRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentitycontactRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(BusinessentitycontactRow.text)
@@ -65,7 +65,7 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into person.businessentitycontact($names) values ($values) returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(BusinessentitycontactRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using BusinessentitycontactRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -76,10 +76,10 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
     SelectBuilderSql("person.businessentitycontact", BusinessentitycontactFields.structure, BusinessentitycontactRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, BusinessentitycontactRow] = {
-    sql"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from person.businessentitycontact""".query(BusinessentitycontactRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from person.businessentitycontact""".query(using BusinessentitycontactRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: BusinessentitycontactId): ZIO[ZConnection, Throwable, Option[BusinessentitycontactRow]] = {
-    sql"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from person.businessentitycontact where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "personid" = ${Segment.paramSegment(compositeId.personid)(BusinessentityId.setter)} AND "contacttypeid" = ${Segment.paramSegment(compositeId.contacttypeid)(ContacttypeId.setter)}""".query(BusinessentitycontactRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from person.businessentitycontact where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "personid" = ${Segment.paramSegment(compositeId.personid)(BusinessentityId.setter)} AND "contacttypeid" = ${Segment.paramSegment(compositeId.contacttypeid)(ContacttypeId.setter)}""".query(using BusinessentitycontactRow.jdbcDecoder).selectOne
   }
   override def update(row: BusinessentitycontactRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -104,6 +104,6 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
           do update set
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text""".insertReturning(BusinessentitycontactRow.jdbcDecoder)
+          returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text""".insertReturning(using BusinessentitycontactRow.jdbcDecoder)
   }
 }

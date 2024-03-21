@@ -38,7 +38,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.locationid)(LocationId.setter)}::int2, ${Segment.paramSegment(unsaved.shelf)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.bin)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.quantity)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
-       """.insertReturning(ProductinventoryRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ProductinventoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductinventoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductinventoryRow.text)
@@ -72,7 +72,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.productinventory($names) values ($values) returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(ProductinventoryRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ProductinventoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -83,10 +83,10 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     SelectBuilderSql("production.productinventory", ProductinventoryFields.structure, ProductinventoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductinventoryRow] = {
-    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory""".query(ProductinventoryRow.jdbcDecoder).selectStream
+    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory""".query(using ProductinventoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: ProductinventoryId): ZIO[ZConnection, Throwable, Option[ProductinventoryRow]] = {
-    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(LocationId.setter)}""".query(ProductinventoryRow.jdbcDecoder).selectOne
+    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(LocationId.setter)}""".query(using ProductinventoryRow.jdbcDecoder).selectOne
   }
   override def update(row: ProductinventoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -119,6 +119,6 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
             "quantity" = EXCLUDED."quantity",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text""".insertReturning(ProductinventoryRow.jdbcDecoder)
+          returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text""".insertReturning(using ProductinventoryRow.jdbcDecoder)
   }
 }

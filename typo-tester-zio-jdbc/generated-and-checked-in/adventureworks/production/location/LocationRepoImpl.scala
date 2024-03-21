@@ -35,7 +35,7 @@ class LocationRepoImpl extends LocationRepo {
     sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
           values (${Segment.paramSegment(unsaved.locationid)(LocationId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.costrate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.availability)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "locationid", "name", "costrate", "availability", "modifieddate"::text
-       """.insertReturning(LocationRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using LocationRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""", batchSize, unsaved)(LocationRow.text)
@@ -70,7 +70,7 @@ class LocationRepoImpl extends LocationRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.location($names) values ($values) returning "locationid", "name", "costrate", "availability", "modifieddate"::text"""
     }
-    q.insertReturning(LocationRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using LocationRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -81,13 +81,13 @@ class LocationRepoImpl extends LocationRepo {
     SelectBuilderSql("production.location", LocationFields.structure, LocationRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, LocationRow] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location""".query(LocationRow.jdbcDecoder).selectStream
+    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location""".query(using LocationRow.jdbcDecoder).selectStream()
   }
   override def selectById(locationid: LocationId): ZIO[ZConnection, Throwable, Option[LocationRow]] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ${Segment.paramSegment(locationid)(LocationId.setter)}""".query(LocationRow.jdbcDecoder).selectOne
+    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ${Segment.paramSegment(locationid)(LocationId.setter)}""".query(using LocationRow.jdbcDecoder).selectOne
   }
   override def selectByIds(locationids: Array[LocationId]): ZStream[ZConnection, Throwable, LocationRow] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ANY(${Segment.paramSegment(locationids)(LocationId.arraySetter)})""".query(LocationRow.jdbcDecoder).selectStream
+    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ANY(${Segment.paramSegment(locationids)(LocationId.arraySetter)})""".query(using LocationRow.jdbcDecoder).selectStream()
   }
   override def update(row: LocationRow): ZIO[ZConnection, Throwable, Boolean] = {
     val locationid = row.locationid
@@ -116,6 +116,6 @@ class LocationRepoImpl extends LocationRepo {
             "costrate" = EXCLUDED."costrate",
             "availability" = EXCLUDED."availability",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "locationid", "name", "costrate", "availability", "modifieddate"::text""".insertReturning(LocationRow.jdbcDecoder)
+          returning "locationid", "name", "costrate", "availability", "modifieddate"::text""".insertReturning(using LocationRow.jdbcDecoder)
   }
 }

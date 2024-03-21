@@ -35,10 +35,10 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.phonenumber)(Write.fromPut(Phone.put))}::varchar, ${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
-       """.query(PersonphoneRow.read).unique
+       """.query(using PersonphoneRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PersonphoneRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(PersonphoneRow.text)
+    new FragmentOps(sql"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PersonphoneRow.text)
   }
   override def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow] = {
     val fs = List(
@@ -62,21 +62,21 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
             returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
          """
     }
-    q.query(PersonphoneRow.read).unique
+    q.query(using PersonphoneRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonphoneRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PersonphoneRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PersonphoneRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonphoneFields, PersonphoneRow] = {
     SelectBuilderSql("person.personphone", PersonphoneFields.structure, PersonphoneRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersonphoneRow] = {
-    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone""".query(PersonphoneRow.read).stream
+    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone""".query(using PersonphoneRow.read).stream
   }
   override def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]] = {
-    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".query(PersonphoneRow.read).option
+    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".query(using PersonphoneRow.read).option
   }
   override def update(row: PersonphoneRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -102,6 +102,6 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
           do update set
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
-       """.query(PersonphoneRow.read).unique
+       """.query(using PersonphoneRow.read).unique
   }
 }

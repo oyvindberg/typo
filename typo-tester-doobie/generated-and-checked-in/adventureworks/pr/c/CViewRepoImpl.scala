@@ -18,6 +18,6 @@ class CViewRepoImpl extends CViewRepo {
     SelectBuilderSql("pr.c", CViewFields.structure, CViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CViewRow] = {
-    sql"""select "id", "cultureid", "name", "modifieddate"::text from pr.c""".query(CViewRow.read).stream
+    sql"""select "id", "cultureid", "name", "modifieddate"::text from pr.c""".query(using CViewRow.read).stream
   }
 }

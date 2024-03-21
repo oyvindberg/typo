@@ -18,6 +18,6 @@ class DViewRepoImpl extends DViewRepo {
     SelectBuilderSql("hr.d", DViewFields.structure, DViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, DViewRow] = {
-    sql"""select "id", "departmentid", "name", "groupname", "modifieddate"::text from hr.d""".query(DViewRow.read).stream
+    sql"""select "id", "departmentid", "name", "groupname", "modifieddate"::text from hr.d""".query(using DViewRow.read).stream
   }
 }

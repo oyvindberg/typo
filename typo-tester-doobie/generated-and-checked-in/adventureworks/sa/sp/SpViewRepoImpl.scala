@@ -18,6 +18,6 @@ class SpViewRepoImpl extends SpViewRepo {
     SelectBuilderSql("sa.sp", SpViewFields.structure, SpViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SpViewRow] = {
-    sql"""select "id", "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text from sa.sp""".query(SpViewRow.read).stream
+    sql"""select "id", "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text from sa.sp""".query(using SpViewRow.read).stream
   }
 }

@@ -18,6 +18,6 @@ class EphViewRepoImpl extends EphViewRepo {
     SelectBuilderSql("hr.eph", EphViewFields.structure, EphViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, EphViewRow] = {
-    sql"""select "id", "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from hr.eph""".query(EphViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from hr.eph""".query(using EphViewRow.jdbcDecoder).selectStream()
   }
 }

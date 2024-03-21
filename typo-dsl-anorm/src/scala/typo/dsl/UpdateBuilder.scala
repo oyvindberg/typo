@@ -5,6 +5,7 @@ import typo.dsl.Fragment.FragmentStringInterpolator
 
 import java.sql.Connection
 import java.util.concurrent.atomic.AtomicInteger
+import scala.annotation.nowarn
 
 trait UpdateBuilder[Fields[_], Row] {
   protected def params: UpdateParams[Fields, Row]
@@ -57,7 +58,7 @@ object UpdateBuilder {
         },
         params.where
           .map(w => w(structure.fields))
-          .reduceLeftOption(_ and _)
+          .reduceLeftOption(_.and(_))
           .map { where => Fragment(" where ") ++ where.render(counter) },
         if (returning) {
           val cols = structure.columns
@@ -98,7 +99,7 @@ object UpdateBuilder {
     override def execute()(implicit c: Connection): Int =
       executeReturnChanged().size
 
-    override def executeReturnChanged()(implicit c: Connection): List[Row] = {
+    override def executeReturnChanged()(implicit @nowarn c: Connection): List[Row] = {
       val changed = List.newBuilder[Row]
       map.foreach { case (id, row) =>
         if (params.where.forall(w => w(fields).eval(row))) {

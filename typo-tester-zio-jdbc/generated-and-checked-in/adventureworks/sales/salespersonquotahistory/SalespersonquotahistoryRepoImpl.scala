@@ -36,7 +36,7 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     sql"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.quotadate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.salesquota)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
-       """.insertReturning(SalespersonquotahistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using SalespersonquotahistoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalespersonquotahistoryRow.text)
@@ -65,7 +65,7 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into sales.salespersonquotahistory($names) values ($values) returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(SalespersonquotahistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using SalespersonquotahistoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -76,10 +76,10 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     SelectBuilderSql("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow] = {
-    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory""".query(SalespersonquotahistoryRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory""".query(using SalespersonquotahistoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Option[SalespersonquotahistoryRow]] = {
-    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "quotadate" = ${Segment.paramSegment(compositeId.quotadate)(TypoLocalDateTime.setter)}""".query(SalespersonquotahistoryRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "quotadate" = ${Segment.paramSegment(compositeId.quotadate)(TypoLocalDateTime.setter)}""".query(using SalespersonquotahistoryRow.jdbcDecoder).selectOne
   }
   override def update(row: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -106,6 +106,6 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
             "salesquota" = EXCLUDED."salesquota",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text""".insertReturning(SalespersonquotahistoryRow.jdbcDecoder)
+          returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text""".insertReturning(using SalespersonquotahistoryRow.jdbcDecoder)
   }
 }

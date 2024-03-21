@@ -18,6 +18,6 @@ class SoViewRepoImpl extends SoViewRepo {
     SelectBuilderSql("sa.so", SoViewFields.structure, SoViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SoViewRow] = {
-    sql"""select "id", "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sa.so""".query(SoViewRow.read).stream
+    sql"""select "id", "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sa.so""".query(using SoViewRow.read).stream
   }
 }

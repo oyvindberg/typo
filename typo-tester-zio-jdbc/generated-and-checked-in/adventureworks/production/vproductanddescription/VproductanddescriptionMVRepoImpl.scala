@@ -18,6 +18,6 @@ class VproductanddescriptionMVRepoImpl extends VproductanddescriptionMVRepo {
     SelectBuilderSql("production.vproductanddescription", VproductanddescriptionMVFields.structure, VproductanddescriptionMVRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VproductanddescriptionMVRow] = {
-    sql"""select "productid", "name", "productmodel", "cultureid", "description" from production.vproductanddescription""".query(VproductanddescriptionMVRow.jdbcDecoder).selectStream
+    sql"""select "productid", "name", "productmodel", "cultureid", "description" from production.vproductanddescription""".query(using VproductanddescriptionMVRow.jdbcDecoder).selectStream()
   }
 }

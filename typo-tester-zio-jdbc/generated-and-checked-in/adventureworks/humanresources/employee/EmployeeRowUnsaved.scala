@@ -121,7 +121,7 @@ object EmployeeRowUnsaved {
     val currentflag = jsonObj.get("currentflag").toRight("Missing field 'currentflag'").flatMap(_.as(Defaulted.jsonDecoder(Flag.jsonDecoder)))
     val rowguid = jsonObj.get("rowguid").toRight("Missing field 'rowguid'").flatMap(_.as(Defaulted.jsonDecoder(TypoUUID.jsonDecoder)))
     val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(Defaulted.jsonDecoder(TypoLocalDateTime.jsonDecoder)))
-    val organizationnode = jsonObj.get("organizationnode").toRight("Missing field 'organizationnode'").flatMap(_.as(Defaulted.jsonDecoder(JsonDecoder.option(JsonDecoder.string))))
+    val organizationnode = jsonObj.get("organizationnode").toRight("Missing field 'organizationnode'").flatMap(_.as(Defaulted.jsonDecoder(JsonDecoder.option(using JsonDecoder.string))))
     if (businessentityid.isRight && nationalidnumber.isRight && loginid.isRight && jobtitle.isRight && birthdate.isRight && maritalstatus.isRight && gender.isRight && hiredate.isRight && salariedflag.isRight && vacationhours.isRight && sickleavehours.isRight && currentflag.isRight && rowguid.isRight && modifieddate.isRight && organizationnode.isRight)
       Right(EmployeeRowUnsaved(businessentityid = businessentityid.toOption.get, nationalidnumber = nationalidnumber.toOption.get, loginid = loginid.toOption.get, jobtitle = jobtitle.toOption.get, birthdate = birthdate.toOption.get, maritalstatus = maritalstatus.toOption.get, gender = gender.toOption.get, hiredate = hiredate.toOption.get, salariedflag = salariedflag.toOption.get, vacationhours = vacationhours.toOption.get, sickleavehours = sickleavehours.toOption.get, currentflag = currentflag.toOption.get, rowguid = rowguid.toOption.get, modifieddate = modifieddate.toOption.get, organizationnode = organizationnode.toOption.get))
     else Left(List[Either[String, Any]](businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode).flatMap(_.left.toOption).mkString(", "))
@@ -172,7 +172,7 @@ object EmployeeRowUnsaved {
       Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
       out.write(",")
       out.write(""""organizationnode":""")
-      Defaulted.jsonEncoder(JsonEncoder.option(JsonEncoder.string)).unsafeEncode(a.organizationnode, indent, out)
+      Defaulted.jsonEncoder(JsonEncoder.option(using JsonEncoder.string)).unsafeEncode(a.organizationnode, indent, out)
       out.write("}")
     }
   }

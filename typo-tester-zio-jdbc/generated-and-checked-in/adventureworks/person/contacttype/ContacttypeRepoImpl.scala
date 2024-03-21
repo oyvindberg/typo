@@ -34,7 +34,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
           values (${Segment.paramSegment(unsaved.contacttypeid)(ContacttypeId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "contacttypeid", "name", "modifieddate"::text
-       """.insertReturning(ContacttypeRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ContacttypeRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ContacttypeRow.text)
@@ -61,7 +61,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into person.contacttype($names) values ($values) returning "contacttypeid", "name", "modifieddate"::text"""
     }
-    q.insertReturning(ContacttypeRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ContacttypeRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -72,13 +72,13 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     SelectBuilderSql("person.contacttype", ContacttypeFields.structure, ContacttypeRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ContacttypeRow] = {
-    sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype""".query(ContacttypeRow.jdbcDecoder).selectStream
+    sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype""".query(using ContacttypeRow.jdbcDecoder).selectStream()
   }
   override def selectById(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Option[ContacttypeRow]] = {
-    sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype where "contacttypeid" = ${Segment.paramSegment(contacttypeid)(ContacttypeId.setter)}""".query(ContacttypeRow.jdbcDecoder).selectOne
+    sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype where "contacttypeid" = ${Segment.paramSegment(contacttypeid)(ContacttypeId.setter)}""".query(using ContacttypeRow.jdbcDecoder).selectOne
   }
   override def selectByIds(contacttypeids: Array[ContacttypeId]): ZStream[ZConnection, Throwable, ContacttypeRow] = {
-    sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype where "contacttypeid" = ANY(${Segment.paramSegment(contacttypeids)(ContacttypeId.arraySetter)})""".query(ContacttypeRow.jdbcDecoder).selectStream
+    sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype where "contacttypeid" = ANY(${Segment.paramSegment(contacttypeids)(ContacttypeId.arraySetter)})""".query(using ContacttypeRow.jdbcDecoder).selectStream()
   }
   override def update(row: ContacttypeRow): ZIO[ZConnection, Throwable, Boolean] = {
     val contacttypeid = row.contacttypeid
@@ -101,6 +101,6 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
           do update set
             "name" = EXCLUDED."name",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "contacttypeid", "name", "modifieddate"::text""".insertReturning(ContacttypeRow.jdbcDecoder)
+          returning "contacttypeid", "name", "modifieddate"::text""".insertReturning(using ContacttypeRow.jdbcDecoder)
   }
 }

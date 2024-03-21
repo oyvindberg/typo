@@ -34,7 +34,7 @@ object TypoHStore {
     },
     "java.util.Map[java.lang.String, java.lang.String]"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoHStore] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoHStore] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoHStore] = JsonDecoder[Map[String, String]].map(TypoHStore.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoHStore] = JsonEncoder[Map[String, String]].contramap(_.value)
   implicit def ordering(implicit O0: Ordering[Map[String, String]]): Ordering[TypoHStore] = Ordering.by(_.value)

@@ -18,6 +18,6 @@ class VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo 
     SelectBuilderSql("person.vadditionalcontactinfo", VadditionalcontactinfoViewFields.structure, VadditionalcontactinfoViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VadditionalcontactinfoViewRow] = {
-    sql"""select "businessentityid", "firstname", "middlename", "lastname", "telephonenumber", "telephonespecialinstructions", "street", "city", "stateprovince", "postalcode", "countryregion", "homeaddressspecialinstructions", "emailaddress", "emailspecialinstructions", "emailtelephonenumber", "rowguid", "modifieddate"::text from person.vadditionalcontactinfo""".query(VadditionalcontactinfoViewRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "firstname", "middlename", "lastname", "telephonenumber", "telephonespecialinstructions", "street", "city", "stateprovince", "postalcode", "countryregion", "homeaddressspecialinstructions", "emailaddress", "emailspecialinstructions", "emailtelephonenumber", "rowguid", "modifieddate"::text from person.vadditionalcontactinfo""".query(using VadditionalcontactinfoViewRow.jdbcDecoder).selectStream()
   }
 }

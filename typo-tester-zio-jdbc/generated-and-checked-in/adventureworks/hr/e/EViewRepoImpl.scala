@@ -18,6 +18,6 @@ class EViewRepoImpl extends EViewRepo {
     SelectBuilderSql("hr.e", EViewFields.structure, EViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, EViewRow] = {
-    sql"""select "id", "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode" from hr.e""".query(EViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode" from hr.e""".query(using EViewRow.jdbcDecoder).selectStream()
   }
 }

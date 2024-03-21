@@ -35,10 +35,10 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
     sql"""insert into person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.emailaddress)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
-       """.query(EmailaddressRow.read).unique
+       """.query(using EmailaddressRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, EmailaddressRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(EmailaddressRow.text)
+    new FragmentOps(sql"""COPY person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using EmailaddressRow.text)
   }
   override def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow] = {
     val fs = List(
@@ -69,21 +69,21 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
             returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
          """
     }
-    q.query(EmailaddressRow.read).unique
+    q.query(using EmailaddressRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmailaddressRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.emailaddress("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(EmailaddressRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.emailaddress("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using EmailaddressRowUnsaved.text)
   }
   override def select: SelectBuilder[EmailaddressFields, EmailaddressRow] = {
     SelectBuilderSql("person.emailaddress", EmailaddressFields.structure, EmailaddressRow.read)
   }
   override def selectAll: Stream[ConnectionIO, EmailaddressRow] = {
-    sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from person.emailaddress""".query(EmailaddressRow.read).stream
+    sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from person.emailaddress""".query(using EmailaddressRow.read).stream
   }
   override def selectById(compositeId: EmailaddressId): ConnectionIO[Option[EmailaddressRow]] = {
-    sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from person.emailaddress where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}""".query(EmailaddressRow.read).option
+    sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from person.emailaddress where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}""".query(using EmailaddressRow.read).option
   }
   override def update(row: EmailaddressRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -114,6 +114,6 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
-       """.query(EmailaddressRow.read).unique
+       """.query(using EmailaddressRow.read).unique
   }
 }

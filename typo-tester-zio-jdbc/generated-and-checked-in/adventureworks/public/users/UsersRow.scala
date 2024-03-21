@@ -45,11 +45,11 @@ object UsersRow {
   implicit lazy val jsonDecoder: JsonDecoder[UsersRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val userId = jsonObj.get("user_id").toRight("Missing field 'user_id'").flatMap(_.as(UsersId.jsonDecoder))
     val name = jsonObj.get("name").toRight("Missing field 'name'").flatMap(_.as(JsonDecoder.string))
-    val lastName = jsonObj.get("last_name").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val lastName = jsonObj.get("last_name").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
     val email = jsonObj.get("email").toRight("Missing field 'email'").flatMap(_.as(TypoUnknownCitext.jsonDecoder))
     val password = jsonObj.get("password").toRight("Missing field 'password'").flatMap(_.as(JsonDecoder.string))
     val createdAt = jsonObj.get("created_at").toRight("Missing field 'created_at'").flatMap(_.as(TypoInstant.jsonDecoder))
-    val verifiedOn = jsonObj.get("verified_on").fold[Either[String, Option[TypoInstant]]](Right(None))(_.as(JsonDecoder.option(TypoInstant.jsonDecoder)))
+    val verifiedOn = jsonObj.get("verified_on").fold[Either[String, Option[TypoInstant]]](Right(None))(_.as(JsonDecoder.option(using TypoInstant.jsonDecoder)))
     if (userId.isRight && name.isRight && lastName.isRight && email.isRight && password.isRight && createdAt.isRight && verifiedOn.isRight)
       Right(UsersRow(userId = userId.toOption.get, name = name.toOption.get, lastName = lastName.toOption.get, email = email.toOption.get, password = password.toOption.get, createdAt = createdAt.toOption.get, verifiedOn = verifiedOn.toOption.get))
     else Left(List[Either[String, Any]](userId, name, lastName, email, password, createdAt, verifiedOn).flatMap(_.left.toOption).mkString(", "))
@@ -64,7 +64,7 @@ object UsersRow {
       JsonEncoder.string.unsafeEncode(a.name, indent, out)
       out.write(",")
       out.write(""""last_name":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.lastName, indent, out)
+      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.lastName, indent, out)
       out.write(",")
       out.write(""""email":""")
       TypoUnknownCitext.jsonEncoder.unsafeEncode(a.email, indent, out)
@@ -76,7 +76,7 @@ object UsersRow {
       TypoInstant.jsonEncoder.unsafeEncode(a.createdAt, indent, out)
       out.write(",")
       out.write(""""verified_on":""")
-      JsonEncoder.option(TypoInstant.jsonEncoder).unsafeEncode(a.verifiedOn, indent, out)
+      JsonEncoder.option(using TypoInstant.jsonEncoder).unsafeEncode(a.verifiedOn, indent, out)
       out.write("}")
     }
   }

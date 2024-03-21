@@ -33,10 +33,10 @@ class CultureRepoImpl extends CultureRepo {
     sql"""insert into production.culture("cultureid", "name", "modifieddate")
           values (${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "cultureid", "name", "modifieddate"::text
-       """.query(CultureRow.read).unique
+       """.query(using CultureRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, CultureRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CultureRow.text)
+    new FragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CultureRow.text)
   }
   override def insert(unsaved: CultureRowUnsaved): ConnectionIO[CultureRow] = {
     val fs = List(
@@ -59,24 +59,24 @@ class CultureRepoImpl extends CultureRepo {
             returning "cultureid", "name", "modifieddate"::text
          """
     }
-    q.query(CultureRow.read).unique
+    q.query(using CultureRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CultureRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CultureRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using CultureRowUnsaved.text)
   }
   override def select: SelectBuilder[CultureFields, CultureRow] = {
     SelectBuilderSql("production.culture", CultureFields.structure, CultureRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CultureRow] = {
-    sql"""select "cultureid", "name", "modifieddate"::text from production.culture""".query(CultureRow.read).stream
+    sql"""select "cultureid", "name", "modifieddate"::text from production.culture""".query(using CultureRow.read).stream
   }
   override def selectById(cultureid: CultureId): ConnectionIO[Option[CultureRow]] = {
-    sql"""select "cultureid", "name", "modifieddate"::text from production.culture where "cultureid" = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}""".query(CultureRow.read).option
+    sql"""select "cultureid", "name", "modifieddate"::text from production.culture where "cultureid" = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}""".query(using CultureRow.read).option
   }
   override def selectByIds(cultureids: Array[CultureId]): Stream[ConnectionIO, CultureRow] = {
-    sql"""select "cultureid", "name", "modifieddate"::text from production.culture where "cultureid" = ANY(${cultureids})""".query(CultureRow.read).stream
+    sql"""select "cultureid", "name", "modifieddate"::text from production.culture where "cultureid" = ANY(${cultureids})""".query(using CultureRow.read).stream
   }
   override def update(row: CultureRow): ConnectionIO[Boolean] = {
     val cultureid = row.cultureid
@@ -103,6 +103,6 @@ class CultureRepoImpl extends CultureRepo {
             "name" = EXCLUDED."name",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "cultureid", "name", "modifieddate"::text
-       """.query(CultureRow.read).unique
+       """.query(using CultureRow.read).unique
   }
 }

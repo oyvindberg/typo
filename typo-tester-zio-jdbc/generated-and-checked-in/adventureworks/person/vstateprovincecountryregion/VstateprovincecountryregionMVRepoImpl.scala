@@ -18,6 +18,6 @@ class VstateprovincecountryregionMVRepoImpl extends VstateprovincecountryregionM
     SelectBuilderSql("person.vstateprovincecountryregion", VstateprovincecountryregionMVFields.structure, VstateprovincecountryregionMVRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VstateprovincecountryregionMVRow] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "isonlystateprovinceflag", "stateprovincename", "territoryid", "countryregioncode", "countryregionname" from person.vstateprovincecountryregion""".query(VstateprovincecountryregionMVRow.jdbcDecoder).selectStream
+    sql"""select "stateprovinceid", "stateprovincecode", "isonlystateprovinceflag", "stateprovincename", "territoryid", "countryregioncode", "countryregionname" from person.vstateprovincecountryregion""".query(using VstateprovincecountryregionMVRow.jdbcDecoder).selectStream()
   }
 }

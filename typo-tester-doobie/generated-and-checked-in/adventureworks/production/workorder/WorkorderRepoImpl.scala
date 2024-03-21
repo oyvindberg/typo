@@ -36,10 +36,10 @@ class WorkorderRepoImpl extends WorkorderRepo {
     sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
           values (${fromWrite(unsaved.workorderid)(Write.fromPut(WorkorderId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.scrappedqty)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.scrapreasonid)(Write.fromPutOption(ScrapreasonId.put))}::int2, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
-       """.query(WorkorderRow.read).unique
+       """.query(using WorkorderRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(WorkorderRow.text)
+    new FragmentOps(sql"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using WorkorderRow.text)
   }
   override def insert(unsaved: WorkorderRowUnsaved): ConnectionIO[WorkorderRow] = {
     val fs = List(
@@ -71,24 +71,24 @@ class WorkorderRepoImpl extends WorkorderRepo {
             returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
          """
     }
-    q.query(WorkorderRow.read).unique
+    q.query(using WorkorderRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, WorkorderRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.workorder("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(WorkorderRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.workorder("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using WorkorderRowUnsaved.text)
   }
   override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
     SelectBuilderSql("production.workorder", WorkorderFields.structure, WorkorderRow.read)
   }
   override def selectAll: Stream[ConnectionIO, WorkorderRow] = {
-    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder""".query(WorkorderRow.read).stream
+    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder""".query(using WorkorderRow.read).stream
   }
   override def selectById(workorderid: WorkorderId): ConnectionIO[Option[WorkorderRow]] = {
-    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ${fromWrite(workorderid)(Write.fromPut(WorkorderId.put))}""".query(WorkorderRow.read).option
+    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ${fromWrite(workorderid)(Write.fromPut(WorkorderId.put))}""".query(using WorkorderRow.read).option
   }
   override def selectByIds(workorderids: Array[WorkorderId]): Stream[ConnectionIO, WorkorderRow] = {
-    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ANY(${workorderids})""".query(WorkorderRow.read).stream
+    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ANY(${workorderids})""".query(using WorkorderRow.read).stream
   }
   override def update(row: WorkorderRow): ConnectionIO[Boolean] = {
     val workorderid = row.workorderid
@@ -133,6 +133,6 @@ class WorkorderRepoImpl extends WorkorderRepo {
             "scrapreasonid" = EXCLUDED."scrapreasonid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
-       """.query(WorkorderRow.read).unique
+       """.query(using WorkorderRow.read).unique
   }
 }

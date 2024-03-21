@@ -18,6 +18,6 @@ class CtViewRepoImpl extends CtViewRepo {
     SelectBuilderSql("pe.ct", CtViewFields.structure, CtViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CtViewRow] = {
-    sql"""select "id", "contacttypeid", "name", "modifieddate"::text from pe.ct""".query(CtViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "contacttypeid", "name", "modifieddate"::text from pe.ct""".query(using CtViewRow.jdbcDecoder).selectStream()
   }
 }

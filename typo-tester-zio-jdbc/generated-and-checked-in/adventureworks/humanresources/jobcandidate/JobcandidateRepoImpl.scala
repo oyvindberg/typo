@@ -36,7 +36,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
           values (${Segment.paramSegment(unsaved.jobcandidateid)(JobcandidateId.setter)}::int4, ${Segment.paramSegment(unsaved.businessentityid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4, ${Segment.paramSegment(unsaved.resume)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
-       """.insertReturning(JobcandidateRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using JobcandidateRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, JobcandidateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate") FROM STDIN""", batchSize, unsaved)(JobcandidateRow.text)
@@ -64,7 +64,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into humanresources.jobcandidate($names) values ($values) returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text"""
     }
-    q.insertReturning(JobcandidateRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using JobcandidateRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -75,13 +75,13 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, JobcandidateRow] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate""".query(JobcandidateRow.jdbcDecoder).selectStream
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate""".query(using JobcandidateRow.jdbcDecoder).selectStream()
   }
   override def selectById(jobcandidateid: JobcandidateId): ZIO[ZConnection, Throwable, Option[JobcandidateRow]] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".query(JobcandidateRow.jdbcDecoder).selectOne
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".query(using JobcandidateRow.jdbcDecoder).selectOne
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): ZStream[ZConnection, Throwable, JobcandidateRow] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ANY(${Segment.paramSegment(jobcandidateids)(JobcandidateId.arraySetter)})""".query(JobcandidateRow.jdbcDecoder).selectStream
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ANY(${Segment.paramSegment(jobcandidateids)(JobcandidateId.arraySetter)})""".query(using JobcandidateRow.jdbcDecoder).selectStream()
   }
   override def update(row: JobcandidateRow): ZIO[ZConnection, Throwable, Boolean] = {
     val jobcandidateid = row.jobcandidateid
@@ -107,6 +107,6 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
             "businessentityid" = EXCLUDED."businessentityid",
             "resume" = EXCLUDED."resume",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text""".insertReturning(JobcandidateRow.jdbcDecoder)
+          returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text""".insertReturning(using JobcandidateRow.jdbcDecoder)
   }
 }

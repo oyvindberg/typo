@@ -49,7 +49,7 @@ object ProductlistpricehistoryRowUnsaved {
   implicit lazy val jsonDecoder: JsonDecoder[ProductlistpricehistoryRowUnsaved] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val productid = jsonObj.get("productid").toRight("Missing field 'productid'").flatMap(_.as(ProductId.jsonDecoder))
     val startdate = jsonObj.get("startdate").toRight("Missing field 'startdate'").flatMap(_.as(TypoLocalDateTime.jsonDecoder))
-    val enddate = jsonObj.get("enddate").fold[Either[String, Option[TypoLocalDateTime]]](Right(None))(_.as(JsonDecoder.option(TypoLocalDateTime.jsonDecoder)))
+    val enddate = jsonObj.get("enddate").fold[Either[String, Option[TypoLocalDateTime]]](Right(None))(_.as(JsonDecoder.option(using TypoLocalDateTime.jsonDecoder)))
     val listprice = jsonObj.get("listprice").toRight("Missing field 'listprice'").flatMap(_.as(JsonDecoder.scalaBigDecimal))
     val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(Defaulted.jsonDecoder(TypoLocalDateTime.jsonDecoder)))
     if (productid.isRight && startdate.isRight && enddate.isRight && listprice.isRight && modifieddate.isRight)
@@ -66,7 +66,7 @@ object ProductlistpricehistoryRowUnsaved {
       TypoLocalDateTime.jsonEncoder.unsafeEncode(a.startdate, indent, out)
       out.write(",")
       out.write(""""enddate":""")
-      JsonEncoder.option(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.enddate, indent, out)
+      JsonEncoder.option(using TypoLocalDateTime.jsonEncoder).unsafeEncode(a.enddate, indent, out)
       out.write(",")
       out.write(""""listprice":""")
       JsonEncoder.scalaBigDecimal.unsafeEncode(a.listprice, indent, out)

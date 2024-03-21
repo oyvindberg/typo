@@ -29,9 +29,9 @@ object TypoBytea {
     },
     "Array[scala.Byte]"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoBytea] = JdbcEncoder.singleParamEncoder(setter)
-  implicit lazy val jsonDecoder: JsonDecoder[TypoBytea] = JsonDecoder.array[Byte](JsonDecoder.byte, implicitly).map(TypoBytea.apply)
-  implicit lazy val jsonEncoder: JsonEncoder[TypoBytea] = JsonEncoder.array[Byte](JsonEncoder.byte, implicitly).contramap(_.value)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoBytea] = JdbcEncoder.singleParamEncoder(using setter)
+  implicit lazy val jsonDecoder: JsonDecoder[TypoBytea] = JsonDecoder.array[Byte](using JsonDecoder.byte, implicitly).map(TypoBytea.apply)
+  implicit lazy val jsonEncoder: JsonEncoder[TypoBytea] = JsonEncoder.array[Byte](using JsonEncoder.byte, implicitly).contramap(_.value)
   implicit def ordering(implicit O0: Ordering[Array[Byte]]): Ordering[TypoBytea] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[TypoBytea] = ParameterMetaData.instance[TypoBytea]("bytea", Types.OTHER)
   implicit lazy val setter: Setter[TypoBytea] = Setter.other(

@@ -30,7 +30,7 @@ object TypoInterval {
     },
     "Array[org.postgresql.util.PGInterval]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoInterval]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoInterval]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoInterval]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -50,7 +50,7 @@ object TypoInterval {
     },
     "org.postgresql.util.PGInterval"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoInterval] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoInterval] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoInterval] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val years = jsonObj.get("years").toRight("Missing field 'years'").flatMap(_.as(JsonDecoder.int))
     val months = jsonObj.get("months").toRight("Missing field 'months'").flatMap(_.as(JsonDecoder.int))

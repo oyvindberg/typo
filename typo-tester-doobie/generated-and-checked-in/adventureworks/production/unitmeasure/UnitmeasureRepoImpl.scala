@@ -33,10 +33,10 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
     sql"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
           values (${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "unitmeasurecode", "name", "modifieddate"::text
-       """.query(UnitmeasureRow.read).unique
+       """.query(using UnitmeasureRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(UnitmeasureRow.text)
+    new FragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using UnitmeasureRow.text)
   }
   override def insert(unsaved: UnitmeasureRowUnsaved): ConnectionIO[UnitmeasureRow] = {
     val fs = List(
@@ -59,24 +59,24 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
             returning "unitmeasurecode", "name", "modifieddate"::text
          """
     }
-    q.query(UnitmeasureRow.read).unique
+    q.query(using UnitmeasureRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(UnitmeasureRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using UnitmeasureRowUnsaved.text)
   }
   override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
     SelectBuilderSql("production.unitmeasure", UnitmeasureFields.structure, UnitmeasureRow.read)
   }
   override def selectAll: Stream[ConnectionIO, UnitmeasureRow] = {
-    sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure""".query(UnitmeasureRow.read).stream
+    sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure""".query(using UnitmeasureRow.read).stream
   }
   override def selectById(unitmeasurecode: UnitmeasureId): ConnectionIO[Option[UnitmeasureRow]] = {
-    sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure where "unitmeasurecode" = ${fromWrite(unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}""".query(UnitmeasureRow.read).option
+    sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure where "unitmeasurecode" = ${fromWrite(unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}""".query(using UnitmeasureRow.read).option
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): Stream[ConnectionIO, UnitmeasureRow] = {
-    sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure where "unitmeasurecode" = ANY(${unitmeasurecodes})""".query(UnitmeasureRow.read).stream
+    sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure where "unitmeasurecode" = ANY(${unitmeasurecodes})""".query(using UnitmeasureRow.read).stream
   }
   override def update(row: UnitmeasureRow): ConnectionIO[Boolean] = {
     val unitmeasurecode = row.unitmeasurecode
@@ -103,6 +103,6 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
             "name" = EXCLUDED."name",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "unitmeasurecode", "name", "modifieddate"::text
-       """.query(UnitmeasureRow.read).unique
+       """.query(using UnitmeasureRow.read).unique
   }
 }

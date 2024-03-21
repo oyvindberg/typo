@@ -34,22 +34,22 @@ class FootballClubRepoImpl extends FootballClubRepo {
     sql"""insert into myschema.football_club("id", "name")
           values (${fromWrite(unsaved.id)(Write.fromPut(FootballClubId.put))}::int8, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))})
           returning "id", "name"
-       """.query(FootballClubRow.read).unique
+       """.query(using FootballClubRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY myschema.football_club("id", "name") FROM STDIN""").copyIn(unsaved, batchSize)(FootballClubRow.text)
+    new FragmentOps(sql"""COPY myschema.football_club("id", "name") FROM STDIN""").copyIn(unsaved, batchSize)(using FootballClubRow.text)
   }
   override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
     SelectBuilderSql("myschema.football_club", FootballClubFields.structure, FootballClubRow.read)
   }
   override def selectAll: Stream[ConnectionIO, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club""".query(FootballClubRow.read).stream
+    sql"""select "id", "name" from myschema.football_club""".query(using FootballClubRow.read).stream
   }
   override def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".query(FootballClubRow.read).option
+    sql"""select "id", "name" from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".query(using FootballClubRow.read).option
   }
   override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${ids})""".query(FootballClubRow.read).stream
+    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${ids})""".query(using FootballClubRow.read).stream
   }
   override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): Stream[ConnectionIO, FootballClubRow] = {
     val where = fragments.whereAndOpt(
@@ -58,7 +58,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
         case FootballClubFieldValue.name(value) => fr""""name" = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"""
       }
     )
-    sql"""select "id", "name" from myschema.football_club $where""".query(FootballClubRow.read).stream
+    sql"""select "id", "name" from myschema.football_club $where""".query(using FootballClubRow.read).stream
   }
   override def update(row: FootballClubRow): ConnectionIO[Boolean] = {
     val id = row.id
@@ -96,6 +96,6 @@ class FootballClubRepoImpl extends FootballClubRepo {
           do update set
             "name" = EXCLUDED."name"
           returning "id", "name"
-       """.query(FootballClubRow.read).unique
+       """.query(using FootballClubRow.read).unique
   }
 }

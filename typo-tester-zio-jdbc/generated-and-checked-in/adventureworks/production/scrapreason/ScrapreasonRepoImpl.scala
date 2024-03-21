@@ -34,7 +34,7 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
     sql"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
           values (${Segment.paramSegment(unsaved.scrapreasonid)(ScrapreasonId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "scrapreasonid", "name", "modifieddate"::text
-       """.insertReturning(ScrapreasonRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ScrapreasonRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ScrapreasonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.scrapreason("scrapreasonid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ScrapreasonRow.text)
@@ -61,7 +61,7 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.scrapreason($names) values ($values) returning "scrapreasonid", "name", "modifieddate"::text"""
     }
-    q.insertReturning(ScrapreasonRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ScrapreasonRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -72,13 +72,13 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
     SelectBuilderSql("production.scrapreason", ScrapreasonFields.structure, ScrapreasonRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ScrapreasonRow] = {
-    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason""".query(ScrapreasonRow.jdbcDecoder).selectStream
+    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason""".query(using ScrapreasonRow.jdbcDecoder).selectStream()
   }
   override def selectById(scrapreasonid: ScrapreasonId): ZIO[ZConnection, Throwable, Option[ScrapreasonRow]] = {
-    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason where "scrapreasonid" = ${Segment.paramSegment(scrapreasonid)(ScrapreasonId.setter)}""".query(ScrapreasonRow.jdbcDecoder).selectOne
+    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason where "scrapreasonid" = ${Segment.paramSegment(scrapreasonid)(ScrapreasonId.setter)}""".query(using ScrapreasonRow.jdbcDecoder).selectOne
   }
   override def selectByIds(scrapreasonids: Array[ScrapreasonId]): ZStream[ZConnection, Throwable, ScrapreasonRow] = {
-    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason where "scrapreasonid" = ANY(${Segment.paramSegment(scrapreasonids)(ScrapreasonId.arraySetter)})""".query(ScrapreasonRow.jdbcDecoder).selectStream
+    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason where "scrapreasonid" = ANY(${Segment.paramSegment(scrapreasonids)(ScrapreasonId.arraySetter)})""".query(using ScrapreasonRow.jdbcDecoder).selectStream()
   }
   override def update(row: ScrapreasonRow): ZIO[ZConnection, Throwable, Boolean] = {
     val scrapreasonid = row.scrapreasonid
@@ -101,6 +101,6 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
           do update set
             "name" = EXCLUDED."name",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "scrapreasonid", "name", "modifieddate"::text""".insertReturning(ScrapreasonRow.jdbcDecoder)
+          returning "scrapreasonid", "name", "modifieddate"::text""".insertReturning(using ScrapreasonRow.jdbcDecoder)
   }
 }

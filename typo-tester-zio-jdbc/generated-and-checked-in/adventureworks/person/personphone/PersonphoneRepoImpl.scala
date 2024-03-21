@@ -36,7 +36,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.phonenumber)(Phone.setter)}::varchar, ${Segment.paramSegment(unsaved.phonenumbertypeid)(PhonenumbertypeId.setter)}::int4, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
-       """.insertReturning(PersonphoneRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using PersonphoneRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonphoneRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersonphoneRow.text)
@@ -61,7 +61,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into person.personphone($names) values ($values) returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text"""
     }
-    q.insertReturning(PersonphoneRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using PersonphoneRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -72,10 +72,10 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     SelectBuilderSql("person.personphone", PersonphoneFields.structure, PersonphoneRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PersonphoneRow] = {
-    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone""".query(PersonphoneRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone""".query(using PersonphoneRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: PersonphoneId): ZIO[ZConnection, Throwable, Option[PersonphoneRow]] = {
-    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Phone.setter)} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(PhonenumbertypeId.setter)}""".query(PersonphoneRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Phone.setter)} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(PhonenumbertypeId.setter)}""".query(using PersonphoneRow.jdbcDecoder).selectOne
   }
   override def update(row: PersonphoneRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -97,6 +97,6 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
           on conflict ("businessentityid", "phonenumber", "phonenumbertypeid")
           do update set
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text""".insertReturning(PersonphoneRow.jdbcDecoder)
+          returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text""".insertReturning(using PersonphoneRow.jdbcDecoder)
   }
 }

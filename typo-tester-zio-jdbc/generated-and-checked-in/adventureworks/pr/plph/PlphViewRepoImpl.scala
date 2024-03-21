@@ -18,6 +18,6 @@ class PlphViewRepoImpl extends PlphViewRepo {
     SelectBuilderSql("pr.plph", PlphViewFields.structure, PlphViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PlphViewRow] = {
-    sql"""select "id", "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text from pr.plph""".query(PlphViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text from pr.plph""".query(using PlphViewRow.jdbcDecoder).selectStream()
   }
 }

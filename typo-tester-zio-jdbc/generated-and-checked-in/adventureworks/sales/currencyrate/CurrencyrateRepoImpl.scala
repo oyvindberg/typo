@@ -35,7 +35,7 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
     sql"""insert into sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")
           values (${Segment.paramSegment(unsaved.currencyrateid)(CurrencyrateId.setter)}::int4, ${Segment.paramSegment(unsaved.currencyratedate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.fromcurrencycode)(CurrencyId.setter)}::bpchar, ${Segment.paramSegment(unsaved.tocurrencycode)(CurrencyId.setter)}::bpchar, ${Segment.paramSegment(unsaved.averagerate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.endofdayrate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
-       """.insertReturning(CurrencyrateRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using CurrencyrateRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyrateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate") FROM STDIN""", batchSize, unsaved)(CurrencyrateRow.text)
@@ -66,7 +66,7 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into sales.currencyrate($names) values ($values) returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text"""
     }
-    q.insertReturning(CurrencyrateRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using CurrencyrateRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -77,13 +77,13 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
     SelectBuilderSql("sales.currencyrate", CurrencyrateFields.structure, CurrencyrateRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CurrencyrateRow] = {
-    sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from sales.currencyrate""".query(CurrencyrateRow.jdbcDecoder).selectStream
+    sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from sales.currencyrate""".query(using CurrencyrateRow.jdbcDecoder).selectStream()
   }
   override def selectById(currencyrateid: CurrencyrateId): ZIO[ZConnection, Throwable, Option[CurrencyrateRow]] = {
-    sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from sales.currencyrate where "currencyrateid" = ${Segment.paramSegment(currencyrateid)(CurrencyrateId.setter)}""".query(CurrencyrateRow.jdbcDecoder).selectOne
+    sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from sales.currencyrate where "currencyrateid" = ${Segment.paramSegment(currencyrateid)(CurrencyrateId.setter)}""".query(using CurrencyrateRow.jdbcDecoder).selectOne
   }
   override def selectByIds(currencyrateids: Array[CurrencyrateId]): ZStream[ZConnection, Throwable, CurrencyrateRow] = {
-    sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from sales.currencyrate where "currencyrateid" = ANY(${Segment.paramSegment(currencyrateids)(CurrencyrateId.arraySetter)})""".query(CurrencyrateRow.jdbcDecoder).selectStream
+    sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from sales.currencyrate where "currencyrateid" = ANY(${Segment.paramSegment(currencyrateids)(CurrencyrateId.arraySetter)})""".query(using CurrencyrateRow.jdbcDecoder).selectStream()
   }
   override def update(row: CurrencyrateRow): ZIO[ZConnection, Throwable, Boolean] = {
     val currencyrateid = row.currencyrateid
@@ -118,6 +118,6 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
             "averagerate" = EXCLUDED."averagerate",
             "endofdayrate" = EXCLUDED."endofdayrate",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text""".insertReturning(CurrencyrateRow.jdbcDecoder)
+          returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text""".insertReturning(using CurrencyrateRow.jdbcDecoder)
   }
 }

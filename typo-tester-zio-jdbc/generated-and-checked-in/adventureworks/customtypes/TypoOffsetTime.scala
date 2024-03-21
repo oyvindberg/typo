@@ -37,7 +37,7 @@ object TypoOffsetTime {
     },
     "Array[java.lang.String]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoOffsetTime]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoOffsetTime]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoOffsetTime]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -58,7 +58,7 @@ object TypoOffsetTime {
     },
     "java.lang.String"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoOffsetTime] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoOffsetTime] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoOffsetTime] = JsonDecoder.offsetTime.map(TypoOffsetTime.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoOffsetTime] = JsonEncoder.offsetTime.contramap(_.value)
   implicit def ordering(implicit O0: Ordering[OffsetTime]): Ordering[TypoOffsetTime] = Ordering.by(_.value)

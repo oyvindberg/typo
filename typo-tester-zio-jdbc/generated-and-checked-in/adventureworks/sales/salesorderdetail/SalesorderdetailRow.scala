@@ -74,7 +74,7 @@ object SalesorderdetailRow {
   implicit lazy val jsonDecoder: JsonDecoder[SalesorderdetailRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val salesorderid = jsonObj.get("salesorderid").toRight("Missing field 'salesorderid'").flatMap(_.as(SalesorderheaderId.jsonDecoder))
     val salesorderdetailid = jsonObj.get("salesorderdetailid").toRight("Missing field 'salesorderdetailid'").flatMap(_.as(JsonDecoder.int))
-    val carriertrackingnumber = jsonObj.get("carriertrackingnumber").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val carriertrackingnumber = jsonObj.get("carriertrackingnumber").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
     val orderqty = jsonObj.get("orderqty").toRight("Missing field 'orderqty'").flatMap(_.as(TypoShort.jsonDecoder))
     val productid = jsonObj.get("productid").toRight("Missing field 'productid'").flatMap(_.as(ProductId.jsonDecoder))
     val specialofferid = jsonObj.get("specialofferid").toRight("Missing field 'specialofferid'").flatMap(_.as(SpecialofferId.jsonDecoder))
@@ -96,7 +96,7 @@ object SalesorderdetailRow {
       JsonEncoder.int.unsafeEncode(a.salesorderdetailid, indent, out)
       out.write(",")
       out.write(""""carriertrackingnumber":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.carriertrackingnumber, indent, out)
+      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.carriertrackingnumber, indent, out)
       out.write(",")
       out.write(""""orderqty":""")
       TypoShort.jsonEncoder.unsafeEncode(a.orderqty, indent, out)

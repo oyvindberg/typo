@@ -33,11 +33,11 @@ object TypoVector {
     override def sqlType: String = "vector"
     override def jdbcType: Int = Types.OTHER
   }
-  implicit lazy val reads: Reads[TypoVector] = Reads.ArrayReads[Float](Reads.FloatReads, implicitly).map(TypoVector.apply)
+  implicit lazy val reads: Reads[TypoVector] = Reads.ArrayReads[Float](using Reads.FloatReads, implicitly).map(TypoVector.apply)
   implicit lazy val text: Text[TypoVector] = new Text[TypoVector] {
     override def unsafeEncode(v: TypoVector, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.mkString("[", ",", "]"), sb)
     override def unsafeArrayEncode(v: TypoVector, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value.mkString("[", ",", "]"), sb)
   }
   implicit lazy val toStatement: ToStatement[TypoVector] = ToStatement[TypoVector]((s, index, v) => s.setObject(index, v.value.map(x => x: java.lang.Float)))
-  implicit lazy val writes: Writes[TypoVector] = Writes.arrayWrites[Float](implicitly, Writes.FloatWrites).contramap(_.value)
+  implicit lazy val writes: Writes[TypoVector] = Writes.arrayWrites[Float](using implicitly, Writes.FloatWrites).contramap(_.value)
 }

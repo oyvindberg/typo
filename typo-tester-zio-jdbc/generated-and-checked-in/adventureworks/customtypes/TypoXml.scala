@@ -30,7 +30,7 @@ object TypoXml {
     },
     "Array[java.lang.String]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoXml]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoXml]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoXml]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -56,7 +56,7 @@ object TypoXml {
     },
     "java.lang.String"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoXml] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoXml] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoXml] = JsonDecoder.string.map(TypoXml.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoXml] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoXml] = Ordering.by(_.value)

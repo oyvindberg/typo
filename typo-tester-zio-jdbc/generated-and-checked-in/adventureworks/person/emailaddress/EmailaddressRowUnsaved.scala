@@ -53,7 +53,7 @@ case class EmailaddressRowUnsaved(
 object EmailaddressRowUnsaved {
   implicit lazy val jsonDecoder: JsonDecoder[EmailaddressRowUnsaved] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val businessentityid = jsonObj.get("businessentityid").toRight("Missing field 'businessentityid'").flatMap(_.as(BusinessentityId.jsonDecoder))
-    val emailaddress = jsonObj.get("emailaddress").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val emailaddress = jsonObj.get("emailaddress").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
     val emailaddressid = jsonObj.get("emailaddressid").toRight("Missing field 'emailaddressid'").flatMap(_.as(Defaulted.jsonDecoder(JsonDecoder.int)))
     val rowguid = jsonObj.get("rowguid").toRight("Missing field 'rowguid'").flatMap(_.as(Defaulted.jsonDecoder(TypoUUID.jsonDecoder)))
     val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(Defaulted.jsonDecoder(TypoLocalDateTime.jsonDecoder)))
@@ -68,7 +68,7 @@ object EmailaddressRowUnsaved {
       BusinessentityId.jsonEncoder.unsafeEncode(a.businessentityid, indent, out)
       out.write(",")
       out.write(""""emailaddress":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.emailaddress, indent, out)
+      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.emailaddress, indent, out)
       out.write(",")
       out.write(""""emailaddressid":""")
       Defaulted.jsonEncoder(JsonEncoder.int).unsafeEncode(a.emailaddressid, indent, out)

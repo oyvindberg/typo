@@ -39,7 +39,7 @@ object Myenum {
   val ByName: Map[String, Myenum] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[Myenum]] = adventureworks.StringArrayDecoder.map(a => if (a == null) null else a.map(force))
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[Myenum]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[Myenum]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[Myenum]] = adventureworks.StringArraySetter.contramap(_.map(_.value))
   implicit lazy val jdbcDecoder: JdbcDecoder[Myenum] = JdbcDecoder.stringDecoder.flatMap { s =>
     new JdbcDecoder[Myenum] {

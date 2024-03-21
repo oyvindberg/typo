@@ -18,6 +18,6 @@ class PpViewRepoImpl extends PpViewRepo {
     SelectBuilderSql("pe.pp", PpViewFields.structure, PpViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PpViewRow] = {
-    sql"""select "id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from pe.pp""".query(PpViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from pe.pp""".query(using PpViewRow.jdbcDecoder).selectStream()
   }
 }

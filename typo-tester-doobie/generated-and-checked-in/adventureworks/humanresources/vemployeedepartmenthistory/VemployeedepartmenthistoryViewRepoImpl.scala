@@ -18,6 +18,6 @@ class VemployeedepartmenthistoryViewRepoImpl extends VemployeedepartmenthistoryV
     SelectBuilderSql("humanresources.vemployeedepartmenthistory", VemployeedepartmenthistoryViewFields.structure, VemployeedepartmenthistoryViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VemployeedepartmenthistoryViewRow] = {
-    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "shift", "department", "groupname", "startdate"::text, "enddate"::text from humanresources.vemployeedepartmenthistory""".query(VemployeedepartmenthistoryViewRow.read).stream
+    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "shift", "department", "groupname", "startdate"::text, "enddate"::text from humanresources.vemployeedepartmenthistory""".query(using VemployeedepartmenthistoryViewRow.read).stream
   }
 }

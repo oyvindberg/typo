@@ -18,6 +18,6 @@ class StViewRepoImpl extends StViewRepo {
     SelectBuilderSql("sa.st", StViewFields.structure, StViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, StViewRow] = {
-    sql"""select "id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sa.st""".query(StViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sa.st""".query(using StViewRow.jdbcDecoder).selectStream()
   }
 }

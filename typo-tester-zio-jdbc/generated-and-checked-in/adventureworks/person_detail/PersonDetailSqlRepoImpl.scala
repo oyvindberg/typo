@@ -33,6 +33,6 @@ class PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
                      LEFT JOIN person.address a ON a.addressid = bea.addressid
             where s.businessentityid = ${Segment.paramSegment(businessentityid)(/* user-picked */ BusinessentityId.setter)}::int4
               and p.modifieddate > ${Segment.paramSegment(modifiedAfter)(TypoLocalDateTime.setter)}::timestamp"""
-    sql.query(PersonDetailSqlRow.jdbcDecoder).selectStream
+    sql.query(using PersonDetailSqlRow.jdbcDecoder).selectStream()
   }
 }

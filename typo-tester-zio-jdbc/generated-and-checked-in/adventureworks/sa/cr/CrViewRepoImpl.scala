@@ -18,6 +18,6 @@ class CrViewRepoImpl extends CrViewRepo {
     SelectBuilderSql("sa.cr", CrViewFields.structure, CrViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CrViewRow] = {
-    sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from sa.cr""".query(CrViewRow.jdbcDecoder).selectStream
+    sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from sa.cr""".query(using CrViewRow.jdbcDecoder).selectStream()
   }
 }

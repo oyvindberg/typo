@@ -34,10 +34,10 @@ class ShiftRepoImpl extends ShiftRepo {
     sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
           values (${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.starttime)(Write.fromPut(TypoLocalTime.put))}::time, ${fromWrite(unsaved.endtime)(Write.fromPut(TypoLocalTime.put))}::time, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
-       """.query(ShiftRow.read).unique
+       """.query(using ShiftRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ShiftRow.text)
+    new FragmentOps(sql"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ShiftRow.text)
   }
   override def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = {
     val fs = List(
@@ -65,24 +65,24 @@ class ShiftRepoImpl extends ShiftRepo {
             returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
          """
     }
-    q.query(ShiftRow.read).unique
+    q.query(using ShiftRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShiftRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.shift("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ShiftRowUnsaved.text)
+    new FragmentOps(sql"""COPY humanresources.shift("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ShiftRowUnsaved.text)
   }
   override def select: SelectBuilder[ShiftFields, ShiftRow] = {
     SelectBuilderSql("humanresources.shift", ShiftFields.structure, ShiftRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ShiftRow] = {
-    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift""".query(ShiftRow.read).stream
+    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift""".query(using ShiftRow.read).stream
   }
   override def selectById(shiftid: ShiftId): ConnectionIO[Option[ShiftRow]] = {
-    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}""".query(ShiftRow.read).option
+    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}""".query(using ShiftRow.read).option
   }
   override def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow] = {
-    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ANY(${shiftids})""".query(ShiftRow.read).stream
+    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ANY(${shiftids})""".query(using ShiftRow.read).stream
   }
   override def update(row: ShiftRow): ConnectionIO[Boolean] = {
     val shiftid = row.shiftid
@@ -115,6 +115,6 @@ class ShiftRepoImpl extends ShiftRepo {
             "endtime" = EXCLUDED."endtime",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
-       """.query(ShiftRow.read).unique
+       """.query(using ShiftRow.read).unique
   }
 }

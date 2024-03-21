@@ -35,10 +35,10 @@ class CustomerRepoImpl extends CustomerRepo {
     sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.customerid)(Write.fromPut(CustomerId.put))}::int4, ${fromWrite(unsaved.personid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.storeid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
-       """.query(CustomerRow.read).unique
+       """.query(using CustomerRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, CustomerRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CustomerRow.text)
+    new FragmentOps(sql"""COPY sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CustomerRow.text)
   }
   override def insert(unsaved: CustomerRowUnsaved): ConnectionIO[CustomerRow] = {
     val fs = List(
@@ -70,24 +70,24 @@ class CustomerRepoImpl extends CustomerRepo {
             returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
          """
     }
-    q.query(CustomerRow.read).unique
+    q.query(using CustomerRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CustomerRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.customer("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CustomerRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.customer("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using CustomerRowUnsaved.text)
   }
   override def select: SelectBuilder[CustomerFields, CustomerRow] = {
     SelectBuilderSql("sales.customer", CustomerFields.structure, CustomerRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CustomerRow] = {
-    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer""".query(CustomerRow.read).stream
+    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer""".query(using CustomerRow.read).stream
   }
   override def selectById(customerid: CustomerId): ConnectionIO[Option[CustomerRow]] = {
-    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}""".query(CustomerRow.read).option
+    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}""".query(using CustomerRow.read).option
   }
   override def selectByIds(customerids: Array[CustomerId]): Stream[ConnectionIO, CustomerRow] = {
-    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ANY(${customerids})""".query(CustomerRow.read).stream
+    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ANY(${customerids})""".query(using CustomerRow.read).stream
   }
   override def update(row: CustomerRow): ConnectionIO[Boolean] = {
     val customerid = row.customerid
@@ -123,6 +123,6 @@ class CustomerRepoImpl extends CustomerRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
-       """.query(CustomerRow.read).unique
+       """.query(using CustomerRow.read).unique
   }
 }

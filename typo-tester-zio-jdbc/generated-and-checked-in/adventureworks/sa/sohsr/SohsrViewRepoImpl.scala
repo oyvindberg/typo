@@ -18,6 +18,6 @@ class SohsrViewRepoImpl extends SohsrViewRepo {
     SelectBuilderSql("sa.sohsr", SohsrViewFields.structure, SohsrViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SohsrViewRow] = {
-    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sa.sohsr""".query(SohsrViewRow.jdbcDecoder).selectStream
+    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sa.sohsr""".query(using SohsrViewRow.jdbcDecoder).selectStream()
   }
 }

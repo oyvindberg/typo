@@ -103,7 +103,7 @@ object EmployeeRow {
     val currentflag = jsonObj.get("currentflag").toRight("Missing field 'currentflag'").flatMap(_.as(Flag.jsonDecoder))
     val rowguid = jsonObj.get("rowguid").toRight("Missing field 'rowguid'").flatMap(_.as(TypoUUID.jsonDecoder))
     val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(TypoLocalDateTime.jsonDecoder))
-    val organizationnode = jsonObj.get("organizationnode").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val organizationnode = jsonObj.get("organizationnode").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
     if (businessentityid.isRight && nationalidnumber.isRight && loginid.isRight && jobtitle.isRight && birthdate.isRight && maritalstatus.isRight && gender.isRight && hiredate.isRight && salariedflag.isRight && vacationhours.isRight && sickleavehours.isRight && currentflag.isRight && rowguid.isRight && modifieddate.isRight && organizationnode.isRight)
       Right(EmployeeRow(businessentityid = businessentityid.toOption.get, nationalidnumber = nationalidnumber.toOption.get, loginid = loginid.toOption.get, jobtitle = jobtitle.toOption.get, birthdate = birthdate.toOption.get, maritalstatus = maritalstatus.toOption.get, gender = gender.toOption.get, hiredate = hiredate.toOption.get, salariedflag = salariedflag.toOption.get, vacationhours = vacationhours.toOption.get, sickleavehours = sickleavehours.toOption.get, currentflag = currentflag.toOption.get, rowguid = rowguid.toOption.get, modifieddate = modifieddate.toOption.get, organizationnode = organizationnode.toOption.get))
     else Left(List[Either[String, Any]](businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode).flatMap(_.left.toOption).mkString(", "))
@@ -154,7 +154,7 @@ object EmployeeRow {
       TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)
       out.write(",")
       out.write(""""organizationnode":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.organizationnode, indent, out)
+      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.organizationnode, indent, out)
       out.write("}")
     }
   }

@@ -35,10 +35,10 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     sql"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.quotadate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.salesquota)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
-       """.query(SalespersonquotahistoryRow.read).unique
+       """.query(using SalespersonquotahistoryRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SalespersonquotahistoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalespersonquotahistoryRow.text)
+    new FragmentOps(sql"""COPY sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalespersonquotahistoryRow.text)
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved): ConnectionIO[SalespersonquotahistoryRow] = {
     val fs = List(
@@ -66,21 +66,21 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
             returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
          """
     }
-    q.query(SalespersonquotahistoryRow.read).unique
+    q.query(using SalespersonquotahistoryRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalespersonquotahistoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalespersonquotahistoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalespersonquotahistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
     SelectBuilderSql("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SalespersonquotahistoryRow] = {
-    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory""".query(SalespersonquotahistoryRow.read).stream
+    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory""".query(using SalespersonquotahistoryRow.read).stream
   }
   override def selectById(compositeId: SalespersonquotahistoryId): ConnectionIO[Option[SalespersonquotahistoryRow]] = {
-    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(Write.fromPut(TypoLocalDateTime.put))}""".query(SalespersonquotahistoryRow.read).option
+    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(Write.fromPut(TypoLocalDateTime.put))}""".query(using SalespersonquotahistoryRow.read).option
   }
   override def update(row: SalespersonquotahistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -111,6 +111,6 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
-       """.query(SalespersonquotahistoryRow.read).unique
+       """.query(using SalespersonquotahistoryRow.read).unique
   }
 }

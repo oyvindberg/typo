@@ -39,10 +39,10 @@ class PersonRepoImpl extends PersonRepo {
     sql"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.persontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.namestyle)(Write.fromPut(NameStyle.put))}::bool, ${fromWrite(unsaved.title)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.firstname)(Write.fromPut(/* user-picked */ FirstName.put))}::varchar, ${fromWrite(unsaved.middlename)(Write.fromPutOption(Name.put))}::varchar, ${fromWrite(unsaved.lastname)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.suffix)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.emailpromotion)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.additionalcontactinfo)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
-       """.query(PersonRow.read).unique
+       """.query(using PersonRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(PersonRow.text)
+    new FragmentOps(sql"""COPY person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PersonRow.text)
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
@@ -84,24 +84,24 @@ class PersonRepoImpl extends PersonRepo {
             returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
          """
     }
-    q.query(PersonRow.read).unique
+    q.query(using PersonRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.person("businessentityid", "persontype", "title", "firstname", "middlename", "lastname", "suffix", "additionalcontactinfo", "demographics", "namestyle", "emailpromotion", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PersonRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.person("businessentityid", "persontype", "title", "firstname", "middlename", "lastname", "suffix", "additionalcontactinfo", "demographics", "namestyle", "emailpromotion", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PersonRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
     SelectBuilderSql("person.person", PersonFields.structure, PersonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
-    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person""".query(PersonRow.read).stream
+    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person""".query(using PersonRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PersonRow]] = {
-    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(PersonRow.read).option
+    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using PersonRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PersonRow] = {
-    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person where "businessentityid" = ANY(${businessentityids})""".query(PersonRow.read).stream
+    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person where "businessentityid" = ANY(${businessentityids})""".query(using PersonRow.read).stream
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -158,6 +158,6 @@ class PersonRepoImpl extends PersonRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
-       """.query(PersonRow.read).unique
+       """.query(using PersonRow.read).unique
   }
 }

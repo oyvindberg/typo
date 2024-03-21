@@ -33,10 +33,10 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
     sql"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
           values (${fromWrite(unsaved.salesreasonid)(Write.fromPut(SalesreasonId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.reasontype)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "salesreasonid", "name", "reasontype", "modifieddate"::text
-       """.query(SalesreasonRow.read).unique
+       """.query(using SalesreasonRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SalesreasonRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalesreasonRow.text)
+    new FragmentOps(sql"""COPY sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalesreasonRow.text)
   }
   override def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow] = {
     val fs = List(
@@ -63,24 +63,24 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
             returning "salesreasonid", "name", "reasontype", "modifieddate"::text
          """
     }
-    q.query(SalesreasonRow.read).unique
+    q.query(using SalesreasonRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesreasonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salesreason("name", "reasontype", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesreasonRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.salesreason("name", "reasontype", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalesreasonRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesreasonFields, SalesreasonRow] = {
     SelectBuilderSql("sales.salesreason", SalesreasonFields.structure, SalesreasonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SalesreasonRow] = {
-    sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from sales.salesreason""".query(SalesreasonRow.read).stream
+    sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from sales.salesreason""".query(using SalesreasonRow.read).stream
   }
   override def selectById(salesreasonid: SalesreasonId): ConnectionIO[Option[SalesreasonRow]] = {
-    sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from sales.salesreason where "salesreasonid" = ${fromWrite(salesreasonid)(Write.fromPut(SalesreasonId.put))}""".query(SalesreasonRow.read).option
+    sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from sales.salesreason where "salesreasonid" = ${fromWrite(salesreasonid)(Write.fromPut(SalesreasonId.put))}""".query(using SalesreasonRow.read).option
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId]): Stream[ConnectionIO, SalesreasonRow] = {
-    sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from sales.salesreason where "salesreasonid" = ANY(${salesreasonids})""".query(SalesreasonRow.read).stream
+    sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from sales.salesreason where "salesreasonid" = ANY(${salesreasonids})""".query(using SalesreasonRow.read).stream
   }
   override def update(row: SalesreasonRow): ConnectionIO[Boolean] = {
     val salesreasonid = row.salesreasonid
@@ -110,6 +110,6 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
             "reasontype" = EXCLUDED."reasontype",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "salesreasonid", "name", "reasontype", "modifieddate"::text
-       """.query(SalesreasonRow.read).unique
+       """.query(using SalesreasonRow.read).unique
   }
 }

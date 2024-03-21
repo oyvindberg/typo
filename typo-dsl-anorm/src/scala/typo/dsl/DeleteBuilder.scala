@@ -38,7 +38,7 @@ object DeleteBuilder {
         Some(frag"delete from ${Fragment(name)}"),
         params.where
           .map(w => w(structure.fields))
-          .reduceLeftOption(_ and _)
+          .reduceLeftOption(_.and(_))
           .map { where => Fragment(" where ") ++ where.render(counter) }
       ).flatten.reduce(_ ++ _)
     }
@@ -64,7 +64,7 @@ object DeleteBuilder {
     override def sql: Option[Fragment] =
       None
 
-    override def execute()(implicit c: Connection): Int = {
+    override def execute()(implicit @nowarn c: Connection): Int = {
       var changed = 0
       map.foreach { case (id, row) =>
         if (params.where.forall(w => w(fields).eval(row))) {

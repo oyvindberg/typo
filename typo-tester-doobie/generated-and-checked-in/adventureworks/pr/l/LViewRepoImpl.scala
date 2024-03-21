@@ -18,6 +18,6 @@ class LViewRepoImpl extends LViewRepo {
     SelectBuilderSql("pr.l", LViewFields.structure, LViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, LViewRow] = {
-    sql"""select "id", "locationid", "name", "costrate", "availability", "modifieddate"::text from pr.l""".query(LViewRow.read).stream
+    sql"""select "id", "locationid", "name", "costrate", "availability", "modifieddate"::text from pr.l""".query(using LViewRow.read).stream
   }
 }

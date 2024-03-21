@@ -36,7 +36,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     sql"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
           values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.productphotoid)(ProductphotoId.setter)}::int4, ${Segment.paramSegment(unsaved.primary)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productid", "productphotoid", "primary", "modifieddate"::text
-       """.insertReturning(ProductproductphotoRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ProductproductphotoRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductproductphotoRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductproductphotoRow.text)
@@ -64,7 +64,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.productproductphoto($names) values ($values) returning "productid", "productphotoid", "primary", "modifieddate"::text"""
     }
-    q.insertReturning(ProductproductphotoRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ProductproductphotoRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -75,10 +75,10 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     SelectBuilderSql("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductproductphotoRow] = {
-    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto""".query(ProductproductphotoRow.jdbcDecoder).selectStream
+    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto""".query(using ProductproductphotoRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: ProductproductphotoId): ZIO[ZConnection, Throwable, Option[ProductproductphotoRow]] = {
-    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "productphotoid" = ${Segment.paramSegment(compositeId.productphotoid)(ProductphotoId.setter)}""".query(ProductproductphotoRow.jdbcDecoder).selectOne
+    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "productphotoid" = ${Segment.paramSegment(compositeId.productphotoid)(ProductphotoId.setter)}""".query(using ProductproductphotoRow.jdbcDecoder).selectOne
   }
   override def update(row: ProductproductphotoRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -102,6 +102,6 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
           do update set
             "primary" = EXCLUDED."primary",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "productid", "productphotoid", "primary", "modifieddate"::text""".insertReturning(ProductproductphotoRow.jdbcDecoder)
+          returning "productid", "productphotoid", "primary", "modifieddate"::text""".insertReturning(using ProductproductphotoRow.jdbcDecoder)
   }
 }

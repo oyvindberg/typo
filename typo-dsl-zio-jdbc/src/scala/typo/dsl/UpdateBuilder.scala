@@ -80,7 +80,7 @@ object UpdateBuilder {
       mkSql(new AtomicInteger(0), returning = false).update
 
     override def executeReturnChanged: ZIO[ZConnection, Throwable, Chunk[Row]] = {
-      mkSql(new AtomicInteger(0), returning = true).query[Row](decoder).selectAll
+      mkSql(new AtomicInteger(0), returning = true).query[Row](using decoder).selectAll
     }
   }
   final case class UpdateBuilderMock[Id, Fields[_], Row](

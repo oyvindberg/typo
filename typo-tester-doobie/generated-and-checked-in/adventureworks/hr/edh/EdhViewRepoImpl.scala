@@ -18,6 +18,6 @@ class EdhViewRepoImpl extends EdhViewRepo {
     SelectBuilderSql("hr.edh", EdhViewFields.structure, EdhViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, EdhViewRow] = {
-    sql"""select "id", "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from hr.edh""".query(EdhViewRow.read).stream
+    sql"""select "id", "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from hr.edh""".query(using EdhViewRow.read).stream
   }
 }

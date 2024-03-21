@@ -18,6 +18,6 @@ class SciViewRepoImpl extends SciViewRepo {
     SelectBuilderSql("sa.sci", SciViewFields.structure, SciViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SciViewRow] = {
-    sql"""select "id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sa.sci""".query(SciViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sa.sci""".query(using SciViewRow.jdbcDecoder).selectStream()
   }
 }

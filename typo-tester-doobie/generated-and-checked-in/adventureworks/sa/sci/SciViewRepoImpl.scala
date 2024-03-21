@@ -18,6 +18,6 @@ class SciViewRepoImpl extends SciViewRepo {
     SelectBuilderSql("sa.sci", SciViewFields.structure, SciViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SciViewRow] = {
-    sql"""select "id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sa.sci""".query(SciViewRow.read).stream
+    sql"""select "id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sa.sci""".query(using SciViewRow.read).stream
   }
 }

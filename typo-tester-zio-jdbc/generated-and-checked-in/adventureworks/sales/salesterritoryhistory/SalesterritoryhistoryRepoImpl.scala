@@ -37,7 +37,7 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     sql"""insert into sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.territoryid)(SalesterritoryId.setter)}::int4, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
-       """.insertReturning(SalesterritoryhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using SalesterritoryhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesterritoryhistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesterritoryhistoryRow.text)
@@ -67,7 +67,7 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into sales.salesterritoryhistory($names) values ($values) returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(SalesterritoryhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using SalesterritoryhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -78,10 +78,10 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     SelectBuilderSql("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure, SalesterritoryhistoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalesterritoryhistoryRow] = {
-    sql"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sales.salesterritoryhistory""".query(SalesterritoryhistoryRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sales.salesterritoryhistory""".query(using SalesterritoryhistoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: SalesterritoryhistoryId): ZIO[ZConnection, Throwable, Option[SalesterritoryhistoryRow]] = {
-    sql"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sales.salesterritoryhistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)} AND "territoryid" = ${Segment.paramSegment(compositeId.territoryid)(SalesterritoryId.setter)}""".query(SalesterritoryhistoryRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sales.salesterritoryhistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)} AND "territoryid" = ${Segment.paramSegment(compositeId.territoryid)(SalesterritoryId.setter)}""".query(using SalesterritoryhistoryRow.jdbcDecoder).selectOne
   }
   override def update(row: SalesterritoryhistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -109,6 +109,6 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
             "enddate" = EXCLUDED."enddate",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text""".insertReturning(SalesterritoryhistoryRow.jdbcDecoder)
+          returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text""".insertReturning(using SalesterritoryhistoryRow.jdbcDecoder)
   }
 }

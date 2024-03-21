@@ -18,6 +18,6 @@ class PchViewRepoImpl extends PchViewRepo {
     SelectBuilderSql("pr.pch", PchViewFields.structure, PchViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PchViewRow] = {
-    sql"""select "id", "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from pr.pch""".query(PchViewRow.read).stream
+    sql"""select "id", "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from pr.pch""".query(using PchViewRow.read).stream
   }
 }

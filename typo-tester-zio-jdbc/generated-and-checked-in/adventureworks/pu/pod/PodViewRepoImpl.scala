@@ -18,6 +18,6 @@ class PodViewRepoImpl extends PodViewRepo {
     SelectBuilderSql("pu.pod", PodViewFields.structure, PodViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PodViewRow] = {
-    sql"""select "id", "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from pu.pod""".query(PodViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from pu.pod""".query(using PodViewRow.jdbcDecoder).selectStream()
   }
 }

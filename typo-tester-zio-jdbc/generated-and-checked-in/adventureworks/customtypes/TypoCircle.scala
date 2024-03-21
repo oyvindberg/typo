@@ -30,7 +30,7 @@ object TypoCircle {
     },
     "Array[org.postgresql.geometric.PGcircle]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoCircle]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoCircle]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoCircle]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -50,7 +50,7 @@ object TypoCircle {
     },
     "org.postgresql.geometric.PGcircle"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoCircle] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoCircle] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoCircle] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val center = jsonObj.get("center").toRight("Missing field 'center'").flatMap(_.as(TypoPoint.jsonDecoder))
     val radius = jsonObj.get("radius").toRight("Missing field 'radius'").flatMap(_.as(JsonDecoder.double))

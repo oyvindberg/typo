@@ -34,7 +34,7 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     sql"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
           values (${Segment.paramSegment(unsaved.phonenumbertypeid)(PhonenumbertypeId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "phonenumbertypeid", "name", "modifieddate"::text
-       """.insertReturning(PhonenumbertypeRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using PhonenumbertypeRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PhonenumbertypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY person.phonenumbertype("phonenumbertypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(PhonenumbertypeRow.text)
@@ -61,7 +61,7 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into person.phonenumbertype($names) values ($values) returning "phonenumbertypeid", "name", "modifieddate"::text"""
     }
-    q.insertReturning(PhonenumbertypeRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using PhonenumbertypeRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -72,13 +72,13 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PhonenumbertypeRow] = {
-    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype""".query(PhonenumbertypeRow.jdbcDecoder).selectStream
+    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype""".query(using PhonenumbertypeRow.jdbcDecoder).selectStream()
   }
   override def selectById(phonenumbertypeid: PhonenumbertypeId): ZIO[ZConnection, Throwable, Option[PhonenumbertypeRow]] = {
-    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype where "phonenumbertypeid" = ${Segment.paramSegment(phonenumbertypeid)(PhonenumbertypeId.setter)}""".query(PhonenumbertypeRow.jdbcDecoder).selectOne
+    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype where "phonenumbertypeid" = ${Segment.paramSegment(phonenumbertypeid)(PhonenumbertypeId.setter)}""".query(using PhonenumbertypeRow.jdbcDecoder).selectOne
   }
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId]): ZStream[ZConnection, Throwable, PhonenumbertypeRow] = {
-    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype where "phonenumbertypeid" = ANY(${Segment.paramSegment(phonenumbertypeids)(PhonenumbertypeId.arraySetter)})""".query(PhonenumbertypeRow.jdbcDecoder).selectStream
+    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype where "phonenumbertypeid" = ANY(${Segment.paramSegment(phonenumbertypeids)(PhonenumbertypeId.arraySetter)})""".query(using PhonenumbertypeRow.jdbcDecoder).selectStream()
   }
   override def update(row: PhonenumbertypeRow): ZIO[ZConnection, Throwable, Boolean] = {
     val phonenumbertypeid = row.phonenumbertypeid
@@ -101,6 +101,6 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
           do update set
             "name" = EXCLUDED."name",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "phonenumbertypeid", "name", "modifieddate"::text""".insertReturning(PhonenumbertypeRow.jdbcDecoder)
+          returning "phonenumbertypeid", "name", "modifieddate"::text""".insertReturning(using PhonenumbertypeRow.jdbcDecoder)
   }
 }

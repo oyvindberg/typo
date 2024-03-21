@@ -38,7 +38,7 @@ class StoreRepoImpl extends StoreRepo {
     sql"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.salespersonid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4, ${Segment.paramSegment(unsaved.demographics)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
-       """.insertReturning(StoreRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using StoreRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, StoreRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StoreRow.text)
@@ -68,7 +68,7 @@ class StoreRepoImpl extends StoreRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into sales.store($names) values ($values) returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(StoreRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using StoreRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -79,13 +79,13 @@ class StoreRepoImpl extends StoreRepo {
     SelectBuilderSql("sales.store", StoreFields.structure, StoreRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, StoreRow] = {
-    sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store""".query(StoreRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store""".query(using StoreRow.jdbcDecoder).selectStream()
   }
   override def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[StoreRow]] = {
-    sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".query(StoreRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".query(using StoreRow.jdbcDecoder).selectOne
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, StoreRow] = {
-    sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(StoreRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(using StoreRow.jdbcDecoder).selectStream()
   }
   override def update(row: StoreRow): ZIO[ZConnection, Throwable, Boolean] = {
     val businessentityid = row.businessentityid
@@ -117,6 +117,6 @@ class StoreRepoImpl extends StoreRepo {
             "demographics" = EXCLUDED."demographics",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text""".insertReturning(StoreRow.jdbcDecoder)
+          returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text""".insertReturning(using StoreRow.jdbcDecoder)
   }
 }

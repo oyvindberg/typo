@@ -33,10 +33,10 @@ class CurrencyRepoImpl extends CurrencyRepo {
     sql"""insert into sales.currency("currencycode", "name", "modifieddate")
           values (${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "currencycode", "name", "modifieddate"::text
-       """.query(CurrencyRow.read).unique
+       """.query(using CurrencyRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, CurrencyRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CurrencyRow.text)
+    new FragmentOps(sql"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CurrencyRow.text)
   }
   override def insert(unsaved: CurrencyRowUnsaved): ConnectionIO[CurrencyRow] = {
     val fs = List(
@@ -59,24 +59,24 @@ class CurrencyRepoImpl extends CurrencyRepo {
             returning "currencycode", "name", "modifieddate"::text
          """
     }
-    q.query(CurrencyRow.read).unique
+    q.query(using CurrencyRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CurrencyRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CurrencyRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using CurrencyRowUnsaved.text)
   }
   override def select: SelectBuilder[CurrencyFields, CurrencyRow] = {
     SelectBuilderSql("sales.currency", CurrencyFields.structure, CurrencyRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CurrencyRow] = {
-    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency""".query(CurrencyRow.read).stream
+    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency""".query(using CurrencyRow.read).stream
   }
   override def selectById(currencycode: CurrencyId): ConnectionIO[Option[CurrencyRow]] = {
-    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}""".query(CurrencyRow.read).option
+    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}""".query(using CurrencyRow.read).option
   }
   override def selectByIds(currencycodes: Array[CurrencyId]): Stream[ConnectionIO, CurrencyRow] = {
-    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ANY(${currencycodes})""".query(CurrencyRow.read).stream
+    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ANY(${currencycodes})""".query(using CurrencyRow.read).stream
   }
   override def update(row: CurrencyRow): ConnectionIO[Boolean] = {
     val currencycode = row.currencycode
@@ -103,6 +103,6 @@ class CurrencyRepoImpl extends CurrencyRepo {
             "name" = EXCLUDED."name",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "currencycode", "name", "modifieddate"::text
-       """.query(CurrencyRow.read).unique
+       """.query(using CurrencyRow.read).unique
   }
 }

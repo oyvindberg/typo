@@ -20,6 +20,6 @@ class PersonDynamicSqlRepoImpl extends PersonDynamicSqlRepo {
             FROM person.person p
             WHERE ${fromWrite(firstName)(Write.fromPutOption(Meta.StringMeta.put))}::text IS NULL OR p.firstname = ${fromWrite(firstName)(Write.fromPutOption(Meta.StringMeta.put))}
       """
-    sql.query(PersonDynamicSqlRow.read).stream
+    sql.query(using PersonDynamicSqlRow.read).stream
   }
 }

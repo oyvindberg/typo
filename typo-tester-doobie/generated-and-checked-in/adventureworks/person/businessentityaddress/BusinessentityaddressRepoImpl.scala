@@ -36,10 +36,10 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     sql"""insert into person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.addressid)(Write.fromPut(AddressId.put))}::int4, ${fromWrite(unsaved.addresstypeid)(Write.fromPut(AddresstypeId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
-       """.query(BusinessentityaddressRow.read).unique
+       """.query(using BusinessentityaddressRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentityaddressRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(BusinessentityaddressRow.text)
+    new FragmentOps(sql"""COPY person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using BusinessentityaddressRow.text)
   }
   override def insert(unsaved: BusinessentityaddressRowUnsaved): ConnectionIO[BusinessentityaddressRow] = {
     val fs = List(
@@ -67,21 +67,21 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
             returning "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
          """
     }
-    q.query(BusinessentityaddressRow.read).unique
+    q.query(using BusinessentityaddressRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BusinessentityaddressRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(BusinessentityaddressRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using BusinessentityaddressRowUnsaved.text)
   }
   override def select: SelectBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
     SelectBuilderSql("person.businessentityaddress", BusinessentityaddressFields.structure, BusinessentityaddressRow.read)
   }
   override def selectAll: Stream[ConnectionIO, BusinessentityaddressRow] = {
-    sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from person.businessentityaddress""".query(BusinessentityaddressRow.read).stream
+    sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from person.businessentityaddress""".query(using BusinessentityaddressRow.read).stream
   }
   override def selectById(compositeId: BusinessentityaddressId): ConnectionIO[Option[BusinessentityaddressRow]] = {
-    sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from person.businessentityaddress where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "addressid" = ${fromWrite(compositeId.addressid)(Write.fromPut(AddressId.put))} AND "addresstypeid" = ${fromWrite(compositeId.addresstypeid)(Write.fromPut(AddresstypeId.put))}""".query(BusinessentityaddressRow.read).option
+    sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from person.businessentityaddress where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "addressid" = ${fromWrite(compositeId.addressid)(Write.fromPut(AddressId.put))} AND "addresstypeid" = ${fromWrite(compositeId.addresstypeid)(Write.fromPut(AddresstypeId.put))}""".query(using BusinessentityaddressRow.read).option
   }
   override def update(row: BusinessentityaddressRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -110,6 +110,6 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
-       """.query(BusinessentityaddressRow.read).unique
+       """.query(using BusinessentityaddressRow.read).unique
   }
 }

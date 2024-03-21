@@ -18,6 +18,6 @@ class PdViewRepoImpl extends PdViewRepo {
     SelectBuilderSql("pr.pd", PdViewFields.structure, PdViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PdViewRow] = {
-    sql"""select "id", "productdescriptionid", "description", "rowguid", "modifieddate"::text from pr.pd""".query(PdViewRow.read).stream
+    sql"""select "id", "productdescriptionid", "description", "rowguid", "modifieddate"::text from pr.pd""".query(using PdViewRow.read).stream
   }
 }

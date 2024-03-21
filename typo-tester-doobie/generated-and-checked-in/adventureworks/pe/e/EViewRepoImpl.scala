@@ -18,6 +18,6 @@ class EViewRepoImpl extends EViewRepo {
     SelectBuilderSql("pe.e", EViewFields.structure, EViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, EViewRow] = {
-    sql"""select "id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from pe.e""".query(EViewRow.read).stream
+    sql"""select "id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from pe.e""".query(using EViewRow.read).stream
   }
 }

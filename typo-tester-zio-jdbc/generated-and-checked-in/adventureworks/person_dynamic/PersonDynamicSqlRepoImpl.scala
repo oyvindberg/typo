@@ -19,6 +19,6 @@ class PersonDynamicSqlRepoImpl extends PersonDynamicSqlRepo {
             FROM person.person p
             WHERE ${Segment.paramSegment(firstName)(Setter.optionParamSetter(Setter.stringSetter))}::text IS NULL OR p.firstname = ${Segment.paramSegment(firstName)(Setter.optionParamSetter(Setter.stringSetter))}
       """
-    sql.query(PersonDynamicSqlRow.jdbcDecoder).selectStream
+    sql.query(using PersonDynamicSqlRow.jdbcDecoder).selectStream()
   }
 }

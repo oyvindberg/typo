@@ -34,10 +34,10 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (${fromWrite(unsaved.transactionid)(Write.fromPut(TransactionhistoryId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.referenceorderid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.referenceorderlineid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.transactiondate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.transactiontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.actualcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
-       """.query(TransactionhistoryRow.read).unique
+       """.query(using TransactionhistoryRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(TransactionhistoryRow.text)
+    new FragmentOps(sql"""COPY production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using TransactionhistoryRow.text)
   }
   override def insert(unsaved: TransactionhistoryRowUnsaved): ConnectionIO[TransactionhistoryRow] = {
     val fs = List(
@@ -75,24 +75,24 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
             returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
          """
     }
-    q.query(TransactionhistoryRow.read).unique
+    q.query(using TransactionhistoryRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.transactionhistory("productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "transactionid", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(TransactionhistoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.transactionhistory("productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "transactionid", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using TransactionhistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
     SelectBuilderSql("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, TransactionhistoryRow] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory""".query(TransactionhistoryRow.read).stream
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory""".query(using TransactionhistoryRow.read).stream
   }
   override def selectById(transactionid: TransactionhistoryId): ConnectionIO[Option[TransactionhistoryRow]] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}""".query(TransactionhistoryRow.read).option
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}""".query(using TransactionhistoryRow.read).option
   }
   override def selectByIds(transactionids: Array[TransactionhistoryId]): Stream[ConnectionIO, TransactionhistoryRow] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ANY(${transactionids})""".query(TransactionhistoryRow.read).stream
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ANY(${transactionids})""".query(using TransactionhistoryRow.read).stream
   }
   override def update(row: TransactionhistoryRow): ConnectionIO[Boolean] = {
     val transactionid = row.transactionid
@@ -137,6 +137,6 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
             "actualcost" = EXCLUDED."actualcost",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
-       """.query(TransactionhistoryRow.read).unique
+       """.query(using TransactionhistoryRow.read).unique
   }
 }

@@ -34,8 +34,8 @@ object PersonRowJoinSqlRow {
   }
   implicit lazy val jsonDecoder: JsonDecoder[PersonRowJoinSqlRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val businessentityid = jsonObj.get("businessentityid").toRight("Missing field 'businessentityid'").flatMap(_.as(BusinessentityId.jsonDecoder))
-    val email = jsonObj.get("email").fold[Either[String, Option[Array[TypoRecord]]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.array[TypoRecord](TypoRecord.jsonDecoder, implicitly))))
-    val emails = jsonObj.get("emails").fold[Either[String, Option[Array[TypoRecord]]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.array[TypoRecord](TypoRecord.jsonDecoder, implicitly))))
+    val email = jsonObj.get("email").fold[Either[String, Option[Array[TypoRecord]]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.array[TypoRecord](using TypoRecord.jsonDecoder, implicitly))))
+    val emails = jsonObj.get("emails").fold[Either[String, Option[Array[TypoRecord]]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.array[TypoRecord](using TypoRecord.jsonDecoder, implicitly))))
     if (businessentityid.isRight && email.isRight && emails.isRight)
       Right(PersonRowJoinSqlRow(businessentityid = businessentityid.toOption.get, email = email.toOption.get, emails = emails.toOption.get))
     else Left(List[Either[String, Any]](businessentityid, email, emails).flatMap(_.left.toOption).mkString(", "))
@@ -47,10 +47,10 @@ object PersonRowJoinSqlRow {
       BusinessentityId.jsonEncoder.unsafeEncode(a.businessentityid, indent, out)
       out.write(",")
       out.write(""""email":""")
-      JsonEncoder.option(JsonEncoder.array[TypoRecord](TypoRecord.jsonEncoder, implicitly)).unsafeEncode(a.email, indent, out)
+      JsonEncoder.option(using JsonEncoder.array[TypoRecord](using TypoRecord.jsonEncoder, implicitly)).unsafeEncode(a.email, indent, out)
       out.write(",")
       out.write(""""emails":""")
-      JsonEncoder.option(JsonEncoder.array[TypoRecord](TypoRecord.jsonEncoder, implicitly)).unsafeEncode(a.emails, indent, out)
+      JsonEncoder.option(using JsonEncoder.array[TypoRecord](using TypoRecord.jsonEncoder, implicitly)).unsafeEncode(a.emails, indent, out)
       out.write("}")
     }
   }

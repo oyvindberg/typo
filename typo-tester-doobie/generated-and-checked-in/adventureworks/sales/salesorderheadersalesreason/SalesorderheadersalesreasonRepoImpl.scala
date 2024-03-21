@@ -34,10 +34,10 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
     sql"""insert into sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate")
           values (${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4, ${fromWrite(unsaved.salesreasonid)(Write.fromPut(SalesreasonId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "salesorderid", "salesreasonid", "modifieddate"::text
-       """.query(SalesorderheadersalesreasonRow.read).unique
+       """.query(using SalesorderheadersalesreasonRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderheadersalesreasonRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalesorderheadersalesreasonRow.text)
+    new FragmentOps(sql"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalesorderheadersalesreasonRow.text)
   }
   override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved): ConnectionIO[SalesorderheadersalesreasonRow] = {
     val fs = List(
@@ -60,21 +60,21 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
             returning "salesorderid", "salesreasonid", "modifieddate"::text
          """
     }
-    q.query(SalesorderheadersalesreasonRow.read).unique
+    q.query(using SalesorderheadersalesreasonRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesorderheadersalesreasonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalesorderheadersalesreasonRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalesorderheadersalesreasonRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
     SelectBuilderSql("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure, SalesorderheadersalesreasonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SalesorderheadersalesreasonRow] = {
-    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sales.salesorderheadersalesreason""".query(SalesorderheadersalesreasonRow.read).stream
+    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sales.salesorderheadersalesreason""".query(using SalesorderheadersalesreasonRow.read).stream
   }
   override def selectById(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Option[SalesorderheadersalesreasonRow]] = {
-    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sales.salesorderheadersalesreason where "salesorderid" = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND "salesreasonid" = ${fromWrite(compositeId.salesreasonid)(Write.fromPut(SalesreasonId.put))}""".query(SalesorderheadersalesreasonRow.read).option
+    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sales.salesorderheadersalesreason where "salesorderid" = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND "salesreasonid" = ${fromWrite(compositeId.salesreasonid)(Write.fromPut(SalesreasonId.put))}""".query(using SalesorderheadersalesreasonRow.read).option
   }
   override def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -99,6 +99,6 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
           do update set
             "modifieddate" = EXCLUDED."modifieddate"
           returning "salesorderid", "salesreasonid", "modifieddate"::text
-       """.query(SalesorderheadersalesreasonRow.read).unique
+       """.query(using SalesorderheadersalesreasonRow.read).unique
   }
 }

@@ -35,10 +35,10 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     sql"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4, ${fromWrite(unsaved.primary)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "productphotoid", "primary", "modifieddate"::text
-       """.query(ProductproductphotoRow.read).unique
+       """.query(using ProductproductphotoRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductproductphotoRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductproductphotoRow.text)
+    new FragmentOps(sql"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductproductphotoRow.text)
   }
   override def insert(unsaved: ProductproductphotoRowUnsaved): ConnectionIO[ProductproductphotoRow] = {
     val fs = List(
@@ -65,21 +65,21 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
             returning "productid", "productphotoid", "primary", "modifieddate"::text
          """
     }
-    q.query(ProductproductphotoRow.read).unique
+    q.query(using ProductproductphotoRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductproductphotoRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductproductphotoRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductproductphotoRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
     SelectBuilderSql("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductproductphotoRow] = {
-    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto""".query(ProductproductphotoRow.read).stream
+    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto""".query(using ProductproductphotoRow.read).stream
   }
   override def selectById(compositeId: ProductproductphotoId): ConnectionIO[Option[ProductproductphotoRow]] = {
-    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}""".query(ProductproductphotoRow.read).option
+    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}""".query(using ProductproductphotoRow.read).option
   }
   override def update(row: ProductproductphotoRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -107,6 +107,6 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
             "primary" = EXCLUDED."primary",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productid", "productphotoid", "primary", "modifieddate"::text
-       """.query(ProductproductphotoRow.read).unique
+       """.query(using ProductproductphotoRow.read).unique
   }
 }

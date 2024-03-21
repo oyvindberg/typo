@@ -18,6 +18,6 @@ class LViewRepoImpl extends LViewRepo {
     SelectBuilderSql("pr.l", LViewFields.structure, LViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, LViewRow] = {
-    sql"""select "id", "locationid", "name", "costrate", "availability", "modifieddate"::text from pr.l""".query(LViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "locationid", "name", "costrate", "availability", "modifieddate"::text from pr.l""".query(using LViewRow.jdbcDecoder).selectStream()
   }
 }

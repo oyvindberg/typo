@@ -34,7 +34,7 @@ class CurrencyRepoImpl extends CurrencyRepo {
     sql"""insert into sales.currency("currencycode", "name", "modifieddate")
           values (${Segment.paramSegment(unsaved.currencycode)(CurrencyId.setter)}::bpchar, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "currencycode", "name", "modifieddate"::text
-       """.insertReturning(CurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using CurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CurrencyRow.text)
@@ -58,7 +58,7 @@ class CurrencyRepoImpl extends CurrencyRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into sales.currency($names) values ($values) returning "currencycode", "name", "modifieddate"::text"""
     }
-    q.insertReturning(CurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using CurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -69,13 +69,13 @@ class CurrencyRepoImpl extends CurrencyRepo {
     SelectBuilderSql("sales.currency", CurrencyFields.structure, CurrencyRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CurrencyRow] = {
-    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency""".query(CurrencyRow.jdbcDecoder).selectStream
+    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency""".query(using CurrencyRow.jdbcDecoder).selectStream()
   }
   override def selectById(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Option[CurrencyRow]] = {
-    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".query(CurrencyRow.jdbcDecoder).selectOne
+    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".query(using CurrencyRow.jdbcDecoder).selectOne
   }
   override def selectByIds(currencycodes: Array[CurrencyId]): ZStream[ZConnection, Throwable, CurrencyRow] = {
-    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ANY(${Segment.paramSegment(currencycodes)(CurrencyId.arraySetter)})""".query(CurrencyRow.jdbcDecoder).selectStream
+    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ANY(${Segment.paramSegment(currencycodes)(CurrencyId.arraySetter)})""".query(using CurrencyRow.jdbcDecoder).selectStream()
   }
   override def update(row: CurrencyRow): ZIO[ZConnection, Throwable, Boolean] = {
     val currencycode = row.currencycode
@@ -98,6 +98,6 @@ class CurrencyRepoImpl extends CurrencyRepo {
           do update set
             "name" = EXCLUDED."name",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "currencycode", "name", "modifieddate"::text""".insertReturning(CurrencyRow.jdbcDecoder)
+          returning "currencycode", "name", "modifieddate"::text""".insertReturning(using CurrencyRow.jdbcDecoder)
   }
 }

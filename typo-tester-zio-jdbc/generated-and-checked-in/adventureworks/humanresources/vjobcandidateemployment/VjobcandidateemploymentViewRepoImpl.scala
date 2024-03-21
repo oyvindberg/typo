@@ -18,6 +18,6 @@ class VjobcandidateemploymentViewRepoImpl extends VjobcandidateemploymentViewRep
     SelectBuilderSql("humanresources.vjobcandidateemployment", VjobcandidateemploymentViewFields.structure, VjobcandidateemploymentViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VjobcandidateemploymentViewRow] = {
-    sql"""select "jobcandidateid", "Emp.StartDate"::text, "Emp.EndDate"::text, "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City" from humanresources.vjobcandidateemployment""".query(VjobcandidateemploymentViewRow.jdbcDecoder).selectStream
+    sql"""select "jobcandidateid", "Emp.StartDate"::text, "Emp.EndDate"::text, "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City" from humanresources.vjobcandidateemployment""".query(using VjobcandidateemploymentViewRow.jdbcDecoder).selectStream()
   }
 }

@@ -35,10 +35,10 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     sql"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.rate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.payfrequency)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
-       """.query(EmployeepayhistoryRow.read).unique
+       """.query(using EmployeepayhistoryRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, EmployeepayhistoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(EmployeepayhistoryRow.text)
+    new FragmentOps(sql"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using EmployeepayhistoryRow.text)
   }
   override def insert(unsaved: EmployeepayhistoryRowUnsaved): ConnectionIO[EmployeepayhistoryRow] = {
     val fs = List(
@@ -63,21 +63,21 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
          """
     }
-    q.query(EmployeepayhistoryRow.read).unique
+    q.query(using EmployeepayhistoryRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmployeepayhistoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(EmployeepayhistoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using EmployeepayhistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     SelectBuilderSql("humanresources.employeepayhistory", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, EmployeepayhistoryRow] = {
-    sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory""".query(EmployeepayhistoryRow.read).stream
+    sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory""".query(using EmployeepayhistoryRow.read).stream
   }
   override def selectById(compositeId: EmployeepayhistoryId): ConnectionIO[Option[EmployeepayhistoryRow]] = {
-    sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "ratechangedate" = ${fromWrite(compositeId.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}""".query(EmployeepayhistoryRow.read).option
+    sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "ratechangedate" = ${fromWrite(compositeId.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}""".query(using EmployeepayhistoryRow.read).option
   }
   override def update(row: EmployeepayhistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -108,6 +108,6 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             "payfrequency" = EXCLUDED."payfrequency",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
-       """.query(EmployeepayhistoryRow.read).unique
+       """.query(using EmployeepayhistoryRow.read).unique
   }
 }

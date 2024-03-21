@@ -34,10 +34,10 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     sql"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.productcategoryid)(Write.fromPut(ProductcategoryId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productcategoryid", "name", "rowguid", "modifieddate"::text
-       """.query(ProductcategoryRow.read).unique
+       """.query(using ProductcategoryRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductcategoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productcategory("productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductcategoryRow.text)
+    new FragmentOps(sql"""COPY production.productcategory("productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductcategoryRow.text)
   }
   override def insert(unsaved: ProductcategoryRowUnsaved): ConnectionIO[ProductcategoryRow] = {
     val fs = List(
@@ -67,24 +67,24 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
             returning "productcategoryid", "name", "rowguid", "modifieddate"::text
          """
     }
-    q.query(ProductcategoryRow.read).unique
+    q.query(using ProductcategoryRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductcategoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productcategory("name", "productcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductcategoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productcategory("name", "productcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductcategoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductcategoryFields, ProductcategoryRow] = {
     SelectBuilderSql("production.productcategory", ProductcategoryFields.structure, ProductcategoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductcategoryRow] = {
-    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory""".query(ProductcategoryRow.read).stream
+    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory""".query(using ProductcategoryRow.read).stream
   }
   override def selectById(productcategoryid: ProductcategoryId): ConnectionIO[Option[ProductcategoryRow]] = {
-    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory where "productcategoryid" = ${fromWrite(productcategoryid)(Write.fromPut(ProductcategoryId.put))}""".query(ProductcategoryRow.read).option
+    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory where "productcategoryid" = ${fromWrite(productcategoryid)(Write.fromPut(ProductcategoryId.put))}""".query(using ProductcategoryRow.read).option
   }
   override def selectByIds(productcategoryids: Array[ProductcategoryId]): Stream[ConnectionIO, ProductcategoryRow] = {
-    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory where "productcategoryid" = ANY(${productcategoryids})""".query(ProductcategoryRow.read).stream
+    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory where "productcategoryid" = ANY(${productcategoryids})""".query(using ProductcategoryRow.read).stream
   }
   override def update(row: ProductcategoryRow): ConnectionIO[Boolean] = {
     val productcategoryid = row.productcategoryid
@@ -114,6 +114,6 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productcategoryid", "name", "rowguid", "modifieddate"::text
-       """.query(ProductcategoryRow.read).unique
+       """.query(using ProductcategoryRow.read).unique
   }
 }

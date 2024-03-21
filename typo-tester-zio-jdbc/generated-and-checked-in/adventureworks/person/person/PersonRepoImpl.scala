@@ -40,7 +40,7 @@ class PersonRepoImpl extends PersonRepo {
     sql"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.persontype)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.namestyle)(NameStyle.setter)}::bool, ${Segment.paramSegment(unsaved.title)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.firstname)(/* user-picked */ FirstName.setter)}::varchar, ${Segment.paramSegment(unsaved.middlename)(Setter.optionParamSetter(Name.setter))}::varchar, ${Segment.paramSegment(unsaved.lastname)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.suffix)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.emailpromotion)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.additionalcontactinfo)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.demographics)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
-       """.insertReturning(PersonRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using PersonRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersonRow.text)
@@ -83,7 +83,7 @@ class PersonRepoImpl extends PersonRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into person.person($names) values ($values) returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(PersonRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using PersonRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -94,13 +94,13 @@ class PersonRepoImpl extends PersonRepo {
     SelectBuilderSql("person.person", PersonFields.structure, PersonRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PersonRow] = {
-    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person""".query(PersonRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person""".query(using PersonRow.jdbcDecoder).selectStream()
   }
   override def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[PersonRow]] = {
-    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".query(PersonRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".query(using PersonRow.jdbcDecoder).selectOne
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, PersonRow] = {
-    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(PersonRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(using PersonRow.jdbcDecoder).selectStream()
   }
   override def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean] = {
     val businessentityid = row.businessentityid
@@ -153,6 +153,6 @@ class PersonRepoImpl extends PersonRepo {
             "demographics" = EXCLUDED."demographics",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text""".insertReturning(PersonRow.jdbcDecoder)
+          returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text""".insertReturning(using PersonRow.jdbcDecoder)
   }
 }

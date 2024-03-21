@@ -18,6 +18,6 @@ class PViewRepoImpl extends PViewRepo {
     SelectBuilderSql("pr.p", PViewFields.structure, PViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PViewRow] = {
-    sql"""select "id", "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from pr.p""".query(PViewRow.read).stream
+    sql"""select "id", "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from pr.p""".query(using PViewRow.read).stream
   }
 }

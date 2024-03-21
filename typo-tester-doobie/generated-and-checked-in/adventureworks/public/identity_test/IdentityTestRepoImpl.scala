@@ -32,10 +32,10 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     sql"""insert into public.identity-test("always_generated", "default_generated", "name")
           values (${fromWrite(unsaved.alwaysGenerated)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.defaultGenerated)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(IdentityTestId.put))})
           returning "always_generated", "default_generated", "name"
-       """.query(IdentityTestRow.read).unique
+       """.query(using IdentityTestRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, IdentityTestRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY public.identity-test("always_generated", "default_generated", "name") FROM STDIN""").copyIn(unsaved, batchSize)(IdentityTestRow.text)
+    new FragmentOps(sql"""COPY public.identity-test("always_generated", "default_generated", "name") FROM STDIN""").copyIn(unsaved, batchSize)(using IdentityTestRow.text)
   }
   override def insert(unsaved: IdentityTestRowUnsaved): ConnectionIO[IdentityTestRow] = {
     val fs = List(
@@ -57,24 +57,24 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
             returning "always_generated", "default_generated", "name"
          """
     }
-    q.query(IdentityTestRow.read).unique
+    q.query(using IdentityTestRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IdentityTestRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY public.identity-test("name", "default_generated") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(IdentityTestRowUnsaved.text)
+    new FragmentOps(sql"""COPY public.identity-test("name", "default_generated") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using IdentityTestRowUnsaved.text)
   }
   override def select: SelectBuilder[IdentityTestFields, IdentityTestRow] = {
     SelectBuilderSql("public.identity-test", IdentityTestFields.structure, IdentityTestRow.read)
   }
   override def selectAll: Stream[ConnectionIO, IdentityTestRow] = {
-    sql"""select "always_generated", "default_generated", "name" from public.identity-test""".query(IdentityTestRow.read).stream
+    sql"""select "always_generated", "default_generated", "name" from public.identity-test""".query(using IdentityTestRow.read).stream
   }
   override def selectById(name: IdentityTestId): ConnectionIO[Option[IdentityTestRow]] = {
-    sql"""select "always_generated", "default_generated", "name" from public.identity-test where "name" = ${fromWrite(name)(Write.fromPut(IdentityTestId.put))}""".query(IdentityTestRow.read).option
+    sql"""select "always_generated", "default_generated", "name" from public.identity-test where "name" = ${fromWrite(name)(Write.fromPut(IdentityTestId.put))}""".query(using IdentityTestRow.read).option
   }
   override def selectByIds(names: Array[IdentityTestId]): Stream[ConnectionIO, IdentityTestRow] = {
-    sql"""select "always_generated", "default_generated", "name" from public.identity-test where "name" = ANY(${names})""".query(IdentityTestRow.read).stream
+    sql"""select "always_generated", "default_generated", "name" from public.identity-test where "name" = ANY(${names})""".query(using IdentityTestRow.read).stream
   }
   override def update(row: IdentityTestRow): ConnectionIO[Boolean] = {
     val name = row.name
@@ -101,6 +101,6 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
             "always_generated" = EXCLUDED."always_generated",
             "default_generated" = EXCLUDED."default_generated"
           returning "always_generated", "default_generated", "name"
-       """.query(IdentityTestRow.read).unique
+       """.query(using IdentityTestRow.read).unique
   }
 }

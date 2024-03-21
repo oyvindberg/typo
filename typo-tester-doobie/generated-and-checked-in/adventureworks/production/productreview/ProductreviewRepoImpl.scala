@@ -35,10 +35,10 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     sql"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
           values (${fromWrite(unsaved.productreviewid)(Write.fromPut(ProductreviewId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.reviewername)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.reviewdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.emailaddress)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.rating)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.comments)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
-       """.query(ProductreviewRow.read).unique
+       """.query(using ProductreviewRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductreviewRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductreviewRow.text)
+    new FragmentOps(sql"""COPY production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductreviewRow.text)
   }
   override def insert(unsaved: ProductreviewRowUnsaved): ConnectionIO[ProductreviewRow] = {
     val fs = List(
@@ -72,24 +72,24 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
             returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
          """
     }
-    q.query(ProductreviewRow.read).unique
+    q.query(using ProductreviewRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductreviewRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productreview("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductreviewRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productreview("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductreviewRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductreviewFields, ProductreviewRow] = {
     SelectBuilderSql("production.productreview", ProductreviewFields.structure, ProductreviewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductreviewRow] = {
-    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview""".query(ProductreviewRow.read).stream
+    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview""".query(using ProductreviewRow.read).stream
   }
   override def selectById(productreviewid: ProductreviewId): ConnectionIO[Option[ProductreviewRow]] = {
-    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview where "productreviewid" = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}""".query(ProductreviewRow.read).option
+    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview where "productreviewid" = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}""".query(using ProductreviewRow.read).option
   }
   override def selectByIds(productreviewids: Array[ProductreviewId]): Stream[ConnectionIO, ProductreviewRow] = {
-    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview where "productreviewid" = ANY(${productreviewids})""".query(ProductreviewRow.read).stream
+    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview where "productreviewid" = ANY(${productreviewids})""".query(using ProductreviewRow.read).stream
   }
   override def update(row: ProductreviewRow): ConnectionIO[Boolean] = {
     val productreviewid = row.productreviewid
@@ -131,6 +131,6 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
             "comments" = EXCLUDED."comments",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
-       """.query(ProductreviewRow.read).unique
+       """.query(using ProductreviewRow.read).unique
   }
 }

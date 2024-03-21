@@ -39,7 +39,7 @@ object DeleteBuilder {
         Some(fr"delete from ${Fragment.const(name)}"),
         params.where
           .map(w => w(structure.fields))
-          .reduceLeftOption(_ and _)
+          .reduceLeftOption(_.and(_))
           .map { where => fr" where " ++ where.render(counter) }
       ).flatten.reduce(_ ++ _)
     }

@@ -35,10 +35,10 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     sql"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
           values (${fromWrite(unsaved.productmodelid)(Write.fromPut(ProductmodelId.put))}::int4, ${fromWrite(unsaved.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}::int4, ${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
-       """.query(ProductmodelproductdescriptioncultureRow.read).unique
+       """.query(using ProductmodelproductdescriptioncultureRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductmodelproductdescriptioncultureRow.text)
+    new FragmentOps(sql"""COPY production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductmodelproductdescriptioncultureRow.text)
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRowUnsaved): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     val fs = List(
@@ -62,21 +62,21 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
             returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
          """
     }
-    q.query(ProductmodelproductdescriptioncultureRow.read).unique
+    q.query(using ProductmodelproductdescriptioncultureRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductmodelproductdescriptioncultureRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductmodelproductdescriptioncultureRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductmodelproductdescriptioncultureRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
     SelectBuilderSql("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow] = {
-    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture""".query(ProductmodelproductdescriptioncultureRow.read).stream
+    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture""".query(using ProductmodelproductdescriptioncultureRow.read).stream
   }
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId): ConnectionIO[Option[ProductmodelproductdescriptioncultureRow]] = {
-    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture where "productmodelid" = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND "productdescriptionid" = ${fromWrite(compositeId.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))} AND "cultureid" = ${fromWrite(compositeId.cultureid)(Write.fromPut(CultureId.put))}""".query(ProductmodelproductdescriptioncultureRow.read).option
+    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture where "productmodelid" = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND "productdescriptionid" = ${fromWrite(compositeId.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))} AND "cultureid" = ${fromWrite(compositeId.cultureid)(Write.fromPut(CultureId.put))}""".query(using ProductmodelproductdescriptioncultureRow.read).option
   }
   override def update(row: ProductmodelproductdescriptioncultureRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -102,6 +102,6 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
           do update set
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
-       """.query(ProductmodelproductdescriptioncultureRow.read).unique
+       """.query(using ProductmodelproductdescriptioncultureRow.read).unique
   }
 }

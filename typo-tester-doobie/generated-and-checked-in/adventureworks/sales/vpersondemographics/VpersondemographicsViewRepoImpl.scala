@@ -18,6 +18,6 @@ class VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
     SelectBuilderSql("sales.vpersondemographics", VpersondemographicsViewFields.structure, VpersondemographicsViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VpersondemographicsViewRow] = {
-    sql"""select "businessentityid", "totalpurchaseytd"::numeric, "datefirstpurchase"::text, "birthdate"::text, "maritalstatus", "yearlyincome", "gender", "totalchildren", "numberchildrenathome", "education", "occupation", "homeownerflag", "numbercarsowned" from sales.vpersondemographics""".query(VpersondemographicsViewRow.read).stream
+    sql"""select "businessentityid", "totalpurchaseytd"::numeric, "datefirstpurchase"::text, "birthdate"::text, "maritalstatus", "yearlyincome", "gender", "totalchildren", "numberchildrenathome", "education", "occupation", "homeownerflag", "numbercarsowned" from sales.vpersondemographics""".query(using VpersondemographicsViewRow.read).stream
   }
 }

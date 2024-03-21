@@ -36,7 +36,7 @@ class PasswordRepoImpl extends PasswordRepo {
     sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.passwordhash)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.passwordsalt)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
-       """.insertReturning(PasswordRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using PasswordRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PasswordRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PasswordRow.text)
@@ -65,7 +65,7 @@ class PasswordRepoImpl extends PasswordRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into person.password($names) values ($values) returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(PasswordRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using PasswordRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -76,13 +76,13 @@ class PasswordRepoImpl extends PasswordRepo {
     SelectBuilderSql("person.password", PasswordFields.structure, PasswordRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PasswordRow] = {
-    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password""".query(PasswordRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password""".query(using PasswordRow.jdbcDecoder).selectStream()
   }
   override def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[PasswordRow]] = {
-    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".query(PasswordRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".query(using PasswordRow.jdbcDecoder).selectOne
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, PasswordRow] = {
-    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(PasswordRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(using PasswordRow.jdbcDecoder).selectStream()
   }
   override def update(row: PasswordRow): ZIO[ZConnection, Throwable, Boolean] = {
     val businessentityid = row.businessentityid
@@ -111,6 +111,6 @@ class PasswordRepoImpl extends PasswordRepo {
             "passwordsalt" = EXCLUDED."passwordsalt",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text""".insertReturning(PasswordRow.jdbcDecoder)
+          returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text""".insertReturning(using PasswordRow.jdbcDecoder)
   }
 }

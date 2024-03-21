@@ -41,7 +41,7 @@ case class IllustrationRowUnsaved(
 }
 object IllustrationRowUnsaved {
   implicit lazy val jsonDecoder: JsonDecoder[IllustrationRowUnsaved] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
-    val diagram = jsonObj.get("diagram").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(TypoXml.jsonDecoder)))
+    val diagram = jsonObj.get("diagram").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(using TypoXml.jsonDecoder)))
     val illustrationid = jsonObj.get("illustrationid").toRight("Missing field 'illustrationid'").flatMap(_.as(Defaulted.jsonDecoder(IllustrationId.jsonDecoder)))
     val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(Defaulted.jsonDecoder(TypoLocalDateTime.jsonDecoder)))
     if (diagram.isRight && illustrationid.isRight && modifieddate.isRight)
@@ -52,7 +52,7 @@ object IllustrationRowUnsaved {
     override def unsafeEncode(a: IllustrationRowUnsaved, indent: Option[Int], out: Write): Unit = {
       out.write("{")
       out.write(""""diagram":""")
-      JsonEncoder.option(TypoXml.jsonEncoder).unsafeEncode(a.diagram, indent, out)
+      JsonEncoder.option(using TypoXml.jsonEncoder).unsafeEncode(a.diagram, indent, out)
       out.write(",")
       out.write(""""illustrationid":""")
       Defaulted.jsonEncoder(IllustrationId.jsonEncoder).unsafeEncode(a.illustrationid, indent, out)

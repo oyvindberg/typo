@@ -18,6 +18,6 @@ class WViewRepoImpl extends WViewRepo {
     SelectBuilderSql("pr.w", WViewFields.structure, WViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, WViewRow] = {
-    sql"""select "id", "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from pr.w""".query(WViewRow.read).stream
+    sql"""select "id", "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from pr.w""".query(using WViewRow.read).stream
   }
 }

@@ -36,10 +36,10 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     sql"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
           values (${fromWrite(unsaved.billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.productassemblyid)(Write.fromPutOption(ProductId.put))}::int4, ${fromWrite(unsaved.componentid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.bomlevel)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.perassemblyqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
-       """.query(BillofmaterialsRow.read).unique
+       """.query(using BillofmaterialsRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, BillofmaterialsRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(BillofmaterialsRow.text)
+    new FragmentOps(sql"""COPY production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using BillofmaterialsRow.text)
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved): ConnectionIO[BillofmaterialsRow] = {
     val fs = List(
@@ -77,24 +77,24 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
             returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
          """
     }
-    q.query(BillofmaterialsRow.read).unique
+    q.query(using BillofmaterialsRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BillofmaterialsRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.billofmaterials("productassemblyid", "componentid", "enddate", "unitmeasurecode", "bomlevel", "billofmaterialsid", "startdate", "perassemblyqty", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(BillofmaterialsRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.billofmaterials("productassemblyid", "componentid", "enddate", "unitmeasurecode", "bomlevel", "billofmaterialsid", "startdate", "perassemblyqty", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using BillofmaterialsRowUnsaved.text)
   }
   override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     SelectBuilderSql("production.billofmaterials", BillofmaterialsFields.structure, BillofmaterialsRow.read)
   }
   override def selectAll: Stream[ConnectionIO, BillofmaterialsRow] = {
-    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials""".query(BillofmaterialsRow.read).stream
+    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials""".query(using BillofmaterialsRow.read).stream
   }
   override def selectById(billofmaterialsid: Int): ConnectionIO[Option[BillofmaterialsRow]] = {
-    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}""".query(BillofmaterialsRow.read).option
+    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}""".query(using BillofmaterialsRow.read).option
   }
   override def selectByIds(billofmaterialsids: Array[Int]): Stream[ConnectionIO, BillofmaterialsRow] = {
-    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials where "billofmaterialsid" = ANY(${billofmaterialsids})""".query(BillofmaterialsRow.read).stream
+    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials where "billofmaterialsid" = ANY(${billofmaterialsids})""".query(using BillofmaterialsRow.read).stream
   }
   override def update(row: BillofmaterialsRow): ConnectionIO[Boolean] = {
     val billofmaterialsid = row.billofmaterialsid
@@ -139,6 +139,6 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
             "perassemblyqty" = EXCLUDED."perassemblyqty",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
-       """.query(BillofmaterialsRow.read).unique
+       """.query(using BillofmaterialsRow.read).unique
   }
 }

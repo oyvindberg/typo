@@ -37,7 +37,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
     sql"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
           values (${Segment.paramSegment(unsaved.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}::int4, ${Segment.paramSegment(unsaved.cardtype)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.cardnumber)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.expmonth)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.expyear)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
-       """.insertReturning(CreditcardRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using CreditcardRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CreditcardRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate") FROM STDIN""", batchSize, unsaved)(CreditcardRow.text)
@@ -67,7 +67,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into sales.creditcard($names) values ($values) returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text"""
     }
-    q.insertReturning(CreditcardRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using CreditcardRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -78,13 +78,13 @@ class CreditcardRepoImpl extends CreditcardRepo {
     SelectBuilderSql("sales.creditcard", CreditcardFields.structure, CreditcardRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CreditcardRow] = {
-    sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard""".query(CreditcardRow.jdbcDecoder).selectStream
+    sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard""".query(using CreditcardRow.jdbcDecoder).selectStream()
   }
   override def selectById(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Option[CreditcardRow]] = {
-    sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ${Segment.paramSegment(creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".query(CreditcardRow.jdbcDecoder).selectOne
+    sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ${Segment.paramSegment(creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".query(using CreditcardRow.jdbcDecoder).selectOne
   }
   override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZStream[ZConnection, Throwable, CreditcardRow] = {
-    sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ANY(${Segment.paramSegment(creditcardids)(CustomCreditcardId.arraySetter)})""".query(CreditcardRow.jdbcDecoder).selectStream
+    sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ANY(${Segment.paramSegment(creditcardids)(CustomCreditcardId.arraySetter)})""".query(using CreditcardRow.jdbcDecoder).selectStream()
   }
   override def update(row: CreditcardRow): ZIO[ZConnection, Throwable, Boolean] = {
     val creditcardid = row.creditcardid
@@ -116,6 +116,6 @@ class CreditcardRepoImpl extends CreditcardRepo {
             "expmonth" = EXCLUDED."expmonth",
             "expyear" = EXCLUDED."expyear",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text""".insertReturning(CreditcardRow.jdbcDecoder)
+          returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text""".insertReturning(using CreditcardRow.jdbcDecoder)
   }
 }

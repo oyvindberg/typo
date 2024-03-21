@@ -35,7 +35,7 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
     sql"""insert into sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate")
           values (${Segment.paramSegment(unsaved.salesorderid)(SalesorderheaderId.setter)}::int4, ${Segment.paramSegment(unsaved.salesreasonid)(SalesreasonId.setter)}::int4, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "salesorderid", "salesreasonid", "modifieddate"::text
-       """.insertReturning(SalesorderheadersalesreasonRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using SalesorderheadersalesreasonRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderheadersalesreasonRow.text)
@@ -59,7 +59,7 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into sales.salesorderheadersalesreason($names) values ($values) returning "salesorderid", "salesreasonid", "modifieddate"::text"""
     }
-    q.insertReturning(SalesorderheadersalesreasonRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using SalesorderheadersalesreasonRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -70,10 +70,10 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
     SelectBuilderSql("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure, SalesorderheadersalesreasonRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRow] = {
-    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sales.salesorderheadersalesreason""".query(SalesorderheadersalesreasonRow.jdbcDecoder).selectStream
+    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sales.salesorderheadersalesreason""".query(using SalesorderheadersalesreasonRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: SalesorderheadersalesreasonId): ZIO[ZConnection, Throwable, Option[SalesorderheadersalesreasonRow]] = {
-    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sales.salesorderheadersalesreason where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesreasonid" = ${Segment.paramSegment(compositeId.salesreasonid)(SalesreasonId.setter)}""".query(SalesorderheadersalesreasonRow.jdbcDecoder).selectOne
+    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sales.salesorderheadersalesreason where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesreasonid" = ${Segment.paramSegment(compositeId.salesreasonid)(SalesreasonId.setter)}""".query(using SalesorderheadersalesreasonRow.jdbcDecoder).selectOne
   }
   override def update(row: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -94,6 +94,6 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
           on conflict ("salesorderid", "salesreasonid")
           do update set
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "salesorderid", "salesreasonid", "modifieddate"::text""".insertReturning(SalesorderheadersalesreasonRow.jdbcDecoder)
+          returning "salesorderid", "salesreasonid", "modifieddate"::text""".insertReturning(using SalesorderheadersalesreasonRow.jdbcDecoder)
   }
 }

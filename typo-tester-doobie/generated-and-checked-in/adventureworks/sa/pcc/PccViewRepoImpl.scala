@@ -18,6 +18,6 @@ class PccViewRepoImpl extends PccViewRepo {
     SelectBuilderSql("sa.pcc", PccViewFields.structure, PccViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PccViewRow] = {
-    sql"""select "id", "businessentityid", "creditcardid", "modifieddate"::text from sa.pcc""".query(PccViewRow.read).stream
+    sql"""select "id", "businessentityid", "creditcardid", "modifieddate"::text from sa.pcc""".query(using PccViewRow.read).stream
   }
 }

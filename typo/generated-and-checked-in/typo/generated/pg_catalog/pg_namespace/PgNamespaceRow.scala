@@ -41,7 +41,7 @@ object PgNamespaceRow {
           oid = json.\("oid").as(PgNamespaceId.reads),
           nspname = json.\("nspname").as(Reads.StringReads),
           nspowner = json.\("nspowner").as(Reads.LongReads),
-          nspacl = json.\("nspacl").toOption.map(_.as(Reads.ArrayReads[TypoAclItem](TypoAclItem.reads, implicitly)))
+          nspacl = json.\("nspacl").toOption.map(_.as(using Reads.ArrayReads[TypoAclItem](using TypoAclItem.reads, implicitly)))
         )
       )
     ),
@@ -61,7 +61,7 @@ object PgNamespaceRow {
       "oid" -> PgNamespaceId.writes.writes(o.oid),
       "nspname" -> Writes.StringWrites.writes(o.nspname),
       "nspowner" -> Writes.LongWrites.writes(o.nspowner),
-      "nspacl" -> Writes.OptionWrites(Writes.arrayWrites[TypoAclItem](implicitly, TypoAclItem.writes)).writes(o.nspacl)
+      "nspacl" -> Writes.OptionWrites(using Writes.arrayWrites[TypoAclItem](using implicitly, TypoAclItem.writes)).writes(o.nspacl)
     ))
   )
 }

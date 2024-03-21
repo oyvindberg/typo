@@ -18,6 +18,6 @@ class EphViewRepoImpl extends EphViewRepo {
     SelectBuilderSql("hr.eph", EphViewFields.structure, EphViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, EphViewRow] = {
-    sql"""select "id", "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from hr.eph""".query(EphViewRow.read).stream
+    sql"""select "id", "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from hr.eph""".query(using EphViewRow.read).stream
   }
 }

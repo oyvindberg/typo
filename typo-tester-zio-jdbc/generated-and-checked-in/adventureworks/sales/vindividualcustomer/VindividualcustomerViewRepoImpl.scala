@@ -18,6 +18,6 @@ class VindividualcustomerViewRepoImpl extends VindividualcustomerViewRepo {
     SelectBuilderSql("sales.vindividualcustomer", VindividualcustomerViewFields.structure, VindividualcustomerViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VindividualcustomerViewRow] = {
-    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "demographics" from sales.vindividualcustomer""".query(VindividualcustomerViewRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "demographics" from sales.vindividualcustomer""".query(using VindividualcustomerViewRow.jdbcDecoder).selectStream()
   }
 }

@@ -37,7 +37,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
     sql"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.productmodelid)(ProductmodelId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.catalogdescription)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.instructions)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
-       """.insertReturning(ProductmodelRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ProductmodelRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelRow.text)
@@ -70,7 +70,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.productmodel($names) values ($values) returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(ProductmodelRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ProductmodelRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -81,13 +81,13 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
     SelectBuilderSql("production.productmodel", ProductmodelFields.structure, ProductmodelRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductmodelRow] = {
-    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel""".query(ProductmodelRow.jdbcDecoder).selectStream
+    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel""".query(using ProductmodelRow.jdbcDecoder).selectStream()
   }
   override def selectById(productmodelid: ProductmodelId): ZIO[ZConnection, Throwable, Option[ProductmodelRow]] = {
-    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel where "productmodelid" = ${Segment.paramSegment(productmodelid)(ProductmodelId.setter)}""".query(ProductmodelRow.jdbcDecoder).selectOne
+    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel where "productmodelid" = ${Segment.paramSegment(productmodelid)(ProductmodelId.setter)}""".query(using ProductmodelRow.jdbcDecoder).selectOne
   }
   override def selectByIds(productmodelids: Array[ProductmodelId]): ZStream[ZConnection, Throwable, ProductmodelRow] = {
-    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel where "productmodelid" = ANY(${Segment.paramSegment(productmodelids)(ProductmodelId.arraySetter)})""".query(ProductmodelRow.jdbcDecoder).selectStream
+    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel where "productmodelid" = ANY(${Segment.paramSegment(productmodelids)(ProductmodelId.arraySetter)})""".query(using ProductmodelRow.jdbcDecoder).selectStream()
   }
   override def update(row: ProductmodelRow): ZIO[ZConnection, Throwable, Boolean] = {
     val productmodelid = row.productmodelid
@@ -119,6 +119,6 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
             "instructions" = EXCLUDED."instructions",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text""".insertReturning(ProductmodelRow.jdbcDecoder)
+          returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text""".insertReturning(using ProductmodelRow.jdbcDecoder)
   }
 }

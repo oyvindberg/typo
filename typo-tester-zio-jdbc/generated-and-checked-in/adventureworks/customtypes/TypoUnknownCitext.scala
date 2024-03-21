@@ -28,7 +28,7 @@ object TypoUnknownCitext {
     },
     "Array[java.lang.String]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoUnknownCitext]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoUnknownCitext]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoUnknownCitext]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -49,7 +49,7 @@ object TypoUnknownCitext {
     },
     "java.lang.String"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoUnknownCitext] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoUnknownCitext] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoUnknownCitext] = JsonDecoder.string.map(TypoUnknownCitext.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoUnknownCitext] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoUnknownCitext] = Ordering.by(_.value)

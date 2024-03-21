@@ -110,7 +110,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
   }
 
   def query(sql: sc.Code, rowType: sc.Type): sc.Code =
-    if (fixVerySlowImplicit) code"$sql.query($rowType.$readName)"
+    if (fixVerySlowImplicit) code"$sql.query(using $rowType.$readName)"
     else code"$sql.query[$rowType]"
 
   override def repoImpl(repoMethod: RepoMethod): sc.Code =
@@ -239,12 +239,12 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       case RepoMethod.InsertStreaming(relName, cols, rowType) =>
         val sql = SQL(code"COPY $relName(${dbNames(cols, isRead = false)}) FROM STDIN")
 
-        if (fixVerySlowImplicit) code"new $FragmentOps($sql).copyIn(unsaved, batchSize)(${textSupport.get.lookupTextFor(rowType)})"
+        if (fixVerySlowImplicit) code"new $FragmentOps($sql).copyIn(unsaved, batchSize)(using ${textSupport.get.lookupTextFor(rowType)})"
         else code"new $FragmentOps($sql).copyIn[$rowType](unsaved, batchSize)"
       case RepoMethod.InsertUnsavedStreaming(relName, unsaved) =>
         val sql = SQL(code"COPY $relName(${dbNames(unsaved.allCols, isRead = false)}) FROM STDIN (DEFAULT '${textSupport.get.DefaultValue}')")
 
-        if (fixVerySlowImplicit) code"new $FragmentOps($sql).copyIn(unsaved, batchSize)(${textSupport.get.lookupTextFor(unsaved.tpe)})"
+        if (fixVerySlowImplicit) code"new $FragmentOps($sql).copyIn(unsaved, batchSize)(using ${textSupport.get.lookupTextFor(unsaved.tpe)})"
         else code"new $FragmentOps($sql).copyIn[${unsaved.tpe}](unsaved, batchSize)"
 
       case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType) =>

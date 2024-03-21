@@ -36,7 +36,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
     sql"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.shipmethodid)(ShipmethodId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.shipbase)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.shiprate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
-       """.insertReturning(ShipmethodRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ShipmethodRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShipmethodRow.text)
@@ -75,7 +75,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into purchasing.shipmethod($names) values ($values) returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(ShipmethodRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ShipmethodRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -86,13 +86,13 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
     SelectBuilderSql("purchasing.shipmethod", ShipmethodFields.structure, ShipmethodRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ShipmethodRow] = {
-    sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod""".query(ShipmethodRow.jdbcDecoder).selectStream
+    sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod""".query(using ShipmethodRow.jdbcDecoder).selectStream()
   }
   override def selectById(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Option[ShipmethodRow]] = {
-    sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(ShipmethodId.setter)}""".query(ShipmethodRow.jdbcDecoder).selectOne
+    sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(ShipmethodId.setter)}""".query(using ShipmethodRow.jdbcDecoder).selectOne
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId]): ZStream[ZConnection, Throwable, ShipmethodRow] = {
-    sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod where "shipmethodid" = ANY(${Segment.paramSegment(shipmethodids)(ShipmethodId.arraySetter)})""".query(ShipmethodRow.jdbcDecoder).selectStream
+    sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod where "shipmethodid" = ANY(${Segment.paramSegment(shipmethodids)(ShipmethodId.arraySetter)})""".query(using ShipmethodRow.jdbcDecoder).selectStream()
   }
   override def update(row: ShipmethodRow): ZIO[ZConnection, Throwable, Boolean] = {
     val shipmethodid = row.shipmethodid
@@ -124,6 +124,6 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
             "shiprate" = EXCLUDED."shiprate",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text""".insertReturning(ShipmethodRow.jdbcDecoder)
+          returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text""".insertReturning(using ShipmethodRow.jdbcDecoder)
   }
 }

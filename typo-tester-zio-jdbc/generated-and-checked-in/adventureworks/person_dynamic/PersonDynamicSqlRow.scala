@@ -38,9 +38,9 @@ object PersonDynamicSqlRow {
         )
   }
   implicit lazy val jsonDecoder: JsonDecoder[PersonDynamicSqlRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
-    val title = jsonObj.get("title").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val title = jsonObj.get("title").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
     val firstname = jsonObj.get("firstname").toRight("Missing field 'firstname'").flatMap(_.as(FirstName.jsonDecoder))
-    val middlename = jsonObj.get("middlename").fold[Either[String, Option[Name]]](Right(None))(_.as(JsonDecoder.option(Name.jsonDecoder)))
+    val middlename = jsonObj.get("middlename").fold[Either[String, Option[Name]]](Right(None))(_.as(JsonDecoder.option(using Name.jsonDecoder)))
     val lastname = jsonObj.get("lastname").toRight("Missing field 'lastname'").flatMap(_.as(Name.jsonDecoder))
     if (title.isRight && firstname.isRight && middlename.isRight && lastname.isRight)
       Right(PersonDynamicSqlRow(title = title.toOption.get, firstname = firstname.toOption.get, middlename = middlename.toOption.get, lastname = lastname.toOption.get))
@@ -50,13 +50,13 @@ object PersonDynamicSqlRow {
     override def unsafeEncode(a: PersonDynamicSqlRow, indent: Option[Int], out: Write): Unit = {
       out.write("{")
       out.write(""""title":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.title, indent, out)
+      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.title, indent, out)
       out.write(",")
       out.write(""""firstname":""")
       FirstName.jsonEncoder.unsafeEncode(a.firstname, indent, out)
       out.write(",")
       out.write(""""middlename":""")
-      JsonEncoder.option(Name.jsonEncoder).unsafeEncode(a.middlename, indent, out)
+      JsonEncoder.option(using Name.jsonEncoder).unsafeEncode(a.middlename, indent, out)
       out.write(",")
       out.write(""""lastname":""")
       Name.jsonEncoder.unsafeEncode(a.lastname, indent, out)

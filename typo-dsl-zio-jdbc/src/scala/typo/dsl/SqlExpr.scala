@@ -30,10 +30,10 @@ trait SqlExpr[T, N[_], R] extends SqlExpr.SqlExprNoHkt[N[T], R] {
   final def <=[N2[_], NC[_]](t: SqlExpr[T, N2, R])(implicit O: Ordering[T], N: Nullability2[N, N2, NC]): SqlExpr[Boolean, NC, R] =
     SqlExpr.Binary(this, SqlOperator.lte, t, N)
 
-  final def or[N2[_], NC[_]](other: SqlExpr[T, N2, R])(implicit B: Bijection[T, Boolean], N: Nullability2[N, N2, NC]): SqlExpr[T, NC, R] =
+  final infix def or[N2[_], NC[_]](other: SqlExpr[T, N2, R])(implicit B: Bijection[T, Boolean], N: Nullability2[N, N2, NC]): SqlExpr[T, NC, R] =
     SqlExpr.Binary(this, SqlOperator.or[T], other, N)
 
-  final def and[N2[_], NC[_]](other: SqlExpr[T, N2, R])(implicit B: Bijection[T, Boolean], N: Nullability2[N, N2, NC]): SqlExpr[T, NC, R] =
+  final infix def and[N2[_], NC[_]](other: SqlExpr[T, N2, R])(implicit B: Bijection[T, Boolean], N: Nullability2[N, N2, NC]): SqlExpr[T, NC, R] =
     SqlExpr.Binary(this, SqlOperator.and[T], other, N)
 
   def unary_!(implicit B: Bijection[T, Boolean], N: Nullability[N]): SqlExpr[T, N, R] =
@@ -86,7 +86,7 @@ trait SqlExpr[T, N[_], R] extends SqlExpr.SqlExprNoHkt[N[T], R] {
   ): SqlExpr[T, NC, R] =
     SqlExpr.Apply3(SqlFunction3.substring[T](), this, from, count, N)
 
-  final def in(ts: Array[T])(implicit ev: JdbcEncoder[Array[T]], N: Nullability[N]): SqlExpr[Boolean, N, R] =
+  final infix def in(ts: Array[T])(implicit ev: JdbcEncoder[Array[T]], N: Nullability[N]): SqlExpr[Boolean, N, R] =
     SqlExpr.In(this, ts, ev, N)
 
   final def ?(implicit N: Nullability[N]): SqlExpr[T, Option, R] = opt

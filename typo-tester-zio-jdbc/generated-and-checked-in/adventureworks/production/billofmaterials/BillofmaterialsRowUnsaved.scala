@@ -80,9 +80,9 @@ case class BillofmaterialsRowUnsaved(
 }
 object BillofmaterialsRowUnsaved {
   implicit lazy val jsonDecoder: JsonDecoder[BillofmaterialsRowUnsaved] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
-    val productassemblyid = jsonObj.get("productassemblyid").fold[Either[String, Option[ProductId]]](Right(None))(_.as(JsonDecoder.option(ProductId.jsonDecoder)))
+    val productassemblyid = jsonObj.get("productassemblyid").fold[Either[String, Option[ProductId]]](Right(None))(_.as(JsonDecoder.option(using ProductId.jsonDecoder)))
     val componentid = jsonObj.get("componentid").toRight("Missing field 'componentid'").flatMap(_.as(ProductId.jsonDecoder))
-    val enddate = jsonObj.get("enddate").fold[Either[String, Option[TypoLocalDateTime]]](Right(None))(_.as(JsonDecoder.option(TypoLocalDateTime.jsonDecoder)))
+    val enddate = jsonObj.get("enddate").fold[Either[String, Option[TypoLocalDateTime]]](Right(None))(_.as(JsonDecoder.option(using TypoLocalDateTime.jsonDecoder)))
     val unitmeasurecode = jsonObj.get("unitmeasurecode").toRight("Missing field 'unitmeasurecode'").flatMap(_.as(UnitmeasureId.jsonDecoder))
     val bomlevel = jsonObj.get("bomlevel").toRight("Missing field 'bomlevel'").flatMap(_.as(TypoShort.jsonDecoder))
     val billofmaterialsid = jsonObj.get("billofmaterialsid").toRight("Missing field 'billofmaterialsid'").flatMap(_.as(Defaulted.jsonDecoder(JsonDecoder.int)))
@@ -97,13 +97,13 @@ object BillofmaterialsRowUnsaved {
     override def unsafeEncode(a: BillofmaterialsRowUnsaved, indent: Option[Int], out: Write): Unit = {
       out.write("{")
       out.write(""""productassemblyid":""")
-      JsonEncoder.option(ProductId.jsonEncoder).unsafeEncode(a.productassemblyid, indent, out)
+      JsonEncoder.option(using ProductId.jsonEncoder).unsafeEncode(a.productassemblyid, indent, out)
       out.write(",")
       out.write(""""componentid":""")
       ProductId.jsonEncoder.unsafeEncode(a.componentid, indent, out)
       out.write(",")
       out.write(""""enddate":""")
-      JsonEncoder.option(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.enddate, indent, out)
+      JsonEncoder.option(using TypoLocalDateTime.jsonEncoder).unsafeEncode(a.enddate, indent, out)
       out.write(",")
       out.write(""""unitmeasurecode":""")
       UnitmeasureId.jsonEncoder.unsafeEncode(a.unitmeasurecode, indent, out)

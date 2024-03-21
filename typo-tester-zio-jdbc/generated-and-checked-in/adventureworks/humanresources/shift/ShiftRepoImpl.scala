@@ -35,7 +35,7 @@ class ShiftRepoImpl extends ShiftRepo {
     sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
           values (${Segment.paramSegment(unsaved.shiftid)(ShiftId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.starttime)(TypoLocalTime.setter)}::time, ${Segment.paramSegment(unsaved.endtime)(TypoLocalTime.setter)}::time, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
-       """.insertReturning(ShiftRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ShiftRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShiftRow.text)
@@ -64,7 +64,7 @@ class ShiftRepoImpl extends ShiftRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into humanresources.shift($names) values ($values) returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text"""
     }
-    q.insertReturning(ShiftRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ShiftRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -75,13 +75,13 @@ class ShiftRepoImpl extends ShiftRepo {
     SelectBuilderSql("humanresources.shift", ShiftFields.structure, ShiftRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ShiftRow] = {
-    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift""".query(ShiftRow.jdbcDecoder).selectStream
+    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift""".query(using ShiftRow.jdbcDecoder).selectStream()
   }
   override def selectById(shiftid: ShiftId): ZIO[ZConnection, Throwable, Option[ShiftRow]] = {
-    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".query(ShiftRow.jdbcDecoder).selectOne
+    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".query(using ShiftRow.jdbcDecoder).selectOne
   }
   override def selectByIds(shiftids: Array[ShiftId]): ZStream[ZConnection, Throwable, ShiftRow] = {
-    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ANY(${Segment.paramSegment(shiftids)(ShiftId.arraySetter)})""".query(ShiftRow.jdbcDecoder).selectStream
+    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ANY(${Segment.paramSegment(shiftids)(ShiftId.arraySetter)})""".query(using ShiftRow.jdbcDecoder).selectStream()
   }
   override def update(row: ShiftRow): ZIO[ZConnection, Throwable, Boolean] = {
     val shiftid = row.shiftid
@@ -110,6 +110,6 @@ class ShiftRepoImpl extends ShiftRepo {
             "starttime" = EXCLUDED."starttime",
             "endtime" = EXCLUDED."endtime",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text""".insertReturning(ShiftRow.jdbcDecoder)
+          returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text""".insertReturning(using ShiftRow.jdbcDecoder)
   }
 }

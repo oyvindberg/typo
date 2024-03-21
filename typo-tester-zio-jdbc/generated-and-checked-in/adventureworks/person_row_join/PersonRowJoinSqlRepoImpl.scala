@@ -18,6 +18,6 @@ class PersonRowJoinSqlRepoImpl extends PersonRowJoinSqlRepo {
                    (select ARRAY[ROW(a.emailaddress, a.rowguid)] from person.emailaddress a where a.businessentityid = s.businessentityid) as emails
             FROM sales.salesperson s
       """
-    sql.query(PersonRowJoinSqlRow.jdbcDecoder).selectStream
+    sql.query(using PersonRowJoinSqlRow.jdbcDecoder).selectStream()
   }
 }

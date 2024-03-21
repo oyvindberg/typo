@@ -36,10 +36,10 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     sql"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int2, ${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int2, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDate.put))}::date, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDate.put))}::date, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
-       """.query(EmployeedepartmenthistoryRow.read).unique
+       """.query(using EmployeedepartmenthistoryRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, EmployeedepartmenthistoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(EmployeedepartmenthistoryRow.text)
+    new FragmentOps(sql"""COPY humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using EmployeedepartmenthistoryRow.text)
   }
   override def insert(unsaved: EmployeedepartmenthistoryRowUnsaved): ConnectionIO[EmployeedepartmenthistoryRow] = {
     val fs = List(
@@ -65,21 +65,21 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
             returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
          """
     }
-    q.query(EmployeedepartmenthistoryRow.read).unique
+    q.query(using EmployeedepartmenthistoryRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmployeedepartmenthistoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(EmployeedepartmenthistoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using EmployeedepartmenthistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
     SelectBuilderSql("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields.structure, EmployeedepartmenthistoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, EmployeedepartmenthistoryRow] = {
-    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory""".query(EmployeedepartmenthistoryRow.read).stream
+    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory""".query(using EmployeedepartmenthistoryRow.read).stream
   }
   override def selectById(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Option[EmployeedepartmenthistoryRow]] = {
-    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(Write.fromPut(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(Write.fromPut(ShiftId.put))}""".query(EmployeedepartmenthistoryRow.read).option
+    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(Write.fromPut(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(Write.fromPut(ShiftId.put))}""".query(using EmployeedepartmenthistoryRow.read).option
   }
   override def update(row: EmployeedepartmenthistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -109,6 +109,6 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
             "enddate" = EXCLUDED."enddate",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
-       """.query(EmployeedepartmenthistoryRow.read).unique
+       """.query(using EmployeedepartmenthistoryRow.read).unique
   }
 }

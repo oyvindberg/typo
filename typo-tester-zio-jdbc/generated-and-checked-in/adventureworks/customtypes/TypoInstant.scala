@@ -38,7 +38,7 @@ object TypoInstant {
     },
     "Array[java.lang.String]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoInstant]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoInstant]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoInstant]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -59,7 +59,7 @@ object TypoInstant {
     },
     "java.lang.String"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoInstant] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoInstant] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoInstant] = JsonDecoder.instant.map(TypoInstant.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoInstant] = JsonEncoder.instant.contramap(_.value)
   implicit def ordering(implicit O0: Ordering[Instant]): Ordering[TypoInstant] = Ordering.by(_.value)

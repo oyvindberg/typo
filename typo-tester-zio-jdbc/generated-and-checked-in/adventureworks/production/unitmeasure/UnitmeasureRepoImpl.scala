@@ -34,7 +34,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
     sql"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
           values (${Segment.paramSegment(unsaved.unitmeasurecode)(UnitmeasureId.setter)}::bpchar, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "unitmeasurecode", "name", "modifieddate"::text
-       """.insertReturning(UnitmeasureRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using UnitmeasureRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UnitmeasureRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(UnitmeasureRow.text)
@@ -58,7 +58,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.unitmeasure($names) values ($values) returning "unitmeasurecode", "name", "modifieddate"::text"""
     }
-    q.insertReturning(UnitmeasureRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using UnitmeasureRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -69,13 +69,13 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
     SelectBuilderSql("production.unitmeasure", UnitmeasureFields.structure, UnitmeasureRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, UnitmeasureRow] = {
-    sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure""".query(UnitmeasureRow.jdbcDecoder).selectStream
+    sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure""".query(using UnitmeasureRow.jdbcDecoder).selectStream()
   }
   override def selectById(unitmeasurecode: UnitmeasureId): ZIO[ZConnection, Throwable, Option[UnitmeasureRow]] = {
-    sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure where "unitmeasurecode" = ${Segment.paramSegment(unitmeasurecode)(UnitmeasureId.setter)}""".query(UnitmeasureRow.jdbcDecoder).selectOne
+    sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure where "unitmeasurecode" = ${Segment.paramSegment(unitmeasurecode)(UnitmeasureId.setter)}""".query(using UnitmeasureRow.jdbcDecoder).selectOne
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): ZStream[ZConnection, Throwable, UnitmeasureRow] = {
-    sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure where "unitmeasurecode" = ANY(${Segment.paramSegment(unitmeasurecodes)(UnitmeasureId.arraySetter)})""".query(UnitmeasureRow.jdbcDecoder).selectStream
+    sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure where "unitmeasurecode" = ANY(${Segment.paramSegment(unitmeasurecodes)(UnitmeasureId.arraySetter)})""".query(using UnitmeasureRow.jdbcDecoder).selectStream()
   }
   override def update(row: UnitmeasureRow): ZIO[ZConnection, Throwable, Boolean] = {
     val unitmeasurecode = row.unitmeasurecode
@@ -98,6 +98,6 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
           do update set
             "name" = EXCLUDED."name",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "unitmeasurecode", "name", "modifieddate"::text""".insertReturning(UnitmeasureRow.jdbcDecoder)
+          returning "unitmeasurecode", "name", "modifieddate"::text""".insertReturning(using UnitmeasureRow.jdbcDecoder)
   }
 }

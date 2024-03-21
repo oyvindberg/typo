@@ -33,9 +33,9 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
         case TypesJava.OffsetTime                                          => code"$JsonDecoder.offsetTime"
         case TypesJava.String                                              => code"$JsonDecoder.string"
         case TypesJava.UUID                                                => code"$JsonDecoder.uuid"
-        case sc.Type.ArrayOf(targ)                                         => code"$JsonDecoder.array[$targ](${go(targ)}, implicitly)"
+        case sc.Type.ArrayOf(targ)                                         => code"$JsonDecoder.array[$targ](using ${go(targ)}, implicitly)"
         case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$decoderName(${go(targ)})"
-        case TypesScala.Optional(targ)                                     => code"$JsonDecoder.option(${go(targ)})"
+        case TypesScala.Optional(targ)                                     => code"$JsonDecoder.option(using ${go(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) => code"$tpe.$decoderName"
         case other                                                         => code"${JsonDecoder.of(other)}"
       }
@@ -62,9 +62,9 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
         case TypesJava.OffsetTime                                          => code"$JsonEncoder.offsetTime"
         case TypesJava.String                                              => code"$JsonEncoder.string"
         case TypesJava.UUID                                                => code"$JsonEncoder.uuid"
-        case sc.Type.ArrayOf(targ)                                         => code"$JsonEncoder.array[$targ](${go(targ)}, implicitly)"
+        case sc.Type.ArrayOf(targ)                                         => code"$JsonEncoder.array[$targ](using ${go(targ)}, implicitly)"
         case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$encoderName(${go(targ)})"
-        case TypesScala.Optional(targ)                                     => code"$JsonEncoder.option(${go(targ)})"
+        case TypesScala.Optional(targ)                                     => code"$JsonEncoder.option(using ${go(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) => code"$tpe.$encoderName"
         case other                                                         => code"${JsonEncoder.of(other)}"
       }

@@ -34,10 +34,10 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
     sql"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4, ${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.discountpct)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.`type`)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.category)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.minqty)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.maxqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
-       """.query(SpecialofferRow.read).unique
+       """.query(using SpecialofferRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SpecialofferRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SpecialofferRow.text)
+    new FragmentOps(sql"""COPY sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SpecialofferRow.text)
   }
   override def insert(unsaved: SpecialofferRowUnsaved): ConnectionIO[SpecialofferRow] = {
     val fs = List(
@@ -80,24 +80,24 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
             returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
          """
     }
-    q.query(SpecialofferRow.read).unique
+    q.query(using SpecialofferRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SpecialofferRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.specialoffer("description", "type", "category", "startdate", "enddate", "maxqty", "specialofferid", "discountpct", "minqty", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SpecialofferRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.specialoffer("description", "type", "category", "startdate", "enddate", "maxqty", "specialofferid", "discountpct", "minqty", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SpecialofferRowUnsaved.text)
   }
   override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
     SelectBuilderSql("sales.specialoffer", SpecialofferFields.structure, SpecialofferRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SpecialofferRow] = {
-    sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer""".query(SpecialofferRow.read).stream
+    sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer""".query(using SpecialofferRow.read).stream
   }
   override def selectById(specialofferid: SpecialofferId): ConnectionIO[Option[SpecialofferRow]] = {
-    sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer where "specialofferid" = ${fromWrite(specialofferid)(Write.fromPut(SpecialofferId.put))}""".query(SpecialofferRow.read).option
+    sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer where "specialofferid" = ${fromWrite(specialofferid)(Write.fromPut(SpecialofferId.put))}""".query(using SpecialofferRow.read).option
   }
   override def selectByIds(specialofferids: Array[SpecialofferId]): Stream[ConnectionIO, SpecialofferRow] = {
-    sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer where "specialofferid" = ANY(${specialofferids})""".query(SpecialofferRow.read).stream
+    sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer where "specialofferid" = ANY(${specialofferids})""".query(using SpecialofferRow.read).stream
   }
   override def update(row: SpecialofferRow): ConnectionIO[Boolean] = {
     val specialofferid = row.specialofferid
@@ -148,6 +148,6 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
-       """.query(SpecialofferRow.read).unique
+       """.query(using SpecialofferRow.read).unique
   }
 }

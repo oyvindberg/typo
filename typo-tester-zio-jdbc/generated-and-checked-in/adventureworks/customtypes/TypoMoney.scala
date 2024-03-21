@@ -28,7 +28,7 @@ object TypoMoney {
     },
     "Array[java.math.BigDecimal]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoMoney]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoMoney]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoMoney]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -49,7 +49,7 @@ object TypoMoney {
     },
     "java.math.BigDecimal"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoMoney] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoMoney] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoMoney] = JsonDecoder.scalaBigDecimal.map(TypoMoney.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoMoney] = JsonEncoder.scalaBigDecimal.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoMoney] = Ordering.by(_.value)

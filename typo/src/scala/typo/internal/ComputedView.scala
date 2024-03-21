@@ -12,7 +12,7 @@ case class ComputedView(
     enableFieldValue: Boolean,
     enableDsl: Boolean
 ) extends HasSource {
-  val source = Source.View(view.name, view.isMaterialized)
+  val source: Source.View = Source.View(view.name, view.isMaterialized)
 
   val cols: NonEmptyList[ComputedColumn] =
     view.cols.map { case (col, parsedName) =>

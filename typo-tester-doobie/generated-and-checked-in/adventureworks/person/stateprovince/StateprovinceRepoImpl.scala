@@ -38,10 +38,10 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
     sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4, ${fromWrite(unsaved.stateprovincecode)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.isonlystateprovinceflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
-       """.query(StateprovinceRow.read).unique
+       """.query(using StateprovinceRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, StateprovinceRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(StateprovinceRow.text)
+    new FragmentOps(sql"""COPY person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using StateprovinceRow.text)
   }
   override def insert(unsaved: StateprovinceRowUnsaved): ConnectionIO[StateprovinceRow] = {
     val fs = List(
@@ -78,24 +78,24 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
             returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
          """
     }
-    q.query(StateprovinceRow.read).unique
+    q.query(using StateprovinceRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, StateprovinceRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.stateprovince("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(StateprovinceRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.stateprovince("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using StateprovinceRowUnsaved.text)
   }
   override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
     SelectBuilderSql("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.read)
   }
   override def selectAll: Stream[ConnectionIO, StateprovinceRow] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince""".query(StateprovinceRow.read).stream
+    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince""".query(using StateprovinceRow.read).stream
   }
   override def selectById(stateprovinceid: StateprovinceId): ConnectionIO[Option[StateprovinceRow]] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ${fromWrite(stateprovinceid)(Write.fromPut(StateprovinceId.put))}""".query(StateprovinceRow.read).option
+    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ${fromWrite(stateprovinceid)(Write.fromPut(StateprovinceId.put))}""".query(using StateprovinceRow.read).option
   }
   override def selectByIds(stateprovinceids: Array[StateprovinceId]): Stream[ConnectionIO, StateprovinceRow] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ANY(${stateprovinceids})""".query(StateprovinceRow.read).stream
+    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ANY(${stateprovinceids})""".query(using StateprovinceRow.read).stream
   }
   override def update(row: StateprovinceRow): ConnectionIO[Boolean] = {
     val stateprovinceid = row.stateprovinceid
@@ -137,6 +137,6 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
-       """.query(StateprovinceRow.read).unique
+       """.query(using StateprovinceRow.read).unique
   }
 }

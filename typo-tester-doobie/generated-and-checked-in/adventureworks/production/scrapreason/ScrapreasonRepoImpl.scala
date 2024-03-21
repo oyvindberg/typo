@@ -33,10 +33,10 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
     sql"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
           values (${fromWrite(unsaved.scrapreasonid)(Write.fromPut(ScrapreasonId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "scrapreasonid", "name", "modifieddate"::text
-       """.query(ScrapreasonRow.read).unique
+       """.query(using ScrapreasonRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ScrapreasonRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.scrapreason("scrapreasonid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ScrapreasonRow.text)
+    new FragmentOps(sql"""COPY production.scrapreason("scrapreasonid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ScrapreasonRow.text)
   }
   override def insert(unsaved: ScrapreasonRowUnsaved): ConnectionIO[ScrapreasonRow] = {
     val fs = List(
@@ -62,24 +62,24 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
             returning "scrapreasonid", "name", "modifieddate"::text
          """
     }
-    q.query(ScrapreasonRow.read).unique
+    q.query(using ScrapreasonRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ScrapreasonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.scrapreason("name", "scrapreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ScrapreasonRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.scrapreason("name", "scrapreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ScrapreasonRowUnsaved.text)
   }
   override def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow] = {
     SelectBuilderSql("production.scrapreason", ScrapreasonFields.structure, ScrapreasonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ScrapreasonRow] = {
-    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason""".query(ScrapreasonRow.read).stream
+    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason""".query(using ScrapreasonRow.read).stream
   }
   override def selectById(scrapreasonid: ScrapreasonId): ConnectionIO[Option[ScrapreasonRow]] = {
-    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason where "scrapreasonid" = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}""".query(ScrapreasonRow.read).option
+    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason where "scrapreasonid" = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}""".query(using ScrapreasonRow.read).option
   }
   override def selectByIds(scrapreasonids: Array[ScrapreasonId]): Stream[ConnectionIO, ScrapreasonRow] = {
-    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason where "scrapreasonid" = ANY(${scrapreasonids})""".query(ScrapreasonRow.read).stream
+    sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason where "scrapreasonid" = ANY(${scrapreasonids})""".query(using ScrapreasonRow.read).stream
   }
   override def update(row: ScrapreasonRow): ConnectionIO[Boolean] = {
     val scrapreasonid = row.scrapreasonid
@@ -106,6 +106,6 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
             "name" = EXCLUDED."name",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "scrapreasonid", "name", "modifieddate"::text
-       """.query(ScrapreasonRow.read).unique
+       """.query(using ScrapreasonRow.read).unique
   }
 }

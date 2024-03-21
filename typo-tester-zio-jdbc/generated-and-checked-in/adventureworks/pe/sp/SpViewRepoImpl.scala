@@ -18,6 +18,6 @@ class SpViewRepoImpl extends SpViewRepo {
     SelectBuilderSql("pe.sp", SpViewFields.structure, SpViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SpViewRow] = {
-    sql"""select "id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from pe.sp""".query(SpViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from pe.sp""".query(using SpViewRow.jdbcDecoder).selectStream()
   }
 }

@@ -18,6 +18,6 @@ class BecViewRepoImpl extends BecViewRepo {
     SelectBuilderSql("pe.bec", BecViewFields.structure, BecViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, BecViewRow] = {
-    sql"""select "id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from pe.bec""".query(BecViewRow.read).stream
+    sql"""select "id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from pe.bec""".query(using BecViewRow.read).stream
   }
 }

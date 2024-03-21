@@ -34,7 +34,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
     sql"""insert into myschema.football_club("id", "name")
           values (${Segment.paramSegment(unsaved.id)(FootballClubId.setter)}::int8, ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)})
           returning "id", "name"
-       """.insertReturning(FootballClubRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using FootballClubRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FootballClubRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY myschema.football_club("id", "name") FROM STDIN""", batchSize, unsaved)(FootballClubRow.text)
@@ -43,13 +43,13 @@ class FootballClubRepoImpl extends FootballClubRepo {
     SelectBuilderSql("myschema.football_club", FootballClubFields.structure, FootballClubRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club""".query(FootballClubRow.jdbcDecoder).selectStream
+    sql"""select "id", "name" from myschema.football_club""".query(using FootballClubRow.jdbcDecoder).selectStream()
   }
   override def selectById(id: FootballClubId): ZIO[ZConnection, Throwable, Option[FootballClubRow]] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".query(FootballClubRow.jdbcDecoder).selectOne
+    sql"""select "id", "name" from myschema.football_club where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".query(using FootballClubRow.jdbcDecoder).selectOne
   }
   override def selectByIds(ids: Array[FootballClubId]): ZStream[ZConnection, Throwable, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${Segment.paramSegment(ids)(FootballClubId.arraySetter)})""".query(FootballClubRow.jdbcDecoder).selectStream
+    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${Segment.paramSegment(ids)(FootballClubId.arraySetter)})""".query(using FootballClubRow.jdbcDecoder).selectStream()
   }
   override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, FootballClubRow] = {
     fieldValues match {
@@ -61,7 +61,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
             case FootballClubFieldValue.name(value) => sql""""name" = ${Segment.paramSegment(value)(Setter.stringSetter)}"""
           }
         )
-        sql"""select "id", "name" from myschema.football_club where $wheres""".query(FootballClubRow.jdbcDecoder).selectStream
+        sql"""select "id", "name" from myschema.football_club where $wheres""".query(using FootballClubRow.jdbcDecoder).selectStream()
     }
   }
   override def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Boolean] = {
@@ -93,6 +93,6 @@ class FootballClubRepoImpl extends FootballClubRepo {
           on conflict ("id")
           do update set
             "name" = EXCLUDED."name"
-          returning "id", "name"""".insertReturning(FootballClubRow.jdbcDecoder)
+          returning "id", "name"""".insertReturning(using FootballClubRow.jdbcDecoder)
   }
 }

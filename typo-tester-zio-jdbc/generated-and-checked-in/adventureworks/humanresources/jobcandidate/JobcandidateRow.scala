@@ -44,8 +44,8 @@ object JobcandidateRow {
   }
   implicit lazy val jsonDecoder: JsonDecoder[JobcandidateRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val jobcandidateid = jsonObj.get("jobcandidateid").toRight("Missing field 'jobcandidateid'").flatMap(_.as(JobcandidateId.jsonDecoder))
-    val businessentityid = jsonObj.get("businessentityid").fold[Either[String, Option[BusinessentityId]]](Right(None))(_.as(JsonDecoder.option(BusinessentityId.jsonDecoder)))
-    val resume = jsonObj.get("resume").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(TypoXml.jsonDecoder)))
+    val businessentityid = jsonObj.get("businessentityid").fold[Either[String, Option[BusinessentityId]]](Right(None))(_.as(JsonDecoder.option(using BusinessentityId.jsonDecoder)))
+    val resume = jsonObj.get("resume").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(using TypoXml.jsonDecoder)))
     val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(TypoLocalDateTime.jsonDecoder))
     if (jobcandidateid.isRight && businessentityid.isRight && resume.isRight && modifieddate.isRight)
       Right(JobcandidateRow(jobcandidateid = jobcandidateid.toOption.get, businessentityid = businessentityid.toOption.get, resume = resume.toOption.get, modifieddate = modifieddate.toOption.get))
@@ -58,10 +58,10 @@ object JobcandidateRow {
       JobcandidateId.jsonEncoder.unsafeEncode(a.jobcandidateid, indent, out)
       out.write(",")
       out.write(""""businessentityid":""")
-      JsonEncoder.option(BusinessentityId.jsonEncoder).unsafeEncode(a.businessentityid, indent, out)
+      JsonEncoder.option(using BusinessentityId.jsonEncoder).unsafeEncode(a.businessentityid, indent, out)
       out.write(",")
       out.write(""""resume":""")
-      JsonEncoder.option(TypoXml.jsonEncoder).unsafeEncode(a.resume, indent, out)
+      JsonEncoder.option(using TypoXml.jsonEncoder).unsafeEncode(a.resume, indent, out)
       out.write(",")
       out.write(""""modifieddate":""")
       TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)

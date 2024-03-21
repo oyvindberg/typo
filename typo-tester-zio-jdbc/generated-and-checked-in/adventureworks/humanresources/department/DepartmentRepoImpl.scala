@@ -34,7 +34,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
     sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
           values (${Segment.paramSegment(unsaved.departmentid)(DepartmentId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.groupname)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "departmentid", "name", "groupname", "modifieddate"::text
-       """.insertReturning(DepartmentRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using DepartmentRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DepartmentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""", batchSize, unsaved)(DepartmentRow.text)
@@ -62,7 +62,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into humanresources.department($names) values ($values) returning "departmentid", "name", "groupname", "modifieddate"::text"""
     }
-    q.insertReturning(DepartmentRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using DepartmentRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -73,13 +73,13 @@ class DepartmentRepoImpl extends DepartmentRepo {
     SelectBuilderSql("humanresources.department", DepartmentFields.structure, DepartmentRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, DepartmentRow] = {
-    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department""".query(DepartmentRow.jdbcDecoder).selectStream
+    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department""".query(using DepartmentRow.jdbcDecoder).selectStream()
   }
   override def selectById(departmentid: DepartmentId): ZIO[ZConnection, Throwable, Option[DepartmentRow]] = {
-    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ${Segment.paramSegment(departmentid)(DepartmentId.setter)}""".query(DepartmentRow.jdbcDecoder).selectOne
+    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ${Segment.paramSegment(departmentid)(DepartmentId.setter)}""".query(using DepartmentRow.jdbcDecoder).selectOne
   }
   override def selectByIds(departmentids: Array[DepartmentId]): ZStream[ZConnection, Throwable, DepartmentRow] = {
-    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ANY(${Segment.paramSegment(departmentids)(DepartmentId.arraySetter)})""".query(DepartmentRow.jdbcDecoder).selectStream
+    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ANY(${Segment.paramSegment(departmentids)(DepartmentId.arraySetter)})""".query(using DepartmentRow.jdbcDecoder).selectStream()
   }
   override def update(row: DepartmentRow): ZIO[ZConnection, Throwable, Boolean] = {
     val departmentid = row.departmentid
@@ -105,6 +105,6 @@ class DepartmentRepoImpl extends DepartmentRepo {
             "name" = EXCLUDED."name",
             "groupname" = EXCLUDED."groupname",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "departmentid", "name", "groupname", "modifieddate"::text""".insertReturning(DepartmentRow.jdbcDecoder)
+          returning "departmentid", "name", "groupname", "modifieddate"::text""".insertReturning(using DepartmentRow.jdbcDecoder)
   }
 }

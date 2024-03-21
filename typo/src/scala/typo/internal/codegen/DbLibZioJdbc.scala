@@ -240,12 +240,12 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       case RepoMethod.SelectAll(relName, cols, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
         val sql = SQL(code"""select $joinedColNames from $relName""")
-        code"""$sql.query(${lookupJdbcDecoder(rowType)}).selectStream"""
+        code"""$sql.query(using ${lookupJdbcDecoder(rowType)}).selectStream()"""
 
       case RepoMethod.SelectById(relName, cols, id, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
         val sql = SQL(code"""select $joinedColNames from $relName where ${matchId(id)}""")
-        code"""$sql.query(${lookupJdbcDecoder(rowType)}).selectOne"""
+        code"""$sql.query(using ${lookupJdbcDecoder(rowType)}).selectOne"""
 
       case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
@@ -253,7 +253,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         val sql = SQL(
           code"""select $joinedColNames from $relName where ${unaryId.col.dbName} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe)})"""
         )
-        code"""$sql.query(${lookupJdbcDecoder(rowType)}).selectStream"""
+        code"""$sql.query(using ${lookupJdbcDecoder(rowType)}).selectStream()"""
       case RepoMethod.SelectByUnique(relName, keyColumns, allCols, rowType) =>
         val sql = SQL {
           code"""|select ${dbNames(allCols, isRead = true)}
@@ -261,7 +261,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
                  |where ${keyColumns.map(c => code"${c.dbName} = ${runtimeInterpolateValue(c.name, c.tpe)}").mkCode(" AND ")}
                  |""".stripMargin
         }
-        code"""$sql.query(${lookupJdbcDecoder(rowType)}).selectOne"""
+        code"""$sql.query(using ${lookupJdbcDecoder(rowType)}).selectOne"""
 
       case RepoMethod.SelectByFieldValues(relName, cols, fieldValue, fieldValueOrIdsParam, rowType) =>
         val cases =
@@ -278,7 +278,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
               |        ${cases.mkCode("\n")}
               |      }
               |    )
-              |    ${SQL(code"""select ${dbNames(cols, isRead = true)} from $relName where $$wheres""")}.query(${lookupJdbcDecoder(rowType)}).selectStream
+              |    ${SQL(code"""select ${dbNames(cols, isRead = true)} from $relName where $$wheres""")}.query(using ${lookupJdbcDecoder(rowType)}).selectStream()
               |}""".stripMargin
 
       case RepoMethod.UpdateFieldValues(relName, id, varargs, fieldValue, cases0, _) =>
@@ -344,7 +344,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
                |  val values = fs.map { case (_, f) => f }.mkFragment($SqlFragment(", "))
                |  ${SQL(code"insert into $relName($$names) values ($$values) returning ${dbNames(cols, isRead = true)}")}
                |}
-               |q.insertReturning(${lookupJdbcDecoder(rowType)}).map(_.updatedKeys.head)
+               |q.insertReturning(using ${lookupJdbcDecoder(rowType)}).map(_.updatedKeys.head)
                |"""
       case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType) =>
         val values = cols.map { c =>
@@ -380,7 +380,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
           ).flatten.mkCode("\n")
         }
 
-        code"$sql.insertReturning(${lookupJdbcDecoder(rowType)})"
+        code"$sql.insertReturning(using ${lookupJdbcDecoder(rowType)})"
 
       case RepoMethod.Insert(relName, cols, unsavedParam, rowType) =>
         val values = cols.map { c =>
@@ -393,7 +393,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
                  |""".stripMargin
         }
 
-        code"$sql.insertReturning(${lookupJdbcDecoder(rowType)}).map(_.updatedKeys.head)"
+        code"$sql.insertReturning(using ${lookupJdbcDecoder(rowType)}).map(_.updatedKeys.head)"
       case RepoMethod.InsertStreaming(relName, cols, rowType) =>
         val sql = sc.s(code"COPY $relName(${dbNames(cols, isRead = false)}) FROM STDIN")
         code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.lookupTextFor(rowType)})"
@@ -433,7 +433,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
 
           code"""|val sql =
                  |  ${SQL(renderedWithCasts)}
-                 |sql.query(${lookupJdbcDecoder(rowName)}).selectStream""".stripMargin
+                 |sql.query(using ${lookupJdbcDecoder(rowName)}).selectStream()""".stripMargin
         }
         ret.getOrElse {
           code"${SQL(renderedScript)}.update"
@@ -570,7 +570,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       implicitParams = Nil,
       tpe = JdbcEncoder.of(sc.Type.ArrayOf(wrapperType)),
       // JdbcEncoder for unary types defined in terms of `Setter`
-      body = code"""$JdbcEncoder.singleParamEncoder(${arraySetterName})"""
+      body = code"""$JdbcEncoder.singleParamEncoder(using ${arraySetterName})"""
     )
     val jdbcEncoder = sc.Given(
       tparams = Nil,
@@ -732,7 +732,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         name = sc.Ident(s"${T.name.value}ArrayEncoder"),
         implicitParams = Nil,
         tpe = JdbcEncoder.of(sc.Type.ArrayOf(T)),
-        body = code"""$JdbcEncoder.singleParamEncoder(${T.name.value}ArraySetter)"""
+        body = code"""$JdbcEncoder.singleParamEncoder(using ${T.name.value}ArraySetter)"""
       )
     }
 
@@ -814,7 +814,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       implicitParams = Nil,
       tpe = JdbcEncoder.of(ct.typoType),
       // JdbcEncoder for unary types defined in terms of `Setter`
-      body = code"""$JdbcEncoder.singleParamEncoder($setterName)"""
+      body = code"""$JdbcEncoder.singleParamEncoder(using $setterName)"""
     )
 
     val jdbcDecoder = {
@@ -863,7 +863,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       implicitParams = Nil,
       tpe = JdbcEncoder.of(sc.Type.ArrayOf(ct.typoType)),
       // JdbcEncoder for unary types defined in terms of `Setter`
-      body = code"""$JdbcEncoder.singleParamEncoder(${arraySetterName})"""
+      body = code"""$JdbcEncoder.singleParamEncoder(using ${arraySetterName})"""
     )
 
     val jdbcDecoder = {

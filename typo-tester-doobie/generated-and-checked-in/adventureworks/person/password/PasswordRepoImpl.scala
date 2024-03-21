@@ -35,10 +35,10 @@ class PasswordRepoImpl extends PasswordRepo {
     sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.passwordhash)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.passwordsalt)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
-       """.query(PasswordRow.read).unique
+       """.query(using PasswordRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PasswordRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(PasswordRow.text)
+    new FragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PasswordRow.text)
   }
   override def insert(unsaved: PasswordRowUnsaved): ConnectionIO[PasswordRow] = {
     val fs = List(
@@ -66,24 +66,24 @@ class PasswordRepoImpl extends PasswordRepo {
             returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
          """
     }
-    q.query(PasswordRow.read).unique
+    q.query(using PasswordRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PasswordRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PasswordRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PasswordRowUnsaved.text)
   }
   override def select: SelectBuilder[PasswordFields, PasswordRow] = {
     SelectBuilderSql("person.password", PasswordFields.structure, PasswordRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PasswordRow] = {
-    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password""".query(PasswordRow.read).stream
+    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password""".query(using PasswordRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PasswordRow]] = {
-    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(PasswordRow.read).option
+    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using PasswordRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PasswordRow] = {
-    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ANY(${businessentityids})""".query(PasswordRow.read).stream
+    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ANY(${businessentityids})""".query(using PasswordRow.read).stream
   }
   override def update(row: PasswordRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -116,6 +116,6 @@ class PasswordRepoImpl extends PasswordRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
-       """.query(PasswordRow.read).unique
+       """.query(using PasswordRow.read).unique
   }
 }

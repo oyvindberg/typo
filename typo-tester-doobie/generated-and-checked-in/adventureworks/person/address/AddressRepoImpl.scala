@@ -36,10 +36,10 @@ class AddressRepoImpl extends AddressRepo {
     sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.addressid)(Write.fromPut(AddressId.put))}::int4, ${fromWrite(unsaved.addressline1)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.addressline2)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.city)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4, ${fromWrite(unsaved.postalcode)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.spatiallocation)(Write.fromPutOption(TypoBytea.put))}::bytea, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
-       """.query(AddressRow.read).unique
+       """.query(using AddressRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, AddressRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(AddressRow.text)
+    new FragmentOps(sql"""COPY person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using AddressRow.text)
   }
   override def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow] = {
     val fs = List(
@@ -74,24 +74,24 @@ class AddressRepoImpl extends AddressRepo {
             returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
          """
     }
-    q.query(AddressRow.read).unique
+    q.query(using AddressRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, AddressRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.address("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(AddressRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.address("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using AddressRowUnsaved.text)
   }
   override def select: SelectBuilder[AddressFields, AddressRow] = {
     SelectBuilderSql("person.address", AddressFields.structure, AddressRow.read)
   }
   override def selectAll: Stream[ConnectionIO, AddressRow] = {
-    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address""".query(AddressRow.read).stream
+    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address""".query(using AddressRow.read).stream
   }
   override def selectById(addressid: AddressId): ConnectionIO[Option[AddressRow]] = {
-    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address where "addressid" = ${fromWrite(addressid)(Write.fromPut(AddressId.put))}""".query(AddressRow.read).option
+    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address where "addressid" = ${fromWrite(addressid)(Write.fromPut(AddressId.put))}""".query(using AddressRow.read).option
   }
   override def selectByIds(addressids: Array[AddressId]): Stream[ConnectionIO, AddressRow] = {
-    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address where "addressid" = ANY(${addressids})""".query(AddressRow.read).stream
+    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address where "addressid" = ANY(${addressids})""".query(using AddressRow.read).stream
   }
   override def update(row: AddressRow): ConnectionIO[Boolean] = {
     val addressid = row.addressid
@@ -136,6 +136,6 @@ class AddressRepoImpl extends AddressRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
-       """.query(AddressRow.read).unique
+       """.query(using AddressRow.read).unique
   }
 }

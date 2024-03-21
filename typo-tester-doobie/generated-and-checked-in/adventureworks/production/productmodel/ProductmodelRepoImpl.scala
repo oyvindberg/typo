@@ -35,10 +35,10 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
     sql"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.productmodelid)(Write.fromPut(ProductmodelId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.catalogdescription)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.instructions)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
-       """.query(ProductmodelRow.read).unique
+       """.query(using ProductmodelRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductmodelRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductmodelRow.text)
+    new FragmentOps(sql"""COPY production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductmodelRow.text)
   }
   override def insert(unsaved: ProductmodelRowUnsaved): ConnectionIO[ProductmodelRow] = {
     val fs = List(
@@ -70,24 +70,24 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
             returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
          """
     }
-    q.query(ProductmodelRow.read).unique
+    q.query(using ProductmodelRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductmodelRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productmodel("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductmodelRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productmodel("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductmodelRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelFields, ProductmodelRow] = {
     SelectBuilderSql("production.productmodel", ProductmodelFields.structure, ProductmodelRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelRow] = {
-    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel""".query(ProductmodelRow.read).stream
+    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel""".query(using ProductmodelRow.read).stream
   }
   override def selectById(productmodelid: ProductmodelId): ConnectionIO[Option[ProductmodelRow]] = {
-    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel where "productmodelid" = ${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.put))}""".query(ProductmodelRow.read).option
+    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel where "productmodelid" = ${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.put))}""".query(using ProductmodelRow.read).option
   }
   override def selectByIds(productmodelids: Array[ProductmodelId]): Stream[ConnectionIO, ProductmodelRow] = {
-    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel where "productmodelid" = ANY(${productmodelids})""".query(ProductmodelRow.read).stream
+    sql"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from production.productmodel where "productmodelid" = ANY(${productmodelids})""".query(using ProductmodelRow.read).stream
   }
   override def update(row: ProductmodelRow): ConnectionIO[Boolean] = {
     val productmodelid = row.productmodelid
@@ -123,6 +123,6 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
-       """.query(ProductmodelRow.read).unique
+       """.query(using ProductmodelRow.read).unique
   }
 }

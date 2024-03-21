@@ -34,10 +34,10 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
           values (${fromWrite(unsaved.jobcandidateid)(Write.fromPut(JobcandidateId.put))}::int4, ${fromWrite(unsaved.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.resume)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
-       """.query(JobcandidateRow.read).unique
+       """.query(using JobcandidateRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(JobcandidateRow.text)
+    new FragmentOps(sql"""COPY humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using JobcandidateRow.text)
   }
   override def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow] = {
     val fs = List(
@@ -64,24 +64,24 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
             returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
          """
     }
-    q.query(JobcandidateRow.read).unique
+    q.query(using JobcandidateRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, JobcandidateRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.jobcandidate("businessentityid", "resume", "jobcandidateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(JobcandidateRowUnsaved.text)
+    new FragmentOps(sql"""COPY humanresources.jobcandidate("businessentityid", "resume", "jobcandidateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using JobcandidateRowUnsaved.text)
   }
   override def select: SelectBuilder[JobcandidateFields, JobcandidateRow] = {
     SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.read)
   }
   override def selectAll: Stream[ConnectionIO, JobcandidateRow] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate""".query(JobcandidateRow.read).stream
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate""".query(using JobcandidateRow.read).stream
   }
   override def selectById(jobcandidateid: JobcandidateId): ConnectionIO[Option[JobcandidateRow]] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}""".query(JobcandidateRow.read).option
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}""".query(using JobcandidateRow.read).option
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ANY(${jobcandidateids})""".query(JobcandidateRow.read).stream
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ANY(${jobcandidateids})""".query(using JobcandidateRow.read).stream
   }
   override def update(row: JobcandidateRow): ConnectionIO[Boolean] = {
     val jobcandidateid = row.jobcandidateid
@@ -111,6 +111,6 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
             "resume" = EXCLUDED."resume",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
-       """.query(JobcandidateRow.read).unique
+       """.query(using JobcandidateRow.read).unique
   }
 }

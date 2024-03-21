@@ -35,7 +35,7 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
     sql"""insert into production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate")
           values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.listprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text
-       """.insertReturning(ProductlistpricehistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ProductlistpricehistoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductlistpricehistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductlistpricehistoryRow.text)
@@ -61,7 +61,7 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.productlistpricehistory($names) values ($values) returning "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text"""
     }
-    q.insertReturning(ProductlistpricehistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ProductlistpricehistoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -72,10 +72,10 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
     SelectBuilderSql("production.productlistpricehistory", ProductlistpricehistoryFields.structure, ProductlistpricehistoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductlistpricehistoryRow] = {
-    sql"""select "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text from production.productlistpricehistory""".query(ProductlistpricehistoryRow.jdbcDecoder).selectStream
+    sql"""select "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text from production.productlistpricehistory""".query(using ProductlistpricehistoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: ProductlistpricehistoryId): ZIO[ZConnection, Throwable, Option[ProductlistpricehistoryRow]] = {
-    sql"""select "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text from production.productlistpricehistory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".query(ProductlistpricehistoryRow.jdbcDecoder).selectOne
+    sql"""select "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text from production.productlistpricehistory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".query(using ProductlistpricehistoryRow.jdbcDecoder).selectOne
   }
   override def update(row: ProductlistpricehistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -102,6 +102,6 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
             "enddate" = EXCLUDED."enddate",
             "listprice" = EXCLUDED."listprice",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text""".insertReturning(ProductlistpricehistoryRow.jdbcDecoder)
+          returning "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text""".insertReturning(using ProductlistpricehistoryRow.jdbcDecoder)
   }
 }

@@ -39,7 +39,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.salesorderid)(SalesorderheaderId.setter)}::int4, ${Segment.paramSegment(unsaved.salesorderdetailid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.carriertrackingnumber)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.orderqty)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.specialofferid)(SpecialofferId.setter)}::int4, ${Segment.paramSegment(unsaved.unitprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.unitpricediscount)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
-       """.insertReturning(SalesorderdetailRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using SalesorderdetailRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderdetailRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderdetailRow.text)
@@ -79,7 +79,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into sales.salesorderdetail($names) values ($values) returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(SalesorderdetailRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using SalesorderdetailRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -90,10 +90,10 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     SelectBuilderSql("sales.salesorderdetail", SalesorderdetailFields.structure, SalesorderdetailRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalesorderdetailRow] = {
-    sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sales.salesorderdetail""".query(SalesorderdetailRow.jdbcDecoder).selectStream
+    sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sales.salesorderdetail""".query(using SalesorderdetailRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: SalesorderdetailId): ZIO[ZConnection, Throwable, Option[SalesorderdetailRow]] = {
-    sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sales.salesorderdetail where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".query(SalesorderdetailRow.jdbcDecoder).selectOne
+    sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sales.salesorderdetail where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".query(using SalesorderdetailRow.jdbcDecoder).selectOne
   }
   override def update(row: SalesorderdetailRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -135,6 +135,6 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
             "unitpricediscount" = EXCLUDED."unitpricediscount",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text""".insertReturning(SalesorderdetailRow.jdbcDecoder)
+          returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text""".insertReturning(using SalesorderdetailRow.jdbcDecoder)
   }
 }

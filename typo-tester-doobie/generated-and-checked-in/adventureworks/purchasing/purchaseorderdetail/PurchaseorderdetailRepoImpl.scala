@@ -22,9 +22,9 @@ class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields.structure, PurchaseorderdetailRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow] = {
-    sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from purchasing.purchaseorderdetail""".query(PurchaseorderdetailRow.read).stream
+    sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from purchasing.purchaseorderdetail""".query(using PurchaseorderdetailRow.read).stream
   }
   override def selectById(compositeId: PurchaseorderdetailId): ConnectionIO[Option[PurchaseorderdetailRow]] = {
-    sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from purchasing.purchaseorderdetail where "purchaseorderid" = ${fromWrite(compositeId.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))} AND "purchaseorderdetailid" = ${fromWrite(compositeId.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}""".query(PurchaseorderdetailRow.read).option
+    sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from purchasing.purchaseorderdetail where "purchaseorderid" = ${fromWrite(compositeId.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))} AND "purchaseorderdetailid" = ${fromWrite(compositeId.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}""".query(using PurchaseorderdetailRow.read).option
   }
 }

@@ -18,6 +18,6 @@ class VvendorwithaddressesViewRepoImpl extends VvendorwithaddressesViewRepo {
     SelectBuilderSql("purchasing.vvendorwithaddresses", VvendorwithaddressesViewFields.structure, VvendorwithaddressesViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VvendorwithaddressesViewRow] = {
-    sql"""select "businessentityid", "name", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname" from purchasing.vvendorwithaddresses""".query(VvendorwithaddressesViewRow.read).stream
+    sql"""select "businessentityid", "name", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname" from purchasing.vvendorwithaddresses""".query(using VvendorwithaddressesViewRow.read).stream
   }
 }

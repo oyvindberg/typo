@@ -18,6 +18,6 @@ class PcViewRepoImpl extends PcViewRepo {
     SelectBuilderSql("pr.pc", PcViewFields.structure, PcViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PcViewRow] = {
-    sql"""select "id", "productcategoryid", "name", "rowguid", "modifieddate"::text from pr.pc""".query(PcViewRow.read).stream
+    sql"""select "id", "productcategoryid", "name", "rowguid", "modifieddate"::text from pr.pc""".query(using PcViewRow.read).stream
   }
 }

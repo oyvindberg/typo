@@ -18,6 +18,6 @@ class PcViewRepoImpl extends PcViewRepo {
     SelectBuilderSql("pr.pc", PcViewFields.structure, PcViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PcViewRow] = {
-    sql"""select "id", "productcategoryid", "name", "rowguid", "modifieddate"::text from pr.pc""".query(PcViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "productcategoryid", "name", "rowguid", "modifieddate"::text from pr.pc""".query(using PcViewRow.jdbcDecoder).selectStream()
   }
 }

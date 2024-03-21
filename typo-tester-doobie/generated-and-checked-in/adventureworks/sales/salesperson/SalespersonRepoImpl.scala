@@ -36,10 +36,10 @@ class SalespersonRepoImpl extends SalespersonRepo {
     sql"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.salesquota)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.bonus)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.commissionpct)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.salesytd)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.saleslastyear)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
-       """.query(SalespersonRow.read).unique
+       """.query(using SalespersonRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SalespersonRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SalespersonRow.text)
+    new FragmentOps(sql"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalespersonRow.text)
   }
   override def insert(unsaved: SalespersonRowUnsaved): ConnectionIO[SalespersonRow] = {
     val fs = List(
@@ -83,24 +83,24 @@ class SalespersonRepoImpl extends SalespersonRepo {
             returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
          """
     }
-    q.query(SalespersonRow.read).unique
+    q.query(using SalespersonRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalespersonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SalespersonRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalespersonRowUnsaved.text)
   }
   override def select: SelectBuilder[SalespersonFields, SalespersonRow] = {
     SelectBuilderSql("sales.salesperson", SalespersonFields.structure, SalespersonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SalespersonRow] = {
-    sql"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text from sales.salesperson""".query(SalespersonRow.read).stream
+    sql"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text from sales.salesperson""".query(using SalespersonRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[SalespersonRow]] = {
-    sql"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text from sales.salesperson where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(SalespersonRow.read).option
+    sql"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text from sales.salesperson where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using SalespersonRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, SalespersonRow] = {
-    sql"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text from sales.salesperson where "businessentityid" = ANY(${businessentityids})""".query(SalespersonRow.read).stream
+    sql"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text from sales.salesperson where "businessentityid" = ANY(${businessentityids})""".query(using SalespersonRow.read).stream
   }
   override def update(row: SalespersonRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -145,6 +145,6 @@ class SalespersonRepoImpl extends SalespersonRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
-       """.query(SalespersonRow.read).unique
+       """.query(using SalespersonRow.read).unique
   }
 }

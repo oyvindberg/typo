@@ -18,6 +18,6 @@ class CtViewRepoImpl extends CtViewRepo {
     SelectBuilderSql("pe.ct", CtViewFields.structure, CtViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CtViewRow] = {
-    sql"""select "id", "contacttypeid", "name", "modifieddate"::text from pe.ct""".query(CtViewRow.read).stream
+    sql"""select "id", "contacttypeid", "name", "modifieddate"::text from pe.ct""".query(using CtViewRow.read).stream
   }
 }

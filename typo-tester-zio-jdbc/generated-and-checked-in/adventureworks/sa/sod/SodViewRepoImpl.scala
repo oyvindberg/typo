@@ -18,6 +18,6 @@ class SodViewRepoImpl extends SodViewRepo {
     SelectBuilderSql("sa.sod", SodViewFields.structure, SodViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SodViewRow] = {
-    sql"""select "id", "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sa.sod""".query(SodViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sa.sod""".query(using SodViewRow.jdbcDecoder).selectStream()
   }
 }

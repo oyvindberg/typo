@@ -69,8 +69,8 @@ object SalespersonRow {
   }
   implicit lazy val jsonDecoder: JsonDecoder[SalespersonRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val businessentityid = jsonObj.get("businessentityid").toRight("Missing field 'businessentityid'").flatMap(_.as(BusinessentityId.jsonDecoder))
-    val territoryid = jsonObj.get("territoryid").fold[Either[String, Option[SalesterritoryId]]](Right(None))(_.as(JsonDecoder.option(SalesterritoryId.jsonDecoder)))
-    val salesquota = jsonObj.get("salesquota").fold[Either[String, Option[BigDecimal]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.scalaBigDecimal)))
+    val territoryid = jsonObj.get("territoryid").fold[Either[String, Option[SalesterritoryId]]](Right(None))(_.as(JsonDecoder.option(using SalesterritoryId.jsonDecoder)))
+    val salesquota = jsonObj.get("salesquota").fold[Either[String, Option[BigDecimal]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.scalaBigDecimal)))
     val bonus = jsonObj.get("bonus").toRight("Missing field 'bonus'").flatMap(_.as(JsonDecoder.scalaBigDecimal))
     val commissionpct = jsonObj.get("commissionpct").toRight("Missing field 'commissionpct'").flatMap(_.as(JsonDecoder.scalaBigDecimal))
     val salesytd = jsonObj.get("salesytd").toRight("Missing field 'salesytd'").flatMap(_.as(JsonDecoder.scalaBigDecimal))
@@ -88,10 +88,10 @@ object SalespersonRow {
       BusinessentityId.jsonEncoder.unsafeEncode(a.businessentityid, indent, out)
       out.write(",")
       out.write(""""territoryid":""")
-      JsonEncoder.option(SalesterritoryId.jsonEncoder).unsafeEncode(a.territoryid, indent, out)
+      JsonEncoder.option(using SalesterritoryId.jsonEncoder).unsafeEncode(a.territoryid, indent, out)
       out.write(",")
       out.write(""""salesquota":""")
-      JsonEncoder.option(JsonEncoder.scalaBigDecimal).unsafeEncode(a.salesquota, indent, out)
+      JsonEncoder.option(using JsonEncoder.scalaBigDecimal).unsafeEncode(a.salesquota, indent, out)
       out.write(",")
       out.write(""""bonus":""")
       JsonEncoder.scalaBigDecimal.unsafeEncode(a.bonus, indent, out)

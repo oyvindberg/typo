@@ -18,6 +18,6 @@ class UmViewRepoImpl extends UmViewRepo {
     SelectBuilderSql("pr.um", UmViewFields.structure, UmViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, UmViewRow] = {
-    sql"""select "id", "unitmeasurecode", "name", "modifieddate"::text from pr.um""".query(UmViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "unitmeasurecode", "name", "modifieddate"::text from pr.um""".query(using UmViewRow.jdbcDecoder).selectStream()
   }
 }

@@ -33,10 +33,10 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
     sql"""insert into production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (${fromWrite(unsaved.transactionid)(Write.fromPut(TransactionhistoryarchiveId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.referenceorderid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.referenceorderlineid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.transactiondate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.transactiontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.actualcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
-       """.query(TransactionhistoryarchiveRow.read).unique
+       """.query(using TransactionhistoryarchiveRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryarchiveRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(TransactionhistoryarchiveRow.text)
+    new FragmentOps(sql"""COPY production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using TransactionhistoryarchiveRow.text)
   }
   override def insert(unsaved: TransactionhistoryarchiveRowUnsaved): ConnectionIO[TransactionhistoryarchiveRow] = {
     val fs = List(
@@ -71,24 +71,24 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
             returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
          """
     }
-    q.query(TransactionhistoryarchiveRow.read).unique
+    q.query(using TransactionhistoryarchiveRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryarchiveRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(TransactionhistoryarchiveRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using TransactionhistoryarchiveRowUnsaved.text)
   }
   override def select: SelectBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
     SelectBuilderSql("production.transactionhistoryarchive", TransactionhistoryarchiveFields.structure, TransactionhistoryarchiveRow.read)
   }
   override def selectAll: Stream[ConnectionIO, TransactionhistoryarchiveRow] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistoryarchive""".query(TransactionhistoryarchiveRow.read).stream
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistoryarchive""".query(using TransactionhistoryarchiveRow.read).stream
   }
   override def selectById(transactionid: TransactionhistoryarchiveId): ConnectionIO[Option[TransactionhistoryarchiveRow]] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistoryarchive where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryarchiveId.put))}""".query(TransactionhistoryarchiveRow.read).option
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistoryarchive where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryarchiveId.put))}""".query(using TransactionhistoryarchiveRow.read).option
   }
   override def selectByIds(transactionids: Array[TransactionhistoryarchiveId]): Stream[ConnectionIO, TransactionhistoryarchiveRow] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistoryarchive where "transactionid" = ANY(${transactionids})""".query(TransactionhistoryarchiveRow.read).stream
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistoryarchive where "transactionid" = ANY(${transactionids})""".query(using TransactionhistoryarchiveRow.read).stream
   }
   override def update(row: TransactionhistoryarchiveRow): ConnectionIO[Boolean] = {
     val transactionid = row.transactionid
@@ -133,6 +133,6 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
             "actualcost" = EXCLUDED."actualcost",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
-       """.query(TransactionhistoryarchiveRow.read).unique
+       """.query(using TransactionhistoryarchiveRow.read).unique
   }
 }

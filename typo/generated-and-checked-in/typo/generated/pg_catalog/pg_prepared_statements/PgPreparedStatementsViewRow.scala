@@ -48,7 +48,7 @@ object PgPreparedStatementsViewRow {
           name = json.\("name").toOption.map(_.as(Reads.StringReads)),
           statement = json.\("statement").toOption.map(_.as(Reads.StringReads)),
           prepareTime = json.\("prepare_time").toOption.map(_.as(TypoOffsetDateTime.reads)),
-          parameterTypes = json.\("parameter_types").toOption.map(_.as(Reads.ArrayReads[TypoRegtype](TypoRegtype.reads, implicitly))),
+          parameterTypes = json.\("parameter_types").toOption.map(_.as(using Reads.ArrayReads[TypoRegtype](using TypoRegtype.reads, implicitly))),
           fromSql = json.\("from_sql").toOption.map(_.as(Reads.BooleanReads)),
           genericPlans = json.\("generic_plans").toOption.map(_.as(Reads.LongReads)),
           customPlans = json.\("custom_plans").toOption.map(_.as(Reads.LongReads))
@@ -74,7 +74,7 @@ object PgPreparedStatementsViewRow {
       "name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.name),
       "statement" -> Writes.OptionWrites(Writes.StringWrites).writes(o.statement),
       "prepare_time" -> Writes.OptionWrites(TypoOffsetDateTime.writes).writes(o.prepareTime),
-      "parameter_types" -> Writes.OptionWrites(Writes.arrayWrites[TypoRegtype](implicitly, TypoRegtype.writes)).writes(o.parameterTypes),
+      "parameter_types" -> Writes.OptionWrites(using Writes.arrayWrites[TypoRegtype](using implicitly, TypoRegtype.writes)).writes(o.parameterTypes),
       "from_sql" -> Writes.OptionWrites(Writes.BooleanWrites).writes(o.fromSql),
       "generic_plans" -> Writes.OptionWrites(Writes.LongWrites).writes(o.genericPlans),
       "custom_plans" -> Writes.OptionWrites(Writes.LongWrites).writes(o.customPlans)

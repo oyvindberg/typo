@@ -33,10 +33,10 @@ class IllustrationRepoImpl extends IllustrationRepo {
     sql"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
           values (${fromWrite(unsaved.illustrationid)(Write.fromPut(IllustrationId.put))}::int4, ${fromWrite(unsaved.diagram)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "illustrationid", "diagram", "modifieddate"::text
-       """.query(IllustrationRow.read).unique
+       """.query(using IllustrationRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.illustration("illustrationid", "diagram", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(IllustrationRow.text)
+    new FragmentOps(sql"""COPY production.illustration("illustrationid", "diagram", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using IllustrationRow.text)
   }
   override def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow] = {
     val fs = List(
@@ -62,24 +62,24 @@ class IllustrationRepoImpl extends IllustrationRepo {
             returning "illustrationid", "diagram", "modifieddate"::text
          """
     }
-    q.query(IllustrationRow.read).unique
+    q.query(using IllustrationRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IllustrationRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.illustration("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(IllustrationRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.illustration("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using IllustrationRowUnsaved.text)
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
     SelectBuilderSql("production.illustration", IllustrationFields.structure, IllustrationRow.read)
   }
   override def selectAll: Stream[ConnectionIO, IllustrationRow] = {
-    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration""".query(IllustrationRow.read).stream
+    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration""".query(using IllustrationRow.read).stream
   }
   override def selectById(illustrationid: IllustrationId): ConnectionIO[Option[IllustrationRow]] = {
-    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}""".query(IllustrationRow.read).option
+    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}""".query(using IllustrationRow.read).option
   }
   override def selectByIds(illustrationids: Array[IllustrationId]): Stream[ConnectionIO, IllustrationRow] = {
-    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ANY(${illustrationids})""".query(IllustrationRow.read).stream
+    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ANY(${illustrationids})""".query(using IllustrationRow.read).stream
   }
   override def update(row: IllustrationRow): ConnectionIO[Boolean] = {
     val illustrationid = row.illustrationid
@@ -106,6 +106,6 @@ class IllustrationRepoImpl extends IllustrationRepo {
             "diagram" = EXCLUDED."diagram",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "illustrationid", "diagram", "modifieddate"::text
-       """.query(IllustrationRow.read).unique
+       """.query(using IllustrationRow.read).unique
   }
 }

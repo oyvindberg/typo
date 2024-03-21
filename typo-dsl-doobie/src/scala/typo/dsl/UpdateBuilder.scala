@@ -87,7 +87,7 @@ object UpdateBuilder {
       mkSql(new AtomicInteger(0), returning = false).update.run
 
     override def executeReturnChanged: ConnectionIO[List[Row]] = {
-      mkSql(new AtomicInteger(0), returning = true).query(read).to[List]
+      mkSql(new AtomicInteger(0), returning = true).query(using read).to[List]
     }
   }
   case class UpdateBuilderMock[Id, Fields[_], Row](

@@ -18,6 +18,6 @@ class ThaViewRepoImpl extends ThaViewRepo {
     SelectBuilderSql("pr.tha", ThaViewFields.structure, ThaViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ThaViewRow] = {
-    sql"""select "id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from pr.tha""".query(ThaViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from pr.tha""".query(using ThaViewRow.jdbcDecoder).selectStream()
   }
 }

@@ -42,7 +42,7 @@ object IViewRow {
   implicit lazy val jsonDecoder: JsonDecoder[IViewRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val id = jsonObj.get("id").toRight("Missing field 'id'").flatMap(_.as(IllustrationId.jsonDecoder))
     val illustrationid = jsonObj.get("illustrationid").toRight("Missing field 'illustrationid'").flatMap(_.as(IllustrationId.jsonDecoder))
-    val diagram = jsonObj.get("diagram").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(TypoXml.jsonDecoder)))
+    val diagram = jsonObj.get("diagram").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(using TypoXml.jsonDecoder)))
     val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(TypoLocalDateTime.jsonDecoder))
     if (id.isRight && illustrationid.isRight && diagram.isRight && modifieddate.isRight)
       Right(IViewRow(id = id.toOption.get, illustrationid = illustrationid.toOption.get, diagram = diagram.toOption.get, modifieddate = modifieddate.toOption.get))
@@ -58,7 +58,7 @@ object IViewRow {
       IllustrationId.jsonEncoder.unsafeEncode(a.illustrationid, indent, out)
       out.write(",")
       out.write(""""diagram":""")
-      JsonEncoder.option(TypoXml.jsonEncoder).unsafeEncode(a.diagram, indent, out)
+      JsonEncoder.option(using TypoXml.jsonEncoder).unsafeEncode(a.diagram, indent, out)
       out.write(",")
       out.write(""""modifieddate":""")
       TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)

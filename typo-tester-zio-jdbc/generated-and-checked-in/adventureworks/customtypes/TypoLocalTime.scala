@@ -33,7 +33,7 @@ object TypoLocalTime {
     },
     "Array[java.lang.String]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoLocalTime]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoLocalTime]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoLocalTime]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -54,7 +54,7 @@ object TypoLocalTime {
     },
     "java.lang.String"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoLocalTime] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoLocalTime] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoLocalTime] = JsonDecoder.localTime.map(TypoLocalTime.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoLocalTime] = JsonEncoder.localTime.contramap(_.value)
   implicit def ordering(implicit O0: Ordering[LocalTime]): Ordering[TypoLocalTime] = Ordering.by(_.value)

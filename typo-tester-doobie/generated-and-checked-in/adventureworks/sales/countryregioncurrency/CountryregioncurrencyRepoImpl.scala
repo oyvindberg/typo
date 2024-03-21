@@ -34,10 +34,10 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     sql"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")
           values (${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "countryregioncode", "currencycode", "modifieddate"::text
-       """.query(CountryregioncurrencyRow.read).unique
+       """.query(using CountryregioncurrencyRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, CountryregioncurrencyRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CountryregioncurrencyRow.text)
+    new FragmentOps(sql"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CountryregioncurrencyRow.text)
   }
   override def insert(unsaved: CountryregioncurrencyRowUnsaved): ConnectionIO[CountryregioncurrencyRow] = {
     val fs = List(
@@ -60,21 +60,21 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
             returning "countryregioncode", "currencycode", "modifieddate"::text
          """
     }
-    q.query(CountryregioncurrencyRow.read).unique
+    q.query(using CountryregioncurrencyRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregioncurrencyRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CountryregioncurrencyRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using CountryregioncurrencyRowUnsaved.text)
   }
   override def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     SelectBuilderSql("sales.countryregioncurrency", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CountryregioncurrencyRow] = {
-    sql"""select "countryregioncode", "currencycode", "modifieddate"::text from sales.countryregioncurrency""".query(CountryregioncurrencyRow.read).stream
+    sql"""select "countryregioncode", "currencycode", "modifieddate"::text from sales.countryregioncurrency""".query(using CountryregioncurrencyRow.read).stream
   }
   override def selectById(compositeId: CountryregioncurrencyId): ConnectionIO[Option[CountryregioncurrencyRow]] = {
-    sql"""select "countryregioncode", "currencycode", "modifieddate"::text from sales.countryregioncurrency where "countryregioncode" = ${fromWrite(compositeId.countryregioncode)(Write.fromPut(CountryregionId.put))} AND "currencycode" = ${fromWrite(compositeId.currencycode)(Write.fromPut(CurrencyId.put))}""".query(CountryregioncurrencyRow.read).option
+    sql"""select "countryregioncode", "currencycode", "modifieddate"::text from sales.countryregioncurrency where "countryregioncode" = ${fromWrite(compositeId.countryregioncode)(Write.fromPut(CountryregionId.put))} AND "currencycode" = ${fromWrite(compositeId.currencycode)(Write.fromPut(CurrencyId.put))}""".query(using CountryregioncurrencyRow.read).option
   }
   override def update(row: CountryregioncurrencyRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -99,6 +99,6 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           do update set
             "modifieddate" = EXCLUDED."modifieddate"
           returning "countryregioncode", "currencycode", "modifieddate"::text
-       """.query(CountryregioncurrencyRow.read).unique
+       """.query(using CountryregioncurrencyRow.read).unique
   }
 }

@@ -36,10 +36,10 @@ class PersonRepoImpl extends PersonRepo {
     sql"""insert into compositepk.person("one", "two", "name")
           values (${fromWrite(unsaved.one)(Write.fromPut(Meta.LongMeta.put))}::int8, ${fromWrite(unsaved.two)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.name)(Write.fromPutOption(Meta.StringMeta.put))})
           returning "one", "two", "name"
-       """.query(PersonRow.read).unique
+       """.query(using PersonRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY compositepk.person("one", "two", "name") FROM STDIN""").copyIn(unsaved, batchSize)(PersonRow.text)
+    new FragmentOps(sql"""COPY compositepk.person("one", "two", "name") FROM STDIN""").copyIn(unsaved, batchSize)(using PersonRow.text)
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
@@ -65,21 +65,21 @@ class PersonRepoImpl extends PersonRepo {
             returning "one", "two", "name"
          """
     }
-    q.query(PersonRow.read).unique
+    q.query(using PersonRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY compositepk.person("name", "one", "two") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PersonRowUnsaved.text)
+    new FragmentOps(sql"""COPY compositepk.person("name", "one", "two") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PersonRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
     SelectBuilderSql("compositepk.person", PersonFields.structure, PersonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
-    sql"""select "one", "two", "name" from compositepk.person""".query(PersonRow.read).stream
+    sql"""select "one", "two", "name" from compositepk.person""".query(using PersonRow.read).stream
   }
   override def selectById(compositeId: PersonId): ConnectionIO[Option[PersonRow]] = {
-    sql"""select "one", "two", "name" from compositepk.person where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND "two" = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".query(PersonRow.read).option
+    sql"""select "one", "two", "name" from compositepk.person where "one" = ${fromWrite(compositeId.one)(Write.fromPut(Meta.LongMeta.put))} AND "two" = ${fromWrite(compositeId.two)(Write.fromPutOption(Meta.StringMeta.put))}""".query(using PersonRow.read).option
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): Stream[ConnectionIO, PersonRow] = {
     val where = fragments.whereAndOpt(
@@ -89,7 +89,7 @@ class PersonRepoImpl extends PersonRepo {
         case PersonFieldValue.name(value) => fr""""name" = ${fromWrite(value)(Write.fromPutOption(Meta.StringMeta.put))}"""
       }
     )
-    sql"""select "one", "two", "name" from compositepk.person $where""".query(PersonRow.read).stream
+    sql"""select "one", "two", "name" from compositepk.person $where""".query(using PersonRow.read).stream
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -128,6 +128,6 @@ class PersonRepoImpl extends PersonRepo {
           do update set
             "name" = EXCLUDED."name"
           returning "one", "two", "name"
-       """.query(PersonRow.read).unique
+       """.query(using PersonRow.read).unique
   }
 }

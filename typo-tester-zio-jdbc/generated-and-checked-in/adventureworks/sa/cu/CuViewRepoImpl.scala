@@ -18,6 +18,6 @@ class CuViewRepoImpl extends CuViewRepo {
     SelectBuilderSql("sa.cu", CuViewFields.structure, CuViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CuViewRow] = {
-    sql"""select "id", "currencycode", "name", "modifieddate"::text from sa.cu""".query(CuViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "currencycode", "name", "modifieddate"::text from sa.cu""".query(using CuViewRow.jdbcDecoder).selectStream()
   }
 }

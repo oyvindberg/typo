@@ -18,6 +18,6 @@ class VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsVie
     SelectBuilderSql("production.vproductmodelinstructions", VproductmodelinstructionsViewFields.structure, VproductmodelinstructionsViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VproductmodelinstructionsViewRow] = {
-    sql"""select "productmodelid", "name", "instructions", "LocationID", "SetupHours", "MachineHours", "LaborHours", "LotSize", "Step", "rowguid", "modifieddate"::text from production.vproductmodelinstructions""".query(VproductmodelinstructionsViewRow.jdbcDecoder).selectStream
+    sql"""select "productmodelid", "name", "instructions", "LocationID", "SetupHours", "MachineHours", "LaborHours", "LotSize", "Step", "rowguid", "modifieddate"::text from production.vproductmodelinstructions""".query(using VproductmodelinstructionsViewRow.jdbcDecoder).selectStream()
   }
 }

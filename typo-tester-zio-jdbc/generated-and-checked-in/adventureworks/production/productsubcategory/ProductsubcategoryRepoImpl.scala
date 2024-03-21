@@ -36,7 +36,7 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     sql"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.productsubcategoryid)(ProductsubcategoryId.setter)}::int4, ${Segment.paramSegment(unsaved.productcategoryid)(ProductcategoryId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text
-       """.insertReturning(ProductsubcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ProductsubcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductsubcategoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductsubcategoryRow.text)
@@ -68,7 +68,7 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.productsubcategory($names) values ($values) returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(ProductsubcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ProductsubcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -79,13 +79,13 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     SelectBuilderSql("production.productsubcategory", ProductsubcategoryFields.structure, ProductsubcategoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductsubcategoryRow] = {
-    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory""".query(ProductsubcategoryRow.jdbcDecoder).selectStream
+    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory""".query(using ProductsubcategoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(productsubcategoryid: ProductsubcategoryId): ZIO[ZConnection, Throwable, Option[ProductsubcategoryRow]] = {
-    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory where "productsubcategoryid" = ${Segment.paramSegment(productsubcategoryid)(ProductsubcategoryId.setter)}""".query(ProductsubcategoryRow.jdbcDecoder).selectOne
+    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory where "productsubcategoryid" = ${Segment.paramSegment(productsubcategoryid)(ProductsubcategoryId.setter)}""".query(using ProductsubcategoryRow.jdbcDecoder).selectOne
   }
   override def selectByIds(productsubcategoryids: Array[ProductsubcategoryId]): ZStream[ZConnection, Throwable, ProductsubcategoryRow] = {
-    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory where "productsubcategoryid" = ANY(${Segment.paramSegment(productsubcategoryids)(ProductsubcategoryId.arraySetter)})""".query(ProductsubcategoryRow.jdbcDecoder).selectStream
+    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory where "productsubcategoryid" = ANY(${Segment.paramSegment(productsubcategoryids)(ProductsubcategoryId.arraySetter)})""".query(using ProductsubcategoryRow.jdbcDecoder).selectStream()
   }
   override def update(row: ProductsubcategoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val productsubcategoryid = row.productsubcategoryid
@@ -114,6 +114,6 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
             "name" = EXCLUDED."name",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text""".insertReturning(ProductsubcategoryRow.jdbcDecoder)
+          returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text""".insertReturning(using ProductsubcategoryRow.jdbcDecoder)
   }
 }

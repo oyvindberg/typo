@@ -37,7 +37,7 @@ class CustomerRepoImpl extends CustomerRepo {
     sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.customerid)(CustomerId.setter)}::int4, ${Segment.paramSegment(unsaved.personid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4, ${Segment.paramSegment(unsaved.storeid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4, ${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
-       """.insertReturning(CustomerRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using CustomerRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CustomerRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(CustomerRow.text)
@@ -70,7 +70,7 @@ class CustomerRepoImpl extends CustomerRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into sales.customer($names) values ($values) returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(CustomerRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using CustomerRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -81,13 +81,13 @@ class CustomerRepoImpl extends CustomerRepo {
     SelectBuilderSql("sales.customer", CustomerFields.structure, CustomerRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CustomerRow] = {
-    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer""".query(CustomerRow.jdbcDecoder).selectStream
+    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer""".query(using CustomerRow.jdbcDecoder).selectStream()
   }
   override def selectById(customerid: CustomerId): ZIO[ZConnection, Throwable, Option[CustomerRow]] = {
-    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ${Segment.paramSegment(customerid)(CustomerId.setter)}""".query(CustomerRow.jdbcDecoder).selectOne
+    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ${Segment.paramSegment(customerid)(CustomerId.setter)}""".query(using CustomerRow.jdbcDecoder).selectOne
   }
   override def selectByIds(customerids: Array[CustomerId]): ZStream[ZConnection, Throwable, CustomerRow] = {
-    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ANY(${Segment.paramSegment(customerids)(CustomerId.arraySetter)})""".query(CustomerRow.jdbcDecoder).selectStream
+    sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ANY(${Segment.paramSegment(customerids)(CustomerId.arraySetter)})""".query(using CustomerRow.jdbcDecoder).selectStream()
   }
   override def update(row: CustomerRow): ZIO[ZConnection, Throwable, Boolean] = {
     val customerid = row.customerid
@@ -119,6 +119,6 @@ class CustomerRepoImpl extends CustomerRepo {
             "territoryid" = EXCLUDED."territoryid",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text""".insertReturning(CustomerRow.jdbcDecoder)
+          returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text""".insertReturning(using CustomerRow.jdbcDecoder)
   }
 }

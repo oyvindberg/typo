@@ -35,7 +35,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")
           values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.documentnode)(DocumentId.setter)})
           returning "productid", "modifieddate"::text, "documentnode"
-       """.insertReturning(ProductdocumentRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ProductdocumentRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductdocumentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN""", batchSize, unsaved)(ProductdocumentRow.text)
@@ -62,7 +62,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.productdocument($names) values ($values) returning "productid", "modifieddate"::text, "documentnode""""
     }
-    q.insertReturning(ProductdocumentRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ProductdocumentRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -73,10 +73,10 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     SelectBuilderSql("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductdocumentRow] = {
-    sql"""select "productid", "modifieddate"::text, "documentnode" from production.productdocument""".query(ProductdocumentRow.jdbcDecoder).selectStream
+    sql"""select "productid", "modifieddate"::text, "documentnode" from production.productdocument""".query(using ProductdocumentRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: ProductdocumentId): ZIO[ZConnection, Throwable, Option[ProductdocumentRow]] = {
-    sql"""select "productid", "modifieddate"::text, "documentnode" from production.productdocument where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".query(ProductdocumentRow.jdbcDecoder).selectOne
+    sql"""select "productid", "modifieddate"::text, "documentnode" from production.productdocument where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".query(using ProductdocumentRow.jdbcDecoder).selectOne
   }
   override def update(row: ProductdocumentRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -97,6 +97,6 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
           on conflict ("productid", "documentnode")
           do update set
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "productid", "modifieddate"::text, "documentnode"""".insertReturning(ProductdocumentRow.jdbcDecoder)
+          returning "productid", "modifieddate"::text, "documentnode"""".insertReturning(using ProductdocumentRow.jdbcDecoder)
   }
 }

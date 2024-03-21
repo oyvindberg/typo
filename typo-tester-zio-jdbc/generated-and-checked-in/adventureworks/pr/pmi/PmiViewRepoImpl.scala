@@ -18,6 +18,6 @@ class PmiViewRepoImpl extends PmiViewRepo {
     SelectBuilderSql("pr.pmi", PmiViewFields.structure, PmiViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PmiViewRow] = {
-    sql"""select "productmodelid", "illustrationid", "modifieddate"::text from pr.pmi""".query(PmiViewRow.jdbcDecoder).selectStream
+    sql"""select "productmodelid", "illustrationid", "modifieddate"::text from pr.pmi""".query(using PmiViewRow.jdbcDecoder).selectStream()
   }
 }

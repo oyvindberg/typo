@@ -18,6 +18,6 @@ class TrViewRepoImpl extends TrViewRepo {
     SelectBuilderSql("sa.tr", TrViewFields.structure, TrViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, TrViewRow] = {
-    sql"""select "id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sa.tr""".query(TrViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sa.tr""".query(using TrViewRow.jdbcDecoder).selectStream()
   }
 }

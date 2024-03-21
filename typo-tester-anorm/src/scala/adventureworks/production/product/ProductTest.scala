@@ -120,12 +120,12 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
       productRepo.update(saved1.copy(modifieddate = newModifiedDate)): @nowarn
       val List(saved3) = productRepo.selectAll: @unchecked
       assert(saved3.modifieddate == newModifiedDate): @nowarn
-      val true = productRepo.update(saved3.copy(size = None)): @unchecked
+      assert(productRepo.update(saved3.copy(size = None))): @nowarn
 
       val query =
         productRepo.select
           .where(_.`class` === "H ")
-          .where(x => x.daystomanufacture > 25 or x.daystomanufacture <= 0)
+          .where(x => (x.daystomanufacture > 25).or(x.daystomanufacture <= 0))
           .where(x => x.productline === "foo")
           .join(unitmeasureRepo.select.where(_.name.like("name%")))
           .on { case (p, um) => p.sizeunitmeasurecode === um.unitmeasurecode }
@@ -150,7 +150,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
       val update = productRepo.update
         .setComputedValue(_.name)(p => (p.reverse.upper || Name("flaff")).substring(2, 4))
         .setValue(_.listprice)(BigDecimal(2))
-        .setComputedValue(_.reorderpoint)(_ plus TypoShort(22))
+        .setComputedValue(_.reorderpoint)(_ + TypoShort(22))
         .setComputedValue(_.sizeunitmeasurecode)(_ => Some(unitmeasure.unitmeasurecode))
         .setComputedValue(_.sellstartdate)(_ => sellStartDate)
         .where(_.productid === saved1.productid)
@@ -193,7 +193,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         // works arbitrarily deep
         .join(projectModelRepo.select.where(pm => pm.name.strLength > 0))
         .leftOn { case ((p, _), pm2) =>
-          p.productmodelid === pm2.productmodelid and false
+          (p.productmodelid === pm2.productmodelid).and(false)
         }
         // order by
         .orderBy { case (_, pm2) => pm2(_.name).asc }

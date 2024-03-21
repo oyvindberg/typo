@@ -40,7 +40,7 @@ object Sector {
   val ByName: Map[String, Sector] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[Sector]] = testdb.hardcoded.StringArrayDecoder.map(a => if (a == null) null else a.map(force))
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[Sector]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[Sector]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[Sector]] = testdb.hardcoded.StringArraySetter.contramap(_.map(_.value))
   implicit lazy val jdbcDecoder: JdbcDecoder[Sector] = JdbcDecoder.stringDecoder.flatMap { s =>
     new JdbcDecoder[Sector] {

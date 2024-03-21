@@ -18,6 +18,6 @@ class ThViewRepoImpl extends ThViewRepo {
     SelectBuilderSql("pr.th", ThViewFields.structure, ThViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ThViewRow] = {
-    sql"""select "id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from pr.th""".query(ThViewRow.read).stream
+    sql"""select "id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from pr.th""".query(using ThViewRow.read).stream
   }
 }

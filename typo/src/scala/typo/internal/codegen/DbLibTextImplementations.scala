@@ -13,7 +13,7 @@ object DbLibTextImplementations {
            |import scala.util.control.NonFatal
            |
            |object streamingInsert {
-           |  def apply[T: $Text](copyCommand: String, batchSize: Int, rows: Iterator[T])(implicit c: Connection): Long = {
+           |  def apply[T](copyCommand: String, batchSize: Int, rows: Iterator[T])(implicit text: $Text[T], c: Connection): Long = {
            |    val copyManager = c.unwrap(classOf[PGConnection]).getCopyAPI
            |
            |    val in = copyManager.copyIn(copyCommand)
@@ -50,7 +50,7 @@ object DbLibTextImplementations {
            |import zio.stream.{ZSink, ZStream}
            |
            |object streamingInsert {
-           |  def apply[T: $Text](copyCommand: String, batchSize: Int, rows: ZStream[ZConnection, Throwable, T]): ZIO[ZConnection, Throwable, Long] = ZIO.scoped {
+           |  def apply[T](copyCommand: String, batchSize: Int, rows: ZStream[ZConnection, Throwable, T])(implicit text: $Text[T]): ZIO[ZConnection, Throwable, Long] = ZIO.scoped {
            |    def startCopy(c: ZConnection): Task[CopyIn] =
            |      c.access(_.unwrap(classOf[PGConnection])).flatMap(c => ZIO.attemptBlocking(c.getCopyAPI.copyIn(copyCommand)))
            |

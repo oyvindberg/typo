@@ -18,6 +18,6 @@ class PscViewRepoImpl extends PscViewRepo {
     SelectBuilderSql("pr.psc", PscViewFields.structure, PscViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PscViewRow] = {
-    sql"""select "id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from pr.psc""".query(PscViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from pr.psc""".query(using PscViewRow.jdbcDecoder).selectStream()
   }
 }

@@ -36,10 +36,10 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
     sql"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.averageleadtime)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.standardprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.lastreceiptcost)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.lastreceiptdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.minorderqty)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.maxorderqty)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.onorderqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
-       """.query(ProductvendorRow.read).unique
+       """.query(using ProductvendorRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductvendorRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductvendorRow.text)
+    new FragmentOps(sql"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductvendorRow.text)
   }
   override def insert(unsaved: ProductvendorRowUnsaved): ConnectionIO[ProductvendorRow] = {
     val fs = List(
@@ -70,21 +70,21 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
             returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
          """
     }
-    q.query(ProductvendorRow.read).unique
+    q.query(using ProductvendorRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductvendorRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductvendorRowUnsaved.text)
+    new FragmentOps(sql"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductvendorRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductvendorFields, ProductvendorRow] = {
     SelectBuilderSql("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductvendorRow] = {
-    sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor""".query(ProductvendorRow.read).stream
+    sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor""".query(using ProductvendorRow.read).stream
   }
   override def selectById(compositeId: ProductvendorId): ConnectionIO[Option[ProductvendorRow]] = {
-    sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(ProductvendorRow.read).option
+    sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using ProductvendorRow.read).option
   }
   override def update(row: ProductvendorRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -133,6 +133,6 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
             "unitmeasurecode" = EXCLUDED."unitmeasurecode",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
-       """.query(ProductvendorRow.read).unique
+       """.query(using ProductvendorRow.read).unique
   }
 }

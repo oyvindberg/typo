@@ -33,7 +33,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     sql"""insert into public.identity-test("always_generated", "default_generated", "name")
           values (${Segment.paramSegment(unsaved.alwaysGenerated)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.defaultGenerated)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.name)(IdentityTestId.setter)})
           returning "always_generated", "default_generated", "name"
-       """.insertReturning(IdentityTestRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using IdentityTestRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY public.identity-test("always_generated", "default_generated", "name") FROM STDIN""", batchSize, unsaved)(IdentityTestRow.text)
@@ -56,7 +56,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into public.identity-test($names) values ($values) returning "always_generated", "default_generated", "name""""
     }
-    q.insertReturning(IdentityTestRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using IdentityTestRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -67,13 +67,13 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     SelectBuilderSql("public.identity-test", IdentityTestFields.structure, IdentityTestRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, IdentityTestRow] = {
-    sql"""select "always_generated", "default_generated", "name" from public.identity-test""".query(IdentityTestRow.jdbcDecoder).selectStream
+    sql"""select "always_generated", "default_generated", "name" from public.identity-test""".query(using IdentityTestRow.jdbcDecoder).selectStream()
   }
   override def selectById(name: IdentityTestId): ZIO[ZConnection, Throwable, Option[IdentityTestRow]] = {
-    sql"""select "always_generated", "default_generated", "name" from public.identity-test where "name" = ${Segment.paramSegment(name)(IdentityTestId.setter)}""".query(IdentityTestRow.jdbcDecoder).selectOne
+    sql"""select "always_generated", "default_generated", "name" from public.identity-test where "name" = ${Segment.paramSegment(name)(IdentityTestId.setter)}""".query(using IdentityTestRow.jdbcDecoder).selectOne
   }
   override def selectByIds(names: Array[IdentityTestId]): ZStream[ZConnection, Throwable, IdentityTestRow] = {
-    sql"""select "always_generated", "default_generated", "name" from public.identity-test where "name" = ANY(${Segment.paramSegment(names)(IdentityTestId.arraySetter)})""".query(IdentityTestRow.jdbcDecoder).selectStream
+    sql"""select "always_generated", "default_generated", "name" from public.identity-test where "name" = ANY(${Segment.paramSegment(names)(IdentityTestId.arraySetter)})""".query(using IdentityTestRow.jdbcDecoder).selectStream()
   }
   override def update(row: IdentityTestRow): ZIO[ZConnection, Throwable, Boolean] = {
     val name = row.name
@@ -96,6 +96,6 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
           do update set
             "always_generated" = EXCLUDED."always_generated",
             "default_generated" = EXCLUDED."default_generated"
-          returning "always_generated", "default_generated", "name"""".insertReturning(IdentityTestRow.jdbcDecoder)
+          returning "always_generated", "default_generated", "name"""".insertReturning(using IdentityTestRow.jdbcDecoder)
   }
 }

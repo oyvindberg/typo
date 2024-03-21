@@ -36,7 +36,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     sql"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
           values (${Segment.paramSegment(unsaved.productmodelid)(ProductmodelId.setter)}::int4, ${Segment.paramSegment(unsaved.productdescriptionid)(ProductdescriptionId.setter)}::int4, ${Segment.paramSegment(unsaved.cultureid)(CultureId.setter)}::bpchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
-       """.insertReturning(ProductmodelproductdescriptioncultureRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ProductmodelproductdescriptioncultureRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelproductdescriptioncultureRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelproductdescriptioncultureRow.text)
@@ -61,7 +61,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.productmodelproductdescriptionculture($names) values ($values) returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text"""
     }
-    q.insertReturning(ProductmodelproductdescriptioncultureRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ProductmodelproductdescriptioncultureRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -72,10 +72,10 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     SelectBuilderSql("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductmodelproductdescriptioncultureRow] = {
-    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture""".query(ProductmodelproductdescriptioncultureRow.jdbcDecoder).selectStream
+    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture""".query(using ProductmodelproductdescriptioncultureRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId): ZIO[ZConnection, Throwable, Option[ProductmodelproductdescriptioncultureRow]] = {
-    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(ProductmodelId.setter)} AND "productdescriptionid" = ${Segment.paramSegment(compositeId.productdescriptionid)(ProductdescriptionId.setter)} AND "cultureid" = ${Segment.paramSegment(compositeId.cultureid)(CultureId.setter)}""".query(ProductmodelproductdescriptioncultureRow.jdbcDecoder).selectOne
+    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(ProductmodelId.setter)} AND "productdescriptionid" = ${Segment.paramSegment(compositeId.productdescriptionid)(ProductdescriptionId.setter)} AND "cultureid" = ${Segment.paramSegment(compositeId.cultureid)(CultureId.setter)}""".query(using ProductmodelproductdescriptioncultureRow.jdbcDecoder).selectOne
   }
   override def update(row: ProductmodelproductdescriptioncultureRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -97,6 +97,6 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
           on conflict ("productmodelid", "productdescriptionid", "cultureid")
           do update set
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text""".insertReturning(ProductmodelproductdescriptioncultureRow.jdbcDecoder)
+          returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text""".insertReturning(using ProductmodelproductdescriptioncultureRow.jdbcDecoder)
   }
 }

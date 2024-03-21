@@ -18,6 +18,6 @@ class CcViewRepoImpl extends CcViewRepo {
     SelectBuilderSql("sa.cc", CcViewFields.structure, CcViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CcViewRow] = {
-    sql"""select "id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sa.cc""".query(CcViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sa.cc""".query(using CcViewRow.jdbcDecoder).selectStream()
   }
 }

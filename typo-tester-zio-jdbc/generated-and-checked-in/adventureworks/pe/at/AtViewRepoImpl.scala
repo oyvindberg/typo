@@ -18,6 +18,6 @@ class AtViewRepoImpl extends AtViewRepo {
     SelectBuilderSql("pe.at", AtViewFields.structure, AtViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, AtViewRow] = {
-    sql"""select "id", "addresstypeid", "name", "rowguid", "modifieddate"::text from pe.at""".query(AtViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "addresstypeid", "name", "rowguid", "modifieddate"::text from pe.at""".query(using AtViewRow.jdbcDecoder).selectStream()
   }
 }

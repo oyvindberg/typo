@@ -30,7 +30,7 @@ object TypoBox {
     },
     "Array[org.postgresql.geometric.PGbox]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoBox]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoBox]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoBox]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -50,7 +50,7 @@ object TypoBox {
     },
     "org.postgresql.geometric.PGbox"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoBox] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoBox] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoBox] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val x1 = jsonObj.get("x1").toRight("Missing field 'x1'").flatMap(_.as(JsonDecoder.double))
     val y1 = jsonObj.get("y1").toRight("Missing field 'y1'").flatMap(_.as(JsonDecoder.double))

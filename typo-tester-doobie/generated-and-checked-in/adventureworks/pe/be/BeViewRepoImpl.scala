@@ -18,6 +18,6 @@ class BeViewRepoImpl extends BeViewRepo {
     SelectBuilderSql("pe.be", BeViewFields.structure, BeViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, BeViewRow] = {
-    sql"""select "id", "businessentityid", "rowguid", "modifieddate"::text from pe.be""".query(BeViewRow.read).stream
+    sql"""select "id", "businessentityid", "rowguid", "modifieddate"::text from pe.be""".query(using BeViewRow.read).stream
   }
 }

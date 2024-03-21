@@ -35,7 +35,7 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (${Segment.paramSegment(unsaved.transactionid)(TransactionhistoryId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.referenceorderid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.referenceorderlineid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.transactiondate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.transactiontype)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.quantity)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.actualcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
-       """.insertReturning(TransactionhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using TransactionhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, TransactionhistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""", batchSize, unsaved)(TransactionhistoryRow.text)
@@ -74,7 +74,7 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.transactionhistory($names) values ($values) returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text"""
     }
-    q.insertReturning(TransactionhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using TransactionhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -85,13 +85,13 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     SelectBuilderSql("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, TransactionhistoryRow] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory""".query(TransactionhistoryRow.jdbcDecoder).selectStream
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory""".query(using TransactionhistoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(transactionid: TransactionhistoryId): ZIO[ZConnection, Throwable, Option[TransactionhistoryRow]] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryId.setter)}""".query(TransactionhistoryRow.jdbcDecoder).selectOne
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryId.setter)}""".query(using TransactionhistoryRow.jdbcDecoder).selectOne
   }
   override def selectByIds(transactionids: Array[TransactionhistoryId]): ZStream[ZConnection, Throwable, TransactionhistoryRow] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ANY(${Segment.paramSegment(transactionids)(TransactionhistoryId.arraySetter)})""".query(TransactionhistoryRow.jdbcDecoder).selectStream
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ANY(${Segment.paramSegment(transactionids)(TransactionhistoryId.arraySetter)})""".query(using TransactionhistoryRow.jdbcDecoder).selectStream()
   }
   override def update(row: TransactionhistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val transactionid = row.transactionid
@@ -132,6 +132,6 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
             "quantity" = EXCLUDED."quantity",
             "actualcost" = EXCLUDED."actualcost",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text""".insertReturning(TransactionhistoryRow.jdbcDecoder)
+          returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text""".insertReturning(using TransactionhistoryRow.jdbcDecoder)
   }
 }

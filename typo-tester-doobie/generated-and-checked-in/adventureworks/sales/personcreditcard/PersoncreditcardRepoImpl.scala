@@ -34,10 +34,10 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     sql"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "creditcardid", "modifieddate"::text
-       """.query(PersoncreditcardRow.read).unique
+       """.query(using PersoncreditcardRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PersoncreditcardRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(PersoncreditcardRow.text)
+    new FragmentOps(sql"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PersoncreditcardRow.text)
   }
   override def insert(unsaved: PersoncreditcardRowUnsaved): ConnectionIO[PersoncreditcardRow] = {
     val fs = List(
@@ -60,21 +60,21 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
             returning "businessentityid", "creditcardid", "modifieddate"::text
          """
     }
-    q.query(PersoncreditcardRow.read).unique
+    q.query(using PersoncreditcardRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersoncreditcardRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PersoncreditcardRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PersoncreditcardRowUnsaved.text)
   }
   override def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     SelectBuilderSql("sales.personcreditcard", PersoncreditcardFields.structure, PersoncreditcardRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersoncreditcardRow] = {
-    sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard""".query(PersoncreditcardRow.read).stream
+    sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard""".query(using PersoncreditcardRow.read).stream
   }
   override def selectById(compositeId: PersoncreditcardId): ConnectionIO[Option[PersoncreditcardRow]] = {
-    sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "creditcardid" = ${fromWrite(compositeId.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".query(PersoncreditcardRow.read).option
+    sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "creditcardid" = ${fromWrite(compositeId.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".query(using PersoncreditcardRow.read).option
   }
   override def update(row: PersoncreditcardRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -99,6 +99,6 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           do update set
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "creditcardid", "modifieddate"::text
-       """.query(PersoncreditcardRow.read).unique
+       """.query(using PersoncreditcardRow.read).unique
   }
 }

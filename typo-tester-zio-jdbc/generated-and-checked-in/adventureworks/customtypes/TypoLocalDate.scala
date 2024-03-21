@@ -31,7 +31,7 @@ object TypoLocalDate {
     },
     "Array[java.lang.String]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoLocalDate]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoLocalDate]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoLocalDate]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -52,7 +52,7 @@ object TypoLocalDate {
     },
     "java.lang.String"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoLocalDate] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoLocalDate] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoLocalDate] = JsonDecoder.localDate.map(TypoLocalDate.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoLocalDate] = JsonEncoder.localDate.contramap(_.value)
   implicit def ordering(implicit O0: Ordering[LocalDate]): Ordering[TypoLocalDate] = Ordering.by(_.value)

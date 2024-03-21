@@ -29,7 +29,7 @@ object TypoRecord {
     },
     "Array[org.postgresql.util.PGobject]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoRecord]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoRecord]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoRecord]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -55,7 +55,7 @@ object TypoRecord {
     },
     "org.postgresql.util.PGobject"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoRecord] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoRecord] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoRecord] = JsonDecoder.string.map(TypoRecord.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoRecord] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoRecord] = Ordering.by(_.value)

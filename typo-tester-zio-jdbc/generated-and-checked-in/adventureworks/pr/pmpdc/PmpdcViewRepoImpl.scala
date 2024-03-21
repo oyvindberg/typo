@@ -18,6 +18,6 @@ class PmpdcViewRepoImpl extends PmpdcViewRepo {
     SelectBuilderSql("pr.pmpdc", PmpdcViewFields.structure, PmpdcViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PmpdcViewRow] = {
-    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from pr.pmpdc""".query(PmpdcViewRow.jdbcDecoder).selectStream
+    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from pr.pmpdc""".query(using PmpdcViewRow.jdbcDecoder).selectStream()
   }
 }

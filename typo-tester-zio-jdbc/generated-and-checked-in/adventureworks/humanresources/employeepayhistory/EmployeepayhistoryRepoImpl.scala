@@ -36,7 +36,7 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     sql"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.ratechangedate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.rate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.payfrequency)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
-       """.insertReturning(EmployeepayhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using EmployeepayhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, EmployeepayhistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN""", batchSize, unsaved)(EmployeepayhistoryRow.text)
@@ -62,7 +62,7 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into humanresources.employeepayhistory($names) values ($values) returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text"""
     }
-    q.insertReturning(EmployeepayhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using EmployeepayhistoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -73,10 +73,10 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     SelectBuilderSql("humanresources.employeepayhistory", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, EmployeepayhistoryRow] = {
-    sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory""".query(EmployeepayhistoryRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory""".query(using EmployeepayhistoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: EmployeepayhistoryId): ZIO[ZConnection, Throwable, Option[EmployeepayhistoryRow]] = {
-    sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "ratechangedate" = ${Segment.paramSegment(compositeId.ratechangedate)(TypoLocalDateTime.setter)}""".query(EmployeepayhistoryRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "ratechangedate" = ${Segment.paramSegment(compositeId.ratechangedate)(TypoLocalDateTime.setter)}""".query(using EmployeepayhistoryRow.jdbcDecoder).selectOne
   }
   override def update(row: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -103,6 +103,6 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             "rate" = EXCLUDED."rate",
             "payfrequency" = EXCLUDED."payfrequency",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text""".insertReturning(EmployeepayhistoryRow.jdbcDecoder)
+          returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text""".insertReturning(using EmployeepayhistoryRow.jdbcDecoder)
   }
 }

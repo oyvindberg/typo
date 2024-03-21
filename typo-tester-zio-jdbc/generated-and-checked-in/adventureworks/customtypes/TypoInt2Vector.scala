@@ -29,7 +29,7 @@ object TypoInt2Vector {
     },
     "Array[org.postgresql.util.PGobject]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoInt2Vector]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoInt2Vector]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoInt2Vector]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -55,7 +55,7 @@ object TypoInt2Vector {
     },
     "org.postgresql.util.PGobject"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoInt2Vector] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoInt2Vector] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoInt2Vector] = JsonDecoder.string.map(TypoInt2Vector.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoInt2Vector] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoInt2Vector] = Ordering.by(_.value)

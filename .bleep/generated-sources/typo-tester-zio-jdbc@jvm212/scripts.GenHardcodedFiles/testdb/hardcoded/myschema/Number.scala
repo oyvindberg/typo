@@ -40,7 +40,7 @@ object Number {
   val ByName: Map[String, Number] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[Number]] = testdb.hardcoded.StringArrayDecoder.map(a => if (a == null) null else a.map(force))
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[Number]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[Number]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[Number]] = testdb.hardcoded.StringArraySetter.contramap(_.map(_.value))
   implicit lazy val jdbcDecoder: JdbcDecoder[Number] = JdbcDecoder.stringDecoder.flatMap { s =>
     new JdbcDecoder[Number] {

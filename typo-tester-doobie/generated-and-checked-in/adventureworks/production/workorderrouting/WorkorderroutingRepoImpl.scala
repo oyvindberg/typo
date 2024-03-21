@@ -36,10 +36,10 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     sql"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
           values (${fromWrite(unsaved.workorderid)(Write.fromPut(WorkorderId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.operationsequence)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int2, ${fromWrite(unsaved.scheduledstartdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.scheduledenddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.actualstartdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.actualenddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.actualresourcehrs)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.plannedcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.actualcost)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
-       """.query(WorkorderroutingRow.read).unique
+       """.query(using WorkorderroutingRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(WorkorderroutingRow.text)
+    new FragmentOps(sql"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using WorkorderroutingRow.text)
   }
   override def insert(unsaved: WorkorderroutingRowUnsaved): ConnectionIO[WorkorderroutingRow] = {
     val fs = List(
@@ -71,21 +71,21 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
             returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
          """
     }
-    q.query(WorkorderroutingRow.read).unique
+    q.query(using WorkorderroutingRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(WorkorderroutingRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using WorkorderroutingRowUnsaved.text)
   }
   override def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     SelectBuilderSql("production.workorderrouting", WorkorderroutingFields.structure, WorkorderroutingRow.read)
   }
   override def selectAll: Stream[ConnectionIO, WorkorderroutingRow] = {
-    sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting""".query(WorkorderroutingRow.read).stream
+    sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting""".query(using WorkorderroutingRow.read).stream
   }
   override def selectById(compositeId: WorkorderroutingId): ConnectionIO[Option[WorkorderroutingRow]] = {
-    sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting where "workorderid" = ${fromWrite(compositeId.workorderid)(Write.fromPut(WorkorderId.put))} AND "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(Meta.IntMeta.put))} AND "operationsequence" = ${fromWrite(compositeId.operationsequence)(Write.fromPut(TypoShort.put))}""".query(WorkorderroutingRow.read).option
+    sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting where "workorderid" = ${fromWrite(compositeId.workorderid)(Write.fromPut(WorkorderId.put))} AND "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(Meta.IntMeta.put))} AND "operationsequence" = ${fromWrite(compositeId.operationsequence)(Write.fromPut(TypoShort.put))}""".query(using WorkorderroutingRow.read).option
   }
   override def update(row: WorkorderroutingRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -135,6 +135,6 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
             "actualcost" = EXCLUDED."actualcost",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
-       """.query(WorkorderroutingRow.read).unique
+       """.query(using WorkorderroutingRow.read).unique
   }
 }

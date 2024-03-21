@@ -33,10 +33,10 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "rowguid", "modifieddate"::text
-       """.query(BusinessentityRow.read).unique
+       """.query(using BusinessentityRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentityRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(BusinessentityRow.text)
+    new FragmentOps(sql"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using BusinessentityRow.text)
   }
   override def insert(unsaved: BusinessentityRowUnsaved): ConnectionIO[BusinessentityRow] = {
     val fs = List(
@@ -65,24 +65,24 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
             returning "businessentityid", "rowguid", "modifieddate"::text
          """
     }
-    q.query(BusinessentityRow.read).unique
+    q.query(using BusinessentityRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BusinessentityRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(BusinessentityRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using BusinessentityRowUnsaved.text)
   }
   override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
     SelectBuilderSql("person.businessentity", BusinessentityFields.structure, BusinessentityRow.read)
   }
   override def selectAll: Stream[ConnectionIO, BusinessentityRow] = {
-    sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity""".query(BusinessentityRow.read).stream
+    sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity""".query(using BusinessentityRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[BusinessentityRow]] = {
-    sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(BusinessentityRow.read).option
+    sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using BusinessentityRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, BusinessentityRow] = {
-    sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity where "businessentityid" = ANY(${businessentityids})""".query(BusinessentityRow.read).stream
+    sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity where "businessentityid" = ANY(${businessentityids})""".query(using BusinessentityRow.read).stream
   }
   override def update(row: BusinessentityRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
@@ -109,6 +109,6 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "rowguid", "modifieddate"::text
-       """.query(BusinessentityRow.read).unique
+       """.query(using BusinessentityRow.read).unique
   }
 }

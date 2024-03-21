@@ -34,10 +34,10 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     sql"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")
           values (${fromWrite(unsaved.productmodelid)(Write.fromPut(ProductmodelId.put))}::int4, ${fromWrite(unsaved.illustrationid)(Write.fromPut(IllustrationId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productmodelid", "illustrationid", "modifieddate"::text
-       """.query(ProductmodelillustrationRow.read).unique
+       """.query(using ProductmodelillustrationRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductmodelillustrationRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductmodelillustrationRow.text)
+    new FragmentOps(sql"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductmodelillustrationRow.text)
   }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved): ConnectionIO[ProductmodelillustrationRow] = {
     val fs = List(
@@ -60,21 +60,21 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
             returning "productmodelid", "illustrationid", "modifieddate"::text
          """
     }
-    q.query(ProductmodelillustrationRow.read).unique
+    q.query(using ProductmodelillustrationRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductmodelillustrationRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductmodelillustrationRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductmodelillustrationRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
     SelectBuilderSql("production.productmodelillustration", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductmodelillustrationRow] = {
-    sql"""select "productmodelid", "illustrationid", "modifieddate"::text from production.productmodelillustration""".query(ProductmodelillustrationRow.read).stream
+    sql"""select "productmodelid", "illustrationid", "modifieddate"::text from production.productmodelillustration""".query(using ProductmodelillustrationRow.read).stream
   }
   override def selectById(compositeId: ProductmodelillustrationId): ConnectionIO[Option[ProductmodelillustrationRow]] = {
-    sql"""select "productmodelid", "illustrationid", "modifieddate"::text from production.productmodelillustration where "productmodelid" = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND "illustrationid" = ${fromWrite(compositeId.illustrationid)(Write.fromPut(IllustrationId.put))}""".query(ProductmodelillustrationRow.read).option
+    sql"""select "productmodelid", "illustrationid", "modifieddate"::text from production.productmodelillustration where "productmodelid" = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND "illustrationid" = ${fromWrite(compositeId.illustrationid)(Write.fromPut(IllustrationId.put))}""".query(using ProductmodelillustrationRow.read).option
   }
   override def update(row: ProductmodelillustrationRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -99,6 +99,6 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           do update set
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productmodelid", "illustrationid", "modifieddate"::text
-       """.query(ProductmodelillustrationRow.read).unique
+       """.query(using ProductmodelillustrationRow.read).unique
   }
 }

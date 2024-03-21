@@ -18,6 +18,6 @@ class AtViewRepoImpl extends AtViewRepo {
     SelectBuilderSql("pe.at", AtViewFields.structure, AtViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, AtViewRow] = {
-    sql"""select "id", "addresstypeid", "name", "rowguid", "modifieddate"::text from pe.at""".query(AtViewRow.read).stream
+    sql"""select "id", "addresstypeid", "name", "rowguid", "modifieddate"::text from pe.at""".query(using AtViewRow.read).stream
   }
 }

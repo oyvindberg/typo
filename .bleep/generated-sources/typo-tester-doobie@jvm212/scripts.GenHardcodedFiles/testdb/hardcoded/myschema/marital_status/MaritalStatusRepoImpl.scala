@@ -31,22 +31,22 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     sql"""insert into myschema.marital_status("id")
           values (${fromWrite(unsaved.id)(Write.fromPut(MaritalStatusId.put))}::int8)
           returning "id"
-       """.query(MaritalStatusRow.read).unique
+       """.query(using MaritalStatusRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, MaritalStatusRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY myschema.marital_status("id") FROM STDIN""").copyIn(unsaved, batchSize)(MaritalStatusRow.text)
+    new FragmentOps(sql"""COPY myschema.marital_status("id") FROM STDIN""").copyIn(unsaved, batchSize)(using MaritalStatusRow.text)
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
     SelectBuilderSql("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.read)
   }
   override def selectAll: Stream[ConnectionIO, MaritalStatusRow] = {
-    sql"""select "id" from myschema.marital_status""".query(MaritalStatusRow.read).stream
+    sql"""select "id" from myschema.marital_status""".query(using MaritalStatusRow.read).stream
   }
   override def selectById(id: MaritalStatusId): ConnectionIO[Option[MaritalStatusRow]] = {
-    sql"""select "id" from myschema.marital_status where "id" = ${fromWrite(id)(Write.fromPut(MaritalStatusId.put))}""".query(MaritalStatusRow.read).option
+    sql"""select "id" from myschema.marital_status where "id" = ${fromWrite(id)(Write.fromPut(MaritalStatusId.put))}""".query(using MaritalStatusRow.read).option
   }
   override def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow] = {
-    sql"""select "id" from myschema.marital_status where "id" = ANY(${ids})""".query(MaritalStatusRow.read).stream
+    sql"""select "id" from myschema.marital_status where "id" = ANY(${ids})""".query(using MaritalStatusRow.read).stream
   }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): Stream[ConnectionIO, MaritalStatusRow] = {
     val where = fragments.whereAndOpt(
@@ -54,7 +54,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
         case MaritalStatusFieldValue.id(value) => fr""""id" = ${fromWrite(value)(Write.fromPut(MaritalStatusId.put))}"""
       }
     )
-    sql"""select "id" from myschema.marital_status $where""".query(MaritalStatusRow.read).stream
+    sql"""select "id" from myschema.marital_status $where""".query(using MaritalStatusRow.read).stream
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
     UpdateBuilder("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.read)
@@ -68,6 +68,6 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
           do update set
             
           returning "id"
-       """.query(MaritalStatusRow.read).unique
+       """.query(using MaritalStatusRow.read).unique
   }
 }

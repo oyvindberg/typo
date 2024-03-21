@@ -25,6 +25,6 @@ class UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
             )
             select row."firstname", row."modifieddate"::text
             from row"""
-    sql.query(UpdatePersonReturningSqlRow.read).stream
+    sql.query(using UpdatePersonReturningSqlRow.read).stream
   }
 }

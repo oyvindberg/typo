@@ -35,7 +35,7 @@ class UsersRepoImpl extends UsersRepo {
     sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
           values (${Segment.paramSegment(unsaved.userId)(UsersId.setter)}::uuid, ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.lastName)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.email)(TypoUnknownCitext.setter)}::citext, ${Segment.paramSegment(unsaved.password)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.createdAt)(TypoInstant.setter)}::timestamptz, ${Segment.paramSegment(unsaved.verifiedOn)(Setter.optionParamSetter(TypoInstant.setter))}::timestamptz)
           returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
-       """.insertReturning(UsersRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using UsersRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""", batchSize, unsaved)(UsersRow.text)
@@ -63,7 +63,7 @@ class UsersRepoImpl extends UsersRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into public.users($names) values ($values) returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text"""
     }
-    q.insertReturning(UsersRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using UsersRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -74,19 +74,19 @@ class UsersRepoImpl extends UsersRepo {
     SelectBuilderSql("public.users", UsersFields.structure, UsersRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, UsersRow] = {
-    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users""".query(UsersRow.jdbcDecoder).selectStream
+    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users""".query(using UsersRow.jdbcDecoder).selectStream()
   }
   override def selectById(userId: UsersId): ZIO[ZConnection, Throwable, Option[UsersRow]] = {
-    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".query(UsersRow.jdbcDecoder).selectOne
+    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".query(using UsersRow.jdbcDecoder).selectOne
   }
   override def selectByIds(userIds: Array[UsersId]): ZStream[ZConnection, Throwable, UsersRow] = {
-    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ANY(${Segment.paramSegment(userIds)(UsersId.arraySetter)})""".query(UsersRow.jdbcDecoder).selectStream
+    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ANY(${Segment.paramSegment(userIds)(UsersId.arraySetter)})""".query(using UsersRow.jdbcDecoder).selectStream()
   }
   override def selectByUnique(email: TypoUnknownCitext): ZIO[ZConnection, Throwable, Option[UsersRow]] = {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
           from public.users
           where "email" = ${Segment.paramSegment(email)(TypoUnknownCitext.setter)}
-       """.query(UsersRow.jdbcDecoder).selectOne
+       """.query(using UsersRow.jdbcDecoder).selectOne
   }
   override def update(row: UsersRow): ZIO[ZConnection, Throwable, Boolean] = {
     val userId = row.userId
@@ -121,6 +121,6 @@ class UsersRepoImpl extends UsersRepo {
             "password" = EXCLUDED."password",
             "created_at" = EXCLUDED."created_at",
             "verified_on" = EXCLUDED."verified_on"
-          returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text""".insertReturning(UsersRow.jdbcDecoder)
+          returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text""".insertReturning(using UsersRow.jdbcDecoder)
   }
 }

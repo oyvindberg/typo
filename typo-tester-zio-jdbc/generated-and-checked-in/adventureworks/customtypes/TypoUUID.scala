@@ -31,7 +31,7 @@ object TypoUUID {
     },
     "Array[java.util.UUID]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoUUID]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoUUID]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoUUID]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -52,7 +52,7 @@ object TypoUUID {
     },
     "java.util.UUID"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoUUID] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoUUID] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoUUID] = JsonDecoder.uuid.map(TypoUUID.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoUUID] = JsonEncoder.uuid.contramap(_.value)
   implicit def ordering(implicit O0: Ordering[UUID]): Ordering[TypoUUID] = Ordering.by(_.value)

@@ -35,7 +35,7 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     sql"""insert into production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.productdescriptionid)(ProductdescriptionId.setter)}::int4, ${Segment.paramSegment(unsaved.description)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productdescriptionid", "description", "rowguid", "modifieddate"::text
-       """.insertReturning(ProductdescriptionRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ProductdescriptionRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductdescriptionRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductdescriptionRow.text)
@@ -66,7 +66,7 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.productdescription($names) values ($values) returning "productdescriptionid", "description", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(ProductdescriptionRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ProductdescriptionRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -77,13 +77,13 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     SelectBuilderSql("production.productdescription", ProductdescriptionFields.structure, ProductdescriptionRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductdescriptionRow] = {
-    sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from production.productdescription""".query(ProductdescriptionRow.jdbcDecoder).selectStream
+    sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from production.productdescription""".query(using ProductdescriptionRow.jdbcDecoder).selectStream()
   }
   override def selectById(productdescriptionid: ProductdescriptionId): ZIO[ZConnection, Throwable, Option[ProductdescriptionRow]] = {
-    sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from production.productdescription where "productdescriptionid" = ${Segment.paramSegment(productdescriptionid)(ProductdescriptionId.setter)}""".query(ProductdescriptionRow.jdbcDecoder).selectOne
+    sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from production.productdescription where "productdescriptionid" = ${Segment.paramSegment(productdescriptionid)(ProductdescriptionId.setter)}""".query(using ProductdescriptionRow.jdbcDecoder).selectOne
   }
   override def selectByIds(productdescriptionids: Array[ProductdescriptionId]): ZStream[ZConnection, Throwable, ProductdescriptionRow] = {
-    sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from production.productdescription where "productdescriptionid" = ANY(${Segment.paramSegment(productdescriptionids)(ProductdescriptionId.arraySetter)})""".query(ProductdescriptionRow.jdbcDecoder).selectStream
+    sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from production.productdescription where "productdescriptionid" = ANY(${Segment.paramSegment(productdescriptionids)(ProductdescriptionId.arraySetter)})""".query(using ProductdescriptionRow.jdbcDecoder).selectStream()
   }
   override def update(row: ProductdescriptionRow): ZIO[ZConnection, Throwable, Boolean] = {
     val productdescriptionid = row.productdescriptionid
@@ -109,6 +109,6 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
             "description" = EXCLUDED."description",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "productdescriptionid", "description", "rowguid", "modifieddate"::text""".insertReturning(ProductdescriptionRow.jdbcDecoder)
+          returning "productdescriptionid", "description", "rowguid", "modifieddate"::text""".insertReturning(using ProductdescriptionRow.jdbcDecoder)
   }
 }

@@ -35,10 +35,10 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     sql"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "specialofferid", "productid", "rowguid", "modifieddate"::text
-       """.query(SpecialofferproductRow.read).unique
+       """.query(using SpecialofferproductRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SpecialofferproductRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(SpecialofferproductRow.text)
+    new FragmentOps(sql"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SpecialofferproductRow.text)
   }
   override def insert(unsaved: SpecialofferproductRowUnsaved): ConnectionIO[SpecialofferproductRow] = {
     val fs = List(
@@ -65,21 +65,21 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
             returning "specialofferid", "productid", "rowguid", "modifieddate"::text
          """
     }
-    q.query(SpecialofferproductRow.read).unique
+    q.query(using SpecialofferproductRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SpecialofferproductRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(SpecialofferproductRowUnsaved.text)
+    new FragmentOps(sql"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SpecialofferproductRowUnsaved.text)
   }
   override def select: SelectBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
     SelectBuilderSql("sales.specialofferproduct", SpecialofferproductFields.structure, SpecialofferproductRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SpecialofferproductRow] = {
-    sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text from sales.specialofferproduct""".query(SpecialofferproductRow.read).stream
+    sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text from sales.specialofferproduct""".query(using SpecialofferproductRow.read).stream
   }
   override def selectById(compositeId: SpecialofferproductId): ConnectionIO[Option[SpecialofferproductRow]] = {
-    sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text from sales.specialofferproduct where "specialofferid" = ${fromWrite(compositeId.specialofferid)(Write.fromPut(SpecialofferId.put))} AND "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))}""".query(SpecialofferproductRow.read).option
+    sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text from sales.specialofferproduct where "specialofferid" = ${fromWrite(compositeId.specialofferid)(Write.fromPut(SpecialofferId.put))} AND "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))}""".query(using SpecialofferproductRow.read).option
   }
   override def update(row: SpecialofferproductRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -107,6 +107,6 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "specialofferid", "productid", "rowguid", "modifieddate"::text
-       """.query(SpecialofferproductRow.read).unique
+       """.query(using SpecialofferproductRow.read).unique
   }
 }

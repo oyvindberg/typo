@@ -18,6 +18,6 @@ class VsalespersonViewRepoImpl extends VsalespersonViewRepo {
     SelectBuilderSql("sales.vsalesperson", VsalespersonViewFields.structure, VsalespersonViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VsalespersonViewRow] = {
-    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "territoryname", "territorygroup", "salesquota", "salesytd", "saleslastyear" from sales.vsalesperson""".query(VsalespersonViewRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "territoryname", "territorygroup", "salesquota", "salesytd", "saleslastyear" from sales.vsalesperson""".query(using VsalespersonViewRow.jdbcDecoder).selectStream()
   }
 }

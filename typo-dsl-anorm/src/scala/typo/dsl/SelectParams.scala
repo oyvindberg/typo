@@ -24,7 +24,7 @@ object SelectParams {
 
     val maybeEnd: Option[Fragment] =
       List[Option[Fragment]](
-        params.where.map(w => w(fields)).reduceLeftOption(_ and _).map { where =>
+        params.where.map(w => w(fields)).reduceLeftOption(_.and(_)).map { where =>
           Fragment(" where ") ++ where.render(counter)
         },
         params.orderBy match {

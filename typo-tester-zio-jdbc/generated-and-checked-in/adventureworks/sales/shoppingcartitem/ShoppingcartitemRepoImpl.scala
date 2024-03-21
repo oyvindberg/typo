@@ -35,7 +35,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
           values (${Segment.paramSegment(unsaved.shoppingcartitemid)(ShoppingcartitemId.setter)}::int4, ${Segment.paramSegment(unsaved.shoppingcartid)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.quantity)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.datecreated)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
-       """.insertReturning(ShoppingcartitemRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ShoppingcartitemRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShoppingcartitemRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShoppingcartitemRow.text)
@@ -71,7 +71,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into sales.shoppingcartitem($names) values ($values) returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text"""
     }
-    q.insertReturning(ShoppingcartitemRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ShoppingcartitemRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -82,13 +82,13 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     SelectBuilderSql("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ShoppingcartitemRow] = {
-    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem""".query(ShoppingcartitemRow.jdbcDecoder).selectStream
+    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem""".query(using ShoppingcartitemRow.jdbcDecoder).selectStream()
   }
   override def selectById(shoppingcartitemid: ShoppingcartitemId): ZIO[ZConnection, Throwable, Option[ShoppingcartitemRow]] = {
-    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(ShoppingcartitemId.setter)}""".query(ShoppingcartitemRow.jdbcDecoder).selectOne
+    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(ShoppingcartitemId.setter)}""".query(using ShoppingcartitemRow.jdbcDecoder).selectOne
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): ZStream[ZConnection, Throwable, ShoppingcartitemRow] = {
-    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem where "shoppingcartitemid" = ANY(${Segment.paramSegment(shoppingcartitemids)(ShoppingcartitemId.arraySetter)})""".query(ShoppingcartitemRow.jdbcDecoder).selectStream
+    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem where "shoppingcartitemid" = ANY(${Segment.paramSegment(shoppingcartitemids)(ShoppingcartitemId.arraySetter)})""".query(using ShoppingcartitemRow.jdbcDecoder).selectStream()
   }
   override def update(row: ShoppingcartitemRow): ZIO[ZConnection, Throwable, Boolean] = {
     val shoppingcartitemid = row.shoppingcartitemid
@@ -120,6 +120,6 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
             "productid" = EXCLUDED."productid",
             "datecreated" = EXCLUDED."datecreated",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text""".insertReturning(ShoppingcartitemRow.jdbcDecoder)
+          returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text""".insertReturning(using ShoppingcartitemRow.jdbcDecoder)
   }
 }

@@ -14,7 +14,7 @@ import java.sql.Connection
 import scala.util.control.NonFatal
 
 object streamingInsert {
-  def apply[T: Text](copyCommand: String, batchSize: Int, rows: Iterator[T])(implicit c: Connection): Long = {
+  def apply[T](copyCommand: String, batchSize: Int, rows: Iterator[T])(implicit text: Text[T], c: Connection): Long = {
     val copyManager = c.unwrap(classOf[PGConnection]).getCopyAPI
 
     val in = copyManager.copyIn(copyCommand)

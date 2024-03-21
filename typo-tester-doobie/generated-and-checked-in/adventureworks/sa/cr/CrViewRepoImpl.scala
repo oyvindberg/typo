@@ -18,6 +18,6 @@ class CrViewRepoImpl extends CrViewRepo {
     SelectBuilderSql("sa.cr", CrViewFields.structure, CrViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CrViewRow] = {
-    sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from sa.cr""".query(CrViewRow.read).stream
+    sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from sa.cr""".query(using CrViewRow.read).stream
   }
 }

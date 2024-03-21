@@ -35,7 +35,7 @@ class PersonRepoImpl extends PersonRepo {
     sql"""insert into compositepk.person("one", "two", "name")
           values (${Segment.paramSegment(unsaved.one)(Setter.longSetter)}::int8, ${Segment.paramSegment(unsaved.two)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.name)(Setter.optionParamSetter(Setter.stringSetter))})
           returning "one", "two", "name"
-       """.insertReturning(PersonRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using PersonRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY compositepk.person("one", "two", "name") FROM STDIN""", batchSize, unsaved)(PersonRow.text)
@@ -62,7 +62,7 @@ class PersonRepoImpl extends PersonRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into compositepk.person($names) values ($values) returning "one", "two", "name""""
     }
-    q.insertReturning(PersonRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using PersonRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -73,10 +73,10 @@ class PersonRepoImpl extends PersonRepo {
     SelectBuilderSql("compositepk.person", PersonFields.structure, PersonRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PersonRow] = {
-    sql"""select "one", "two", "name" from compositepk.person""".query(PersonRow.jdbcDecoder).selectStream
+    sql"""select "one", "two", "name" from compositepk.person""".query(using PersonRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: PersonId): ZIO[ZConnection, Throwable, Option[PersonRow]] = {
-    sql"""select "one", "two", "name" from compositepk.person where "one" = ${Segment.paramSegment(compositeId.one)(Setter.longSetter)} AND "two" = ${Segment.paramSegment(compositeId.two)(Setter.optionParamSetter(Setter.stringSetter))}""".query(PersonRow.jdbcDecoder).selectOne
+    sql"""select "one", "two", "name" from compositepk.person where "one" = ${Segment.paramSegment(compositeId.one)(Setter.longSetter)} AND "two" = ${Segment.paramSegment(compositeId.two)(Setter.optionParamSetter(Setter.stringSetter))}""".query(using PersonRow.jdbcDecoder).selectOne
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, PersonRow] = {
     fieldValues match {
@@ -89,7 +89,7 @@ class PersonRepoImpl extends PersonRepo {
             case PersonFieldValue.name(value) => sql""""name" = ${Segment.paramSegment(value)(Setter.optionParamSetter(Setter.stringSetter))}"""
           }
         )
-        sql"""select "one", "two", "name" from compositepk.person where $wheres""".query(PersonRow.jdbcDecoder).selectStream
+        sql"""select "one", "two", "name" from compositepk.person where $wheres""".query(using PersonRow.jdbcDecoder).selectStream()
     }
   }
   override def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean] = {
@@ -122,6 +122,6 @@ class PersonRepoImpl extends PersonRepo {
           on conflict ("one", "two")
           do update set
             "name" = EXCLUDED."name"
-          returning "one", "two", "name"""".insertReturning(PersonRow.jdbcDecoder)
+          returning "one", "two", "name"""".insertReturning(using PersonRow.jdbcDecoder)
   }
 }

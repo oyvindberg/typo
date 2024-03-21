@@ -39,7 +39,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
     sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4, ${Segment.paramSegment(unsaved.stateprovincecode)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}, ${Segment.paramSegment(unsaved.isonlystateprovinceflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.territoryid)(SalesterritoryId.setter)}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
-       """.insertReturning(StateprovinceRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using StateprovinceRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StateprovinceRow.text)
@@ -77,7 +77,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into person.stateprovince($names) values ($values) returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(StateprovinceRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using StateprovinceRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -88,13 +88,13 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
     SelectBuilderSql("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, StateprovinceRow] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince""".query(StateprovinceRow.jdbcDecoder).selectStream
+    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince""".query(using StateprovinceRow.jdbcDecoder).selectStream()
   }
   override def selectById(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Option[StateprovinceRow]] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".query(StateprovinceRow.jdbcDecoder).selectOne
+    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".query(using StateprovinceRow.jdbcDecoder).selectOne
   }
   override def selectByIds(stateprovinceids: Array[StateprovinceId]): ZStream[ZConnection, Throwable, StateprovinceRow] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ANY(${Segment.paramSegment(stateprovinceids)(StateprovinceId.arraySetter)})""".query(StateprovinceRow.jdbcDecoder).selectStream
+    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ANY(${Segment.paramSegment(stateprovinceids)(StateprovinceId.arraySetter)})""".query(using StateprovinceRow.jdbcDecoder).selectStream()
   }
   override def update(row: StateprovinceRow): ZIO[ZConnection, Throwable, Boolean] = {
     val stateprovinceid = row.stateprovinceid
@@ -132,6 +132,6 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
             "territoryid" = EXCLUDED."territoryid",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text""".insertReturning(StateprovinceRow.jdbcDecoder)
+          returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text""".insertReturning(using StateprovinceRow.jdbcDecoder)
   }
 }

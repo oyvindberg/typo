@@ -37,7 +37,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
           values (${Segment.paramSegment(unsaved.purchaseorderid)(PurchaseorderheaderId.setter)}::int4, ${Segment.paramSegment(unsaved.revisionnumber)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.status)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.employeeid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.vendorid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.shipmethodid)(ShipmethodId.setter)}::int4, ${Segment.paramSegment(unsaved.orderdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.subtotal)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.taxamt)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.freight)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text
-       """.insertReturning(PurchaseorderheaderRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using PurchaseorderheaderRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PurchaseorderheaderRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate") FROM STDIN""", batchSize, unsaved)(PurchaseorderheaderRow.text)
@@ -91,7 +91,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into purchasing.purchaseorderheader($names) values ($values) returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text"""
     }
-    q.insertReturning(PurchaseorderheaderRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using PurchaseorderheaderRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -102,13 +102,13 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     SelectBuilderSql("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PurchaseorderheaderRow] = {
-    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader""".query(PurchaseorderheaderRow.jdbcDecoder).selectStream
+    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader""".query(using PurchaseorderheaderRow.jdbcDecoder).selectStream()
   }
   override def selectById(purchaseorderid: PurchaseorderheaderId): ZIO[ZConnection, Throwable, Option[PurchaseorderheaderRow]] = {
-    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(PurchaseorderheaderId.setter)}""".query(PurchaseorderheaderRow.jdbcDecoder).selectOne
+    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(PurchaseorderheaderId.setter)}""".query(using PurchaseorderheaderRow.jdbcDecoder).selectOne
   }
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId]): ZStream[ZConnection, Throwable, PurchaseorderheaderRow] = {
-    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader where "purchaseorderid" = ANY(${Segment.paramSegment(purchaseorderids)(PurchaseorderheaderId.arraySetter)})""".query(PurchaseorderheaderRow.jdbcDecoder).selectStream
+    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader where "purchaseorderid" = ANY(${Segment.paramSegment(purchaseorderids)(PurchaseorderheaderId.arraySetter)})""".query(using PurchaseorderheaderRow.jdbcDecoder).selectStream()
   }
   override def update(row: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, Boolean] = {
     val purchaseorderid = row.purchaseorderid
@@ -158,6 +158,6 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
             "taxamt" = EXCLUDED."taxamt",
             "freight" = EXCLUDED."freight",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text""".insertReturning(PurchaseorderheaderRow.jdbcDecoder)
+          returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text""".insertReturning(using PurchaseorderheaderRow.jdbcDecoder)
   }
 }

@@ -39,7 +39,7 @@ class VendorRepoImpl extends VendorRepo {
     sql"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.accountnumber)(AccountNumber.setter)}::varchar, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.creditrating)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.preferredvendorstatus)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.activeflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.purchasingwebserviceurl)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
-       """.insertReturning(VendorRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using VendorRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, VendorRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") FROM STDIN""", batchSize, unsaved)(VendorRow.text)
@@ -74,7 +74,7 @@ class VendorRepoImpl extends VendorRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into purchasing.vendor($names) values ($values) returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text"""
     }
-    q.insertReturning(VendorRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using VendorRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -85,13 +85,13 @@ class VendorRepoImpl extends VendorRepo {
     SelectBuilderSql("purchasing.vendor", VendorFields.structure, VendorRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VendorRow] = {
-    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor""".query(VendorRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor""".query(using VendorRow.jdbcDecoder).selectStream()
   }
   override def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[VendorRow]] = {
-    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".query(VendorRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".query(using VendorRow.jdbcDecoder).selectOne
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, VendorRow] = {
-    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(VendorRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(using VendorRow.jdbcDecoder).selectStream()
   }
   override def update(row: VendorRow): ZIO[ZConnection, Throwable, Boolean] = {
     val businessentityid = row.businessentityid
@@ -129,6 +129,6 @@ class VendorRepoImpl extends VendorRepo {
             "activeflag" = EXCLUDED."activeflag",
             "purchasingwebserviceurl" = EXCLUDED."purchasingwebserviceurl",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text""".insertReturning(VendorRow.jdbcDecoder)
+          returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text""".insertReturning(using VendorRow.jdbcDecoder)
   }
 }

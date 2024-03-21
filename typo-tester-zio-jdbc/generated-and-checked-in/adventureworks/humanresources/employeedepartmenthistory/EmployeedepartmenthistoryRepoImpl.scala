@@ -38,7 +38,7 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     sql"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.departmentid)(DepartmentId.setter)}::int2, ${Segment.paramSegment(unsaved.shiftid)(ShiftId.setter)}::int2, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDate.setter)}::date, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDate.setter))}::date, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
-       """.insertReturning(EmployeedepartmenthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using EmployeedepartmenthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, EmployeedepartmenthistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") FROM STDIN""", batchSize, unsaved)(EmployeedepartmenthistoryRow.text)
@@ -65,7 +65,7 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into humanresources.employeedepartmenthistory($names) values ($values) returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text"""
     }
-    q.insertReturning(EmployeedepartmenthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using EmployeedepartmenthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -76,10 +76,10 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     SelectBuilderSql("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields.structure, EmployeedepartmenthistoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, EmployeedepartmenthistoryRow] = {
-    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory""".query(EmployeedepartmenthistoryRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory""".query(using EmployeedepartmenthistoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: EmployeedepartmenthistoryId): ZIO[ZConnection, Throwable, Option[EmployeedepartmenthistoryRow]] = {
-    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDate.setter)} AND "departmentid" = ${Segment.paramSegment(compositeId.departmentid)(DepartmentId.setter)} AND "shiftid" = ${Segment.paramSegment(compositeId.shiftid)(ShiftId.setter)}""".query(EmployeedepartmenthistoryRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDate.setter)} AND "departmentid" = ${Segment.paramSegment(compositeId.departmentid)(DepartmentId.setter)} AND "shiftid" = ${Segment.paramSegment(compositeId.shiftid)(ShiftId.setter)}""".query(using EmployeedepartmenthistoryRow.jdbcDecoder).selectOne
   }
   override def update(row: EmployeedepartmenthistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -105,6 +105,6 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
           do update set
             "enddate" = EXCLUDED."enddate",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text""".insertReturning(EmployeedepartmenthistoryRow.jdbcDecoder)
+          returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text""".insertReturning(using EmployeedepartmenthistoryRow.jdbcDecoder)
   }
 }

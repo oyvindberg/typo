@@ -18,6 +18,6 @@ class VemployeedepartmentViewRepoImpl extends VemployeedepartmentViewRepo {
     SelectBuilderSql("humanresources.vemployeedepartment", VemployeedepartmentViewFields.structure, VemployeedepartmentViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VemployeedepartmentViewRow] = {
-    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "department", "groupname", "startdate"::text from humanresources.vemployeedepartment""".query(VemployeedepartmentViewRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "department", "groupname", "startdate"::text from humanresources.vemployeedepartment""".query(using VemployeedepartmentViewRow.jdbcDecoder).selectStream()
   }
 }

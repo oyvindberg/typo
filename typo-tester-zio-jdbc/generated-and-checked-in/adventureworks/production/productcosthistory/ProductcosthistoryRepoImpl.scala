@@ -35,7 +35,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
           values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.standardcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
-       """.insertReturning(ProductcosthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ProductcosthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductcosthistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductcosthistoryRow.text)
@@ -61,7 +61,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.productcosthistory($names) values ($values) returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text"""
     }
-    q.insertReturning(ProductcosthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ProductcosthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -72,10 +72,10 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductcosthistoryRow] = {
-    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory""".query(ProductcosthistoryRow.jdbcDecoder).selectStream
+    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory""".query(using ProductcosthistoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: ProductcosthistoryId): ZIO[ZConnection, Throwable, Option[ProductcosthistoryRow]] = {
-    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".query(ProductcosthistoryRow.jdbcDecoder).selectOne
+    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".query(using ProductcosthistoryRow.jdbcDecoder).selectOne
   }
   override def update(row: ProductcosthistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -102,6 +102,6 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
             "enddate" = EXCLUDED."enddate",
             "standardcost" = EXCLUDED."standardcost",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text""".insertReturning(ProductcosthistoryRow.jdbcDecoder)
+          returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text""".insertReturning(using ProductcosthistoryRow.jdbcDecoder)
   }
 }

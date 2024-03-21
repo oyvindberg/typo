@@ -95,7 +95,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         _ <- productRepo.update(saved3.copy(size = None)).map(res => assert(res))
         query = productRepo.select
           .where(_.`class` === "H ")
-          .where(x => x.daystomanufacture > 25 or x.daystomanufacture <= 0)
+          .where(x => (x.daystomanufacture > 25).or(x.daystomanufacture <= 0))
           .where(x => x.productline === "foo")
           .join(unitmeasureRepo.select.where(_.name.like("name%")))
           .on { case (p, um) => p.sizeunitmeasurecode === um.unitmeasurecode }
@@ -114,7 +114,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         update = productRepo.update
           .setComputedValue(_.name)(p => (p.reverse.upper || Name("flaff")).substring(2, 4))
           .setValue(_.listprice)(BigDecimal(2))
-          .setComputedValue(_.reorderpoint)(_ plus TypoShort(22))
+          .setComputedValue(_.reorderpoint)(_ + TypoShort(22))
 //          .setComputedValue(_.sizeunitmeasurecode)(_ => Some(unitmeasure.unitmeasurecode))
           .where(_.productid === saved1.productid)
 
@@ -157,7 +157,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
             .where { case (_, pm) => pm.productmodelid.underlying > 0 }
             // works arbitrarily deep
             .join(projectModelRepo.select.where(pm => !pm.name.like("foo%")))
-            .leftOn { case ((p, _), pm2) => p.productmodelid === pm2.productmodelid and false }
+            .leftOn { case ((p, _), pm2) => (p.productmodelid === pm2.productmodelid).and(false) }
             // order by
             .orderBy { case ((p, _), _) => p.name.asc }
             .orderBy { case ((_, pm), _) => pm.rowguid.desc.withNullsFirst }

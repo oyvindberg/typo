@@ -35,7 +35,7 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     sql"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.productcategoryid)(ProductcategoryId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productcategoryid", "name", "rowguid", "modifieddate"::text
-       """.insertReturning(ProductcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using ProductcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductcategoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.productcategory("productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductcategoryRow.text)
@@ -66,7 +66,7 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.productcategory($names) values ($values) returning "productcategoryid", "name", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(ProductcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using ProductcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -77,13 +77,13 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     SelectBuilderSql("production.productcategory", ProductcategoryFields.structure, ProductcategoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductcategoryRow] = {
-    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory""".query(ProductcategoryRow.jdbcDecoder).selectStream
+    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory""".query(using ProductcategoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(productcategoryid: ProductcategoryId): ZIO[ZConnection, Throwable, Option[ProductcategoryRow]] = {
-    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory where "productcategoryid" = ${Segment.paramSegment(productcategoryid)(ProductcategoryId.setter)}""".query(ProductcategoryRow.jdbcDecoder).selectOne
+    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory where "productcategoryid" = ${Segment.paramSegment(productcategoryid)(ProductcategoryId.setter)}""".query(using ProductcategoryRow.jdbcDecoder).selectOne
   }
   override def selectByIds(productcategoryids: Array[ProductcategoryId]): ZStream[ZConnection, Throwable, ProductcategoryRow] = {
-    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory where "productcategoryid" = ANY(${Segment.paramSegment(productcategoryids)(ProductcategoryId.arraySetter)})""".query(ProductcategoryRow.jdbcDecoder).selectStream
+    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory where "productcategoryid" = ANY(${Segment.paramSegment(productcategoryids)(ProductcategoryId.arraySetter)})""".query(using ProductcategoryRow.jdbcDecoder).selectStream()
   }
   override def update(row: ProductcategoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val productcategoryid = row.productcategoryid
@@ -109,6 +109,6 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
             "name" = EXCLUDED."name",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "productcategoryid", "name", "rowguid", "modifieddate"::text""".insertReturning(ProductcategoryRow.jdbcDecoder)
+          returning "productcategoryid", "name", "rowguid", "modifieddate"::text""".insertReturning(using ProductcategoryRow.jdbcDecoder)
   }
 }

@@ -37,10 +37,10 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int2, ${fromWrite(unsaved.shelf)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.bin)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.quantity)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
-       """.query(ProductinventoryRow.read).unique
+       """.query(using ProductinventoryRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(ProductinventoryRow.text)
+    new FragmentOps(sql"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductinventoryRow.text)
   }
   override def insert(unsaved: ProductinventoryRowUnsaved): ConnectionIO[ProductinventoryRow] = {
     val fs = List(
@@ -73,21 +73,21 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
             returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
          """
     }
-    q.query(ProductinventoryRow.read).unique
+    q.query(using ProductinventoryRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(ProductinventoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductinventoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductinventoryFields, ProductinventoryRow] = {
     SelectBuilderSql("production.productinventory", ProductinventoryFields.structure, ProductinventoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductinventoryRow] = {
-    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory""".query(ProductinventoryRow.read).stream
+    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory""".query(using ProductinventoryRow.read).stream
   }
   override def selectById(compositeId: ProductinventoryId): ConnectionIO[Option[ProductinventoryRow]] = {
-    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}""".query(ProductinventoryRow.read).option
+    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}""".query(using ProductinventoryRow.read).option
   }
   override def update(row: ProductinventoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
@@ -124,6 +124,6 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
-       """.query(ProductinventoryRow.read).unique
+       """.query(using ProductinventoryRow.read).unique
   }
 }

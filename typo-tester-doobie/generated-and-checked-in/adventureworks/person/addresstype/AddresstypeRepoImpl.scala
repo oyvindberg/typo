@@ -34,10 +34,10 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
     sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.addresstypeid)(Write.fromPut(AddresstypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "addresstypeid", "name", "rowguid", "modifieddate"::text
-       """.query(AddresstypeRow.read).unique
+       """.query(using AddresstypeRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, AddresstypeRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.addresstype("addresstypeid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(AddresstypeRow.text)
+    new FragmentOps(sql"""COPY person.addresstype("addresstypeid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using AddresstypeRow.text)
   }
   override def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow] = {
     val fs = List(
@@ -67,24 +67,24 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
             returning "addresstypeid", "name", "rowguid", "modifieddate"::text
          """
     }
-    q.query(AddresstypeRow.read).unique
+    q.query(using AddresstypeRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, AddresstypeRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.addresstype("name", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(AddresstypeRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.addresstype("name", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using AddresstypeRowUnsaved.text)
   }
   override def select: SelectBuilder[AddresstypeFields, AddresstypeRow] = {
     SelectBuilderSql("person.addresstype", AddresstypeFields.structure, AddresstypeRow.read)
   }
   override def selectAll: Stream[ConnectionIO, AddresstypeRow] = {
-    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype""".query(AddresstypeRow.read).stream
+    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype""".query(using AddresstypeRow.read).stream
   }
   override def selectById(addresstypeid: AddresstypeId): ConnectionIO[Option[AddresstypeRow]] = {
-    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype where "addresstypeid" = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}""".query(AddresstypeRow.read).option
+    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype where "addresstypeid" = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}""".query(using AddresstypeRow.read).option
   }
   override def selectByIds(addresstypeids: Array[AddresstypeId]): Stream[ConnectionIO, AddresstypeRow] = {
-    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype where "addresstypeid" = ANY(${addresstypeids})""".query(AddresstypeRow.read).stream
+    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype where "addresstypeid" = ANY(${addresstypeids})""".query(using AddresstypeRow.read).stream
   }
   override def update(row: AddresstypeRow): ConnectionIO[Boolean] = {
     val addresstypeid = row.addresstypeid
@@ -114,6 +114,6 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "addresstypeid", "name", "rowguid", "modifieddate"::text
-       """.query(AddresstypeRow.read).unique
+       """.query(using AddresstypeRow.read).unique
   }
 }

@@ -18,6 +18,6 @@ class VproductmodelcatalogdescriptionViewRepoImpl extends Vproductmodelcatalogde
     SelectBuilderSql("production.vproductmodelcatalogdescription", VproductmodelcatalogdescriptionViewFields.structure, VproductmodelcatalogdescriptionViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VproductmodelcatalogdescriptionViewRow] = {
-    sql"""select "productmodelid", "name", "Summary", "manufacturer", "copyright", "producturl", "warrantyperiod", "warrantydescription", "noofyears", "maintenancedescription", "wheel", "saddle", "pedal", "bikeframe", "crankset", "pictureangle", "picturesize", "productphotoid", "material", "color", "productline", "style", "riderexperience", "rowguid", "modifieddate"::text from production.vproductmodelcatalogdescription""".query(VproductmodelcatalogdescriptionViewRow.jdbcDecoder).selectStream
+    sql"""select "productmodelid", "name", "Summary", "manufacturer", "copyright", "producturl", "warrantyperiod", "warrantydescription", "noofyears", "maintenancedescription", "wheel", "saddle", "pedal", "bikeframe", "crankset", "pictureangle", "picturesize", "productphotoid", "material", "color", "productline", "style", "riderexperience", "rowguid", "modifieddate"::text from production.vproductmodelcatalogdescription""".query(using VproductmodelcatalogdescriptionViewRow.jdbcDecoder).selectStream()
   }
 }

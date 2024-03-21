@@ -42,12 +42,12 @@ object VsalespersonsalesbyfiscalyearsdataViewRow {
         )
   }
   implicit lazy val jsonDecoder: JsonDecoder[VsalespersonsalesbyfiscalyearsdataViewRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
-    val salespersonid = jsonObj.get("salespersonid").fold[Either[String, Option[BusinessentityId]]](Right(None))(_.as(JsonDecoder.option(BusinessentityId.jsonDecoder)))
-    val fullname = jsonObj.get("fullname").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.string)))
+    val salespersonid = jsonObj.get("salespersonid").fold[Either[String, Option[BusinessentityId]]](Right(None))(_.as(JsonDecoder.option(using BusinessentityId.jsonDecoder)))
+    val fullname = jsonObj.get("fullname").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
     val jobtitle = jsonObj.get("jobtitle").toRight("Missing field 'jobtitle'").flatMap(_.as(JsonDecoder.string))
     val salesterritory = jsonObj.get("salesterritory").toRight("Missing field 'salesterritory'").flatMap(_.as(Name.jsonDecoder))
-    val salestotal = jsonObj.get("salestotal").fold[Either[String, Option[BigDecimal]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.scalaBigDecimal)))
-    val fiscalyear = jsonObj.get("fiscalyear").fold[Either[String, Option[BigDecimal]]](Right(None))(_.as(JsonDecoder.option(JsonDecoder.scalaBigDecimal)))
+    val salestotal = jsonObj.get("salestotal").fold[Either[String, Option[BigDecimal]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.scalaBigDecimal)))
+    val fiscalyear = jsonObj.get("fiscalyear").fold[Either[String, Option[BigDecimal]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.scalaBigDecimal)))
     if (salespersonid.isRight && fullname.isRight && jobtitle.isRight && salesterritory.isRight && salestotal.isRight && fiscalyear.isRight)
       Right(VsalespersonsalesbyfiscalyearsdataViewRow(salespersonid = salespersonid.toOption.get, fullname = fullname.toOption.get, jobtitle = jobtitle.toOption.get, salesterritory = salesterritory.toOption.get, salestotal = salestotal.toOption.get, fiscalyear = fiscalyear.toOption.get))
     else Left(List[Either[String, Any]](salespersonid, fullname, jobtitle, salesterritory, salestotal, fiscalyear).flatMap(_.left.toOption).mkString(", "))
@@ -56,10 +56,10 @@ object VsalespersonsalesbyfiscalyearsdataViewRow {
     override def unsafeEncode(a: VsalespersonsalesbyfiscalyearsdataViewRow, indent: Option[Int], out: Write): Unit = {
       out.write("{")
       out.write(""""salespersonid":""")
-      JsonEncoder.option(BusinessentityId.jsonEncoder).unsafeEncode(a.salespersonid, indent, out)
+      JsonEncoder.option(using BusinessentityId.jsonEncoder).unsafeEncode(a.salespersonid, indent, out)
       out.write(",")
       out.write(""""fullname":""")
-      JsonEncoder.option(JsonEncoder.string).unsafeEncode(a.fullname, indent, out)
+      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.fullname, indent, out)
       out.write(",")
       out.write(""""jobtitle":""")
       JsonEncoder.string.unsafeEncode(a.jobtitle, indent, out)
@@ -68,10 +68,10 @@ object VsalespersonsalesbyfiscalyearsdataViewRow {
       Name.jsonEncoder.unsafeEncode(a.salesterritory, indent, out)
       out.write(",")
       out.write(""""salestotal":""")
-      JsonEncoder.option(JsonEncoder.scalaBigDecimal).unsafeEncode(a.salestotal, indent, out)
+      JsonEncoder.option(using JsonEncoder.scalaBigDecimal).unsafeEncode(a.salestotal, indent, out)
       out.write(",")
       out.write(""""fiscalyear":""")
-      JsonEncoder.option(JsonEncoder.scalaBigDecimal).unsafeEncode(a.fiscalyear, indent, out)
+      JsonEncoder.option(using JsonEncoder.scalaBigDecimal).unsafeEncode(a.fiscalyear, indent, out)
       out.write("}")
     }
   }

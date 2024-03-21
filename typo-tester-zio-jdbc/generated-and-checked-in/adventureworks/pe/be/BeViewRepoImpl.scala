@@ -18,6 +18,6 @@ class BeViewRepoImpl extends BeViewRepo {
     SelectBuilderSql("pe.be", BeViewFields.structure, BeViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, BeViewRow] = {
-    sql"""select "id", "businessentityid", "rowguid", "modifieddate"::text from pe.be""".query(BeViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "businessentityid", "rowguid", "modifieddate"::text from pe.be""".query(using BeViewRow.jdbcDecoder).selectStream()
   }
 }

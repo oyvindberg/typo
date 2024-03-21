@@ -42,7 +42,7 @@ object TypoShort {
     },
     "Array[java.lang.Integer]"
   )
-  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoShort]] = JdbcEncoder.singleParamEncoder(arraySetter)
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TypoShort]] = JdbcEncoder.singleParamEncoder(using arraySetter)
   implicit lazy val arraySetter: Setter[Array[TypoShort]] = Setter.forSqlType((ps, i, v) =>
     ps.setArray(
       i,
@@ -63,7 +63,7 @@ object TypoShort {
     },
     "java.lang.Integer"
   )
-  implicit lazy val jdbcEncoder: JdbcEncoder[TypoShort] = JdbcEncoder.singleParamEncoder(setter)
+  implicit lazy val jdbcEncoder: JdbcEncoder[TypoShort] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoShort] = JsonDecoder[Short].map(TypoShort.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoShort] = JsonEncoder[Short].contramap(_.value)
   implicit lazy val ordering: Ordering[TypoShort] = Ordering.by(_.value)

@@ -33,10 +33,10 @@ class DepartmentRepoImpl extends DepartmentRepo {
     sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
           values (${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "departmentid", "name", "groupname", "modifieddate"::text
-       """.query(DepartmentRow.read).unique
+       """.query(using DepartmentRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, DepartmentRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(DepartmentRow.text)
+    new FragmentOps(sql"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using DepartmentRow.text)
   }
   override def insert(unsaved: DepartmentRowUnsaved): ConnectionIO[DepartmentRow] = {
     val fs = List(
@@ -63,24 +63,24 @@ class DepartmentRepoImpl extends DepartmentRepo {
             returning "departmentid", "name", "groupname", "modifieddate"::text
          """
     }
-    q.query(DepartmentRow.read).unique
+    q.query(using DepartmentRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, DepartmentRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.department("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(DepartmentRowUnsaved.text)
+    new FragmentOps(sql"""COPY humanresources.department("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using DepartmentRowUnsaved.text)
   }
   override def select: SelectBuilder[DepartmentFields, DepartmentRow] = {
     SelectBuilderSql("humanresources.department", DepartmentFields.structure, DepartmentRow.read)
   }
   override def selectAll: Stream[ConnectionIO, DepartmentRow] = {
-    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department""".query(DepartmentRow.read).stream
+    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department""".query(using DepartmentRow.read).stream
   }
   override def selectById(departmentid: DepartmentId): ConnectionIO[Option[DepartmentRow]] = {
-    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}""".query(DepartmentRow.read).option
+    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}""".query(using DepartmentRow.read).option
   }
   override def selectByIds(departmentids: Array[DepartmentId]): Stream[ConnectionIO, DepartmentRow] = {
-    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ANY(${departmentids})""".query(DepartmentRow.read).stream
+    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ANY(${departmentids})""".query(using DepartmentRow.read).stream
   }
   override def update(row: DepartmentRow): ConnectionIO[Boolean] = {
     val departmentid = row.departmentid
@@ -110,6 +110,6 @@ class DepartmentRepoImpl extends DepartmentRepo {
             "groupname" = EXCLUDED."groupname",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "departmentid", "name", "groupname", "modifieddate"::text
-       """.query(DepartmentRow.read).unique
+       """.query(using DepartmentRow.read).unique
   }
 }

@@ -33,10 +33,10 @@ class CountryregionRepoImpl extends CountryregionRepo {
     sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
           values (${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "countryregioncode", "name", "modifieddate"::text
-       """.query(CountryregionRow.read).unique
+       """.query(using CountryregionRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(CountryregionRow.text)
+    new FragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CountryregionRow.text)
   }
   override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
     val fs = List(
@@ -59,24 +59,24 @@ class CountryregionRepoImpl extends CountryregionRepo {
             returning "countryregioncode", "name", "modifieddate"::text
          """
     }
-    q.query(CountryregionRow.read).unique
+    q.query(using CountryregionRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregionRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(CountryregionRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using CountryregionRowUnsaved.text)
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
     SelectBuilderSql("person.countryregion", CountryregionFields.structure, CountryregionRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CountryregionRow] = {
-    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion""".query(CountryregionRow.read).stream
+    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion""".query(using CountryregionRow.read).stream
   }
   override def selectById(countryregioncode: CountryregionId): ConnectionIO[Option[CountryregionRow]] = {
-    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}""".query(CountryregionRow.read).option
+    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}""".query(using CountryregionRow.read).option
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow] = {
-    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ANY(${countryregioncodes})""".query(CountryregionRow.read).stream
+    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ANY(${countryregioncodes})""".query(using CountryregionRow.read).stream
   }
   override def update(row: CountryregionRow): ConnectionIO[Boolean] = {
     val countryregioncode = row.countryregioncode
@@ -103,6 +103,6 @@ class CountryregionRepoImpl extends CountryregionRepo {
             "name" = EXCLUDED."name",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "countryregioncode", "name", "modifieddate"::text
-       """.query(CountryregionRow.read).unique
+       """.query(using CountryregionRow.read).unique
   }
 }

@@ -36,7 +36,7 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
     sql"""insert into person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.emailaddressid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.emailaddress)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
-       """.insertReturning(EmailaddressRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using EmailaddressRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, EmailaddressRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(EmailaddressRow.text)
@@ -68,7 +68,7 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into person.emailaddress($names) values ($values) returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(EmailaddressRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using EmailaddressRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -79,10 +79,10 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
     SelectBuilderSql("person.emailaddress", EmailaddressFields.structure, EmailaddressRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, EmailaddressRow] = {
-    sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from person.emailaddress""".query(EmailaddressRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from person.emailaddress""".query(using EmailaddressRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: EmailaddressId): ZIO[ZConnection, Throwable, Option[EmailaddressRow]] = {
-    sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from person.emailaddress where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "emailaddressid" = ${Segment.paramSegment(compositeId.emailaddressid)(Setter.intSetter)}""".query(EmailaddressRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from person.emailaddress where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "emailaddressid" = ${Segment.paramSegment(compositeId.emailaddressid)(Setter.intSetter)}""".query(using EmailaddressRow.jdbcDecoder).selectOne
   }
   override def update(row: EmailaddressRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -109,6 +109,6 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
             "emailaddress" = EXCLUDED."emailaddress",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text""".insertReturning(EmailaddressRow.jdbcDecoder)
+          returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text""".insertReturning(using EmailaddressRow.jdbcDecoder)
   }
 }

@@ -39,7 +39,7 @@ class DocumentRepoImpl extends DocumentRepo {
     sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
           values (${Segment.paramSegment(unsaved.title)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.owner)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.folderflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.filename)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.fileextension)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.revision)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.changenumber)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.status)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.documentsummary)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.document)(Setter.optionParamSetter(TypoBytea.setter))}::bytea, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.documentnode)(DocumentId.setter)})
           returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
-       """.insertReturning(DocumentRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using DocumentRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") FROM STDIN""", batchSize, unsaved)(DocumentRow.text)
@@ -85,7 +85,7 @@ class DocumentRepoImpl extends DocumentRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.document($names) values ($values) returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode""""
     }
-    q.insertReturning(DocumentRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using DocumentRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -96,19 +96,19 @@ class DocumentRepoImpl extends DocumentRepo {
     SelectBuilderSql("production.document", DocumentFields.structure, DocumentRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, DocumentRow] = {
-    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document""".query(DocumentRow.jdbcDecoder).selectStream
+    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document""".query(using DocumentRow.jdbcDecoder).selectStream()
   }
   override def selectById(documentnode: DocumentId): ZIO[ZConnection, Throwable, Option[DocumentRow]] = {
-    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document where "documentnode" = ${Segment.paramSegment(documentnode)(DocumentId.setter)}""".query(DocumentRow.jdbcDecoder).selectOne
+    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document where "documentnode" = ${Segment.paramSegment(documentnode)(DocumentId.setter)}""".query(using DocumentRow.jdbcDecoder).selectOne
   }
   override def selectByIds(documentnodes: Array[DocumentId]): ZStream[ZConnection, Throwable, DocumentRow] = {
-    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document where "documentnode" = ANY(${Segment.paramSegment(documentnodes)(DocumentId.arraySetter)})""".query(DocumentRow.jdbcDecoder).selectStream
+    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document where "documentnode" = ANY(${Segment.paramSegment(documentnodes)(DocumentId.arraySetter)})""".query(using DocumentRow.jdbcDecoder).selectStream()
   }
   override def selectByUnique(rowguid: TypoUUID): ZIO[ZConnection, Throwable, Option[DocumentRow]] = {
     sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
           from production.document
           where "rowguid" = ${Segment.paramSegment(rowguid)(TypoUUID.setter)}
-       """.query(DocumentRow.jdbcDecoder).selectOne
+       """.query(using DocumentRow.jdbcDecoder).selectOne
   }
   override def update(row: DocumentRow): ZIO[ZConnection, Throwable, Boolean] = {
     val documentnode = row.documentnode
@@ -161,6 +161,6 @@ class DocumentRepoImpl extends DocumentRepo {
             "document" = EXCLUDED."document",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"""".insertReturning(DocumentRow.jdbcDecoder)
+          returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"""".insertReturning(using DocumentRow.jdbcDecoder)
   }
 }

@@ -18,6 +18,6 @@ class SthViewRepoImpl extends SthViewRepo {
     SelectBuilderSql("sa.sth", SthViewFields.structure, SthViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SthViewRow] = {
-    sql"""select "id", "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sa.sth""".query(SthViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sa.sth""".query(using SthViewRow.jdbcDecoder).selectStream()
   }
 }

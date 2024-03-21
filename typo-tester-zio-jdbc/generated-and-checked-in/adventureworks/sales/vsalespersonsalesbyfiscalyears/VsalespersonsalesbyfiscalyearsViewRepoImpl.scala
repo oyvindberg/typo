@@ -18,6 +18,6 @@ class VsalespersonsalesbyfiscalyearsViewRepoImpl extends Vsalespersonsalesbyfisc
     SelectBuilderSql("sales.vsalespersonsalesbyfiscalyears", VsalespersonsalesbyfiscalyearsViewFields.structure, VsalespersonsalesbyfiscalyearsViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VsalespersonsalesbyfiscalyearsViewRow] = {
-    sql"""select "SalesPersonID", "FullName", "JobTitle", "SalesTerritory", "2012", "2013", "2014" from sales.vsalespersonsalesbyfiscalyears""".query(VsalespersonsalesbyfiscalyearsViewRow.jdbcDecoder).selectStream
+    sql"""select "SalesPersonID", "FullName", "JobTitle", "SalesTerritory", "2012", "2013", "2014" from sales.vsalespersonsalesbyfiscalyears""".query(using VsalespersonsalesbyfiscalyearsViewRow.jdbcDecoder).selectStream()
   }
 }

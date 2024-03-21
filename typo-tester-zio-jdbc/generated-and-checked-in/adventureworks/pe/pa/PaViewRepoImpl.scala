@@ -18,6 +18,6 @@ class PaViewRepoImpl extends PaViewRepo {
     SelectBuilderSql("pe.pa", PaViewFields.structure, PaViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PaViewRow] = {
-    sql"""select "id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from pe.pa""".query(PaViewRow.jdbcDecoder).selectStream
+    sql"""select "id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from pe.pa""".query(using PaViewRow.jdbcDecoder).selectStream()
   }
 }

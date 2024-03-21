@@ -56,8 +56,8 @@ case class ProductmodelRowUnsaved(
 object ProductmodelRowUnsaved {
   implicit lazy val jsonDecoder: JsonDecoder[ProductmodelRowUnsaved] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val name = jsonObj.get("name").toRight("Missing field 'name'").flatMap(_.as(Name.jsonDecoder))
-    val catalogdescription = jsonObj.get("catalogdescription").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(TypoXml.jsonDecoder)))
-    val instructions = jsonObj.get("instructions").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(TypoXml.jsonDecoder)))
+    val catalogdescription = jsonObj.get("catalogdescription").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(using TypoXml.jsonDecoder)))
+    val instructions = jsonObj.get("instructions").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(using TypoXml.jsonDecoder)))
     val productmodelid = jsonObj.get("productmodelid").toRight("Missing field 'productmodelid'").flatMap(_.as(Defaulted.jsonDecoder(ProductmodelId.jsonDecoder)))
     val rowguid = jsonObj.get("rowguid").toRight("Missing field 'rowguid'").flatMap(_.as(Defaulted.jsonDecoder(TypoUUID.jsonDecoder)))
     val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(Defaulted.jsonDecoder(TypoLocalDateTime.jsonDecoder)))
@@ -72,10 +72,10 @@ object ProductmodelRowUnsaved {
       Name.jsonEncoder.unsafeEncode(a.name, indent, out)
       out.write(",")
       out.write(""""catalogdescription":""")
-      JsonEncoder.option(TypoXml.jsonEncoder).unsafeEncode(a.catalogdescription, indent, out)
+      JsonEncoder.option(using TypoXml.jsonEncoder).unsafeEncode(a.catalogdescription, indent, out)
       out.write(",")
       out.write(""""instructions":""")
-      JsonEncoder.option(TypoXml.jsonEncoder).unsafeEncode(a.instructions, indent, out)
+      JsonEncoder.option(using TypoXml.jsonEncoder).unsafeEncode(a.instructions, indent, out)
       out.write(",")
       out.write(""""productmodelid":""")
       Defaulted.jsonEncoder(ProductmodelId.jsonEncoder).unsafeEncode(a.productmodelid, indent, out)

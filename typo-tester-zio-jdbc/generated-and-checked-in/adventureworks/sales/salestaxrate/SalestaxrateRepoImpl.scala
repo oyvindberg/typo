@@ -38,7 +38,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     sql"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.salestaxrateid)(SalestaxrateId.setter)}::int4, ${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4, ${Segment.paramSegment(unsaved.taxtype)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.taxrate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
-       """.insertReturning(SalestaxrateRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using SalestaxrateRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalestaxrateRow.text)
@@ -75,7 +75,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into sales.salestaxrate($names) values ($values) returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text"""
     }
-    q.insertReturning(SalestaxrateRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using SalestaxrateRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -86,13 +86,13 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     SelectBuilderSql("sales.salestaxrate", SalestaxrateFields.structure, SalestaxrateRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalestaxrateRow] = {
-    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate""".query(SalestaxrateRow.jdbcDecoder).selectStream
+    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate""".query(using SalestaxrateRow.jdbcDecoder).selectStream()
   }
   override def selectById(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Option[SalestaxrateRow]] = {
-    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}""".query(SalestaxrateRow.jdbcDecoder).selectOne
+    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}""".query(using SalestaxrateRow.jdbcDecoder).selectOne
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId]): ZStream[ZConnection, Throwable, SalestaxrateRow] = {
-    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate where "salestaxrateid" = ANY(${Segment.paramSegment(salestaxrateids)(SalestaxrateId.arraySetter)})""".query(SalestaxrateRow.jdbcDecoder).selectStream
+    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate where "salestaxrateid" = ANY(${Segment.paramSegment(salestaxrateids)(SalestaxrateId.arraySetter)})""".query(using SalestaxrateRow.jdbcDecoder).selectStream()
   }
   override def update(row: SalestaxrateRow): ZIO[ZConnection, Throwable, Boolean] = {
     val salestaxrateid = row.salestaxrateid
@@ -127,6 +127,6 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
             "name" = EXCLUDED."name",
             "rowguid" = EXCLUDED."rowguid",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text""".insertReturning(SalestaxrateRow.jdbcDecoder)
+          returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text""".insertReturning(using SalestaxrateRow.jdbcDecoder)
   }
 }

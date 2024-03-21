@@ -37,7 +37,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     sql"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
           values (${Segment.paramSegment(unsaved.billofmaterialsid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.productassemblyid)(Setter.optionParamSetter(ProductId.setter))}::int4, ${Segment.paramSegment(unsaved.componentid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.unitmeasurecode)(UnitmeasureId.setter)}::bpchar, ${Segment.paramSegment(unsaved.bomlevel)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.perassemblyqty)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
-       """.insertReturning(BillofmaterialsRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using BillofmaterialsRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BillofmaterialsRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate") FROM STDIN""", batchSize, unsaved)(BillofmaterialsRow.text)
@@ -76,7 +76,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.billofmaterials($names) values ($values) returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text"""
     }
-    q.insertReturning(BillofmaterialsRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using BillofmaterialsRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -87,13 +87,13 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     SelectBuilderSql("production.billofmaterials", BillofmaterialsFields.structure, BillofmaterialsRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, BillofmaterialsRow] = {
-    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials""".query(BillofmaterialsRow.jdbcDecoder).selectStream
+    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials""".query(using BillofmaterialsRow.jdbcDecoder).selectStream()
   }
   override def selectById(billofmaterialsid: Int): ZIO[ZConnection, Throwable, Option[BillofmaterialsRow]] = {
-    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials where "billofmaterialsid" = ${Segment.paramSegment(billofmaterialsid)(Setter.intSetter)}""".query(BillofmaterialsRow.jdbcDecoder).selectOne
+    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials where "billofmaterialsid" = ${Segment.paramSegment(billofmaterialsid)(Setter.intSetter)}""".query(using BillofmaterialsRow.jdbcDecoder).selectOne
   }
   override def selectByIds(billofmaterialsids: Array[Int]): ZStream[ZConnection, Throwable, BillofmaterialsRow] = {
-    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials where "billofmaterialsid" = ANY(${Segment.paramSegment(billofmaterialsids)(adventureworks.IntArraySetter)})""".query(BillofmaterialsRow.jdbcDecoder).selectStream
+    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials where "billofmaterialsid" = ANY(${Segment.paramSegment(billofmaterialsids)(adventureworks.IntArraySetter)})""".query(using BillofmaterialsRow.jdbcDecoder).selectStream()
   }
   override def update(row: BillofmaterialsRow): ZIO[ZConnection, Throwable, Boolean] = {
     val billofmaterialsid = row.billofmaterialsid
@@ -134,6 +134,6 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
             "bomlevel" = EXCLUDED."bomlevel",
             "perassemblyqty" = EXCLUDED."perassemblyqty",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text""".insertReturning(BillofmaterialsRow.jdbcDecoder)
+          returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text""".insertReturning(using BillofmaterialsRow.jdbcDecoder)
   }
 }

@@ -62,7 +62,7 @@ object SelectBuilderSql {
     }
 
     override def sqlFor(counter: AtomicInteger): Query[Row] =
-      sql(counter).query[Row](read)
+      sql(counter).query[Row](using read)
 
     override def instantiate(counter: AtomicInteger): SelectBuilderSql.Instantiated[Fields, Row] = {
       val completeSql = sql(counter)
@@ -124,7 +124,7 @@ object SelectBuilderSql {
       }
       val newCombinedFrag = SelectParams.render[(Row1, Row2), Joined[Fields1, Fields2, *]](instance.structure.fields, combinedFrag, paramCounter, params)
 
-      newCombinedFrag.query(instance.decoder)
+      newCombinedFrag.query(using instance.decoder)
     }
   }
 
@@ -182,7 +182,7 @@ object SelectBuilderSql {
       val newCombinedFrag =
         SelectParams.render[(Row1, Option[Row2]), LeftJoined[Fields1, Fields2, *]](instance.structure.fields, combinedFrag, paramCounter, params)
 
-      newCombinedFrag.query(instance.decoder)
+      newCombinedFrag.query(using instance.decoder)
     }
   }
 

@@ -37,7 +37,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     sql"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
           values (${Segment.paramSegment(unsaved.workorderid)(WorkorderId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.operationsequence)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.locationid)(LocationId.setter)}::int2, ${Segment.paramSegment(unsaved.scheduledstartdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.scheduledenddate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.actualstartdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.actualenddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.actualresourcehrs)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.plannedcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.actualcost)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
-       """.insertReturning(WorkorderroutingRow.jdbcDecoder).map(_.updatedKeys.head)
+       """.insertReturning(using WorkorderroutingRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderroutingRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN""", batchSize, unsaved)(WorkorderroutingRow.text)
@@ -70,7 +70,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into production.workorderrouting($names) values ($values) returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text"""
     }
-    q.insertReturning(WorkorderroutingRow.jdbcDecoder).map(_.updatedKeys.head)
+    q.insertReturning(using WorkorderroutingRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
@@ -81,10 +81,10 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     SelectBuilderSql("production.workorderrouting", WorkorderroutingFields.structure, WorkorderroutingRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, WorkorderroutingRow] = {
-    sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting""".query(WorkorderroutingRow.jdbcDecoder).selectStream
+    sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting""".query(using WorkorderroutingRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: WorkorderroutingId): ZIO[ZConnection, Throwable, Option[WorkorderroutingRow]] = {
-    sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(WorkorderId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(TypoShort.setter)}""".query(WorkorderroutingRow.jdbcDecoder).selectOne
+    sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(WorkorderId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(TypoShort.setter)}""".query(using WorkorderroutingRow.jdbcDecoder).selectOne
   }
   override def update(row: WorkorderroutingRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
@@ -130,6 +130,6 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
             "plannedcost" = EXCLUDED."plannedcost",
             "actualcost" = EXCLUDED."actualcost",
             "modifieddate" = EXCLUDED."modifieddate"
-          returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text""".insertReturning(WorkorderroutingRow.jdbcDecoder)
+          returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text""".insertReturning(using WorkorderroutingRow.jdbcDecoder)
   }
 }

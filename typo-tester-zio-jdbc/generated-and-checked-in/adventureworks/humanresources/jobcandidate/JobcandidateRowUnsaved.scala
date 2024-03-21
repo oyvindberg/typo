@@ -46,8 +46,8 @@ case class JobcandidateRowUnsaved(
 }
 object JobcandidateRowUnsaved {
   implicit lazy val jsonDecoder: JsonDecoder[JobcandidateRowUnsaved] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
-    val businessentityid = jsonObj.get("businessentityid").fold[Either[String, Option[BusinessentityId]]](Right(None))(_.as(JsonDecoder.option(BusinessentityId.jsonDecoder)))
-    val resume = jsonObj.get("resume").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(TypoXml.jsonDecoder)))
+    val businessentityid = jsonObj.get("businessentityid").fold[Either[String, Option[BusinessentityId]]](Right(None))(_.as(JsonDecoder.option(using BusinessentityId.jsonDecoder)))
+    val resume = jsonObj.get("resume").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(using TypoXml.jsonDecoder)))
     val jobcandidateid = jsonObj.get("jobcandidateid").toRight("Missing field 'jobcandidateid'").flatMap(_.as(Defaulted.jsonDecoder(JobcandidateId.jsonDecoder)))
     val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(Defaulted.jsonDecoder(TypoLocalDateTime.jsonDecoder)))
     if (businessentityid.isRight && resume.isRight && jobcandidateid.isRight && modifieddate.isRight)
@@ -58,10 +58,10 @@ object JobcandidateRowUnsaved {
     override def unsafeEncode(a: JobcandidateRowUnsaved, indent: Option[Int], out: Write): Unit = {
       out.write("{")
       out.write(""""businessentityid":""")
-      JsonEncoder.option(BusinessentityId.jsonEncoder).unsafeEncode(a.businessentityid, indent, out)
+      JsonEncoder.option(using BusinessentityId.jsonEncoder).unsafeEncode(a.businessentityid, indent, out)
       out.write(",")
       out.write(""""resume":""")
-      JsonEncoder.option(TypoXml.jsonEncoder).unsafeEncode(a.resume, indent, out)
+      JsonEncoder.option(using TypoXml.jsonEncoder).unsafeEncode(a.resume, indent, out)
       out.write(",")
       out.write(""""jobcandidateid":""")
       Defaulted.jsonEncoder(JobcandidateId.jsonEncoder).unsafeEncode(a.jobcandidateid, indent, out)

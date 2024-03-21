@@ -58,9 +58,9 @@ case class CustomerRowUnsaved(
 }
 object CustomerRowUnsaved {
   implicit lazy val jsonDecoder: JsonDecoder[CustomerRowUnsaved] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
-    val personid = jsonObj.get("personid").fold[Either[String, Option[BusinessentityId]]](Right(None))(_.as(JsonDecoder.option(BusinessentityId.jsonDecoder)))
-    val storeid = jsonObj.get("storeid").fold[Either[String, Option[BusinessentityId]]](Right(None))(_.as(JsonDecoder.option(BusinessentityId.jsonDecoder)))
-    val territoryid = jsonObj.get("territoryid").fold[Either[String, Option[SalesterritoryId]]](Right(None))(_.as(JsonDecoder.option(SalesterritoryId.jsonDecoder)))
+    val personid = jsonObj.get("personid").fold[Either[String, Option[BusinessentityId]]](Right(None))(_.as(JsonDecoder.option(using BusinessentityId.jsonDecoder)))
+    val storeid = jsonObj.get("storeid").fold[Either[String, Option[BusinessentityId]]](Right(None))(_.as(JsonDecoder.option(using BusinessentityId.jsonDecoder)))
+    val territoryid = jsonObj.get("territoryid").fold[Either[String, Option[SalesterritoryId]]](Right(None))(_.as(JsonDecoder.option(using SalesterritoryId.jsonDecoder)))
     val customerid = jsonObj.get("customerid").toRight("Missing field 'customerid'").flatMap(_.as(Defaulted.jsonDecoder(CustomerId.jsonDecoder)))
     val rowguid = jsonObj.get("rowguid").toRight("Missing field 'rowguid'").flatMap(_.as(Defaulted.jsonDecoder(TypoUUID.jsonDecoder)))
     val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(Defaulted.jsonDecoder(TypoLocalDateTime.jsonDecoder)))
@@ -72,13 +72,13 @@ object CustomerRowUnsaved {
     override def unsafeEncode(a: CustomerRowUnsaved, indent: Option[Int], out: Write): Unit = {
       out.write("{")
       out.write(""""personid":""")
-      JsonEncoder.option(BusinessentityId.jsonEncoder).unsafeEncode(a.personid, indent, out)
+      JsonEncoder.option(using BusinessentityId.jsonEncoder).unsafeEncode(a.personid, indent, out)
       out.write(",")
       out.write(""""storeid":""")
-      JsonEncoder.option(BusinessentityId.jsonEncoder).unsafeEncode(a.storeid, indent, out)
+      JsonEncoder.option(using BusinessentityId.jsonEncoder).unsafeEncode(a.storeid, indent, out)
       out.write(",")
       out.write(""""territoryid":""")
-      JsonEncoder.option(SalesterritoryId.jsonEncoder).unsafeEncode(a.territoryid, indent, out)
+      JsonEncoder.option(using SalesterritoryId.jsonEncoder).unsafeEncode(a.territoryid, indent, out)
       out.write(",")
       out.write(""""customerid":""")
       Defaulted.jsonEncoder(CustomerId.jsonEncoder).unsafeEncode(a.customerid, indent, out)

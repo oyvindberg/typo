@@ -18,6 +18,6 @@ class VvendorwithcontactsViewRepoImpl extends VvendorwithcontactsViewRepo {
     SelectBuilderSql("purchasing.vvendorwithcontacts", VvendorwithcontactsViewFields.structure, VvendorwithcontactsViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VvendorwithcontactsViewRow] = {
-    sql"""select "businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion" from purchasing.vvendorwithcontacts""".query(VvendorwithcontactsViewRow.jdbcDecoder).selectStream
+    sql"""select "businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion" from purchasing.vvendorwithcontacts""".query(using VvendorwithcontactsViewRow.jdbcDecoder).selectStream()
   }
 }

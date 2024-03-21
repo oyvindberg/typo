@@ -33,10 +33,10 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     sql"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
           values (${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "phonenumbertypeid", "name", "modifieddate"::text
-       """.query(PhonenumbertypeRow.read).unique
+       """.query(using PhonenumbertypeRow.read).unique
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.phonenumbertype("phonenumbertypeid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(PhonenumbertypeRow.text)
+    new FragmentOps(sql"""COPY person.phonenumbertype("phonenumbertypeid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PhonenumbertypeRow.text)
   }
   override def insert(unsaved: PhonenumbertypeRowUnsaved): ConnectionIO[PhonenumbertypeRow] = {
     val fs = List(
@@ -62,24 +62,24 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
             returning "phonenumbertypeid", "name", "modifieddate"::text
          """
     }
-    q.query(PhonenumbertypeRow.read).unique
+    q.query(using PhonenumbertypeRow.read).unique
     
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.phonenumbertype("name", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(PhonenumbertypeRowUnsaved.text)
+    new FragmentOps(sql"""COPY person.phonenumbertype("name", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PhonenumbertypeRowUnsaved.text)
   }
   override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PhonenumbertypeRow] = {
-    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype""".query(PhonenumbertypeRow.read).stream
+    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype""".query(using PhonenumbertypeRow.read).stream
   }
   override def selectById(phonenumbertypeid: PhonenumbertypeId): ConnectionIO[Option[PhonenumbertypeRow]] = {
-    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype where "phonenumbertypeid" = ${fromWrite(phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".query(PhonenumbertypeRow.read).option
+    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype where "phonenumbertypeid" = ${fromWrite(phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".query(using PhonenumbertypeRow.read).option
   }
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId]): Stream[ConnectionIO, PhonenumbertypeRow] = {
-    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype where "phonenumbertypeid" = ANY(${phonenumbertypeids})""".query(PhonenumbertypeRow.read).stream
+    sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype where "phonenumbertypeid" = ANY(${phonenumbertypeids})""".query(using PhonenumbertypeRow.read).stream
   }
   override def update(row: PhonenumbertypeRow): ConnectionIO[Boolean] = {
     val phonenumbertypeid = row.phonenumbertypeid
@@ -106,6 +106,6 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
             "name" = EXCLUDED."name",
             "modifieddate" = EXCLUDED."modifieddate"
           returning "phonenumbertypeid", "name", "modifieddate"::text
-       """.query(PhonenumbertypeRow.read).unique
+       """.query(using PhonenumbertypeRow.read).unique
   }
 }
