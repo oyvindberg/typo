@@ -57,7 +57,7 @@ object TypoLocalTime {
   implicit lazy val jdbcEncoder: JdbcEncoder[TypoLocalTime] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoLocalTime] = JsonDecoder.localTime.map(TypoLocalTime.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoLocalTime] = JsonEncoder.localTime.contramap(_.value)
-  implicit def ordering(implicit O0: Ordering[LocalTime]): Ordering[TypoLocalTime] = Ordering.by(_.value)
+  implicit lazy val ordering: Ordering[TypoLocalTime] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[TypoLocalTime] = ParameterMetaData.instance[TypoLocalTime]("time", Types.OTHER)
   implicit lazy val setter: Setter[TypoLocalTime] = Setter.other(
     (ps, i, v) => {

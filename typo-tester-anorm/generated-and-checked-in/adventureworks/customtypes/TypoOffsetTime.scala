@@ -49,7 +49,7 @@ object TypoOffsetTime {
       case other => Left(TypeDoesNotMatch(s"Expected instance of java.lang.String, got ${other.getClass.getName}"))
     }
   )
-  implicit def ordering(implicit O0: Ordering[OffsetTime]): Ordering[TypoOffsetTime] = Ordering.by(_.value)
+  implicit lazy val ordering: Ordering[TypoOffsetTime] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[TypoOffsetTime] = new ParameterMetaData[TypoOffsetTime] {
     override def sqlType: String = "timetz"
     override def jdbcType: Int = Types.OTHER

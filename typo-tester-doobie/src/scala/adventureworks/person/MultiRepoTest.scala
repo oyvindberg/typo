@@ -8,7 +8,6 @@ import adventureworks.public.Name
 import cats.syntax.applicative.*
 import cats.syntax.traverse.*
 import doobie.ConnectionIO
-import doobie.free.connection.WeakAsyncConnectionIO // necessary for 2.12
 
 case class PersonWithAddresses(person: PersonRow, addresses: Map[Name, AddressRow])
 

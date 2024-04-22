@@ -37,7 +37,7 @@ object TypoInstant {
   implicit lazy val encoder: Encoder[TypoInstant] = Encoder.encodeInstant.contramap(_.value)
   implicit lazy val get: Get[TypoInstant] = Get.Advanced.other[String](NonEmptyList.one("timestamptz"))
     .map(v => TypoInstant(v))
-  implicit def ordering(implicit O0: Ordering[Instant]): Ordering[TypoInstant] = Ordering.by(_.value)
+  implicit lazy val ordering: Ordering[TypoInstant] = Ordering.by(_.value)
   implicit lazy val put: Put[TypoInstant] = Put.Advanced.other[String](NonEmptyList.one("timestamptz")).contramap(v => v.value.toString)
   implicit lazy val text: Text[TypoInstant] = new Text[TypoInstant] {
     override def unsafeEncode(v: TypoInstant, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value.toString, sb)

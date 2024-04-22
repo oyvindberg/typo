@@ -7,7 +7,7 @@ import adventureworks.person.person.*
 import adventureworks.public.Name
 import zio.{Chunk, ZIO}
 import zio.jdbc.ZConnection
-import zio.prelude.ForEachOps // necessary for 2.12
+import zio.prelude.ForEachOps
 
 case class PersonWithAddresses(person: PersonRow, addresses: Map[Name, AddressRow])
 

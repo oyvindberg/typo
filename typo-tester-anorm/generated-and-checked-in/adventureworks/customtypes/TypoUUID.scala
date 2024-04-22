@@ -43,7 +43,7 @@ object TypoUUID {
       case other => Left(TypeDoesNotMatch(s"Expected instance of java.util.UUID, got ${other.getClass.getName}"))
     }
   )
-  implicit def ordering(implicit O0: Ordering[UUID]): Ordering[TypoUUID] = Ordering.by(_.value)
+  implicit lazy val ordering: Ordering[TypoUUID] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[TypoUUID] = new ParameterMetaData[TypoUUID] {
     override def sqlType: String = "uuid"
     override def jdbcType: Int = Types.OTHER

@@ -21,8 +21,6 @@ projects:
     sources: ./generated-and-checked-in
   typo-dsl-anorm:
     cross:
-      jvm212:
-        extends: template-kind-projector
       jvm213:
         extends: template-kind-projector
     dependencies: org.playframework.anorm::anorm:2.7.0
@@ -30,8 +28,6 @@ projects:
     sources: ../typo-dsl-shared
   typo-dsl-doobie:
     cross:
-      jvm212:
-        extends: template-kind-projector
       jvm213:
         extends: template-kind-projector
     dependencies: org.tpolecat::doobie-postgres:1.0.0-RC5
@@ -39,8 +35,6 @@ projects:
     sources: ../typo-dsl-shared
   typo-dsl-zio-jdbc:
     cross:
-      jvm212:
-        extends: template-kind-projector
       jvm213:
         extends: template-kind-projector
     dependencies: dev.zio::zio-jdbc:0.1.2
@@ -129,10 +123,6 @@ templates:
       strict: true
   template-cross:
     cross:
-      jvm212:
-        scala:
-          options: -Xsource:3
-          version: 2.12.19
       jvm213:
         scala:
           options: -Xsource:3

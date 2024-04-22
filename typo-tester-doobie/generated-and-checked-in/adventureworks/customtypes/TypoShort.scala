@@ -26,11 +26,11 @@ object TypoShort {
       override def times(x: TypoShort, y: TypoShort): TypoShort = TypoShort((x.value * y.value).toShort)
       override def negate(x: TypoShort): TypoShort = TypoShort((-x.value).toShort)
       override def fromInt(x: Int): TypoShort = TypoShort(x.toShort)
-      override def toInt(x: TypoShort): Int = x.toInt
-      override def toLong(x: TypoShort): Long = x.toLong
-      override def toFloat(x: TypoShort): Float = x.toFloat
-      override def toDouble(x: TypoShort): Double = x.toDouble
-      def parseString(str: String): Option[TypoShort] = (str, Option.empty[TypoShort])._2 // sorry mac, this was too much trouble to implement for 2.12
+      override def toInt(x: TypoShort): Int = x.value.toInt
+      override def toLong(x: TypoShort): Long = x.value.toLong
+      override def toFloat(x: TypoShort): Float = x.value.toFloat
+      override def toDouble(x: TypoShort): Double = x.value.toDouble
+      def parseString(str: String): Option[TypoShort] = str.toShortOption.map(TypoShort.apply)
     }
   implicit lazy val arrayGet: Get[Array[TypoShort]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_int2"))
     .map(_.map(v => TypoShort(v.asInstanceOf[java.lang.Short])))

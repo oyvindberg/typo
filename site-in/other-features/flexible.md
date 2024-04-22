@@ -9,7 +9,7 @@ of integrating Typo piece-by-piece into your code base.
 
 ## Developed in the Scala 2/3 shared subset
 
-Everything works on 2.12, 2.13, and 3.3.
+Everything works on Scala 2.13 and 3.3.
 
 ## Bring your own DB library
 

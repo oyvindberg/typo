@@ -55,7 +55,7 @@ object TypoUUID {
   implicit lazy val jdbcEncoder: JdbcEncoder[TypoUUID] = JdbcEncoder.singleParamEncoder(using setter)
   implicit lazy val jsonDecoder: JsonDecoder[TypoUUID] = JsonDecoder.uuid.map(TypoUUID.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoUUID] = JsonEncoder.uuid.contramap(_.value)
-  implicit def ordering(implicit O0: Ordering[UUID]): Ordering[TypoUUID] = Ordering.by(_.value)
+  implicit lazy val ordering: Ordering[TypoUUID] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[TypoUUID] = ParameterMetaData.instance[TypoUUID]("uuid", Types.OTHER)
   implicit lazy val setter: Setter[TypoUUID] = Setter.other(
     (ps, i, v) => {
