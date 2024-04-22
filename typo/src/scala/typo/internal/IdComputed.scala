@@ -36,8 +36,5 @@ object IdComputed {
     override def paramName: sc.Ident = col.name
   }
 
-  case class Composite(cols: NonEmptyList[ComputedColumn], tpe: sc.Type.Qualified, paramName: sc.Ident) extends IdComputed {
-    val colByName: Map[sc.Ident, ComputedColumn] =
-      cols.map(c => c.name -> c).toMap
-  }
+  case class Composite(cols: NonEmptyList[ComputedColumn], tpe: sc.Type.Qualified, paramName: sc.Ident) extends IdComputed 
 }
