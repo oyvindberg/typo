@@ -19,6 +19,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: sales.salesterritory
+    Sales territory lookup table.
+    Primary key: territoryid */
 case class SalesterritoryRow(
   /** Primary key for SalesTerritory records.
       Default: nextval('sales.salesterritory_territoryid_seq'::regclass) */

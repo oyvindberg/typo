@@ -18,6 +18,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.productdocument
+    Cross-reference table mapping products to related product documents.
+    Composite primary key: productid, documentnode */
 case class ProductdocumentRow(
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */

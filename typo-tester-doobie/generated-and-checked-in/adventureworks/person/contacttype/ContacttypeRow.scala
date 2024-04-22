@@ -16,6 +16,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: person.contacttype
+    Lookup table containing the types of business entity contacts.
+    Primary key: contacttypeid */
 case class ContacttypeRow(
   /** Primary key for ContactType records.
       Default: nextval('person.contacttype_contacttypeid_seq'::regclass) */

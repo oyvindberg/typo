@@ -15,6 +15,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** SQL file: update_person_returning.sql */
 case class UpdatePersonReturningSqlRow(
   /** Points to [[person.person.PersonRow.firstname]] */
   firstname: /* user-picked */ FirstName,

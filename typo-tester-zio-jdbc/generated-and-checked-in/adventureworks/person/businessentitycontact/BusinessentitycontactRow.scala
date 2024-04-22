@@ -19,6 +19,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: person.businessentitycontact
+    Cross-reference table mapping stores, vendors, and employees to people
+    Composite primary key: businessentityid, personid, contacttypeid */
 case class BusinessentitycontactRow(
   /** Primary key. Foreign key to BusinessEntity.BusinessEntityID.
       Points to [[businessentity.BusinessentityRow.businessentityid]] */

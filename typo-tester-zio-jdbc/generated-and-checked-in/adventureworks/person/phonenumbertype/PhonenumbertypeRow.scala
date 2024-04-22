@@ -17,6 +17,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: person.phonenumbertype
+    Type of phone number of a person.
+    Primary key: phonenumbertypeid */
 case class PhonenumbertypeRow(
   /** Primary key for telephone number type records.
       Default: nextval('person.phonenumbertype_phonenumbertypeid_seq'::regclass) */

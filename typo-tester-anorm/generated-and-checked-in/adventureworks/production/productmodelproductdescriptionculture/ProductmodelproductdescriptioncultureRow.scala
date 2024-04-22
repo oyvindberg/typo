@@ -22,6 +22,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: production.productmodelproductdescriptionculture
+    Cross-reference table mapping product descriptions and the language the description is written in.
+    Composite primary key: productmodelid, productdescriptionid, cultureid */
 case class ProductmodelproductdescriptioncultureRow(
   /** Primary key. Foreign key to ProductModel.ProductModelID.
       Points to [[productmodel.ProductmodelRow.productmodelid]] */

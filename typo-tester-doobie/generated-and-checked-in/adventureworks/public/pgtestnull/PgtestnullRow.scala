@@ -45,6 +45,7 @@ import io.circe.Json
 import java.sql.ResultSet
 import scala.util.Try
 
+/** Table: public.pgtestnull */
 case class PgtestnullRow(
   bool: Option[Boolean],
   box: Option[TypoBox],

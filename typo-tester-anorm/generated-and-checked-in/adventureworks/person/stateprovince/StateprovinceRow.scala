@@ -26,6 +26,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: person.stateprovince
+    State and province lookup table.
+    Primary key: stateprovinceid */
 case class StateprovinceRow(
   /** Primary key for StateProvince records.
       Default: nextval('person.stateprovince_stateprovinceid_seq'::regclass) */

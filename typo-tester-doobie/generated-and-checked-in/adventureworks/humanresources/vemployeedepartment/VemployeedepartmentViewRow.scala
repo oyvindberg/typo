@@ -18,6 +18,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: humanresources.vemployeedepartment */
 case class VemployeedepartmentViewRow(
   /** Points to [[employee.EmployeeRow.businessentityid]] */
   businessentityid: BusinessentityId,

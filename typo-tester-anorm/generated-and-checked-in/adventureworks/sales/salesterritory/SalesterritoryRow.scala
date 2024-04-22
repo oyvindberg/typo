@@ -24,6 +24,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: sales.salesterritory
+    Sales territory lookup table.
+    Primary key: territoryid */
 case class SalesterritoryRow(
   /** Primary key for SalesTerritory records.
       Default: nextval('sales.salesterritory_territoryid_seq'::regclass) */

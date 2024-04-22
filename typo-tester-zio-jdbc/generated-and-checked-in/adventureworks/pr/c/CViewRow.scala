@@ -17,6 +17,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: pr.c */
 case class CViewRow(
   /** Points to [[production.culture.CultureRow.cultureid]] */
   id: CultureId,

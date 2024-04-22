@@ -18,6 +18,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: sales.salesorderheadersalesreason
+    Cross-reference table mapping sales orders to sales reason codes.
+    Composite primary key: salesorderid, salesreasonid */
 case class SalesorderheadersalesreasonRow(
   /** Primary key. Foreign key to SalesOrderHeader.SalesOrderID.
       Points to [[salesorderheader.SalesorderheaderRow.salesorderid]] */

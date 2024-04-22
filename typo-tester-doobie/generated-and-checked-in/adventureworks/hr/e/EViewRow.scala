@@ -20,6 +20,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: hr.e */
 case class EViewRow(
   /** Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
   id: BusinessentityId,

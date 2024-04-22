@@ -21,6 +21,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: pr.tha */
 case class ThaViewRow(
   /** Points to [[production.transactionhistoryarchive.TransactionhistoryarchiveRow.transactionid]] */
   id: TransactionhistoryarchiveId,

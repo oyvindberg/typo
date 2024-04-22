@@ -17,6 +17,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: sales.specialoffer
+    Sale discounts lookup table.
+    Primary key: specialofferid */
 case class SpecialofferRow(
   /** Primary key for SpecialOffer records.
       Default: nextval('sales.specialoffer_specialofferid_seq'::regclass) */

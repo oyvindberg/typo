@@ -18,6 +18,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: purchasing.shipmethod
+    Shipping company lookup table.
+    Primary key: shipmethodid */
 case class ShipmethodRow(
   /** Primary key for ShipMethod records.
       Default: nextval('purchasing.shipmethod_shipmethodid_seq'::regclass) */

@@ -16,6 +16,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: production.scrapreason
+    Manufacturing failure reasons lookup table.
+    Primary key: scrapreasonid */
 case class ScrapreasonRow(
   /** Primary key for ScrapReason records.
       Default: nextval('production.scrapreason_scrapreasonid_seq'::regclass) */

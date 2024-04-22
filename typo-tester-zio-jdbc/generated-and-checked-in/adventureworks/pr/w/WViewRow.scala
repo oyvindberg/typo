@@ -19,6 +19,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: pr.w */
 case class WViewRow(
   /** Points to [[production.workorder.WorkorderRow.workorderid]] */
   id: WorkorderId,

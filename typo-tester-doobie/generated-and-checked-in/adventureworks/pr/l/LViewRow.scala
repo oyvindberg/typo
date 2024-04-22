@@ -17,6 +17,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pr.l */
 case class LViewRow(
   /** Points to [[production.location.LocationRow.locationid]] */
   id: LocationId,

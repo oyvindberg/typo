@@ -18,6 +18,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: purchasing.shipmethod
+    Shipping company lookup table.
+    Primary key: shipmethodid */
 case class ShipmethodRow(
   /** Primary key for ShipMethod records.
       Default: nextval('purchasing.shipmethod_shipmethodid_seq'::regclass) */

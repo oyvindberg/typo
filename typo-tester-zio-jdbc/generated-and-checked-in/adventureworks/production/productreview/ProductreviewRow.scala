@@ -18,6 +18,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.productreview
+    Customer reviews of products they have purchased.
+    Primary key: productreviewid */
 case class ProductreviewRow(
   /** Primary key for ProductReview records.
       Default: nextval('production.productreview_productreviewid_seq'::regclass) */

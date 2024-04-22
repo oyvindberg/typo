@@ -24,6 +24,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: production.workorder
+    Manufacturing work orders.
+    Primary key: workorderid */
 case class WorkorderRow(
   /** Primary key for WorkOrder records.
       Default: nextval('production.workorder_workorderid_seq'::regclass) */

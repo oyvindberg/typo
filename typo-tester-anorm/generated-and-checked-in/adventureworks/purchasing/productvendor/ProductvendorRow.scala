@@ -24,6 +24,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: purchasing.productvendor
+    Cross-reference table mapping vendors with the products they supply.
+    Composite primary key: productid, businessentityid */
 case class ProductvendorRow(
   /** Primary key. Foreign key to Product.ProductID.
       Points to [[production.product.ProductRow.productid]] */

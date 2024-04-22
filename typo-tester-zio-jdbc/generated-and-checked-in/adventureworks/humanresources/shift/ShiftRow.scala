@@ -18,6 +18,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: humanresources.shift
+    Work shift lookup table.
+    Primary key: shiftid */
 case class ShiftRow(
   /** Primary key for Shift records.
       Default: nextval('humanresources.shift_shiftid_seq'::regclass) */

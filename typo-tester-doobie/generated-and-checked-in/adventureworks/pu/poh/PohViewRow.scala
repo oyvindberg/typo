@@ -19,6 +19,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pu.poh */
 case class PohViewRow(
   /** Points to [[purchasing.purchaseorderheader.PurchaseorderheaderRow.purchaseorderid]] */
   id: PurchaseorderheaderId,

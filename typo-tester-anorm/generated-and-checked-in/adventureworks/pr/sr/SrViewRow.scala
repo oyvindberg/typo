@@ -20,6 +20,7 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: pr.sr */
 case class SrViewRow(
   /** Points to [[production.scrapreason.ScrapreasonRow.scrapreasonid]] */
   id: ScrapreasonId,

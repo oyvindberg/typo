@@ -18,6 +18,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pu.sm */
 case class SmViewRow(
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shipmethodid]] */
   id: ShipmethodId,

@@ -17,6 +17,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: sales.currencyrate
+    Currency exchange rates.
+    Primary key: currencyrateid */
 case class CurrencyrateRow(
   /** Primary key for CurrencyRate records.
       Default: nextval('sales.currencyrate_currencyrateid_seq'::regclass) */

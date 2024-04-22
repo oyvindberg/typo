@@ -21,6 +21,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: humanresources.shift
+    Work shift lookup table.
+    Primary key: shiftid */
 case class ShiftRow(
   /** Primary key for Shift records.
       Default: nextval('humanresources.shift_shiftid_seq'::regclass) */

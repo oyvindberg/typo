@@ -18,6 +18,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.productcategory
+    High-level product categorization.
+    Primary key: productcategoryid */
 case class ProductcategoryRow(
   /** Primary key for ProductCategory records.
       Default: nextval('production.productcategory_productcategoryid_seq'::regclass) */

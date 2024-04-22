@@ -21,6 +21,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: humanresources.employee
+    Employee information such as salary, department, and title.
+    Primary key: businessentityid */
 case class EmployeeRow(
   /** Primary key for Employee records.  Foreign key to BusinessEntity.BusinessEntityID.
       Points to [[person.person.PersonRow.businessentityid]] */

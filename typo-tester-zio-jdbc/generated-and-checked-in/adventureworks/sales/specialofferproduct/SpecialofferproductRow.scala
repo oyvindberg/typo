@@ -19,6 +19,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: sales.specialofferproduct
+    Cross-reference table mapping products to special offer discounts.
+    Composite primary key: specialofferid, productid */
 case class SpecialofferproductRow(
   /** Primary key for SpecialOfferProduct records.
       Points to [[specialoffer.SpecialofferRow.specialofferid]] */

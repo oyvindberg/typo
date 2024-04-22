@@ -26,6 +26,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: production.document
+    Product maintenance documents.
+    Primary key: documentnode */
 case class DocumentRow(
   /** Title of the document. */
   title: /* max 50 chars */ String,

@@ -33,6 +33,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: sa.soh */
 case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.salesorderid]] */
   id: SalesorderheaderId,

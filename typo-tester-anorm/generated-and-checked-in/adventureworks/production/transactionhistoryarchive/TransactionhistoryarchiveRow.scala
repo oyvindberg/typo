@@ -21,6 +21,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: production.transactionhistoryarchive
+    Transactions for previous years.
+    Primary key: transactionid */
 case class TransactionhistoryarchiveRow(
   /** Primary key for TransactionHistoryArchive records. */
   transactionid: TransactionhistoryarchiveId,

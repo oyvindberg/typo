@@ -24,6 +24,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: sales.customer
+    Current customer information. Also see the Person and Store tables.
+    Primary key: customerid */
 case class CustomerRow(
   /** Primary key.
       Default: nextval('sales.customer_customerid_seq'::regclass) */

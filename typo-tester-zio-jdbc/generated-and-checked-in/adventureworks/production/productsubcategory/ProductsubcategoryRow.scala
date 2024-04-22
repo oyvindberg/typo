@@ -19,6 +19,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.productsubcategory
+    Product subcategories. See ProductCategory table.
+    Primary key: productsubcategoryid */
 case class ProductsubcategoryRow(
   /** Primary key for ProductSubcategory records.
       Default: nextval('production.productsubcategory_productsubcategoryid_seq'::regclass) */

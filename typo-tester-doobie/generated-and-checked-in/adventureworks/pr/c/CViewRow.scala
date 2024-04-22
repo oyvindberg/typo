@@ -16,6 +16,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pr.c */
 case class CViewRow(
   /** Points to [[production.culture.CultureRow.cultureid]] */
   id: CultureId,

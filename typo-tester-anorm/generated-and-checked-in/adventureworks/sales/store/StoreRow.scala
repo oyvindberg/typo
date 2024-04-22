@@ -25,6 +25,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: sales.store
+    Customers (resellers) of Adventure Works products.
+    Primary key: businessentityid */
 case class StoreRow(
   /** Primary key. Foreign key to Customer.BusinessEntityID.
       Points to [[person.businessentity.BusinessentityRow.businessentityid]] */

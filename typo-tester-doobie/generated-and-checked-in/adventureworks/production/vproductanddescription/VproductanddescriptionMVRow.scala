@@ -17,6 +17,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Materialized View: production.vproductanddescription */
 case class VproductanddescriptionMVRow(
   /** Points to [[product.ProductRow.productid]] */
   productid: ProductId,

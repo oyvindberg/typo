@@ -19,6 +19,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: humanresources.employeedepartmenthistory
+    Employee department transfers.
+    Composite primary key: businessentityid, startdate, departmentid, shiftid */
 case class EmployeedepartmenthistoryRow(
   /** Employee identification number. Foreign key to Employee.BusinessEntityID.
       Points to [[employee.EmployeeRow.businessentityid]] */

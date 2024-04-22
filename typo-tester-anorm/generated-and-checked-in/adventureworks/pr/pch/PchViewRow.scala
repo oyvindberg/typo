@@ -21,6 +21,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: pr.pch */
 case class PchViewRow(
   /** Points to [[production.productcosthistory.ProductcosthistoryRow.productid]] */
   id: ProductId,

@@ -23,6 +23,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: purchasing.shipmethod
+    Shipping company lookup table.
+    Primary key: shipmethodid */
 case class ShipmethodRow(
   /** Primary key for ShipMethod records.
       Default: nextval('purchasing.shipmethod_shipmethodid_seq'::regclass) */

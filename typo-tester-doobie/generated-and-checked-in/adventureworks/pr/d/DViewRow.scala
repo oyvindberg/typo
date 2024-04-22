@@ -21,6 +21,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pr.d */
 case class DViewRow(
   /** Points to [[production.document.DocumentRow.title]] */
   title: /* max 50 chars */ String,

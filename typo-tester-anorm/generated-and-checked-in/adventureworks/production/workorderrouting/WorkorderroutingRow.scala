@@ -24,6 +24,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: production.workorderrouting
+    Work order details.
+    Composite primary key: workorderid, productid, operationsequence */
 case class WorkorderroutingRow(
   /** Primary key. Foreign key to WorkOrder.WorkOrderID.
       Points to [[workorder.WorkorderRow.workorderid]] */

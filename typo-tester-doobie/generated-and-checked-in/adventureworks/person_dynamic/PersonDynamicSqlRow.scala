@@ -15,6 +15,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** SQL file: person_dynamic.sql */
 case class PersonDynamicSqlRow(
   /** Points to [[person.person.PersonRow.title]] */
   title: Option[/* max 8 chars */ String],

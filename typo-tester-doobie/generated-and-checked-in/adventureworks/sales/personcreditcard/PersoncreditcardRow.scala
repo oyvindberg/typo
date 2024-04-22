@@ -17,6 +17,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: sales.personcreditcard
+    Cross-reference table mapping people to their credit card information in the CreditCard table.
+    Composite primary key: businessentityid, creditcardid */
 case class PersoncreditcardRow(
   /** Business entity identification number. Foreign key to Person.BusinessEntityID.
       Points to [[person.person.PersonRow.businessentityid]] */

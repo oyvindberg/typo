@@ -17,6 +17,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.productphoto
+    Product images.
+    Primary key: productphotoid */
 case class ProductphotoRow(
   /** Primary key for ProductPhoto records.
       Default: nextval('production.productphoto_productphotoid_seq'::regclass) */

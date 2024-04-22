@@ -17,6 +17,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: sales.currency
+    Lookup table containing standard ISO currencies.
+    Primary key: currencycode */
 case class CurrencyRow(
   /** The ISO code for the Currency. */
   currencycode: CurrencyId,

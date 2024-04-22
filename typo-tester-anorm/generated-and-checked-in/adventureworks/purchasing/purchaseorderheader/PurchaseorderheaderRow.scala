@@ -24,6 +24,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: purchasing.purchaseorderheader
+    General purchase order information. See PurchaseOrderDetail.
+    Primary key: purchaseorderid */
 case class PurchaseorderheaderRow(
   /** Primary key.
       Default: nextval('purchasing.purchaseorderheader_purchaseorderid_seq'::regclass) */

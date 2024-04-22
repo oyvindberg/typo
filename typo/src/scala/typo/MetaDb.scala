@@ -5,6 +5,7 @@ import typo.generated.custom.constraints.{ConstraintsSqlRepoImpl, ConstraintsSql
 import typo.generated.custom.domains.{DomainsSqlRepoImpl, DomainsSqlRow}
 import typo.generated.custom.enums.{EnumsSqlRepoImpl, EnumsSqlRow}
 import typo.generated.custom.view_find_all.*
+import typo.generated.custom.table_comments.*
 import typo.generated.information_schema.columns.{ColumnsViewRepoImpl, ColumnsViewRow}
 import typo.generated.information_schema.key_column_usage.{KeyColumnUsageViewRepoImpl, KeyColumnUsageViewRow}
 import typo.generated.information_schema.referential_constraints.{ReferentialConstraintsViewRepoImpl, ReferentialConstraintsViewRow}
@@ -35,7 +36,8 @@ object MetaDb {
       views: List[ViewFindAllSqlRow],
       domains: List[DomainsSqlRow],
       columnComments: List[CommentsSqlRow],
-      constraints: List[ConstraintsSqlRow]
+      constraints: List[ConstraintsSqlRow],
+      tableComments: List[TableCommentsSqlRow]
   )
 
   object Input {
@@ -58,7 +60,8 @@ object MetaDb {
         views = timed("views")((new ViewFindAllSqlRepoImpl)()),
         domains = timed("domains")((new DomainsSqlRepoImpl)()),
         columnComments = timed("columnComments")((new CommentsSqlRepoImpl)()),
-        constraints = timed("constraints")((new ConstraintsSqlRepoImpl)())
+        constraints = timed("constraints")((new ConstraintsSqlRepoImpl)()),
+        tableComments = timed("tableComments")((new TableCommentsSqlRepoImpl)())
       )
     }
   }
@@ -105,7 +108,8 @@ object MetaDb {
 
     val columnsByTable: Map[db.RelationName, List[ColumnsViewRow]] =
       input.columns.groupBy(c => db.RelationName(c.tableSchema, c.tableName.get))
-
+    val tableCommentsByTable: Map[db.RelationName, String] =
+      input.tableComments.flatMap(c => c.description.map(d => (db.RelationName(Some(c.schema), c.name), d))).toMap
     val views: Map[db.RelationName, Lazy[db.View]] =
       input.views.flatMap { viewRow =>
         viewRow.viewDefinition.map { sqlContent =>
@@ -155,7 +159,7 @@ object MetaDb {
                 case MaybeReturnsRows.Update => ???
               }
 
-            db.View(relationName, decomposedSql, cols, deps, isMaterialized = viewRow.relkind == "m")
+            db.View(relationName, tableCommentsByTable.get(relationName), decomposedSql, cols, deps, isMaterialized = viewRow.relkind == "m")
           }
           (relationName, lazyAnalysis)
         }
@@ -218,6 +222,7 @@ object MetaDb {
 
             db.Table(
               name = relationName,
+              comment = tableCommentsByTable.get(relationName),
               cols = mappedCols,
               primaryKey = primaryKeys.get(relationName),
               uniqueKeys = uniqueKeys.getOrElse(relationName, List.empty),

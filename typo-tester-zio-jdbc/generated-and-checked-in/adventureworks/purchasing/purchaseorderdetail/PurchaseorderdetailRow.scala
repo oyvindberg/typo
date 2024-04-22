@@ -19,6 +19,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: purchasing.purchaseorderdetail
+    Individual products associated with a specific purchase order. See PurchaseOrderHeader.
+    Composite primary key: purchaseorderid, purchaseorderdetailid */
 case class PurchaseorderdetailRow(
   /** Primary key. Foreign key to PurchaseOrderHeader.PurchaseOrderID.
       Points to [[purchaseorderheader.PurchaseorderheaderRow.purchaseorderid]] */

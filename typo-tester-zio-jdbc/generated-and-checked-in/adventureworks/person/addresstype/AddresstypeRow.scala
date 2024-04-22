@@ -18,6 +18,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: person.addresstype
+    Types of addresses stored in the Address table.
+    Primary key: addresstypeid */
 case class AddresstypeRow(
   /** Primary key for AddressType records.
       Default: nextval('person.addresstype_addresstypeid_seq'::regclass) */

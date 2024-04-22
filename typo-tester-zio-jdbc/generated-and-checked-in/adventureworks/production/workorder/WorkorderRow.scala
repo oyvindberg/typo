@@ -19,6 +19,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.workorder
+    Manufacturing work orders.
+    Primary key: workorderid */
 case class WorkorderRow(
   /** Primary key for WorkOrder records.
       Default: nextval('production.workorder_workorderid_seq'::regclass) */

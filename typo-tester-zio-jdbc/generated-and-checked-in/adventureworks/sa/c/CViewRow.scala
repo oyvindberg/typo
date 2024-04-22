@@ -19,6 +19,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: sa.c */
 case class CViewRow(
   /** Points to [[sales.customer.CustomerRow.customerid]] */
   id: CustomerId,

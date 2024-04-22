@@ -16,6 +16,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: person.businessentity
+    Source of the ID that connects vendors, customers, and employees with address and contact information.
+    Primary key: businessentityid */
 case class BusinessentityRow(
   /** Primary key for all customers, vendors, and employees.
       Default: nextval('person.businessentity_businessentityid_seq'::regclass) */

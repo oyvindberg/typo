@@ -16,6 +16,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: sa.sr */
 case class SrViewRow(
   /** Points to [[sales.salesreason.SalesreasonRow.salesreasonid]] */
   id: SalesreasonId,

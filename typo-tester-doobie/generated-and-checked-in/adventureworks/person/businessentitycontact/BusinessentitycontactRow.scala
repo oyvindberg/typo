@@ -18,6 +18,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: person.businessentitycontact
+    Cross-reference table mapping stores, vendors, and employees to people
+    Composite primary key: businessentityid, personid, contacttypeid */
 case class BusinessentitycontactRow(
   /** Primary key. Foreign key to BusinessEntity.BusinessEntityID.
       Points to [[businessentity.BusinessentityRow.businessentityid]] */

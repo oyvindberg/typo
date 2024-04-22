@@ -17,6 +17,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.location
+    Product inventory and manufacturing locations.
+    Primary key: locationid */
 case class LocationRow(
   /** Primary key for Location records.
       Default: nextval('production.location_locationid_seq'::regclass) */

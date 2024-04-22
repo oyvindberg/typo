@@ -17,6 +17,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: production.transactionhistory
+    Record of each purchase order, sales order, or work order transaction year to date.
+    Primary key: transactionid */
 case class TransactionhistoryRow(
   /** Primary key for TransactionHistory records.
       Default: nextval('production.transactionhistory_transactionid_seq'::regclass) */

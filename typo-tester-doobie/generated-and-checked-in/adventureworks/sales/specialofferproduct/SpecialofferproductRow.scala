@@ -18,6 +18,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: sales.specialofferproduct
+    Cross-reference table mapping products to special offer discounts.
+    Composite primary key: specialofferid, productid */
 case class SpecialofferproductRow(
   /** Primary key for SpecialOfferProduct records.
       Points to [[specialoffer.SpecialofferRow.specialofferid]] */

@@ -32,6 +32,7 @@ import io.circe.Json
 import java.sql.ResultSet
 import scala.util.Try
 
+/** View: sa.soh */
 case class SohViewRow(
   /** Points to [[sales.salesorderheader.SalesorderheaderRow.salesorderid]] */
   id: SalesorderheaderId,

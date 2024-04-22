@@ -19,6 +19,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: purchasing.purchaseorderheader
+    General purchase order information. See PurchaseOrderDetail.
+    Primary key: purchaseorderid */
 case class PurchaseorderheaderRow(
   /** Primary key.
       Default: nextval('purchasing.purchaseorderheader_purchaseorderid_seq'::regclass) */

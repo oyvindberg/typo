@@ -18,6 +18,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pr.psc */
 case class PscViewRow(
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.productsubcategoryid]] */
   id: ProductsubcategoryId,

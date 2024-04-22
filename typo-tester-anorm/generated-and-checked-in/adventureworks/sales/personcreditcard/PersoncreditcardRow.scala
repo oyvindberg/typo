@@ -21,6 +21,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: sales.personcreditcard
+    Cross-reference table mapping people to their credit card information in the CreditCard table.
+    Composite primary key: businessentityid, creditcardid */
 case class PersoncreditcardRow(
   /** Business entity identification number. Foreign key to Person.BusinessEntityID.
       Points to [[person.person.PersonRow.businessentityid]] */

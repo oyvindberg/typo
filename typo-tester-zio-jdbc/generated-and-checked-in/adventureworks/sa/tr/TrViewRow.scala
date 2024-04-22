@@ -20,6 +20,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: sa.tr */
 case class TrViewRow(
   /** Points to [[sales.salestaxrate.SalestaxrateRow.salestaxrateid]] */
   id: SalestaxrateId,

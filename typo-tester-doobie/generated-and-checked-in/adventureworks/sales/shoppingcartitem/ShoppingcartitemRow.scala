@@ -17,6 +17,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: sales.shoppingcartitem
+    Contains online customer orders until the order is submitted or cancelled.
+    Primary key: shoppingcartitemid */
 case class ShoppingcartitemRow(
   /** Primary key for ShoppingCartItem records.
       Default: nextval('sales.shoppingcartitem_shoppingcartitemid_seq'::regclass) */

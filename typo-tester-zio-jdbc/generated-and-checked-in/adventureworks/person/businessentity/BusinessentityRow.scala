@@ -17,6 +17,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: person.businessentity
+    Source of the ID that connects vendors, customers, and employees with address and contact information.
+    Primary key: businessentityid */
 case class BusinessentityRow(
   /** Primary key for all customers, vendors, and employees.
       Default: nextval('person.businessentity_businessentityid_seq'::regclass) */

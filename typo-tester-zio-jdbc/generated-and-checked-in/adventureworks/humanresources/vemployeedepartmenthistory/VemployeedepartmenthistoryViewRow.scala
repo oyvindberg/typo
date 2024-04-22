@@ -18,6 +18,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: humanresources.vemployeedepartmenthistory */
 case class VemployeedepartmenthistoryViewRow(
   /** Points to [[employee.EmployeeRow.businessentityid]] */
   businessentityid: BusinessentityId,

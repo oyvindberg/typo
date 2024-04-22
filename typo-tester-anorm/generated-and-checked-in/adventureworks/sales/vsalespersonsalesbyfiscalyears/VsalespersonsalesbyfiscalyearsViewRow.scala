@@ -19,6 +19,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: sales.vsalespersonsalesbyfiscalyears */
 case class VsalespersonsalesbyfiscalyearsViewRow(
   SalesPersonID: /* nullability unknown */ Option[Int],
   FullName: /* nullability unknown */ Option[String],

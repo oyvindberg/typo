@@ -15,6 +15,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: myschema.marital_status
+    Primary key: id */
 case class MaritalStatusRow(
   id: MaritalStatusId
 )

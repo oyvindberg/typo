@@ -18,6 +18,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: sales.salesterritoryhistory
+    Sales representative transfers to other sales territories.
+    Composite primary key: businessentityid, startdate, territoryid */
 case class SalesterritoryhistoryRow(
   /** Primary key. The sales rep.  Foreign key to SalesPerson.BusinessEntityID.
       Points to [[salesperson.SalespersonRow.businessentityid]] */

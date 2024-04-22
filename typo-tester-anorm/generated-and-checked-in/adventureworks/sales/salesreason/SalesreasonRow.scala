@@ -20,6 +20,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: sales.salesreason
+    Lookup table of customer purchase reasons.
+    Primary key: salesreasonid */
 case class SalesreasonRow(
   /** Primary key for SalesReason records.
       Default: nextval('sales.salesreason_salesreasonid_seq'::regclass) */

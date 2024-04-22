@@ -18,6 +18,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: sales.salespersonquotahistory
+    Sales performance tracking.
+    Composite primary key: businessentityid, quotadate */
 case class SalespersonquotahistoryRow(
   /** Sales person identification number. Foreign key to SalesPerson.BusinessEntityID.
       Points to [[salesperson.SalespersonRow.businessentityid]] */

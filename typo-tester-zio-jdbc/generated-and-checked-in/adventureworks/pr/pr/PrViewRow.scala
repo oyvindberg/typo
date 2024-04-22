@@ -18,6 +18,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: pr.pr */
 case class PrViewRow(
   /** Points to [[production.productreview.ProductreviewRow.productreviewid]] */
   id: ProductreviewId,

@@ -17,6 +17,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: production.productlistpricehistory
+    Changes in the list price of a product over time.
+    Composite primary key: productid, startdate */
 case class ProductlistpricehistoryRow(
   /** Product identification number. Foreign key to Product.ProductID
       Points to [[product.ProductRow.productid]] */

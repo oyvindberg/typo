@@ -18,6 +18,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: humanresources.jobcandidate
+    RÃ©sumÃ©s submitted to Human Resources by job applicants.
+    Primary key: jobcandidateid */
 case class JobcandidateRow(
   /** Primary key for JobCandidate records.
       Default: nextval('humanresources.jobcandidate_jobcandidateid_seq'::regclass) */

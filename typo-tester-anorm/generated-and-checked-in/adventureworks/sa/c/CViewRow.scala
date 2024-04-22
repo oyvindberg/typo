@@ -24,6 +24,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: sa.c */
 case class CViewRow(
   /** Points to [[sales.customer.CustomerRow.customerid]] */
   id: CustomerId,

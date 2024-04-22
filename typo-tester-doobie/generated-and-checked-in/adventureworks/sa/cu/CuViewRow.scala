@@ -16,6 +16,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: sa.cu */
 case class CuViewRow(
   /** Points to [[sales.currency.CurrencyRow.currencycode]] */
   id: CurrencyId,

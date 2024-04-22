@@ -18,6 +18,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: production.productmodelproductdescriptionculture
+    Cross-reference table mapping product descriptions and the language the description is written in.
+    Composite primary key: productmodelid, productdescriptionid, cultureid */
 case class ProductmodelproductdescriptioncultureRow(
   /** Primary key. Foreign key to ProductModel.ProductModelID.
       Points to [[productmodel.ProductmodelRow.productmodelid]] */

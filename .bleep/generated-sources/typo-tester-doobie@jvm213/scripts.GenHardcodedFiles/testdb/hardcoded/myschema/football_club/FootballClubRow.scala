@@ -16,6 +16,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: myschema.football_club
+    football club
+    Primary key: id */
 case class FootballClubRow(
   id: FootballClubId,
   name: /* max 100 chars */ String

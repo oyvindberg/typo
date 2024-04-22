@@ -19,6 +19,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: purchasing.productvendor
+    Cross-reference table mapping vendors with the products they supply.
+    Composite primary key: productid, businessentityid */
 case class ProductvendorRow(
   /** Primary key. Foreign key to Product.ProductID.
       Points to [[production.product.ProductRow.productid]] */

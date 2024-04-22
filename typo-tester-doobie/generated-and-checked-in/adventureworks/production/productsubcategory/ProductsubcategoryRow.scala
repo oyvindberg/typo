@@ -18,6 +18,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: production.productsubcategory
+    Product subcategories. See ProductCategory table.
+    Primary key: productsubcategoryid */
 case class ProductsubcategoryRow(
   /** Primary key for ProductSubcategory records.
       Default: nextval('production.productsubcategory_productsubcategoryid_seq'::regclass) */

@@ -16,6 +16,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: person.countryregion
+    Lookup table containing the ISO standard codes for countries and regions.
+    Primary key: countryregioncode */
 case class CountryregionRow(
   /** ISO standard code for countries and regions. */
   countryregioncode: CountryregionId,

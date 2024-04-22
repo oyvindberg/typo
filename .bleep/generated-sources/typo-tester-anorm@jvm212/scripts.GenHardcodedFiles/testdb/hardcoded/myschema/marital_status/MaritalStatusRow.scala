@@ -19,6 +19,8 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 import testdb.hardcoded.Text
 
+/** Table: myschema.marital_status
+    Primary key: id */
 case class MaritalStatusRow(
   id: MaritalStatusId
 )

@@ -25,6 +25,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: production.productinventory
+    Product inventory information.
+    Composite primary key: productid, locationid */
 case class ProductinventoryRow(
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */

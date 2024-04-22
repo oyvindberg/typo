@@ -22,6 +22,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: person.businessentitycontact
+    Cross-reference table mapping stores, vendors, and employees to people
+    Composite primary key: businessentityid, personid, contacttypeid */
 case class BusinessentitycontactRow(
   /** Primary key. Foreign key to BusinessEntity.BusinessEntityID.
       Points to [[businessentity.BusinessentityRow.businessentityid]] */

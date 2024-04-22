@@ -21,6 +21,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: sales.countryregioncurrency
+    Cross-reference table mapping ISO currency codes to a country or region.
+    Composite primary key: countryregioncode, currencycode */
 case class CountryregioncurrencyRow(
   /** ISO code for countries and regions. Foreign key to CountryRegion.CountryRegionCode.
       Points to [[person.countryregion.CountryregionRow.countryregioncode]] */

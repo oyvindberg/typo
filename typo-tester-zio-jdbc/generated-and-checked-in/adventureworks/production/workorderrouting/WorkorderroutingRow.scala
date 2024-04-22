@@ -19,6 +19,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.workorderrouting
+    Work order details.
+    Composite primary key: workorderid, productid, operationsequence */
 case class WorkorderroutingRow(
   /** Primary key. Foreign key to WorkOrder.WorkOrderID.
       Points to [[workorder.WorkorderRow.workorderid]] */

@@ -23,6 +23,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: sales.creditcard
+    Customer credit card information.
+    Primary key: creditcardid */
 case class CreditcardRow(
   /** Primary key for CreditCard records.
       Default: nextval('sales.creditcard_creditcardid_seq'::regclass) */

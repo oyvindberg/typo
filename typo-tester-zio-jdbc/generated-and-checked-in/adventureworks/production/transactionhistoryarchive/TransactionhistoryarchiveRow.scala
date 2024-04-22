@@ -16,6 +16,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.transactionhistoryarchive
+    Transactions for previous years.
+    Primary key: transactionid */
 case class TransactionhistoryarchiveRow(
   /** Primary key for TransactionHistoryArchive records. */
   transactionid: TransactionhistoryarchiveId,

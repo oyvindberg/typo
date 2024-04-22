@@ -23,6 +23,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.product
+    Products sold or used in the manfacturing of sold products.
+    Primary key: productid */
 case class ProductRow(
   /** Primary key for Product records.
       Default: nextval('production.product_productid_seq'::regclass) */

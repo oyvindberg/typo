@@ -16,6 +16,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: myschema.football_club
+    football club
+    Primary key: id */
 case class FootballClubRow(
   id: FootballClubId,
   name: /* max 100 chars */ String

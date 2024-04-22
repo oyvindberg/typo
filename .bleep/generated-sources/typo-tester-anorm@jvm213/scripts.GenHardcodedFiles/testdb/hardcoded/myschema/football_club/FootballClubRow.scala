@@ -21,6 +21,9 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 import testdb.hardcoded.Text
 
+/** Table: myschema.football_club
+    football club
+    Primary key: id */
 case class FootballClubRow(
   id: FootballClubId,
   name: /* max 100 chars */ String

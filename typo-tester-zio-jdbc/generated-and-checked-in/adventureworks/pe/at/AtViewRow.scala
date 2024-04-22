@@ -18,6 +18,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: pe.at */
 case class AtViewRow(
   /** Points to [[person.addresstype.AddresstypeRow.addresstypeid]] */
   id: AddresstypeId,
