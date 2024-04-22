@@ -36,5 +36,5 @@ object IdComputed {
     override def paramName: sc.Ident = col.name
   }
 
-  case class Composite(cols: NonEmptyList[ComputedColumn], tpe: sc.Type.Qualified, paramName: sc.Ident) extends IdComputed 
+  case class Composite(cols: NonEmptyList[ComputedColumn], tpe: sc.Type.Qualified, paramName: sc.Ident) extends IdComputed
 }
