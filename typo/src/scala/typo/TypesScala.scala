@@ -48,9 +48,34 @@ object TypesScala {
     }
   }
 
-  /* also in scala 2.12 */
   val HasOrdering: Set[sc.Type] =
-    Set(BigDecimal, Boolean, Byte, Double, Float, Int, Long, Short, TypesJava.String)
+    Set(
+      BigDecimal,
+      Boolean,
+      Byte,
+      Char,
+      Double,
+      Float,
+      Int,
+      Long,
+      Short,
+      TypesJava.BigDecimal,
+      TypesJava.Boolean,
+      TypesJava.Byte,
+      TypesJava.Double,
+      TypesJava.Float,
+      TypesJava.Instant,
+      TypesJava.Integer,
+      TypesJava.LocalDate,
+      TypesJava.LocalDateTime,
+      TypesJava.LocalTime,
+      TypesJava.Long,
+      TypesJava.OffsetDateTime,
+      TypesJava.OffsetTime,
+      TypesJava.Short,
+      TypesJava.String,
+      TypesJava.UUID
+    )
 
   def boxedType(tpe: sc.Type): Option[sc.Type.Qualified] =
     tpe match {

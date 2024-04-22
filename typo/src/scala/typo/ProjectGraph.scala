@@ -1,7 +1,6 @@
 package typo
 
 import java.nio.file.Path
-import typo.internal.compat.*
 
 /** this can be used to separate generated source in groups, typically because you want to put them in different projects in your build.
   *
@@ -11,7 +10,7 @@ import typo.internal.compat.*
   */
 final case class ProjectGraph[T, S](name: String, target: Path, value: T, scripts: S, downstream: List[ProjectGraph[T, S]]) {
   def toList: List[ProjectGraph[T, S]] =
-    (this :: downstream.flatMap(_.toList)).distinctByCompat(_.target)
+    (this :: downstream.flatMap(_.toList)).distinctBy(_.target)
 
   def valueFromProject[TT, SS](f: ProjectGraph[T, S] => (TT, SS)): ProjectGraph[TT, SS] = {
     val (tt, ss) = f(this)

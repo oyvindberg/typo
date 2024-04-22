@@ -401,11 +401,11 @@ class CustomTypes(pkg: sc.QIdent) {
                |    override def times(x: $target, y: $target): $target = $target((x.value * y.value).toShort)
                |    override def negate(x: $target): $target = $target((-x.value).toShort)
                |    override def fromInt(x: Int): $target = $target(x.toShort)
-               |    override def toInt(x: $target): ${TypesScala.Int} = x.toInt
-               |    override def toLong(x: $target): ${TypesScala.Long} = x.toLong
-               |    override def toFloat(x: $target): ${TypesScala.Float} = x.toFloat
-               |    override def toDouble(x: $target): ${TypesScala.Double} = x.toDouble
-               |    def parseString(str: String): Option[$target] = (str, Option.empty[$target])._2 // sorry mac, this was too much trouble to implement for 2.12
+               |    override def toInt(x: $target): ${TypesScala.Int} = x.value.toInt
+               |    override def toLong(x: $target): ${TypesScala.Long} = x.value.toLong
+               |    override def toFloat(x: $target): ${TypesScala.Float} = x.value.toFloat
+               |    override def toDouble(x: $target): ${TypesScala.Double} = x.value.toDouble
+               |    def parseString(str: String): Option[$target] = str.toShortOption.map($target.apply)
                |  }
                |""".stripMargin
     })

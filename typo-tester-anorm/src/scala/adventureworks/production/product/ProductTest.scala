@@ -17,9 +17,6 @@ import scala.annotation.nowarn
 import scala.util.Random
 
 class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
-  // for scala 2.12
-  implicit val `Ordering[LocalDateTime]` : Ordering[LocalDateTime] = (x: LocalDateTime, y: LocalDateTime) => x.compareTo(y)
-
   val personDynamicSqlRepo = new PersonDynamicSqlRepoImpl
 
   test("flaf") {

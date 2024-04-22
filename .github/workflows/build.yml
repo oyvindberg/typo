@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scala-version: [212, 213, 3]
+        scala-version: [213, 3]
         postgres-version: [12, 16]
     steps:
       - uses: actions/checkout@v4

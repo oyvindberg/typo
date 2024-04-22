@@ -15,7 +15,6 @@ class GenOrdering(customTypes: CustomTypes, pkg: sc.QIdent) {
         case more =>
           code"${TypesScala.Ordering}.by(x => (${more.map(col => code"x.${col.name.code}").mkCode(", ")}))"
       }
-
     // don't demand that parts of the id are ordered, for instance if they are custom types or user-provided
     val needsImplicits = constituents.toList.filterNot { x =>
       val baseType = sc.Type.base(x.tpe)

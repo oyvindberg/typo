@@ -1,7 +1,6 @@
 package typo.internal.analysis
 
 import typo.internal.codegen.CodeOps
-import typo.internal.compat.ListOps
 import typo.{db, sc}
 
 case class DecomposedSql(frags: List[DecomposedSql.Fragment]) {
@@ -43,7 +42,7 @@ case class DecomposedSql(frags: List[DecomposedSql.Fragment]) {
       paramsWithIndex.collect { case (DecomposedSql.NamedParam(parsedName), i) if parsedName.name == name => i }
 
     paramsWithIndex
-      .distinctByCompat {
+      .distinctBy {
         case (DecomposedSql.NotNamedParam, idx)        => idx.toString
         case (DecomposedSql.NamedParam(parsedName), _) => parsedName.name
       }

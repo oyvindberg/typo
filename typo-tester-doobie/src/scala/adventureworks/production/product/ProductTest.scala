@@ -15,9 +15,6 @@ import org.scalatest.funsuite.AnyFunSuite
 import java.time.LocalDateTime
 
 class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
-  // for scala 2.12
-  implicit val `Ordering[LocalDateTime]` : Ordering[LocalDateTime] = (x: LocalDateTime, y: LocalDateTime) => x.compareTo(y)
-
   def runTest(
       productRepo: ProductRepo,
       projectModelRepo: ProductmodelRepo,
