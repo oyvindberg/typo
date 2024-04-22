@@ -144,12 +144,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         else (DbLibName.Anorm, JsonLibName.PlayJson)
       val domains = Nil
 
-      val metaDb = MetaDb(
-        relations = all.map(t => t.name -> Lazy(t)).toMap,
-        enums = enums,
-        domains = domains,
-        TypeMapperDb(enums, domains)
-      )
+      val metaDb = MetaDb(relations = all.map(t => t.name -> Lazy(t)).toMap, enums = enums, domains = domains)
 
       val generated: List[Generated] =
         generate(

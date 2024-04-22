@@ -20,7 +20,8 @@ case class Options(
     debugTypes: Boolean = false,
     inlineImplicits: Boolean = true,
     fixVerySlowImplicit: Boolean = true,
-    keepDependencies: Boolean = false
+    keepDependencies: Boolean = false,
+    rewriteDatabase: MetaDb => MetaDb = identity
 )
 
 object Options {

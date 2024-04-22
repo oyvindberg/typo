@@ -21,9 +21,11 @@ import scala.collection.immutable.SortedSet
 case class MetaDb(
     relations: Map[db.RelationName, Lazy[db.Relation]],
     enums: List[db.StringEnum],
-    domains: List[db.Domain],
-    typeMapperDb: TypeMapperDb
-)
+    domains: List[db.Domain]
+) {
+  val typeMapperDb = TypeMapperDb(enums, domains)
+
+}
 
 object MetaDb {
   case class Input(
@@ -234,6 +236,6 @@ object MetaDb {
         }
       }.toMap
 
-    MetaDb(tables ++ views, enums, domains, typeMapperDb)
+    MetaDb(tables ++ views, enums, domains)
   }
 }

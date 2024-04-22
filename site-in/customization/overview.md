@@ -36,6 +36,7 @@ val options = Options(
 | `readonlyRepo`           | Specifies whether to generate read-only repositories for specific repositories. Useful when you're working on a part of the system where you only consume certain tables. (default is `false` - all mutable). |
 | `enableDsl`              | Enables the [SQL DSL](what-is/dsl.md) for code generation (default is `false`).                                                                                                                               |
 | `keepDependencies`       | Specifies whether to generate [table dependencies](type-safety/type-flow.md) in generated code even if you didn't select them (default is `false`).                                                           |
+| `rewriteDatabase`        | Let's you perform arbitrary rewrites of database schema snapshot. you can add/remove rows, foreign keys and so on.                                                                                            |
 
 ## Development options
 

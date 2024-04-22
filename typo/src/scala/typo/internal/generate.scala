@@ -11,9 +11,9 @@ object generate {
   private type Files = Map[sc.Type.Qualified, sc.File]
 
   // use this constructor if you need to run `typo` multiple times with different options but same database/scripts
-  def apply(publicOptions: Options, metaDb: MetaDb, graph: ProjectGraph[Selector, List[SqlFile]]): List[Generated] = {
+  def apply(publicOptions: Options, metaDb0: MetaDb, graph: ProjectGraph[Selector, List[SqlFile]]): List[Generated] = {
     Banner.maybePrint(publicOptions)
-
+    val metaDb = publicOptions.rewriteDatabase(metaDb0)
     val pkg = sc.Type.Qualified(publicOptions.pkg).value
     val customTypesPackage = pkg / sc.Ident("customtypes")
 
