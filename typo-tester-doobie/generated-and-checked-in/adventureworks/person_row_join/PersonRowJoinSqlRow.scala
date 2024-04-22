@@ -14,6 +14,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** SQL file: person_row_join.sql */
 case class PersonRowJoinSqlRow(
   /** Points to [[sales.salesperson.SalespersonRow.businessentityid]] */
   businessentityid: BusinessentityId,

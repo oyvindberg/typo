@@ -15,6 +15,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** SQL file: person_row_join.sql */
 case class PersonRowJoinSqlRow(
   /** Points to [[sales.salesperson.SalespersonRow.businessentityid]] */
   businessentityid: BusinessentityId,

@@ -17,6 +17,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: sales.countryregioncurrency
+    Cross-reference table mapping ISO currency codes to a country or region.
+    Composite primary key: countryregioncode, currencycode */
 case class CountryregioncurrencyRow(
   /** ISO code for countries and regions. Foreign key to CountryRegion.CountryRegionCode.
       Points to [[person.countryregion.CountryregionRow.countryregioncode]] */

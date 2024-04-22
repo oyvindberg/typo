@@ -25,6 +25,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: pu.v */
 case class VViewRow(
   /** Points to [[purchasing.vendor.VendorRow.businessentityid]] */
   id: BusinessentityId,

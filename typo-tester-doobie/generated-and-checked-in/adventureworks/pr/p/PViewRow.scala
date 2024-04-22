@@ -27,6 +27,7 @@ import io.circe.Json
 import java.sql.ResultSet
 import scala.util.Try
 
+/** View: pr.p */
 case class PViewRow(
   /** Points to [[production.product.ProductRow.productid]] */
   id: ProductId,

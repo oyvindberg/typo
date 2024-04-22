@@ -18,6 +18,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: production.productproductphoto
+    Cross-reference table mapping products and product photos.
+    Composite primary key: productid, productphotoid */
 case class ProductproductphotoRow(
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */

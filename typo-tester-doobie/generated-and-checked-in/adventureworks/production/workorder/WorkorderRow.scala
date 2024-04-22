@@ -19,6 +19,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: production.workorder
+    Manufacturing work orders.
+    Primary key: workorderid */
 case class WorkorderRow(
   /** Primary key for WorkOrder records.
       Default: nextval('production.workorder_workorderid_seq'::regclass) */

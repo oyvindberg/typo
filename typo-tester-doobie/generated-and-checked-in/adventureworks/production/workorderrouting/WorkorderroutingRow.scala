@@ -19,6 +19,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: production.workorderrouting
+    Work order details.
+    Composite primary key: workorderid, productid, operationsequence */
 case class WorkorderroutingRow(
   /** Primary key. Foreign key to WorkOrder.WorkOrderID.
       Points to [[workorder.WorkorderRow.workorderid]] */

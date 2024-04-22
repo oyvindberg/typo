@@ -22,6 +22,7 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: pr.psc */
 case class PscViewRow(
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.productsubcategoryid]] */
   id: ProductsubcategoryId,

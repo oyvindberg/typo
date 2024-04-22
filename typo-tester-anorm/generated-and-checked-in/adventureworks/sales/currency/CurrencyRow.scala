@@ -20,6 +20,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: sales.currency
+    Lookup table containing standard ISO currencies.
+    Primary key: currencycode */
 case class CurrencyRow(
   /** The ISO code for the Currency. */
   currencycode: CurrencyId,

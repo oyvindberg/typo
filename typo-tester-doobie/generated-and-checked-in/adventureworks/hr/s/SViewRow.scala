@@ -17,6 +17,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: hr.s */
 case class SViewRow(
   /** Points to [[humanresources.shift.ShiftRow.shiftid]] */
   id: ShiftId,

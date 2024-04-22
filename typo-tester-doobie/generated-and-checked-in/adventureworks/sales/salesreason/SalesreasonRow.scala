@@ -16,6 +16,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: sales.salesreason
+    Lookup table of customer purchase reasons.
+    Primary key: salesreasonid */
 case class SalesreasonRow(
   /** Primary key for SalesReason records.
       Default: nextval('sales.salesreason_salesreasonid_seq'::regclass) */

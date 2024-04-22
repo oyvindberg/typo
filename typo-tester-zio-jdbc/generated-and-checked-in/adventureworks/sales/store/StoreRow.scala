@@ -20,6 +20,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: sales.store
+    Customers (resellers) of Adventure Works products.
+    Primary key: businessentityid */
 case class StoreRow(
   /** Primary key. Foreign key to Customer.BusinessEntityID.
       Points to [[person.businessentity.BusinessentityRow.businessentityid]] */

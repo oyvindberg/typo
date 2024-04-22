@@ -18,6 +18,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: person.personphone
+    Telephone number and type of a person.
+    Composite primary key: businessentityid, phonenumber, phonenumbertypeid */
 case class PersonphoneRow(
   /** Business entity identification number. Foreign key to Person.BusinessEntityID.
       Points to [[person.PersonRow.businessentityid]] */

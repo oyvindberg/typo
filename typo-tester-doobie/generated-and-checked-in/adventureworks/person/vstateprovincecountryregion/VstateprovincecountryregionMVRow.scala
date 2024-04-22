@@ -19,6 +19,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Materialized View: person.vstateprovincecountryregion */
 case class VstateprovincecountryregionMVRow(
   /** Points to [[stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: StateprovinceId,

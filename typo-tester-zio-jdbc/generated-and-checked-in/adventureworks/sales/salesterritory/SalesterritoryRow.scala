@@ -19,6 +19,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: sales.salesterritory
+    Sales territory lookup table.
+    Primary key: territoryid */
 case class SalesterritoryRow(
   /** Primary key for SalesTerritory records.
       Default: nextval('sales.salesterritory_territoryid_seq'::regclass) */

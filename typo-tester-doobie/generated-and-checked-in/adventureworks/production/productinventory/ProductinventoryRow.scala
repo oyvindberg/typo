@@ -20,6 +20,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: production.productinventory
+    Product inventory information.
+    Composite primary key: productid, locationid */
 case class ProductinventoryRow(
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */

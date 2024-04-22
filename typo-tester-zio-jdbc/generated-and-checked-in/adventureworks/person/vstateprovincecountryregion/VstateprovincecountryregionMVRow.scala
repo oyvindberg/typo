@@ -19,6 +19,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Materialized View: person.vstateprovincecountryregion */
 case class VstateprovincecountryregionMVRow(
   /** Points to [[stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: StateprovinceId,

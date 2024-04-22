@@ -20,6 +20,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: myschema.person
+    person table
+    Primary key: id */
 case class PersonRow(
   /** Default: auto-increment */
   id: PersonId,

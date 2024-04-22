@@ -17,6 +17,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pe.bec */
 case class BecViewRow(
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.businessentityid]] */
   id: BusinessentityId,

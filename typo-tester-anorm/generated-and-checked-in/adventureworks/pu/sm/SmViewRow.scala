@@ -23,6 +23,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: pu.sm */
 case class SmViewRow(
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shipmethodid]] */
   id: ShipmethodId,

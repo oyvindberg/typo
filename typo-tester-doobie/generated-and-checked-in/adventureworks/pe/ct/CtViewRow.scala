@@ -16,6 +16,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pe.ct */
 case class CtViewRow(
   /** Points to [[person.contacttype.ContacttypeRow.contacttypeid]] */
   id: ContacttypeId,

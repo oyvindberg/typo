@@ -21,6 +21,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: production.productdocument
+    Cross-reference table mapping products to related product documents.
+    Composite primary key: productid, documentnode */
 case class ProductdocumentRow(
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */

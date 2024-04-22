@@ -17,6 +17,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pe.at */
 case class AtViewRow(
   /** Points to [[person.addresstype.AddresstypeRow.addresstypeid]] */
   id: AddresstypeId,

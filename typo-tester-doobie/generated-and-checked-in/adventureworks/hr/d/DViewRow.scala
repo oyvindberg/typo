@@ -16,6 +16,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: hr.d */
 case class DViewRow(
   /** Points to [[humanresources.department.DepartmentRow.departmentid]] */
   id: DepartmentId,

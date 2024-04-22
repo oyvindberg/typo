@@ -25,6 +25,9 @@ import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 
+/** Table: myschema.person
+    person table
+    Primary key: id */
 case class PersonRow(
   /** Default: auto-increment */
   id: PersonId,

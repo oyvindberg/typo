@@ -19,6 +19,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: purchasing.productvendor
+    Cross-reference table mapping vendors with the products they supply.
+    Composite primary key: productid, businessentityid */
 case class ProductvendorRow(
   /** Primary key. Foreign key to Product.ProductID.
       Points to [[production.product.ProductRow.productid]] */

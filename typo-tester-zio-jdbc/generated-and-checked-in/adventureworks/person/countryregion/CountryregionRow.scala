@@ -17,6 +17,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: person.countryregion
+    Lookup table containing the ISO standard codes for countries and regions.
+    Primary key: countryregioncode */
 case class CountryregionRow(
   /** ISO standard code for countries and regions. */
   countryregioncode: CountryregionId,

@@ -129,6 +129,7 @@ object db {
 
   case class Table(
       name: RelationName,
+      comment: Option[String],
       cols: NonEmptyList[Col],
       primaryKey: Option[PrimaryKey],
       uniqueKeys: List[UniqueKey],
@@ -137,6 +138,7 @@ object db {
 
   case class View(
       name: RelationName,
+      comment: Option[String],
       decomposedSql: DecomposedSql,
       cols: NonEmptyList[(db.Col, ParsedName)],
       deps: Map[db.ColName, (db.RelationName, db.ColName)],

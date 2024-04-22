@@ -20,6 +20,7 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: sa.pcc */
 case class PccViewRow(
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.businessentityid]] */
   id: BusinessentityId,

@@ -20,6 +20,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: production.scrapreason
+    Manufacturing failure reasons lookup table.
+    Primary key: scrapreasonid */
 case class ScrapreasonRow(
   /** Primary key for ScrapReason records.
       Default: nextval('production.scrapreason_scrapreasonid_seq'::regclass) */

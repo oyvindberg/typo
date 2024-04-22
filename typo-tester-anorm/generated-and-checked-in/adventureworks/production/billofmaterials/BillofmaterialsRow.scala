@@ -24,6 +24,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: production.billofmaterials
+    Items required to make bicycles and bicycle subassemblies. It identifies the heirarchical relationship between a parent product and its components.
+    Primary key: billofmaterialsid */
 case class BillofmaterialsRow(
   /** Primary key for BillOfMaterials records.
       Default: nextval('production.billofmaterials_billofmaterialsid_seq'::regclass) */

@@ -16,6 +16,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: sa.pcc */
 case class PccViewRow(
   /** Points to [[sales.personcreditcard.PersoncreditcardRow.businessentityid]] */
   id: BusinessentityId,

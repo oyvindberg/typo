@@ -18,6 +18,7 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** SQL file: update_person_returning.sql */
 case class UpdatePersonReturningSqlRow(
   /** Points to [[person.person.PersonRow.firstname]] */
   firstname: /* user-picked */ FirstName,

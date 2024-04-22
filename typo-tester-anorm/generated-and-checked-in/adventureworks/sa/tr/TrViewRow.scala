@@ -25,6 +25,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: sa.tr */
 case class TrViewRow(
   /** Points to [[sales.salestaxrate.SalestaxrateRow.salestaxrateid]] */
   id: SalestaxrateId,

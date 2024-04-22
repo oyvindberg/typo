@@ -17,6 +17,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.productlistpricehistory
+    Changes in the list price of a product over time.
+    Composite primary key: productid, startdate */
 case class ProductlistpricehistoryRow(
   /** Product identification number. Foreign key to Product.ProductID
       Points to [[product.ProductRow.productid]] */

@@ -22,6 +22,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: production.productcosthistory
+    Changes in the cost of a product over time.
+    Composite primary key: productid, startdate */
 case class ProductcosthistoryRow(
   /** Product identification number. Foreign key to Product.ProductID
       Points to [[product.ProductRow.productid]] */

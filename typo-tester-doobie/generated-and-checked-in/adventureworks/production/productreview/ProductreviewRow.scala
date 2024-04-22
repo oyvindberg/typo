@@ -18,6 +18,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: production.productreview
+    Customer reviews of products they have purchased.
+    Primary key: productreviewid */
 case class ProductreviewRow(
   /** Primary key for ProductReview records.
       Default: nextval('production.productreview_productreviewid_seq'::regclass) */

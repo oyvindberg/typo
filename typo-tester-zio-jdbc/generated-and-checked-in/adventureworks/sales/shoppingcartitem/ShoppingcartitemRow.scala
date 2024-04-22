@@ -17,6 +17,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: sales.shoppingcartitem
+    Contains online customer orders until the order is submitted or cancelled.
+    Primary key: shoppingcartitemid */
 case class ShoppingcartitemRow(
   /** Primary key for ShoppingCartItem records.
       Default: nextval('sales.shoppingcartitem_shoppingcartitemid_seq'::regclass) */

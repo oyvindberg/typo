@@ -17,6 +17,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pe.e */
 case class EViewRow(
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddressid]] */
   id: Int,

@@ -25,6 +25,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: sales.salestaxrate
+    Tax rate lookup table.
+    Primary key: salestaxrateid */
 case class SalestaxrateRow(
   /** Primary key for SalesTaxRate records.
       Default: nextval('sales.salestaxrate_salestaxrateid_seq'::regclass) */

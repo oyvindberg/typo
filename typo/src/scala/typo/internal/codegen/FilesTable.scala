@@ -7,7 +7,7 @@ import typo.internal.codegen.DbLib.RowType
 
 case class FilesTable(table: ComputedTable, options: InternalOptions, genOrdering: GenOrdering) {
   val relation = FilesRelation(table.naming, table.names, Some(table.cols), options)
-  val RowFile = relation.RowFile(RowType.ReadWriteable)
+  val RowFile = relation.RowFile(RowType.ReadWriteable, table.dbTable.comment)
 
   val UnsavedRowFile: Option[sc.File] =
     for {

@@ -20,6 +20,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: person.phonenumbertype
+    Type of phone number of a person.
+    Primary key: phonenumbertypeid */
 case class PhonenumbertypeRow(
   /** Primary key for telephone number type records.
       Default: nextval('person.phonenumbertype_phonenumbertypeid_seq'::regclass) */

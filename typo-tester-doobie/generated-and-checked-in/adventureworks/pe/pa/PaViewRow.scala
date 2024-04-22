@@ -17,6 +17,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pe.pa */
 case class PaViewRow(
   /** Points to [[person.password.PasswordRow.businessentityid]] */
   id: BusinessentityId,

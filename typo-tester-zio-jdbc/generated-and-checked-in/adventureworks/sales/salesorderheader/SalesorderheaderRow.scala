@@ -28,6 +28,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: sales.salesorderheader
+    General sales order information.
+    Primary key: salesorderid */
 case class SalesorderheaderRow(
   /** Primary key.
       Default: nextval('sales.salesorderheader_salesorderid_seq'::regclass) */

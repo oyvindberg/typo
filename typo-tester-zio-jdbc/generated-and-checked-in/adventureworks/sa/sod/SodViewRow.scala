@@ -20,6 +20,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: sa.sod */
 case class SodViewRow(
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.salesorderdetailid]] */
   id: Int,

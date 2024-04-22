@@ -17,6 +17,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: sales.salesorderheadersalesreason
+    Cross-reference table mapping sales orders to sales reason codes.
+    Composite primary key: salesorderid, salesreasonid */
 case class SalesorderheadersalesreasonRow(
   /** Primary key. Foreign key to SalesOrderHeader.SalesOrderID.
       Points to [[salesorderheader.SalesorderheaderRow.salesorderid]] */

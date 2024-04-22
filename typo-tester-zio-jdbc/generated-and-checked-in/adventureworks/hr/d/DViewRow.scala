@@ -17,6 +17,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: hr.d */
 case class DViewRow(
   /** Points to [[humanresources.department.DepartmentRow.departmentid]] */
   id: DepartmentId,

@@ -20,6 +20,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: humanresources.employeedepartmenthistory
+    Employee department transfers.
+    Composite primary key: businessentityid, startdate, departmentid, shiftid */
 case class EmployeedepartmenthistoryRow(
   /** Employee identification number. Foreign key to Employee.BusinessEntityID.
       Points to [[employee.EmployeeRow.businessentityid]] */

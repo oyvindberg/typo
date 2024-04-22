@@ -18,6 +18,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: sales.vstorewithcontacts */
 case class VstorewithcontactsViewRow(
   /** Points to [[store.StoreRow.businessentityid]] */
   businessentityid: BusinessentityId,

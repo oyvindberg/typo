@@ -18,6 +18,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pr.pr */
 case class PrViewRow(
   /** Points to [[production.productreview.ProductreviewRow.productreviewid]] */
   id: ProductreviewId,

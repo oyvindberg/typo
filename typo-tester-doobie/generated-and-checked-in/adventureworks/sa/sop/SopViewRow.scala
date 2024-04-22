@@ -17,6 +17,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: sa.sop */
 case class SopViewRow(
   /** Points to [[sales.specialofferproduct.SpecialofferproductRow.specialofferid]] */
   id: SpecialofferId,

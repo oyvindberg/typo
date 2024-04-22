@@ -19,6 +19,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: purchasing.purchaseorderheader
+    General purchase order information. See PurchaseOrderDetail.
+    Primary key: purchaseorderid */
 case class PurchaseorderheaderRow(
   /** Primary key.
       Default: nextval('purchasing.purchaseorderheader_purchaseorderid_seq'::regclass) */

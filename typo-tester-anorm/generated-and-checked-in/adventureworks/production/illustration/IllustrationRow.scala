@@ -22,6 +22,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: production.illustration
+    Bicycle assembly diagrams.
+    Primary key: illustrationid */
 case class IllustrationRow(
   /** Primary key for Illustration records.
       Default: nextval('production.illustration_illustrationid_seq'::regclass) */

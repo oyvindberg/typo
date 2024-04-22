@@ -17,6 +17,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: sa.cr */
 case class CrViewRow(
   /** Points to [[sales.currencyrate.CurrencyrateRow.currencyrateid]] */
   currencyrateid: CurrencyrateId,

@@ -17,6 +17,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: pr.sr */
 case class SrViewRow(
   /** Points to [[production.scrapreason.ScrapreasonRow.scrapreasonid]] */
   id: ScrapreasonId,

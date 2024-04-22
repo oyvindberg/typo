@@ -22,6 +22,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: production.productsubcategory
+    Product subcategories. See ProductCategory table.
+    Primary key: productsubcategoryid */
 case class ProductsubcategoryRow(
   /** Primary key for ProductSubcategory records.
       Default: nextval('production.productsubcategory_productsubcategoryid_seq'::regclass) */

@@ -17,6 +17,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Materialized View: production.vproductanddescription */
 case class VproductanddescriptionMVRow(
   /** Points to [[product.ProductRow.productid]] */
   productid: ProductId,

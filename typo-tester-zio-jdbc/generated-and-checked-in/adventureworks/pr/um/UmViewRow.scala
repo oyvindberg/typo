@@ -17,6 +17,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: pr.um */
 case class UmViewRow(
   /** Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   id: UnitmeasureId,

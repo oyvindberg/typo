@@ -17,6 +17,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: sa.cu */
 case class CuViewRow(
   /** Points to [[sales.currency.CurrencyRow.currencycode]] */
   id: CurrencyId,

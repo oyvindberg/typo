@@ -16,6 +16,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pr.um */
 case class UmViewRow(
   /** Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   id: UnitmeasureId,

@@ -17,6 +17,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: sa.cc */
 case class CcViewRow(
   /** Points to [[sales.creditcard.CreditcardRow.creditcardid]] */
   id: /* user-picked */ CustomCreditcardId,

@@ -22,6 +22,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: person.personphone
+    Telephone number and type of a person.
+    Composite primary key: businessentityid, phonenumber, phonenumbertypeid */
 case class PersonphoneRow(
   /** Business entity identification number. Foreign key to Person.BusinessEntityID.
       Points to [[person.PersonRow.businessentityid]] */

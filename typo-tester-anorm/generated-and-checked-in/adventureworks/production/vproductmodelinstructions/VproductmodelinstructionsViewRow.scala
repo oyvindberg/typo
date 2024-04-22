@@ -23,6 +23,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: production.vproductmodelinstructions */
 case class VproductmodelinstructionsViewRow(
   /** Points to [[productmodel.ProductmodelRow.productmodelid]] */
   productmodelid: ProductmodelId,

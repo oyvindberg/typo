@@ -20,6 +20,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: production.culture
+    Lookup table containing the languages in which some AdventureWorks data is stored.
+    Primary key: cultureid */
 case class CultureRow(
   /** Primary key for Culture records. */
   cultureid: CultureId,

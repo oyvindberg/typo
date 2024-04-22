@@ -6,7 +6,7 @@ import play.api.libs.json.Json
 import typo.sc.Type
 
 case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option[NonEmptyList[ComputedColumn]], options: InternalOptions) {
-  def RowFile(rowType: DbLib.RowType): Option[sc.File] = maybeCols.map { cols =>
+  def RowFile(rowType: DbLib.RowType, comment: Option[String]): Option[sc.File] = maybeCols.map { cols =>
     val compositeId = names.maybeId match {
       case Some(x: IdComputed.Composite) =>
         code"""|{
@@ -44,8 +44,26 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
       options.jsonLibs.flatMap(_.instances(names.RowName, cols)) ++
         options.dbLib.toList.flatMap(_.rowInstances(names.RowName, cols, rowType = rowType))
 
+    val classComment = {
+      val lines = List[Iterable[String]](
+        Some(names.source match {
+          case Source.Table(name)       => s"Table: ${name.value}"
+          case Source.View(name, true)  => s"Materialized View: ${name.value}"
+          case Source.View(name, false) => s"View: ${name.value}"
+          case Source.SqlFile(relPath)  => s"SQL file: ${relPath.asString}"
+        }),
+        comment,
+        names.maybeId.map {
+          case x: IdComputed.Unary     => s"Primary key: ${x.col.dbName.value}"
+          case x: IdComputed.Composite => s"Composite primary key: ${x.cols.map(_.dbName.value).mkString(", ")}"
+        }
+      ).flatten
+      code"""|/** ${lines.mkString("\n")} */
+             |""".stripMargin
+    }
+
     val str =
-      code"""case class ${names.RowName.name}(
+      code"""${classComment}case class ${names.RowName.name}(
             |  ${formattedCols.mkCode(",\n")}
             |)$compositeId
             |

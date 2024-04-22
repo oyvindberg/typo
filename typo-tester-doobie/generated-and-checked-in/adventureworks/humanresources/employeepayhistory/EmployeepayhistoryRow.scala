@@ -18,6 +18,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: humanresources.employeepayhistory
+    Employee pay history.
+    Composite primary key: businessentityid, ratechangedate */
 case class EmployeepayhistoryRow(
   /** Employee identification number. Foreign key to Employee.BusinessEntityID.
       Points to [[employee.EmployeeRow.businessentityid]] */

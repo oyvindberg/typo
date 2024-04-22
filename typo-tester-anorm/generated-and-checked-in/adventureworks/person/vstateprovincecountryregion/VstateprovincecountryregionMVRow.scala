@@ -24,6 +24,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Materialized View: person.vstateprovincecountryregion */
 case class VstateprovincecountryregionMVRow(
   /** Points to [[stateprovince.StateprovinceRow.stateprovinceid]] */
   stateprovinceid: StateprovinceId,

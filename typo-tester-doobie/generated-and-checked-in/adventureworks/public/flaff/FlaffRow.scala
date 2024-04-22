@@ -16,6 +16,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: public.flaff
+    Composite primary key: code, another_code, some_number, specifier */
 case class FlaffRow(
   /** Points to [[FlaffRow.code]] */
   code: ShortText,

@@ -19,6 +19,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: person.address
+    Street address information for customers, employees, and vendors.
+    Primary key: addressid */
 case class AddressRow(
   /** Primary key for Address records.
       Default: nextval('person.address_addressid_seq'::regclass) */

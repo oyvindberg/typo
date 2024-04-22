@@ -22,6 +22,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: person.person
+    Human beings involved with AdventureWorks: employees, customer contacts, and vendor contacts.
+    Primary key: businessentityid */
 case class PersonRow(
   /** Primary key for Person records.
       Points to [[businessentity.BusinessentityRow.businessentityid]] */

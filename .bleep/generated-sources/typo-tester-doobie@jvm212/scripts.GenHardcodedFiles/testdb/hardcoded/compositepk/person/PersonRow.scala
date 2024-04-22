@@ -16,6 +16,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: compositepk.person
+    Composite primary key: one, two */
 case class PersonRow(
   /** Default: auto-increment */
   one: Long,

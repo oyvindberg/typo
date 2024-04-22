@@ -19,6 +19,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: pr.w */
 case class WViewRow(
   /** Points to [[production.workorder.WorkorderRow.workorderid]] */
   id: WorkorderId,

@@ -24,6 +24,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: pr.pm */
 case class PmViewRow(
   /** Points to [[production.productmodel.ProductmodelRow.productmodelid]] */
   id: ProductmodelId,

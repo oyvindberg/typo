@@ -18,6 +18,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: sales.customer
+    Current customer information. Also see the Person and Store tables.
+    Primary key: customerid */
 case class CustomerRow(
   /** Primary key.
       Default: nextval('sales.customer_customerid_seq'::regclass) */

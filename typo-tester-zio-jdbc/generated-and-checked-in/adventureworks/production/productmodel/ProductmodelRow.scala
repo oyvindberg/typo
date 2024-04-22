@@ -19,6 +19,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.productmodel
+    Product model classification.
+    Primary key: productmodelid */
 case class ProductmodelRow(
   /** Primary key for ProductModel records.
       Default: nextval('production.productmodel_productmodelid_seq'::regclass) */

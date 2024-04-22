@@ -18,6 +18,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: pr.wr */
 case class WrViewRow(
   /** Points to [[production.workorderrouting.WorkorderroutingRow.workorderid]] */
   id: WorkorderId,

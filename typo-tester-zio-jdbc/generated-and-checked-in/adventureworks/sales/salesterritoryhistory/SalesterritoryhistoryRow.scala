@@ -19,6 +19,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: sales.salesterritoryhistory
+    Sales representative transfers to other sales territories.
+    Composite primary key: businessentityid, startdate, territoryid */
 case class SalesterritoryhistoryRow(
   /** Primary key. The sales rep.  Foreign key to SalesPerson.BusinessEntityID.
       Points to [[salesperson.SalespersonRow.businessentityid]] */

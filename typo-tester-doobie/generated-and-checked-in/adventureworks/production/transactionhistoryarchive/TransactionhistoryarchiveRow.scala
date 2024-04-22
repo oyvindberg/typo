@@ -16,6 +16,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: production.transactionhistoryarchive
+    Transactions for previous years.
+    Primary key: transactionid */
 case class TransactionhistoryarchiveRow(
   /** Primary key for TransactionHistoryArchive records. */
   transactionid: TransactionhistoryarchiveId,

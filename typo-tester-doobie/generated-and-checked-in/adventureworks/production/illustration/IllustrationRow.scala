@@ -16,6 +16,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: production.illustration
+    Bicycle assembly diagrams.
+    Primary key: illustrationid */
 case class IllustrationRow(
   /** Primary key for Illustration records.
       Default: nextval('production.illustration_illustrationid_seq'::regclass) */

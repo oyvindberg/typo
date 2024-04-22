@@ -17,6 +17,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: sa.cc */
 case class CcViewRow(
   /** Points to [[sales.creditcard.CreditcardRow.creditcardid]] */
   id: /* user-picked */ CustomCreditcardId,

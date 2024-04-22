@@ -16,6 +16,7 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** View: sa.sohsr */
 case class SohsrViewRow(
   /** Points to [[sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.salesorderid]] */
   salesorderid: SalesorderheaderId,

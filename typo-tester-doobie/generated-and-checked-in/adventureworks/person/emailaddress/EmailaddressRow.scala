@@ -18,6 +18,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: person.emailaddress
+    Where to send a person email.
+    Composite primary key: businessentityid, emailaddressid */
 case class EmailaddressRow(
   /** Primary key. Person associated with this email address.  Foreign key to Person.BusinessEntityID
       Points to [[person.PersonRow.businessentityid]] */

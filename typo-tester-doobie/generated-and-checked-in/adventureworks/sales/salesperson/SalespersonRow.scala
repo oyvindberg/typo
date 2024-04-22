@@ -19,6 +19,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: sales.salesperson
+    Sales representative current information.
+    Primary key: businessentityid */
 case class SalespersonRow(
   /** Primary key for SalesPerson records. Foreign key to Employee.BusinessEntityID
       Points to [[humanresources.employee.EmployeeRow.businessentityid]] */

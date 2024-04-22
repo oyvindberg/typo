@@ -16,6 +16,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: sales.currency
+    Lookup table containing standard ISO currencies.
+    Primary key: currencycode */
 case class CurrencyRow(
   /** The ISO code for the Currency. */
   currencycode: CurrencyId,

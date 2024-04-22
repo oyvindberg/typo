@@ -16,6 +16,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: pr.pch */
 case class PchViewRow(
   /** Points to [[production.productcosthistory.ProductcosthistoryRow.productid]] */
   id: ProductId,

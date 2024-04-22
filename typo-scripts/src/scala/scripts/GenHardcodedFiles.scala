@@ -17,6 +17,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
 
   val person = db.Table(
     name = db.RelationName(Some("myschema"), "person"),
+    comment = Some("person table"),
     cols = NonEmptyList(
       db.Col(ParsedName.of("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = Some("auto-increment"), None, None, Nil, DebugJson.Empty),
       db.Col(
@@ -90,6 +91,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   )
   val football_club = db.Table(
     name = db.RelationName(Some("myschema"), "football_club"),
+    comment = Some("football club"),
     cols = NonEmptyList(
       db.Col(ParsedName.of("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = None, None, None, Nil, DebugJson.Empty),
       db.Col(ParsedName.of("name"), db.Type.VarChar(Some(100)), Some("varchar"), Nullability.NoNulls, columnDefault = None, None, None, Nil, DebugJson.Empty)
@@ -100,6 +102,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
   )
   val marital_status = db.Table(
     name = db.RelationName(Some("myschema"), "marital_status"),
+    comment = None,
     cols = NonEmptyList(
       db.Col(ParsedName.of("id"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = None, None, None, Nil, DebugJson.Empty)
     ),
@@ -110,6 +113,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
 
   val cpk_person = db.Table(
     name = db.RelationName(Some("compositepk"), "person"), // name clash to ensure we handle it
+    comment = None,
     cols = NonEmptyList(
       db.Col(ParsedName.of("one"), db.Type.Int8, Some("int8"), Nullability.NoNulls, columnDefault = Some("auto-increment"), None, None, Nil, DebugJson.Empty),
       db.Col(ParsedName.of("two"), db.Type.Text, Some("text"), Nullability.Nullable, columnDefault = Some("auto-increment"), None, None, Nil, DebugJson.Empty),

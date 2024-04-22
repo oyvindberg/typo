@@ -17,6 +17,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.scrapreason
+    Manufacturing failure reasons lookup table.
+    Primary key: scrapreasonid */
 case class ScrapreasonRow(
   /** Primary key for ScrapReason records.
       Default: nextval('production.scrapreason_scrapreasonid_seq'::regclass) */

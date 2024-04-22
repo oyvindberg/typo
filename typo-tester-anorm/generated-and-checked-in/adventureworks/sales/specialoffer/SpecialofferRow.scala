@@ -22,6 +22,9 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: sales.specialoffer
+    Sale discounts lookup table.
+    Primary key: specialofferid */
 case class SpecialofferRow(
   /** Primary key for SpecialOffer records.
       Default: nextval('sales.specialoffer_specialofferid_seq'::regclass) */

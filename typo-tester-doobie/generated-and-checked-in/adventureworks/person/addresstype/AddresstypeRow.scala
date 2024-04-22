@@ -17,6 +17,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: person.addresstype
+    Types of addresses stored in the Address table.
+    Primary key: addresstypeid */
 case class AddresstypeRow(
   /** Primary key for AddressType records.
       Default: nextval('person.addresstype_addresstypeid_seq'::regclass) */

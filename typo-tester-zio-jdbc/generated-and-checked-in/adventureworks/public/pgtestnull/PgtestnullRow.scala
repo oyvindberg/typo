@@ -41,6 +41,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: public.pgtestnull */
 case class PgtestnullRow(
   bool: Option[Boolean],
   box: Option[TypoBox],

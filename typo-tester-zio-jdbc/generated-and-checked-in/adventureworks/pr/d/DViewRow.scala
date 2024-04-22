@@ -21,6 +21,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: pr.d */
 case class DViewRow(
   /** Points to [[production.document.DocumentRow.title]] */
   title: /* max 50 chars */ String,

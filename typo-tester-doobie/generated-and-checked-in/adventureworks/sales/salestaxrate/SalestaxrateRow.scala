@@ -20,6 +20,9 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
+/** Table: sales.salestaxrate
+    Tax rate lookup table.
+    Primary key: salestaxrateid */
 case class SalestaxrateRow(
   /** Primary key for SalesTaxRate records.
       Default: nextval('sales.salestaxrate_salestaxrateid_seq'::regclass) */

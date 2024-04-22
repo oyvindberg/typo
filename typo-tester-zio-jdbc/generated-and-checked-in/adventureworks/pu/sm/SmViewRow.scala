@@ -18,6 +18,7 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** View: pu.sm */
 case class SmViewRow(
   /** Points to [[purchasing.shipmethod.ShipmethodRow.shipmethodid]] */
   id: ShipmethodId,

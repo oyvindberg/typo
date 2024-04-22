@@ -22,6 +22,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: pr.l */
 case class LViewRow(
   /** Points to [[production.location.LocationRow.locationid]] */
   id: LocationId,

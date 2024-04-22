@@ -19,6 +19,9 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
+/** Table: production.productproductphoto
+    Cross-reference table mapping products and product photos.
+    Composite primary key: productid, productphotoid */
 case class ProductproductphotoRow(
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */

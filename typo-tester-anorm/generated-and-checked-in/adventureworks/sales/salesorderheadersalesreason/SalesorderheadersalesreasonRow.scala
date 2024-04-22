@@ -21,6 +21,9 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** Table: sales.salesorderheadersalesreason
+    Cross-reference table mapping sales orders to sales reason codes.
+    Composite primary key: salesorderid, salesreasonid */
 case class SalesorderheadersalesreasonRow(
   /** Primary key. Foreign key to SalesOrderHeader.SalesOrderID.
       Points to [[salesorderheader.SalesorderheaderRow.salesorderid]] */
