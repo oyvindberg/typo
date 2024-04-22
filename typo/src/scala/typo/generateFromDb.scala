@@ -5,12 +5,26 @@ import typo.internal.sqlfiles.readSqlFileDirectories
 import java.nio.file.Path
 import java.sql.Connection
 
+/** Main entry-point for generating code from a database.
+  */
 object generateFromDb {
-  def apply(options: Options, folder: Path, selector: Selector = Selector.ExcludePostgresInternal, scriptsPaths: List[Path] = Nil)(implicit c: Connection): Generated = {
-    apply(options, ProjectGraph(name = "", folder, selector, scriptsPaths, Nil)).head
-  }
 
-  def apply(options: Options, graph: ProjectGraph[Selector, List[Path]])(implicit c: Connection): List[Generated] = {
+  /** Allows you to generate code into *one* folder
+    */
+  def apply(
+      options: Options,
+      targetFolder: Path,
+      selector: Selector = Selector.ExcludePostgresInternal,
+      scriptsPaths: List[Path] = Nil
+  )(implicit c: Connection): Generated =
+    apply(options, ProjectGraph(name = "", targetFolder, selector, scriptsPaths, Nil)).head
+
+  /** Allows you to generate code into multiple folders
+    */
+  def apply(
+      options: Options,
+      graph: ProjectGraph[Selector, List[Path]]
+  )(implicit c: Connection): List[Generated] = {
     Banner.maybePrint(options)
     internal.generate(
       options,

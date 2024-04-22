@@ -65,7 +65,7 @@ val scriptsFolder = location.resolve("sql")
 // you can use this to customize which relations you want to generate code for, see below
 val selector = Selector.ExcludePostgresInternal
 
-generateFromDb(options, folder = targetDir, selector = selector, scriptsPaths = List(scriptsFolder))
+generateFromDb(options, targetFolder = targetDir, selector = selector, scriptsPaths = List(scriptsFolder))
   .overwriteFolder()
 
 // add changed files to git, so you can keep them under control
