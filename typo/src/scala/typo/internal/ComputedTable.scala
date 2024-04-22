@@ -12,13 +12,13 @@ case class ComputedTable(
     eval: Eval[db.RelationName, HasSource]
 ) extends HasSource {
   override val source: Source.Table = Source.Table(dbTable.name)
-  val pointsTo: Map[db.ColName, (Source.Relation, db.ColName)] =
-    dbTable.foreignKeys.flatMap { fk =>
-      val maybeOtherTable: Option[HasSource] =
-        if (fk.otherTable == dbTable.name) Some(this)
-        else eval(fk.otherTable).get
+  val pointsTo: Map[db.ColName, (Source.Relation, db.ColName)] = {
+    val (fkSelf, fkOther) = dbTable.foreignKeys.partition { fk => fk.otherTable == dbTable.name }
 
-      maybeOtherTable match {
+    val fromSelf = fkSelf.flatMap(fk => fk.cols.zip(fk.otherCols.map(cn => (source, cn))).toList).toMap
+
+    val fromOthers = fkOther.flatMap { fk =>
+      eval(fk.otherTable).get match {
         case None =>
           options.logger.warn(s"Circular: ${dbTable.name.value} => ${fk.otherTable.value}")
           Nil
@@ -27,6 +27,10 @@ case class ComputedTable(
           fk.cols.zip(value).toList
       }
     }.toMap
+
+    // prefer inferring types from outside the table
+    fromSelf ++ fromOthers
+  }
 
   val dbColsByName: Map[db.ColName, db.Col] =
     dbTable.cols.map(col => (col.name, col)).toMap
@@ -87,11 +91,14 @@ case class ComputedTable(
     }
   }
 
-  def deriveType(dbCol: db.Col) = {
+  def deriveType(dbCol: db.Col): sc.Type = {
     // we let types flow through constraints down to this column, the point is to reuse id types downstream
     val typeFromFk: Option[sc.Type] =
-      pointsTo.get(dbCol.name) match {
-        case Some((otherTableSource, otherColName)) if otherTableSource.name != dbTable.name =>
+      pointsTo.get(dbCol.name).flatMap { case (otherTableSource, otherColName) =>
+        if (otherTableSource.name == dbTable.name)
+          if (otherColName == dbCol.name) None
+          else Some(deriveType(dbColsByName(otherColName)))
+        else
           eval(otherTableSource.name).get match {
             case Some(otherTable) =>
               otherTable.cols.find(_.dbName == otherColName).map(_.tpe)
@@ -99,8 +106,6 @@ case class ComputedTable(
               options.logger.warn(s"Unexpected circular dependency involving ${dbTable.name.value} => ${otherTableSource.name.value}")
               None
           }
-
-        case _ => None
       }
 
     val typeFromId: Option[sc.Type] =

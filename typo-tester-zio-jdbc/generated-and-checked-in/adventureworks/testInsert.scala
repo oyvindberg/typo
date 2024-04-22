@@ -197,6 +197,9 @@ import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import adventureworks.public.OrderNumber
 import adventureworks.public.Phone
+import adventureworks.public.ShortText
+import adventureworks.public.flaff.FlaffRepoImpl
+import adventureworks.public.flaff.FlaffRow
 import adventureworks.public.identity_test.IdentityTestId
 import adventureworks.public.identity_test.IdentityTestRepoImpl
 import adventureworks.public.identity_test.IdentityTestRow
@@ -621,6 +624,12 @@ class TestInsert(random: Random) {
                                  actualcost: Option[BigDecimal] = if (random.nextBoolean()) None else Some(BigDecimal.decimal(random.nextDouble())),
                                  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                 ): ZIO[ZConnection, Throwable, WorkorderroutingRow] = (new WorkorderroutingRepoImpl).insert(new WorkorderroutingRowUnsaved(workorderid = workorderid, locationid = locationid, productid = productid, operationsequence = operationsequence, scheduledstartdate = scheduledstartdate, scheduledenddate = scheduledenddate, actualstartdate = actualstartdate, actualenddate = actualenddate, actualresourcehrs = actualresourcehrs, plannedcost = plannedcost, actualcost = actualcost, modifieddate = modifieddate))
+  def publicFlaff(code: ShortText = ShortText(random.alphanumeric.take(20).mkString),
+                  anotherCode: /* max 20 chars */ String = random.alphanumeric.take(20).mkString,
+                  someNumber: Int = random.nextInt(),
+                  specifier: ShortText = ShortText(random.alphanumeric.take(20).mkString),
+                  parentspecifier: Option[ShortText] = if (random.nextBoolean()) None else Some(ShortText(random.alphanumeric.take(20).mkString))
+                 ): ZIO[ZConnection, Throwable, FlaffRow] = (new FlaffRepoImpl).insert(new FlaffRow(code = code, anotherCode = anotherCode, someNumber = someNumber, specifier = specifier, parentspecifier = parentspecifier))
   def publicIdentityTest(name: IdentityTestId, defaultGenerated: Defaulted[Int] = Defaulted.UseDefault): ZIO[ZConnection, Throwable, IdentityTestRow] = (new IdentityTestRepoImpl).insert(new IdentityTestRowUnsaved(name = name, defaultGenerated = defaultGenerated))
   def publicPgtest(box: TypoBox,
                    bytea: TypoBytea,
