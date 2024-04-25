@@ -41,7 +41,7 @@ class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
       val wanted = Array(ph1.compositeId, ph2.compositeId, ph3.compositeId.copy(productid = ProductId(9999)))
 
       val repo = new ProductcosthistoryRepoImpl()
-      assert(repo.selectByIds(wanted).map(_.compositeId) === List(ph1.compositeId, ph2.compositeId)): @nowarn
+      assert(repo.selectByIds(wanted).map(_.compositeId).toSet === Set(ph1.compositeId, ph2.compositeId)): @nowarn
       assert(repo.deleteByIds(wanted) === 2): @nowarn
       assert(repo.selectAll.map(_.compositeId) === List(ph3.compositeId))
     }

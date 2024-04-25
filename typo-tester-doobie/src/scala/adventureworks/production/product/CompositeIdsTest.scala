@@ -41,7 +41,7 @@ class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
         ph3 <- testInsert.productionProductcosthistory(product.productid, startdate = now.map(_.plusDays(2)), enddate = Some(now.map(_.plusDays(3))))
         wanted = Array(ph1.compositeId, ph2.compositeId, ph3.compositeId.copy(productid = ProductId(9999)))
         found <- repo.selectByIds(wanted).compile.toList
-        _ <- delay(assert(found.map(_.compositeId) === List(ph1.compositeId, ph2.compositeId)))
+        _ <- delay(assert(found.map(_.compositeId).toSet === Set(ph1.compositeId, ph2.compositeId)))
         deleted <- repo.deleteByIds(wanted)
         _ <- delay(assert(deleted === 2))
         all <- repo.selectAll.compile.toList
