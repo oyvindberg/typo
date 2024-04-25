@@ -22,14 +22,14 @@ import typo.dsl.UpdateParams
 
 class SalespersonRepoMock(toRow: Function1[SalespersonRowUnsaved, SalespersonRow],
                           map: scala.collection.mutable.Map[BusinessentityId, SalespersonRow] = scala.collection.mutable.Map.empty) extends SalespersonRepo {
-  override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[SalespersonFields, SalespersonRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SalespersonFields.structure.fields, map)
+  }
+  override def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     map.remove(businessentityid).isDefined
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
     businessentityids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[SalespersonFields, SalespersonRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalespersonFields.structure.fields, map)
   }
   override def insert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow = {
     val _ = if (map.contains(unsaved.businessentityid))
@@ -39,14 +39,14 @@ class SalespersonRepoMock(toRow: Function1[SalespersonRowUnsaved, SalespersonRow
     
     unsaved
   }
+  override def insert(unsaved: SalespersonRowUnsaved)(implicit c: Connection): SalespersonRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[SalespersonRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.businessentityid -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: SalespersonRowUnsaved)(implicit c: Connection): SalespersonRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SalespersonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -68,6 +68,9 @@ class SalespersonRepoMock(toRow: Function1[SalespersonRowUnsaved, SalespersonRow
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[SalespersonRow] = {
     businessentityids.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SalespersonFields.structure.fields, map)
+  }
   override def update(row: SalespersonRow)(implicit c: Connection): Boolean = {
     map.get(row.businessentityid) match {
       case Some(`row`) => false
@@ -76,9 +79,6 @@ class SalespersonRepoMock(toRow: Function1[SalespersonRowUnsaved, SalespersonRow
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalespersonFields.structure.fields, map)
   }
   override def upsert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow = {
     map.put(unsaved.businessentityid, unsaved): @nowarn

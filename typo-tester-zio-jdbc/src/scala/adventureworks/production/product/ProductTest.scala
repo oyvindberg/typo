@@ -170,7 +170,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
           }
         }
         // delete
-        _ <- productRepo.delete(saved1.productid)
+        _ <- productRepo.deleteById(saved1.productid)
         _ <- productRepo.selectAll.runCollect.map(_.toList).map {
           case Nil   => ()
           case other => throw new MatchError(other)

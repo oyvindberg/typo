@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow],
                           map: scala.collection.mutable.Map[PersonphoneId, PersonphoneRow] = scala.collection.mutable.Map.empty) extends PersonphoneRepo {
-  override def delete(compositeId: PersonphoneId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PersonphoneFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: PersonphoneId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
   }
   override def deleteByIds(compositeIds: Array[PersonphoneId]): ConnectionIO[Int] = {
     delay(compositeIds.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PersonphoneFields.structure.fields, map)
   }
   override def insert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     delay {
@@ -42,6 +42,9 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
       unsaved
     }
   }
+  override def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PersonphoneRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
       }
       num
     }
-  }
-  override def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonphoneRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
   override def selectByIds(compositeIds: Array[PersonphoneId]): Stream[ConnectionIO, PersonphoneRow] = {
     Stream.emits(compositeIds.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PersonphoneFields.structure.fields, map)
+  }
   override def update(row: PersonphoneRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {
@@ -89,9 +92,6 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PersonphoneFields.structure.fields, map)
   }
   override def upsert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     delay {

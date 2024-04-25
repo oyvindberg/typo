@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait TransactionhistoryRepo {
-  def delete(transactionid: TransactionhistoryId): ConnectionIO[Boolean]
-  def deleteByIds(transactionids: Array[TransactionhistoryId]): ConnectionIO[Int]
   def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow]
+  def deleteById(transactionid: TransactionhistoryId): ConnectionIO[Boolean]
+  def deleteByIds(transactionids: Array[TransactionhistoryId]): ConnectionIO[Int]
   def insert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: TransactionhistoryRowUnsaved): ConnectionIO[TransactionhistoryRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow]
   def selectAll: Stream[ConnectionIO, TransactionhistoryRow]
   def selectById(transactionid: TransactionhistoryId): ConnectionIO[Option[TransactionhistoryRow]]
   def selectByIds(transactionids: Array[TransactionhistoryId]): Stream[ConnectionIO, TransactionhistoryRow]
-  def update(row: TransactionhistoryRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow]
+  def update(row: TransactionhistoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow]
 }

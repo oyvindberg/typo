@@ -17,16 +17,16 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait MaritalStatusRepo {
-  def delete(id: MaritalStatusId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow]
+  def deleteById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, MaritalStatusRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, MaritalStatusRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow]
   def selectAll: ZStream[ZConnection, Throwable, MaritalStatusRow]
+  def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, MaritalStatusRow]
   def selectById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Option[MaritalStatusRow]]
   def selectByIds(ids: Array[MaritalStatusId]): ZStream[ZConnection, Throwable, MaritalStatusRow]
-  def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, MaritalStatusRow]
   def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow]
   def upsert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, UpdateResult[MaritalStatusRow]]
 }

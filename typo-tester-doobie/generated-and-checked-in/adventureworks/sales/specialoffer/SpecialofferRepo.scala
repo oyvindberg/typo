@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait SpecialofferRepo {
-  def delete(specialofferid: SpecialofferId): ConnectionIO[Boolean]
-  def deleteByIds(specialofferids: Array[SpecialofferId]): ConnectionIO[Int]
   def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow]
+  def deleteById(specialofferid: SpecialofferId): ConnectionIO[Boolean]
+  def deleteByIds(specialofferids: Array[SpecialofferId]): ConnectionIO[Int]
   def insert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, SpecialofferRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: SpecialofferRowUnsaved): ConnectionIO[SpecialofferRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, SpecialofferRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SpecialofferRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[SpecialofferFields, SpecialofferRow]
   def selectAll: Stream[ConnectionIO, SpecialofferRow]
   def selectById(specialofferid: SpecialofferId): ConnectionIO[Option[SpecialofferRow]]
   def selectByIds(specialofferids: Array[SpecialofferId]): Stream[ConnectionIO, SpecialofferRow]
-  def update(row: SpecialofferRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[SpecialofferFields, SpecialofferRow]
+  def update(row: SpecialofferRow): ConnectionIO[Boolean]
   def upsert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow]
 }

@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRepo {
-  override def delete(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
+    DeleteBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure)
+  }
+  override def deleteById(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Boolean] = {
     sql"""delete from sales.salesorderheadersalesreason where "salesorderid" = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND "salesreasonid" = ${fromWrite(compositeId.salesreasonid)(Write.fromPut(SalesreasonId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[SalesorderheadersalesreasonId]): ConnectionIO[Int] = {
@@ -37,17 +40,11 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
        """.update.run
     
   }
-  override def delete: DeleteBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
-    DeleteBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure)
-  }
   override def insert(unsaved: SalesorderheadersalesreasonRow): ConnectionIO[SalesorderheadersalesreasonRow] = {
     sql"""insert into sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate")
           values (${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4, ${fromWrite(unsaved.salesreasonid)(Write.fromPut(SalesreasonId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "salesorderid", "salesreasonid", "modifieddate"::text
        """.query(using SalesorderheadersalesreasonRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderheadersalesreasonRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalesorderheadersalesreasonRow.text)
   }
   override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved): ConnectionIO[SalesorderheadersalesreasonRow] = {
     val fs = List(
@@ -73,6 +70,9 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
     q.query(using SalesorderheadersalesreasonRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderheadersalesreasonRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalesorderheadersalesreasonRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesorderheadersalesreasonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalesorderheadersalesreasonRowUnsaved.text)
@@ -96,6 +96,9 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
        """.query(using SalesorderheadersalesreasonRow.read).stream
     
   }
+  override def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
+    UpdateBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure, SalesorderheadersalesreasonRow.read)
+  }
   override def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.salesorderheadersalesreason
@@ -104,9 +107,6 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
-    UpdateBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure, SalesorderheadersalesreasonRow.read)
   }
   override def upsert(unsaved: SalesorderheadersalesreasonRow): ConnectionIO[SalesorderheadersalesreasonRow] = {
     sql"""insert into sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate")

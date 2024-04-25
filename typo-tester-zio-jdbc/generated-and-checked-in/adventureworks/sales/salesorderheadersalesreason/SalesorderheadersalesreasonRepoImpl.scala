@@ -25,7 +25,10 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRepo {
-  override def delete(compositeId: SalesorderheadersalesreasonId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
+    DeleteBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure)
+  }
+  override def deleteById(compositeId: SalesorderheadersalesreasonId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.salesorderheadersalesreason where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesreasonid" = ${Segment.paramSegment(compositeId.salesreasonid)(SalesreasonId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[SalesorderheadersalesreasonId]): ZIO[ZConnection, Throwable, Long] = {
@@ -38,17 +41,11 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
        """.delete
     
   }
-  override def delete: DeleteBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
-    DeleteBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure)
-  }
   override def insert(unsaved: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, SalesorderheadersalesreasonRow] = {
     sql"""insert into sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate")
           values (${Segment.paramSegment(unsaved.salesorderid)(SalesorderheaderId.setter)}::int4, ${Segment.paramSegment(unsaved.salesreasonid)(SalesreasonId.setter)}::int4, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "salesorderid", "salesreasonid", "modifieddate"::text
        """.insertReturning(using SalesorderheadersalesreasonRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderheadersalesreasonRow.text)
   }
   override def insert(unsaved: SalesorderheadersalesreasonRowUnsaved): ZIO[ZConnection, Throwable, SalesorderheadersalesreasonRow] = {
     val fs = List(
@@ -71,6 +68,9 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
     }
     q.insertReturning(using SalesorderheadersalesreasonRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderheadersalesreasonRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -95,14 +95,14 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
        """.query(using SalesorderheadersalesreasonRow.jdbcDecoder).selectStream()
     
   }
+  override def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
+    UpdateBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure, SalesorderheadersalesreasonRow.jdbcDecoder)
+  }
   override def update(row: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.salesorderheadersalesreason
           set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesreasonid" = ${Segment.paramSegment(compositeId.salesreasonid)(SalesreasonId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
-    UpdateBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure, SalesorderheadersalesreasonRow.jdbcDecoder)
   }
   override def upsert(unsaved: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderheadersalesreasonRow]] = {
     sql"""insert into sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate")

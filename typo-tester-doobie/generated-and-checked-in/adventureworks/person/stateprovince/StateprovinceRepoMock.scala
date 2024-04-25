@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, StateprovinceRow],
                             map: scala.collection.mutable.Map[StateprovinceId, StateprovinceRow] = scala.collection.mutable.Map.empty) extends StateprovinceRepo {
-  override def delete(stateprovinceid: StateprovinceId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
+    DeleteBuilderMock(DeleteParams.empty, StateprovinceFields.structure.fields, map)
+  }
+  override def deleteById(stateprovinceid: StateprovinceId): ConnectionIO[Boolean] = {
     delay(map.remove(stateprovinceid).isDefined)
   }
   override def deleteByIds(stateprovinceids: Array[StateprovinceId]): ConnectionIO[Int] = {
     delay(stateprovinceids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
-    DeleteBuilderMock(DeleteParams.empty, StateprovinceFields.structure.fields, map)
   }
   override def insert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     delay {
@@ -42,6 +42,9 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
       unsaved
     }
   }
+  override def insert(unsaved: StateprovinceRowUnsaved): ConnectionIO[StateprovinceRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, StateprovinceRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
       }
       num
     }
-  }
-  override def insert(unsaved: StateprovinceRowUnsaved): ConnectionIO[StateprovinceRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, StateprovinceRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
   override def selectByIds(stateprovinceids: Array[StateprovinceId]): Stream[ConnectionIO, StateprovinceRow] = {
     Stream.emits(stateprovinceids.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
+    UpdateBuilderMock(UpdateParams.empty, StateprovinceFields.structure.fields, map)
+  }
   override def update(row: StateprovinceRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.stateprovinceid) match {
@@ -89,9 +92,6 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
-    UpdateBuilderMock(UpdateParams.empty, StateprovinceFields.structure.fields, map)
   }
   override def upsert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     delay {

@@ -25,7 +25,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class AddresstypeRepoImpl extends AddresstypeRepo {
-  override def delete(addresstypeid: AddresstypeId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
+    DeleteBuilder("person.addresstype", AddresstypeFields.structure)
+  }
+  override def deleteById(addresstypeid: AddresstypeId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.addresstype where "addresstypeid" = ${ParameterValue(addresstypeid, null, AddresstypeId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(addresstypeids: Array[AddresstypeId])(implicit c: Connection): Int = {
@@ -35,9 +38,6 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
-    DeleteBuilder("person.addresstype", AddresstypeFields.structure)
-  }
   override def insert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {
     SQL"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.addresstypeid, null, AddresstypeId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -45,9 +45,6 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
        """
       .executeInsert(AddresstypeRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[AddresstypeRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.addresstype("addresstypeid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(AddresstypeRow.text, c)
   }
   override def insert(unsaved: AddresstypeRowUnsaved)(implicit c: Connection): AddresstypeRow = {
     val namedParameters = List(
@@ -81,6 +78,9 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[AddresstypeRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.addresstype("addresstypeid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(AddresstypeRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[AddresstypeRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY person.addresstype("name", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(AddresstypeRowUnsaved.text, c)
@@ -106,6 +106,9 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
        """.as(AddresstypeRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
+    UpdateBuilder("person.addresstype", AddresstypeFields.structure, AddresstypeRow.rowParser)
+  }
   override def update(row: AddresstypeRow)(implicit c: Connection): Boolean = {
     val addresstypeid = row.addresstypeid
     SQL"""update person.addresstype
@@ -114,9 +117,6 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "addresstypeid" = ${ParameterValue(addresstypeid, null, AddresstypeId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
-    UpdateBuilder("person.addresstype", AddresstypeFields.structure, AddresstypeRow.rowParser)
   }
   override def upsert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {
     SQL"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")

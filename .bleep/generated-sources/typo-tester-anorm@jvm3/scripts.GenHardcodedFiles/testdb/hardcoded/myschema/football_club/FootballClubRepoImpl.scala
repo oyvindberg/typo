@@ -23,7 +23,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class FootballClubRepoImpl extends FootballClubRepo {
-  override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
+    DeleteBuilder("myschema.football_club", FootballClubFields.structure)
+  }
+  override def deleteById(id: FootballClubId)(implicit c: Connection): Boolean = {
     SQL"""delete from myschema.football_club where "id" = ${ParameterValue(id, null, FootballClubId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(ids: Array[FootballClubId])(implicit c: Connection): Int = {
@@ -32,9 +35,6 @@ class FootballClubRepoImpl extends FootballClubRepo {
           where "id" = ANY(${ids})
        """.executeUpdate()
     
-  }
-  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
-    DeleteBuilder("myschema.football_club", FootballClubFields.structure)
   }
   override def insert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
     SQL"""insert into myschema.football_club("id", "name")
@@ -55,19 +55,6 @@ class FootballClubRepoImpl extends FootballClubRepo {
           from myschema.football_club
        """.as(FootballClubRow.rowParser(1).*)
   }
-  override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = {
-    SQL"""select "id", "name"
-          from myschema.football_club
-          where "id" = ${ParameterValue(id, null, FootballClubId.toStatement)}
-       """.as(FootballClubRow.rowParser(1).singleOpt)
-  }
-  override def selectByIds(ids: Array[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
-    SQL"""select "id", "name"
-          from myschema.football_club
-          where "id" = ANY(${ids})
-       """.as(FootballClubRow.rowParser(1).*)
-    
-  }
   override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]])(implicit c: Connection): List[FootballClubRow] = {
     fieldValues match {
       case Nil => selectAll
@@ -86,15 +73,28 @@ class FootballClubRepoImpl extends FootballClubRepo {
     }
     
   }
+  override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = {
+    SQL"""select "id", "name"
+          from myschema.football_club
+          where "id" = ${ParameterValue(id, null, FootballClubId.toStatement)}
+       """.as(FootballClubRow.rowParser(1).singleOpt)
+  }
+  override def selectByIds(ids: Array[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
+    SQL"""select "id", "name"
+          from myschema.football_club
+          where "id" = ANY(${ids})
+       """.as(FootballClubRow.rowParser(1).*)
+    
+  }
+  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
+    UpdateBuilder("myschema.football_club", FootballClubFields.structure, FootballClubRow.rowParser)
+  }
   override def update(row: FootballClubRow)(implicit c: Connection): Boolean = {
     val id = row.id
     SQL"""update myschema.football_club
           set "name" = ${ParameterValue(row.name, null, ToStatement.stringToStatement)}
           where "id" = ${ParameterValue(id, null, FootballClubId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
-    UpdateBuilder("myschema.football_club", FootballClubFields.structure, FootballClubRow.rowParser)
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]])(implicit c: Connection): Boolean = {
     fieldValues match {

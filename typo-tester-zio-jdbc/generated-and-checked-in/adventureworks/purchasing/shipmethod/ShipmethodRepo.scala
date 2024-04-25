@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait ShipmethodRepo {
-  def delete(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(shipmethodids: Array[ShipmethodId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow]
+  def deleteById(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(shipmethodids: Array[ShipmethodId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, ShipmethodRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ShipmethodRowUnsaved): ZIO[ZConnection, Throwable, ShipmethodRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[ShipmethodFields, ShipmethodRow]
   def selectAll: ZStream[ZConnection, Throwable, ShipmethodRow]
   def selectById(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Option[ShipmethodRow]]
   def selectByIds(shipmethodids: Array[ShipmethodId]): ZStream[ZConnection, Throwable, ShipmethodRow]
-  def update(row: ShipmethodRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[ShipmethodFields, ShipmethodRow]
+  def update(row: ShipmethodRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, UpdateResult[ShipmethodRow]]
 }

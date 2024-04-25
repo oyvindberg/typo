@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait ScrapreasonRepo {
-  def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean
-  def deleteByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): Int
   def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow]
+  def deleteById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean
+  def deleteByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): Int
   def insert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow
-  def insertStreaming(unsaved: Iterator[ScrapreasonRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow
+  def insertStreaming(unsaved: Iterator[ScrapreasonRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[ScrapreasonRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow]
   def selectAll(implicit c: Connection): List[ScrapreasonRow]
   def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow]
   def selectByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow]
-  def update(row: ScrapreasonRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow]
+  def update(row: ScrapreasonRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow
 }

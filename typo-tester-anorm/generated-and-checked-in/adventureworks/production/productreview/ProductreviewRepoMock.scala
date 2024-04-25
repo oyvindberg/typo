@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, ProductreviewRow],
                             map: scala.collection.mutable.Map[ProductreviewId, ProductreviewRow] = scala.collection.mutable.Map.empty) extends ProductreviewRepo {
-  override def delete(productreviewid: ProductreviewId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductreviewFields.structure.fields, map)
+  }
+  override def deleteById(productreviewid: ProductreviewId)(implicit c: Connection): Boolean = {
     map.remove(productreviewid).isDefined
   }
   override def deleteByIds(productreviewids: Array[ProductreviewId])(implicit c: Connection): Int = {
     productreviewids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductreviewFields.structure.fields, map)
   }
   override def insert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     val _ = if (map.contains(unsaved.productreviewid))
@@ -38,14 +38,14 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
     
     unsaved
   }
+  override def insert(unsaved: ProductreviewRowUnsaved)(implicit c: Connection): ProductreviewRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[ProductreviewRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.productreviewid -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: ProductreviewRowUnsaved)(implicit c: Connection): ProductreviewRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductreviewRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
   override def selectByIds(productreviewids: Array[ProductreviewId])(implicit c: Connection): List[ProductreviewRow] = {
     productreviewids.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductreviewFields.structure.fields, map)
+  }
   override def update(row: ProductreviewRow)(implicit c: Connection): Boolean = {
     map.get(row.productreviewid) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductreviewFields.structure.fields, map)
   }
   override def upsert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     map.put(unsaved.productreviewid, unsaved): @nowarn

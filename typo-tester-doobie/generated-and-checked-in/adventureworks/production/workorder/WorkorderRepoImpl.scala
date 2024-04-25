@@ -26,23 +26,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class WorkorderRepoImpl extends WorkorderRepo {
-  override def delete(workorderid: WorkorderId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
+    DeleteBuilder("production.workorder", WorkorderFields.structure)
+  }
+  override def deleteById(workorderid: WorkorderId): ConnectionIO[Boolean] = {
     sql"""delete from production.workorder where "workorderid" = ${fromWrite(workorderid)(Write.fromPut(WorkorderId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(workorderids: Array[WorkorderId]): ConnectionIO[Int] = {
     sql"""delete from production.workorder where "workorderid" = ANY(${workorderids})""".update.run
-  }
-  override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
-    DeleteBuilder("production.workorder", WorkorderFields.structure)
   }
   override def insert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
           values (${fromWrite(unsaved.workorderid)(Write.fromPut(WorkorderId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.scrappedqty)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.scrapreasonid)(Write.fromPutOption(ScrapreasonId.put))}::int2, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
        """.query(using WorkorderRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using WorkorderRow.text)
   }
   override def insert(unsaved: WorkorderRowUnsaved): ConnectionIO[WorkorderRow] = {
     val fs = List(
@@ -77,6 +74,9 @@ class WorkorderRepoImpl extends WorkorderRepo {
     q.query(using WorkorderRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using WorkorderRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, WorkorderRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.workorder("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using WorkorderRowUnsaved.text)
@@ -93,6 +93,9 @@ class WorkorderRepoImpl extends WorkorderRepo {
   override def selectByIds(workorderids: Array[WorkorderId]): Stream[ConnectionIO, WorkorderRow] = {
     sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ANY(${workorderids})""".query(using WorkorderRow.read).stream
   }
+  override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
+    UpdateBuilder("production.workorder", WorkorderFields.structure, WorkorderRow.read)
+  }
   override def update(row: WorkorderRow): ConnectionIO[Boolean] = {
     val workorderid = row.workorderid
     sql"""update production.workorder
@@ -108,9 +111,6 @@ class WorkorderRepoImpl extends WorkorderRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
-    UpdateBuilder("production.workorder", WorkorderFields.structure, WorkorderRow.read)
   }
   override def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")

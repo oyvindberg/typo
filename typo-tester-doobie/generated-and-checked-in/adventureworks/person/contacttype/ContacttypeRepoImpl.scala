@@ -23,23 +23,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ContacttypeRepoImpl extends ContacttypeRepo {
-  override def delete(contacttypeid: ContacttypeId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
+    DeleteBuilder("person.contacttype", ContacttypeFields.structure)
+  }
+  override def deleteById(contacttypeid: ContacttypeId): ConnectionIO[Boolean] = {
     sql"""delete from person.contacttype where "contacttypeid" = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(contacttypeids: Array[ContacttypeId]): ConnectionIO[Int] = {
     sql"""delete from person.contacttype where "contacttypeid" = ANY(${contacttypeids})""".update.run
-  }
-  override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
-    DeleteBuilder("person.contacttype", ContacttypeFields.structure)
   }
   override def insert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
           values (${fromWrite(unsaved.contacttypeid)(Write.fromPut(ContacttypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "contacttypeid", "name", "modifieddate"::text
        """.query(using ContacttypeRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ContacttypeRow.text)
   }
   override def insert(unsaved: ContacttypeRowUnsaved): ConnectionIO[ContacttypeRow] = {
     val fs = List(
@@ -68,6 +65,9 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     q.query(using ContacttypeRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ContacttypeRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ContacttypeRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY person.contacttype("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ContacttypeRowUnsaved.text)
@@ -84,6 +84,9 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
   override def selectByIds(contacttypeids: Array[ContacttypeId]): Stream[ConnectionIO, ContacttypeRow] = {
     sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype where "contacttypeid" = ANY(${contacttypeids})""".query(using ContacttypeRow.read).stream
   }
+  override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
+    UpdateBuilder("person.contacttype", ContacttypeFields.structure, ContacttypeRow.read)
+  }
   override def update(row: ContacttypeRow): ConnectionIO[Boolean] = {
     val contacttypeid = row.contacttypeid
     sql"""update person.contacttype
@@ -93,9 +96,6 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
-    UpdateBuilder("person.contacttype", ContacttypeFields.structure, ContacttypeRow.read)
   }
   override def upsert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")

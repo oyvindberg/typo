@@ -25,23 +25,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class PasswordRepoImpl extends PasswordRepo {
-  override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
+    DeleteBuilder("person.password", PasswordFields.structure)
+  }
+  override def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     sql"""delete from person.password where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
     sql"""delete from person.password where "businessentityid" = ANY(${businessentityids})""".update.run
-  }
-  override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
-    DeleteBuilder("person.password", PasswordFields.structure)
   }
   override def insert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.passwordhash)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.passwordsalt)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
        """.query(using PasswordRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, PasswordRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PasswordRow.text)
   }
   override def insert(unsaved: PasswordRowUnsaved): ConnectionIO[PasswordRow] = {
     val fs = List(
@@ -72,6 +69,9 @@ class PasswordRepoImpl extends PasswordRepo {
     q.query(using PasswordRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, PasswordRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PasswordRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PasswordRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PasswordRowUnsaved.text)
@@ -88,6 +88,9 @@ class PasswordRepoImpl extends PasswordRepo {
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PasswordRow] = {
     sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ANY(${businessentityids})""".query(using PasswordRow.read).stream
   }
+  override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
+    UpdateBuilder("person.password", PasswordFields.structure, PasswordRow.read)
+  }
   override def update(row: PasswordRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update person.password
@@ -99,9 +102,6 @@ class PasswordRepoImpl extends PasswordRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
-    UpdateBuilder("person.password", PasswordFields.structure, PasswordRow.read)
   }
   override def upsert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")

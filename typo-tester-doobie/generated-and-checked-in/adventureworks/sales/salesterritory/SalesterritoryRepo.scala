@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait SalesterritoryRepo {
-  def delete(territoryid: SalesterritoryId): ConnectionIO[Boolean]
-  def deleteByIds(territoryids: Array[SalesterritoryId]): ConnectionIO[Int]
   def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow]
+  def deleteById(territoryid: SalesterritoryId): ConnectionIO[Boolean]
+  def deleteByIds(territoryids: Array[SalesterritoryId]): ConnectionIO[Int]
   def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow]
   def selectAll: Stream[ConnectionIO, SalesterritoryRow]
   def selectById(territoryid: SalesterritoryId): ConnectionIO[Option[SalesterritoryRow]]
   def selectByIds(territoryids: Array[SalesterritoryId]): Stream[ConnectionIO, SalesterritoryRow]
-  def update(row: SalesterritoryRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow]
+  def update(row: SalesterritoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow]
 }

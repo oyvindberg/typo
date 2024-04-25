@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait CurrencyrateRepo {
-  def delete(currencyrateid: CurrencyrateId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(currencyrateids: Array[CurrencyrateId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow]
+  def deleteById(currencyrateid: CurrencyrateId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(currencyrateids: Array[CurrencyrateId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: CurrencyrateRow): ZIO[ZConnection, Throwable, CurrencyrateRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyrateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: CurrencyrateRowUnsaved): ZIO[ZConnection, Throwable, CurrencyrateRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyrateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyrateRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow]
   def selectAll: ZStream[ZConnection, Throwable, CurrencyrateRow]
   def selectById(currencyrateid: CurrencyrateId): ZIO[ZConnection, Throwable, Option[CurrencyrateRow]]
   def selectByIds(currencyrateids: Array[CurrencyrateId]): ZStream[ZConnection, Throwable, CurrencyrateRow]
-  def update(row: CurrencyrateRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow]
+  def update(row: CurrencyrateRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CurrencyrateRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyrateRow]]
 }

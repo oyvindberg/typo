@@ -26,7 +26,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class UsersRepoImpl extends UsersRepo {
-  override def delete(userId: UsersId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[UsersFields, UsersRow] = {
+    DeleteBuilder("public.users", UsersFields.structure)
+  }
+  override def deleteById(userId: UsersId)(implicit c: Connection): Boolean = {
     SQL"""delete from public.users where "user_id" = ${ParameterValue(userId, null, UsersId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(userIds: Array[UsersId])(implicit c: Connection): Int = {
@@ -36,9 +39,6 @@ class UsersRepoImpl extends UsersRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[UsersFields, UsersRow] = {
-    DeleteBuilder("public.users", UsersFields.structure)
-  }
   override def insert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
     SQL"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
           values (${ParameterValue(unsaved.userId, null, UsersId.toStatement)}::uuid, ${ParameterValue(unsaved.name, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.lastName, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.email, null, TypoUnknownCitext.toStatement)}::citext, ${ParameterValue(unsaved.password, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.createdAt, null, TypoInstant.toStatement)}::timestamptz, ${ParameterValue(unsaved.verifiedOn, null, ToStatement.optionToStatement(TypoInstant.toStatement, TypoInstant.parameterMetadata))}::timestamptz)
@@ -46,9 +46,6 @@ class UsersRepoImpl extends UsersRepo {
        """
       .executeInsert(UsersRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[UsersRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""", batchSize, unsaved)(UsersRow.text, c)
   }
   override def insert(unsaved: UsersRowUnsaved)(implicit c: Connection): UsersRow = {
     val namedParameters = List(
@@ -78,6 +75,9 @@ class UsersRepoImpl extends UsersRepo {
         .executeInsert(UsersRow.rowParser(1).single)
     }
     
+  }
+  override def insertStreaming(unsaved: Iterator[UsersRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""", batchSize, unsaved)(UsersRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[UsersRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -111,6 +111,9 @@ class UsersRepoImpl extends UsersRepo {
        """.as(UsersRow.rowParser(1).singleOpt)
     
   }
+  override def update: UpdateBuilder[UsersFields, UsersRow] = {
+    UpdateBuilder("public.users", UsersFields.structure, UsersRow.rowParser)
+  }
   override def update(row: UsersRow)(implicit c: Connection): Boolean = {
     val userId = row.userId
     SQL"""update public.users
@@ -122,9 +125,6 @@ class UsersRepoImpl extends UsersRepo {
               "verified_on" = ${ParameterValue(row.verifiedOn, null, ToStatement.optionToStatement(TypoInstant.toStatement, TypoInstant.parameterMetadata))}::timestamptz
           where "user_id" = ${ParameterValue(userId, null, UsersId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[UsersFields, UsersRow] = {
-    UpdateBuilder("public.users", UsersFields.structure, UsersRow.rowParser)
   }
   override def upsert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
     SQL"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")

@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait ContacttypeRepo {
-  def delete(contacttypeid: ContacttypeId): ConnectionIO[Boolean]
-  def deleteByIds(contacttypeids: Array[ContacttypeId]): ConnectionIO[Int]
   def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow]
+  def deleteById(contacttypeid: ContacttypeId): ConnectionIO[Boolean]
+  def deleteByIds(contacttypeids: Array[ContacttypeId]): ConnectionIO[Int]
   def insert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ContacttypeRowUnsaved): ConnectionIO[ContacttypeRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ContacttypeRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ContacttypeFields, ContacttypeRow]
   def selectAll: Stream[ConnectionIO, ContacttypeRow]
   def selectById(contacttypeid: ContacttypeId): ConnectionIO[Option[ContacttypeRow]]
   def selectByIds(contacttypeids: Array[ContacttypeId]): Stream[ConnectionIO, ContacttypeRow]
-  def update(row: ContacttypeRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[ContacttypeFields, ContacttypeRow]
+  def update(row: ContacttypeRow): ConnectionIO[Boolean]
   def upsert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow]
 }

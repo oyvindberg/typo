@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
                        map: scala.collection.mutable.Map[LocationId, LocationRow] = scala.collection.mutable.Map.empty) extends LocationRepo {
-  override def delete(locationid: LocationId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[LocationFields, LocationRow] = {
+    DeleteBuilderMock(DeleteParams.empty, LocationFields.structure.fields, map)
+  }
+  override def deleteById(locationid: LocationId)(implicit c: Connection): Boolean = {
     map.remove(locationid).isDefined
   }
   override def deleteByIds(locationids: Array[LocationId])(implicit c: Connection): Int = {
     locationids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilderMock(DeleteParams.empty, LocationFields.structure.fields, map)
   }
   override def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     val _ = if (map.contains(unsaved.locationid))
@@ -38,14 +38,14 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
     
     unsaved
   }
+  override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[LocationRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.locationid -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[LocationRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
   override def selectByIds(locationids: Array[LocationId])(implicit c: Connection): List[LocationRow] = {
     locationids.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[LocationFields, LocationRow] = {
+    UpdateBuilderMock(UpdateParams.empty, LocationFields.structure.fields, map)
+  }
   override def update(row: LocationRow)(implicit c: Connection): Boolean = {
     map.get(row.locationid) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilderMock(UpdateParams.empty, LocationFields.structure.fields, map)
   }
   override def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     map.put(unsaved.locationid, unsaved): @nowarn

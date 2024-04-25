@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, ProductreviewRow],
                             map: scala.collection.mutable.Map[ProductreviewId, ProductreviewRow] = scala.collection.mutable.Map.empty) extends ProductreviewRepo {
-  override def delete(productreviewid: ProductreviewId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductreviewFields.structure.fields, map)
+  }
+  override def deleteById(productreviewid: ProductreviewId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(productreviewid).isDefined)
   }
   override def deleteByIds(productreviewids: Array[ProductreviewId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(productreviewids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductreviewFields.structure.fields, map)
   }
   override def insert(unsaved: ProductreviewRow): ZIO[ZConnection, Throwable, ProductreviewRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
       unsaved
     }
   }
+  override def insert(unsaved: ProductreviewRowUnsaved): ZIO[ZConnection, Throwable, ProductreviewRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductreviewRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: ProductreviewRowUnsaved): ZIO[ZConnection, Throwable, ProductreviewRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductreviewRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
   override def selectByIds(productreviewids: Array[ProductreviewId]): ZStream[ZConnection, Throwable, ProductreviewRow] = {
     ZStream.fromIterable(productreviewids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductreviewFields.structure.fields, map)
+  }
   override def update(row: ProductreviewRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.productreviewid) match {
@@ -88,9 +91,6 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductreviewFields.structure.fields, map)
   }
   override def upsert(unsaved: ProductreviewRow): ZIO[ZConnection, Throwable, UpdateResult[ProductreviewRow]] = {
     ZIO.succeed {

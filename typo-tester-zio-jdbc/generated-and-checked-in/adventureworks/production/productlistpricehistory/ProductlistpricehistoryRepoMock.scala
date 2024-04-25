@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class ProductlistpricehistoryRepoMock(toRow: Function1[ProductlistpricehistoryRowUnsaved, ProductlistpricehistoryRow],
                                       map: scala.collection.mutable.Map[ProductlistpricehistoryId, ProductlistpricehistoryRow] = scala.collection.mutable.Map.empty) extends ProductlistpricehistoryRepo {
-  override def delete(compositeId: ProductlistpricehistoryId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductlistpricehistoryFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: ProductlistpricehistoryId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
   override def deleteByIds(compositeIds: Array[ProductlistpricehistoryId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(compositeIds.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductlistpricehistoryFields.structure.fields, map)
   }
   override def insert(unsaved: ProductlistpricehistoryRow): ZIO[ZConnection, Throwable, ProductlistpricehistoryRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class ProductlistpricehistoryRepoMock(toRow: Function1[ProductlistpricehistoryRo
       unsaved
     }
   }
+  override def insert(unsaved: ProductlistpricehistoryRowUnsaved): ZIO[ZConnection, Throwable, ProductlistpricehistoryRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductlistpricehistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class ProductlistpricehistoryRepoMock(toRow: Function1[ProductlistpricehistoryRo
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: ProductlistpricehistoryRowUnsaved): ZIO[ZConnection, Throwable, ProductlistpricehistoryRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductlistpricehistoryRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class ProductlistpricehistoryRepoMock(toRow: Function1[ProductlistpricehistoryRo
   override def selectByIds(compositeIds: Array[ProductlistpricehistoryId]): ZStream[ZConnection, Throwable, ProductlistpricehistoryRow] = {
     ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
+  override def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductlistpricehistoryFields.structure.fields, map)
+  }
   override def update(row: ProductlistpricehistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.compositeId) match {
@@ -88,9 +91,6 @@ class ProductlistpricehistoryRepoMock(toRow: Function1[ProductlistpricehistoryRo
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductlistpricehistoryFields.structure.fields, map)
   }
   override def upsert(unsaved: ProductlistpricehistoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductlistpricehistoryRow]] = {
     ZIO.succeed {

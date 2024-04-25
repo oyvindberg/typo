@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class SalesreasonRepoImpl extends SalesreasonRepo {
-  override def delete(salesreasonid: SalesreasonId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow] = {
+    DeleteBuilder("sales.salesreason", SalesreasonFields.structure)
+  }
+  override def deleteById(salesreasonid: SalesreasonId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.salesreason where "salesreasonid" = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): Int = {
@@ -34,9 +37,6 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow] = {
-    DeleteBuilder("sales.salesreason", SalesreasonFields.structure)
-  }
   override def insert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
     SQL"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
           values (${ParameterValue(unsaved.salesreasonid, null, SalesreasonId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.reasontype, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -44,9 +44,6 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
        """
       .executeInsert(SalesreasonRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[SalesreasonRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesreasonRow.text, c)
   }
   override def insert(unsaved: SalesreasonRowUnsaved)(implicit c: Connection): SalesreasonRow = {
     val namedParameters = List(
@@ -77,6 +74,9 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[SalesreasonRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesreasonRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SalesreasonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY sales.salesreason("name", "reasontype", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesreasonRowUnsaved.text, c)
@@ -102,6 +102,9 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
        """.as(SalesreasonRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
+    UpdateBuilder("sales.salesreason", SalesreasonFields.structure, SalesreasonRow.rowParser)
+  }
   override def update(row: SalesreasonRow)(implicit c: Connection): Boolean = {
     val salesreasonid = row.salesreasonid
     SQL"""update sales.salesreason
@@ -110,9 +113,6 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "salesreasonid" = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
-    UpdateBuilder("sales.salesreason", SalesreasonFields.structure, SalesreasonRow.rowParser)
   }
   override def upsert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
     SQL"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")

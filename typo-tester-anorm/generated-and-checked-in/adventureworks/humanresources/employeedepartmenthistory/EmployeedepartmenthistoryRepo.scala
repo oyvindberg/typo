@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait EmployeedepartmenthistoryRepo {
-  def delete(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Boolean
-  def deleteByIds(compositeIds: Array[EmployeedepartmenthistoryId])(implicit c: Connection): Int
   def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow]
+  def deleteById(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Boolean
+  def deleteByIds(compositeIds: Array[EmployeedepartmenthistoryId])(implicit c: Connection): Int
   def insert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow
-  def insertStreaming(unsaved: Iterator[EmployeedepartmenthistoryRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: EmployeedepartmenthistoryRowUnsaved)(implicit c: Connection): EmployeedepartmenthistoryRow
+  def insertStreaming(unsaved: Iterator[EmployeedepartmenthistoryRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[EmployeedepartmenthistoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow]
   def selectAll(implicit c: Connection): List[EmployeedepartmenthistoryRow]
   def selectById(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Option[EmployeedepartmenthistoryRow]
   def selectByIds(compositeIds: Array[EmployeedepartmenthistoryId])(implicit c: Connection): List[EmployeedepartmenthistoryRow]
-  def update(row: EmployeedepartmenthistoryRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow]
+  def update(row: EmployeedepartmenthistoryRow)(implicit c: Connection): Boolean
   def upsert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow
 }

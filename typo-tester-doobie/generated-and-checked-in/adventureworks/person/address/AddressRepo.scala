@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait AddressRepo {
-  def delete(addressid: AddressId): ConnectionIO[Boolean]
-  def deleteByIds(addressids: Array[AddressId]): ConnectionIO[Int]
   def delete: DeleteBuilder[AddressFields, AddressRow]
+  def deleteById(addressid: AddressId): ConnectionIO[Boolean]
+  def deleteByIds(addressids: Array[AddressId]): ConnectionIO[Int]
   def insert(unsaved: AddressRow): ConnectionIO[AddressRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, AddressRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, AddressRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, AddressRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[AddressFields, AddressRow]
   def selectAll: Stream[ConnectionIO, AddressRow]
   def selectById(addressid: AddressId): ConnectionIO[Option[AddressRow]]
   def selectByIds(addressids: Array[AddressId]): Stream[ConnectionIO, AddressRow]
-  def update(row: AddressRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[AddressFields, AddressRow]
+  def update(row: AddressRow): ConnectionIO[Boolean]
   def upsert(unsaved: AddressRow): ConnectionIO[AddressRow]
 }

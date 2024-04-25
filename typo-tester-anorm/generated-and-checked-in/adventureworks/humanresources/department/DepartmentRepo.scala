@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait DepartmentRepo {
-  def delete(departmentid: DepartmentId)(implicit c: Connection): Boolean
-  def deleteByIds(departmentids: Array[DepartmentId])(implicit c: Connection): Int
   def delete: DeleteBuilder[DepartmentFields, DepartmentRow]
+  def deleteById(departmentid: DepartmentId)(implicit c: Connection): Boolean
+  def deleteByIds(departmentids: Array[DepartmentId])(implicit c: Connection): Int
   def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow
-  def insertStreaming(unsaved: Iterator[DepartmentRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: DepartmentRowUnsaved)(implicit c: Connection): DepartmentRow
+  def insertStreaming(unsaved: Iterator[DepartmentRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[DepartmentRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[DepartmentFields, DepartmentRow]
   def selectAll(implicit c: Connection): List[DepartmentRow]
   def selectById(departmentid: DepartmentId)(implicit c: Connection): Option[DepartmentRow]
   def selectByIds(departmentids: Array[DepartmentId])(implicit c: Connection): List[DepartmentRow]
-  def update(row: DepartmentRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[DepartmentFields, DepartmentRow]
+  def update(row: DepartmentRow)(implicit c: Connection): Boolean
   def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow
 }

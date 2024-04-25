@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait IllustrationRepo {
-  def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean
-  def deleteByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): Int
   def delete: DeleteBuilder[IllustrationFields, IllustrationRow]
+  def deleteById(illustrationid: IllustrationId)(implicit c: Connection): Boolean
+  def deleteByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): Int
   def insert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow
-  def insertStreaming(unsaved: Iterator[IllustrationRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow
+  def insertStreaming(unsaved: Iterator[IllustrationRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[IllustrationRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[IllustrationFields, IllustrationRow]
   def selectAll(implicit c: Connection): List[IllustrationRow]
   def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow]
   def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow]
-  def update(row: IllustrationRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[IllustrationFields, IllustrationRow]
+  def update(row: IllustrationRow)(implicit c: Connection): Boolean
   def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow
 }

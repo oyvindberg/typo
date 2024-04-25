@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, TransactionhistoryRow],
                                  map: scala.collection.mutable.Map[TransactionhistoryId, TransactionhistoryRow] = scala.collection.mutable.Map.empty) extends TransactionhistoryRepo {
-  override def delete(transactionid: TransactionhistoryId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
+    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryFields.structure.fields, map)
+  }
+  override def deleteById(transactionid: TransactionhistoryId): ConnectionIO[Boolean] = {
     delay(map.remove(transactionid).isDefined)
   }
   override def deleteByIds(transactionids: Array[TransactionhistoryId]): ConnectionIO[Int] = {
     delay(transactionids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryFields.structure.fields, map)
   }
   override def insert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     delay {
@@ -42,6 +42,9 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
       unsaved
     }
   }
+  override def insert(unsaved: TransactionhistoryRowUnsaved): ConnectionIO[TransactionhistoryRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
       }
       num
     }
-  }
-  override def insert(unsaved: TransactionhistoryRowUnsaved): ConnectionIO[TransactionhistoryRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
   override def selectByIds(transactionids: Array[TransactionhistoryId]): Stream[ConnectionIO, TransactionhistoryRow] = {
     Stream.emits(transactionids.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
+    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryFields.structure.fields, map)
+  }
   override def update(row: TransactionhistoryRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.transactionid) match {
@@ -89,9 +92,6 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryFields.structure.fields, map)
   }
   override def upsert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     delay {

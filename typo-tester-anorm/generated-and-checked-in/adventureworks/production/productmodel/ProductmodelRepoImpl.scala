@@ -27,7 +27,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductmodelRepoImpl extends ProductmodelRepo {
-  override def delete(productmodelid: ProductmodelId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ProductmodelFields, ProductmodelRow] = {
+    DeleteBuilder("production.productmodel", ProductmodelFields.structure)
+  }
+  override def deleteById(productmodelid: ProductmodelId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productmodel where "productmodelid" = ${ParameterValue(productmodelid, null, ProductmodelId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(productmodelids: Array[ProductmodelId])(implicit c: Connection): Int = {
@@ -37,9 +40,6 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[ProductmodelFields, ProductmodelRow] = {
-    DeleteBuilder("production.productmodel", ProductmodelFields.structure)
-  }
   override def insert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
     SQL"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.catalogdescription, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.instructions, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -47,9 +47,6 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
        """
       .executeInsert(ProductmodelRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[ProductmodelRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelRow.text, c)
   }
   override def insert(unsaved: ProductmodelRowUnsaved)(implicit c: Connection): ProductmodelRow = {
     val namedParameters = List(
@@ -85,6 +82,9 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[ProductmodelRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductmodelRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.productmodel("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductmodelRowUnsaved.text, c)
@@ -110,6 +110,9 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
        """.as(ProductmodelRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[ProductmodelFields, ProductmodelRow] = {
+    UpdateBuilder("production.productmodel", ProductmodelFields.structure, ProductmodelRow.rowParser)
+  }
   override def update(row: ProductmodelRow)(implicit c: Connection): Boolean = {
     val productmodelid = row.productmodelid
     SQL"""update production.productmodel
@@ -120,9 +123,6 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productmodelid" = ${ParameterValue(productmodelid, null, ProductmodelId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[ProductmodelFields, ProductmodelRow] = {
-    UpdateBuilder("production.productmodel", ProductmodelFields.structure, ProductmodelRow.rowParser)
   }
   override def upsert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
     SQL"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")

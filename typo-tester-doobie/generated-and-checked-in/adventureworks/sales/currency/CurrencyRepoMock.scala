@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
                        map: scala.collection.mutable.Map[CurrencyId, CurrencyRow] = scala.collection.mutable.Map.empty) extends CurrencyRepo {
-  override def delete(currencycode: CurrencyId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CurrencyFields.structure.fields, map)
+  }
+  override def deleteById(currencycode: CurrencyId): ConnectionIO[Boolean] = {
     delay(map.remove(currencycode).isDefined)
   }
   override def deleteByIds(currencycodes: Array[CurrencyId]): ConnectionIO[Int] = {
     delay(currencycodes.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CurrencyFields.structure.fields, map)
   }
   override def insert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     delay {
@@ -42,6 +42,9 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
       unsaved
     }
   }
+  override def insert(unsaved: CurrencyRowUnsaved): ConnectionIO[CurrencyRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, CurrencyRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
       }
       num
     }
-  }
-  override def insert(unsaved: CurrencyRowUnsaved): ConnectionIO[CurrencyRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CurrencyRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
   override def selectByIds(currencycodes: Array[CurrencyId]): Stream[ConnectionIO, CurrencyRow] = {
     Stream.emits(currencycodes.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CurrencyFields.structure.fields, map)
+  }
   override def update(row: CurrencyRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.currencycode) match {
@@ -89,9 +92,6 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CurrencyFields.structure.fields, map)
   }
   override def upsert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     delay {

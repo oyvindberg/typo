@@ -20,14 +20,14 @@ import typo.dsl.UpdateBuilder.UpdateBuilderMock
 import typo.dsl.UpdateParams
 
 class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala.collection.mutable.Map.empty) extends FlaffRepo {
-  override def delete(compositeId: FlaffId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
+    DeleteBuilderMock(DeleteParams.empty, FlaffFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: FlaffId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
   }
   override def deleteByIds(compositeIds: Array[FlaffId])(implicit c: Connection): Int = {
     compositeIds.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
-    DeleteBuilderMock(DeleteParams.empty, FlaffFields.structure.fields, map)
   }
   override def insert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow = {
     val _ = if (map.contains(unsaved.compositeId))
@@ -55,6 +55,9 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
   override def selectByIds(compositeIds: Array[FlaffId])(implicit c: Connection): List[FlaffRow] = {
     compositeIds.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
+    UpdateBuilderMock(UpdateParams.empty, FlaffFields.structure.fields, map)
+  }
   override def update(row: FlaffRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
       case Some(`row`) => false
@@ -63,9 +66,6 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
-    UpdateBuilderMock(UpdateParams.empty, FlaffFields.structure.fields, map)
   }
   override def upsert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow = {
     map.put(unsaved.compositeId, unsaved): @nowarn

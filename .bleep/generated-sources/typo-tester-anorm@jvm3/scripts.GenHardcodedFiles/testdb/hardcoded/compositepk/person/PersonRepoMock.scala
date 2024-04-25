@@ -22,11 +22,11 @@ import typo.dsl.UpdateParams
 
 class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
                      map: scala.collection.mutable.Map[PersonId, PersonRow] = scala.collection.mutable.Map.empty) extends PersonRepo {
-  override def delete(compositeId: PersonId)(implicit c: Connection): Boolean = {
-    map.remove(compositeId).isDefined
-  }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
     DeleteBuilderMock(DeleteParams.empty, PersonFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: PersonId)(implicit c: Connection): Boolean = {
+    map.remove(compositeId).isDefined
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     val _ = if (map.contains(unsaved.compositeId))
@@ -36,14 +36,14 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
     
     unsaved
   }
+  override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[PersonRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.compositeId -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[PersonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -59,15 +59,18 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
   override def selectAll(implicit c: Connection): List[PersonRow] = {
     map.values.toList
   }
-  override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    map.get(compositeId)
-  }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]])(implicit c: Connection): List[PersonRow] = {
     fieldValues.foldLeft(map.values) {
       case (acc, PersonFieldValue.one(value)) => acc.filter(_.one == value)
       case (acc, PersonFieldValue.two(value)) => acc.filter(_.two == value)
       case (acc, PersonFieldValue.name(value)) => acc.filter(_.name == value)
     }.toList
+  }
+  override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
+    map.get(compositeId)
+  }
+  override def update: UpdateBuilder[PersonFields, PersonRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PersonFields.structure.fields, map)
   }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
@@ -77,9 +80,6 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PersonFields.structure.fields, map)
   }
   override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean = {
     map.get(compositeId) match {

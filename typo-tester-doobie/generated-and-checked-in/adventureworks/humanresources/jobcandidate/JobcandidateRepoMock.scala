@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, JobcandidateRow],
                            map: scala.collection.mutable.Map[JobcandidateId, JobcandidateRow] = scala.collection.mutable.Map.empty) extends JobcandidateRepo {
-  override def delete(jobcandidateid: JobcandidateId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
+    DeleteBuilderMock(DeleteParams.empty, JobcandidateFields.structure.fields, map)
+  }
+  override def deleteById(jobcandidateid: JobcandidateId): ConnectionIO[Boolean] = {
     delay(map.remove(jobcandidateid).isDefined)
   }
   override def deleteByIds(jobcandidateids: Array[JobcandidateId]): ConnectionIO[Int] = {
     delay(jobcandidateids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
-    DeleteBuilderMock(DeleteParams.empty, JobcandidateFields.structure.fields, map)
   }
   override def insert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     delay {
@@ -42,6 +42,9 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
       unsaved
     }
   }
+  override def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
       }
       num
     }
-  }
-  override def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, JobcandidateRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow] = {
     Stream.emits(jobcandidateids.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
+    UpdateBuilderMock(UpdateParams.empty, JobcandidateFields.structure.fields, map)
+  }
   override def update(row: JobcandidateRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.jobcandidateid) match {
@@ -89,9 +92,6 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
-    UpdateBuilderMock(UpdateParams.empty, JobcandidateFields.structure.fields, map)
   }
   override def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     delay {

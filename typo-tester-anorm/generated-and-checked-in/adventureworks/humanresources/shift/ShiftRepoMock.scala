@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
                     map: scala.collection.mutable.Map[ShiftId, ShiftRow] = scala.collection.mutable.Map.empty) extends ShiftRepo {
-  override def delete(shiftid: ShiftId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ShiftFields.structure.fields, map)
+  }
+  override def deleteById(shiftid: ShiftId)(implicit c: Connection): Boolean = {
     map.remove(shiftid).isDefined
   }
   override def deleteByIds(shiftids: Array[ShiftId])(implicit c: Connection): Int = {
     shiftids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShiftFields.structure.fields, map)
   }
   override def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     val _ = if (map.contains(unsaved.shiftid))
@@ -38,14 +38,14 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     
     unsaved
   }
+  override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[ShiftRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.shiftid -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ShiftRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
   override def selectByIds(shiftids: Array[ShiftId])(implicit c: Connection): List[ShiftRow] = {
     shiftids.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure.fields, map)
+  }
   override def update(row: ShiftRow)(implicit c: Connection): Boolean = {
     map.get(row.shiftid) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure.fields, map)
   }
   override def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     map.put(unsaved.shiftid, unsaved): @nowarn

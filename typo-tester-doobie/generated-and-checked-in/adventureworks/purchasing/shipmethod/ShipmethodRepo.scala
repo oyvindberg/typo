@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait ShipmethodRepo {
-  def delete(shipmethodid: ShipmethodId): ConnectionIO[Boolean]
-  def deleteByIds(shipmethodids: Array[ShipmethodId]): ConnectionIO[Int]
   def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow]
+  def deleteById(shipmethodid: ShipmethodId): ConnectionIO[Boolean]
+  def deleteByIds(shipmethodids: Array[ShipmethodId]): ConnectionIO[Int]
   def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, ShipmethodRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ShipmethodRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShipmethodRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ShipmethodFields, ShipmethodRow]
   def selectAll: Stream[ConnectionIO, ShipmethodRow]
   def selectById(shipmethodid: ShipmethodId): ConnectionIO[Option[ShipmethodRow]]
   def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow]
-  def update(row: ShipmethodRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[ShipmethodFields, ShipmethodRow]
+  def update(row: ShipmethodRow): ConnectionIO[Boolean]
   def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow]
 }

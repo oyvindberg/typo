@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait ProductlistpricehistoryRepo {
-  def delete(compositeId: ProductlistpricehistoryId): ConnectionIO[Boolean]
-  def deleteByIds(compositeIds: Array[ProductlistpricehistoryId]): ConnectionIO[Int]
   def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
+  def deleteById(compositeId: ProductlistpricehistoryId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[ProductlistpricehistoryId]): ConnectionIO[Int]
   def insert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, ProductlistpricehistoryRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ProductlistpricehistoryRowUnsaved): ConnectionIO[ProductlistpricehistoryRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ProductlistpricehistoryRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductlistpricehistoryRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def selectAll: Stream[ConnectionIO, ProductlistpricehistoryRow]
   def selectById(compositeId: ProductlistpricehistoryId): ConnectionIO[Option[ProductlistpricehistoryRow]]
   def selectByIds(compositeIds: Array[ProductlistpricehistoryId]): Stream[ConnectionIO, ProductlistpricehistoryRow]
-  def update(row: ProductlistpricehistoryRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
+  def update(row: ProductlistpricehistoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow]
 }

@@ -32,7 +32,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductRepoImpl extends ProductRepo {
-  override def delete(productid: ProductId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ProductFields, ProductRow] = {
+    DeleteBuilder("production.product", ProductFields.structure)
+  }
+  override def deleteById(productid: ProductId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.product where "productid" = ${ParameterValue(productid, null, ProductId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(productids: Array[ProductId])(implicit c: Connection): Int = {
@@ -42,9 +45,6 @@ class ProductRepoImpl extends ProductRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[ProductFields, ProductRow] = {
-    DeleteBuilder("production.product", ProductFields.structure)
-  }
   override def insert(unsaved: ProductRow)(implicit c: Connection): ProductRow = {
     SQL"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.productnumber, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.makeflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.finishedgoodsflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.color, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.safetystocklevel, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.reorderpoint, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.standardcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.listprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.size, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.sizeunitmeasurecode, null, ToStatement.optionToStatement(UnitmeasureId.toStatement, UnitmeasureId.parameterMetadata))}::bpchar, ${ParameterValue(unsaved.weightunitmeasurecode, null, ToStatement.optionToStatement(UnitmeasureId.toStatement, UnitmeasureId.parameterMetadata))}::bpchar, ${ParameterValue(unsaved.weight, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric, ${ParameterValue(unsaved.daystomanufacture, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.productline, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::bpchar, ${ParameterValue(unsaved.`class`, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::bpchar, ${ParameterValue(unsaved.style, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}::bpchar, ${ParameterValue(unsaved.productsubcategoryid, null, ToStatement.optionToStatement(ProductsubcategoryId.toStatement, ProductsubcategoryId.parameterMetadata))}::int4, ${ParameterValue(unsaved.productmodelid, null, ToStatement.optionToStatement(ProductmodelId.toStatement, ProductmodelId.parameterMetadata))}::int4, ${ParameterValue(unsaved.sellstartdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.sellenddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.discontinueddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -52,9 +52,6 @@ class ProductRepoImpl extends ProductRepo {
        """
       .executeInsert(ProductRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[ProductRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductRow.text, c)
   }
   override def insert(unsaved: ProductRowUnsaved)(implicit c: Connection): ProductRow = {
     val namedParameters = List(
@@ -115,6 +112,9 @@ class ProductRepoImpl extends ProductRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[ProductRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.product("name", "productnumber", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "productid", "makeflag", "finishedgoodsflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductRowUnsaved.text, c)
@@ -139,6 +139,9 @@ class ProductRepoImpl extends ProductRepo {
           where "productid" = ANY(${productids})
        """.as(ProductRow.rowParser(1).*)
     
+  }
+  override def update: UpdateBuilder[ProductFields, ProductRow] = {
+    UpdateBuilder("production.product", ProductFields.structure, ProductRow.rowParser)
   }
   override def update(row: ProductRow)(implicit c: Connection): Boolean = {
     val productid = row.productid
@@ -169,9 +172,6 @@ class ProductRepoImpl extends ProductRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productid" = ${ParameterValue(productid, null, ProductId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[ProductFields, ProductRow] = {
-    UpdateBuilder("production.product", ProductFields.structure, ProductRow.rowParser)
   }
   override def upsert(unsaved: ProductRow)(implicit c: Connection): ProductRow = {
     SQL"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")

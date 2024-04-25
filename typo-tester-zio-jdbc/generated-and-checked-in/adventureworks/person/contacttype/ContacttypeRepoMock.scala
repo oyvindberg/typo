@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow],
                           map: scala.collection.mutable.Map[ContacttypeId, ContacttypeRow] = scala.collection.mutable.Map.empty) extends ContacttypeRepo {
-  override def delete(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ContacttypeFields.structure.fields, map)
+  }
+  override def deleteById(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(contacttypeid).isDefined)
   }
   override def deleteByIds(contacttypeids: Array[ContacttypeId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(contacttypeids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ContacttypeFields.structure.fields, map)
   }
   override def insert(unsaved: ContacttypeRow): ZIO[ZConnection, Throwable, ContacttypeRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
       unsaved
     }
   }
+  override def insert(unsaved: ContacttypeRowUnsaved): ZIO[ZConnection, Throwable, ContacttypeRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: ContacttypeRowUnsaved): ZIO[ZConnection, Throwable, ContacttypeRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
   override def selectByIds(contacttypeids: Array[ContacttypeId]): ZStream[ZConnection, Throwable, ContacttypeRow] = {
     ZStream.fromIterable(contacttypeids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ContacttypeFields.structure.fields, map)
+  }
   override def update(row: ContacttypeRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.contacttypeid) match {
@@ -88,9 +91,6 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ContacttypeFields.structure.fields, map)
   }
   override def upsert(unsaved: ContacttypeRow): ZIO[ZConnection, Throwable, UpdateResult[ContacttypeRow]] = {
     ZIO.succeed {

@@ -29,23 +29,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class PersonRepoImpl extends PersonRepo {
-  override def delete(id: PersonId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[PersonFields, PersonRow] = {
+    DeleteBuilder("myschema.person", PersonFields.structure)
+  }
+  override def deleteById(id: PersonId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from myschema.person where "id" = ${Segment.paramSegment(id)(PersonId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(ids: Array[PersonId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from myschema.person where "id" = ANY(${ids})""".delete
-  }
-  override def delete: DeleteBuilder[PersonFields, PersonRow] = {
-    DeleteBuilder("myschema.person", PersonFields.structure)
   }
   override def insert(unsaved: PersonRow): ZIO[ZConnection, Throwable, PersonRow] = {
     sql"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
           values (${Segment.paramSegment(unsaved.id)(PersonId.setter)}::int8, ${Segment.paramSegment(unsaved.favouriteFootballClubId)(FootballClubId.setter)}, ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.nickName)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.blogUrl)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.email)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.phone)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.likesPizza)(Setter.booleanSetter)}, ${Segment.paramSegment(unsaved.maritalStatusId)(MaritalStatusId.setter)}, ${Segment.paramSegment(unsaved.workEmail)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.sector)(Sector.setter)}::myschema.sector, ${Segment.paramSegment(unsaved.favoriteNumber)(Number.setter)}::myschema.number)
           returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
        """.insertReturning(using PersonRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number") FROM STDIN""", batchSize, unsaved)(PersonRow.text)
   }
   override def insert(unsaved: PersonRowUnsaved): ZIO[ZConnection, Throwable, PersonRow] = {
     val fs = List(
@@ -87,6 +84,9 @@ class PersonRepoImpl extends PersonRepo {
     q.insertReturning(using PersonRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number") FROM STDIN""", batchSize, unsaved)(PersonRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY myschema.person("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector", "favorite_number") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text)
@@ -96,12 +96,6 @@ class PersonRepoImpl extends PersonRepo {
   }
   override def selectAll: ZStream[ZConnection, Throwable, PersonRow] = {
     sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person""".query(using PersonRow.jdbcDecoder).selectStream()
-  }
-  override def selectById(id: PersonId): ZIO[ZConnection, Throwable, Option[PersonRow]] = {
-    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where "id" = ${Segment.paramSegment(id)(PersonId.setter)}""".query(using PersonRow.jdbcDecoder).selectOne
-  }
-  override def selectByIds(ids: Array[PersonId]): ZStream[ZConnection, Throwable, PersonRow] = {
-    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where "id" = ANY(${Segment.paramSegment(ids)(PersonId.arraySetter)})""".query(using PersonRow.jdbcDecoder).selectStream()
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, PersonRow] = {
     fieldValues match {
@@ -126,6 +120,15 @@ class PersonRepoImpl extends PersonRepo {
         sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where $wheres""".query(using PersonRow.jdbcDecoder).selectStream()
     }
   }
+  override def selectById(id: PersonId): ZIO[ZConnection, Throwable, Option[PersonRow]] = {
+    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where "id" = ${Segment.paramSegment(id)(PersonId.setter)}""".query(using PersonRow.jdbcDecoder).selectOne
+  }
+  override def selectByIds(ids: Array[PersonId]): ZStream[ZConnection, Throwable, PersonRow] = {
+    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where "id" = ANY(${Segment.paramSegment(ids)(PersonId.arraySetter)})""".query(using PersonRow.jdbcDecoder).selectStream()
+  }
+  override def update: UpdateBuilder[PersonFields, PersonRow] = {
+    UpdateBuilder("myschema.person", PersonFields.structure, PersonRow.jdbcDecoder)
+  }
   override def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean] = {
     val id = row.id
     sql"""update myschema.person
@@ -141,9 +144,6 @@ class PersonRepoImpl extends PersonRepo {
               "sector" = ${Segment.paramSegment(row.sector)(Sector.setter)}::myschema.sector,
               "favorite_number" = ${Segment.paramSegment(row.favoriteNumber)(Number.setter)}::myschema.number
           where "id" = ${Segment.paramSegment(id)(PersonId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilder("myschema.person", PersonFields.structure, PersonRow.jdbcDecoder)
   }
   override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean] = {
     NonEmptyChunk.fromIterableOption(fieldValues) match {

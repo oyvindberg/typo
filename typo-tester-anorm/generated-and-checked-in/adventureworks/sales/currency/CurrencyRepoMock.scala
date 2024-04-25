@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
                        map: scala.collection.mutable.Map[CurrencyId, CurrencyRow] = scala.collection.mutable.Map.empty) extends CurrencyRepo {
-  override def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CurrencyFields.structure.fields, map)
+  }
+  override def deleteById(currencycode: CurrencyId)(implicit c: Connection): Boolean = {
     map.remove(currencycode).isDefined
   }
   override def deleteByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): Int = {
     currencycodes.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CurrencyFields.structure.fields, map)
   }
   override def insert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
     val _ = if (map.contains(unsaved.currencycode))
@@ -38,14 +38,14 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
     
     unsaved
   }
+  override def insert(unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[CurrencyRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.currencycode -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[CurrencyRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
   override def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow] = {
     currencycodes.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CurrencyFields.structure.fields, map)
+  }
   override def update(row: CurrencyRow)(implicit c: Connection): Boolean = {
     map.get(row.currencycode) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CurrencyFields.structure.fields, map)
   }
   override def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
     map.put(unsaved.currencycode, unsaved): @nowarn

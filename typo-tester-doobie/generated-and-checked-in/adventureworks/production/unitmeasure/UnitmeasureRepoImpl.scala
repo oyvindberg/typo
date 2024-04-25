@@ -23,23 +23,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class UnitmeasureRepoImpl extends UnitmeasureRepo {
-  override def delete(unitmeasurecode: UnitmeasureId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
+    DeleteBuilder("production.unitmeasure", UnitmeasureFields.structure)
+  }
+  override def deleteById(unitmeasurecode: UnitmeasureId): ConnectionIO[Boolean] = {
     sql"""delete from production.unitmeasure where "unitmeasurecode" = ${fromWrite(unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(unitmeasurecodes: Array[UnitmeasureId]): ConnectionIO[Int] = {
     sql"""delete from production.unitmeasure where "unitmeasurecode" = ANY(${unitmeasurecodes})""".update.run
-  }
-  override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    DeleteBuilder("production.unitmeasure", UnitmeasureFields.structure)
   }
   override def insert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     sql"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
           values (${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "unitmeasurecode", "name", "modifieddate"::text
        """.query(using UnitmeasureRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using UnitmeasureRow.text)
   }
   override def insert(unsaved: UnitmeasureRowUnsaved): ConnectionIO[UnitmeasureRow] = {
     val fs = List(
@@ -65,6 +62,9 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
     q.query(using UnitmeasureRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using UnitmeasureRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using UnitmeasureRowUnsaved.text)
@@ -81,6 +81,9 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): Stream[ConnectionIO, UnitmeasureRow] = {
     sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure where "unitmeasurecode" = ANY(${unitmeasurecodes})""".query(using UnitmeasureRow.read).stream
   }
+  override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
+    UpdateBuilder("production.unitmeasure", UnitmeasureFields.structure, UnitmeasureRow.read)
+  }
   override def update(row: UnitmeasureRow): ConnectionIO[Boolean] = {
     val unitmeasurecode = row.unitmeasurecode
     sql"""update production.unitmeasure
@@ -90,9 +93,6 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    UpdateBuilder("production.unitmeasure", UnitmeasureFields.structure, UnitmeasureRow.read)
   }
   override def upsert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     sql"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")

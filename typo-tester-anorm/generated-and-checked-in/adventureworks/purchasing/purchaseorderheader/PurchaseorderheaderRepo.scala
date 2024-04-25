@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait PurchaseorderheaderRepo {
-  def delete(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Boolean
-  def deleteByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): Int
   def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
+  def deleteById(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Boolean
+  def deleteByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): Int
   def insert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow
-  def insertStreaming(unsaved: Iterator[PurchaseorderheaderRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderRow
+  def insertStreaming(unsaved: Iterator[PurchaseorderheaderRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[PurchaseorderheaderRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
   def selectAll(implicit c: Connection): List[PurchaseorderheaderRow]
   def selectById(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Option[PurchaseorderheaderRow]
   def selectByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow]
-  def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
+  def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean
   def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow
 }

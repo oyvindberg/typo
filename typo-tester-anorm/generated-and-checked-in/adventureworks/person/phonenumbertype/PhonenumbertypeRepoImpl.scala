@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
-  override def delete(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields.structure)
+  }
+  override def deleteById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.phonenumbertype where "phonenumbertypeid" = ${ParameterValue(phonenumbertypeid, null, PhonenumbertypeId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(phonenumbertypeids: Array[PhonenumbertypeId])(implicit c: Connection): Int = {
@@ -34,9 +37,6 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields.structure)
-  }
   override def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
     SQL"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
           values (${ParameterValue(unsaved.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -44,9 +44,6 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
        """
       .executeInsert(PhonenumbertypeRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[PhonenumbertypeRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.phonenumbertype("phonenumbertypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(PhonenumbertypeRow.text, c)
   }
   override def insert(unsaved: PhonenumbertypeRowUnsaved)(implicit c: Connection): PhonenumbertypeRow = {
     val namedParameters = List(
@@ -76,6 +73,9 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[PhonenumbertypeRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.phonenumbertype("phonenumbertypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(PhonenumbertypeRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[PhonenumbertypeRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY person.phonenumbertype("name", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PhonenumbertypeRowUnsaved.text, c)
@@ -101,6 +101,9 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
        """.as(PhonenumbertypeRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.rowParser)
+  }
   override def update(row: PhonenumbertypeRow)(implicit c: Connection): Boolean = {
     val phonenumbertypeid = row.phonenumbertypeid
     SQL"""update person.phonenumbertype
@@ -108,9 +111,6 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "phonenumbertypeid" = ${ParameterValue(phonenumbertypeid, null, PhonenumbertypeId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.rowParser)
   }
   override def upsert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
     SQL"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")

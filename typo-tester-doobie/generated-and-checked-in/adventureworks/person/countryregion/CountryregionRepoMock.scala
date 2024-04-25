@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, CountryregionRow],
                             map: scala.collection.mutable.Map[CountryregionId, CountryregionRow] = scala.collection.mutable.Map.empty) extends CountryregionRepo {
-  override def delete(countryregioncode: CountryregionId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CountryregionFields.structure.fields, map)
+  }
+  override def deleteById(countryregioncode: CountryregionId): ConnectionIO[Boolean] = {
     delay(map.remove(countryregioncode).isDefined)
   }
   override def deleteByIds(countryregioncodes: Array[CountryregionId]): ConnectionIO[Int] = {
     delay(countryregioncodes.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CountryregionFields.structure.fields, map)
   }
   override def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     delay {
@@ -42,6 +42,9 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
       unsaved
     }
   }
+  override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
       }
       num
     }
-  }
-  override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregionRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
   override def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow] = {
     Stream.emits(countryregioncodes.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CountryregionFields.structure.fields, map)
+  }
   override def update(row: CountryregionRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.countryregioncode) match {
@@ -89,9 +92,6 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CountryregionFields.structure.fields, map)
   }
   override def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     delay {

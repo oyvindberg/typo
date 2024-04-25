@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait BusinessentitycontactRepo {
-  def delete(compositeId: BusinessentitycontactId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(compositeIds: Array[BusinessentitycontactId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
+  def deleteById(compositeId: BusinessentitycontactId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[BusinessentitycontactId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: BusinessentitycontactRow): ZIO[ZConnection, Throwable, BusinessentitycontactRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentitycontactRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: BusinessentitycontactRowUnsaved): ZIO[ZConnection, Throwable, BusinessentitycontactRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentitycontactRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentitycontactRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def selectAll: ZStream[ZConnection, Throwable, BusinessentitycontactRow]
   def selectById(compositeId: BusinessentitycontactId): ZIO[ZConnection, Throwable, Option[BusinessentitycontactRow]]
   def selectByIds(compositeIds: Array[BusinessentitycontactId]): ZStream[ZConnection, Throwable, BusinessentitycontactRow]
-  def update(row: BusinessentitycontactRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
+  def update(row: BusinessentitycontactRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: BusinessentitycontactRow): ZIO[ZConnection, Throwable, UpdateResult[BusinessentitycontactRow]]
 }

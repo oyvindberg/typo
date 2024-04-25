@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait ProductsubcategoryRepo {
-  def delete(productsubcategoryid: ProductsubcategoryId): ConnectionIO[Boolean]
-  def deleteByIds(productsubcategoryids: Array[ProductsubcategoryId]): ConnectionIO[Int]
   def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow]
+  def deleteById(productsubcategoryid: ProductsubcategoryId): ConnectionIO[Boolean]
+  def deleteByIds(productsubcategoryids: Array[ProductsubcategoryId]): ConnectionIO[Int]
   def insert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, ProductsubcategoryRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ProductsubcategoryRowUnsaved): ConnectionIO[ProductsubcategoryRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ProductsubcategoryRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductsubcategoryRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow]
   def selectAll: Stream[ConnectionIO, ProductsubcategoryRow]
   def selectById(productsubcategoryid: ProductsubcategoryId): ConnectionIO[Option[ProductsubcategoryRow]]
   def selectByIds(productsubcategoryids: Array[ProductsubcategoryId]): Stream[ConnectionIO, ProductsubcategoryRow]
-  def update(row: ProductsubcategoryRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow]
+  def update(row: ProductsubcategoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow]
 }

@@ -26,7 +26,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
-  override def delete(compositeId: BusinessentitycontactId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
+    DeleteBuilder("person.businessentitycontact", BusinessentitycontactFields.structure)
+  }
+  override def deleteById(compositeId: BusinessentitycontactId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.businessentitycontact where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "personid" = ${ParameterValue(compositeId.personid, null, BusinessentityId.toStatement)} AND "contacttypeid" = ${ParameterValue(compositeId.contacttypeid, null, ContacttypeId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[BusinessentitycontactId])(implicit c: Connection): Int = {
@@ -40,9 +43,6 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    DeleteBuilder("person.businessentitycontact", BusinessentitycontactFields.structure)
-  }
   override def insert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow = {
     SQL"""insert into person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.personid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.contacttypeid, null, ContacttypeId.toStatement)}::int4, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -50,9 +50,6 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
        """
       .executeInsert(BusinessentitycontactRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[BusinessentitycontactRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(BusinessentitycontactRow.text, c)
   }
   override def insert(unsaved: BusinessentitycontactRowUnsaved)(implicit c: Connection): BusinessentitycontactRow = {
     val namedParameters = List(
@@ -84,6 +81,9 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[BusinessentitycontactRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(BusinessentitycontactRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[BusinessentitycontactRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BusinessentitycontactRowUnsaved.text, c)
@@ -113,6 +113,9 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
        """.as(BusinessentitycontactRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
+    UpdateBuilder("person.businessentitycontact", BusinessentitycontactFields.structure, BusinessentitycontactRow.rowParser)
+  }
   override def update(row: BusinessentitycontactRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update person.businessentitycontact
@@ -120,9 +123,6 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "personid" = ${ParameterValue(compositeId.personid, null, BusinessentityId.toStatement)} AND "contacttypeid" = ${ParameterValue(compositeId.contacttypeid, null, ContacttypeId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
-    UpdateBuilder("person.businessentitycontact", BusinessentitycontactFields.structure, BusinessentitycontactRow.rowParser)
   }
   override def upsert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow = {
     SQL"""insert into person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")

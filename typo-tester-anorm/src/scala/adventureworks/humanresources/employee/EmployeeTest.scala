@@ -76,7 +76,7 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(saved3.gender == "M"): @nowarn
 
       // delete
-      employeeRepo.delete(saved1.businessentityid): @nowarn
+      employeeRepo.deleteById(saved1.businessentityid): @nowarn
 
       val List() = employeeRepo.selectAll: @unchecked
 

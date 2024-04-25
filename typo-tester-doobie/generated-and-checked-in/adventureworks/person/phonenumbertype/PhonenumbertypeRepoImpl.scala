@@ -23,23 +23,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
-  override def delete(phonenumbertypeid: PhonenumbertypeId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields.structure)
+  }
+  override def deleteById(phonenumbertypeid: PhonenumbertypeId): ConnectionIO[Boolean] = {
     sql"""delete from person.phonenumbertype where "phonenumbertypeid" = ${fromWrite(phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(phonenumbertypeids: Array[PhonenumbertypeId]): ConnectionIO[Int] = {
     sql"""delete from person.phonenumbertype where "phonenumbertypeid" = ANY(${phonenumbertypeids})""".update.run
-  }
-  override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields.structure)
   }
   override def insert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     sql"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
           values (${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "phonenumbertypeid", "name", "modifieddate"::text
        """.query(using PhonenumbertypeRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.phonenumbertype("phonenumbertypeid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PhonenumbertypeRow.text)
   }
   override def insert(unsaved: PhonenumbertypeRowUnsaved): ConnectionIO[PhonenumbertypeRow] = {
     val fs = List(
@@ -68,6 +65,9 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     q.query(using PhonenumbertypeRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY person.phonenumbertype("phonenumbertypeid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PhonenumbertypeRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY person.phonenumbertype("name", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PhonenumbertypeRowUnsaved.text)
@@ -84,6 +84,9 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId]): Stream[ConnectionIO, PhonenumbertypeRow] = {
     sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype where "phonenumbertypeid" = ANY(${phonenumbertypeids})""".query(using PhonenumbertypeRow.read).stream
   }
+  override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.read)
+  }
   override def update(row: PhonenumbertypeRow): ConnectionIO[Boolean] = {
     val phonenumbertypeid = row.phonenumbertypeid
     sql"""update person.phonenumbertype
@@ -93,9 +96,6 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.read)
   }
   override def upsert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     sql"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")

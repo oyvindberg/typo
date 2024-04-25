@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ScrapreasonRepoImpl extends ScrapreasonRepo {
-  override def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    DeleteBuilder("production.scrapreason", ScrapreasonFields.structure)
+  }
+  override def deleteById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.scrapreason where "scrapreasonid" = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): Int = {
@@ -34,9 +37,6 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    DeleteBuilder("production.scrapreason", ScrapreasonFields.structure)
-  }
   override def insert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     SQL"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
           values (${ParameterValue(unsaved.scrapreasonid, null, ScrapreasonId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -44,9 +44,6 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
        """
       .executeInsert(ScrapreasonRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[ScrapreasonRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.scrapreason("scrapreasonid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ScrapreasonRow.text, c)
   }
   override def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow = {
     val namedParameters = List(
@@ -76,6 +73,9 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[ScrapreasonRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.scrapreason("scrapreasonid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ScrapreasonRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ScrapreasonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.scrapreason("name", "scrapreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ScrapreasonRowUnsaved.text, c)
@@ -101,6 +101,9 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
        """.as(ScrapreasonRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    UpdateBuilder("production.scrapreason", ScrapreasonFields.structure, ScrapreasonRow.rowParser)
+  }
   override def update(row: ScrapreasonRow)(implicit c: Connection): Boolean = {
     val scrapreasonid = row.scrapreasonid
     SQL"""update production.scrapreason
@@ -108,9 +111,6 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "scrapreasonid" = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    UpdateBuilder("production.scrapreason", ScrapreasonFields.structure, ScrapreasonRow.rowParser)
   }
   override def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     SQL"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")

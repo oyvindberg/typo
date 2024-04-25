@@ -26,7 +26,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
-  override def delete(compositeId: SpecialofferproductId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
+    DeleteBuilder("sales.specialofferproduct", SpecialofferproductFields.structure)
+  }
+  override def deleteById(compositeId: SpecialofferproductId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.specialofferproduct where "specialofferid" = ${ParameterValue(compositeId.specialofferid, null, SpecialofferId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[SpecialofferproductId])(implicit c: Connection): Int = {
@@ -39,9 +42,6 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    DeleteBuilder("sales.specialofferproduct", SpecialofferproductFields.structure)
-  }
   override def insert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
     SQL"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.specialofferid, null, SpecialofferId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -49,9 +49,6 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
        """
       .executeInsert(SpecialofferproductRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[SpecialofferproductRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SpecialofferproductRow.text, c)
   }
   override def insert(unsaved: SpecialofferproductRowUnsaved)(implicit c: Connection): SpecialofferproductRow = {
     val namedParameters = List(
@@ -82,6 +79,9 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[SpecialofferproductRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SpecialofferproductRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SpecialofferproductRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SpecialofferproductRowUnsaved.text, c)
@@ -110,6 +110,9 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
        """.as(SpecialofferproductRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
+    UpdateBuilder("sales.specialofferproduct", SpecialofferproductFields.structure, SpecialofferproductRow.rowParser)
+  }
   override def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.specialofferproduct
@@ -117,9 +120,6 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "specialofferid" = ${ParameterValue(compositeId.specialofferid, null, SpecialofferId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    UpdateBuilder("sales.specialofferproduct", SpecialofferproductFields.structure, SpecialofferproductRow.rowParser)
   }
   override def upsert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow = {
     SQL"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")

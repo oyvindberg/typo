@@ -25,11 +25,11 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class PersonRepoImpl extends PersonRepo {
-  override def delete(compositeId: PersonId)(implicit c: Connection): Boolean = {
-    SQL"""delete from compositepk.person where "one" = ${ParameterValue(compositeId.one, null, ToStatement.longToStatement)} AND "two" = ${ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}""".executeUpdate() > 0
-  }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
     DeleteBuilder("compositepk.person", PersonFields.structure)
+  }
+  override def deleteById(compositeId: PersonId)(implicit c: Connection): Boolean = {
+    SQL"""delete from compositepk.person where "one" = ${ParameterValue(compositeId.one, null, ToStatement.longToStatement)} AND "two" = ${ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}""".executeUpdate() > 0
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into compositepk.person("one", "two", "name")
@@ -38,9 +38,6 @@ class PersonRepoImpl extends PersonRepo {
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[PersonRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY compositepk.person("one", "two", "name") FROM STDIN""", batchSize, unsaved)(PersonRow.text, c)
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
@@ -70,6 +67,9 @@ class PersonRepoImpl extends PersonRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[PersonRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY compositepk.person("one", "two", "name") FROM STDIN""", batchSize, unsaved)(PersonRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[PersonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY compositepk.person("name", "one", "two") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text, c)
@@ -81,12 +81,6 @@ class PersonRepoImpl extends PersonRepo {
     SQL"""select "one", "two", "name"
           from compositepk.person
        """.as(PersonRow.rowParser(1).*)
-  }
-  override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
-    SQL"""select "one", "two", "name"
-          from compositepk.person
-          where "one" = ${ParameterValue(compositeId.one, null, ToStatement.longToStatement)} AND "two" = ${ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
-       """.as(PersonRow.rowParser(1).singleOpt)
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]])(implicit c: Connection): List[PersonRow] = {
     fieldValues match {
@@ -107,15 +101,21 @@ class PersonRepoImpl extends PersonRepo {
     }
     
   }
+  override def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow] = {
+    SQL"""select "one", "two", "name"
+          from compositepk.person
+          where "one" = ${ParameterValue(compositeId.one, null, ToStatement.longToStatement)} AND "two" = ${ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
+       """.as(PersonRow.rowParser(1).singleOpt)
+  }
+  override def update: UpdateBuilder[PersonFields, PersonRow] = {
+    UpdateBuilder("compositepk.person", PersonFields.structure, PersonRow.rowParser)
+  }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update compositepk.person
           set "name" = ${ParameterValue(row.name, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
           where "one" = ${ParameterValue(compositeId.one, null, ToStatement.longToStatement)} AND "two" = ${ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilder("compositepk.person", PersonFields.structure, PersonRow.rowParser)
   }
   override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean = {
     fieldValues match {

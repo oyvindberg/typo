@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
                          map: scala.collection.mutable.Map[/* user-picked */ CustomCreditcardId, CreditcardRow] = scala.collection.mutable.Map.empty) extends CreditcardRepo {
-  override def delete(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CreditcardFields.structure.fields, map)
+  }
+  override def deleteById(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Boolean = {
     map.remove(creditcardid).isDefined
   }
   override def deleteByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): Int = {
     creditcardids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CreditcardFields.structure.fields, map)
   }
   override def insert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
     val _ = if (map.contains(unsaved.creditcardid))
@@ -40,14 +40,14 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
     
     unsaved
   }
+  override def insert(unsaved: CreditcardRowUnsaved)(implicit c: Connection): CreditcardRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[CreditcardRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.creditcardid -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: CreditcardRowUnsaved)(implicit c: Connection): CreditcardRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[CreditcardRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -69,6 +69,9 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
   override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[CreditcardRow] = {
     creditcardids.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CreditcardFields.structure.fields, map)
+  }
   override def update(row: CreditcardRow)(implicit c: Connection): Boolean = {
     map.get(row.creditcardid) match {
       case Some(`row`) => false
@@ -77,9 +80,6 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CreditcardFields.structure.fields, map)
   }
   override def upsert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {
     map.put(unsaved.creditcardid, unsaved): @nowarn

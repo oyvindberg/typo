@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait LocationRepo {
-  def delete(locationid: LocationId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[LocationFields, LocationRow]
+  def deleteById(locationid: LocationId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: LocationRow): ZIO[ZConnection, Throwable, LocationRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: LocationRowUnsaved): ZIO[ZConnection, Throwable, LocationRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[LocationFields, LocationRow]
   def selectAll: ZStream[ZConnection, Throwable, LocationRow]
   def selectById(locationid: LocationId): ZIO[ZConnection, Throwable, Option[LocationRow]]
   def selectByIds(locationids: Array[LocationId]): ZStream[ZConnection, Throwable, LocationRow]
-  def update(row: LocationRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[LocationFields, LocationRow]
+  def update(row: LocationRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: LocationRow): ZIO[ZConnection, Throwable, UpdateResult[LocationRow]]
 }

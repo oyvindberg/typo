@@ -28,23 +28,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class StoreRepoImpl extends StoreRepo {
-  override def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[StoreFields, StoreRow] = {
+    DeleteBuilder("sales.store", StoreFields.structure)
+  }
+  override def deleteById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.store where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from sales.store where "businessentityid" = ANY(${businessentityids})""".delete
-  }
-  override def delete: DeleteBuilder[StoreFields, StoreRow] = {
-    DeleteBuilder("sales.store", StoreFields.structure)
   }
   override def insert(unsaved: StoreRow): ZIO[ZConnection, Throwable, StoreRow] = {
     sql"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.salespersonid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4, ${Segment.paramSegment(unsaved.demographics)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
        """.insertReturning(using StoreRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, StoreRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StoreRow.text)
   }
   override def insert(unsaved: StoreRowUnsaved): ZIO[ZConnection, Throwable, StoreRow] = {
     val fs = List(
@@ -74,6 +71,9 @@ class StoreRepoImpl extends StoreRepo {
     q.insertReturning(using StoreRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, StoreRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StoreRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, StoreRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StoreRowUnsaved.text)
@@ -90,6 +90,9 @@ class StoreRepoImpl extends StoreRepo {
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, StoreRow] = {
     sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(using StoreRow.jdbcDecoder).selectStream()
   }
+  override def update: UpdateBuilder[StoreFields, StoreRow] = {
+    UpdateBuilder("sales.store", StoreFields.structure, StoreRow.jdbcDecoder)
+  }
   override def update(row: StoreRow): ZIO[ZConnection, Throwable, Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update sales.store
@@ -99,9 +102,6 @@ class StoreRepoImpl extends StoreRepo {
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[StoreFields, StoreRow] = {
-    UpdateBuilder("sales.store", StoreFields.structure, StoreRow.jdbcDecoder)
   }
   override def upsert(unsaved: StoreRow): ZIO[ZConnection, Throwable, UpdateResult[StoreRow]] = {
     sql"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")

@@ -47,7 +47,7 @@ case class PersonWithAddressesRepo(
       _ <- oldAttachedAddresses.forEach { ba =>
         currentAddressesByAddresstype.get(ba.addresstypeid) match {
           case Some(address) if address.addressid == ba.addressid => ZIO.succeed(false)
-          case _                                                  => businessentityAddressRepo.delete(ba.compositeId)
+          case _                                                  => businessentityAddressRepo.deleteById(ba.compositeId)
         }
       }
       currentAttachedAddresses <- currentAddressesWithAddresstype.forEach { case (addresstypeId, address) =>

@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, ProductreviewRow],
                             map: scala.collection.mutable.Map[ProductreviewId, ProductreviewRow] = scala.collection.mutable.Map.empty) extends ProductreviewRepo {
-  override def delete(productreviewid: ProductreviewId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductreviewFields.structure.fields, map)
+  }
+  override def deleteById(productreviewid: ProductreviewId): ConnectionIO[Boolean] = {
     delay(map.remove(productreviewid).isDefined)
   }
   override def deleteByIds(productreviewids: Array[ProductreviewId]): ConnectionIO[Int] = {
     delay(productreviewids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductreviewFields.structure.fields, map)
   }
   override def insert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
     delay {
@@ -42,6 +42,9 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
       unsaved
     }
   }
+  override def insert(unsaved: ProductreviewRowUnsaved): ConnectionIO[ProductreviewRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductreviewRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
       }
       num
     }
-  }
-  override def insert(unsaved: ProductreviewRowUnsaved): ConnectionIO[ProductreviewRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductreviewRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
   override def selectByIds(productreviewids: Array[ProductreviewId]): Stream[ConnectionIO, ProductreviewRow] = {
     Stream.emits(productreviewids.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductreviewFields.structure.fields, map)
+  }
   override def update(row: ProductreviewRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.productreviewid) match {
@@ -89,9 +92,6 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductreviewFields.structure.fields, map)
   }
   override def upsert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
     delay {

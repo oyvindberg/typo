@@ -26,7 +26,10 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class EmailaddressRepoImpl extends EmailaddressRepo {
-  override def delete(compositeId: EmailaddressId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
+    DeleteBuilder("person.emailaddress", EmailaddressFields.structure)
+  }
+  override def deleteById(compositeId: EmailaddressId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.emailaddress where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "emailaddressid" = ${Segment.paramSegment(compositeId.emailaddressid)(Setter.intSetter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[EmailaddressId]): ZIO[ZConnection, Throwable, Long] = {
@@ -39,17 +42,11 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
        """.delete
     
   }
-  override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
-    DeleteBuilder("person.emailaddress", EmailaddressFields.structure)
-  }
   override def insert(unsaved: EmailaddressRow): ZIO[ZConnection, Throwable, EmailaddressRow] = {
     sql"""insert into person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.emailaddressid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.emailaddress)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
        """.insertReturning(using EmailaddressRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, EmailaddressRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(EmailaddressRow.text)
   }
   override def insert(unsaved: EmailaddressRowUnsaved): ZIO[ZConnection, Throwable, EmailaddressRow] = {
     val fs = List(
@@ -81,6 +78,9 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
     q.insertReturning(using EmailaddressRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, EmailaddressRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(EmailaddressRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, EmailaddressRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY person.emailaddress("businessentityid", "emailaddress", "emailaddressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmailaddressRowUnsaved.text)
@@ -104,6 +104,9 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
        """.query(using EmailaddressRow.jdbcDecoder).selectStream()
     
   }
+  override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
+    UpdateBuilder("person.emailaddress", EmailaddressFields.structure, EmailaddressRow.jdbcDecoder)
+  }
   override def update(row: EmailaddressRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update person.emailaddress
@@ -111,9 +114,6 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "emailaddressid" = ${Segment.paramSegment(compositeId.emailaddressid)(Setter.intSetter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
-    UpdateBuilder("person.emailaddress", EmailaddressFields.structure, EmailaddressRow.jdbcDecoder)
   }
   override def upsert(unsaved: EmailaddressRow): ZIO[ZConnection, Throwable, UpdateResult[EmailaddressRow]] = {
     sql"""insert into person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")

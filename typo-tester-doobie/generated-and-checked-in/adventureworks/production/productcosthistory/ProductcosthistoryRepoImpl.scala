@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
-  override def delete(compositeId: ProductcosthistoryId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
+    DeleteBuilder("production.productcosthistory", ProductcosthistoryFields.structure)
+  }
+  override def deleteById(compositeId: ProductcosthistoryId): ConnectionIO[Boolean] = {
     sql"""delete from production.productcosthistory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductcosthistoryId]): ConnectionIO[Int] = {
@@ -37,17 +40,11 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
        """.update.run
     
   }
-  override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    DeleteBuilder("production.productcosthistory", ProductcosthistoryFields.structure)
-  }
   override def insert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
     sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
        """.query(using ProductcosthistoryRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductcosthistoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductcosthistoryRow.text)
   }
   override def insert(unsaved: ProductcosthistoryRowUnsaved): ConnectionIO[ProductcosthistoryRow] = {
     val fs = List(
@@ -75,6 +72,9 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     q.query(using ProductcosthistoryRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductcosthistoryRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductcosthistoryRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductcosthistoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductcosthistoryRowUnsaved.text)
@@ -98,6 +98,9 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
        """.query(using ProductcosthistoryRow.read).stream
     
   }
+  override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
+    UpdateBuilder("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.read)
+  }
   override def update(row: ProductcosthistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productcosthistory
@@ -108,9 +111,6 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    UpdateBuilder("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.read)
   }
   override def upsert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
     sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")

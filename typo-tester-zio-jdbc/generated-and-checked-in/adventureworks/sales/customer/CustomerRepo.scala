@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait CustomerRepo {
-  def delete(customerid: CustomerId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(customerids: Array[CustomerId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[CustomerFields, CustomerRow]
+  def deleteById(customerid: CustomerId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(customerids: Array[CustomerId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: CustomerRow): ZIO[ZConnection, Throwable, CustomerRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CustomerRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: CustomerRowUnsaved): ZIO[ZConnection, Throwable, CustomerRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CustomerRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CustomerRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[CustomerFields, CustomerRow]
   def selectAll: ZStream[ZConnection, Throwable, CustomerRow]
   def selectById(customerid: CustomerId): ZIO[ZConnection, Throwable, Option[CustomerRow]]
   def selectByIds(customerids: Array[CustomerId]): ZStream[ZConnection, Throwable, CustomerRow]
-  def update(row: CustomerRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[CustomerFields, CustomerRow]
+  def update(row: CustomerRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CustomerRow): ZIO[ZConnection, Throwable, UpdateResult[CustomerRow]]
 }

@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved, PurchaseorderheaderRow],
                                   map: scala.collection.mutable.Map[PurchaseorderheaderId, PurchaseorderheaderRow] = scala.collection.mutable.Map.empty) extends PurchaseorderheaderRepo {
-  override def delete(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PurchaseorderheaderFields.structure.fields, map)
+  }
+  override def deleteById(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Boolean = {
     map.remove(purchaseorderid).isDefined
   }
   override def deleteByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): Int = {
     purchaseorderids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PurchaseorderheaderFields.structure.fields, map)
   }
   override def insert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
     val _ = if (map.contains(unsaved.purchaseorderid))
@@ -38,14 +38,14 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
     
     unsaved
   }
+  override def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[PurchaseorderheaderRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.purchaseorderid -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: PurchaseorderheaderRowUnsaved)(implicit c: Connection): PurchaseorderheaderRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[PurchaseorderheaderRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow] = {
     purchaseorderids.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PurchaseorderheaderFields.structure.fields, map)
+  }
   override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {
     map.get(row.purchaseorderid) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PurchaseorderheaderFields.structure.fields, map)
   }
   override def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
     map.put(unsaved.purchaseorderid, unsaved): @nowarn

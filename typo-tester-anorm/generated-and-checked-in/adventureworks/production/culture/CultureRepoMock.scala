@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
                       map: scala.collection.mutable.Map[CultureId, CultureRow] = scala.collection.mutable.Map.empty) extends CultureRepo {
-  override def delete(cultureid: CultureId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[CultureFields, CultureRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CultureFields.structure.fields, map)
+  }
+  override def deleteById(cultureid: CultureId)(implicit c: Connection): Boolean = {
     map.remove(cultureid).isDefined
   }
   override def deleteByIds(cultureids: Array[CultureId])(implicit c: Connection): Int = {
     cultureids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[CultureFields, CultureRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CultureFields.structure.fields, map)
   }
   override def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     val _ = if (map.contains(unsaved.cultureid))
@@ -38,14 +38,14 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     
     unsaved
   }
+  override def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[CultureRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.cultureid -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[CultureRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
   override def selectByIds(cultureids: Array[CultureId])(implicit c: Connection): List[CultureRow] = {
     cultureids.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[CultureFields, CultureRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CultureFields.structure.fields, map)
+  }
   override def update(row: CultureRow)(implicit c: Connection): Boolean = {
     map.get(row.cultureid) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[CultureFields, CultureRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CultureFields.structure.fields, map)
   }
   override def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     map.put(unsaved.cultureid, unsaved): @nowarn

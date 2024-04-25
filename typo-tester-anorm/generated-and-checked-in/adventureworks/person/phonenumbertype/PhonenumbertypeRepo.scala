@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait PhonenumbertypeRepo {
-  def delete(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean
-  def deleteByIds(phonenumbertypeids: Array[PhonenumbertypeId])(implicit c: Connection): Int
   def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
+  def deleteById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean
+  def deleteByIds(phonenumbertypeids: Array[PhonenumbertypeId])(implicit c: Connection): Int
   def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow
-  def insertStreaming(unsaved: Iterator[PhonenumbertypeRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: PhonenumbertypeRowUnsaved)(implicit c: Connection): PhonenumbertypeRow
+  def insertStreaming(unsaved: Iterator[PhonenumbertypeRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[PhonenumbertypeRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
   def selectAll(implicit c: Connection): List[PhonenumbertypeRow]
   def selectById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Option[PhonenumbertypeRow]
   def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId])(implicit c: Connection): List[PhonenumbertypeRow]
-  def update(row: PhonenumbertypeRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
+  def update(row: PhonenumbertypeRow)(implicit c: Connection): Boolean
   def upsert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow
 }

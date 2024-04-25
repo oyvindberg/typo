@@ -29,7 +29,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class StateprovinceRepoImpl extends StateprovinceRepo {
-  override def delete(stateprovinceid: StateprovinceId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
+    DeleteBuilder("person.stateprovince", StateprovinceFields.structure)
+  }
+  override def deleteById(stateprovinceid: StateprovinceId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.stateprovince where "stateprovinceid" = ${ParameterValue(stateprovinceid, null, StateprovinceId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): Int = {
@@ -39,9 +42,6 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
-    DeleteBuilder("person.stateprovince", StateprovinceFields.structure)
-  }
   override def insert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
     SQL"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.stateprovincecode, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)}, ${ParameterValue(unsaved.isonlystateprovinceflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.territoryid, null, SalesterritoryId.toStatement)}::int4, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -49,9 +49,6 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
        """
       .executeInsert(StateprovinceRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[StateprovinceRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StateprovinceRow.text, c)
   }
   override def insert(unsaved: StateprovinceRowUnsaved)(implicit c: Connection): StateprovinceRow = {
     val namedParameters = List(
@@ -92,6 +89,9 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[StateprovinceRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StateprovinceRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[StateprovinceRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY person.stateprovince("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StateprovinceRowUnsaved.text, c)
@@ -117,6 +117,9 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
        """.as(StateprovinceRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
+    UpdateBuilder("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.rowParser)
+  }
   override def update(row: StateprovinceRow)(implicit c: Connection): Boolean = {
     val stateprovinceid = row.stateprovinceid
     SQL"""update person.stateprovince
@@ -129,9 +132,6 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "stateprovinceid" = ${ParameterValue(stateprovinceid, null, StateprovinceId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
-    UpdateBuilder("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.rowParser)
   }
   override def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
     SQL"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")

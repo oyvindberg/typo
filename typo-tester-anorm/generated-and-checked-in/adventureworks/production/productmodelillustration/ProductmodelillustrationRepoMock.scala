@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class ProductmodelillustrationRepoMock(toRow: Function1[ProductmodelillustrationRowUnsaved, ProductmodelillustrationRow],
                                        map: scala.collection.mutable.Map[ProductmodelillustrationId, ProductmodelillustrationRow] = scala.collection.mutable.Map.empty) extends ProductmodelillustrationRepo {
-  override def delete(compositeId: ProductmodelillustrationId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductmodelillustrationFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: ProductmodelillustrationId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
   }
   override def deleteByIds(compositeIds: Array[ProductmodelillustrationId])(implicit c: Connection): Int = {
     compositeIds.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductmodelillustrationFields.structure.fields, map)
   }
   override def insert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     val _ = if (map.contains(unsaved.compositeId))
@@ -38,14 +38,14 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
     
     unsaved
   }
+  override def insert(unsaved: ProductmodelillustrationRowUnsaved)(implicit c: Connection): ProductmodelillustrationRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[ProductmodelillustrationRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.compositeId -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: ProductmodelillustrationRowUnsaved)(implicit c: Connection): ProductmodelillustrationRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductmodelillustrationRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
   override def selectByIds(compositeIds: Array[ProductmodelillustrationId])(implicit c: Connection): List[ProductmodelillustrationRow] = {
     compositeIds.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductmodelillustrationFields.structure.fields, map)
+  }
   override def update(row: ProductmodelillustrationRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductmodelillustrationFields.structure.fields, map)
   }
   override def upsert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     map.put(unsaved.compositeId, unsaved): @nowarn

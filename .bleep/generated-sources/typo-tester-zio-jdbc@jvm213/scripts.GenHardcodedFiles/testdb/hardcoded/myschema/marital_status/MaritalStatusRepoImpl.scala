@@ -22,14 +22,14 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class MaritalStatusRepoImpl extends MaritalStatusRepo {
-  override def delete(id: MaritalStatusId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    DeleteBuilder("myschema.marital_status", MaritalStatusFields.structure)
+  }
+  override def deleteById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from myschema.marital_status where "id" = ${Segment.paramSegment(id)(MaritalStatusId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from myschema.marital_status where "id" = ANY(${ids})""".delete
-  }
-  override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilder("myschema.marital_status", MaritalStatusFields.structure)
   }
   override def insert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, MaritalStatusRow] = {
     sql"""insert into myschema.marital_status("id")
@@ -46,12 +46,6 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def selectAll: ZStream[ZConnection, Throwable, MaritalStatusRow] = {
     sql"""select "id" from myschema.marital_status""".query(using MaritalStatusRow.jdbcDecoder).selectStream()
   }
-  override def selectById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Option[MaritalStatusRow]] = {
-    sql"""select "id" from myschema.marital_status where "id" = ${Segment.paramSegment(id)(MaritalStatusId.setter)}""".query(using MaritalStatusRow.jdbcDecoder).selectOne
-  }
-  override def selectByIds(ids: Array[MaritalStatusId]): ZStream[ZConnection, Throwable, MaritalStatusRow] = {
-    sql"""select "id" from myschema.marital_status where "id" = ANY(${Segment.paramSegment(ids)(MaritalStatusId.arraySetter)})""".query(using MaritalStatusRow.jdbcDecoder).selectStream()
-  }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, MaritalStatusRow] = {
     fieldValues match {
       case Nil      => selectAll
@@ -63,6 +57,12 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
         )
         sql"""select "id" from myschema.marital_status where $wheres""".query(using MaritalStatusRow.jdbcDecoder).selectStream()
     }
+  }
+  override def selectById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Option[MaritalStatusRow]] = {
+    sql"""select "id" from myschema.marital_status where "id" = ${Segment.paramSegment(id)(MaritalStatusId.setter)}""".query(using MaritalStatusRow.jdbcDecoder).selectOne
+  }
+  override def selectByIds(ids: Array[MaritalStatusId]): ZStream[ZConnection, Throwable, MaritalStatusRow] = {
+    sql"""select "id" from myschema.marital_status where "id" = ANY(${Segment.paramSegment(ids)(MaritalStatusId.arraySetter)})""".query(using MaritalStatusRow.jdbcDecoder).selectStream()
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
     UpdateBuilder("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.jdbcDecoder)

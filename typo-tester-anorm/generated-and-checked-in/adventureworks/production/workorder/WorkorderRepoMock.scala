@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
                         map: scala.collection.mutable.Map[WorkorderId, WorkorderRow] = scala.collection.mutable.Map.empty) extends WorkorderRepo {
-  override def delete(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
+    DeleteBuilderMock(DeleteParams.empty, WorkorderFields.structure.fields, map)
+  }
+  override def deleteById(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
     map.remove(workorderid).isDefined
   }
   override def deleteByIds(workorderids: Array[WorkorderId])(implicit c: Connection): Int = {
     workorderids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
-    DeleteBuilderMock(DeleteParams.empty, WorkorderFields.structure.fields, map)
   }
   override def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     val _ = if (map.contains(unsaved.workorderid))
@@ -38,14 +38,14 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     
     unsaved
   }
+  override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[WorkorderRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.workorderid -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[WorkorderRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
   override def selectByIds(workorderids: Array[WorkorderId])(implicit c: Connection): List[WorkorderRow] = {
     workorderids.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
+    UpdateBuilderMock(UpdateParams.empty, WorkorderFields.structure.fields, map)
+  }
   override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
     map.get(row.workorderid) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
-    UpdateBuilderMock(UpdateParams.empty, WorkorderFields.structure.fields, map)
   }
   override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     map.put(unsaved.workorderid, unsaved): @nowarn

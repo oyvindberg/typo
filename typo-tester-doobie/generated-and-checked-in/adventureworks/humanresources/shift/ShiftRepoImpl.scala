@@ -24,23 +24,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ShiftRepoImpl extends ShiftRepo {
-  override def delete(shiftid: ShiftId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
+    DeleteBuilder("humanresources.shift", ShiftFields.structure)
+  }
+  override def deleteById(shiftid: ShiftId): ConnectionIO[Boolean] = {
     sql"""delete from humanresources.shift where "shiftid" = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(shiftids: Array[ShiftId]): ConnectionIO[Int] = {
     sql"""delete from humanresources.shift where "shiftid" = ANY(${shiftids})""".update.run
-  }
-  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilder("humanresources.shift", ShiftFields.structure)
   }
   override def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
           values (${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.starttime)(Write.fromPut(TypoLocalTime.put))}::time, ${fromWrite(unsaved.endtime)(Write.fromPut(TypoLocalTime.put))}::time, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
        """.query(using ShiftRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ShiftRow.text)
   }
   override def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = {
     val fs = List(
@@ -71,6 +68,9 @@ class ShiftRepoImpl extends ShiftRepo {
     q.query(using ShiftRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ShiftRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShiftRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY humanresources.shift("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ShiftRowUnsaved.text)
@@ -87,6 +87,9 @@ class ShiftRepoImpl extends ShiftRepo {
   override def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow] = {
     sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ANY(${shiftids})""".query(using ShiftRow.read).stream
   }
+  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
+    UpdateBuilder("humanresources.shift", ShiftFields.structure, ShiftRow.read)
+  }
   override def update(row: ShiftRow): ConnectionIO[Boolean] = {
     val shiftid = row.shiftid
     sql"""update humanresources.shift
@@ -98,9 +101,6 @@ class ShiftRepoImpl extends ShiftRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilder("humanresources.shift", ShiftFields.structure, ShiftRow.read)
   }
   override def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")

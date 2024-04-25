@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait BusinessentityaddressRepo {
-  def delete(compositeId: BusinessentityaddressId): ConnectionIO[Boolean]
-  def deleteByIds(compositeIds: Array[BusinessentityaddressId]): ConnectionIO[Int]
   def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
+  def deleteById(compositeId: BusinessentityaddressId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[BusinessentityaddressId]): ConnectionIO[Int]
   def insert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentityaddressRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: BusinessentityaddressRowUnsaved): ConnectionIO[BusinessentityaddressRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentityaddressRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BusinessentityaddressRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
   def selectAll: Stream[ConnectionIO, BusinessentityaddressRow]
   def selectById(compositeId: BusinessentityaddressId): ConnectionIO[Option[BusinessentityaddressRow]]
   def selectByIds(compositeIds: Array[BusinessentityaddressId]): Stream[ConnectionIO, BusinessentityaddressRow]
-  def update(row: BusinessentityaddressRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
+  def update(row: BusinessentityaddressRow): ConnectionIO[Boolean]
   def upsert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow]
 }

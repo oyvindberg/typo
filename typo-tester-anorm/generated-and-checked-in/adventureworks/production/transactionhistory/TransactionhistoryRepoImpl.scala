@@ -25,7 +25,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
-  override def delete(transactionid: TransactionhistoryId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
+    DeleteBuilder("production.transactionhistory", TransactionhistoryFields.structure)
+  }
+  override def deleteById(transactionid: TransactionhistoryId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.transactionhistory where "transactionid" = ${ParameterValue(transactionid, null, TransactionhistoryId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(transactionids: Array[TransactionhistoryId])(implicit c: Connection): Int = {
@@ -35,9 +38,6 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    DeleteBuilder("production.transactionhistory", TransactionhistoryFields.structure)
-  }
   override def insert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow = {
     SQL"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (${ParameterValue(unsaved.transactionid, null, TransactionhistoryId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.referenceorderid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.referenceorderlineid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.transactiondate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.transactiontype, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.quantity, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.actualcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -45,9 +45,6 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
        """
       .executeInsert(TransactionhistoryRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[TransactionhistoryRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""", batchSize, unsaved)(TransactionhistoryRow.text, c)
   }
   override def insert(unsaved: TransactionhistoryRowUnsaved)(implicit c: Connection): TransactionhistoryRow = {
     val namedParameters = List(
@@ -89,6 +86,9 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[TransactionhistoryRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""", batchSize, unsaved)(TransactionhistoryRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[TransactionhistoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.transactionhistory("productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "transactionid", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(TransactionhistoryRowUnsaved.text, c)
@@ -114,6 +114,9 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
        """.as(TransactionhistoryRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
+    UpdateBuilder("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.rowParser)
+  }
   override def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean = {
     val transactionid = row.transactionid
     SQL"""update production.transactionhistory
@@ -127,9 +130,6 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "transactionid" = ${ParameterValue(transactionid, null, TransactionhistoryId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    UpdateBuilder("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.rowParser)
   }
   override def upsert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow = {
     SQL"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")

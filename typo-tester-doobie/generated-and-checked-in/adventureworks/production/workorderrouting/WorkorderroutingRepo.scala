@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait WorkorderroutingRepo {
-  def delete(compositeId: WorkorderroutingId): ConnectionIO[Boolean]
-  def deleteByIds(compositeIds: Array[WorkorderroutingId]): ConnectionIO[Int]
   def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow]
+  def deleteById(compositeId: WorkorderroutingId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[WorkorderroutingId]): ConnectionIO[Int]
   def insert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: WorkorderroutingRowUnsaved): ConnectionIO[WorkorderroutingRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def selectAll: Stream[ConnectionIO, WorkorderroutingRow]
   def selectById(compositeId: WorkorderroutingId): ConnectionIO[Option[WorkorderroutingRow]]
   def selectByIds(compositeIds: Array[WorkorderroutingId]): Stream[ConnectionIO, WorkorderroutingRow]
-  def update(row: WorkorderroutingRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow]
+  def update(row: WorkorderroutingRow): ConnectionIO[Boolean]
   def upsert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow]
 }

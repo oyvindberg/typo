@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait SalesorderdetailRepo {
-  def delete(compositeId: SalesorderdetailId): ConnectionIO[Boolean]
-  def deleteByIds(compositeIds: Array[SalesorderdetailId]): ConnectionIO[Int]
   def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow]
+  def deleteById(compositeId: SalesorderdetailId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[SalesorderdetailId]): ConnectionIO[Int]
   def insert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderdetailRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: SalesorderdetailRowUnsaved): ConnectionIO[SalesorderdetailRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderdetailRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesorderdetailRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def selectAll: Stream[ConnectionIO, SalesorderdetailRow]
   def selectById(compositeId: SalesorderdetailId): ConnectionIO[Option[SalesorderdetailRow]]
   def selectByIds(compositeIds: Array[SalesorderdetailId]): Stream[ConnectionIO, SalesorderdetailRow]
-  def update(row: SalesorderdetailRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow]
+  def update(row: SalesorderdetailRow): ConnectionIO[Boolean]
   def upsert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow]
 }

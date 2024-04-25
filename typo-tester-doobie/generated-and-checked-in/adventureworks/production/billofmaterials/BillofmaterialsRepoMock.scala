@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, BillofmaterialsRow],
                               map: scala.collection.mutable.Map[Int, BillofmaterialsRow] = scala.collection.mutable.Map.empty) extends BillofmaterialsRepo {
-  override def delete(billofmaterialsid: Int): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields.structure.fields, map)
+  }
+  override def deleteById(billofmaterialsid: Int): ConnectionIO[Boolean] = {
     delay(map.remove(billofmaterialsid).isDefined)
   }
   override def deleteByIds(billofmaterialsids: Array[Int]): ConnectionIO[Int] = {
     delay(billofmaterialsids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields.structure.fields, map)
   }
   override def insert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     delay {
@@ -42,6 +42,9 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
       unsaved
     }
   }
+  override def insert(unsaved: BillofmaterialsRowUnsaved): ConnectionIO[BillofmaterialsRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, BillofmaterialsRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
       }
       num
     }
-  }
-  override def insert(unsaved: BillofmaterialsRowUnsaved): ConnectionIO[BillofmaterialsRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BillofmaterialsRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   override def selectByIds(billofmaterialsids: Array[Int]): Stream[ConnectionIO, BillofmaterialsRow] = {
     Stream.emits(billofmaterialsids.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields.structure.fields, map)
+  }
   override def update(row: BillofmaterialsRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.billofmaterialsid) match {
@@ -89,9 +92,6 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields.structure.fields, map)
   }
   override def upsert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     delay {

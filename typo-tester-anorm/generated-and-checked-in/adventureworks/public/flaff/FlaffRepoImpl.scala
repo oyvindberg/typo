@@ -19,7 +19,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class FlaffRepoImpl extends FlaffRepo {
-  override def delete(compositeId: FlaffId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
+    DeleteBuilder("public.flaff", FlaffFields.structure)
+  }
+  override def deleteById(compositeId: FlaffId)(implicit c: Connection): Boolean = {
     SQL"""delete from public.flaff where "code" = ${ParameterValue(compositeId.code, null, ShortText.toStatement)} AND "another_code" = ${ParameterValue(compositeId.anotherCode, null, ToStatement.stringToStatement)} AND "some_number" = ${ParameterValue(compositeId.someNumber, null, ToStatement.intToStatement)} AND "specifier" = ${ParameterValue(compositeId.specifier, null, ShortText.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[FlaffId])(implicit c: Connection): Int = {
@@ -33,9 +36,6 @@ class FlaffRepoImpl extends FlaffRepo {
           in (select unnest(${code}), unnest(${anotherCode}), unnest(${someNumber}), unnest(${specifier}))
        """.executeUpdate()
     
-  }
-  override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
-    DeleteBuilder("public.flaff", FlaffFields.structure)
   }
   override def insert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow = {
     SQL"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")
@@ -74,15 +74,15 @@ class FlaffRepoImpl extends FlaffRepo {
        """.as(FlaffRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
+    UpdateBuilder("public.flaff", FlaffFields.structure, FlaffRow.rowParser)
+  }
   override def update(row: FlaffRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update public.flaff
           set "parentspecifier" = ${ParameterValue(row.parentspecifier, null, ToStatement.optionToStatement(ShortText.toStatement, ShortText.parameterMetadata))}::text
           where "code" = ${ParameterValue(compositeId.code, null, ShortText.toStatement)} AND "another_code" = ${ParameterValue(compositeId.anotherCode, null, ToStatement.stringToStatement)} AND "some_number" = ${ParameterValue(compositeId.someNumber, null, ToStatement.intToStatement)} AND "specifier" = ${ParameterValue(compositeId.specifier, null, ShortText.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
-    UpdateBuilder("public.flaff", FlaffFields.structure, FlaffRow.rowParser)
   }
   override def upsert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow = {
     SQL"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")

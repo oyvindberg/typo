@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait SalestaxrateRepo {
-  def delete(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(salestaxrateids: Array[SalestaxrateId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow]
+  def deleteById(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(salestaxrateids: Array[SalestaxrateId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: SalestaxrateRow): ZIO[ZConnection, Throwable, SalestaxrateRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: SalestaxrateRowUnsaved): ZIO[ZConnection, Throwable, SalestaxrateRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow]
   def selectAll: ZStream[ZConnection, Throwable, SalestaxrateRow]
   def selectById(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Option[SalestaxrateRow]]
   def selectByIds(salestaxrateids: Array[SalestaxrateId]): ZStream[ZConnection, Throwable, SalestaxrateRow]
-  def update(row: SalestaxrateRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow]
+  def update(row: SalestaxrateRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: SalestaxrateRow): ZIO[ZConnection, Throwable, UpdateResult[SalestaxrateRow]]
 }

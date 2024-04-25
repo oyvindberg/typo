@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait BusinessentityRepo {
-  def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow]
+  def deleteById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: BusinessentityRow): ZIO[ZConnection, Throwable, BusinessentityRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: BusinessentityRowUnsaved): ZIO[ZConnection, Throwable, BusinessentityRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[BusinessentityFields, BusinessentityRow]
   def selectAll: ZStream[ZConnection, Throwable, BusinessentityRow]
   def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[BusinessentityRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, BusinessentityRow]
-  def update(row: BusinessentityRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[BusinessentityFields, BusinessentityRow]
+  def update(row: BusinessentityRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: BusinessentityRow): ZIO[ZConnection, Throwable, UpdateResult[BusinessentityRow]]
 }

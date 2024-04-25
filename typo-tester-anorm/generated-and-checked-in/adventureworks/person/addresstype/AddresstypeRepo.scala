@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait AddresstypeRepo {
-  def delete(addresstypeid: AddresstypeId)(implicit c: Connection): Boolean
-  def deleteByIds(addresstypeids: Array[AddresstypeId])(implicit c: Connection): Int
   def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow]
+  def deleteById(addresstypeid: AddresstypeId)(implicit c: Connection): Boolean
+  def deleteByIds(addresstypeids: Array[AddresstypeId])(implicit c: Connection): Int
   def insert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow
-  def insertStreaming(unsaved: Iterator[AddresstypeRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: AddresstypeRowUnsaved)(implicit c: Connection): AddresstypeRow
+  def insertStreaming(unsaved: Iterator[AddresstypeRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[AddresstypeRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[AddresstypeFields, AddresstypeRow]
   def selectAll(implicit c: Connection): List[AddresstypeRow]
   def selectById(addresstypeid: AddresstypeId)(implicit c: Connection): Option[AddresstypeRow]
   def selectByIds(addresstypeids: Array[AddresstypeId])(implicit c: Connection): List[AddresstypeRow]
-  def update(row: AddresstypeRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[AddresstypeFields, AddresstypeRow]
+  def update(row: AddresstypeRow)(implicit c: Connection): Boolean
   def upsert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow
 }

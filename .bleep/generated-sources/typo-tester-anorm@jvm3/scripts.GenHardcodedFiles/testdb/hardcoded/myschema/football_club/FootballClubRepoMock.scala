@@ -21,14 +21,14 @@ import typo.dsl.UpdateBuilder.UpdateBuilderMock
 import typo.dsl.UpdateParams
 
 class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, FootballClubRow] = scala.collection.mutable.Map.empty) extends FootballClubRepo {
-  override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
+    DeleteBuilderMock(DeleteParams.empty, FootballClubFields.structure.fields, map)
+  }
+  override def deleteById(id: FootballClubId)(implicit c: Connection): Boolean = {
     map.remove(id).isDefined
   }
   override def deleteByIds(ids: Array[FootballClubId])(implicit c: Connection): Int = {
     ids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
-    DeleteBuilderMock(DeleteParams.empty, FootballClubFields.structure.fields, map)
   }
   override def insert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow = {
     val _ = if (map.contains(unsaved.id))
@@ -50,17 +50,20 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
   override def selectAll(implicit c: Connection): List[FootballClubRow] = {
     map.values.toList
   }
+  override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]])(implicit c: Connection): List[FootballClubRow] = {
+    fieldValues.foldLeft(map.values) {
+      case (acc, FootballClubFieldValue.id(value)) => acc.filter(_.id == value)
+      case (acc, FootballClubFieldValue.name(value)) => acc.filter(_.name == value)
+    }.toList
+  }
   override def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow] = {
     map.get(id)
   }
   override def selectByIds(ids: Array[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
     ids.flatMap(map.get).toList
   }
-  override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]])(implicit c: Connection): List[FootballClubRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, FootballClubFieldValue.id(value)) => acc.filter(_.id == value)
-      case (acc, FootballClubFieldValue.name(value)) => acc.filter(_.name == value)
-    }.toList
+  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
+    UpdateBuilderMock(UpdateParams.empty, FootballClubFields.structure.fields, map)
   }
   override def update(row: FootballClubRow)(implicit c: Connection): Boolean = {
     map.get(row.id) match {
@@ -70,9 +73,6 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
-    UpdateBuilderMock(UpdateParams.empty, FootballClubFields.structure.fields, map)
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]])(implicit c: Connection): Boolean = {
     map.get(id) match {

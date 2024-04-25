@@ -15,19 +15,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait PasswordRepo {
-  def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean]
-  def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int]
   def delete: DeleteBuilder[PasswordFields, PasswordRow]
+  def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean]
+  def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int]
   def insert(unsaved: PasswordRow): ConnectionIO[PasswordRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, PasswordRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: PasswordRowUnsaved): ConnectionIO[PasswordRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, PasswordRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PasswordRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[PasswordFields, PasswordRow]
   def selectAll: Stream[ConnectionIO, PasswordRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PasswordRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PasswordRow]
-  def update(row: PasswordRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PasswordFields, PasswordRow]
+  def update(row: PasswordRow): ConnectionIO[Boolean]
   def upsert(unsaved: PasswordRow): ConnectionIO[PasswordRow]
 }

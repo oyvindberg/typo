@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait SalesreasonRepo {
-  def delete(salesreasonid: SalesreasonId): ConnectionIO[Boolean]
-  def deleteByIds(salesreasonids: Array[SalesreasonId]): ConnectionIO[Int]
   def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow]
+  def deleteById(salesreasonid: SalesreasonId): ConnectionIO[Boolean]
+  def deleteByIds(salesreasonids: Array[SalesreasonId]): ConnectionIO[Int]
   def insert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, SalesreasonRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, SalesreasonRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesreasonRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[SalesreasonFields, SalesreasonRow]
   def selectAll: Stream[ConnectionIO, SalesreasonRow]
   def selectById(salesreasonid: SalesreasonId): ConnectionIO[Option[SalesreasonRow]]
   def selectByIds(salesreasonids: Array[SalesreasonId]): Stream[ConnectionIO, SalesreasonRow]
-  def update(row: SalesreasonRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[SalesreasonFields, SalesreasonRow]
+  def update(row: SalesreasonRow): ConnectionIO[Boolean]
   def upsert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow]
 }

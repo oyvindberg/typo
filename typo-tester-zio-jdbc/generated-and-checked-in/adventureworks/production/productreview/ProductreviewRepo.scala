@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait ProductreviewRepo {
-  def delete(productreviewid: ProductreviewId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(productreviewids: Array[ProductreviewId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow]
+  def deleteById(productreviewid: ProductreviewId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(productreviewids: Array[ProductreviewId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ProductreviewRow): ZIO[ZConnection, Throwable, ProductreviewRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductreviewRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ProductreviewRowUnsaved): ZIO[ZConnection, Throwable, ProductreviewRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductreviewRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductreviewRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[ProductreviewFields, ProductreviewRow]
   def selectAll: ZStream[ZConnection, Throwable, ProductreviewRow]
   def selectById(productreviewid: ProductreviewId): ZIO[ZConnection, Throwable, Option[ProductreviewRow]]
   def selectByIds(productreviewids: Array[ProductreviewId]): ZStream[ZConnection, Throwable, ProductreviewRow]
-  def update(row: ProductreviewRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[ProductreviewFields, ProductreviewRow]
+  def update(row: ProductreviewRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ProductreviewRow): ZIO[ZConnection, Throwable, UpdateResult[ProductreviewRow]]
 }

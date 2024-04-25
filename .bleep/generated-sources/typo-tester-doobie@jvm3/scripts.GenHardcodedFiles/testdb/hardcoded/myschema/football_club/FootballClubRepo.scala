@@ -15,18 +15,18 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait FootballClubRepo {
-  def delete(id: FootballClubId): ConnectionIO[Boolean]
-  def deleteByIds(ids: Array[FootballClubId]): ConnectionIO[Int]
   def delete: DeleteBuilder[FootballClubFields, FootballClubRow]
+  def deleteById(id: FootballClubId): ConnectionIO[Boolean]
+  def deleteByIds(ids: Array[FootballClubId]): ConnectionIO[Int]
   def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[FootballClubFields, FootballClubRow]
   def selectAll: Stream[ConnectionIO, FootballClubRow]
+  def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): Stream[ConnectionIO, FootballClubRow]
   def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]]
   def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow]
-  def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): Stream[ConnectionIO, FootballClubRow]
-  def update(row: FootballClubRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[FootballClubFields, FootballClubRow]
+  def update(row: FootballClubRow): ConnectionIO[Boolean]
   def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ConnectionIO[Boolean]
   def upsert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow]
 }

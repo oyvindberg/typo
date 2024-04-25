@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait WorkorderroutingRepo {
-  def delete(compositeId: WorkorderroutingId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(compositeIds: Array[WorkorderroutingId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow]
+  def deleteById(compositeId: WorkorderroutingId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[WorkorderroutingId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: WorkorderroutingRow): ZIO[ZConnection, Throwable, WorkorderroutingRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderroutingRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: WorkorderroutingRowUnsaved): ZIO[ZConnection, Throwable, WorkorderroutingRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderroutingRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderroutingRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def selectAll: ZStream[ZConnection, Throwable, WorkorderroutingRow]
   def selectById(compositeId: WorkorderroutingId): ZIO[ZConnection, Throwable, Option[WorkorderroutingRow]]
   def selectByIds(compositeIds: Array[WorkorderroutingId]): ZStream[ZConnection, Throwable, WorkorderroutingRow]
-  def update(row: WorkorderroutingRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow]
+  def update(row: WorkorderroutingRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: WorkorderroutingRow): ZIO[ZConnection, Throwable, UpdateResult[WorkorderroutingRow]]
 }

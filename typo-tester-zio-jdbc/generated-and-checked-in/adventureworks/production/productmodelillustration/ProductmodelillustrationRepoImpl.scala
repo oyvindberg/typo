@@ -25,7 +25,10 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
-  override def delete(compositeId: ProductmodelillustrationId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure)
+  }
+  override def deleteById(compositeId: ProductmodelillustrationId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.productmodelillustration where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(ProductmodelId.setter)} AND "illustrationid" = ${Segment.paramSegment(compositeId.illustrationid)(IllustrationId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductmodelillustrationId]): ZIO[ZConnection, Throwable, Long] = {
@@ -38,17 +41,11 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
        """.delete
     
   }
-  override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure)
-  }
   override def insert(unsaved: ProductmodelillustrationRow): ZIO[ZConnection, Throwable, ProductmodelillustrationRow] = {
     sql"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")
           values (${Segment.paramSegment(unsaved.productmodelid)(ProductmodelId.setter)}::int4, ${Segment.paramSegment(unsaved.illustrationid)(IllustrationId.setter)}::int4, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productmodelid", "illustrationid", "modifieddate"::text
        """.insertReturning(using ProductmodelillustrationRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelillustrationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelillustrationRow.text)
   }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved): ZIO[ZConnection, Throwable, ProductmodelillustrationRow] = {
     val fs = List(
@@ -71,6 +68,9 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     }
     q.insertReturning(using ProductmodelillustrationRow.jdbcDecoder).map(_.updatedKeys.head)
     
+  }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelillustrationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelillustrationRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelillustrationRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -95,14 +95,14 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
        """.query(using ProductmodelillustrationRow.jdbcDecoder).selectStream()
     
   }
+  override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    UpdateBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.jdbcDecoder)
+  }
   override def update(row: ProductmodelillustrationRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productmodelillustration
           set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(ProductmodelId.setter)} AND "illustrationid" = ${Segment.paramSegment(compositeId.illustrationid)(IllustrationId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    UpdateBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductmodelillustrationRow): ZIO[ZConnection, Throwable, UpdateResult[ProductmodelillustrationRow]] = {
     sql"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")

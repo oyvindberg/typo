@@ -14,21 +14,21 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait PersonRepo {
-  def delete(id: PersonId)(implicit c: Connection): Boolean
-  def deleteByIds(ids: Array[PersonId])(implicit c: Connection): Int
   def delete: DeleteBuilder[PersonFields, PersonRow]
+  def deleteById(id: PersonId)(implicit c: Connection): Boolean
+  def deleteByIds(ids: Array[PersonId])(implicit c: Connection): Int
   def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow
-  def insertStreaming(unsaved: Iterator[PersonRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow
+  def insertStreaming(unsaved: Iterator[PersonRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[PersonRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[PersonFields, PersonRow]
   def selectAll(implicit c: Connection): List[PersonRow]
+  def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]])(implicit c: Connection): List[PersonRow]
   def selectById(id: PersonId)(implicit c: Connection): Option[PersonRow]
   def selectByIds(ids: Array[PersonId])(implicit c: Connection): List[PersonRow]
-  def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]])(implicit c: Connection): List[PersonRow]
-  def update(row: PersonRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PersonFields, PersonRow]
+  def update(row: PersonRow)(implicit c: Connection): Boolean
   def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean
   def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow
 }

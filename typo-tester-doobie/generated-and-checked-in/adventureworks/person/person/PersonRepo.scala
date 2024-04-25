@@ -15,19 +15,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait PersonRepo {
-  def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean]
-  def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int]
   def delete: DeleteBuilder[PersonFields, PersonRow]
+  def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean]
+  def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int]
   def insert(unsaved: PersonRow): ConnectionIO[PersonRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[PersonFields, PersonRow]
   def selectAll: Stream[ConnectionIO, PersonRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PersonRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PersonRow]
-  def update(row: PersonRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PersonFields, PersonRow]
+  def update(row: PersonRow): ConnectionIO[Boolean]
   def upsert(unsaved: PersonRow): ConnectionIO[PersonRow]
 }

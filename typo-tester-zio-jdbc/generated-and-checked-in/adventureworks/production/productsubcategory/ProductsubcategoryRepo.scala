@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait ProductsubcategoryRepo {
-  def delete(productsubcategoryid: ProductsubcategoryId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(productsubcategoryids: Array[ProductsubcategoryId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow]
+  def deleteById(productsubcategoryid: ProductsubcategoryId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(productsubcategoryids: Array[ProductsubcategoryId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ProductsubcategoryRow): ZIO[ZConnection, Throwable, ProductsubcategoryRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductsubcategoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ProductsubcategoryRowUnsaved): ZIO[ZConnection, Throwable, ProductsubcategoryRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductsubcategoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductsubcategoryRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow]
   def selectAll: ZStream[ZConnection, Throwable, ProductsubcategoryRow]
   def selectById(productsubcategoryid: ProductsubcategoryId): ZIO[ZConnection, Throwable, Option[ProductsubcategoryRow]]
   def selectByIds(productsubcategoryids: Array[ProductsubcategoryId]): ZStream[ZConnection, Throwable, ProductsubcategoryRow]
-  def update(row: ProductsubcategoryRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow]
+  def update(row: ProductsubcategoryRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ProductsubcategoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductsubcategoryRow]]
 }

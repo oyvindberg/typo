@@ -24,14 +24,14 @@ import typo.dsl.UpdateParams
 
 class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
                        map: scala.collection.mutable.Map[DocumentId, DocumentRow] = scala.collection.mutable.Map.empty) extends DocumentRepo {
-  override def delete(documentnode: DocumentId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
+    DeleteBuilderMock(DeleteParams.empty, DocumentFields.structure.fields, map)
+  }
+  override def deleteById(documentnode: DocumentId): ConnectionIO[Boolean] = {
     delay(map.remove(documentnode).isDefined)
   }
   override def deleteByIds(documentnodes: Array[DocumentId]): ConnectionIO[Int] = {
     delay(documentnodes.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
-    DeleteBuilderMock(DeleteParams.empty, DocumentFields.structure.fields, map)
   }
   override def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     delay {
@@ -43,6 +43,9 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
       unsaved
     }
   }
+  override def insert(unsaved: DocumentRowUnsaved): ConnectionIO[DocumentRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -52,9 +55,6 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
       }
       num
     }
-  }
-  override def insert(unsaved: DocumentRowUnsaved): ConnectionIO[DocumentRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, DocumentRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -83,6 +83,9 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   override def selectByUniqueRowguid(rowguid: TypoUUID): ConnectionIO[Option[DocumentRow]] = {
     delay(map.values.find(v => rowguid == v.rowguid))
   }
+  override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
+    UpdateBuilderMock(UpdateParams.empty, DocumentFields.structure.fields, map)
+  }
   override def update(row: DocumentRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.documentnode) match {
@@ -93,9 +96,6 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
-    UpdateBuilderMock(UpdateParams.empty, DocumentFields.structure.fields, map)
   }
   override def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     delay {

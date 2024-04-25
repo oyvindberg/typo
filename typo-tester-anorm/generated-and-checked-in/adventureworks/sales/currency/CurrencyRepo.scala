@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait CurrencyRepo {
-  def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean
-  def deleteByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): Int
   def delete: DeleteBuilder[CurrencyFields, CurrencyRow]
+  def deleteById(currencycode: CurrencyId)(implicit c: Connection): Boolean
+  def deleteByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): Int
   def insert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow
-  def insertStreaming(unsaved: Iterator[CurrencyRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow
+  def insertStreaming(unsaved: Iterator[CurrencyRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[CurrencyRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[CurrencyFields, CurrencyRow]
   def selectAll(implicit c: Connection): List[CurrencyRow]
   def selectById(currencycode: CurrencyId)(implicit c: Connection): Option[CurrencyRow]
   def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow]
-  def update(row: CurrencyRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[CurrencyFields, CurrencyRow]
+  def update(row: CurrencyRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow
 }

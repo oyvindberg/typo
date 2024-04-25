@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class CultureRepoImpl extends CultureRepo {
-  override def delete(cultureid: CultureId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[CultureFields, CultureRow] = {
+    DeleteBuilder("production.culture", CultureFields.structure)
+  }
+  override def deleteById(cultureid: CultureId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.culture where "cultureid" = ${ParameterValue(cultureid, null, CultureId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(cultureids: Array[CultureId])(implicit c: Connection): Int = {
@@ -34,9 +37,6 @@ class CultureRepoImpl extends CultureRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[CultureFields, CultureRow] = {
-    DeleteBuilder("production.culture", CultureFields.structure)
-  }
   override def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     SQL"""insert into production.culture("cultureid", "name", "modifieddate")
           values (${ParameterValue(unsaved.cultureid, null, CultureId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -44,9 +44,6 @@ class CultureRepoImpl extends CultureRepo {
        """
       .executeInsert(CultureRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[CultureRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CultureRow.text, c)
   }
   override def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow = {
     val namedParameters = List(
@@ -73,6 +70,9 @@ class CultureRepoImpl extends CultureRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[CultureRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CultureRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[CultureRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CultureRowUnsaved.text, c)
@@ -98,6 +98,9 @@ class CultureRepoImpl extends CultureRepo {
        """.as(CultureRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[CultureFields, CultureRow] = {
+    UpdateBuilder("production.culture", CultureFields.structure, CultureRow.rowParser)
+  }
   override def update(row: CultureRow)(implicit c: Connection): Boolean = {
     val cultureid = row.cultureid
     SQL"""update production.culture
@@ -105,9 +108,6 @@ class CultureRepoImpl extends CultureRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "cultureid" = ${ParameterValue(cultureid, null, CultureId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[CultureFields, CultureRow] = {
-    UpdateBuilder("production.culture", CultureFields.structure, CultureRow.rowParser)
   }
   override def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     SQL"""insert into production.culture("cultureid", "name", "modifieddate")

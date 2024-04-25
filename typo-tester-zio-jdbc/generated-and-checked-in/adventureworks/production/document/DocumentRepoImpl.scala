@@ -29,23 +29,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class DocumentRepoImpl extends DocumentRepo {
-  override def delete(documentnode: DocumentId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
+    DeleteBuilder("production.document", DocumentFields.structure)
+  }
+  override def deleteById(documentnode: DocumentId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.document where "documentnode" = ${Segment.paramSegment(documentnode)(DocumentId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(documentnodes: Array[DocumentId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from production.document where "documentnode" = ANY(${documentnodes})""".delete
-  }
-  override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
-    DeleteBuilder("production.document", DocumentFields.structure)
   }
   override def insert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, DocumentRow] = {
     sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
           values (${Segment.paramSegment(unsaved.title)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.owner)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.folderflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.filename)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.fileextension)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.revision)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.changenumber)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.status)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.documentsummary)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.document)(Setter.optionParamSetter(TypoBytea.setter))}::bytea, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.documentnode)(DocumentId.setter)})
           returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
        """.insertReturning(using DocumentRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") FROM STDIN""", batchSize, unsaved)(DocumentRow.text)
   }
   override def insert(unsaved: DocumentRowUnsaved): ZIO[ZConnection, Throwable, DocumentRow] = {
     val fs = List(
@@ -91,6 +88,9 @@ class DocumentRepoImpl extends DocumentRepo {
     q.insertReturning(using DocumentRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") FROM STDIN""", batchSize, unsaved)(DocumentRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.document("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(DocumentRowUnsaved.text)
@@ -113,6 +113,9 @@ class DocumentRepoImpl extends DocumentRepo {
           where "rowguid" = ${Segment.paramSegment(rowguid)(TypoUUID.setter)}
        """.query(using DocumentRow.jdbcDecoder).selectOne
   }
+  override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
+    UpdateBuilder("production.document", DocumentFields.structure, DocumentRow.jdbcDecoder)
+  }
   override def update(row: DocumentRow): ZIO[ZConnection, Throwable, Boolean] = {
     val documentnode = row.documentnode
     sql"""update production.document
@@ -129,9 +132,6 @@ class DocumentRepoImpl extends DocumentRepo {
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "documentnode" = ${Segment.paramSegment(documentnode)(DocumentId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
-    UpdateBuilder("production.document", DocumentFields.structure, DocumentRow.jdbcDecoder)
   }
   override def upsert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, UpdateResult[DocumentRow]] = {
     sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")

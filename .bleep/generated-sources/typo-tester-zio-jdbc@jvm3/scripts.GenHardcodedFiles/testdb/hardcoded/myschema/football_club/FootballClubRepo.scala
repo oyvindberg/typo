@@ -17,18 +17,18 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait FootballClubRepo {
-  def delete(id: FootballClubId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[FootballClubFields, FootballClubRow]
+  def deleteById(id: FootballClubId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: FootballClubRow): ZIO[ZConnection, Throwable, FootballClubRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FootballClubRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[FootballClubFields, FootballClubRow]
   def selectAll: ZStream[ZConnection, Throwable, FootballClubRow]
+  def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, FootballClubRow]
   def selectById(id: FootballClubId): ZIO[ZConnection, Throwable, Option[FootballClubRow]]
   def selectByIds(ids: Array[FootballClubId]): ZStream[ZConnection, Throwable, FootballClubRow]
-  def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, FootballClubRow]
-  def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[FootballClubFields, FootballClubRow]
+  def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Boolean]
   def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: FootballClubRow): ZIO[ZConnection, Throwable, UpdateResult[FootballClubRow]]
 }

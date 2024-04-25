@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait SalestaxrateRepo {
-  def delete(salestaxrateid: SalestaxrateId): ConnectionIO[Boolean]
-  def deleteByIds(salestaxrateids: Array[SalestaxrateId]): ConnectionIO[Int]
   def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow]
+  def deleteById(salestaxrateid: SalestaxrateId): ConnectionIO[Boolean]
+  def deleteByIds(salestaxrateids: Array[SalestaxrateId]): ConnectionIO[Int]
   def insert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: SalestaxrateRowUnsaved): ConnectionIO[SalestaxrateRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow]
   def selectAll: Stream[ConnectionIO, SalestaxrateRow]
   def selectById(salestaxrateid: SalestaxrateId): ConnectionIO[Option[SalestaxrateRow]]
   def selectByIds(salestaxrateids: Array[SalestaxrateId]): Stream[ConnectionIO, SalestaxrateRow]
-  def update(row: SalestaxrateRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow]
+  def update(row: SalestaxrateRow): ConnectionIO[Boolean]
   def upsert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow]
 }

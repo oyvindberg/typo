@@ -27,7 +27,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class SalesterritoryRepoImpl extends SalesterritoryRepo {
-  override def delete(territoryid: SalesterritoryId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    DeleteBuilder("sales.salesterritory", SalesterritoryFields.structure)
+  }
+  override def deleteById(territoryid: SalesterritoryId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.salesterritory where "territoryid" = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): Int = {
@@ -37,9 +40,6 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    DeleteBuilder("sales.salesterritory", SalesterritoryFields.structure)
-  }
   override def insert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
     SQL"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.territoryid, null, SalesterritoryId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)}, ${ParameterValue(unsaved.group, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.salesytd, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.saleslastyear, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.costytd, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.costlastyear, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -47,9 +47,6 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
        """
       .executeInsert(SalesterritoryRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[SalesterritoryRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesterritoryRow.text, c)
   }
   override def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryRow = {
     val namedParameters = List(
@@ -101,6 +98,9 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[SalesterritoryRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesterritoryRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SalesterritoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY sales.salesterritory("name", "countryregioncode", "group", "territoryid", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesterritoryRowUnsaved.text, c)
@@ -126,6 +126,9 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
        """.as(SalesterritoryRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    UpdateBuilder("sales.salesterritory", SalesterritoryFields.structure, SalesterritoryRow.rowParser)
+  }
   override def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
     val territoryid = row.territoryid
     SQL"""update sales.salesterritory
@@ -140,9 +143,6 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "territoryid" = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    UpdateBuilder("sales.salesterritory", SalesterritoryFields.structure, SalesterritoryRow.rowParser)
   }
   override def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
     SQL"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")

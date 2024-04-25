@@ -101,7 +101,7 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
         _ <- delay(assert(saved3_1 === saved3_2))
         _ <- delay(assert(saved3_2.gender == "M"))
         // delete
-        _ <- employeeRepo.delete(saved1.businessentityid)
+        _ <- employeeRepo.deleteById(saved1.businessentityid)
         _ <- employeeRepo.selectAll.compile.toList.map {
           case Nil      => ()
           case nonEmpty => throw new MatchError(nonEmpty)

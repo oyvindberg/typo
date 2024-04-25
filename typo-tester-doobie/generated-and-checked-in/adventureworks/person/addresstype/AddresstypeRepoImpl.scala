@@ -24,23 +24,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class AddresstypeRepoImpl extends AddresstypeRepo {
-  override def delete(addresstypeid: AddresstypeId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
+    DeleteBuilder("person.addresstype", AddresstypeFields.structure)
+  }
+  override def deleteById(addresstypeid: AddresstypeId): ConnectionIO[Boolean] = {
     sql"""delete from person.addresstype where "addresstypeid" = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(addresstypeids: Array[AddresstypeId]): ConnectionIO[Int] = {
     sql"""delete from person.addresstype where "addresstypeid" = ANY(${addresstypeids})""".update.run
-  }
-  override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
-    DeleteBuilder("person.addresstype", AddresstypeFields.structure)
   }
   override def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.addresstypeid)(Write.fromPut(AddresstypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "addresstypeid", "name", "rowguid", "modifieddate"::text
        """.query(using AddresstypeRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, AddresstypeRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.addresstype("addresstypeid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using AddresstypeRow.text)
   }
   override def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow] = {
     val fs = List(
@@ -73,6 +70,9 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
     q.query(using AddresstypeRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, AddresstypeRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY person.addresstype("addresstypeid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using AddresstypeRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, AddresstypeRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY person.addresstype("name", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using AddresstypeRowUnsaved.text)
@@ -89,6 +89,9 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
   override def selectByIds(addresstypeids: Array[AddresstypeId]): Stream[ConnectionIO, AddresstypeRow] = {
     sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype where "addresstypeid" = ANY(${addresstypeids})""".query(using AddresstypeRow.read).stream
   }
+  override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
+    UpdateBuilder("person.addresstype", AddresstypeFields.structure, AddresstypeRow.read)
+  }
   override def update(row: AddresstypeRow): ConnectionIO[Boolean] = {
     val addresstypeid = row.addresstypeid
     sql"""update person.addresstype
@@ -99,9 +102,6 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
-    UpdateBuilder("person.addresstype", AddresstypeFields.structure, AddresstypeRow.read)
   }
   override def upsert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")

@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait WorkorderRepo {
-  def delete(workorderid: WorkorderId): ConnectionIO[Boolean]
-  def deleteByIds(workorderids: Array[WorkorderId]): ConnectionIO[Int]
   def delete: DeleteBuilder[WorkorderFields, WorkorderRow]
+  def deleteById(workorderid: WorkorderId): ConnectionIO[Boolean]
+  def deleteByIds(workorderids: Array[WorkorderId]): ConnectionIO[Int]
   def insert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: WorkorderRowUnsaved): ConnectionIO[WorkorderRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, WorkorderRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[WorkorderFields, WorkorderRow]
   def selectAll: Stream[ConnectionIO, WorkorderRow]
   def selectById(workorderid: WorkorderId): ConnectionIO[Option[WorkorderRow]]
   def selectByIds(workorderids: Array[WorkorderId]): Stream[ConnectionIO, WorkorderRow]
-  def update(row: WorkorderRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[WorkorderFields, WorkorderRow]
+  def update(row: WorkorderRow): ConnectionIO[Boolean]
   def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow]
 }

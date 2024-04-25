@@ -21,14 +21,14 @@ import typo.dsl.UpdateBuilder.UpdateBuilderMock
 import typo.dsl.UpdateParams
 
 class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, MaritalStatusRow] = scala.collection.mutable.Map.empty) extends MaritalStatusRepo {
-  override def delete(id: MaritalStatusId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure.fields, map)
+  }
+  override def deleteById(id: MaritalStatusId)(implicit c: Connection): Boolean = {
     map.remove(id).isDefined
   }
   override def deleteByIds(ids: Array[MaritalStatusId])(implicit c: Connection): Int = {
     ids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure.fields, map)
   }
   override def insert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
     val _ = if (map.contains(unsaved.id))
@@ -50,16 +50,16 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
     map.values.toList
   }
+  override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]])(implicit c: Connection): List[MaritalStatusRow] = {
+    fieldValues.foldLeft(map.values) {
+      case (acc, MaritalStatusFieldValue.id(value)) => acc.filter(_.id == value)
+    }.toList
+  }
   override def selectById(id: MaritalStatusId)(implicit c: Connection): Option[MaritalStatusRow] = {
     map.get(id)
   }
   override def selectByIds(ids: Array[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
     ids.flatMap(map.get).toList
-  }
-  override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]])(implicit c: Connection): List[MaritalStatusRow] = {
-    fieldValues.foldLeft(map.values) {
-      case (acc, MaritalStatusFieldValue.id(value)) => acc.filter(_.id == value)
-    }.toList
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
     UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields.structure.fields, map)

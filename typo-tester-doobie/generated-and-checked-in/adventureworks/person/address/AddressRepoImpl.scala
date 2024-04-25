@@ -26,23 +26,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class AddressRepoImpl extends AddressRepo {
-  override def delete(addressid: AddressId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[AddressFields, AddressRow] = {
+    DeleteBuilder("person.address", AddressFields.structure)
+  }
+  override def deleteById(addressid: AddressId): ConnectionIO[Boolean] = {
     sql"""delete from person.address where "addressid" = ${fromWrite(addressid)(Write.fromPut(AddressId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(addressids: Array[AddressId]): ConnectionIO[Int] = {
     sql"""delete from person.address where "addressid" = ANY(${addressids})""".update.run
-  }
-  override def delete: DeleteBuilder[AddressFields, AddressRow] = {
-    DeleteBuilder("person.address", AddressFields.structure)
   }
   override def insert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.addressid)(Write.fromPut(AddressId.put))}::int4, ${fromWrite(unsaved.addressline1)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.addressline2)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.city)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4, ${fromWrite(unsaved.postalcode)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.spatiallocation)(Write.fromPutOption(TypoBytea.put))}::bytea, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
        """.query(using AddressRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, AddressRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using AddressRow.text)
   }
   override def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow] = {
     val fs = List(
@@ -80,6 +77,9 @@ class AddressRepoImpl extends AddressRepo {
     q.query(using AddressRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, AddressRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using AddressRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, AddressRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY person.address("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using AddressRowUnsaved.text)
@@ -96,6 +96,9 @@ class AddressRepoImpl extends AddressRepo {
   override def selectByIds(addressids: Array[AddressId]): Stream[ConnectionIO, AddressRow] = {
     sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address where "addressid" = ANY(${addressids})""".query(using AddressRow.read).stream
   }
+  override def update: UpdateBuilder[AddressFields, AddressRow] = {
+    UpdateBuilder("person.address", AddressFields.structure, AddressRow.read)
+  }
   override def update(row: AddressRow): ConnectionIO[Boolean] = {
     val addressid = row.addressid
     sql"""update person.address
@@ -111,9 +114,6 @@ class AddressRepoImpl extends AddressRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[AddressFields, AddressRow] = {
-    UpdateBuilder("person.address", AddressFields.structure, AddressRow.read)
   }
   override def upsert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")

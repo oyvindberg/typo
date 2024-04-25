@@ -25,7 +25,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class PersonphoneRepoImpl extends PersonphoneRepo {
-  override def delete(compositeId: PersonphoneId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
+    DeleteBuilder("person.personphone", PersonphoneFields.structure)
+  }
+  override def deleteById(compositeId: PersonphoneId): ConnectionIO[Boolean] = {
     sql"""delete from person.personphone where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[PersonphoneId]): ConnectionIO[Int] = {
@@ -39,17 +42,11 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
        """.update.run
     
   }
-  override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
-    DeleteBuilder("person.personphone", PersonphoneFields.structure)
-  }
   override def insert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.phonenumber)(Write.fromPut(Phone.put))}::varchar, ${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
        """.query(using PersonphoneRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, PersonphoneRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PersonphoneRow.text)
   }
   override def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow] = {
     val fs = List(
@@ -76,6 +73,9 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     q.query(using PersonphoneRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, PersonphoneRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PersonphoneRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonphoneRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PersonphoneRowUnsaved.text)
@@ -100,6 +100,9 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
        """.query(using PersonphoneRow.read).stream
     
   }
+  override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
+    UpdateBuilder("person.personphone", PersonphoneFields.structure, PersonphoneRow.read)
+  }
   override def update(row: PersonphoneRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update person.personphone
@@ -108,9 +111,6 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
-    UpdateBuilder("person.personphone", PersonphoneFields.structure, PersonphoneRow.read)
   }
   override def upsert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")

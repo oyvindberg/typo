@@ -25,7 +25,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
-  override def delete(compositeId: ProductmodelillustrationId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure)
+  }
+  override def deleteById(compositeId: ProductmodelillustrationId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productmodelillustration where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "illustrationid" = ${ParameterValue(compositeId.illustrationid, null, IllustrationId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[ProductmodelillustrationId])(implicit c: Connection): Int = {
@@ -38,9 +41,6 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure)
-  }
   override def insert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     SQL"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")
           values (${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4, ${ParameterValue(unsaved.illustrationid, null, IllustrationId.toStatement)}::int4, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -48,9 +48,6 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
        """
       .executeInsert(ProductmodelillustrationRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[ProductmodelillustrationRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelillustrationRow.text, c)
   }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved)(implicit c: Connection): ProductmodelillustrationRow = {
     val namedParameters = List(
@@ -76,6 +73,9 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
         .executeInsert(ProductmodelillustrationRow.rowParser(1).single)
     }
     
+  }
+  override def insertStreaming(unsaved: Iterator[ProductmodelillustrationRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productmodelillustration("productmodelid", "illustrationid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelillustrationRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductmodelillustrationRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -105,15 +105,15 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
        """.as(ProductmodelillustrationRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
+    UpdateBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.rowParser)
+  }
   override def update(row: ProductmodelillustrationRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productmodelillustration
           set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "illustrationid" = ${ParameterValue(compositeId.illustrationid, null, IllustrationId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
-    UpdateBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.rowParser)
   }
   override def upsert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     SQL"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")

@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
                          map: scala.collection.mutable.Map[ShipmethodId, ShipmethodRow] = scala.collection.mutable.Map.empty) extends ShipmethodRepo {
-  override def delete(shipmethodid: ShipmethodId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ShipmethodFields.structure.fields, map)
+  }
+  override def deleteById(shipmethodid: ShipmethodId): ConnectionIO[Boolean] = {
     delay(map.remove(shipmethodid).isDefined)
   }
   override def deleteByIds(shipmethodids: Array[ShipmethodId]): ConnectionIO[Int] = {
     delay(shipmethodids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShipmethodFields.structure.fields, map)
   }
   override def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     delay {
@@ -42,6 +42,9 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
       unsaved
     }
   }
+  override def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ShipmethodRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
       }
       num
     }
-  }
-  override def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShipmethodRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
   override def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow] = {
     Stream.emits(shipmethodids.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ShipmethodFields.structure.fields, map)
+  }
   override def update(row: ShipmethodRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.shipmethodid) match {
@@ -89,9 +92,6 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShipmethodFields.structure.fields, map)
   }
   override def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     delay {

@@ -29,7 +29,7 @@ class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
         _ <- ZIO.succeed(assert(saved3.map(_.name).contains(Name("baz"))))
         // delete
         _ <- departmentRepo.selectAll.runCollect.map(x => assert(x.size === 1))
-        _ <- departmentRepo.delete(saved1.departmentid)
+        _ <- departmentRepo.deleteById(saved1.departmentid)
         _ <- departmentRepo.selectAll.runCollect.map(x => assert(x.isEmpty))
       } yield succeed
     }

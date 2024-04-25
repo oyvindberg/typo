@@ -28,23 +28,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class DocumentRepoImpl extends DocumentRepo {
-  override def delete(documentnode: DocumentId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
+    DeleteBuilder("production.document", DocumentFields.structure)
+  }
+  override def deleteById(documentnode: DocumentId): ConnectionIO[Boolean] = {
     sql"""delete from production.document where "documentnode" = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(documentnodes: Array[DocumentId]): ConnectionIO[Int] = {
     sql"""delete from production.document where "documentnode" = ANY(${documentnodes})""".update.run
-  }
-  override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
-    DeleteBuilder("production.document", DocumentFields.structure)
   }
   override def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
           values (${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.owner)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.folderflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.filename)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.fileextension)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.changenumber)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.document)(Write.fromPutOption(TypoBytea.put))}::bytea, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.documentnode)(Write.fromPut(DocumentId.put))})
           returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
        """.query(using DocumentRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") FROM STDIN""").copyIn(unsaved, batchSize)(using DocumentRow.text)
   }
   override def insert(unsaved: DocumentRowUnsaved): ConnectionIO[DocumentRow] = {
     val fs = List(
@@ -92,6 +89,9 @@ class DocumentRepoImpl extends DocumentRepo {
     q.query(using DocumentRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") FROM STDIN""").copyIn(unsaved, batchSize)(using DocumentRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, DocumentRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.document("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using DocumentRowUnsaved.text)
@@ -114,6 +114,9 @@ class DocumentRepoImpl extends DocumentRepo {
           where "rowguid" = ${fromWrite(rowguid)(Write.fromPut(TypoUUID.put))}
        """.query(using DocumentRow.read).option
   }
+  override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
+    UpdateBuilder("production.document", DocumentFields.structure, DocumentRow.read)
+  }
   override def update(row: DocumentRow): ConnectionIO[Boolean] = {
     val documentnode = row.documentnode
     sql"""update production.document
@@ -133,9 +136,6 @@ class DocumentRepoImpl extends DocumentRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
-    UpdateBuilder("production.document", DocumentFields.structure, DocumentRow.read)
   }
   override def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")

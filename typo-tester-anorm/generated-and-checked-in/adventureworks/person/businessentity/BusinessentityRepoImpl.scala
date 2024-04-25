@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class BusinessentityRepoImpl extends BusinessentityRepo {
-  override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
+    DeleteBuilder("person.businessentity", BusinessentityFields.structure)
+  }
+  override def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.businessentity where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
@@ -34,9 +37,6 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
-    DeleteBuilder("person.businessentity", BusinessentityFields.structure)
-  }
   override def insert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
     SQL"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -44,9 +44,6 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
        """
       .executeInsert(BusinessentityRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[BusinessentityRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(BusinessentityRow.text, c)
   }
   override def insert(unsaved: BusinessentityRowUnsaved)(implicit c: Connection): BusinessentityRow = {
     val namedParameters = List(
@@ -79,6 +76,9 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[BusinessentityRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(BusinessentityRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[BusinessentityRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BusinessentityRowUnsaved.text, c)
@@ -104,6 +104,9 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
        """.as(BusinessentityRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
+    UpdateBuilder("person.businessentity", BusinessentityFields.structure, BusinessentityRow.rowParser)
+  }
   override def update(row: BusinessentityRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update person.businessentity
@@ -111,9 +114,6 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
-    UpdateBuilder("person.businessentity", BusinessentityFields.structure, BusinessentityRow.rowParser)
   }
   override def upsert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
     SQL"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")

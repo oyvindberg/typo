@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, SalesterritoryRow],
                              map: scala.collection.mutable.Map[SalesterritoryId, SalesterritoryRow] = scala.collection.mutable.Map.empty) extends SalesterritoryRepo {
-  override def delete(territoryid: SalesterritoryId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields.structure.fields, map)
+  }
+  override def deleteById(territoryid: SalesterritoryId)(implicit c: Connection): Boolean = {
     map.remove(territoryid).isDefined
   }
   override def deleteByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): Int = {
     territoryids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields.structure.fields, map)
   }
   override def insert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
     val _ = if (map.contains(unsaved.territoryid))
@@ -38,14 +38,14 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     
     unsaved
   }
+  override def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[SalesterritoryRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.territoryid -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SalesterritoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
   override def selectByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow] = {
     territoryids.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields.structure.fields, map)
+  }
   override def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
     map.get(row.territoryid) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields.structure.fields, map)
   }
   override def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
     map.put(unsaved.territoryid, unsaved): @nowarn

@@ -30,7 +30,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class EmployeeRepoImpl extends EmployeeRepo {
-  override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[EmployeeFields, EmployeeRow] = {
+    DeleteBuilder("humanresources.employee", EmployeeFields.structure)
+  }
+  override def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from humanresources.employee where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
@@ -40,9 +43,6 @@ class EmployeeRepoImpl extends EmployeeRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[EmployeeFields, EmployeeRow] = {
-    DeleteBuilder("humanresources.employee", EmployeeFields.structure)
-  }
   override def insert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow = {
     SQL"""insert into humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.nationalidnumber, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.loginid, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.jobtitle, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.birthdate, null, TypoLocalDate.toStatement)}::date, ${ParameterValue(unsaved.maritalstatus, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.gender, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.hiredate, null, TypoLocalDate.toStatement)}::date, ${ParameterValue(unsaved.salariedflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.vacationhours, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.sickleavehours, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.currentflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.organizationnode, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))})
@@ -50,9 +50,6 @@ class EmployeeRepoImpl extends EmployeeRepo {
        """
       .executeInsert(EmployeeRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[EmployeeRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") FROM STDIN""", batchSize, unsaved)(EmployeeRow.text, c)
   }
   override def insert(unsaved: EmployeeRowUnsaved)(implicit c: Connection): EmployeeRow = {
     val namedParameters = List(
@@ -109,6 +106,9 @@ class EmployeeRepoImpl extends EmployeeRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[EmployeeRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") FROM STDIN""", batchSize, unsaved)(EmployeeRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[EmployeeRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmployeeRowUnsaved.text, c)
@@ -134,6 +134,9 @@ class EmployeeRepoImpl extends EmployeeRepo {
        """.as(EmployeeRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
+    UpdateBuilder("humanresources.employee", EmployeeFields.structure, EmployeeRow.rowParser)
+  }
   override def update(row: EmployeeRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update humanresources.employee
@@ -153,9 +156,6 @@ class EmployeeRepoImpl extends EmployeeRepo {
               "organizationnode" = ${ParameterValue(row.organizationnode, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
-    UpdateBuilder("humanresources.employee", EmployeeFields.structure, EmployeeRow.rowParser)
   }
   override def upsert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow = {
     SQL"""insert into humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")

@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow],
                           map: scala.collection.mutable.Map[ContacttypeId, ContacttypeRow] = scala.collection.mutable.Map.empty) extends ContacttypeRepo {
-  override def delete(contacttypeid: ContacttypeId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ContacttypeFields.structure.fields, map)
+  }
+  override def deleteById(contacttypeid: ContacttypeId): ConnectionIO[Boolean] = {
     delay(map.remove(contacttypeid).isDefined)
   }
   override def deleteByIds(contacttypeids: Array[ContacttypeId]): ConnectionIO[Int] = {
     delay(contacttypeids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ContacttypeFields.structure.fields, map)
   }
   override def insert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     delay {
@@ -42,6 +42,9 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
       unsaved
     }
   }
+  override def insert(unsaved: ContacttypeRowUnsaved): ConnectionIO[ContacttypeRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
       }
       num
     }
-  }
-  override def insert(unsaved: ContacttypeRowUnsaved): ConnectionIO[ContacttypeRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ContacttypeRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
   override def selectByIds(contacttypeids: Array[ContacttypeId]): Stream[ConnectionIO, ContacttypeRow] = {
     Stream.emits(contacttypeids.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ContacttypeFields.structure.fields, map)
+  }
   override def update(row: ContacttypeRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.contacttypeid) match {
@@ -89,9 +92,6 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ContacttypeFields.structure.fields, map)
   }
   override def upsert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     delay {

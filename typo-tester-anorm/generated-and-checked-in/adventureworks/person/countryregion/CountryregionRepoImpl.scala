@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class CountryregionRepoImpl extends CountryregionRepo {
-  override def delete(countryregioncode: CountryregionId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
+    DeleteBuilder("person.countryregion", CountryregionFields.structure)
+  }
+  override def deleteById(countryregioncode: CountryregionId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.countryregion where "countryregioncode" = ${ParameterValue(countryregioncode, null, CountryregionId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): Int = {
@@ -34,9 +37,6 @@ class CountryregionRepoImpl extends CountryregionRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
-    DeleteBuilder("person.countryregion", CountryregionFields.structure)
-  }
   override def insert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     SQL"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
           values (${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)}, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -44,9 +44,6 @@ class CountryregionRepoImpl extends CountryregionRepo {
        """
       .executeInsert(CountryregionRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[CountryregionRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CountryregionRow.text, c)
   }
   override def insert(unsaved: CountryregionRowUnsaved)(implicit c: Connection): CountryregionRow = {
     val namedParameters = List(
@@ -73,6 +70,9 @@ class CountryregionRepoImpl extends CountryregionRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[CountryregionRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CountryregionRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[CountryregionRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregionRowUnsaved.text, c)
@@ -98,6 +98,9 @@ class CountryregionRepoImpl extends CountryregionRepo {
        """.as(CountryregionRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
+    UpdateBuilder("person.countryregion", CountryregionFields.structure, CountryregionRow.rowParser)
+  }
   override def update(row: CountryregionRow)(implicit c: Connection): Boolean = {
     val countryregioncode = row.countryregioncode
     SQL"""update person.countryregion
@@ -105,9 +108,6 @@ class CountryregionRepoImpl extends CountryregionRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "countryregioncode" = ${ParameterValue(countryregioncode, null, CountryregionId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
-    UpdateBuilder("person.countryregion", CountryregionFields.structure, CountryregionRow.rowParser)
   }
   override def upsert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
     SQL"""insert into person.countryregion("countryregioncode", "name", "modifieddate")

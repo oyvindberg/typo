@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
                     map: scala.collection.mutable.Map[ShiftId, ShiftRow] = scala.collection.mutable.Map.empty) extends ShiftRepo {
-  override def delete(shiftid: ShiftId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ShiftFields.structure.fields, map)
+  }
+  override def deleteById(shiftid: ShiftId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(shiftid).isDefined)
   }
   override def deleteByIds(shiftids: Array[ShiftId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(shiftids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShiftFields.structure.fields, map)
   }
   override def insert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, ShiftRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
       unsaved
     }
   }
+  override def insert(unsaved: ShiftRowUnsaved): ZIO[ZConnection, Throwable, ShiftRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: ShiftRowUnsaved): ZIO[ZConnection, Throwable, ShiftRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
   override def selectByIds(shiftids: Array[ShiftId]): ZStream[ZConnection, Throwable, ShiftRow] = {
     ZStream.fromIterable(shiftids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure.fields, map)
+  }
   override def update(row: ShiftRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.shiftid) match {
@@ -88,9 +91,6 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure.fields, map)
   }
   override def upsert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, UpdateResult[ShiftRow]] = {
     ZIO.succeed {

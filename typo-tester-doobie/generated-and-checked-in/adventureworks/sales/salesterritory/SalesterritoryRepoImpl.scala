@@ -26,23 +26,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class SalesterritoryRepoImpl extends SalesterritoryRepo {
-  override def delete(territoryid: SalesterritoryId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    DeleteBuilder("sales.salesterritory", SalesterritoryFields.structure)
+  }
+  override def deleteById(territoryid: SalesterritoryId): ConnectionIO[Boolean] = {
     sql"""delete from sales.salesterritory where "territoryid" = ${fromWrite(territoryid)(Write.fromPut(SalesterritoryId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(territoryids: Array[SalesterritoryId]): ConnectionIO[Int] = {
     sql"""delete from sales.salesterritory where "territoryid" = ANY(${territoryids})""".update.run
-  }
-  override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    DeleteBuilder("sales.salesterritory", SalesterritoryFields.structure)
   }
   override def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     sql"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.group)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.salesytd)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.saleslastyear)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.costytd)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.costlastyear)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
        """.query(using SalesterritoryRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalesterritoryRow.text)
   }
   override def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow] = {
     val fs = List(
@@ -93,6 +90,9 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
     q.query(using SalesterritoryRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalesterritoryRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY sales.salesterritory("name", "countryregioncode", "group", "territoryid", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalesterritoryRowUnsaved.text)
@@ -108,6 +108,9 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
   }
   override def selectByIds(territoryids: Array[SalesterritoryId]): Stream[ConnectionIO, SalesterritoryRow] = {
     sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory where "territoryid" = ANY(${territoryids})""".query(using SalesterritoryRow.read).stream
+  }
+  override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
+    UpdateBuilder("sales.salesterritory", SalesterritoryFields.structure, SalesterritoryRow.read)
   }
   override def update(row: SalesterritoryRow): ConnectionIO[Boolean] = {
     val territoryid = row.territoryid
@@ -125,9 +128,6 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    UpdateBuilder("sales.salesterritory", SalesterritoryFields.structure, SalesterritoryRow.read)
   }
   override def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     sql"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")

@@ -31,7 +31,7 @@ class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(saved3.name == Name("baz")): @nowarn
 
       // delete
-      departmentRepoI.delete(saved1.departmentid): @nowarn
+      departmentRepoI.deleteById(saved1.departmentid): @nowarn
       val List() = departmentRepoI.selectAll: @unchecked
 
       // done

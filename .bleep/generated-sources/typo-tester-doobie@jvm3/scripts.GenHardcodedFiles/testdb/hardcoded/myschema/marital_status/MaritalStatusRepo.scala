@@ -15,16 +15,16 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait MaritalStatusRepo {
-  def delete(id: MaritalStatusId): ConnectionIO[Boolean]
-  def deleteByIds(ids: Array[MaritalStatusId]): ConnectionIO[Int]
   def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow]
+  def deleteById(id: MaritalStatusId): ConnectionIO[Boolean]
+  def deleteByIds(ids: Array[MaritalStatusId]): ConnectionIO[Int]
   def insert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, MaritalStatusRow], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow]
   def selectAll: Stream[ConnectionIO, MaritalStatusRow]
+  def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): Stream[ConnectionIO, MaritalStatusRow]
   def selectById(id: MaritalStatusId): ConnectionIO[Option[MaritalStatusRow]]
   def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow]
-  def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): Stream[ConnectionIO, MaritalStatusRow]
   def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow]
   def upsert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow]
 }

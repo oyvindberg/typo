@@ -25,23 +25,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class ShiftRepoImpl extends ShiftRepo {
-  override def delete(shiftid: ShiftId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
+    DeleteBuilder("humanresources.shift", ShiftFields.structure)
+  }
+  override def deleteById(shiftid: ShiftId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from humanresources.shift where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(shiftids: Array[ShiftId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from humanresources.shift where "shiftid" = ANY(${shiftids})""".delete
-  }
-  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilder("humanresources.shift", ShiftFields.structure)
   }
   override def insert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, ShiftRow] = {
     sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
           values (${Segment.paramSegment(unsaved.shiftid)(ShiftId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.starttime)(TypoLocalTime.setter)}::time, ${Segment.paramSegment(unsaved.endtime)(TypoLocalTime.setter)}::time, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
        """.insertReturning(using ShiftRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShiftRow.text)
   }
   override def insert(unsaved: ShiftRowUnsaved): ZIO[ZConnection, Throwable, ShiftRow] = {
     val fs = List(
@@ -70,6 +67,9 @@ class ShiftRepoImpl extends ShiftRepo {
     q.insertReturning(using ShiftRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShiftRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY humanresources.shift("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShiftRowUnsaved.text)
@@ -86,6 +86,9 @@ class ShiftRepoImpl extends ShiftRepo {
   override def selectByIds(shiftids: Array[ShiftId]): ZStream[ZConnection, Throwable, ShiftRow] = {
     sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ANY(${Segment.paramSegment(shiftids)(ShiftId.arraySetter)})""".query(using ShiftRow.jdbcDecoder).selectStream()
   }
+  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
+    UpdateBuilder("humanresources.shift", ShiftFields.structure, ShiftRow.jdbcDecoder)
+  }
   override def update(row: ShiftRow): ZIO[ZConnection, Throwable, Boolean] = {
     val shiftid = row.shiftid
     sql"""update humanresources.shift
@@ -94,9 +97,6 @@ class ShiftRepoImpl extends ShiftRepo {
               "endtime" = ${Segment.paramSegment(row.endtime)(TypoLocalTime.setter)}::time,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilder("humanresources.shift", ShiftFields.structure, ShiftRow.jdbcDecoder)
   }
   override def upsert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, UpdateResult[ShiftRow]] = {
     sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")

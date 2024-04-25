@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait LocationRepo {
-  def delete(locationid: LocationId)(implicit c: Connection): Boolean
-  def deleteByIds(locationids: Array[LocationId])(implicit c: Connection): Int
   def delete: DeleteBuilder[LocationFields, LocationRow]
+  def deleteById(locationid: LocationId)(implicit c: Connection): Boolean
+  def deleteByIds(locationids: Array[LocationId])(implicit c: Connection): Int
   def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow
-  def insertStreaming(unsaved: Iterator[LocationRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow
+  def insertStreaming(unsaved: Iterator[LocationRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[LocationRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[LocationFields, LocationRow]
   def selectAll(implicit c: Connection): List[LocationRow]
   def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow]
   def selectByIds(locationids: Array[LocationId])(implicit c: Connection): List[LocationRow]
-  def update(row: LocationRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[LocationFields, LocationRow]
+  def update(row: LocationRow)(implicit c: Connection): Boolean
   def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow
 }

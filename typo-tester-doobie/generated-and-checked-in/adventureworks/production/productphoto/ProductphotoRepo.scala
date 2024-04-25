@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait ProductphotoRepo {
-  def delete(productphotoid: ProductphotoId): ConnectionIO[Boolean]
-  def deleteByIds(productphotoids: Array[ProductphotoId]): ConnectionIO[Int]
   def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow]
+  def deleteById(productphotoid: ProductphotoId): ConnectionIO[Boolean]
+  def deleteByIds(productphotoids: Array[ProductphotoId]): ConnectionIO[Int]
   def insert(unsaved: ProductphotoRow): ConnectionIO[ProductphotoRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, ProductphotoRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ProductphotoRowUnsaved): ConnectionIO[ProductphotoRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ProductphotoRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductphotoRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ProductphotoFields, ProductphotoRow]
   def selectAll: Stream[ConnectionIO, ProductphotoRow]
   def selectById(productphotoid: ProductphotoId): ConnectionIO[Option[ProductphotoRow]]
   def selectByIds(productphotoids: Array[ProductphotoId]): Stream[ConnectionIO, ProductphotoRow]
-  def update(row: ProductphotoRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[ProductphotoFields, ProductphotoRow]
+  def update(row: ProductphotoRow): ConnectionIO[Boolean]
   def upsert(unsaved: ProductphotoRow): ConnectionIO[ProductphotoRow]
 }

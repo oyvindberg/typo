@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
                          map: scala.collection.mutable.Map[DepartmentId, DepartmentRow] = scala.collection.mutable.Map.empty) extends DepartmentRepo {
-  override def delete(departmentid: DepartmentId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
+    DeleteBuilderMock(DeleteParams.empty, DepartmentFields.structure.fields, map)
+  }
+  override def deleteById(departmentid: DepartmentId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(departmentid).isDefined)
   }
   override def deleteByIds(departmentids: Array[DepartmentId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(departmentids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
-    DeleteBuilderMock(DeleteParams.empty, DepartmentFields.structure.fields, map)
   }
   override def insert(unsaved: DepartmentRow): ZIO[ZConnection, Throwable, DepartmentRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
       unsaved
     }
   }
+  override def insert(unsaved: DepartmentRowUnsaved): ZIO[ZConnection, Throwable, DepartmentRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DepartmentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: DepartmentRowUnsaved): ZIO[ZConnection, Throwable, DepartmentRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, DepartmentRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
   override def selectByIds(departmentids: Array[DepartmentId]): ZStream[ZConnection, Throwable, DepartmentRow] = {
     ZStream.fromIterable(departmentids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
+    UpdateBuilderMock(UpdateParams.empty, DepartmentFields.structure.fields, map)
+  }
   override def update(row: DepartmentRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.departmentid) match {
@@ -88,9 +91,6 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
-    UpdateBuilderMock(UpdateParams.empty, DepartmentFields.structure.fields, map)
   }
   override def upsert(unsaved: DepartmentRow): ZIO[ZConnection, Throwable, UpdateResult[DepartmentRow]] = {
     ZIO.succeed {

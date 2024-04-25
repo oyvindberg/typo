@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ContacttypeRepoImpl extends ContacttypeRepo {
-  override def delete(contacttypeid: ContacttypeId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
+    DeleteBuilder("person.contacttype", ContacttypeFields.structure)
+  }
+  override def deleteById(contacttypeid: ContacttypeId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.contacttype where "contacttypeid" = ${ParameterValue(contacttypeid, null, ContacttypeId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(contacttypeids: Array[ContacttypeId])(implicit c: Connection): Int = {
@@ -34,9 +37,6 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
-    DeleteBuilder("person.contacttype", ContacttypeFields.structure)
-  }
   override def insert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
     SQL"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
           values (${ParameterValue(unsaved.contacttypeid, null, ContacttypeId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -44,9 +44,6 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
        """
       .executeInsert(ContacttypeRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[ContacttypeRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ContacttypeRow.text, c)
   }
   override def insert(unsaved: ContacttypeRowUnsaved)(implicit c: Connection): ContacttypeRow = {
     val namedParameters = List(
@@ -76,6 +73,9 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[ContacttypeRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ContacttypeRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ContacttypeRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY person.contacttype("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ContacttypeRowUnsaved.text, c)
@@ -101,6 +101,9 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
        """.as(ContacttypeRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
+    UpdateBuilder("person.contacttype", ContacttypeFields.structure, ContacttypeRow.rowParser)
+  }
   override def update(row: ContacttypeRow)(implicit c: Connection): Boolean = {
     val contacttypeid = row.contacttypeid
     SQL"""update person.contacttype
@@ -108,9 +111,6 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "contacttypeid" = ${ParameterValue(contacttypeid, null, ContacttypeId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
-    UpdateBuilder("person.contacttype", ContacttypeFields.structure, ContacttypeRow.rowParser)
   }
   override def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
     SQL"""insert into person.contacttype("contacttypeid", "name", "modifieddate")

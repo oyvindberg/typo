@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait StateprovinceRepo {
-  def delete(stateprovinceid: StateprovinceId): ConnectionIO[Boolean]
-  def deleteByIds(stateprovinceids: Array[StateprovinceId]): ConnectionIO[Int]
   def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow]
+  def deleteById(stateprovinceid: StateprovinceId): ConnectionIO[Boolean]
+  def deleteByIds(stateprovinceids: Array[StateprovinceId]): ConnectionIO[Int]
   def insert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, StateprovinceRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: StateprovinceRowUnsaved): ConnectionIO[StateprovinceRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, StateprovinceRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, StateprovinceRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[StateprovinceFields, StateprovinceRow]
   def selectAll: Stream[ConnectionIO, StateprovinceRow]
   def selectById(stateprovinceid: StateprovinceId): ConnectionIO[Option[StateprovinceRow]]
   def selectByIds(stateprovinceids: Array[StateprovinceId]): Stream[ConnectionIO, StateprovinceRow]
-  def update(row: StateprovinceRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[StateprovinceFields, StateprovinceRow]
+  def update(row: StateprovinceRow): ConnectionIO[Boolean]
   def upsert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow]
 }

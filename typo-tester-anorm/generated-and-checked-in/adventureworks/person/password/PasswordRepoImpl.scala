@@ -26,7 +26,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class PasswordRepoImpl extends PasswordRepo {
-  override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
+    DeleteBuilder("person.password", PasswordFields.structure)
+  }
+  override def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.password where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
@@ -36,9 +39,6 @@ class PasswordRepoImpl extends PasswordRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
-    DeleteBuilder("person.password", PasswordFields.structure)
-  }
   override def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     SQL"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.passwordhash, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.passwordsalt, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -46,9 +46,6 @@ class PasswordRepoImpl extends PasswordRepo {
        """
       .executeInsert(PasswordRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[PasswordRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PasswordRow.text, c)
   }
   override def insert(unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow = {
     val namedParameters = List(
@@ -80,6 +77,9 @@ class PasswordRepoImpl extends PasswordRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[PasswordRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PasswordRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[PasswordRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PasswordRowUnsaved.text, c)
@@ -105,6 +105,9 @@ class PasswordRepoImpl extends PasswordRepo {
        """.as(PasswordRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
+    UpdateBuilder("person.password", PasswordFields.structure, PasswordRow.rowParser)
+  }
   override def update(row: PasswordRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update person.password
@@ -114,9 +117,6 @@ class PasswordRepoImpl extends PasswordRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
-    UpdateBuilder("person.password", PasswordFields.structure, PasswordRow.rowParser)
   }
   override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     SQL"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")

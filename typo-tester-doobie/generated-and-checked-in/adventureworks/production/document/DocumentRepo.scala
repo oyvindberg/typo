@@ -15,12 +15,12 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait DocumentRepo {
-  def delete(documentnode: DocumentId): ConnectionIO[Boolean]
-  def deleteByIds(documentnodes: Array[DocumentId]): ConnectionIO[Int]
   def delete: DeleteBuilder[DocumentFields, DocumentRow]
+  def deleteById(documentnode: DocumentId): ConnectionIO[Boolean]
+  def deleteByIds(documentnodes: Array[DocumentId]): ConnectionIO[Int]
   def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: DocumentRowUnsaved): ConnectionIO[DocumentRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, DocumentRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[DocumentFields, DocumentRow]
@@ -28,7 +28,7 @@ trait DocumentRepo {
   def selectById(documentnode: DocumentId): ConnectionIO[Option[DocumentRow]]
   def selectByIds(documentnodes: Array[DocumentId]): Stream[ConnectionIO, DocumentRow]
   def selectByUniqueRowguid(rowguid: TypoUUID): ConnectionIO[Option[DocumentRow]]
-  def update(row: DocumentRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[DocumentFields, DocumentRow]
+  def update(row: DocumentRow): ConnectionIO[Boolean]
   def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow]
 }

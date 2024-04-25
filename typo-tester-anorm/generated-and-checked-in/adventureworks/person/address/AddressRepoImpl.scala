@@ -28,7 +28,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class AddressRepoImpl extends AddressRepo {
-  override def delete(addressid: AddressId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[AddressFields, AddressRow] = {
+    DeleteBuilder("person.address", AddressFields.structure)
+  }
+  override def deleteById(addressid: AddressId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.address where "addressid" = ${ParameterValue(addressid, null, AddressId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(addressids: Array[AddressId])(implicit c: Connection): Int = {
@@ -38,9 +41,6 @@ class AddressRepoImpl extends AddressRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[AddressFields, AddressRow] = {
-    DeleteBuilder("person.address", AddressFields.structure)
-  }
   override def insert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
     SQL"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.addressid, null, AddressId.toStatement)}::int4, ${ParameterValue(unsaved.addressline1, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.addressline2, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.city, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.postalcode, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.spatiallocation, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))}::bytea, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -48,9 +48,6 @@ class AddressRepoImpl extends AddressRepo {
        """
       .executeInsert(AddressRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[AddressRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(AddressRow.text, c)
   }
   override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow = {
     val namedParameters = List(
@@ -89,6 +86,9 @@ class AddressRepoImpl extends AddressRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[AddressRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(AddressRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[AddressRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY person.address("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(AddressRowUnsaved.text, c)
@@ -114,6 +114,9 @@ class AddressRepoImpl extends AddressRepo {
        """.as(AddressRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[AddressFields, AddressRow] = {
+    UpdateBuilder("person.address", AddressFields.structure, AddressRow.rowParser)
+  }
   override def update(row: AddressRow)(implicit c: Connection): Boolean = {
     val addressid = row.addressid
     SQL"""update person.address
@@ -127,9 +130,6 @@ class AddressRepoImpl extends AddressRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "addressid" = ${ParameterValue(addressid, null, AddressId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[AddressFields, AddressRow] = {
-    UpdateBuilder("person.address", AddressFields.structure, AddressRow.rowParser)
   }
   override def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
     SQL"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")

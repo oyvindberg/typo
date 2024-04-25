@@ -26,7 +26,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
-  override def delete(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
+    DeleteBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure)
+  }
+  override def deleteById(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.salespersonquotahistory where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "quotadate" = ${ParameterValue(compositeId.quotadate, null, TypoLocalDateTime.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[SalespersonquotahistoryId])(implicit c: Connection): Int = {
@@ -39,9 +42,6 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    DeleteBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure)
-  }
   override def insert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow = {
     SQL"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.quotadate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.salesquota, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -49,9 +49,6 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
        """
       .executeInsert(SalespersonquotahistoryRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[SalespersonquotahistoryRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalespersonquotahistoryRow.text, c)
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved)(implicit c: Connection): SalespersonquotahistoryRow = {
     val namedParameters = List(
@@ -83,6 +80,9 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[SalespersonquotahistoryRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalespersonquotahistoryRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SalespersonquotahistoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalespersonquotahistoryRowUnsaved.text, c)
@@ -111,6 +111,9 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
        """.as(SalespersonquotahistoryRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
+    UpdateBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.rowParser)
+  }
   override def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.salespersonquotahistory
@@ -119,9 +122,6 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "quotadate" = ${ParameterValue(compositeId.quotadate, null, TypoLocalDateTime.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    UpdateBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.rowParser)
   }
   override def upsert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow = {
     SQL"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")

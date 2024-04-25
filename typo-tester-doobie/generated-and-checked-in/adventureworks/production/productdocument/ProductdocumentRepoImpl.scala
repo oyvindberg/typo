@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductdocumentRepoImpl extends ProductdocumentRepo {
-  override def delete(compositeId: ProductdocumentId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    DeleteBuilder("production.productdocument", ProductdocumentFields.structure)
+  }
+  override def deleteById(compositeId: ProductdocumentId): ConnectionIO[Boolean] = {
     sql"""delete from production.productdocument where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "documentnode" = ${fromWrite(compositeId.documentnode)(Write.fromPut(DocumentId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductdocumentId]): ConnectionIO[Int] = {
@@ -37,17 +40,11 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
        """.update.run
     
   }
-  override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    DeleteBuilder("production.productdocument", ProductdocumentFields.structure)
-  }
   override def insert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.documentnode)(Write.fromPut(DocumentId.put))})
           returning "productid", "modifieddate"::text, "documentnode"
        """.query(using ProductdocumentRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductdocumentRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductdocumentRow.text)
   }
   override def insert(unsaved: ProductdocumentRowUnsaved): ConnectionIO[ProductdocumentRow] = {
     val fs = List(
@@ -76,6 +73,9 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     q.query(using ProductdocumentRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductdocumentRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductdocumentRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductdocumentRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductdocumentRowUnsaved.text)
@@ -99,6 +99,9 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
        """.query(using ProductdocumentRow.read).stream
     
   }
+  override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    UpdateBuilder("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.read)
+  }
   override def update(row: ProductdocumentRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productdocument
@@ -107,9 +110,6 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    UpdateBuilder("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.read)
   }
   override def upsert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")

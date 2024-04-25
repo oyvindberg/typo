@@ -24,23 +24,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class ContacttypeRepoImpl extends ContacttypeRepo {
-  override def delete(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
+    DeleteBuilder("person.contacttype", ContacttypeFields.structure)
+  }
+  override def deleteById(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.contacttype where "contacttypeid" = ${Segment.paramSegment(contacttypeid)(ContacttypeId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(contacttypeids: Array[ContacttypeId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from person.contacttype where "contacttypeid" = ANY(${contacttypeids})""".delete
-  }
-  override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
-    DeleteBuilder("person.contacttype", ContacttypeFields.structure)
   }
   override def insert(unsaved: ContacttypeRow): ZIO[ZConnection, Throwable, ContacttypeRow] = {
     sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
           values (${Segment.paramSegment(unsaved.contacttypeid)(ContacttypeId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "contacttypeid", "name", "modifieddate"::text
        """.insertReturning(using ContacttypeRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ContacttypeRow.text)
   }
   override def insert(unsaved: ContacttypeRowUnsaved): ZIO[ZConnection, Throwable, ContacttypeRow] = {
     val fs = List(
@@ -67,6 +64,9 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     q.insertReturning(using ContacttypeRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ContacttypeRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY person.contacttype("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ContacttypeRowUnsaved.text)
@@ -83,15 +83,15 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
   override def selectByIds(contacttypeids: Array[ContacttypeId]): ZStream[ZConnection, Throwable, ContacttypeRow] = {
     sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype where "contacttypeid" = ANY(${Segment.paramSegment(contacttypeids)(ContacttypeId.arraySetter)})""".query(using ContacttypeRow.jdbcDecoder).selectStream()
   }
+  override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
+    UpdateBuilder("person.contacttype", ContacttypeFields.structure, ContacttypeRow.jdbcDecoder)
+  }
   override def update(row: ContacttypeRow): ZIO[ZConnection, Throwable, Boolean] = {
     val contacttypeid = row.contacttypeid
     sql"""update person.contacttype
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "contacttypeid" = ${Segment.paramSegment(contacttypeid)(ContacttypeId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
-    UpdateBuilder("person.contacttype", ContacttypeFields.structure, ContacttypeRow.jdbcDecoder)
   }
   override def upsert(unsaved: ContacttypeRow): ZIO[ZConnection, Throwable, UpdateResult[ContacttypeRow]] = {
     sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")

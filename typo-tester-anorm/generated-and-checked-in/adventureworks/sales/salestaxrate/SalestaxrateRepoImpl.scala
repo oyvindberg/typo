@@ -28,7 +28,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class SalestaxrateRepoImpl extends SalestaxrateRepo {
-  override def delete(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
+    DeleteBuilder("sales.salestaxrate", SalestaxrateFields.structure)
+  }
+  override def deleteById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.salestaxrate where "salestaxrateid" = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): Int = {
@@ -38,9 +41,6 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    DeleteBuilder("sales.salestaxrate", SalestaxrateFields.structure)
-  }
   override def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     SQL"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.salestaxrateid, null, SalestaxrateId.toStatement)}::int4, ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.taxtype, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -48,9 +48,6 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
        """
       .executeInsert(SalestaxrateRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[SalestaxrateRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalestaxrateRow.text, c)
   }
   override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow = {
     val namedParameters = List(
@@ -90,6 +87,9 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[SalestaxrateRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalestaxrateRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SalestaxrateRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY sales.salestaxrate("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalestaxrateRowUnsaved.text, c)
@@ -115,6 +115,9 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
        """.as(SalestaxrateRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
+    UpdateBuilder("sales.salestaxrate", SalestaxrateFields.structure, SalestaxrateRow.rowParser)
+  }
   override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {
     val salestaxrateid = row.salestaxrateid
     SQL"""update sales.salestaxrate
@@ -126,9 +129,6 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "salestaxrateid" = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    UpdateBuilder("sales.salestaxrate", SalestaxrateFields.structure, SalestaxrateRow.rowParser)
   }
   override def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     SQL"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")

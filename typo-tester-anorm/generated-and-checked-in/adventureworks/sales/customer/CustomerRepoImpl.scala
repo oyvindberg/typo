@@ -27,7 +27,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class CustomerRepoImpl extends CustomerRepo {
-  override def delete(customerid: CustomerId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
+    DeleteBuilder("sales.customer", CustomerFields.structure)
+  }
+  override def deleteById(customerid: CustomerId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.customer where "customerid" = ${ParameterValue(customerid, null, CustomerId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(customerids: Array[CustomerId])(implicit c: Connection): Int = {
@@ -37,9 +40,6 @@ class CustomerRepoImpl extends CustomerRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
-    DeleteBuilder("sales.customer", CustomerFields.structure)
-  }
   override def insert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     SQL"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.customerid, null, CustomerId.toStatement)}::int4, ${ParameterValue(unsaved.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -47,9 +47,6 @@ class CustomerRepoImpl extends CustomerRepo {
        """
       .executeInsert(CustomerRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[CustomerRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(CustomerRow.text, c)
   }
   override def insert(unsaved: CustomerRowUnsaved)(implicit c: Connection): CustomerRow = {
     val namedParameters = List(
@@ -85,6 +82,9 @@ class CustomerRepoImpl extends CustomerRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[CustomerRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(CustomerRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[CustomerRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY sales.customer("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CustomerRowUnsaved.text, c)
@@ -110,6 +110,9 @@ class CustomerRepoImpl extends CustomerRepo {
        """.as(CustomerRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
+    UpdateBuilder("sales.customer", CustomerFields.structure, CustomerRow.rowParser)
+  }
   override def update(row: CustomerRow)(implicit c: Connection): Boolean = {
     val customerid = row.customerid
     SQL"""update sales.customer
@@ -120,9 +123,6 @@ class CustomerRepoImpl extends CustomerRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "customerid" = ${ParameterValue(customerid, null, CustomerId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
-    UpdateBuilder("sales.customer", CustomerFields.structure, CustomerRow.rowParser)
   }
   override def upsert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     SQL"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")

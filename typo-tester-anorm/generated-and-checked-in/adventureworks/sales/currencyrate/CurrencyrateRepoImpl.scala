@@ -25,7 +25,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class CurrencyrateRepoImpl extends CurrencyrateRepo {
-  override def delete(currencyrateid: CurrencyrateId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    DeleteBuilder("sales.currencyrate", CurrencyrateFields.structure)
+  }
+  override def deleteById(currencyrateid: CurrencyrateId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.currencyrate where "currencyrateid" = ${ParameterValue(currencyrateid, null, CurrencyrateId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(currencyrateids: Array[CurrencyrateId])(implicit c: Connection): Int = {
@@ -35,9 +38,6 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow] = {
-    DeleteBuilder("sales.currencyrate", CurrencyrateFields.structure)
-  }
   override def insert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
     SQL"""insert into sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")
           values (${ParameterValue(unsaved.currencyrateid, null, CurrencyrateId.toStatement)}::int4, ${ParameterValue(unsaved.currencyratedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.fromcurrencycode, null, CurrencyId.toStatement)}::bpchar, ${ParameterValue(unsaved.tocurrencycode, null, CurrencyId.toStatement)}::bpchar, ${ParameterValue(unsaved.averagerate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.endofdayrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -45,9 +45,6 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
        """
       .executeInsert(CurrencyrateRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[CurrencyrateRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate") FROM STDIN""", batchSize, unsaved)(CurrencyrateRow.text, c)
   }
   override def insert(unsaved: CurrencyrateRowUnsaved)(implicit c: Connection): CurrencyrateRow = {
     val namedParameters = List(
@@ -81,6 +78,9 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[CurrencyrateRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate") FROM STDIN""", batchSize, unsaved)(CurrencyrateRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[CurrencyrateRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY sales.currencyrate("currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "currencyrateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CurrencyrateRowUnsaved.text, c)
@@ -106,6 +106,9 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
        """.as(CurrencyrateRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
+    UpdateBuilder("sales.currencyrate", CurrencyrateFields.structure, CurrencyrateRow.rowParser)
+  }
   override def update(row: CurrencyrateRow)(implicit c: Connection): Boolean = {
     val currencyrateid = row.currencyrateid
     SQL"""update sales.currencyrate
@@ -117,9 +120,6 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "currencyrateid" = ${ParameterValue(currencyrateid, null, CurrencyrateId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
-    UpdateBuilder("sales.currencyrate", CurrencyrateFields.structure, CurrencyrateRow.rowParser)
   }
   override def upsert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
     SQL"""insert into sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")

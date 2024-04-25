@@ -23,23 +23,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class BusinessentityRepoImpl extends BusinessentityRepo {
-  override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
+    DeleteBuilder("person.businessentity", BusinessentityFields.structure)
+  }
+  override def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     sql"""delete from person.businessentity where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
     sql"""delete from person.businessentity where "businessentityid" = ANY(${businessentityids})""".update.run
-  }
-  override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
-    DeleteBuilder("person.businessentity", BusinessentityFields.structure)
   }
   override def insert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "rowguid", "modifieddate"::text
        """.query(using BusinessentityRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentityRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using BusinessentityRow.text)
   }
   override def insert(unsaved: BusinessentityRowUnsaved): ConnectionIO[BusinessentityRow] = {
     val fs = List(
@@ -71,6 +68,9 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     q.query(using BusinessentityRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentityRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using BusinessentityRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BusinessentityRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using BusinessentityRowUnsaved.text)
@@ -87,6 +87,9 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, BusinessentityRow] = {
     sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity where "businessentityid" = ANY(${businessentityids})""".query(using BusinessentityRow.read).stream
   }
+  override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
+    UpdateBuilder("person.businessentity", BusinessentityFields.structure, BusinessentityRow.read)
+  }
   override def update(row: BusinessentityRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update person.businessentity
@@ -96,9 +99,6 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
-    UpdateBuilder("person.businessentity", BusinessentityFields.structure, BusinessentityRow.read)
   }
   override def upsert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")

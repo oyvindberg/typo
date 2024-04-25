@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait SalestaxrateRepo {
-  def delete(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean
-  def deleteByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): Int
   def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow]
+  def deleteById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean
+  def deleteByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): Int
   def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow
-  def insertStreaming(unsaved: Iterator[SalestaxrateRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow
+  def insertStreaming(unsaved: Iterator[SalestaxrateRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[SalestaxrateRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow]
   def selectAll(implicit c: Connection): List[SalestaxrateRow]
   def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow]
   def selectByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow]
-  def update(row: SalestaxrateRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow]
+  def update(row: SalestaxrateRow)(implicit c: Connection): Boolean
   def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow
 }

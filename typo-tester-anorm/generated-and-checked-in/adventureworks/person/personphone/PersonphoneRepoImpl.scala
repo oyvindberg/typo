@@ -26,7 +26,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class PersonphoneRepoImpl extends PersonphoneRepo {
-  override def delete(compositeId: PersonphoneId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
+    DeleteBuilder("person.personphone", PersonphoneFields.structure)
+  }
+  override def deleteById(compositeId: PersonphoneId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.personphone where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "phonenumber" = ${ParameterValue(compositeId.phonenumber, null, Phone.toStatement)} AND "phonenumbertypeid" = ${ParameterValue(compositeId.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[PersonphoneId])(implicit c: Connection): Int = {
@@ -40,9 +43,6 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
-    DeleteBuilder("person.personphone", PersonphoneFields.structure)
-  }
   override def insert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow = {
     SQL"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.phonenumber, null, Phone.toStatement)}::varchar, ${ParameterValue(unsaved.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}::int4, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -50,9 +50,6 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
        """
       .executeInsert(PersonphoneRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[PersonphoneRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersonphoneRow.text, c)
   }
   override def insert(unsaved: PersonphoneRowUnsaved)(implicit c: Connection): PersonphoneRow = {
     val namedParameters = List(
@@ -79,6 +76,9 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
         .executeInsert(PersonphoneRow.rowParser(1).single)
     }
     
+  }
+  override def insertStreaming(unsaved: Iterator[PersonphoneRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersonphoneRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[PersonphoneRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -109,15 +109,15 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
        """.as(PersonphoneRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
+    UpdateBuilder("person.personphone", PersonphoneFields.structure, PersonphoneRow.rowParser)
+  }
   override def update(row: PersonphoneRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update person.personphone
           set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "phonenumber" = ${ParameterValue(compositeId.phonenumber, null, Phone.toStatement)} AND "phonenumbertypeid" = ${ParameterValue(compositeId.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
-    UpdateBuilder("person.personphone", PersonphoneFields.structure, PersonphoneRow.rowParser)
   }
   override def upsert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow = {
     SQL"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")

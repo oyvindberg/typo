@@ -27,7 +27,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductinventoryRepoImpl extends ProductinventoryRepo {
-  override def delete(compositeId: ProductinventoryId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
+    DeleteBuilder("production.productinventory", ProductinventoryFields.structure)
+  }
+  override def deleteById(compositeId: ProductinventoryId): ConnectionIO[Boolean] = {
     sql"""delete from production.productinventory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductinventoryId]): ConnectionIO[Int] = {
@@ -40,17 +43,11 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
        """.update.run
     
   }
-  override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
-    DeleteBuilder("production.productinventory", ProductinventoryFields.structure)
-  }
   override def insert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow] = {
     sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int2, ${fromWrite(unsaved.shelf)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.bin)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.quantity)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
        """.query(using ProductinventoryRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductinventoryRow.text)
   }
   override def insert(unsaved: ProductinventoryRowUnsaved): ConnectionIO[ProductinventoryRow] = {
     val fs = List(
@@ -86,6 +83,9 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     q.query(using ProductinventoryRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductinventoryRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductinventoryRowUnsaved.text)
@@ -109,6 +109,9 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
        """.query(using ProductinventoryRow.read).stream
     
   }
+  override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
+    UpdateBuilder("production.productinventory", ProductinventoryFields.structure, ProductinventoryRow.read)
+  }
   override def update(row: ProductinventoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productinventory
@@ -121,9 +124,6 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
-    UpdateBuilder("production.productinventory", ProductinventoryFields.structure, ProductinventoryRow.read)
   }
   override def upsert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow] = {
     sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")

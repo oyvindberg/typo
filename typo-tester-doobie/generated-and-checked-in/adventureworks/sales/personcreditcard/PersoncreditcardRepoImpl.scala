@@ -25,7 +25,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
-  override def delete(compositeId: PersoncreditcardId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    DeleteBuilder("sales.personcreditcard", PersoncreditcardFields.structure)
+  }
+  override def deleteById(compositeId: PersoncreditcardId): ConnectionIO[Boolean] = {
     sql"""delete from sales.personcreditcard where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "creditcardid" = ${fromWrite(compositeId.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[PersoncreditcardId])(implicit put0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Int] = {
@@ -38,17 +41,11 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
        """.update.run
     
   }
-  override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    DeleteBuilder("sales.personcreditcard", PersoncreditcardFields.structure)
-  }
   override def insert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow] = {
     sql"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "creditcardid", "modifieddate"::text
        """.query(using PersoncreditcardRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, PersoncreditcardRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PersoncreditcardRow.text)
   }
   override def insert(unsaved: PersoncreditcardRowUnsaved): ConnectionIO[PersoncreditcardRow] = {
     val fs = List(
@@ -74,6 +71,9 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     q.query(using PersoncreditcardRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, PersoncreditcardRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PersoncreditcardRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersoncreditcardRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PersoncreditcardRowUnsaved.text)
@@ -97,6 +97,9 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
        """.query(using PersoncreditcardRow.read).stream
     
   }
+  override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    UpdateBuilder("sales.personcreditcard", PersoncreditcardFields.structure, PersoncreditcardRow.read)
+  }
   override def update(row: PersoncreditcardRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.personcreditcard
@@ -105,9 +108,6 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    UpdateBuilder("sales.personcreditcard", PersoncreditcardFields.structure, PersoncreditcardRow.read)
   }
   override def upsert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow] = {
     sql"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")

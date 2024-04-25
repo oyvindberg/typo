@@ -22,7 +22,10 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class FlaffRepoImpl extends FlaffRepo {
-  override def delete(compositeId: FlaffId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
+    DeleteBuilder("public.flaff", FlaffFields.structure)
+  }
+  override def deleteById(compositeId: FlaffId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from public.flaff where "code" = ${Segment.paramSegment(compositeId.code)(ShortText.setter)} AND "another_code" = ${Segment.paramSegment(compositeId.anotherCode)(Setter.stringSetter)} AND "some_number" = ${Segment.paramSegment(compositeId.someNumber)(Setter.intSetter)} AND "specifier" = ${Segment.paramSegment(compositeId.specifier)(ShortText.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Long] = {
@@ -36,9 +39,6 @@ class FlaffRepoImpl extends FlaffRepo {
           in (select unnest(${code}), unnest(${anotherCode}), unnest(${someNumber}), unnest(${specifier}))
        """.delete
     
-  }
-  override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
-    DeleteBuilder("public.flaff", FlaffFields.structure)
   }
   override def insert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, FlaffRow] = {
     sql"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")
@@ -70,14 +70,14 @@ class FlaffRepoImpl extends FlaffRepo {
        """.query(using FlaffRow.jdbcDecoder).selectStream()
     
   }
+  override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
+    UpdateBuilder("public.flaff", FlaffFields.structure, FlaffRow.jdbcDecoder)
+  }
   override def update(row: FlaffRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update public.flaff
           set "parentspecifier" = ${Segment.paramSegment(row.parentspecifier)(Setter.optionParamSetter(ShortText.setter))}::text
           where "code" = ${Segment.paramSegment(compositeId.code)(ShortText.setter)} AND "another_code" = ${Segment.paramSegment(compositeId.anotherCode)(Setter.stringSetter)} AND "some_number" = ${Segment.paramSegment(compositeId.someNumber)(Setter.intSetter)} AND "specifier" = ${Segment.paramSegment(compositeId.specifier)(ShortText.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
-    UpdateBuilder("public.flaff", FlaffFields.structure, FlaffRow.jdbcDecoder)
   }
   override def upsert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, UpdateResult[FlaffRow]] = {
     sql"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")

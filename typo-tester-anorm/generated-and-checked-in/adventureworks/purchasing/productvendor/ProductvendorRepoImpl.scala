@@ -28,7 +28,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductvendorRepoImpl extends ProductvendorRepo {
-  override def delete(compositeId: ProductvendorId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
+    DeleteBuilder("purchasing.productvendor", ProductvendorFields.structure)
+  }
+  override def deleteById(compositeId: ProductvendorId)(implicit c: Connection): Boolean = {
     SQL"""delete from purchasing.productvendor where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[ProductvendorId])(implicit c: Connection): Int = {
@@ -41,9 +44,6 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
-    DeleteBuilder("purchasing.productvendor", ProductvendorFields.structure)
-  }
   override def insert(unsaved: ProductvendorRow)(implicit c: Connection): ProductvendorRow = {
     SQL"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
           values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.averageleadtime, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.standardprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.lastreceiptcost, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric, ${ParameterValue(unsaved.lastreceiptdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.minorderqty, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.maxorderqty, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.onorderqty, null, ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData))}::int4, ${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -51,9 +51,6 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
        """
       .executeInsert(ProductvendorRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[ProductvendorRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductvendorRow.text, c)
   }
   override def insert(unsaved: ProductvendorRowUnsaved)(implicit c: Connection): ProductvendorRow = {
     val namedParameters = List(
@@ -88,6 +85,9 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[ProductvendorRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductvendorRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductvendorRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductvendorRowUnsaved.text, c)
@@ -116,6 +116,9 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
        """.as(ProductvendorRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
+    UpdateBuilder("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.rowParser)
+  }
   override def update(row: ProductvendorRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update purchasing.productvendor
@@ -130,9 +133,6 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
-    UpdateBuilder("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.rowParser)
   }
   override def upsert(unsaved: ProductvendorRow)(implicit c: Connection): ProductvendorRow = {
     SQL"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
