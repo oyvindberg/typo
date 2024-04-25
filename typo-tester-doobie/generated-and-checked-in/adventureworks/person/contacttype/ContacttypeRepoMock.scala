@@ -26,6 +26,9 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
   override def delete(contacttypeid: ContacttypeId): ConnectionIO[Boolean] = {
     delay(map.remove(contacttypeid).isDefined)
   }
+  override def deleteByIds(contacttypeids: Array[ContacttypeId]): ConnectionIO[Int] = {
+    delay(contacttypeids.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
     DeleteBuilderMock(DeleteParams.empty, ContacttypeFields.structure.fields, map)
   }

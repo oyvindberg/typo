@@ -26,6 +26,13 @@ class FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
     SQL"""delete from myschema.football_club where "id" = ${ParameterValue(id, null, FootballClubId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(ids: Array[FootballClubId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from myschema.football_club
+          where "id" = ANY(${ids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
     DeleteBuilder("myschema.football_club", FootballClubFields.structure)
   }

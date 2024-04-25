@@ -27,6 +27,9 @@ class ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId): ConnectionIO[Boolean] = {
     sql"""delete from humanresources.shift where "shiftid" = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(shiftids: Array[ShiftId]): ConnectionIO[Int] = {
+    sql"""delete from humanresources.shift where "shiftid" = ANY(${shiftids})""".update.run
+  }
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
     DeleteBuilder("humanresources.shift", ShiftFields.structure)
   }

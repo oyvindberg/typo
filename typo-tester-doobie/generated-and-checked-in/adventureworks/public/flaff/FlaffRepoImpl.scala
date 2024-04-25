@@ -24,6 +24,18 @@ class FlaffRepoImpl extends FlaffRepo {
   override def delete(compositeId: FlaffId): ConnectionIO[Boolean] = {
     sql"""delete from public.flaff where "code" = ${fromWrite(compositeId.code)(Write.fromPut(ShortText.put))} AND "another_code" = ${fromWrite(compositeId.anotherCode)(Write.fromPut(Meta.StringMeta.put))} AND "some_number" = ${fromWrite(compositeId.someNumber)(Write.fromPut(Meta.IntMeta.put))} AND "specifier" = ${fromWrite(compositeId.specifier)(Write.fromPut(ShortText.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[FlaffId]): ConnectionIO[Int] = {
+    val code = compositeIds.map(_.code)
+    val anotherCode = compositeIds.map(_.anotherCode)
+    val someNumber = compositeIds.map(_.someNumber)
+    val specifier = compositeIds.map(_.specifier)
+    sql"""delete
+          from public.flaff
+          where ("code", "another_code", "some_number", "specifier")
+          in (select unnest(${code}), unnest(${anotherCode}), unnest(${someNumber}), unnest(${specifier}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
     DeleteBuilder("public.flaff", FlaffFields.structure)
   }
@@ -44,6 +56,18 @@ class FlaffRepoImpl extends FlaffRepo {
   }
   override def selectById(compositeId: FlaffId): ConnectionIO[Option[FlaffRow]] = {
     sql"""select "code", "another_code", "some_number", "specifier", "parentspecifier" from public.flaff where "code" = ${fromWrite(compositeId.code)(Write.fromPut(ShortText.put))} AND "another_code" = ${fromWrite(compositeId.anotherCode)(Write.fromPut(Meta.StringMeta.put))} AND "some_number" = ${fromWrite(compositeId.someNumber)(Write.fromPut(Meta.IntMeta.put))} AND "specifier" = ${fromWrite(compositeId.specifier)(Write.fromPut(ShortText.put))}""".query(using FlaffRow.read).option
+  }
+  override def selectByIds(compositeIds: Array[FlaffId]): Stream[ConnectionIO, FlaffRow] = {
+    val code = compositeIds.map(_.code)
+    val anotherCode = compositeIds.map(_.anotherCode)
+    val someNumber = compositeIds.map(_.someNumber)
+    val specifier = compositeIds.map(_.specifier)
+    sql"""select "code", "another_code", "some_number", "specifier", "parentspecifier"
+          from public.flaff
+          where ("code", "another_code", "some_number", "specifier") 
+          in (select unnest(${code}), unnest(${anotherCode}), unnest(${someNumber}), unnest(${specifier}))
+       """.query(using FlaffRow.read).stream
+    
   }
   override def update(row: FlaffRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId

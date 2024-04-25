@@ -31,6 +31,9 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
   override def delete(stateprovinceid: StateprovinceId): ConnectionIO[Boolean] = {
     sql"""delete from person.stateprovince where "stateprovinceid" = ${fromWrite(stateprovinceid)(Write.fromPut(StateprovinceId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(stateprovinceids: Array[StateprovinceId]): ConnectionIO[Int] = {
+    sql"""delete from person.stateprovince where "stateprovinceid" = ANY(${stateprovinceids})""".update.run
+  }
   override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
     DeleteBuilder("person.stateprovince", StateprovinceFields.structure)
   }

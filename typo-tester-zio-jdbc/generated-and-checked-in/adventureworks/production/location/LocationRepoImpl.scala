@@ -28,6 +28,9 @@ class LocationRepoImpl extends LocationRepo {
   override def delete(locationid: LocationId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.location where "locationid" = ${Segment.paramSegment(locationid)(LocationId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from production.location where "locationid" = ANY(${locationids})""".delete
+  }
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
     DeleteBuilder("production.location", LocationFields.structure)
   }

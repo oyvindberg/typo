@@ -25,6 +25,9 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def delete(id: MaritalStatusId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from myschema.marital_status where "id" = ${Segment.paramSegment(id)(MaritalStatusId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from myschema.marital_status where "id" = ANY(${ids})""".delete
+  }
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
     DeleteBuilder("myschema.marital_status", MaritalStatusFields.structure)
   }

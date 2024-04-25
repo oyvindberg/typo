@@ -24,6 +24,9 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
   override def delete(cultureid: CultureId)(implicit c: Connection): Boolean = {
     map.remove(cultureid).isDefined
   }
+  override def deleteByIds(cultureids: Array[CultureId])(implicit c: Connection): Int = {
+    cultureids.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
     DeleteBuilderMock(DeleteParams.empty, CultureFields.structure.fields, map)
   }

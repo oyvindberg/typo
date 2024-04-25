@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait SalesorderdetailRepo {
   def delete(compositeId: SalesorderdetailId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[SalesorderdetailId]): ConnectionIO[Int]
   def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def insert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderdetailRow], batchSize: Int): ConnectionIO[Long]
@@ -24,6 +25,7 @@ trait SalesorderdetailRepo {
   def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def selectAll: Stream[ConnectionIO, SalesorderdetailRow]
   def selectById(compositeId: SalesorderdetailId): ConnectionIO[Option[SalesorderdetailRow]]
+  def selectByIds(compositeIds: Array[SalesorderdetailId]): Stream[ConnectionIO, SalesorderdetailRow]
   def update(row: SalesorderdetailRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def upsert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow]

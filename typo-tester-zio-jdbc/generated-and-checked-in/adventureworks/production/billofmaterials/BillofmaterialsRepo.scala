@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait BillofmaterialsRepo {
   def delete(billofmaterialsid: Int): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(billofmaterialsids: Array[Int]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def insert(unsaved: BillofmaterialsRow): ZIO[ZConnection, Throwable, BillofmaterialsRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BillofmaterialsRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

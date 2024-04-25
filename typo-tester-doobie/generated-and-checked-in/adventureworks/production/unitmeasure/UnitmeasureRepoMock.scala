@@ -26,6 +26,9 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
   override def delete(unitmeasurecode: UnitmeasureId): ConnectionIO[Boolean] = {
     delay(map.remove(unitmeasurecode).isDefined)
   }
+  override def deleteByIds(unitmeasurecodes: Array[UnitmeasureId]): ConnectionIO[Int] = {
+    delay(unitmeasurecodes.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
     DeleteBuilderMock(DeleteParams.empty, UnitmeasureFields.structure.fields, map)
   }

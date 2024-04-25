@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait ProductreviewRepo {
   def delete(productreviewid: ProductreviewId)(implicit c: Connection): Boolean
+  def deleteByIds(productreviewids: Array[ProductreviewId])(implicit c: Connection): Int
   def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow]
   def insert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow
   def insertStreaming(unsaved: Iterator[ProductreviewRow], batchSize: Int)(implicit c: Connection): Long

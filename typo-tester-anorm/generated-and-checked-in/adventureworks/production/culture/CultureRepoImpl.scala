@@ -27,6 +27,13 @@ class CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.culture where "cultureid" = ${ParameterValue(cultureid, null, CultureId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(cultureids: Array[CultureId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from production.culture
+          where "cultureid" = ANY(${cultureids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
     DeleteBuilder("production.culture", CultureFields.structure)
   }

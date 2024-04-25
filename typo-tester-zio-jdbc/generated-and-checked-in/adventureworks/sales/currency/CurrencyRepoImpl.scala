@@ -27,6 +27,9 @@ class CurrencyRepoImpl extends CurrencyRepo {
   override def delete(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.currency where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(currencycodes: Array[CurrencyId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from sales.currency where "currencycode" = ANY(${currencycodes})""".delete
+  }
   override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
     DeleteBuilder("sales.currency", CurrencyFields.structure)
   }

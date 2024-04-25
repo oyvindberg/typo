@@ -28,6 +28,9 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
   override def delete(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(shipmethodid).isDefined)
   }
+  override def deleteByIds(shipmethodids: Array[ShipmethodId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(shipmethodids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
     DeleteBuilderMock(DeleteParams.empty, ShipmethodFields.structure.fields, map)
   }

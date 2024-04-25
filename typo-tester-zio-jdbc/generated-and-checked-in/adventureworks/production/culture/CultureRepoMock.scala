@@ -28,6 +28,9 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
   override def delete(cultureid: CultureId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(cultureid).isDefined)
   }
+  override def deleteByIds(cultureids: Array[CultureId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(cultureids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
     DeleteBuilderMock(DeleteParams.empty, CultureFields.structure.fields, map)
   }

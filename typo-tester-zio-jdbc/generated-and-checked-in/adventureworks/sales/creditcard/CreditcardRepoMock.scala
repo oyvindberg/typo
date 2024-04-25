@@ -30,6 +30,9 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
   override def delete(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(creditcardid).isDefined)
   }
+  override def deleteByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(creditcardids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
     DeleteBuilderMock(DeleteParams.empty, CreditcardFields.structure.fields, map)
   }
@@ -74,7 +77,7 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
   override def selectById(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Option[CreditcardRow]] = {
     ZIO.succeed(map.get(creditcardid))
   }
-  override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZStream[ZConnection, Throwable, CreditcardRow] = {
+  override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZStream[ZConnection, Throwable, CreditcardRow] = {
     ZStream.fromIterable(creditcardids.flatMap(map.get))
   }
   override def update(row: CreditcardRow): ZIO[ZConnection, Throwable, Boolean] = {

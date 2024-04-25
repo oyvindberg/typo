@@ -28,6 +28,9 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
   override def delete(compositeId: CountryregioncurrencyId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
+  override def deleteByIds(compositeIds: Array[CountryregioncurrencyId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(compositeIds.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     DeleteBuilderMock(DeleteParams.empty, CountryregioncurrencyFields.structure.fields, map)
   }
@@ -71,6 +74,9 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
   }
   override def selectById(compositeId: CountryregioncurrencyId): ZIO[ZConnection, Throwable, Option[CountryregioncurrencyRow]] = {
     ZIO.succeed(map.get(compositeId))
+  }
+  override def selectByIds(compositeIds: Array[CountryregioncurrencyId]): ZStream[ZConnection, Throwable, CountryregioncurrencyRow] = {
+    ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
   override def update(row: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

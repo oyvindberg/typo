@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait ProductmodelillustrationRepo {
   def delete(compositeId: ProductmodelillustrationId)(implicit c: Connection): Boolean
+  def deleteByIds(compositeIds: Array[ProductmodelillustrationId])(implicit c: Connection): Int
   def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow]
   def insert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow
   def insertStreaming(unsaved: Iterator[ProductmodelillustrationRow], batchSize: Int)(implicit c: Connection): Long
@@ -23,6 +24,7 @@ trait ProductmodelillustrationRepo {
   def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow]
   def selectAll(implicit c: Connection): List[ProductmodelillustrationRow]
   def selectById(compositeId: ProductmodelillustrationId)(implicit c: Connection): Option[ProductmodelillustrationRow]
+  def selectByIds(compositeIds: Array[ProductmodelillustrationId])(implicit c: Connection): List[ProductmodelillustrationRow]
   def update(row: ProductmodelillustrationRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow]
   def upsert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow

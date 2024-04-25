@@ -24,6 +24,9 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
   override def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean = {
     map.remove(scrapreasonid).isDefined
   }
+  override def deleteByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): Int = {
+    scrapreasonids.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
     DeleteBuilderMock(DeleteParams.empty, ScrapreasonFields.structure.fields, map)
   }

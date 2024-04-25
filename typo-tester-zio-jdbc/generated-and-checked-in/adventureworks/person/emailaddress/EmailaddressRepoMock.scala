@@ -28,6 +28,9 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
   override def delete(compositeId: EmailaddressId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
+  override def deleteByIds(compositeIds: Array[EmailaddressId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(compositeIds.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
     DeleteBuilderMock(DeleteParams.empty, EmailaddressFields.structure.fields, map)
   }
@@ -71,6 +74,9 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
   }
   override def selectById(compositeId: EmailaddressId): ZIO[ZConnection, Throwable, Option[EmailaddressRow]] = {
     ZIO.succeed(map.get(compositeId))
+  }
+  override def selectByIds(compositeIds: Array[EmailaddressId]): ZStream[ZConnection, Throwable, EmailaddressRow] = {
+    ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
   override def update(row: EmailaddressRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

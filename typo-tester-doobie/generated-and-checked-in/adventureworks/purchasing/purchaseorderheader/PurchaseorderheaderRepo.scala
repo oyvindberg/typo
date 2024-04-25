@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait PurchaseorderheaderRepo {
   def delete(purchaseorderid: PurchaseorderheaderId): ConnectionIO[Boolean]
+  def deleteByIds(purchaseorderids: Array[PurchaseorderheaderId]): ConnectionIO[Int]
   def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
   def insert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, PurchaseorderheaderRow], batchSize: Int): ConnectionIO[Long]

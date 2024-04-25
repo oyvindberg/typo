@@ -28,6 +28,9 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
   override def delete(id: FootballClubId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(id).isDefined)
   }
+  override def deleteByIds(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(ids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
     DeleteBuilderMock(DeleteParams.empty, FootballClubFields.structure.fields, map)
   }

@@ -30,6 +30,16 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
   override def delete(compositeId: EmailaddressId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.emailaddress where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "emailaddressid" = ${ParameterValue(compositeId.emailaddressid, null, ToStatement.intToStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[EmailaddressId])(implicit c: Connection): Int = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val emailaddressid = compositeIds.map(_.emailaddressid)
+    SQL"""delete
+          from person.emailaddress
+          where ("businessentityid", "emailaddressid")
+          in (select unnest(${businessentityid}), unnest(${emailaddressid}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
     DeleteBuilder("person.emailaddress", EmailaddressFields.structure)
   }
@@ -94,6 +104,16 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
           from person.emailaddress
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "emailaddressid" = ${ParameterValue(compositeId.emailaddressid, null, ToStatement.intToStatement)}
        """.as(EmailaddressRow.rowParser(1).singleOpt)
+  }
+  override def selectByIds(compositeIds: Array[EmailaddressId])(implicit c: Connection): List[EmailaddressRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val emailaddressid = compositeIds.map(_.emailaddressid)
+    SQL"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
+          from person.emailaddress
+          where ("businessentityid", "emailaddressid") 
+          in (select unnest(${businessentityid}), unnest(${emailaddressid}))
+       """.as(EmailaddressRow.rowParser(1).*)
+    
   }
   override def update(row: EmailaddressRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

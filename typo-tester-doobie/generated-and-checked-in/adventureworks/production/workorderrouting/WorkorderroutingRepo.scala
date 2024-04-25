@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait WorkorderroutingRepo {
   def delete(compositeId: WorkorderroutingId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[WorkorderroutingId]): ConnectionIO[Int]
   def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def insert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRow], batchSize: Int): ConnectionIO[Long]
@@ -24,6 +25,7 @@ trait WorkorderroutingRepo {
   def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def selectAll: Stream[ConnectionIO, WorkorderroutingRow]
   def selectById(compositeId: WorkorderroutingId): ConnectionIO[Option[WorkorderroutingRow]]
+  def selectByIds(compositeIds: Array[WorkorderroutingId]): Stream[ConnectionIO, WorkorderroutingRow]
   def update(row: WorkorderroutingRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def upsert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow]

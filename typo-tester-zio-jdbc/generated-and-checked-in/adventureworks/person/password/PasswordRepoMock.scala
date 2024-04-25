@@ -29,6 +29,9 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
   override def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(businessentityid).isDefined)
   }
+  override def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(businessentityids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
     DeleteBuilderMock(DeleteParams.empty, PasswordFields.structure.fields, map)
   }

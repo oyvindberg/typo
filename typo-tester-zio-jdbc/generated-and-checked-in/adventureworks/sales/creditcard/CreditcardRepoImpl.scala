@@ -30,6 +30,9 @@ class CreditcardRepoImpl extends CreditcardRepo {
   override def delete(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.creditcard where "creditcardid" = ${Segment.paramSegment(creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from sales.creditcard where "creditcardid" = ANY(${creditcardids})""".delete
+  }
   override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
     DeleteBuilder("sales.creditcard", CreditcardFields.structure)
   }
@@ -83,7 +86,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
   override def selectById(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Option[CreditcardRow]] = {
     sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ${Segment.paramSegment(creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".query(using CreditcardRow.jdbcDecoder).selectOne
   }
-  override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZStream[ZConnection, Throwable, CreditcardRow] = {
+  override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZStream[ZConnection, Throwable, CreditcardRow] = {
     sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ANY(${Segment.paramSegment(creditcardids)(CustomCreditcardId.arraySetter)})""".query(using CreditcardRow.jdbcDecoder).selectStream()
   }
   override def update(row: CreditcardRow): ZIO[ZConnection, Throwable, Boolean] = {

@@ -24,6 +24,9 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
   override def delete(territoryid: SalesterritoryId)(implicit c: Connection): Boolean = {
     map.remove(territoryid).isDefined
   }
+  override def deleteByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): Int = {
+    territoryids.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
     DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields.structure.fields, map)
   }

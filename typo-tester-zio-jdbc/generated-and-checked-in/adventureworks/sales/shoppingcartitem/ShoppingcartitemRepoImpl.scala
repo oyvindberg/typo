@@ -28,6 +28,9 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete(shoppingcartitemid: ShoppingcartitemId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(ShoppingcartitemId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(shoppingcartitemids: Array[ShoppingcartitemId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ANY(${shoppingcartitemids})""".delete
+  }
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure)
   }

@@ -27,6 +27,13 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def delete(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.unitmeasure where "unitmeasurecode" = ${ParameterValue(unitmeasurecode, null, UnitmeasureId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from production.unitmeasure
+          where "unitmeasurecode" = ANY(${unitmeasurecodes})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
     DeleteBuilder("production.unitmeasure", UnitmeasureFields.structure)
   }

@@ -28,6 +28,16 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete(compositeId: EmployeepayhistoryId): ConnectionIO[Boolean] = {
     sql"""delete from humanresources.employeepayhistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "ratechangedate" = ${fromWrite(compositeId.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[EmployeepayhistoryId]): ConnectionIO[Int] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val ratechangedate = compositeIds.map(_.ratechangedate)
+    sql"""delete
+          from humanresources.employeepayhistory
+          where ("businessentityid", "ratechangedate")
+          in (select unnest(${businessentityid}), unnest(${ratechangedate}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     DeleteBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields.structure)
   }
@@ -78,6 +88,16 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   }
   override def selectById(compositeId: EmployeepayhistoryId): ConnectionIO[Option[EmployeepayhistoryRow]] = {
     sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "ratechangedate" = ${fromWrite(compositeId.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}""".query(using EmployeepayhistoryRow.read).option
+  }
+  override def selectByIds(compositeIds: Array[EmployeepayhistoryId]): Stream[ConnectionIO, EmployeepayhistoryRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val ratechangedate = compositeIds.map(_.ratechangedate)
+    sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
+          from humanresources.employeepayhistory
+          where ("businessentityid", "ratechangedate") 
+          in (select unnest(${businessentityid}), unnest(${ratechangedate}))
+       """.query(using EmployeepayhistoryRow.read).stream
+    
   }
   override def update(row: EmployeepayhistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId

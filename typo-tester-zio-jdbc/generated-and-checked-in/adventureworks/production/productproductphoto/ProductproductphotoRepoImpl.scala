@@ -29,6 +29,16 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def delete(compositeId: ProductproductphotoId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.productproductphoto where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "productphotoid" = ${Segment.paramSegment(compositeId.productphotoid)(ProductphotoId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[ProductproductphotoId]): ZIO[ZConnection, Throwable, Long] = {
+    val productid = compositeIds.map(_.productid)
+    val productphotoid = compositeIds.map(_.productphotoid)
+    sql"""delete
+          from production.productproductphoto
+          where ("productid", "productphotoid")
+          in (select unnest(${productid}), unnest(${productphotoid}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
     DeleteBuilder("production.productproductphoto", ProductproductphotoFields.structure)
   }
@@ -79,6 +89,16 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   }
   override def selectById(compositeId: ProductproductphotoId): ZIO[ZConnection, Throwable, Option[ProductproductphotoRow]] = {
     sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "productphotoid" = ${Segment.paramSegment(compositeId.productphotoid)(ProductphotoId.setter)}""".query(using ProductproductphotoRow.jdbcDecoder).selectOne
+  }
+  override def selectByIds(compositeIds: Array[ProductproductphotoId]): ZStream[ZConnection, Throwable, ProductproductphotoRow] = {
+    val productid = compositeIds.map(_.productid)
+    val productphotoid = compositeIds.map(_.productphotoid)
+    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text
+          from production.productproductphoto
+          where ("productid", "productphotoid")
+          in (select unnest(${productid}), unnest(${productphotoid}))
+       """.query(using ProductproductphotoRow.jdbcDecoder).selectStream()
+    
   }
   override def update(row: ProductproductphotoRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId

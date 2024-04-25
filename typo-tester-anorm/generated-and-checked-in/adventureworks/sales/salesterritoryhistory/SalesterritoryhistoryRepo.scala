@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait SalesterritoryhistoryRepo {
   def delete(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Boolean
+  def deleteByIds(compositeIds: Array[SalesterritoryhistoryId])(implicit c: Connection): Int
   def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def insert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow
   def insertStreaming(unsaved: Iterator[SalesterritoryhistoryRow], batchSize: Int)(implicit c: Connection): Long
@@ -23,6 +24,7 @@ trait SalesterritoryhistoryRepo {
   def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def selectAll(implicit c: Connection): List[SalesterritoryhistoryRow]
   def selectById(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Option[SalesterritoryhistoryRow]
+  def selectByIds(compositeIds: Array[SalesterritoryhistoryId])(implicit c: Connection): List[SalesterritoryhistoryRow]
   def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def upsert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow

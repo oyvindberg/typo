@@ -29,6 +29,18 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def delete(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Boolean] = {
     sql"""delete from humanresources.employeedepartmenthistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(Write.fromPut(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(Write.fromPut(ShiftId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[EmployeedepartmenthistoryId]): ConnectionIO[Int] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val startdate = compositeIds.map(_.startdate)
+    val departmentid = compositeIds.map(_.departmentid)
+    val shiftid = compositeIds.map(_.shiftid)
+    sql"""delete
+          from humanresources.employeedepartmenthistory
+          where ("businessentityid", "startdate", "departmentid", "shiftid")
+          in (select unnest(${businessentityid}), unnest(${startdate}), unnest(${departmentid}), unnest(${shiftid}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
     DeleteBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields.structure)
   }
@@ -80,6 +92,18 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   }
   override def selectById(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Option[EmployeedepartmenthistoryRow]] = {
     sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(Write.fromPut(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(Write.fromPut(ShiftId.put))}""".query(using EmployeedepartmenthistoryRow.read).option
+  }
+  override def selectByIds(compositeIds: Array[EmployeedepartmenthistoryId]): Stream[ConnectionIO, EmployeedepartmenthistoryRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val startdate = compositeIds.map(_.startdate)
+    val departmentid = compositeIds.map(_.departmentid)
+    val shiftid = compositeIds.map(_.shiftid)
+    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
+          from humanresources.employeedepartmenthistory
+          where ("businessentityid", "startdate", "departmentid", "shiftid") 
+          in (select unnest(${businessentityid}), unnest(${startdate}), unnest(${departmentid}), unnest(${shiftid}))
+       """.query(using EmployeedepartmenthistoryRow.read).stream
+    
   }
   override def update(row: EmployeedepartmenthistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId

@@ -24,6 +24,9 @@ class ProductlistpricehistoryRepoMock(toRow: Function1[ProductlistpricehistoryRo
   override def delete(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
   }
+  override def deleteByIds(compositeIds: Array[ProductlistpricehistoryId])(implicit c: Connection): Int = {
+    compositeIds.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
     DeleteBuilderMock(DeleteParams.empty, ProductlistpricehistoryFields.structure.fields, map)
   }
@@ -60,6 +63,9 @@ class ProductlistpricehistoryRepoMock(toRow: Function1[ProductlistpricehistoryRo
   }
   override def selectById(compositeId: ProductlistpricehistoryId)(implicit c: Connection): Option[ProductlistpricehistoryRow] = {
     map.get(compositeId)
+  }
+  override def selectByIds(compositeIds: Array[ProductlistpricehistoryId])(implicit c: Connection): List[ProductlistpricehistoryRow] = {
+    compositeIds.flatMap(map.get).toList
   }
   override def update(row: ProductlistpricehistoryRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {

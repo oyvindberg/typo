@@ -29,6 +29,9 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   override def delete(documentnode: DocumentId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(documentnode).isDefined)
   }
+  override def deleteByIds(documentnodes: Array[DocumentId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(documentnodes.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
     DeleteBuilderMock(DeleteParams.empty, DocumentFields.structure.fields, map)
   }

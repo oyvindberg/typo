@@ -29,6 +29,9 @@ class SalespersonRepoMock(toRow: Function1[SalespersonRowUnsaved, SalespersonRow
   override def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(businessentityid).isDefined)
   }
+  override def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(businessentityids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[SalespersonFields, SalespersonRow] = {
     DeleteBuilderMock(DeleteParams.empty, SalespersonFields.structure.fields, map)
   }

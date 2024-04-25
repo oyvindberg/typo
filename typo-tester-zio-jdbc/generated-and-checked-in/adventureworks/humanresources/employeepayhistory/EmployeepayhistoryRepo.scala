@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait EmployeepayhistoryRepo {
   def delete(compositeId: EmployeepayhistoryId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[EmployeepayhistoryId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def insert(unsaved: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, EmployeepayhistoryRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, EmployeepayhistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
@@ -26,6 +27,7 @@ trait EmployeepayhistoryRepo {
   def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def selectAll: ZStream[ZConnection, Throwable, EmployeepayhistoryRow]
   def selectById(compositeId: EmployeepayhistoryId): ZIO[ZConnection, Throwable, Option[EmployeepayhistoryRow]]
+  def selectByIds(compositeIds: Array[EmployeepayhistoryId]): ZStream[ZConnection, Throwable, EmployeepayhistoryRow]
   def update(row: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def upsert(unsaved: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[EmployeepayhistoryRow]]

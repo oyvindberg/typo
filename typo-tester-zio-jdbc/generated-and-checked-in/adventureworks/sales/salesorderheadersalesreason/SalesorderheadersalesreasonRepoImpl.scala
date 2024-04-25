@@ -28,6 +28,16 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
   override def delete(compositeId: SalesorderheadersalesreasonId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.salesorderheadersalesreason where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesreasonid" = ${Segment.paramSegment(compositeId.salesreasonid)(SalesreasonId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[SalesorderheadersalesreasonId]): ZIO[ZConnection, Throwable, Long] = {
+    val salesorderid = compositeIds.map(_.salesorderid)
+    val salesreasonid = compositeIds.map(_.salesreasonid)
+    sql"""delete
+          from sales.salesorderheadersalesreason
+          where ("salesorderid", "salesreasonid")
+          in (select unnest(${salesorderid}), unnest(${salesreasonid}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
     DeleteBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure)
   }
@@ -74,6 +84,16 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
   }
   override def selectById(compositeId: SalesorderheadersalesreasonId): ZIO[ZConnection, Throwable, Option[SalesorderheadersalesreasonRow]] = {
     sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sales.salesorderheadersalesreason where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesreasonid" = ${Segment.paramSegment(compositeId.salesreasonid)(SalesreasonId.setter)}""".query(using SalesorderheadersalesreasonRow.jdbcDecoder).selectOne
+  }
+  override def selectByIds(compositeIds: Array[SalesorderheadersalesreasonId]): ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRow] = {
+    val salesorderid = compositeIds.map(_.salesorderid)
+    val salesreasonid = compositeIds.map(_.salesreasonid)
+    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text
+          from sales.salesorderheadersalesreason
+          where ("salesorderid", "salesreasonid")
+          in (select unnest(${salesorderid}), unnest(${salesreasonid}))
+       """.query(using SalesorderheadersalesreasonRow.jdbcDecoder).selectStream()
+    
   }
   override def update(row: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId

@@ -28,6 +28,9 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
   override def delete(name: IdentityTestId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(name).isDefined)
   }
+  override def deleteByIds(names: Array[IdentityTestId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(names.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
     DeleteBuilderMock(DeleteParams.empty, IdentityTestFields.structure.fields, map)
   }

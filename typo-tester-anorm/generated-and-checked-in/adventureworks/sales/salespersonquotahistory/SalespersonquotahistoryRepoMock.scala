@@ -24,6 +24,9 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
   override def delete(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
   }
+  override def deleteByIds(compositeIds: Array[SalespersonquotahistoryId])(implicit c: Connection): Int = {
+    compositeIds.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
     DeleteBuilderMock(DeleteParams.empty, SalespersonquotahistoryFields.structure.fields, map)
   }
@@ -60,6 +63,9 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
   }
   override def selectById(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Option[SalespersonquotahistoryRow] = {
     map.get(compositeId)
+  }
+  override def selectByIds(compositeIds: Array[SalespersonquotahistoryId])(implicit c: Connection): List[SalespersonquotahistoryRow] = {
+    compositeIds.flatMap(map.get).toList
   }
   override def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {

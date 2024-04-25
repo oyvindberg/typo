@@ -26,6 +26,9 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
   override def delete(departmentid: DepartmentId): ConnectionIO[Boolean] = {
     delay(map.remove(departmentid).isDefined)
   }
+  override def deleteByIds(departmentids: Array[DepartmentId]): ConnectionIO[Int] = {
+    delay(departmentids.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
     DeleteBuilderMock(DeleteParams.empty, DepartmentFields.structure.fields, map)
   }

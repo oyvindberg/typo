@@ -29,6 +29,16 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
   override def delete(compositeId: ProductvendorId): ConnectionIO[Boolean] = {
     sql"""delete from purchasing.productvendor where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[ProductvendorId]): ConnectionIO[Int] = {
+    val productid = compositeIds.map(_.productid)
+    val businessentityid = compositeIds.map(_.businessentityid)
+    sql"""delete
+          from purchasing.productvendor
+          where ("productid", "businessentityid")
+          in (select unnest(${productid}), unnest(${businessentityid}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
     DeleteBuilder("purchasing.productvendor", ProductvendorFields.structure)
   }
@@ -85,6 +95,16 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
   }
   override def selectById(compositeId: ProductvendorId): ConnectionIO[Option[ProductvendorRow]] = {
     sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using ProductvendorRow.read).option
+  }
+  override def selectByIds(compositeIds: Array[ProductvendorId]): Stream[ConnectionIO, ProductvendorRow] = {
+    val productid = compositeIds.map(_.productid)
+    val businessentityid = compositeIds.map(_.businessentityid)
+    sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
+          from purchasing.productvendor
+          where ("productid", "businessentityid") 
+          in (select unnest(${productid}), unnest(${businessentityid}))
+       """.query(using ProductvendorRow.read).stream
+    
   }
   override def update(row: ProductvendorRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId

@@ -26,6 +26,9 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
   override def delete(transactionid: TransactionhistoryarchiveId): ConnectionIO[Boolean] = {
     delay(map.remove(transactionid).isDefined)
   }
+  override def deleteByIds(transactionids: Array[TransactionhistoryarchiveId]): ConnectionIO[Int] = {
+    delay(transactionids.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
     DeleteBuilderMock(DeleteParams.empty, TransactionhistoryarchiveFields.structure.fields, map)
   }

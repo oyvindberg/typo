@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait ContacttypeRepo {
   def delete(contacttypeid: ContacttypeId): ConnectionIO[Boolean]
+  def deleteByIds(contacttypeids: Array[ContacttypeId]): ConnectionIO[Int]
   def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow]
   def insert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int): ConnectionIO[Long]

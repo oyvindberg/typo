@@ -31,6 +31,17 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.workorderrouting where "workorderid" = ${ParameterValue(compositeId.workorderid, null, WorkorderId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ToStatement.intToStatement)} AND "operationsequence" = ${ParameterValue(compositeId.operationsequence, null, TypoShort.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): Int = {
+    val workorderid = compositeIds.map(_.workorderid)
+    val productid = compositeIds.map(_.productid)
+    val operationsequence = compositeIds.map(_.operationsequence)
+    SQL"""delete
+          from production.workorderrouting
+          where ("workorderid", "productid", "operationsequence")
+          in (select unnest(${workorderid}), unnest(${productid}), unnest(${operationsequence}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     DeleteBuilder("production.workorderrouting", WorkorderroutingFields.structure)
   }
@@ -96,6 +107,17 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           from production.workorderrouting
           where "workorderid" = ${ParameterValue(compositeId.workorderid, null, WorkorderId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ToStatement.intToStatement)} AND "operationsequence" = ${ParameterValue(compositeId.operationsequence, null, TypoShort.toStatement)}
        """.as(WorkorderroutingRow.rowParser(1).singleOpt)
+  }
+  override def selectByIds(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): List[WorkorderroutingRow] = {
+    val workorderid = compositeIds.map(_.workorderid)
+    val productid = compositeIds.map(_.productid)
+    val operationsequence = compositeIds.map(_.operationsequence)
+    SQL"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
+          from production.workorderrouting
+          where ("workorderid", "productid", "operationsequence") 
+          in (select unnest(${workorderid}), unnest(${productid}), unnest(${operationsequence}))
+       """.as(WorkorderroutingRow.rowParser(1).*)
+    
   }
   override def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

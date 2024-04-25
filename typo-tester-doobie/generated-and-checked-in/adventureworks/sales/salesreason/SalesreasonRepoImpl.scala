@@ -26,6 +26,9 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
   override def delete(salesreasonid: SalesreasonId): ConnectionIO[Boolean] = {
     sql"""delete from sales.salesreason where "salesreasonid" = ${fromWrite(salesreasonid)(Write.fromPut(SalesreasonId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(salesreasonids: Array[SalesreasonId]): ConnectionIO[Int] = {
+    sql"""delete from sales.salesreason where "salesreasonid" = ANY(${salesreasonids})""".update.run
+  }
   override def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow] = {
     DeleteBuilder("sales.salesreason", SalesreasonFields.structure)
   }

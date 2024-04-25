@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait IdentityTestRepo {
   def delete(name: IdentityTestId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(names: Array[IdentityTestId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow]
   def insert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, IdentityTestRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

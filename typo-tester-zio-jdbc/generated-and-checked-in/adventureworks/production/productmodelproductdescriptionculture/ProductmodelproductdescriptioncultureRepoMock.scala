@@ -28,6 +28,9 @@ class ProductmodelproductdescriptioncultureRepoMock(toRow: Function1[Productmode
   override def delete(compositeId: ProductmodelproductdescriptioncultureId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
+  override def deleteByIds(compositeIds: Array[ProductmodelproductdescriptioncultureId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(compositeIds.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
     DeleteBuilderMock(DeleteParams.empty, ProductmodelproductdescriptioncultureFields.structure.fields, map)
   }
@@ -71,6 +74,9 @@ class ProductmodelproductdescriptioncultureRepoMock(toRow: Function1[Productmode
   }
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId): ZIO[ZConnection, Throwable, Option[ProductmodelproductdescriptioncultureRow]] = {
     ZIO.succeed(map.get(compositeId))
+  }
+  override def selectByIds(compositeIds: Array[ProductmodelproductdescriptioncultureId]): ZStream[ZConnection, Throwable, ProductmodelproductdescriptioncultureRow] = {
+    ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
   override def update(row: ProductmodelproductdescriptioncultureRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

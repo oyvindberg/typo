@@ -186,12 +186,15 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       code"def selectAll: ${ZStream.of(ZConnection, Throwable, rowType)}"
     case RepoMethod.SelectById(_, _, id, rowType) =>
       code"def selectById(${id.param}): ${ZIO.of(ZConnection, Throwable, TypesScala.Option.of(rowType))}"
-    case RepoMethod.SelectAllByIds(_, _, unaryId, idsParam, rowType) =>
-      unaryId match {
-        case IdComputed.UnaryUserSpecified(_, tpe) =>
-          code"def selectByIds($idsParam)(implicit encoder: ${JdbcEncoder.of(sc.Type.ArrayOf(tpe))}): ${ZStream.of(ZConnection, Throwable, rowType)}"
-        case _ =>
+    case RepoMethod.SelectAllByIds(_, _, idComputed, idsParam, rowType) =>
+      val usedDefineds = idComputed.userDefinedCols.zipWithIndex
+        .map { case (col, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(col.tpe)), None) }
+
+      usedDefineds match {
+        case Nil =>
           code"def selectByIds($idsParam): ${ZStream.of(ZConnection, Throwable, rowType)}"
+        case nonEmpty =>
+          code"def selectByIds($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ZStream.of(ZConnection, Throwable, rowType)}"
       }
     case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
       val name = s"selectByUnique${keyColumns.map(x => Naming.titleCase(x.name.value)).mkString("And")}"
@@ -222,6 +225,15 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       code"def delete: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
     case RepoMethod.Delete(_, id) =>
       code"def delete(${id.param}): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}"
+    case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
+      val usedDefineds = idComputed.userDefinedCols.zipWithIndex
+        .map { case (col, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(col.tpe)), None) }
+      usedDefineds match {
+        case Nil =>
+          code"def deleteByIds(${idsParam}): ${ZIO.of(ZConnection, Throwable, TypesScala.Long)}"
+        case nonEmpty =>
+          code"def deleteByIds(${idsParam})(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ZIO.of(ZConnection, Throwable, TypesScala.Long)}"
+      }
     case RepoMethod.SqlFile(sqlScript) =>
       val params = sc.Params(sqlScript.params.map(p => sc.Param(p.name, p.tpe, None)))
 
@@ -248,13 +260,29 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         val sql = SQL(code"""select $joinedColNames from $relName where ${matchId(id)}""")
         code"""$sql.query(using ${lookupJdbcDecoder(rowType)}).selectOne"""
 
-      case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, rowType) =>
+      case RepoMethod.SelectAllByIds(relName, cols, computedId, idsParam, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
+        computedId match {
+          case x: IdComputed.Composite =>
+            val vals = x.cols.map(col => code"val ${col.name} = ${idsParam.name}.map(_.${col.name})").mkCode("\n")
+            val sql = SQL {
+              code"""|select ${dbNames(cols, isRead = true)}
+                     |from $relName
+                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")})
+                     |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, col.tpe, forbidInline = true)})").mkCode(", ")})
+                     |""".stripMargin
+            }
+            code"""|$vals
+                   |$sql.query(using ${lookupJdbcDecoder(rowType)}).selectStream()
+                   |""".stripMargin
 
-        val sql = SQL(
-          code"""select $joinedColNames from $relName where ${unaryId.col.dbName} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe)})"""
-        )
-        code"""$sql.query(using ${lookupJdbcDecoder(rowType)}).selectStream()"""
+          case unaryId: IdComputed.Unary =>
+            val sql = SQL(
+              code"""select $joinedColNames from $relName where ${unaryId.col.dbName} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe)})"""
+            )
+            code"""$sql.query(using ${lookupJdbcDecoder(rowType)}).selectStream()"""
+        }
+
       case RepoMethod.SelectByUnique(relName, keyColumns, allCols, rowType) =>
         val sql = SQL {
           code"""|select ${dbNames(allCols, isRead = true)}
@@ -408,6 +436,28 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         val sql = SQL(code"""delete from $relName where ${matchId(id)}""")
         code"$sql.delete.map(_ > 0)"
 
+      case RepoMethod.DeleteByIds(relName, computedId, idsParam) =>
+        computedId match {
+          case x: IdComputed.Composite =>
+            val vals = x.cols.map(col => code"val ${col.name} = ${idsParam.name}.map(_.${col.name})").mkCode("\n")
+            val sql = SQL {
+              code"""|delete
+                     |from $relName
+                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")})
+                     |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, col.tpe, forbidInline = true)})").mkCode(", ")})
+                     |""".stripMargin
+            }
+            code"""|$vals
+                   |$sql.delete
+                   |""".stripMargin
+
+          case x: IdComputed.Unary =>
+            val sql = SQL(
+              code"""delete from $relName where ${code"${x.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, x.tpe, forbidInline = true)})"}"""
+            )
+            code"$sql.delete"
+        }
+
       case RepoMethod.SqlFile(sqlScript) =>
         val renderedScript: sc.Code = sqlScript.sqlFile.decomposedSql.renderCode { (paramAtIndex: Int) =>
           val param = sqlScript.params.find(_.indices.contains(paramAtIndex)).get
@@ -517,6 +567,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType.structure.fields, map)"
       case RepoMethod.Delete(_, id) =>
         code"$ZIO.succeed(map.remove(${id.paramName}).isDefined)"
+      case RepoMethod.DeleteByIds(_, _, idsParam) =>
+        code"$ZIO.succeed(${idsParam.name}.map(id => map.remove(id)).count(_.isDefined).toLong)"
       case RepoMethod.InsertStreaming(_, _, _) =>
         code"""|unsaved.scanZIO(0L) { case (acc, row) =>
                |  ZIO.succeed {

@@ -28,6 +28,13 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
   override def delete(addresstypeid: AddresstypeId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.addresstype where "addresstypeid" = ${ParameterValue(addresstypeid, null, AddresstypeId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(addresstypeids: Array[AddresstypeId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from person.addresstype
+          where "addresstypeid" = ANY(${addresstypeids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
     DeleteBuilder("person.addresstype", AddresstypeFields.structure)
   }

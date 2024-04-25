@@ -31,6 +31,16 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def delete(compositeId: ProductinventoryId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.productinventory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(LocationId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[ProductinventoryId]): ZIO[ZConnection, Throwable, Long] = {
+    val productid = compositeIds.map(_.productid)
+    val locationid = compositeIds.map(_.locationid)
+    sql"""delete
+          from production.productinventory
+          where ("productid", "locationid")
+          in (select unnest(${productid}), unnest(${locationid}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
     DeleteBuilder("production.productinventory", ProductinventoryFields.structure)
   }
@@ -87,6 +97,16 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
   }
   override def selectById(compositeId: ProductinventoryId): ZIO[ZConnection, Throwable, Option[ProductinventoryRow]] = {
     sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(LocationId.setter)}""".query(using ProductinventoryRow.jdbcDecoder).selectOne
+  }
+  override def selectByIds(compositeIds: Array[ProductinventoryId]): ZStream[ZConnection, Throwable, ProductinventoryRow] = {
+    val productid = compositeIds.map(_.productid)
+    val locationid = compositeIds.map(_.locationid)
+    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
+          from production.productinventory
+          where ("productid", "locationid")
+          in (select unnest(${productid}), unnest(${locationid}))
+       """.query(using ProductinventoryRow.jdbcDecoder).selectStream()
+    
   }
   override def update(row: ProductinventoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId

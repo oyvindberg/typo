@@ -22,6 +22,18 @@ class FlaffRepoImpl extends FlaffRepo {
   override def delete(compositeId: FlaffId)(implicit c: Connection): Boolean = {
     SQL"""delete from public.flaff where "code" = ${ParameterValue(compositeId.code, null, ShortText.toStatement)} AND "another_code" = ${ParameterValue(compositeId.anotherCode, null, ToStatement.stringToStatement)} AND "some_number" = ${ParameterValue(compositeId.someNumber, null, ToStatement.intToStatement)} AND "specifier" = ${ParameterValue(compositeId.specifier, null, ShortText.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[FlaffId])(implicit c: Connection): Int = {
+    val code = compositeIds.map(_.code)
+    val anotherCode = compositeIds.map(_.anotherCode)
+    val someNumber = compositeIds.map(_.someNumber)
+    val specifier = compositeIds.map(_.specifier)
+    SQL"""delete
+          from public.flaff
+          where ("code", "another_code", "some_number", "specifier")
+          in (select unnest(${code}), unnest(${anotherCode}), unnest(${someNumber}), unnest(${specifier}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
     DeleteBuilder("public.flaff", FlaffFields.structure)
   }
@@ -49,6 +61,18 @@ class FlaffRepoImpl extends FlaffRepo {
           from public.flaff
           where "code" = ${ParameterValue(compositeId.code, null, ShortText.toStatement)} AND "another_code" = ${ParameterValue(compositeId.anotherCode, null, ToStatement.stringToStatement)} AND "some_number" = ${ParameterValue(compositeId.someNumber, null, ToStatement.intToStatement)} AND "specifier" = ${ParameterValue(compositeId.specifier, null, ShortText.toStatement)}
        """.as(FlaffRow.rowParser(1).singleOpt)
+  }
+  override def selectByIds(compositeIds: Array[FlaffId])(implicit c: Connection): List[FlaffRow] = {
+    val code = compositeIds.map(_.code)
+    val anotherCode = compositeIds.map(_.anotherCode)
+    val someNumber = compositeIds.map(_.someNumber)
+    val specifier = compositeIds.map(_.specifier)
+    SQL"""select "code", "another_code", "some_number", "specifier", "parentspecifier"
+          from public.flaff
+          where ("code", "another_code", "some_number", "specifier") 
+          in (select unnest(${code}), unnest(${anotherCode}), unnest(${someNumber}), unnest(${specifier}))
+       """.as(FlaffRow.rowParser(1).*)
+    
   }
   override def update(row: FlaffRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

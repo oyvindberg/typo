@@ -27,6 +27,9 @@ class DepartmentRepoImpl extends DepartmentRepo {
   override def delete(departmentid: DepartmentId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from humanresources.department where "departmentid" = ${Segment.paramSegment(departmentid)(DepartmentId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(departmentids: Array[DepartmentId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from humanresources.department where "departmentid" = ANY(${departmentids})""".delete
+  }
   override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
     DeleteBuilder("humanresources.department", DepartmentFields.structure)
   }

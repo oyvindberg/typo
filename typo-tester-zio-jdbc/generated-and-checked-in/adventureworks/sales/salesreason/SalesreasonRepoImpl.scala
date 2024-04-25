@@ -27,6 +27,9 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
   override def delete(salesreasonid: SalesreasonId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.salesreason where "salesreasonid" = ${Segment.paramSegment(salesreasonid)(SalesreasonId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(salesreasonids: Array[SalesreasonId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from sales.salesreason where "salesreasonid" = ANY(${salesreasonids})""".delete
+  }
   override def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow] = {
     DeleteBuilder("sales.salesreason", SalesreasonFields.structure)
   }

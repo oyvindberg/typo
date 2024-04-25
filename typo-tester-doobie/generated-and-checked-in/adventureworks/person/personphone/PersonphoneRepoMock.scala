@@ -26,6 +26,9 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
   override def delete(compositeId: PersonphoneId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
   }
+  override def deleteByIds(compositeIds: Array[PersonphoneId]): ConnectionIO[Int] = {
+    delay(compositeIds.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
     DeleteBuilderMock(DeleteParams.empty, PersonphoneFields.structure.fields, map)
   }
@@ -72,6 +75,9 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
   }
   override def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]] = {
     delay(map.get(compositeId))
+  }
+  override def selectByIds(compositeIds: Array[PersonphoneId]): Stream[ConnectionIO, PersonphoneRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
   }
   override def update(row: PersonphoneRow): ConnectionIO[Boolean] = {
     delay {

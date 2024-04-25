@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait CountryregioncurrencyRepo {
   def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean
+  def deleteByIds(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): Int
   def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def insert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow
   def insertStreaming(unsaved: Iterator[CountryregioncurrencyRow], batchSize: Int)(implicit c: Connection): Long
@@ -23,6 +24,7 @@ trait CountryregioncurrencyRepo {
   def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def selectAll(implicit c: Connection): List[CountryregioncurrencyRow]
   def selectById(compositeId: CountryregioncurrencyId)(implicit c: Connection): Option[CountryregioncurrencyRow]
+  def selectByIds(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): List[CountryregioncurrencyRow]
   def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow

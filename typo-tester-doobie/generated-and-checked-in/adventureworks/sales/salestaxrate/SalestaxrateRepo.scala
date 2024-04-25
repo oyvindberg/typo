@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait SalestaxrateRepo {
   def delete(salestaxrateid: SalestaxrateId): ConnectionIO[Boolean]
+  def deleteByIds(salestaxrateids: Array[SalestaxrateId]): ConnectionIO[Int]
   def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow]
   def insert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRow], batchSize: Int): ConnectionIO[Long]

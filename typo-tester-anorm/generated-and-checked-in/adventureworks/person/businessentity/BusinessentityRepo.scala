@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait BusinessentityRepo {
   def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean
+  def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int
   def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow]
   def insert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow
   def insertStreaming(unsaved: Iterator[BusinessentityRow], batchSize: Int)(implicit c: Connection): Long

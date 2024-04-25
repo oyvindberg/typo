@@ -18,6 +18,7 @@ import anorm.RowParser
 import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -27,6 +28,16 @@ import typo.dsl.UpdateBuilder
 class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.personcreditcard where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "creditcardid" = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}""".executeUpdate() > 0
+  }
+  override def deleteByIds(compositeIds: Array[PersoncreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): Int = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val creditcardid = compositeIds.map(_.creditcardid)
+    SQL"""delete
+          from sales.personcreditcard
+          where ("businessentityid", "creditcardid")
+          in (select unnest(${businessentityid}), unnest(${creditcardid}))
+       """.executeUpdate()
+    
   }
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     DeleteBuilder("sales.personcreditcard", PersoncreditcardFields.structure)
@@ -84,6 +95,16 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           from sales.personcreditcard
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "creditcardid" = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
        """.as(PersoncreditcardRow.rowParser(1).singleOpt)
+  }
+  override def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[PersoncreditcardRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val creditcardid = compositeIds.map(_.creditcardid)
+    SQL"""select "businessentityid", "creditcardid", "modifieddate"::text
+          from sales.personcreditcard
+          where ("businessentityid", "creditcardid") 
+          in (select unnest(${businessentityid}), unnest(${creditcardid}))
+       """.as(PersoncreditcardRow.rowParser(1).*)
+    
   }
   override def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

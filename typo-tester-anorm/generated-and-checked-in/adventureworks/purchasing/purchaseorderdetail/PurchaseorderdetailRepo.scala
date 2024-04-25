@@ -11,7 +11,9 @@ import java.sql.Connection
 import typo.dsl.SelectBuilder
 
 trait PurchaseorderdetailRepo {
+  def deleteByIds(compositeIds: Array[PurchaseorderdetailId])(implicit c: Connection): Int
   def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow]
   def selectAll(implicit c: Connection): List[PurchaseorderdetailRow]
   def selectById(compositeId: PurchaseorderdetailId)(implicit c: Connection): Option[PurchaseorderdetailRow]
+  def selectByIds(compositeIds: Array[PurchaseorderdetailId])(implicit c: Connection): List[PurchaseorderdetailRow]
 }

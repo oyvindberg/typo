@@ -28,6 +28,9 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
   override def delete(compositeId: BusinessentitycontactId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
+  override def deleteByIds(compositeIds: Array[BusinessentitycontactId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(compositeIds.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
     DeleteBuilderMock(DeleteParams.empty, BusinessentitycontactFields.structure.fields, map)
   }
@@ -71,6 +74,9 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
   }
   override def selectById(compositeId: BusinessentitycontactId): ZIO[ZConnection, Throwable, Option[BusinessentitycontactRow]] = {
     ZIO.succeed(map.get(compositeId))
+  }
+  override def selectByIds(compositeIds: Array[BusinessentitycontactId]): ZStream[ZConnection, Throwable, BusinessentitycontactRow] = {
+    ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
   override def update(row: BusinessentitycontactRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

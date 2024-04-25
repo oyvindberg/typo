@@ -29,6 +29,16 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete(compositeId: EmployeepayhistoryId)(implicit c: Connection): Boolean = {
     SQL"""delete from humanresources.employeepayhistory where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "ratechangedate" = ${ParameterValue(compositeId.ratechangedate, null, TypoLocalDateTime.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): Int = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val ratechangedate = compositeIds.map(_.ratechangedate)
+    SQL"""delete
+          from humanresources.employeepayhistory
+          where ("businessentityid", "ratechangedate")
+          in (select unnest(${businessentityid}), unnest(${ratechangedate}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     DeleteBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields.structure)
   }
@@ -87,6 +97,16 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
           from humanresources.employeepayhistory
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "ratechangedate" = ${ParameterValue(compositeId.ratechangedate, null, TypoLocalDateTime.toStatement)}
        """.as(EmployeepayhistoryRow.rowParser(1).singleOpt)
+  }
+  override def selectByIds(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): List[EmployeepayhistoryRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val ratechangedate = compositeIds.map(_.ratechangedate)
+    SQL"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
+          from humanresources.employeepayhistory
+          where ("businessentityid", "ratechangedate") 
+          in (select unnest(${businessentityid}), unnest(${ratechangedate}))
+       """.as(EmployeepayhistoryRow.rowParser(1).*)
+    
   }
   override def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

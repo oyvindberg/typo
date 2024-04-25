@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait EmailaddressRepo {
   def delete(compositeId: EmailaddressId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[EmailaddressId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow]
   def insert(unsaved: EmailaddressRow): ZIO[ZConnection, Throwable, EmailaddressRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, EmailaddressRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
@@ -26,6 +27,7 @@ trait EmailaddressRepo {
   def select: SelectBuilder[EmailaddressFields, EmailaddressRow]
   def selectAll: ZStream[ZConnection, Throwable, EmailaddressRow]
   def selectById(compositeId: EmailaddressId): ZIO[ZConnection, Throwable, Option[EmailaddressRow]]
+  def selectByIds(compositeIds: Array[EmailaddressId]): ZStream[ZConnection, Throwable, EmailaddressRow]
   def update(row: EmailaddressRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[EmailaddressFields, EmailaddressRow]
   def upsert(unsaved: EmailaddressRow): ZIO[ZConnection, Throwable, UpdateResult[EmailaddressRow]]

@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait EmployeedepartmenthistoryRepo {
   def delete(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[EmployeedepartmenthistoryId]): ConnectionIO[Int]
   def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow]
   def insert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, EmployeedepartmenthistoryRow], batchSize: Int): ConnectionIO[Long]
@@ -24,6 +25,7 @@ trait EmployeedepartmenthistoryRepo {
   def select: SelectBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow]
   def selectAll: Stream[ConnectionIO, EmployeedepartmenthistoryRow]
   def selectById(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Option[EmployeedepartmenthistoryRow]]
+  def selectByIds(compositeIds: Array[EmployeedepartmenthistoryId]): Stream[ConnectionIO, EmployeedepartmenthistoryRow]
   def update(row: EmployeedepartmenthistoryRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow]
   def upsert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow]

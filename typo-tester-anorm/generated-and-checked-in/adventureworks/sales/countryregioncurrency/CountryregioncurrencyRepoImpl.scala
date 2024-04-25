@@ -28,6 +28,16 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.countryregioncurrency where "countryregioncode" = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND "currencycode" = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): Int = {
+    val countryregioncode = compositeIds.map(_.countryregioncode)
+    val currencycode = compositeIds.map(_.currencycode)
+    SQL"""delete
+          from sales.countryregioncurrency
+          where ("countryregioncode", "currencycode")
+          in (select unnest(${countryregioncode}), unnest(${currencycode}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure)
   }
@@ -84,6 +94,16 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           from sales.countryregioncurrency
           where "countryregioncode" = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND "currencycode" = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}
        """.as(CountryregioncurrencyRow.rowParser(1).singleOpt)
+  }
+  override def selectByIds(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): List[CountryregioncurrencyRow] = {
+    val countryregioncode = compositeIds.map(_.countryregioncode)
+    val currencycode = compositeIds.map(_.currencycode)
+    SQL"""select "countryregioncode", "currencycode", "modifieddate"::text
+          from sales.countryregioncurrency
+          where ("countryregioncode", "currencycode") 
+          in (select unnest(${countryregioncode}), unnest(${currencycode}))
+       """.as(CountryregioncurrencyRow.rowParser(1).*)
+    
   }
   override def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

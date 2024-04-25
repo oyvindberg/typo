@@ -17,6 +17,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 import zio.ZIO
+import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
 import zio.jdbc.UpdateResult
@@ -27,6 +28,16 @@ import zio.stream.ZStream
 class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.personcreditcard where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "creditcardid" = ${Segment.paramSegment(compositeId.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".delete.map(_ > 0)
+  }
+  override def deleteByIds(compositeIds: Array[PersoncreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZIO[ZConnection, Throwable, Long] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val creditcardid = compositeIds.map(_.creditcardid)
+    sql"""delete
+          from sales.personcreditcard
+          where ("businessentityid", "creditcardid")
+          in (select unnest(${businessentityid}), unnest(${creditcardid}))
+       """.delete
+    
   }
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     DeleteBuilder("sales.personcreditcard", PersoncreditcardFields.structure)
@@ -74,6 +85,16 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   }
   override def selectById(compositeId: PersoncreditcardId): ZIO[ZConnection, Throwable, Option[PersoncreditcardRow]] = {
     sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "creditcardid" = ${Segment.paramSegment(compositeId.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".query(using PersoncreditcardRow.jdbcDecoder).selectOne
+  }
+  override def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZStream[ZConnection, Throwable, PersoncreditcardRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val creditcardid = compositeIds.map(_.creditcardid)
+    sql"""select "businessentityid", "creditcardid", "modifieddate"::text
+          from sales.personcreditcard
+          where ("businessentityid", "creditcardid")
+          in (select unnest(${businessentityid}), unnest(${creditcardid}))
+       """.query(using PersoncreditcardRow.jdbcDecoder).selectStream()
+    
   }
   override def update(row: PersoncreditcardRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId

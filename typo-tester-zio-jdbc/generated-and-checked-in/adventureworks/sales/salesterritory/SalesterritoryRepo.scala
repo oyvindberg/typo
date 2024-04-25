@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait SalesterritoryRepo {
   def delete(territoryid: SalesterritoryId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(territoryids: Array[SalesterritoryId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow]
   def insert(unsaved: SalesterritoryRow): ZIO[ZConnection, Throwable, SalesterritoryRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesterritoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

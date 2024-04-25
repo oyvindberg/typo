@@ -30,6 +30,13 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
   override def delete(productreviewid: ProductreviewId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productreview where "productreviewid" = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(productreviewids: Array[ProductreviewId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from production.productreview
+          where "productreviewid" = ANY(${productreviewids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
     DeleteBuilder("production.productreview", ProductreviewFields.structure)
   }

@@ -27,6 +27,9 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId): ConnectionIO[Boolean] = {
     sql"""delete from humanresources.jobcandidate where "jobcandidateid" = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(jobcandidateids: Array[JobcandidateId]): ConnectionIO[Int] = {
+    sql"""delete from humanresources.jobcandidate where "jobcandidateid" = ANY(${jobcandidateids})""".update.run
+  }
   override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
     DeleteBuilder("humanresources.jobcandidate", JobcandidateFields.structure)
   }

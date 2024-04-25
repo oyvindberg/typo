@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait CurrencyRepo {
   def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean
+  def deleteByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): Int
   def delete: DeleteBuilder[CurrencyFields, CurrencyRow]
   def insert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow
   def insertStreaming(unsaved: Iterator[CurrencyRow], batchSize: Int)(implicit c: Connection): Long

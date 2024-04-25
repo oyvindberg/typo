@@ -28,6 +28,9 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
   override def delete(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.specialoffer where "specialofferid" = ${Segment.paramSegment(specialofferid)(SpecialofferId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(specialofferids: Array[SpecialofferId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from sales.specialoffer where "specialofferid" = ANY(${specialofferids})""".delete
+  }
   override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
     DeleteBuilder("sales.specialoffer", SpecialofferFields.structure)
   }

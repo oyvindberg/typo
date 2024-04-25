@@ -18,6 +18,7 @@ import zio.stream.ZStream
 
 trait DocumentRepo {
   def delete(documentnode: DocumentId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(documentnodes: Array[DocumentId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[DocumentFields, DocumentRow]
   def insert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, DocumentRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

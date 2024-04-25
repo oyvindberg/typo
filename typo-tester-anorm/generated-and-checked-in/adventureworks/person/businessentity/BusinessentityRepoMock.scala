@@ -24,6 +24,9 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     map.remove(businessentityid).isDefined
   }
+  override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
+    businessentityids.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
     DeleteBuilderMock(DeleteParams.empty, BusinessentityFields.structure.fields, map)
   }

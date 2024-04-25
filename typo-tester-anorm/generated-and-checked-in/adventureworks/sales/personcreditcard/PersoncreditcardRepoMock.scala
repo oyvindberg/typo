@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package personcreditcard
 
+import adventureworks.userdefined.CustomCreditcardId
+import anorm.ToStatement
 import java.sql.Connection
 import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
@@ -23,6 +25,9 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
                                map: scala.collection.mutable.Map[PersoncreditcardId, PersoncreditcardRow] = scala.collection.mutable.Map.empty) extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
+  }
+  override def deleteByIds(compositeIds: Array[PersoncreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): Int = {
+    compositeIds.map(id => map.remove(id)).count(_.isDefined)
   }
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     DeleteBuilderMock(DeleteParams.empty, PersoncreditcardFields.structure.fields, map)
@@ -60,6 +65,9 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
   }
   override def selectById(compositeId: PersoncreditcardId)(implicit c: Connection): Option[PersoncreditcardRow] = {
     map.get(compositeId)
+  }
+  override def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[PersoncreditcardRow] = {
+    compositeIds.flatMap(map.get).toList
   }
   override def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {

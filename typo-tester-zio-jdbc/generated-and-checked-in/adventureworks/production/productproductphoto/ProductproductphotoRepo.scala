@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait ProductproductphotoRepo {
   def delete(compositeId: ProductproductphotoId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[ProductproductphotoId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow]
   def insert(unsaved: ProductproductphotoRow): ZIO[ZConnection, Throwable, ProductproductphotoRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductproductphotoRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
@@ -26,6 +27,7 @@ trait ProductproductphotoRepo {
   def select: SelectBuilder[ProductproductphotoFields, ProductproductphotoRow]
   def selectAll: ZStream[ZConnection, Throwable, ProductproductphotoRow]
   def selectById(compositeId: ProductproductphotoId): ZIO[ZConnection, Throwable, Option[ProductproductphotoRow]]
+  def selectByIds(compositeIds: Array[ProductproductphotoId]): ZStream[ZConnection, Throwable, ProductproductphotoRow]
   def update(row: ProductproductphotoRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow]
   def upsert(unsaved: ProductproductphotoRow): ZIO[ZConnection, Throwable, UpdateResult[ProductproductphotoRow]]

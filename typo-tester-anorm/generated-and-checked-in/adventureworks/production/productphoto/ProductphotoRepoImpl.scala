@@ -29,6 +29,13 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
   override def delete(productphotoid: ProductphotoId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productphoto where "productphotoid" = ${ParameterValue(productphotoid, null, ProductphotoId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(productphotoids: Array[ProductphotoId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from production.productphoto
+          where "productphotoid" = ANY(${productphotoids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow] = {
     DeleteBuilder("production.productphoto", ProductphotoFields.structure)
   }

@@ -28,6 +28,16 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
   override def delete(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.salesorderheadersalesreason where "salesorderid" = ${ParameterValue(compositeId.salesorderid, null, SalesorderheaderId.toStatement)} AND "salesreasonid" = ${ParameterValue(compositeId.salesreasonid, null, SalesreasonId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[SalesorderheadersalesreasonId])(implicit c: Connection): Int = {
+    val salesorderid = compositeIds.map(_.salesorderid)
+    val salesreasonid = compositeIds.map(_.salesreasonid)
+    SQL"""delete
+          from sales.salesorderheadersalesreason
+          where ("salesorderid", "salesreasonid")
+          in (select unnest(${salesorderid}), unnest(${salesreasonid}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
     DeleteBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure)
   }
@@ -84,6 +94,16 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
           from sales.salesorderheadersalesreason
           where "salesorderid" = ${ParameterValue(compositeId.salesorderid, null, SalesorderheaderId.toStatement)} AND "salesreasonid" = ${ParameterValue(compositeId.salesreasonid, null, SalesreasonId.toStatement)}
        """.as(SalesorderheadersalesreasonRow.rowParser(1).singleOpt)
+  }
+  override def selectByIds(compositeIds: Array[SalesorderheadersalesreasonId])(implicit c: Connection): List[SalesorderheadersalesreasonRow] = {
+    val salesorderid = compositeIds.map(_.salesorderid)
+    val salesreasonid = compositeIds.map(_.salesreasonid)
+    SQL"""select "salesorderid", "salesreasonid", "modifieddate"::text
+          from sales.salesorderheadersalesreason
+          where ("salesorderid", "salesreasonid") 
+          in (select unnest(${salesorderid}), unnest(${salesreasonid}))
+       """.as(SalesorderheadersalesreasonRow.rowParser(1).*)
+    
   }
   override def update(row: SalesorderheadersalesreasonRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

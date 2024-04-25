@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait SalesorderdetailRepo {
   def delete(compositeId: SalesorderdetailId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[SalesorderdetailId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def insert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, SalesorderdetailRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderdetailRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
@@ -26,6 +27,7 @@ trait SalesorderdetailRepo {
   def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def selectAll: ZStream[ZConnection, Throwable, SalesorderdetailRow]
   def selectById(compositeId: SalesorderdetailId): ZIO[ZConnection, Throwable, Option[SalesorderdetailRow]]
+  def selectByIds(compositeIds: Array[SalesorderdetailId]): ZStream[ZConnection, Throwable, SalesorderdetailRow]
   def update(row: SalesorderdetailRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def upsert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderdetailRow]]

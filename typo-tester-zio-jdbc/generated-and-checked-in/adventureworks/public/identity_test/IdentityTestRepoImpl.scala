@@ -26,6 +26,9 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
   override def delete(name: IdentityTestId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from public.identity-test where "name" = ${Segment.paramSegment(name)(IdentityTestId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(names: Array[IdentityTestId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from public.identity-test where "name" = ANY(${names})""".delete
+  }
   override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
     DeleteBuilder("public.identity-test", IdentityTestFields.structure)
   }

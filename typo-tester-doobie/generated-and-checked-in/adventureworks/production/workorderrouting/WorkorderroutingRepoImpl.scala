@@ -29,6 +29,17 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId): ConnectionIO[Boolean] = {
     sql"""delete from production.workorderrouting where "workorderid" = ${fromWrite(compositeId.workorderid)(Write.fromPut(WorkorderId.put))} AND "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(Meta.IntMeta.put))} AND "operationsequence" = ${fromWrite(compositeId.operationsequence)(Write.fromPut(TypoShort.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[WorkorderroutingId]): ConnectionIO[Int] = {
+    val workorderid = compositeIds.map(_.workorderid)
+    val productid = compositeIds.map(_.productid)
+    val operationsequence = compositeIds.map(_.operationsequence)
+    sql"""delete
+          from production.workorderrouting
+          where ("workorderid", "productid", "operationsequence")
+          in (select unnest(${workorderid}), unnest(${productid}), unnest(${operationsequence}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     DeleteBuilder("production.workorderrouting", WorkorderroutingFields.structure)
   }
@@ -86,6 +97,17 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   }
   override def selectById(compositeId: WorkorderroutingId): ConnectionIO[Option[WorkorderroutingRow]] = {
     sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting where "workorderid" = ${fromWrite(compositeId.workorderid)(Write.fromPut(WorkorderId.put))} AND "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(Meta.IntMeta.put))} AND "operationsequence" = ${fromWrite(compositeId.operationsequence)(Write.fromPut(TypoShort.put))}""".query(using WorkorderroutingRow.read).option
+  }
+  override def selectByIds(compositeIds: Array[WorkorderroutingId]): Stream[ConnectionIO, WorkorderroutingRow] = {
+    val workorderid = compositeIds.map(_.workorderid)
+    val productid = compositeIds.map(_.productid)
+    val operationsequence = compositeIds.map(_.operationsequence)
+    sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
+          from production.workorderrouting
+          where ("workorderid", "productid", "operationsequence") 
+          in (select unnest(${workorderid}), unnest(${productid}), unnest(${operationsequence}))
+       """.query(using WorkorderroutingRow.read).stream
+    
   }
   override def update(row: WorkorderroutingRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId

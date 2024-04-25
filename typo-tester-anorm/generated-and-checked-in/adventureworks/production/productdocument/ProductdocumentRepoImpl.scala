@@ -28,6 +28,16 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productdocument where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "documentnode" = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[ProductdocumentId])(implicit c: Connection): Int = {
+    val productid = compositeIds.map(_.productid)
+    val documentnode = compositeIds.map(_.documentnode)
+    SQL"""delete
+          from production.productdocument
+          where ("productid", "documentnode")
+          in (select unnest(${productid}), unnest(${documentnode}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
     DeleteBuilder("production.productdocument", ProductdocumentFields.structure)
   }
@@ -87,6 +97,16 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
           from production.productdocument
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "documentnode" = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}
        """.as(ProductdocumentRow.rowParser(1).singleOpt)
+  }
+  override def selectByIds(compositeIds: Array[ProductdocumentId])(implicit c: Connection): List[ProductdocumentRow] = {
+    val productid = compositeIds.map(_.productid)
+    val documentnode = compositeIds.map(_.documentnode)
+    SQL"""select "productid", "modifieddate"::text, "documentnode"
+          from production.productdocument
+          where ("productid", "documentnode") 
+          in (select unnest(${productid}), unnest(${documentnode}))
+       """.as(ProductdocumentRow.rowParser(1).*)
+    
   }
   override def update(row: ProductdocumentRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

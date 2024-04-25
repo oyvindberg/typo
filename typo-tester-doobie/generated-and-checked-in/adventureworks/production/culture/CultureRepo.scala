@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait CultureRepo {
   def delete(cultureid: CultureId): ConnectionIO[Boolean]
+  def deleteByIds(cultureids: Array[CultureId]): ConnectionIO[Int]
   def delete: DeleteBuilder[CultureFields, CultureRow]
   def insert(unsaved: CultureRow): ConnectionIO[CultureRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, CultureRow], batchSize: Int): ConnectionIO[Long]

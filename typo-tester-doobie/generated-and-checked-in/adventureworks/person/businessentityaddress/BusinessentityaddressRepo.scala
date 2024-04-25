@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait BusinessentityaddressRepo {
   def delete(compositeId: BusinessentityaddressId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[BusinessentityaddressId]): ConnectionIO[Int]
   def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
   def insert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentityaddressRow], batchSize: Int): ConnectionIO[Long]
@@ -24,6 +25,7 @@ trait BusinessentityaddressRepo {
   def select: SelectBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
   def selectAll: Stream[ConnectionIO, BusinessentityaddressRow]
   def selectById(compositeId: BusinessentityaddressId): ConnectionIO[Option[BusinessentityaddressRow]]
+  def selectByIds(compositeIds: Array[BusinessentityaddressId]): Stream[ConnectionIO, BusinessentityaddressRow]
   def update(row: BusinessentityaddressRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
   def upsert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow]

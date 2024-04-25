@@ -24,6 +24,9 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
   override def delete(compositeId: EmailaddressId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
   }
+  override def deleteByIds(compositeIds: Array[EmailaddressId])(implicit c: Connection): Int = {
+    compositeIds.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
     DeleteBuilderMock(DeleteParams.empty, EmailaddressFields.structure.fields, map)
   }
@@ -60,6 +63,9 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
   }
   override def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow] = {
     map.get(compositeId)
+  }
+  override def selectByIds(compositeIds: Array[EmailaddressId])(implicit c: Connection): List[EmailaddressRow] = {
+    compositeIds.flatMap(map.get).toList
   }
   override def update(row: EmailaddressRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {

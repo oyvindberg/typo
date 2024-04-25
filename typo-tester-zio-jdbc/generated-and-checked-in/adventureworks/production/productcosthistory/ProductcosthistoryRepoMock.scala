@@ -28,6 +28,9 @@ class ProductcosthistoryRepoMock(toRow: Function1[ProductcosthistoryRowUnsaved, 
   override def delete(compositeId: ProductcosthistoryId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
+  override def deleteByIds(compositeIds: Array[ProductcosthistoryId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(compositeIds.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     DeleteBuilderMock(DeleteParams.empty, ProductcosthistoryFields.structure.fields, map)
   }
@@ -71,6 +74,9 @@ class ProductcosthistoryRepoMock(toRow: Function1[ProductcosthistoryRowUnsaved, 
   }
   override def selectById(compositeId: ProductcosthistoryId): ZIO[ZConnection, Throwable, Option[ProductcosthistoryRow]] = {
     ZIO.succeed(map.get(compositeId))
+  }
+  override def selectByIds(compositeIds: Array[ProductcosthistoryId]): ZStream[ZConnection, Throwable, ProductcosthistoryRow] = {
+    ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
   override def update(row: ProductcosthistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

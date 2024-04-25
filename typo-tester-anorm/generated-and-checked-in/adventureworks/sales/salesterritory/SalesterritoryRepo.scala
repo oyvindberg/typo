@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait SalesterritoryRepo {
   def delete(territoryid: SalesterritoryId)(implicit c: Connection): Boolean
+  def deleteByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): Int
   def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow]
   def insert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow
   def insertStreaming(unsaved: Iterator[SalesterritoryRow], batchSize: Int)(implicit c: Connection): Long

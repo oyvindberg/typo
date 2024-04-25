@@ -26,6 +26,9 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
   override def delete(compositeId: SpecialofferproductId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
   }
+  override def deleteByIds(compositeIds: Array[SpecialofferproductId]): ConnectionIO[Int] = {
+    delay(compositeIds.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
     DeleteBuilderMock(DeleteParams.empty, SpecialofferproductFields.structure.fields, map)
   }
@@ -72,6 +75,9 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
   }
   override def selectById(compositeId: SpecialofferproductId): ConnectionIO[Option[SpecialofferproductRow]] = {
     delay(map.get(compositeId))
+  }
+  override def selectByIds(compositeIds: Array[SpecialofferproductId]): Stream[ConnectionIO, SpecialofferproductRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
   }
   override def update(row: SpecialofferproductRow): ConnectionIO[Boolean] = {
     delay {

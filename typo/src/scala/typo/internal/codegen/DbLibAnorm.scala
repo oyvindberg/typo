@@ -165,13 +165,11 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       code"def selectAll(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}"
     case RepoMethod.SelectById(_, _, id, rowType) =>
       code"def selectById(${id.param})(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}"
-    case RepoMethod.SelectAllByIds(_, _, unaryId, idsParam, rowType) =>
-      unaryId match {
-        case IdComputed.UnaryUserSpecified(_, tpe) =>
-          code"def selectByIds($idsParam)(implicit c: ${TypesJava.Connection}, toStatement: ${ToStatement.of(sc.Type.ArrayOf(tpe))}): ${TypesScala.List.of(rowType)}"
-        case _ =>
-          code"def selectByIds($idsParam)(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}"
-      }
+    case RepoMethod.SelectAllByIds(_, _, idComputed, idsParam, rowType) =>
+      val usedDefineds = idComputed.userDefinedCols.zipWithIndex
+        .map { case (col, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(col.tpe)), None) }
+      val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
+      code"def selectByIds($idsParam)(implicit ${params.map(_.code).mkCode(", ")}): ${TypesScala.List.of(rowType)}"
     case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
       val name = s"selectByUnique${keyColumns.map(x => Naming.titleCase(x.name.value)).mkString("And")}"
       code"def $name(${keyColumns.map(_.param.code).mkCode(", ")})(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}"
@@ -197,6 +195,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       code"def delete: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
     case RepoMethod.Delete(_, id) =>
       code"def delete(${id.param})(implicit c: ${TypesJava.Connection}): ${TypesScala.Boolean}"
+    case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
+      val usedDefineds =
+        idComputed.userDefinedCols.zipWithIndex
+          .map { case (col, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(col.tpe)), None) }
+      val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
+      code"def deleteByIds($idsParam)(implicit ${params.map(_.code).mkCode(", ")}): ${TypesScala.Int}"
     case RepoMethod.SqlFile(sqlScript) =>
       val params = sc.Params(sqlScript.params.map(p => sc.Param(p.name, p.tpe, None)))
       val retType = sqlScript.maybeRowName match {
@@ -227,16 +231,33 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         }
         code"""$sql.as(${rowParserFor(rowType)}.singleOpt)"""
 
-      case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, rowType) =>
-        val sql = SQL {
-          code"""|select ${dbNames(cols, isRead = true)}
-                 |from $relName
-                 |where ${unaryId.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})
-                 |""".stripMargin
-        }
+      case RepoMethod.SelectAllByIds(relName, cols, computedId, idsParam, rowType) =>
+        val joinedColNames = dbNames(cols, isRead = true)
+        computedId match {
+          case x: IdComputed.Composite =>
+            val vals = x.cols.map(col => code"val ${col.name} = ${idsParam.name}.map(_.${col.name})").mkCode("\n")
+            val sql = SQL {
+              code"""|select ${joinedColNames}
+                     |from $relName
+                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")}) 
+                     |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, col.tpe, forbidInline = true)})").mkCode(", ")})
+                     |""".stripMargin
+            }
+            code"""|$vals
+                   |$sql.as(${rowParserFor(rowType)}.*)
+                   |""".stripMargin
 
-        code"""|$sql.as(${rowParserFor(rowType)}.*)
-               |""".stripMargin
+          case x: IdComputed.Unary =>
+            val sql = SQL {
+              code"""|select ${joinedColNames}
+                     |from $relName
+                     |where ${x.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})
+                     |""".stripMargin
+            }
+
+            code"""|$sql.as(${rowParserFor(rowType)}.*)
+                   |""".stripMargin
+        }
 
       case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
         code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType.structure, $rowType.rowParser)"
@@ -423,6 +444,33 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           code"""delete from $relName where ${matchId(id)}"""
         }
         code"$sql.executeUpdate() > 0"
+      case RepoMethod.DeleteByIds(relName, computedId, idsParam) =>
+        computedId match {
+          case x: IdComputed.Composite =>
+            val vals = x.cols.map(col => code"val ${col.name} = ${idsParam.name}.map(_.${col.name})").mkCode("\n")
+            val sql = SQL {
+              code"""|delete
+                     |from $relName
+                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")})
+                     |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, col.tpe, forbidInline = true)})").mkCode(", ")})
+                     |""".stripMargin
+            }
+            code"""|$vals
+                   |$sql.executeUpdate()
+                   |""".stripMargin
+
+          case x: IdComputed.Unary =>
+            val sql = SQL {
+              code"""|delete
+                     |from $relName
+                     |where ${x.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, x.tpe, forbidInline = true)})
+                     |""".stripMargin
+            }
+
+            code"""|$sql.executeUpdate()
+                   |""".stripMargin
+        }
+
       case RepoMethod.SqlFile(sqlScript) =>
         val renderedScript: sc.Code = sqlScript.sqlFile.decomposedSql.renderCode { (paramAtIndex: Int) =>
           val param = sqlScript.params.find(_.indices.contains(paramAtIndex)).get
@@ -532,6 +580,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType.structure.fields, map)"
       case RepoMethod.Delete(_, id) =>
         code"map.remove(${id.paramName}).isDefined"
+      case RepoMethod.DeleteByIds(_, _, idsParam) =>
+        code"${idsParam.name}.map(id => map.remove(id)).count(_.isDefined)"
       case RepoMethod.SqlFile(_) =>
         // should not happen (tm)
         code"???"

@@ -39,6 +39,9 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def delete(salesorderid: SalesorderheaderId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.salesorderheader where "salesorderid" = ${Segment.paramSegment(salesorderid)(SalesorderheaderId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(salesorderids: Array[SalesorderheaderId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from sales.salesorderheader where "salesorderid" = ANY(${salesorderids})""".delete
+  }
   override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     DeleteBuilder("sales.salesorderheader", SalesorderheaderFields.structure)
   }

@@ -27,6 +27,16 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
   override def delete(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Boolean] = {
     sql"""delete from sales.salesorderheadersalesreason where "salesorderid" = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND "salesreasonid" = ${fromWrite(compositeId.salesreasonid)(Write.fromPut(SalesreasonId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[SalesorderheadersalesreasonId]): ConnectionIO[Int] = {
+    val salesorderid = compositeIds.map(_.salesorderid)
+    val salesreasonid = compositeIds.map(_.salesreasonid)
+    sql"""delete
+          from sales.salesorderheadersalesreason
+          where ("salesorderid", "salesreasonid")
+          in (select unnest(${salesorderid}), unnest(${salesreasonid}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
     DeleteBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure)
   }
@@ -75,6 +85,16 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
   }
   override def selectById(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Option[SalesorderheadersalesreasonRow]] = {
     sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sales.salesorderheadersalesreason where "salesorderid" = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND "salesreasonid" = ${fromWrite(compositeId.salesreasonid)(Write.fromPut(SalesreasonId.put))}""".query(using SalesorderheadersalesreasonRow.read).option
+  }
+  override def selectByIds(compositeIds: Array[SalesorderheadersalesreasonId]): Stream[ConnectionIO, SalesorderheadersalesreasonRow] = {
+    val salesorderid = compositeIds.map(_.salesorderid)
+    val salesreasonid = compositeIds.map(_.salesreasonid)
+    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text
+          from sales.salesorderheadersalesreason
+          where ("salesorderid", "salesreasonid") 
+          in (select unnest(${salesorderid}), unnest(${salesreasonid}))
+       """.query(using SalesorderheadersalesreasonRow.read).stream
+    
   }
   override def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId

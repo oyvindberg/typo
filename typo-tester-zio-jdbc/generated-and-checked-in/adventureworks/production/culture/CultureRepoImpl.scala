@@ -27,6 +27,9 @@ class CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.culture where "cultureid" = ${Segment.paramSegment(cultureid)(CultureId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(cultureids: Array[CultureId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from production.culture where "cultureid" = ANY(${cultureids})""".delete
+  }
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
     DeleteBuilder("production.culture", CultureFields.structure)
   }

@@ -29,6 +29,9 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
   override def delete(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from purchasing.shipmethod where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(ShipmethodId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(shipmethodids: Array[ShipmethodId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from purchasing.shipmethod where "shipmethodid" = ANY(${shipmethodids})""".delete
+  }
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
     DeleteBuilder("purchasing.shipmethod", ShipmethodFields.structure)
   }

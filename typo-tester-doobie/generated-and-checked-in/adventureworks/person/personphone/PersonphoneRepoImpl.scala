@@ -28,6 +28,17 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId): ConnectionIO[Boolean] = {
     sql"""delete from person.personphone where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[PersonphoneId]): ConnectionIO[Int] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val phonenumber = compositeIds.map(_.phonenumber)
+    val phonenumbertypeid = compositeIds.map(_.phonenumbertypeid)
+    sql"""delete
+          from person.personphone
+          where ("businessentityid", "phonenumber", "phonenumbertypeid")
+          in (select unnest(${businessentityid}), unnest(${phonenumber}), unnest(${phonenumbertypeid}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
     DeleteBuilder("person.personphone", PersonphoneFields.structure)
   }
@@ -77,6 +88,17 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
   }
   override def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]] = {
     sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".query(using PersonphoneRow.read).option
+  }
+  override def selectByIds(compositeIds: Array[PersonphoneId]): Stream[ConnectionIO, PersonphoneRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val phonenumber = compositeIds.map(_.phonenumber)
+    val phonenumbertypeid = compositeIds.map(_.phonenumbertypeid)
+    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
+          from person.personphone
+          where ("businessentityid", "phonenumber", "phonenumbertypeid") 
+          in (select unnest(${businessentityid}), unnest(${phonenumber}), unnest(${phonenumbertypeid}))
+       """.query(using PersonphoneRow.read).stream
+    
   }
   override def update(row: PersonphoneRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId

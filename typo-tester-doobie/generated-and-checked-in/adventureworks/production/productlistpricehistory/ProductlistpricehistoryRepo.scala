@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait ProductlistpricehistoryRepo {
   def delete(compositeId: ProductlistpricehistoryId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[ProductlistpricehistoryId]): ConnectionIO[Int]
   def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def insert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, ProductlistpricehistoryRow], batchSize: Int): ConnectionIO[Long]
@@ -24,6 +25,7 @@ trait ProductlistpricehistoryRepo {
   def select: SelectBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def selectAll: Stream[ConnectionIO, ProductlistpricehistoryRow]
   def selectById(compositeId: ProductlistpricehistoryId): ConnectionIO[Option[ProductlistpricehistoryRow]]
+  def selectByIds(compositeIds: Array[ProductlistpricehistoryId]): Stream[ConnectionIO, ProductlistpricehistoryRow]
   def update(row: ProductlistpricehistoryRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def upsert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow]

@@ -26,6 +26,9 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
   override def delete(id: MaritalStatusId): ConnectionIO[Boolean] = {
     delay(map.remove(id).isDefined)
   }
+  override def deleteByIds(ids: Array[MaritalStatusId]): ConnectionIO[Int] = {
+    delay(ids.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
     DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure.fields, map)
   }

@@ -30,6 +30,9 @@ class AddressRepoImpl extends AddressRepo {
   override def delete(addressid: AddressId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.address where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(addressids: Array[AddressId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from person.address where "addressid" = ANY(${addressids})""".delete
+  }
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
     DeleteBuilder("person.address", AddressFields.structure)
   }

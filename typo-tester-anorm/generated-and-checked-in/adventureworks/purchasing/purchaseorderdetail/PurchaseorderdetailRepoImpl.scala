@@ -16,6 +16,16 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
 class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
+  override def deleteByIds(compositeIds: Array[PurchaseorderdetailId])(implicit c: Connection): Int = {
+    val purchaseorderid = compositeIds.map(_.purchaseorderid)
+    val purchaseorderdetailid = compositeIds.map(_.purchaseorderdetailid)
+    SQL"""delete
+          from purchasing.purchaseorderdetail
+          where ("purchaseorderid", "purchaseorderdetailid")
+          in (select unnest(${purchaseorderid}), unnest(${purchaseorderdetailid}))
+       """.executeUpdate()
+    
+  }
   override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
     SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields.structure, PurchaseorderdetailRow.rowParser)
   }
@@ -29,5 +39,15 @@ class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
           from purchasing.purchaseorderdetail
           where "purchaseorderid" = ${ParameterValue(compositeId.purchaseorderid, null, PurchaseorderheaderId.toStatement)} AND "purchaseorderdetailid" = ${ParameterValue(compositeId.purchaseorderdetailid, null, ToStatement.intToStatement)}
        """.as(PurchaseorderdetailRow.rowParser(1).singleOpt)
+  }
+  override def selectByIds(compositeIds: Array[PurchaseorderdetailId])(implicit c: Connection): List[PurchaseorderdetailRow] = {
+    val purchaseorderid = compositeIds.map(_.purchaseorderid)
+    val purchaseorderdetailid = compositeIds.map(_.purchaseorderdetailid)
+    SQL"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text
+          from purchasing.purchaseorderdetail
+          where ("purchaseorderid", "purchaseorderdetailid") 
+          in (select unnest(${purchaseorderid}), unnest(${purchaseorderdetailid}))
+       """.as(PurchaseorderdetailRow.rowParser(1).*)
+    
   }
 }

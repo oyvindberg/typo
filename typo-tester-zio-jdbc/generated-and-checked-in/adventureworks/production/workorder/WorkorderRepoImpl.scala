@@ -30,6 +30,9 @@ class WorkorderRepoImpl extends WorkorderRepo {
   override def delete(workorderid: WorkorderId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.workorder where "workorderid" = ${Segment.paramSegment(workorderid)(WorkorderId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(workorderids: Array[WorkorderId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from production.workorder where "workorderid" = ANY(${workorderids})""".delete
+  }
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
     DeleteBuilder("production.workorder", WorkorderFields.structure)
   }

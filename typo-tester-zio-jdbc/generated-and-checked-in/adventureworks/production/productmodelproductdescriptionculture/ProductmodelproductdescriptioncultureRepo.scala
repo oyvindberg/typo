@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait ProductmodelproductdescriptioncultureRepo {
   def delete(compositeId: ProductmodelproductdescriptioncultureId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[ProductmodelproductdescriptioncultureId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow]
   def insert(unsaved: ProductmodelproductdescriptioncultureRow): ZIO[ZConnection, Throwable, ProductmodelproductdescriptioncultureRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelproductdescriptioncultureRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
@@ -26,6 +27,7 @@ trait ProductmodelproductdescriptioncultureRepo {
   def select: SelectBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow]
   def selectAll: ZStream[ZConnection, Throwable, ProductmodelproductdescriptioncultureRow]
   def selectById(compositeId: ProductmodelproductdescriptioncultureId): ZIO[ZConnection, Throwable, Option[ProductmodelproductdescriptioncultureRow]]
+  def selectByIds(compositeIds: Array[ProductmodelproductdescriptioncultureId]): ZStream[ZConnection, Throwable, ProductmodelproductdescriptioncultureRow]
   def update(row: ProductmodelproductdescriptioncultureRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow]
   def upsert(unsaved: ProductmodelproductdescriptioncultureRow): ZIO[ZConnection, Throwable, UpdateResult[ProductmodelproductdescriptioncultureRow]]

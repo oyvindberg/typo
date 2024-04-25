@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait DocumentRepo {
   def delete(documentnode: DocumentId)(implicit c: Connection): Boolean
+  def deleteByIds(documentnodes: Array[DocumentId])(implicit c: Connection): Int
   def delete: DeleteBuilder[DocumentFields, DocumentRow]
   def insert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow
   def insertStreaming(unsaved: Iterator[DocumentRow], batchSize: Int)(implicit c: Connection): Long

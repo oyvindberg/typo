@@ -27,6 +27,9 @@ class UsersRepoImpl extends UsersRepo {
   override def delete(userId: UsersId): ConnectionIO[Boolean] = {
     sql"""delete from public.users where "user_id" = ${fromWrite(userId)(Write.fromPut(UsersId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(userIds: Array[UsersId]): ConnectionIO[Int] = {
+    sql"""delete from public.users where "user_id" = ANY(${userIds})""".update.run
+  }
   override def delete: DeleteBuilder[UsersFields, UsersRow] = {
     DeleteBuilder("public.users", UsersFields.structure)
   }

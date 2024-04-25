@@ -28,6 +28,9 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
   override def delete(compositeId: PersonphoneId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
+  override def deleteByIds(compositeIds: Array[PersonphoneId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(compositeIds.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
     DeleteBuilderMock(DeleteParams.empty, PersonphoneFields.structure.fields, map)
   }
@@ -71,6 +74,9 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
   }
   override def selectById(compositeId: PersonphoneId): ZIO[ZConnection, Throwable, Option[PersonphoneRow]] = {
     ZIO.succeed(map.get(compositeId))
+  }
+  override def selectByIds(compositeIds: Array[PersonphoneId]): ZStream[ZConnection, Throwable, PersonphoneRow] = {
+    ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
   override def update(row: PersonphoneRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

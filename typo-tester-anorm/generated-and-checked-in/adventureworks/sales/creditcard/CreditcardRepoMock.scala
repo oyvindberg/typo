@@ -26,6 +26,9 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
   override def delete(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Boolean = {
     map.remove(creditcardid).isDefined
   }
+  override def deleteByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): Int = {
+    creditcardids.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
     DeleteBuilderMock(DeleteParams.empty, CreditcardFields.structure.fields, map)
   }
@@ -63,7 +66,7 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
   override def selectById(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Option[CreditcardRow] = {
     map.get(creditcardid)
   }
-  override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[CreditcardRow] = {
+  override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[CreditcardRow] = {
     creditcardids.flatMap(map.get).toList
   }
   override def update(row: CreditcardRow)(implicit c: Connection): Boolean = {

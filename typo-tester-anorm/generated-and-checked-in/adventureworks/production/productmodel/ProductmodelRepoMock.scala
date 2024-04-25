@@ -24,6 +24,9 @@ class ProductmodelRepoMock(toRow: Function1[ProductmodelRowUnsaved, Productmodel
   override def delete(productmodelid: ProductmodelId)(implicit c: Connection): Boolean = {
     map.remove(productmodelid).isDefined
   }
+  override def deleteByIds(productmodelids: Array[ProductmodelId])(implicit c: Connection): Int = {
+    productmodelids.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[ProductmodelFields, ProductmodelRow] = {
     DeleteBuilderMock(DeleteParams.empty, ProductmodelFields.structure.fields, map)
   }

@@ -18,6 +18,7 @@ import zio.stream.ZStream
 
 trait MaritalStatusRepo {
   def delete(id: MaritalStatusId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow]
   def insert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, MaritalStatusRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, MaritalStatusRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

@@ -28,6 +28,9 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
   override def delete(addressid: AddressId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(addressid).isDefined)
   }
+  override def deleteByIds(addressids: Array[AddressId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(addressids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
     DeleteBuilderMock(DeleteParams.empty, AddressFields.structure.fields, map)
   }

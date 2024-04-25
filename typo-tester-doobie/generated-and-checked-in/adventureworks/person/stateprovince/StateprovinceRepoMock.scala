@@ -26,6 +26,9 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
   override def delete(stateprovinceid: StateprovinceId): ConnectionIO[Boolean] = {
     delay(map.remove(stateprovinceid).isDefined)
   }
+  override def deleteByIds(stateprovinceids: Array[StateprovinceId]): ConnectionIO[Int] = {
+    delay(stateprovinceids.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
     DeleteBuilderMock(DeleteParams.empty, StateprovinceFields.structure.fields, map)
   }

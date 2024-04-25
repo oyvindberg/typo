@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait ShiftRepo {
   def delete(shiftid: ShiftId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(shiftids: Array[ShiftId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[ShiftFields, ShiftRow]
   def insert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, ShiftRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

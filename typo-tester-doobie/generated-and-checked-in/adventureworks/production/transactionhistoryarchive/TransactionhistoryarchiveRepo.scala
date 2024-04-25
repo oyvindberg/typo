@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait TransactionhistoryarchiveRepo {
   def delete(transactionid: TransactionhistoryarchiveId): ConnectionIO[Boolean]
+  def deleteByIds(transactionids: Array[TransactionhistoryarchiveId]): ConnectionIO[Int]
   def delete: DeleteBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow]
   def insert(unsaved: TransactionhistoryarchiveRow): ConnectionIO[TransactionhistoryarchiveRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryarchiveRow], batchSize: Int): ConnectionIO[Long]

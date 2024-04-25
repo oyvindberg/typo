@@ -24,6 +24,9 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
   override def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
   }
+  override def deleteByIds(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): Int = {
+    compositeIds.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     DeleteBuilderMock(DeleteParams.empty, CountryregioncurrencyFields.structure.fields, map)
   }
@@ -60,6 +63,9 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
   }
   override def selectById(compositeId: CountryregioncurrencyId)(implicit c: Connection): Option[CountryregioncurrencyRow] = {
     map.get(compositeId)
+  }
+  override def selectByIds(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): List[CountryregioncurrencyRow] = {
+    compositeIds.flatMap(map.get).toList
   }
   override def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {

@@ -29,6 +29,13 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
   override def delete(shipmethodid: ShipmethodId)(implicit c: Connection): Boolean = {
     SQL"""delete from purchasing.shipmethod where "shipmethodid" = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from purchasing.shipmethod
+          where "shipmethodid" = ANY(${shipmethodids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
     DeleteBuilder("purchasing.shipmethod", ShipmethodFields.structure)
   }

@@ -28,6 +28,9 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
   override def delete(locationid: LocationId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(locationid).isDefined)
   }
+  override def deleteByIds(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(locationids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
     DeleteBuilderMock(DeleteParams.empty, LocationFields.structure.fields, map)
   }

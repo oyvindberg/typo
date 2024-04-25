@@ -150,9 +150,10 @@ case class ComputedTable(
           RepoMethod.Upsert(dbTable.name, cols, id, unsavedParam, names.RowName)
         },
         maybeId.collect {
-          // todo: support composite ids
           case unary: IdComputed.Unary =>
             RepoMethod.SelectAllByIds(dbTable.name, cols, unary, sc.Param(unary.paramName.appended("s"), sc.Type.ArrayOf(unary.tpe), None), names.RowName)
+          case x: IdComputed.Composite if x.cols.forall(col => col.dbCol.nullability == Nullability.NoNulls) =>
+            RepoMethod.SelectAllByIds(dbTable.name, cols, x, sc.Param(x.paramName.appended("s"), sc.Type.ArrayOf(x.tpe), None), names.RowName)
         },
         for {
           name <- names.FieldOrIdValueName
@@ -194,7 +195,13 @@ case class ComputedTable(
           case unsavedRow if options.enableStreamingInserts =>
             RepoMethod.InsertUnsavedStreaming(dbTable.name, unsavedRow)
         },
-        maybeId.map(id => RepoMethod.Delete(dbTable.name, id))
+        maybeId.map(id => RepoMethod.Delete(dbTable.name, id)),
+        maybeId.collect {
+          case unary: IdComputed.Unary =>
+            RepoMethod.DeleteByIds(dbTable.name, unary, sc.Param(unary.paramName.appended("s"), sc.Type.ArrayOf(unary.tpe), None))
+          case x: IdComputed.Composite if x.cols.forall(col => col.dbCol.nullability == Nullability.NoNulls) =>
+            RepoMethod.DeleteByIds(dbTable.name, x, sc.Param(x.paramName.appended("s"), sc.Type.ArrayOf(x.tpe), None))
+        }
       ).flatten,
       dbTable.uniqueKeys
         .map { uk =>

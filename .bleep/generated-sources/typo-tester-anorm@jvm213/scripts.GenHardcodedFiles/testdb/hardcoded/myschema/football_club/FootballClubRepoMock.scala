@@ -24,6 +24,9 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
   override def delete(id: FootballClubId)(implicit c: Connection): Boolean = {
     map.remove(id).isDefined
   }
+  override def deleteByIds(ids: Array[FootballClubId])(implicit c: Connection): Int = {
+    ids.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
     DeleteBuilderMock(DeleteParams.empty, FootballClubFields.structure.fields, map)
   }

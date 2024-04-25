@@ -30,6 +30,17 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.workorderrouting where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(WorkorderId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(TypoShort.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[WorkorderroutingId]): ZIO[ZConnection, Throwable, Long] = {
+    val workorderid = compositeIds.map(_.workorderid)
+    val productid = compositeIds.map(_.productid)
+    val operationsequence = compositeIds.map(_.operationsequence)
+    sql"""delete
+          from production.workorderrouting
+          where ("workorderid", "productid", "operationsequence")
+          in (select unnest(${workorderid}), unnest(${productid}), unnest(${operationsequence}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     DeleteBuilder("production.workorderrouting", WorkorderroutingFields.structure)
   }
@@ -85,6 +96,17 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   }
   override def selectById(compositeId: WorkorderroutingId): ZIO[ZConnection, Throwable, Option[WorkorderroutingRow]] = {
     sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text from production.workorderrouting where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(WorkorderId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(TypoShort.setter)}""".query(using WorkorderroutingRow.jdbcDecoder).selectOne
+  }
+  override def selectByIds(compositeIds: Array[WorkorderroutingId]): ZStream[ZConnection, Throwable, WorkorderroutingRow] = {
+    val workorderid = compositeIds.map(_.workorderid)
+    val productid = compositeIds.map(_.productid)
+    val operationsequence = compositeIds.map(_.operationsequence)
+    sql"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
+          from production.workorderrouting
+          where ("workorderid", "productid", "operationsequence")
+          in (select unnest(${workorderid}), unnest(${productid}), unnest(${operationsequence}))
+       """.query(using WorkorderroutingRow.jdbcDecoder).selectStream()
+    
   }
   override def update(row: WorkorderroutingRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId

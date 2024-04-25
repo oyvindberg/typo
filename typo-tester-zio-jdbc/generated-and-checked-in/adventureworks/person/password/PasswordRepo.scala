@@ -18,6 +18,7 @@ import zio.stream.ZStream
 
 trait PasswordRepo {
   def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[PasswordFields, PasswordRow]
   def insert(unsaved: PasswordRow): ZIO[ZConnection, Throwable, PasswordRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PasswordRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

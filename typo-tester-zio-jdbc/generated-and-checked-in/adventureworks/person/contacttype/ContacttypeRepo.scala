@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait ContacttypeRepo {
   def delete(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(contacttypeids: Array[ContacttypeId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow]
   def insert(unsaved: ContacttypeRow): ZIO[ZConnection, Throwable, ContacttypeRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

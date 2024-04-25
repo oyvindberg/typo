@@ -27,6 +27,9 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def delete(transactionid: TransactionhistoryId): ConnectionIO[Boolean] = {
     sql"""delete from production.transactionhistory where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(transactionids: Array[TransactionhistoryId]): ConnectionIO[Int] = {
+    sql"""delete from production.transactionhistory where "transactionid" = ANY(${transactionids})""".update.run
+  }
   override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
     DeleteBuilder("production.transactionhistory", TransactionhistoryFields.structure)
   }

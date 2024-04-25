@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait DepartmentRepo {
   def delete(departmentid: DepartmentId): ConnectionIO[Boolean]
+  def deleteByIds(departmentids: Array[DepartmentId]): ConnectionIO[Int]
   def delete: DeleteBuilder[DepartmentFields, DepartmentRow]
   def insert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, DepartmentRow], batchSize: Int): ConnectionIO[Long]

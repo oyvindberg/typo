@@ -26,6 +26,9 @@ class SalesorderheadersalesreasonRepoMock(toRow: Function1[Salesorderheadersales
   override def delete(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
   }
+  override def deleteByIds(compositeIds: Array[SalesorderheadersalesreasonId]): ConnectionIO[Int] = {
+    delay(compositeIds.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
     DeleteBuilderMock(DeleteParams.empty, SalesorderheadersalesreasonFields.structure.fields, map)
   }
@@ -72,6 +75,9 @@ class SalesorderheadersalesreasonRepoMock(toRow: Function1[Salesorderheadersales
   }
   override def selectById(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Option[SalesorderheadersalesreasonRow]] = {
     delay(map.get(compositeId))
+  }
+  override def selectByIds(compositeIds: Array[SalesorderheadersalesreasonId]): Stream[ConnectionIO, SalesorderheadersalesreasonRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
   }
   override def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Boolean] = {
     delay {

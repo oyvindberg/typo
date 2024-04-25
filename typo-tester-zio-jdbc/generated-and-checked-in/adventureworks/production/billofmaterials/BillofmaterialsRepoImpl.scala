@@ -30,6 +30,9 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def delete(billofmaterialsid: Int): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.billofmaterials where "billofmaterialsid" = ${Segment.paramSegment(billofmaterialsid)(Setter.intSetter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(billofmaterialsids: Array[Int]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from production.billofmaterials where "billofmaterialsid" = ANY(${billofmaterialsids})""".delete
+  }
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     DeleteBuilder("production.billofmaterials", BillofmaterialsFields.structure)
   }

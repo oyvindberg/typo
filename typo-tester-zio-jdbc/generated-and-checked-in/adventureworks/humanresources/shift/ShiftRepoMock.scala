@@ -28,6 +28,9 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
   override def delete(shiftid: ShiftId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(shiftid).isDefined)
   }
+  override def deleteByIds(shiftids: Array[ShiftId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(shiftids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
     DeleteBuilderMock(DeleteParams.empty, ShiftFields.structure.fields, map)
   }

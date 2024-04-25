@@ -26,6 +26,9 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
   override def delete(countryregioncode: CountryregionId): ConnectionIO[Boolean] = {
     delay(map.remove(countryregioncode).isDefined)
   }
+  override def deleteByIds(countryregioncodes: Array[CountryregionId]): ConnectionIO[Int] = {
+    delay(countryregioncodes.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
     DeleteBuilderMock(DeleteParams.empty, CountryregionFields.structure.fields, map)
   }

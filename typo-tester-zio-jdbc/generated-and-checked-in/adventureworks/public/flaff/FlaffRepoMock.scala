@@ -27,6 +27,9 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
   override def delete(compositeId: FlaffId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
+  override def deleteByIds(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(compositeIds.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
     DeleteBuilderMock(DeleteParams.empty, FlaffFields.structure.fields, map)
   }
@@ -57,6 +60,9 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
   }
   override def selectById(compositeId: FlaffId): ZIO[ZConnection, Throwable, Option[FlaffRow]] = {
     ZIO.succeed(map.get(compositeId))
+  }
+  override def selectByIds(compositeIds: Array[FlaffId]): ZStream[ZConnection, Throwable, FlaffRow] = {
+    ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
   override def update(row: FlaffRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

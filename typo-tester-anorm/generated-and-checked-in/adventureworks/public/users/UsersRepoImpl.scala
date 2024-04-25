@@ -29,6 +29,13 @@ class UsersRepoImpl extends UsersRepo {
   override def delete(userId: UsersId)(implicit c: Connection): Boolean = {
     SQL"""delete from public.users where "user_id" = ${ParameterValue(userId, null, UsersId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(userIds: Array[UsersId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from public.users
+          where "user_id" = ANY(${userIds})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[UsersFields, UsersRow] = {
     DeleteBuilder("public.users", UsersFields.structure)
   }

@@ -16,6 +16,7 @@ import typo.dsl.UpdateBuilder
 
 trait FootballClubRepo {
   def delete(id: FootballClubId): ConnectionIO[Boolean]
+  def deleteByIds(ids: Array[FootballClubId]): ConnectionIO[Int]
   def delete: DeleteBuilder[FootballClubFields, FootballClubRow]
   def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int): ConnectionIO[Long]

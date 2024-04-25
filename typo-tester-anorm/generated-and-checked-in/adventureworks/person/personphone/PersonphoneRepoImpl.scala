@@ -29,6 +29,17 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.personphone where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "phonenumber" = ${ParameterValue(compositeId.phonenumber, null, Phone.toStatement)} AND "phonenumbertypeid" = ${ParameterValue(compositeId.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[PersonphoneId])(implicit c: Connection): Int = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val phonenumber = compositeIds.map(_.phonenumber)
+    val phonenumbertypeid = compositeIds.map(_.phonenumbertypeid)
+    SQL"""delete
+          from person.personphone
+          where ("businessentityid", "phonenumber", "phonenumbertypeid")
+          in (select unnest(${businessentityid}), unnest(${phonenumber}), unnest(${phonenumbertypeid}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
     DeleteBuilder("person.personphone", PersonphoneFields.structure)
   }
@@ -86,6 +97,17 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
           from person.personphone
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "phonenumber" = ${ParameterValue(compositeId.phonenumber, null, Phone.toStatement)} AND "phonenumbertypeid" = ${ParameterValue(compositeId.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}
        """.as(PersonphoneRow.rowParser(1).singleOpt)
+  }
+  override def selectByIds(compositeIds: Array[PersonphoneId])(implicit c: Connection): List[PersonphoneRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val phonenumber = compositeIds.map(_.phonenumber)
+    val phonenumbertypeid = compositeIds.map(_.phonenumbertypeid)
+    SQL"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
+          from person.personphone
+          where ("businessentityid", "phonenumber", "phonenumbertypeid") 
+          in (select unnest(${businessentityid}), unnest(${phonenumber}), unnest(${phonenumbertypeid}))
+       """.as(PersonphoneRow.rowParser(1).*)
+    
   }
   override def update(row: PersonphoneRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

@@ -25,6 +25,9 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   override def delete(documentnode: DocumentId)(implicit c: Connection): Boolean = {
     map.remove(documentnode).isDefined
   }
+  override def deleteByIds(documentnodes: Array[DocumentId])(implicit c: Connection): Int = {
+    documentnodes.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
     DeleteBuilderMock(DeleteParams.empty, DocumentFields.structure.fields, map)
   }

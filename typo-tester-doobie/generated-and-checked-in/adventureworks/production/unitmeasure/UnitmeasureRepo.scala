@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait UnitmeasureRepo {
   def delete(unitmeasurecode: UnitmeasureId): ConnectionIO[Boolean]
+  def deleteByIds(unitmeasurecodes: Array[UnitmeasureId]): ConnectionIO[Int]
   def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow]
   def insert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRow], batchSize: Int): ConnectionIO[Long]

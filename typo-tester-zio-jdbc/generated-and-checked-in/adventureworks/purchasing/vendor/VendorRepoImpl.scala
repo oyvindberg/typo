@@ -32,6 +32,9 @@ class VendorRepoImpl extends VendorRepo {
   override def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from purchasing.vendor where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from purchasing.vendor where "businessentityid" = ANY(${businessentityids})""".delete
+  }
   override def delete: DeleteBuilder[VendorFields, VendorRow] = {
     DeleteBuilder("purchasing.vendor", VendorFields.structure)
   }

@@ -29,6 +29,13 @@ class CreditcardRepoImpl extends CreditcardRepo {
   override def delete(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.creditcard where "creditcardid" = ${ParameterValue(creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): Int = {
+    SQL"""delete
+          from sales.creditcard
+          where "creditcardid" = ANY(${creditcardids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
     DeleteBuilder("sales.creditcard", CreditcardFields.structure)
   }
@@ -92,7 +99,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
           where "creditcardid" = ${ParameterValue(creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
        """.as(CreditcardRow.rowParser(1).singleOpt)
   }
-  override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[CreditcardRow] = {
+  override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[CreditcardRow] = {
     SQL"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
           from sales.creditcard
           where "creditcardid" = ANY(${creditcardids})

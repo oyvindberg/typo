@@ -31,6 +31,13 @@ class StoreRepoImpl extends StoreRepo {
   override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.store where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from sales.store
+          where "businessentityid" = ANY(${businessentityids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[StoreFields, StoreRow] = {
     DeleteBuilder("sales.store", StoreFields.structure)
   }

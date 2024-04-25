@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait SalespersonquotahistoryRepo {
   def delete(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[SalespersonquotahistoryId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def insert(unsaved: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, SalespersonquotahistoryRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
@@ -26,6 +27,7 @@ trait SalespersonquotahistoryRepo {
   def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def selectAll: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow]
   def selectById(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Option[SalespersonquotahistoryRow]]
+  def selectByIds(compositeIds: Array[SalespersonquotahistoryId]): ZStream[ZConnection, Throwable, SalespersonquotahistoryRow]
   def update(row: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def upsert(unsaved: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, UpdateResult[SalespersonquotahistoryRow]]

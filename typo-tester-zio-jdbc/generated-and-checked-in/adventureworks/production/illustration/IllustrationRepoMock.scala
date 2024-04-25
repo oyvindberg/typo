@@ -28,6 +28,9 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
   override def delete(illustrationid: IllustrationId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(illustrationid).isDefined)
   }
+  override def deleteByIds(illustrationids: Array[IllustrationId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(illustrationids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
     DeleteBuilderMock(DeleteParams.empty, IllustrationFields.structure.fields, map)
   }

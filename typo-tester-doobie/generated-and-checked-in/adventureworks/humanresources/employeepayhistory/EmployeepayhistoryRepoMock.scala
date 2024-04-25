@@ -26,6 +26,9 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
   override def delete(compositeId: EmployeepayhistoryId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
   }
+  override def deleteByIds(compositeIds: Array[EmployeepayhistoryId]): ConnectionIO[Int] = {
+    delay(compositeIds.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     DeleteBuilderMock(DeleteParams.empty, EmployeepayhistoryFields.structure.fields, map)
   }
@@ -72,6 +75,9 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
   }
   override def selectById(compositeId: EmployeepayhistoryId): ConnectionIO[Option[EmployeepayhistoryRow]] = {
     delay(map.get(compositeId))
+  }
+  override def selectByIds(compositeIds: Array[EmployeepayhistoryId]): Stream[ConnectionIO, EmployeepayhistoryRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
   }
   override def update(row: EmployeepayhistoryRow): ConnectionIO[Boolean] = {
     delay {

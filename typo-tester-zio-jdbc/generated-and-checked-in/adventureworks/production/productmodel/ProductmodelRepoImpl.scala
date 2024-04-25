@@ -30,6 +30,9 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
   override def delete(productmodelid: ProductmodelId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.productmodel where "productmodelid" = ${Segment.paramSegment(productmodelid)(ProductmodelId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(productmodelids: Array[ProductmodelId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from production.productmodel where "productmodelid" = ANY(${productmodelids})""".delete
+  }
   override def delete: DeleteBuilder[ProductmodelFields, ProductmodelRow] = {
     DeleteBuilder("production.productmodel", ProductmodelFields.structure)
   }

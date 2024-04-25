@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait CountryregionRepo {
   def delete(countryregioncode: CountryregionId): ConnectionIO[Boolean]
+  def deleteByIds(countryregioncodes: Array[CountryregionId]): ConnectionIO[Int]
   def delete: DeleteBuilder[CountryregionFields, CountryregionRow]
   def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int): ConnectionIO[Long]

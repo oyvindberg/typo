@@ -28,6 +28,16 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productmodelillustration where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "illustrationid" = ${ParameterValue(compositeId.illustrationid, null, IllustrationId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[ProductmodelillustrationId])(implicit c: Connection): Int = {
+    val productmodelid = compositeIds.map(_.productmodelid)
+    val illustrationid = compositeIds.map(_.illustrationid)
+    SQL"""delete
+          from production.productmodelillustration
+          where ("productmodelid", "illustrationid")
+          in (select unnest(${productmodelid}), unnest(${illustrationid}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
     DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure)
   }
@@ -84,6 +94,16 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           from production.productmodelillustration
           where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "illustrationid" = ${ParameterValue(compositeId.illustrationid, null, IllustrationId.toStatement)}
        """.as(ProductmodelillustrationRow.rowParser(1).singleOpt)
+  }
+  override def selectByIds(compositeIds: Array[ProductmodelillustrationId])(implicit c: Connection): List[ProductmodelillustrationRow] = {
+    val productmodelid = compositeIds.map(_.productmodelid)
+    val illustrationid = compositeIds.map(_.illustrationid)
+    SQL"""select "productmodelid", "illustrationid", "modifieddate"::text
+          from production.productmodelillustration
+          where ("productmodelid", "illustrationid") 
+          in (select unnest(${productmodelid}), unnest(${illustrationid}))
+       """.as(ProductmodelillustrationRow.rowParser(1).*)
+    
   }
   override def update(row: ProductmodelillustrationRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

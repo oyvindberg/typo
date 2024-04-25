@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait PhonenumbertypeRepo {
   def delete(phonenumbertypeid: PhonenumbertypeId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(phonenumbertypeids: Array[PhonenumbertypeId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
   def insert(unsaved: PhonenumbertypeRow): ZIO[ZConnection, Throwable, PhonenumbertypeRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PhonenumbertypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

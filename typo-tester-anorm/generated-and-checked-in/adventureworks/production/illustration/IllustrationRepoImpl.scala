@@ -28,6 +28,13 @@ class IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.illustration where "illustrationid" = ${ParameterValue(illustrationid, null, IllustrationId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from production.illustration
+          where "illustrationid" = ANY(${illustrationids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
     DeleteBuilder("production.illustration", IllustrationFields.structure)
   }

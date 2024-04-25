@@ -28,6 +28,16 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def delete(compositeId: CountryregioncurrencyId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.countryregioncurrency where "countryregioncode" = ${Segment.paramSegment(compositeId.countryregioncode)(CountryregionId.setter)} AND "currencycode" = ${Segment.paramSegment(compositeId.currencycode)(CurrencyId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[CountryregioncurrencyId]): ZIO[ZConnection, Throwable, Long] = {
+    val countryregioncode = compositeIds.map(_.countryregioncode)
+    val currencycode = compositeIds.map(_.currencycode)
+    sql"""delete
+          from sales.countryregioncurrency
+          where ("countryregioncode", "currencycode")
+          in (select unnest(${countryregioncode}), unnest(${currencycode}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure)
   }
@@ -74,6 +84,16 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   }
   override def selectById(compositeId: CountryregioncurrencyId): ZIO[ZConnection, Throwable, Option[CountryregioncurrencyRow]] = {
     sql"""select "countryregioncode", "currencycode", "modifieddate"::text from sales.countryregioncurrency where "countryregioncode" = ${Segment.paramSegment(compositeId.countryregioncode)(CountryregionId.setter)} AND "currencycode" = ${Segment.paramSegment(compositeId.currencycode)(CurrencyId.setter)}""".query(using CountryregioncurrencyRow.jdbcDecoder).selectOne
+  }
+  override def selectByIds(compositeIds: Array[CountryregioncurrencyId]): ZStream[ZConnection, Throwable, CountryregioncurrencyRow] = {
+    val countryregioncode = compositeIds.map(_.countryregioncode)
+    val currencycode = compositeIds.map(_.currencycode)
+    sql"""select "countryregioncode", "currencycode", "modifieddate"::text
+          from sales.countryregioncurrency
+          where ("countryregioncode", "currencycode")
+          in (select unnest(${countryregioncode}), unnest(${currencycode}))
+       """.query(using CountryregioncurrencyRow.jdbcDecoder).selectStream()
+    
   }
   override def update(row: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId

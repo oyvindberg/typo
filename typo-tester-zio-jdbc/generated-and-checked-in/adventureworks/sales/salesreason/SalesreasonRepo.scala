@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait SalesreasonRepo {
   def delete(salesreasonid: SalesreasonId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(salesreasonids: Array[SalesreasonId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow]
   def insert(unsaved: SalesreasonRow): ZIO[ZConnection, Throwable, SalesreasonRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesreasonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

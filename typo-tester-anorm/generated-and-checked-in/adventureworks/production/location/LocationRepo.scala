@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait LocationRepo {
   def delete(locationid: LocationId)(implicit c: Connection): Boolean
+  def deleteByIds(locationids: Array[LocationId])(implicit c: Connection): Int
   def delete: DeleteBuilder[LocationFields, LocationRow]
   def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow
   def insertStreaming(unsaved: Iterator[LocationRow], batchSize: Int)(implicit c: Connection): Long

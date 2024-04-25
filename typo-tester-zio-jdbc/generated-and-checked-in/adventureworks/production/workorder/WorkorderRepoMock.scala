@@ -28,6 +28,9 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
   override def delete(workorderid: WorkorderId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(workorderid).isDefined)
   }
+  override def deleteByIds(workorderids: Array[WorkorderId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(workorderids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
     DeleteBuilderMock(DeleteParams.empty, WorkorderFields.structure.fields, map)
   }

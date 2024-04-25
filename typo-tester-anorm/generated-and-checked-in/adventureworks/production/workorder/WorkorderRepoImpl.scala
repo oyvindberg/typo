@@ -30,6 +30,13 @@ class WorkorderRepoImpl extends WorkorderRepo {
   override def delete(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.workorder where "workorderid" = ${ParameterValue(workorderid, null, WorkorderId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(workorderids: Array[WorkorderId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from production.workorder
+          where "workorderid" = ANY(${workorderids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
     DeleteBuilder("production.workorder", WorkorderFields.structure)
   }

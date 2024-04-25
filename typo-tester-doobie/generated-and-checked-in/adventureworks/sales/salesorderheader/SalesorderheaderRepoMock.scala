@@ -26,6 +26,9 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
   override def delete(salesorderid: SalesorderheaderId): ConnectionIO[Boolean] = {
     delay(map.remove(salesorderid).isDefined)
   }
+  override def deleteByIds(salesorderids: Array[SalesorderheaderId]): ConnectionIO[Int] = {
+    delay(salesorderids.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     DeleteBuilderMock(DeleteParams.empty, SalesorderheaderFields.structure.fields, map)
   }

@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait CurrencyrateRepo {
   def delete(currencyrateid: CurrencyrateId): ConnectionIO[Boolean]
+  def deleteByIds(currencyrateids: Array[CurrencyrateId]): ConnectionIO[Int]
   def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow]
   def insert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, CurrencyrateRow], batchSize: Int): ConnectionIO[Long]

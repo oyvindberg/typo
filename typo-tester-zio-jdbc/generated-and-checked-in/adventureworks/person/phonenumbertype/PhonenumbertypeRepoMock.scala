@@ -28,6 +28,9 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
   override def delete(phonenumbertypeid: PhonenumbertypeId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(phonenumbertypeid).isDefined)
   }
+  override def deleteByIds(phonenumbertypeids: Array[PhonenumbertypeId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(phonenumbertypeids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     DeleteBuilderMock(DeleteParams.empty, PhonenumbertypeFields.structure.fields, map)
   }

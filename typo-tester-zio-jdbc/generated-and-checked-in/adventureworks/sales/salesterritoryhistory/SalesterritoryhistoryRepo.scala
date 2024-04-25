@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait SalesterritoryhistoryRepo {
   def delete(compositeId: SalesterritoryhistoryId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[SalesterritoryhistoryId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def insert(unsaved: SalesterritoryhistoryRow): ZIO[ZConnection, Throwable, SalesterritoryhistoryRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesterritoryhistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
@@ -26,6 +27,7 @@ trait SalesterritoryhistoryRepo {
   def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def selectAll: ZStream[ZConnection, Throwable, SalesterritoryhistoryRow]
   def selectById(compositeId: SalesterritoryhistoryId): ZIO[ZConnection, Throwable, Option[SalesterritoryhistoryRow]]
+  def selectByIds(compositeIds: Array[SalesterritoryhistoryId]): ZStream[ZConnection, Throwable, SalesterritoryhistoryRow]
   def update(row: SalesterritoryhistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def upsert(unsaved: SalesterritoryhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[SalesterritoryhistoryRow]]

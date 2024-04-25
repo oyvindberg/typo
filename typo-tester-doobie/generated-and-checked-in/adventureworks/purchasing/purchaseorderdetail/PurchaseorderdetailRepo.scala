@@ -12,7 +12,9 @@ import fs2.Stream
 import typo.dsl.SelectBuilder
 
 trait PurchaseorderdetailRepo {
+  def deleteByIds(compositeIds: Array[PurchaseorderdetailId]): ConnectionIO[Int]
   def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow]
   def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow]
   def selectById(compositeId: PurchaseorderdetailId): ConnectionIO[Option[PurchaseorderdetailRow]]
+  def selectByIds(compositeIds: Array[PurchaseorderdetailId]): Stream[ConnectionIO, PurchaseorderdetailRow]
 }

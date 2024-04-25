@@ -29,6 +29,17 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
   override def delete(compositeId: ProductmodelproductdescriptioncultureId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productmodelproductdescriptionculture where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "productdescriptionid" = ${ParameterValue(compositeId.productdescriptionid, null, ProductdescriptionId.toStatement)} AND "cultureid" = ${ParameterValue(compositeId.cultureid, null, CultureId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[ProductmodelproductdescriptioncultureId])(implicit c: Connection): Int = {
+    val productmodelid = compositeIds.map(_.productmodelid)
+    val productdescriptionid = compositeIds.map(_.productdescriptionid)
+    val cultureid = compositeIds.map(_.cultureid)
+    SQL"""delete
+          from production.productmodelproductdescriptionculture
+          where ("productmodelid", "productdescriptionid", "cultureid")
+          in (select unnest(${productmodelid}), unnest(${productdescriptionid}), unnest(${cultureid}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
     DeleteBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure)
   }
@@ -86,6 +97,17 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
           from production.productmodelproductdescriptionculture
           where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "productdescriptionid" = ${ParameterValue(compositeId.productdescriptionid, null, ProductdescriptionId.toStatement)} AND "cultureid" = ${ParameterValue(compositeId.cultureid, null, CultureId.toStatement)}
        """.as(ProductmodelproductdescriptioncultureRow.rowParser(1).singleOpt)
+  }
+  override def selectByIds(compositeIds: Array[ProductmodelproductdescriptioncultureId])(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
+    val productmodelid = compositeIds.map(_.productmodelid)
+    val productdescriptionid = compositeIds.map(_.productdescriptionid)
+    val cultureid = compositeIds.map(_.cultureid)
+    SQL"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
+          from production.productmodelproductdescriptionculture
+          where ("productmodelid", "productdescriptionid", "cultureid") 
+          in (select unnest(${productmodelid}), unnest(${productdescriptionid}), unnest(${cultureid}))
+       """.as(ProductmodelproductdescriptioncultureRow.rowParser(1).*)
+    
   }
   override def update(row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId

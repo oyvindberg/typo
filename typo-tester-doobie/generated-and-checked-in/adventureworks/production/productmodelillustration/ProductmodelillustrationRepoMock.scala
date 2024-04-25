@@ -26,6 +26,9 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
   override def delete(compositeId: ProductmodelillustrationId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
   }
+  override def deleteByIds(compositeIds: Array[ProductmodelillustrationId]): ConnectionIO[Int] = {
+    delay(compositeIds.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
     DeleteBuilderMock(DeleteParams.empty, ProductmodelillustrationFields.structure.fields, map)
   }
@@ -72,6 +75,9 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
   }
   override def selectById(compositeId: ProductmodelillustrationId): ConnectionIO[Option[ProductmodelillustrationRow]] = {
     delay(map.get(compositeId))
+  }
+  override def selectByIds(compositeIds: Array[ProductmodelillustrationId]): Stream[ConnectionIO, ProductmodelillustrationRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
   }
   override def update(row: ProductmodelillustrationRow): ConnectionIO[Boolean] = {
     delay {

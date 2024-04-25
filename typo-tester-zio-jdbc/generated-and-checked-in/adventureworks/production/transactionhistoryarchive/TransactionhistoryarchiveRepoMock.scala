@@ -28,6 +28,9 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
   override def delete(transactionid: TransactionhistoryarchiveId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(transactionid).isDefined)
   }
+  override def deleteByIds(transactionids: Array[TransactionhistoryarchiveId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(transactionids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
     DeleteBuilderMock(DeleteParams.empty, TransactionhistoryarchiveFields.structure.fields, map)
   }

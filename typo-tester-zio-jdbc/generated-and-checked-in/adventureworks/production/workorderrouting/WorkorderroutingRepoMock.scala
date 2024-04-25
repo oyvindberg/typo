@@ -28,6 +28,9 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
   override def delete(compositeId: WorkorderroutingId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
+  override def deleteByIds(compositeIds: Array[WorkorderroutingId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(compositeIds.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     DeleteBuilderMock(DeleteParams.empty, WorkorderroutingFields.structure.fields, map)
   }
@@ -71,6 +74,9 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
   }
   override def selectById(compositeId: WorkorderroutingId): ZIO[ZConnection, Throwable, Option[WorkorderroutingRow]] = {
     ZIO.succeed(map.get(compositeId))
+  }
+  override def selectByIds(compositeIds: Array[WorkorderroutingId]): ZStream[ZConnection, Throwable, WorkorderroutingRow] = {
+    ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
   override def update(row: WorkorderroutingRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

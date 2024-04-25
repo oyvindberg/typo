@@ -26,6 +26,13 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
   override def delete(name: IdentityTestId)(implicit c: Connection): Boolean = {
     SQL"""delete from public.identity-test where "name" = ${ParameterValue(name, null, IdentityTestId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(names: Array[IdentityTestId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from public.identity-test
+          where "name" = ANY(${names})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
     DeleteBuilder("public.identity-test", IdentityTestFields.structure)
   }

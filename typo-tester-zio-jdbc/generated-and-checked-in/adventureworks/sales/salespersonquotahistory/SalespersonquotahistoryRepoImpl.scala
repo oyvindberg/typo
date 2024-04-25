@@ -29,6 +29,16 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def delete(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.salespersonquotahistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "quotadate" = ${Segment.paramSegment(compositeId.quotadate)(TypoLocalDateTime.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[SalespersonquotahistoryId]): ZIO[ZConnection, Throwable, Long] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val quotadate = compositeIds.map(_.quotadate)
+    sql"""delete
+          from sales.salespersonquotahistory
+          where ("businessentityid", "quotadate")
+          in (select unnest(${businessentityid}), unnest(${quotadate}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
     DeleteBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure)
   }
@@ -80,6 +90,16 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   }
   override def selectById(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Option[SalespersonquotahistoryRow]] = {
     sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "quotadate" = ${Segment.paramSegment(compositeId.quotadate)(TypoLocalDateTime.setter)}""".query(using SalespersonquotahistoryRow.jdbcDecoder).selectOne
+  }
+  override def selectByIds(compositeIds: Array[SalespersonquotahistoryId]): ZStream[ZConnection, Throwable, SalespersonquotahistoryRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val quotadate = compositeIds.map(_.quotadate)
+    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
+          from sales.salespersonquotahistory
+          where ("businessentityid", "quotadate")
+          in (select unnest(${businessentityid}), unnest(${quotadate}))
+       """.query(using SalespersonquotahistoryRow.jdbcDecoder).selectStream()
+    
   }
   override def update(row: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId

@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait MaritalStatusRepo {
   def delete(id: MaritalStatusId)(implicit c: Connection): Boolean
+  def deleteByIds(ids: Array[MaritalStatusId])(implicit c: Connection): Int
   def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow]
   def insert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow
   def insertStreaming(unsaved: Iterator[MaritalStatusRow], batchSize: Int)(implicit c: Connection): Long

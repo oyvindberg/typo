@@ -26,6 +26,9 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
   override def delete(workorderid: WorkorderId): ConnectionIO[Boolean] = {
     delay(map.remove(workorderid).isDefined)
   }
+  override def deleteByIds(workorderids: Array[WorkorderId]): ConnectionIO[Int] = {
+    delay(workorderids.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
     DeleteBuilderMock(DeleteParams.empty, WorkorderFields.structure.fields, map)
   }

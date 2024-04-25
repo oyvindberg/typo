@@ -24,6 +24,9 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
   override def delete(compositeId: BusinessentitycontactId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
   }
+  override def deleteByIds(compositeIds: Array[BusinessentitycontactId])(implicit c: Connection): Int = {
+    compositeIds.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
     DeleteBuilderMock(DeleteParams.empty, BusinessentitycontactFields.structure.fields, map)
   }
@@ -60,6 +63,9 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
   }
   override def selectById(compositeId: BusinessentitycontactId)(implicit c: Connection): Option[BusinessentitycontactRow] = {
     map.get(compositeId)
+  }
+  override def selectByIds(compositeIds: Array[BusinessentitycontactId])(implicit c: Connection): List[BusinessentitycontactRow] = {
+    compositeIds.flatMap(map.get).toList
   }
   override def update(row: BusinessentitycontactRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {

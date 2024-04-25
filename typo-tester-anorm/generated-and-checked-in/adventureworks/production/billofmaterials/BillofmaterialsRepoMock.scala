@@ -24,6 +24,9 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   override def delete(billofmaterialsid: Int)(implicit c: Connection): Boolean = {
     map.remove(billofmaterialsid).isDefined
   }
+  override def deleteByIds(billofmaterialsids: Array[Int])(implicit c: Connection): Int = {
+    billofmaterialsids.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields.structure.fields, map)
   }

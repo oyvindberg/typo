@@ -32,6 +32,9 @@ class DocumentRepoImpl extends DocumentRepo {
   override def delete(documentnode: DocumentId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.document where "documentnode" = ${Segment.paramSegment(documentnode)(DocumentId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(documentnodes: Array[DocumentId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from production.document where "documentnode" = ANY(${documentnodes})""".delete
+  }
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
     DeleteBuilder("production.document", DocumentFields.structure)
   }
