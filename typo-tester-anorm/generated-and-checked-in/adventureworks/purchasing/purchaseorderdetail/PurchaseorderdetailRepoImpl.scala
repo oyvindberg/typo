@@ -16,6 +16,16 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 
 class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
+  override def deleteByIds(compositeIds: Array[PurchaseorderdetailId])(implicit c: Connection): Int = {
+    val purchaseorderid = compositeIds.map(_.purchaseorderid)
+    val purchaseorderdetailid = compositeIds.map(_.purchaseorderdetailid)
+    SQL"""delete
+          from purchasing.purchaseorderdetail
+          where ("purchaseorderid", "purchaseorderdetailid")
+          in (select unnest(${purchaseorderid}), unnest(${purchaseorderdetailid}))
+       """.executeUpdate()
+    
+  }
   override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
     SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields.structure, PurchaseorderdetailRow.rowParser)
   }
