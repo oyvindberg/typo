@@ -44,6 +44,8 @@ case class SalespersonquotahistoryRow(
  }
 
 object SalespersonquotahistoryRow {
+  def apply(compositeId: SalespersonquotahistoryId, salesquota: BigDecimal, rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
+    new SalespersonquotahistoryRow(compositeId.businessentityid, compositeId.quotadate, salesquota, rowguid, modifieddate)
   implicit lazy val reads: Reads[SalespersonquotahistoryRow] = Reads[SalespersonquotahistoryRow](json => JsResult.fromTry(
       Try(
         SalespersonquotahistoryRow(

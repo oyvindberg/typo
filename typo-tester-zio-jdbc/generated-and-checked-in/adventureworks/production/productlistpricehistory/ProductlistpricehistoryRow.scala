@@ -40,6 +40,8 @@ case class ProductlistpricehistoryRow(
  }
 
 object ProductlistpricehistoryRow {
+  def apply(compositeId: ProductlistpricehistoryId, enddate: Option[TypoLocalDateTime], listprice: BigDecimal, modifieddate: TypoLocalDateTime) =
+    new ProductlistpricehistoryRow(compositeId.productid, compositeId.startdate, enddate, listprice, modifieddate)
   implicit lazy val jdbcDecoder: JdbcDecoder[ProductlistpricehistoryRow] = new JdbcDecoder[ProductlistpricehistoryRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, ProductlistpricehistoryRow) =
       columIndex + 4 ->

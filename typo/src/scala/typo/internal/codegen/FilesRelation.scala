@@ -62,12 +62,21 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
              |""".stripMargin
     }
 
+    val maybeExtraApply: Option[sc.Code] =
+      names.maybeId.collect { case id: IdComputed.Composite =>
+        val nonKeyColumns = cols.toList.filter(col => !names.isIdColumn(col.dbCol.name))
+        val params = sc.Param(id.paramName, id.tpe, None) :: nonKeyColumns.map(col => sc.Param(col.name, col.tpe, None))
+        val args = cols.map { col => if (names.isIdColumn(col.dbCol.name)) code"${id.paramName}.${col.name}" else col.name.code }
+        code"""|def apply(${params.map(_.code).mkCode(", ")}) =
+               |  new ${names.RowName}(${args.map(_.code).mkCode(", ")})""".stripMargin
+      }
+
     val str =
       code"""${classComment}case class ${names.RowName.name}(
             |  ${formattedCols.mkCode(",\n")}
             |)$compositeId
             |
-            |${genObject(names.RowName.value, instances)}
+            |${sc.Obj(names.RowName.value, instances, maybeExtraApply)}
             |""".stripMargin
 
     sc.File(names.RowName, str, secondaryTypes = Nil)

@@ -38,6 +38,8 @@ case class PersoncreditcardRow(
  }
 
 object PersoncreditcardRow {
+  def apply(compositeId: PersoncreditcardId, modifieddate: TypoLocalDateTime) =
+    new PersoncreditcardRow(compositeId.businessentityid, compositeId.creditcardid, modifieddate)
   implicit lazy val reads: Reads[PersoncreditcardRow] = Reads[PersoncreditcardRow](json => JsResult.fromTry(
       Try(
         PersoncreditcardRow(

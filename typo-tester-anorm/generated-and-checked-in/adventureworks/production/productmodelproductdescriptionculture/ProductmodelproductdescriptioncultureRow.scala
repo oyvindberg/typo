@@ -42,6 +42,8 @@ case class ProductmodelproductdescriptioncultureRow(
  }
 
 object ProductmodelproductdescriptioncultureRow {
+  def apply(compositeId: ProductmodelproductdescriptioncultureId, modifieddate: TypoLocalDateTime) =
+    new ProductmodelproductdescriptioncultureRow(compositeId.productmodelid, compositeId.productdescriptionid, compositeId.cultureid, modifieddate)
   implicit lazy val reads: Reads[ProductmodelproductdescriptioncultureRow] = Reads[ProductmodelproductdescriptioncultureRow](json => JsResult.fromTry(
       Try(
         ProductmodelproductdescriptioncultureRow(

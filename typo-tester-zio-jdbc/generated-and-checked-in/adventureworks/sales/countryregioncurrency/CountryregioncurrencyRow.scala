@@ -35,6 +35,8 @@ case class CountryregioncurrencyRow(
  }
 
 object CountryregioncurrencyRow {
+  def apply(compositeId: CountryregioncurrencyId, modifieddate: TypoLocalDateTime) =
+    new CountryregioncurrencyRow(compositeId.countryregioncode, compositeId.currencycode, modifieddate)
   implicit lazy val jdbcDecoder: JdbcDecoder[CountryregioncurrencyRow] = new JdbcDecoder[CountryregioncurrencyRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, CountryregioncurrencyRow) =
       columIndex + 2 ->

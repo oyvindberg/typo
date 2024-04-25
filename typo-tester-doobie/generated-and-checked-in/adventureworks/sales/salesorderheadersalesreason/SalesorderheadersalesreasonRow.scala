@@ -34,6 +34,8 @@ case class SalesorderheadersalesreasonRow(
  }
 
 object SalesorderheadersalesreasonRow {
+  def apply(compositeId: SalesorderheadersalesreasonId, modifieddate: TypoLocalDateTime) =
+    new SalesorderheadersalesreasonRow(compositeId.salesorderid, compositeId.salesreasonid, modifieddate)
   implicit lazy val decoder: Decoder[SalesorderheadersalesreasonRow] = Decoder.forProduct3[SalesorderheadersalesreasonRow, SalesorderheaderId, SalesreasonId, TypoLocalDateTime]("salesorderid", "salesreasonid", "modifieddate")(SalesorderheadersalesreasonRow.apply)(SalesorderheaderId.decoder, SalesreasonId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SalesorderheadersalesreasonRow] = Encoder.forProduct3[SalesorderheadersalesreasonRow, SalesorderheaderId, SalesreasonId, TypoLocalDateTime]("salesorderid", "salesreasonid", "modifieddate")(x => (x.salesorderid, x.salesreasonid, x.modifieddate))(SalesorderheaderId.encoder, SalesreasonId.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[SalesorderheadersalesreasonRow] = new Read[SalesorderheadersalesreasonRow](

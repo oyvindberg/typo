@@ -39,6 +39,8 @@ case class SalespersonquotahistoryRow(
  }
 
 object SalespersonquotahistoryRow {
+  def apply(compositeId: SalespersonquotahistoryId, salesquota: BigDecimal, rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
+    new SalespersonquotahistoryRow(compositeId.businessentityid, compositeId.quotadate, salesquota, rowguid, modifieddate)
   implicit lazy val jdbcDecoder: JdbcDecoder[SalespersonquotahistoryRow] = new JdbcDecoder[SalespersonquotahistoryRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, SalespersonquotahistoryRow) =
       columIndex + 4 ->

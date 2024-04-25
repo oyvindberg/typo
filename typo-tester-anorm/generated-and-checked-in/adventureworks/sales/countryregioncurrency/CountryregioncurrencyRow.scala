@@ -38,6 +38,8 @@ case class CountryregioncurrencyRow(
  }
 
 object CountryregioncurrencyRow {
+  def apply(compositeId: CountryregioncurrencyId, modifieddate: TypoLocalDateTime) =
+    new CountryregioncurrencyRow(compositeId.countryregioncode, compositeId.currencycode, modifieddate)
   implicit lazy val reads: Reads[CountryregioncurrencyRow] = Reads[CountryregioncurrencyRow](json => JsResult.fromTry(
       Try(
         CountryregioncurrencyRow(

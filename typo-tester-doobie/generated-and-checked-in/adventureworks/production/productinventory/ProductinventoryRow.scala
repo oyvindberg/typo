@@ -47,6 +47,8 @@ case class ProductinventoryRow(
  }
 
 object ProductinventoryRow {
+  def apply(compositeId: ProductinventoryId, shelf: /* max 10 chars */ String, bin: TypoShort, quantity: TypoShort, rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
+    new ProductinventoryRow(compositeId.productid, compositeId.locationid, shelf, bin, quantity, rowguid, modifieddate)
   implicit lazy val decoder: Decoder[ProductinventoryRow] = Decoder.forProduct7[ProductinventoryRow, ProductId, LocationId, /* max 10 chars */ String, TypoShort, TypoShort, TypoUUID, TypoLocalDateTime]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(ProductinventoryRow.apply)(ProductId.decoder, LocationId.decoder, Decoder.decodeString, TypoShort.decoder, TypoShort.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ProductinventoryRow] = Encoder.forProduct7[ProductinventoryRow, ProductId, LocationId, /* max 10 chars */ String, TypoShort, TypoShort, TypoUUID, TypoLocalDateTime]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(ProductId.encoder, LocationId.encoder, Encoder.encodeString, TypoShort.encoder, TypoShort.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[ProductinventoryRow] = new Read[ProductinventoryRow](

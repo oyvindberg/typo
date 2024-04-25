@@ -38,6 +38,8 @@ case class SalesorderheadersalesreasonRow(
  }
 
 object SalesorderheadersalesreasonRow {
+  def apply(compositeId: SalesorderheadersalesreasonId, modifieddate: TypoLocalDateTime) =
+    new SalesorderheadersalesreasonRow(compositeId.salesorderid, compositeId.salesreasonid, modifieddate)
   implicit lazy val reads: Reads[SalesorderheadersalesreasonRow] = Reads[SalesorderheadersalesreasonRow](json => JsResult.fromTry(
       Try(
         SalesorderheadersalesreasonRow(

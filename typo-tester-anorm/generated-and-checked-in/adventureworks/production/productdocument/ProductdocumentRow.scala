@@ -39,6 +39,8 @@ case class ProductdocumentRow(
  }
 
 object ProductdocumentRow {
+  def apply(compositeId: ProductdocumentId, modifieddate: TypoLocalDateTime) =
+    new ProductdocumentRow(compositeId.productid, modifieddate, compositeId.documentnode)
   implicit lazy val reads: Reads[ProductdocumentRow] = Reads[ProductdocumentRow](json => JsResult.fromTry(
       Try(
         ProductdocumentRow(

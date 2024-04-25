@@ -45,6 +45,8 @@ case class EmployeepayhistoryRow(
  }
 
 object EmployeepayhistoryRow {
+  def apply(compositeId: EmployeepayhistoryId, rate: BigDecimal, payfrequency: TypoShort, modifieddate: TypoLocalDateTime) =
+    new EmployeepayhistoryRow(compositeId.businessentityid, compositeId.ratechangedate, rate, payfrequency, modifieddate)
   implicit lazy val reads: Reads[EmployeepayhistoryRow] = Reads[EmployeepayhistoryRow](json => JsResult.fromTry(
       Try(
         EmployeepayhistoryRow(

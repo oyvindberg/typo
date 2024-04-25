@@ -35,6 +35,8 @@ case class SalesorderheadersalesreasonRow(
  }
 
 object SalesorderheadersalesreasonRow {
+  def apply(compositeId: SalesorderheadersalesreasonId, modifieddate: TypoLocalDateTime) =
+    new SalesorderheadersalesreasonRow(compositeId.salesorderid, compositeId.salesreasonid, modifieddate)
   implicit lazy val jdbcDecoder: JdbcDecoder[SalesorderheadersalesreasonRow] = new JdbcDecoder[SalesorderheadersalesreasonRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, SalesorderheadersalesreasonRow) =
       columIndex + 2 ->
