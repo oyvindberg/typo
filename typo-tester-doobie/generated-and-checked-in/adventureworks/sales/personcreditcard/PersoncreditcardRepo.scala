@@ -24,6 +24,7 @@ trait PersoncreditcardRepo {
   def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def selectAll: Stream[ConnectionIO, PersoncreditcardRow]
   def selectById(compositeId: PersoncreditcardId): ConnectionIO[Option[PersoncreditcardRow]]
+  def selectByIds(compositeIds: Array[PersoncreditcardId]): Stream[ConnectionIO, PersoncreditcardRow]
   def update(row: PersoncreditcardRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def upsert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow]

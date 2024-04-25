@@ -23,6 +23,7 @@ trait ProductcosthistoryRepo {
   def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def selectAll(implicit c: Connection): List[ProductcosthistoryRow]
   def selectById(compositeId: ProductcosthistoryId)(implicit c: Connection): Option[ProductcosthistoryRow]
+  def selectByIds(compositeIds: Array[ProductcosthistoryId])(implicit c: Connection): List[ProductcosthistoryRow]
   def update(row: ProductcosthistoryRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def upsert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow

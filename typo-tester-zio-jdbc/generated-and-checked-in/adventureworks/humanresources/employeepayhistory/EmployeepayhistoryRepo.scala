@@ -26,6 +26,7 @@ trait EmployeepayhistoryRepo {
   def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def selectAll: ZStream[ZConnection, Throwable, EmployeepayhistoryRow]
   def selectById(compositeId: EmployeepayhistoryId): ZIO[ZConnection, Throwable, Option[EmployeepayhistoryRow]]
+  def selectByIds(compositeIds: Array[EmployeepayhistoryId]): ZStream[ZConnection, Throwable, EmployeepayhistoryRow]
   def update(row: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def upsert(unsaved: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[EmployeepayhistoryRow]]

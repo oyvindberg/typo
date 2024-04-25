@@ -106,6 +106,16 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
           where "salesorderid" = ${ParameterValue(compositeId.salesorderid, null, SalesorderheaderId.toStatement)} AND "salesorderdetailid" = ${ParameterValue(compositeId.salesorderdetailid, null, ToStatement.intToStatement)}
        """.as(SalesorderdetailRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[SalesorderdetailId])(implicit c: Connection): List[SalesorderdetailRow] = {
+    val salesorderid = compositeIds.map(_.salesorderid)
+    val salesorderdetailid = compositeIds.map(_.salesorderdetailid)
+    SQL"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
+          from sales.salesorderdetail
+          where ("salesorderid", "salesorderdetailid") 
+          in (select unnest(${salesorderid}), unnest(${salesorderdetailid}))
+       """.as(SalesorderdetailRow.rowParser(1).*)
+    
+  }
   override def update(row: SalesorderdetailRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.salesorderdetail

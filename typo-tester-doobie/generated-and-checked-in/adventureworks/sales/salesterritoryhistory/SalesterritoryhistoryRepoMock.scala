@@ -73,6 +73,9 @@ class SalesterritoryhistoryRepoMock(toRow: Function1[SalesterritoryhistoryRowUns
   override def selectById(compositeId: SalesterritoryhistoryId): ConnectionIO[Option[SalesterritoryhistoryRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[SalesterritoryhistoryId]): Stream[ConnectionIO, SalesterritoryhistoryRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
+  }
   override def update(row: SalesterritoryhistoryRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

@@ -72,6 +72,9 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
   override def selectById(compositeId: PersoncreditcardId): ZIO[ZConnection, Throwable, Option[PersoncreditcardRow]] = {
     ZIO.succeed(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[PersoncreditcardId]): ZStream[ZConnection, Throwable, PersoncreditcardRow] = {
+    ZStream.fromIterable(compositeIds.flatMap(map.get))
+  }
   override def update(row: PersoncreditcardRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.compositeId) match {

@@ -88,6 +88,16 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "documentnode" = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}
        """.as(ProductdocumentRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[ProductdocumentId])(implicit c: Connection): List[ProductdocumentRow] = {
+    val productid = compositeIds.map(_.productid)
+    val documentnode = compositeIds.map(_.documentnode)
+    SQL"""select "productid", "modifieddate"::text, "documentnode"
+          from production.productdocument
+          where ("productid", "documentnode") 
+          in (select unnest(${productid}), unnest(${documentnode}))
+       """.as(ProductdocumentRow.rowParser(1).*)
+    
+  }
   override def update(row: ProductdocumentRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productdocument

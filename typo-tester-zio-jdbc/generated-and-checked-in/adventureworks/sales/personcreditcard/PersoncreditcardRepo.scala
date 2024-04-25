@@ -26,6 +26,7 @@ trait PersoncreditcardRepo {
   def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def selectAll: ZStream[ZConnection, Throwable, PersoncreditcardRow]
   def selectById(compositeId: PersoncreditcardId): ZIO[ZConnection, Throwable, Option[PersoncreditcardRow]]
+  def selectByIds(compositeIds: Array[PersoncreditcardId]): ZStream[ZConnection, Throwable, PersoncreditcardRow]
   def update(row: PersoncreditcardRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def upsert(unsaved: PersoncreditcardRow): ZIO[ZConnection, Throwable, UpdateResult[PersoncreditcardRow]]

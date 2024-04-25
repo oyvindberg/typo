@@ -72,6 +72,9 @@ class SalesorderheadersalesreasonRepoMock(toRow: Function1[Salesorderheadersales
   override def selectById(compositeId: SalesorderheadersalesreasonId): ZIO[ZConnection, Throwable, Option[SalesorderheadersalesreasonRow]] = {
     ZIO.succeed(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[SalesorderheadersalesreasonId]): ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRow] = {
+    ZStream.fromIterable(compositeIds.flatMap(map.get))
+  }
   override def update(row: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.compositeId) match {

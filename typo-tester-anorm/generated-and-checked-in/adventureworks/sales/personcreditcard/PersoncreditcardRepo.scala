@@ -23,6 +23,7 @@ trait PersoncreditcardRepo {
   def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def selectAll(implicit c: Connection): List[PersoncreditcardRow]
   def selectById(compositeId: PersoncreditcardId)(implicit c: Connection): Option[PersoncreditcardRow]
+  def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit c: Connection): List[PersoncreditcardRow]
   def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def upsert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow

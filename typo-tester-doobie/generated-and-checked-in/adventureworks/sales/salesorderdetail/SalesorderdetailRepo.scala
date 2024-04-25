@@ -24,6 +24,7 @@ trait SalesorderdetailRepo {
   def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def selectAll: Stream[ConnectionIO, SalesorderdetailRow]
   def selectById(compositeId: SalesorderdetailId): ConnectionIO[Option[SalesorderdetailRow]]
+  def selectByIds(compositeIds: Array[SalesorderdetailId]): Stream[ConnectionIO, SalesorderdetailRow]
   def update(row: SalesorderdetailRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def upsert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow]

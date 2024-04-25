@@ -98,6 +98,16 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "locationid" = ${ParameterValue(compositeId.locationid, null, LocationId.toStatement)}
        """.as(ProductinventoryRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[ProductinventoryId])(implicit c: Connection): List[ProductinventoryRow] = {
+    val productid = compositeIds.map(_.productid)
+    val locationid = compositeIds.map(_.locationid)
+    SQL"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
+          from production.productinventory
+          where ("productid", "locationid") 
+          in (select unnest(${productid}), unnest(${locationid}))
+       """.as(ProductinventoryRow.rowParser(1).*)
+    
+  }
   override def update(row: ProductinventoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productinventory

@@ -85,6 +85,16 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
           where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "illustrationid" = ${ParameterValue(compositeId.illustrationid, null, IllustrationId.toStatement)}
        """.as(ProductmodelillustrationRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[ProductmodelillustrationId])(implicit c: Connection): List[ProductmodelillustrationRow] = {
+    val productmodelid = compositeIds.map(_.productmodelid)
+    val illustrationid = compositeIds.map(_.illustrationid)
+    SQL"""select "productmodelid", "illustrationid", "modifieddate"::text
+          from production.productmodelillustration
+          where ("productmodelid", "illustrationid") 
+          in (select unnest(${productmodelid}), unnest(${illustrationid}))
+       """.as(ProductmodelillustrationRow.rowParser(1).*)
+    
+  }
   override def update(row: ProductmodelillustrationRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productmodelillustration

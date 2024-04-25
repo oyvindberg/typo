@@ -24,6 +24,7 @@ trait ProductproductphotoRepo {
   def select: SelectBuilder[ProductproductphotoFields, ProductproductphotoRow]
   def selectAll: Stream[ConnectionIO, ProductproductphotoRow]
   def selectById(compositeId: ProductproductphotoId): ConnectionIO[Option[ProductproductphotoRow]]
+  def selectByIds(compositeIds: Array[ProductproductphotoId]): Stream[ConnectionIO, ProductproductphotoRow]
   def update(row: ProductproductphotoRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow]
   def upsert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow]

@@ -75,6 +75,16 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
   override def selectById(compositeId: SalesorderheadersalesreasonId): ZIO[ZConnection, Throwable, Option[SalesorderheadersalesreasonRow]] = {
     sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sales.salesorderheadersalesreason where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesreasonid" = ${Segment.paramSegment(compositeId.salesreasonid)(SalesreasonId.setter)}""".query(using SalesorderheadersalesreasonRow.jdbcDecoder).selectOne
   }
+  override def selectByIds(compositeIds: Array[SalesorderheadersalesreasonId]): ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRow] = {
+    val salesorderid = compositeIds.map(_.salesorderid)
+    val salesreasonid = compositeIds.map(_.salesreasonid)
+    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text
+          from sales.salesorderheadersalesreason
+          where ("salesorderid", "salesreasonid")
+          in (select unnest(${salesorderid}), unnest(${salesreasonid}))
+       """.query(using SalesorderheadersalesreasonRow.jdbcDecoder).selectStream()
+    
+  }
   override def update(row: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.salesorderheadersalesreason

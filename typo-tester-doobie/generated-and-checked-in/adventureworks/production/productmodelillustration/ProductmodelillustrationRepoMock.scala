@@ -73,6 +73,9 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
   override def selectById(compositeId: ProductmodelillustrationId): ConnectionIO[Option[ProductmodelillustrationRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[ProductmodelillustrationId]): Stream[ConnectionIO, ProductmodelillustrationRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
+  }
   override def update(row: ProductmodelillustrationRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

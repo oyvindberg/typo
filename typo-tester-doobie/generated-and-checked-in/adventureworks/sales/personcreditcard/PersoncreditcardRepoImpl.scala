@@ -76,6 +76,16 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def selectById(compositeId: PersoncreditcardId): ConnectionIO[Option[PersoncreditcardRow]] = {
     sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "creditcardid" = ${fromWrite(compositeId.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".query(using PersoncreditcardRow.read).option
   }
+  override def selectByIds(compositeIds: Array[PersoncreditcardId]): Stream[ConnectionIO, PersoncreditcardRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val creditcardid = compositeIds.map(_.creditcardid)
+    sql"""select "businessentityid", "creditcardid", "modifieddate"::text
+          from sales.personcreditcard
+          where ("businessentityid", "creditcardid") 
+          in (select unnest(${businessentityid}), unnest(${creditcardid}))
+       """.query(using PersoncreditcardRow.read).stream
+    
+  }
   override def update(row: PersoncreditcardRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.personcreditcard

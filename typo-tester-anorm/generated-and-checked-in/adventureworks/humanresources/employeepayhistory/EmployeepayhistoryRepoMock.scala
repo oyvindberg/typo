@@ -61,6 +61,9 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
   override def selectById(compositeId: EmployeepayhistoryId)(implicit c: Connection): Option[EmployeepayhistoryRow] = {
     map.get(compositeId)
   }
+  override def selectByIds(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): List[EmployeepayhistoryRow] = {
+    compositeIds.flatMap(map.get).toList
+  }
   override def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
       case Some(`row`) => false

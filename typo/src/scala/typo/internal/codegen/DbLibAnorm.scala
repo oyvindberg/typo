@@ -227,16 +227,33 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         }
         code"""$sql.as(${rowParserFor(rowType)}.singleOpt)"""
 
-      case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, rowType) =>
-        val sql = SQL {
-          code"""|select ${dbNames(cols, isRead = true)}
-                 |from $relName
-                 |where ${unaryId.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})
-                 |""".stripMargin
-        }
+      case RepoMethod.SelectAllByIds(relName, cols, computedId, idsParam, rowType) =>
+        val joinedColNames = dbNames(cols, isRead = true)
+        computedId match {
+          case x: IdComputed.Composite =>
+            val vals = x.cols.map(col => code"val ${col.name} = ${idsParam.name}.map(_.${col.name})").mkCode("\n")
+            val sql = SQL {
+              code"""|select ${joinedColNames}
+                     |from $relName
+                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")}) 
+                     |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, col.tpe, forbidInline = true)})").mkCode(", ")})
+                     |""".stripMargin
+            }
+            code"""|$vals
+                   |$sql.as(${rowParserFor(rowType)}.*)
+                   |""".stripMargin
 
-        code"""|$sql.as(${rowParserFor(rowType)}.*)
-               |""".stripMargin
+          case x: IdComputed.Unary =>
+            val sql = SQL {
+              code"""|select ${joinedColNames}
+                     |from $relName
+                     |where ${x.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})
+                     |""".stripMargin
+            }
+
+            code"""|$sql.as(${rowParserFor(rowType)}.*)
+                   |""".stripMargin
+        }
 
       case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
         code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType.structure, $rowType.rowParser)"

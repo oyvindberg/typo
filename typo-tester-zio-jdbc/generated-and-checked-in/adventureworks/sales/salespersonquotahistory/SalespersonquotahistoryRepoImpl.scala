@@ -81,6 +81,16 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def selectById(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Option[SalespersonquotahistoryRow]] = {
     sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "quotadate" = ${Segment.paramSegment(compositeId.quotadate)(TypoLocalDateTime.setter)}""".query(using SalespersonquotahistoryRow.jdbcDecoder).selectOne
   }
+  override def selectByIds(compositeIds: Array[SalespersonquotahistoryId]): ZStream[ZConnection, Throwable, SalespersonquotahistoryRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val quotadate = compositeIds.map(_.quotadate)
+    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
+          from sales.salespersonquotahistory
+          where ("businessentityid", "quotadate")
+          in (select unnest(${businessentityid}), unnest(${quotadate}))
+       """.query(using SalespersonquotahistoryRow.jdbcDecoder).selectStream()
+    
+  }
   override def update(row: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.salespersonquotahistory

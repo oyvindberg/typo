@@ -61,6 +61,9 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
   override def selectById(compositeId: SpecialofferproductId)(implicit c: Connection): Option[SpecialofferproductRow] = {
     map.get(compositeId)
   }
+  override def selectByIds(compositeIds: Array[SpecialofferproductId])(implicit c: Connection): List[SpecialofferproductRow] = {
+    compositeIds.flatMap(map.get).toList
+  }
   override def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
       case Some(`row`) => false

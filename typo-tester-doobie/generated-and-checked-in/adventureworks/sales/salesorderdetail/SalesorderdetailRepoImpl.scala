@@ -96,6 +96,16 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def selectById(compositeId: SalesorderdetailId): ConnectionIO[Option[SalesorderdetailRow]] = {
     sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sales.salesorderdetail where "salesorderid" = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND "salesorderdetailid" = ${fromWrite(compositeId.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}""".query(using SalesorderdetailRow.read).option
   }
+  override def selectByIds(compositeIds: Array[SalesorderdetailId]): Stream[ConnectionIO, SalesorderdetailRow] = {
+    val salesorderid = compositeIds.map(_.salesorderid)
+    val salesorderdetailid = compositeIds.map(_.salesorderdetailid)
+    sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
+          from sales.salesorderdetail
+          where ("salesorderid", "salesorderdetailid") 
+          in (select unnest(${salesorderid}), unnest(${salesorderdetailid}))
+       """.query(using SalesorderdetailRow.read).stream
+    
+  }
   override def update(row: SalesorderdetailRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.salesorderdetail

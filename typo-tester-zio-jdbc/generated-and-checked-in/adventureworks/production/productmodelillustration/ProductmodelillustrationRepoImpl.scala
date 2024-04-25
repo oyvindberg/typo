@@ -75,6 +75,16 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def selectById(compositeId: ProductmodelillustrationId): ZIO[ZConnection, Throwable, Option[ProductmodelillustrationRow]] = {
     sql"""select "productmodelid", "illustrationid", "modifieddate"::text from production.productmodelillustration where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(ProductmodelId.setter)} AND "illustrationid" = ${Segment.paramSegment(compositeId.illustrationid)(IllustrationId.setter)}""".query(using ProductmodelillustrationRow.jdbcDecoder).selectOne
   }
+  override def selectByIds(compositeIds: Array[ProductmodelillustrationId]): ZStream[ZConnection, Throwable, ProductmodelillustrationRow] = {
+    val productmodelid = compositeIds.map(_.productmodelid)
+    val illustrationid = compositeIds.map(_.illustrationid)
+    sql"""select "productmodelid", "illustrationid", "modifieddate"::text
+          from production.productmodelillustration
+          where ("productmodelid", "illustrationid")
+          in (select unnest(${productmodelid}), unnest(${illustrationid}))
+       """.query(using ProductmodelillustrationRow.jdbcDecoder).selectStream()
+    
+  }
   override def update(row: ProductmodelillustrationRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productmodelillustration

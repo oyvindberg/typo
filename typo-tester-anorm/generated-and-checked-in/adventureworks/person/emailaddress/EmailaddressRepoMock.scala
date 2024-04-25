@@ -61,6 +61,9 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
   override def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow] = {
     map.get(compositeId)
   }
+  override def selectByIds(compositeIds: Array[EmailaddressId])(implicit c: Connection): List[EmailaddressRow] = {
+    compositeIds.flatMap(map.get).toList
+  }
   override def update(row: EmailaddressRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
       case Some(`row`) => false

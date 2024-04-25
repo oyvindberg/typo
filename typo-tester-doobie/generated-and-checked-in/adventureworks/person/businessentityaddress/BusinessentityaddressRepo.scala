@@ -24,6 +24,7 @@ trait BusinessentityaddressRepo {
   def select: SelectBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
   def selectAll: Stream[ConnectionIO, BusinessentityaddressRow]
   def selectById(compositeId: BusinessentityaddressId): ConnectionIO[Option[BusinessentityaddressRow]]
+  def selectByIds(compositeIds: Array[BusinessentityaddressId]): Stream[ConnectionIO, BusinessentityaddressRow]
   def update(row: BusinessentityaddressRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
   def upsert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow]

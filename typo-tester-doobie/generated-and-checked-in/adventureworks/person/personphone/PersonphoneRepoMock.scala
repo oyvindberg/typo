@@ -73,6 +73,9 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
   override def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[PersonphoneId]): Stream[ConnectionIO, PersonphoneRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
+  }
   override def update(row: PersonphoneRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

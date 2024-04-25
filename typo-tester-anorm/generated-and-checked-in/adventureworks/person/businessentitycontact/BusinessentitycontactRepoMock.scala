@@ -61,6 +61,9 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
   override def selectById(compositeId: BusinessentitycontactId)(implicit c: Connection): Option[BusinessentitycontactRow] = {
     map.get(compositeId)
   }
+  override def selectByIds(compositeIds: Array[BusinessentitycontactId])(implicit c: Connection): List[BusinessentitycontactRow] = {
+    compositeIds.flatMap(map.get).toList
+  }
   override def update(row: BusinessentitycontactRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
       case Some(`row`) => false

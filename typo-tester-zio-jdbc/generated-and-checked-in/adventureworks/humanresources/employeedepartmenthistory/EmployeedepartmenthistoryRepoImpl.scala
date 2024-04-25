@@ -81,6 +81,18 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def selectById(compositeId: EmployeedepartmenthistoryId): ZIO[ZConnection, Throwable, Option[EmployeedepartmenthistoryRow]] = {
     sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from humanresources.employeedepartmenthistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDate.setter)} AND "departmentid" = ${Segment.paramSegment(compositeId.departmentid)(DepartmentId.setter)} AND "shiftid" = ${Segment.paramSegment(compositeId.shiftid)(ShiftId.setter)}""".query(using EmployeedepartmenthistoryRow.jdbcDecoder).selectOne
   }
+  override def selectByIds(compositeIds: Array[EmployeedepartmenthistoryId]): ZStream[ZConnection, Throwable, EmployeedepartmenthistoryRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val startdate = compositeIds.map(_.startdate)
+    val departmentid = compositeIds.map(_.departmentid)
+    val shiftid = compositeIds.map(_.shiftid)
+    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
+          from humanresources.employeedepartmenthistory
+          where ("businessentityid", "startdate", "departmentid", "shiftid")
+          in (select unnest(${businessentityid}), unnest(${startdate}), unnest(${departmentid}), unnest(${shiftid}))
+       """.query(using EmployeedepartmenthistoryRow.jdbcDecoder).selectStream()
+    
+  }
   override def update(row: EmployeedepartmenthistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update humanresources.employeedepartmenthistory

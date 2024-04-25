@@ -73,6 +73,9 @@ class ProductlistpricehistoryRepoMock(toRow: Function1[ProductlistpricehistoryRo
   override def selectById(compositeId: ProductlistpricehistoryId): ConnectionIO[Option[ProductlistpricehistoryRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[ProductlistpricehistoryId]): Stream[ConnectionIO, ProductlistpricehistoryRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
+  }
   override def update(row: ProductlistpricehistoryRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

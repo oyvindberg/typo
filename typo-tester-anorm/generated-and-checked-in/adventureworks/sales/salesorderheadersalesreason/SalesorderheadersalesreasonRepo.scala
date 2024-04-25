@@ -23,6 +23,7 @@ trait SalesorderheadersalesreasonRepo {
   def select: SelectBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow]
   def selectAll(implicit c: Connection): List[SalesorderheadersalesreasonRow]
   def selectById(compositeId: SalesorderheadersalesreasonId)(implicit c: Connection): Option[SalesorderheadersalesreasonRow]
+  def selectByIds(compositeIds: Array[SalesorderheadersalesreasonId])(implicit c: Connection): List[SalesorderheadersalesreasonRow]
   def update(row: SalesorderheadersalesreasonRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow]
   def upsert(unsaved: SalesorderheadersalesreasonRow)(implicit c: Connection): SalesorderheadersalesreasonRow

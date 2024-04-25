@@ -75,6 +75,16 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def selectById(compositeId: PersoncreditcardId): ZIO[ZConnection, Throwable, Option[PersoncreditcardRow]] = {
     sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "creditcardid" = ${Segment.paramSegment(compositeId.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".query(using PersoncreditcardRow.jdbcDecoder).selectOne
   }
+  override def selectByIds(compositeIds: Array[PersoncreditcardId]): ZStream[ZConnection, Throwable, PersoncreditcardRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val creditcardid = compositeIds.map(_.creditcardid)
+    sql"""select "businessentityid", "creditcardid", "modifieddate"::text
+          from sales.personcreditcard
+          where ("businessentityid", "creditcardid")
+          in (select unnest(${businessentityid}), unnest(${creditcardid}))
+       """.query(using PersoncreditcardRow.jdbcDecoder).selectStream()
+    
+  }
   override def update(row: PersoncreditcardRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.personcreditcard

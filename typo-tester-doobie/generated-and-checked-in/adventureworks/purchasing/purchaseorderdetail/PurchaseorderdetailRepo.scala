@@ -15,4 +15,5 @@ trait PurchaseorderdetailRepo {
   def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow]
   def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow]
   def selectById(compositeId: PurchaseorderdetailId): ConnectionIO[Option[PurchaseorderdetailRow]]
+  def selectByIds(compositeIds: Array[PurchaseorderdetailId]): Stream[ConnectionIO, PurchaseorderdetailRow]
 }

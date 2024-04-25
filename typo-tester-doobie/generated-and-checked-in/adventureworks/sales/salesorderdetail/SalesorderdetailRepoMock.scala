@@ -73,6 +73,9 @@ class SalesorderdetailRepoMock(toRow: Function1[SalesorderdetailRowUnsaved, Sale
   override def selectById(compositeId: SalesorderdetailId): ConnectionIO[Option[SalesorderdetailRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[SalesorderdetailId]): Stream[ConnectionIO, SalesorderdetailRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
+  }
   override def update(row: SalesorderdetailRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

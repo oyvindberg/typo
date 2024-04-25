@@ -81,6 +81,17 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   override def selectById(compositeId: BusinessentitycontactId): ZIO[ZConnection, Throwable, Option[BusinessentitycontactRow]] = {
     sql"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from person.businessentitycontact where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "personid" = ${Segment.paramSegment(compositeId.personid)(BusinessentityId.setter)} AND "contacttypeid" = ${Segment.paramSegment(compositeId.contacttypeid)(ContacttypeId.setter)}""".query(using BusinessentitycontactRow.jdbcDecoder).selectOne
   }
+  override def selectByIds(compositeIds: Array[BusinessentitycontactId]): ZStream[ZConnection, Throwable, BusinessentitycontactRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val personid = compositeIds.map(_.personid)
+    val contacttypeid = compositeIds.map(_.contacttypeid)
+    sql"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
+          from person.businessentitycontact
+          where ("businessentityid", "personid", "contacttypeid")
+          in (select unnest(${businessentityid}), unnest(${personid}), unnest(${contacttypeid}))
+       """.query(using BusinessentitycontactRow.jdbcDecoder).selectStream()
+    
+  }
   override def update(row: BusinessentitycontactRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update person.businessentitycontact

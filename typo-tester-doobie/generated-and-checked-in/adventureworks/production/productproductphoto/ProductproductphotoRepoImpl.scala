@@ -81,6 +81,16 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def selectById(compositeId: ProductproductphotoId): ConnectionIO[Option[ProductproductphotoRow]] = {
     sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}""".query(using ProductproductphotoRow.read).option
   }
+  override def selectByIds(compositeIds: Array[ProductproductphotoId]): Stream[ConnectionIO, ProductproductphotoRow] = {
+    val productid = compositeIds.map(_.productid)
+    val productphotoid = compositeIds.map(_.productphotoid)
+    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text
+          from production.productproductphoto
+          where ("productid", "productphotoid") 
+          in (select unnest(${productid}), unnest(${productphotoid}))
+       """.query(using ProductproductphotoRow.read).stream
+    
+  }
   override def update(row: ProductproductphotoRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productproductphoto

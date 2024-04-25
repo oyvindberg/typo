@@ -24,6 +24,7 @@ trait ProductlistpricehistoryRepo {
   def select: SelectBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def selectAll: Stream[ConnectionIO, ProductlistpricehistoryRow]
   def selectById(compositeId: ProductlistpricehistoryId): ConnectionIO[Option[ProductlistpricehistoryRow]]
+  def selectByIds(compositeIds: Array[ProductlistpricehistoryId]): Stream[ConnectionIO, ProductlistpricehistoryRow]
   def update(row: ProductlistpricehistoryRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def upsert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow]

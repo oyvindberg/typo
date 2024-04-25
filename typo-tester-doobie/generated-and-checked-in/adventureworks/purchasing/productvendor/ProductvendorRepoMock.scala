@@ -73,6 +73,9 @@ class ProductvendorRepoMock(toRow: Function1[ProductvendorRowUnsaved, Productven
   override def selectById(compositeId: ProductvendorId): ConnectionIO[Option[ProductvendorRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[ProductvendorId]): Stream[ConnectionIO, ProductvendorRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
+  }
   override def update(row: ProductvendorRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

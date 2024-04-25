@@ -79,6 +79,16 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def selectById(compositeId: ProductdocumentId): ConnectionIO[Option[ProductdocumentRow]] = {
     sql"""select "productid", "modifieddate"::text, "documentnode" from production.productdocument where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "documentnode" = ${fromWrite(compositeId.documentnode)(Write.fromPut(DocumentId.put))}""".query(using ProductdocumentRow.read).option
   }
+  override def selectByIds(compositeIds: Array[ProductdocumentId]): Stream[ConnectionIO, ProductdocumentRow] = {
+    val productid = compositeIds.map(_.productid)
+    val documentnode = compositeIds.map(_.documentnode)
+    sql"""select "productid", "modifieddate"::text, "documentnode"
+          from production.productdocument
+          where ("productid", "documentnode") 
+          in (select unnest(${productid}), unnest(${documentnode}))
+       """.query(using ProductdocumentRow.read).stream
+    
+  }
   override def update(row: ProductdocumentRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productdocument

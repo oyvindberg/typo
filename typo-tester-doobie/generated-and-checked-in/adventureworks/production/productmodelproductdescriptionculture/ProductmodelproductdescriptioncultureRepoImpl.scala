@@ -78,6 +78,17 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId): ConnectionIO[Option[ProductmodelproductdescriptioncultureRow]] = {
     sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture where "productmodelid" = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND "productdescriptionid" = ${fromWrite(compositeId.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))} AND "cultureid" = ${fromWrite(compositeId.cultureid)(Write.fromPut(CultureId.put))}""".query(using ProductmodelproductdescriptioncultureRow.read).option
   }
+  override def selectByIds(compositeIds: Array[ProductmodelproductdescriptioncultureId]): Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow] = {
+    val productmodelid = compositeIds.map(_.productmodelid)
+    val productdescriptionid = compositeIds.map(_.productdescriptionid)
+    val cultureid = compositeIds.map(_.cultureid)
+    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
+          from production.productmodelproductdescriptionculture
+          where ("productmodelid", "productdescriptionid", "cultureid") 
+          in (select unnest(${productmodelid}), unnest(${productdescriptionid}), unnest(${cultureid}))
+       """.query(using ProductmodelproductdescriptioncultureRow.read).stream
+    
+  }
   override def update(row: ProductmodelproductdescriptioncultureRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productmodelproductdescriptionculture

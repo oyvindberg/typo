@@ -91,6 +91,16 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "quotadate" = ${ParameterValue(compositeId.quotadate, null, TypoLocalDateTime.toStatement)}
        """.as(SalespersonquotahistoryRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[SalespersonquotahistoryId])(implicit c: Connection): List[SalespersonquotahistoryRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val quotadate = compositeIds.map(_.quotadate)
+    SQL"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
+          from sales.salespersonquotahistory
+          where ("businessentityid", "quotadate") 
+          in (select unnest(${businessentityid}), unnest(${quotadate}))
+       """.as(SalespersonquotahistoryRow.rowParser(1).*)
+    
+  }
   override def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.salespersonquotahistory

@@ -93,6 +93,17 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)} AND "territoryid" = ${ParameterValue(compositeId.territoryid, null, SalesterritoryId.toStatement)}
        """.as(SalesterritoryhistoryRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[SalesterritoryhistoryId])(implicit c: Connection): List[SalesterritoryhistoryRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val startdate = compositeIds.map(_.startdate)
+    val territoryid = compositeIds.map(_.territoryid)
+    SQL"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
+          from sales.salesterritoryhistory
+          where ("businessentityid", "startdate", "territoryid") 
+          in (select unnest(${businessentityid}), unnest(${startdate}), unnest(${territoryid}))
+       """.as(SalesterritoryhistoryRow.rowParser(1).*)
+    
+  }
   override def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.salesterritoryhistory

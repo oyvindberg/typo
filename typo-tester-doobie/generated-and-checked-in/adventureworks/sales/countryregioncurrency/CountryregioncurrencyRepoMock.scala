@@ -73,6 +73,9 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
   override def selectById(compositeId: CountryregioncurrencyId): ConnectionIO[Option[CountryregioncurrencyRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[CountryregioncurrencyId]): Stream[ConnectionIO, CountryregioncurrencyRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
+  }
   override def update(row: CountryregioncurrencyRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

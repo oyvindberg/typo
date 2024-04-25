@@ -26,6 +26,7 @@ trait SalesorderheadersalesreasonRepo {
   def select: SelectBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow]
   def selectAll: ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRow]
   def selectById(compositeId: SalesorderheadersalesreasonId): ZIO[ZConnection, Throwable, Option[SalesorderheadersalesreasonRow]]
+  def selectByIds(compositeIds: Array[SalesorderheadersalesreasonId]): ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRow]
   def update(row: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow]
   def upsert(unsaved: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderheadersalesreasonRow]]

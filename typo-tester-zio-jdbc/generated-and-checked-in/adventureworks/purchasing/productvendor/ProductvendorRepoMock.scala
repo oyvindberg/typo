@@ -72,6 +72,9 @@ class ProductvendorRepoMock(toRow: Function1[ProductvendorRowUnsaved, Productven
   override def selectById(compositeId: ProductvendorId): ZIO[ZConnection, Throwable, Option[ProductvendorRow]] = {
     ZIO.succeed(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[ProductvendorId]): ZStream[ZConnection, Throwable, ProductvendorRow] = {
+    ZStream.fromIterable(compositeIds.flatMap(map.get))
+  }
   override def update(row: ProductvendorRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.compositeId) match {

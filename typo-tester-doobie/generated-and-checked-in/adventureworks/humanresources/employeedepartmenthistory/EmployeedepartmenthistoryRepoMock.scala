@@ -73,6 +73,9 @@ class EmployeedepartmenthistoryRepoMock(toRow: Function1[Employeedepartmenthisto
   override def selectById(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Option[EmployeedepartmenthistoryRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[EmployeedepartmenthistoryId]): Stream[ConnectionIO, EmployeedepartmenthistoryRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
+  }
   override def update(row: EmployeedepartmenthistoryRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

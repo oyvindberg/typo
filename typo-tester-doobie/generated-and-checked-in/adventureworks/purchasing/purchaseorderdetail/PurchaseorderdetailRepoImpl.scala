@@ -27,4 +27,14 @@ class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def selectById(compositeId: PurchaseorderdetailId): ConnectionIO[Option[PurchaseorderdetailRow]] = {
     sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from purchasing.purchaseorderdetail where "purchaseorderid" = ${fromWrite(compositeId.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))} AND "purchaseorderdetailid" = ${fromWrite(compositeId.purchaseorderdetailid)(Write.fromPut(Meta.IntMeta.put))}""".query(using PurchaseorderdetailRow.read).option
   }
+  override def selectByIds(compositeIds: Array[PurchaseorderdetailId]): Stream[ConnectionIO, PurchaseorderdetailRow] = {
+    val purchaseorderid = compositeIds.map(_.purchaseorderid)
+    val purchaseorderdetailid = compositeIds.map(_.purchaseorderdetailid)
+    sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text
+          from purchasing.purchaseorderdetail
+          where ("purchaseorderid", "purchaseorderdetailid") 
+          in (select unnest(${purchaseorderid}), unnest(${purchaseorderdetailid}))
+       """.query(using PurchaseorderdetailRow.read).stream
+    
+  }
 }

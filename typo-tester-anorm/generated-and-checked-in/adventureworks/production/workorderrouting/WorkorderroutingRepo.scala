@@ -23,6 +23,7 @@ trait WorkorderroutingRepo {
   def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def selectAll(implicit c: Connection): List[WorkorderroutingRow]
   def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow]
+  def selectByIds(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): List[WorkorderroutingRow]
   def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def upsert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow

@@ -24,6 +24,7 @@ trait ProductdocumentRepo {
   def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow]
   def selectAll: Stream[ConnectionIO, ProductdocumentRow]
   def selectById(compositeId: ProductdocumentId): ConnectionIO[Option[ProductdocumentRow]]
+  def selectByIds(compositeIds: Array[ProductdocumentId]): Stream[ConnectionIO, ProductdocumentRow]
   def update(row: ProductdocumentRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow]
   def upsert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow]

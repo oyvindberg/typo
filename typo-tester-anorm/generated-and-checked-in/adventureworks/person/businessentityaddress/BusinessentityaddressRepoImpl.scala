@@ -92,6 +92,17 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "addressid" = ${ParameterValue(compositeId.addressid, null, AddressId.toStatement)} AND "addresstypeid" = ${ParameterValue(compositeId.addresstypeid, null, AddresstypeId.toStatement)}
        """.as(BusinessentityaddressRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[BusinessentityaddressId])(implicit c: Connection): List[BusinessentityaddressRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val addressid = compositeIds.map(_.addressid)
+    val addresstypeid = compositeIds.map(_.addresstypeid)
+    SQL"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
+          from person.businessentityaddress
+          where ("businessentityid", "addressid", "addresstypeid") 
+          in (select unnest(${businessentityid}), unnest(${addressid}), unnest(${addresstypeid}))
+       """.as(BusinessentityaddressRow.rowParser(1).*)
+    
+  }
   override def update(row: BusinessentityaddressRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update person.businessentityaddress

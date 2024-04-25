@@ -85,6 +85,16 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
   override def selectById(compositeId: EmailaddressId): ConnectionIO[Option[EmailaddressRow]] = {
     sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from person.emailaddress where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}""".query(using EmailaddressRow.read).option
   }
+  override def selectByIds(compositeIds: Array[EmailaddressId]): Stream[ConnectionIO, EmailaddressRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val emailaddressid = compositeIds.map(_.emailaddressid)
+    sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
+          from person.emailaddress
+          where ("businessentityid", "emailaddressid") 
+          in (select unnest(${businessentityid}), unnest(${emailaddressid}))
+       """.query(using EmailaddressRow.read).stream
+    
+  }
   override def update(row: EmailaddressRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update person.emailaddress

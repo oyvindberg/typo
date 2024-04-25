@@ -73,6 +73,9 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
   override def selectById(compositeId: EmailaddressId): ConnectionIO[Option[EmailaddressRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[EmailaddressId]): Stream[ConnectionIO, EmailaddressRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
+  }
   override def update(row: EmailaddressRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

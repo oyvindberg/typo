@@ -97,6 +97,17 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           where "workorderid" = ${ParameterValue(compositeId.workorderid, null, WorkorderId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ToStatement.intToStatement)} AND "operationsequence" = ${ParameterValue(compositeId.operationsequence, null, TypoShort.toStatement)}
        """.as(WorkorderroutingRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): List[WorkorderroutingRow] = {
+    val workorderid = compositeIds.map(_.workorderid)
+    val productid = compositeIds.map(_.productid)
+    val operationsequence = compositeIds.map(_.operationsequence)
+    SQL"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
+          from production.workorderrouting
+          where ("workorderid", "productid", "operationsequence") 
+          in (select unnest(${workorderid}), unnest(${productid}), unnest(${operationsequence}))
+       """.as(WorkorderroutingRow.rowParser(1).*)
+    
+  }
   override def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.workorderrouting

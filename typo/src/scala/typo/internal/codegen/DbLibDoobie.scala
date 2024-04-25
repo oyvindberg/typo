@@ -129,13 +129,29 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         val sql = SQL(code"""select $joinedColNames from $relName where ${matchId(id)}""")
         code"""${query(sql, rowType)}.option"""
 
-      case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, rowType) =>
+      case RepoMethod.SelectAllByIds(relName, cols, computedId, idsParam, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
+        computedId match {
+          case x: IdComputed.Composite =>
+            val vals = x.cols.map(col => code"val ${col.name} = ${idsParam.name}.map(_.${col.name})").mkCode("\n")
+            val sql = SQL {
+              code"""|select ${dbNames(cols, isRead = true)}
+                     |from $relName
+                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")}) 
+                     |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, col.tpe, forbidInline = true)})").mkCode(", ")})
+                     |""".stripMargin
+            }
+            code"""|$vals
+                   |${query(sql, rowType)}.stream
+                   |""".stripMargin
 
-        val sql = SQL(
-          code"""select $joinedColNames from $relName where ${code"${unaryId.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})"}"""
-        )
-        code"""${query(sql, rowType)}.stream"""
+          case unaryId: IdComputed.Unary =>
+            val sql = SQL(
+              code"""select $joinedColNames from $relName where ${code"${unaryId.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})"}"""
+            )
+            code"""${query(sql, rowType)}.stream"""
+        }
+
       case RepoMethod.SelectByUnique(relName, keyColumns, allColumns, rowType) =>
         val sql = SQL {
           code"""|select ${dbNames(allColumns, isRead = true)}

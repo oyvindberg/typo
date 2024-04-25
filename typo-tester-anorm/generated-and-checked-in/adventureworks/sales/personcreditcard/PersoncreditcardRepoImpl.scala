@@ -85,6 +85,16 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "creditcardid" = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
        """.as(PersoncreditcardRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit c: Connection): List[PersoncreditcardRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val creditcardid = compositeIds.map(_.creditcardid)
+    SQL"""select "businessentityid", "creditcardid", "modifieddate"::text
+          from sales.personcreditcard
+          where ("businessentityid", "creditcardid") 
+          in (select unnest(${businessentityid}), unnest(${creditcardid}))
+       """.as(PersoncreditcardRow.rowParser(1).*)
+    
+  }
   override def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.personcreditcard

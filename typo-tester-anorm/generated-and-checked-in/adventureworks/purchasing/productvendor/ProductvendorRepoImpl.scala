@@ -96,6 +96,16 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)}
        """.as(ProductvendorRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[ProductvendorId])(implicit c: Connection): List[ProductvendorRow] = {
+    val productid = compositeIds.map(_.productid)
+    val businessentityid = compositeIds.map(_.businessentityid)
+    SQL"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
+          from purchasing.productvendor
+          where ("productid", "businessentityid") 
+          in (select unnest(${productid}), unnest(${businessentityid}))
+       """.as(ProductvendorRow.rowParser(1).*)
+    
+  }
   override def update(row: ProductvendorRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update purchasing.productvendor

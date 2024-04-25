@@ -82,6 +82,17 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   override def selectById(compositeId: BusinessentitycontactId): ConnectionIO[Option[BusinessentitycontactRow]] = {
     sql"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from person.businessentitycontact where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "personid" = ${fromWrite(compositeId.personid)(Write.fromPut(BusinessentityId.put))} AND "contacttypeid" = ${fromWrite(compositeId.contacttypeid)(Write.fromPut(ContacttypeId.put))}""".query(using BusinessentitycontactRow.read).option
   }
+  override def selectByIds(compositeIds: Array[BusinessentitycontactId]): Stream[ConnectionIO, BusinessentitycontactRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val personid = compositeIds.map(_.personid)
+    val contacttypeid = compositeIds.map(_.contacttypeid)
+    sql"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
+          from person.businessentitycontact
+          where ("businessentityid", "personid", "contacttypeid") 
+          in (select unnest(${businessentityid}), unnest(${personid}), unnest(${contacttypeid}))
+       """.query(using BusinessentitycontactRow.read).stream
+    
+  }
   override def update(row: BusinessentitycontactRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update person.businessentitycontact

@@ -31,7 +31,7 @@ object RepoMethod {
   case class SelectAllByIds(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],
-      unaryId: IdComputed.Unary,
+      unaryId: IdComputed,
       idsParam: sc.Param,
       rowType: sc.Type
   ) extends Selector

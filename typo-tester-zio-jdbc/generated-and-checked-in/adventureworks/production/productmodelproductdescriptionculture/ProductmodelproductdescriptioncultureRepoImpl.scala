@@ -77,6 +77,17 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId): ZIO[ZConnection, Throwable, Option[ProductmodelproductdescriptioncultureRow]] = {
     sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from production.productmodelproductdescriptionculture where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(ProductmodelId.setter)} AND "productdescriptionid" = ${Segment.paramSegment(compositeId.productdescriptionid)(ProductdescriptionId.setter)} AND "cultureid" = ${Segment.paramSegment(compositeId.cultureid)(CultureId.setter)}""".query(using ProductmodelproductdescriptioncultureRow.jdbcDecoder).selectOne
   }
+  override def selectByIds(compositeIds: Array[ProductmodelproductdescriptioncultureId]): ZStream[ZConnection, Throwable, ProductmodelproductdescriptioncultureRow] = {
+    val productmodelid = compositeIds.map(_.productmodelid)
+    val productdescriptionid = compositeIds.map(_.productdescriptionid)
+    val cultureid = compositeIds.map(_.cultureid)
+    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
+          from production.productmodelproductdescriptionculture
+          where ("productmodelid", "productdescriptionid", "cultureid")
+          in (select unnest(${productmodelid}), unnest(${productdescriptionid}), unnest(${cultureid}))
+       """.query(using ProductmodelproductdescriptioncultureRow.jdbcDecoder).selectStream()
+    
+  }
   override def update(row: ProductmodelproductdescriptioncultureRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productmodelproductdescriptionculture

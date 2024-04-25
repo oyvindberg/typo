@@ -78,6 +78,16 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def selectById(compositeId: EmployeepayhistoryId): ZIO[ZConnection, Throwable, Option[EmployeepayhistoryRow]] = {
     sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "ratechangedate" = ${Segment.paramSegment(compositeId.ratechangedate)(TypoLocalDateTime.setter)}""".query(using EmployeepayhistoryRow.jdbcDecoder).selectOne
   }
+  override def selectByIds(compositeIds: Array[EmployeepayhistoryId]): ZStream[ZConnection, Throwable, EmployeepayhistoryRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val ratechangedate = compositeIds.map(_.ratechangedate)
+    sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
+          from humanresources.employeepayhistory
+          where ("businessentityid", "ratechangedate")
+          in (select unnest(${businessentityid}), unnest(${ratechangedate}))
+       """.query(using EmployeepayhistoryRow.jdbcDecoder).selectStream()
+    
+  }
   override def update(row: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update humanresources.employeepayhistory

@@ -84,6 +84,16 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
   override def selectById(compositeId: EmailaddressId): ZIO[ZConnection, Throwable, Option[EmailaddressRow]] = {
     sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from person.emailaddress where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "emailaddressid" = ${Segment.paramSegment(compositeId.emailaddressid)(Setter.intSetter)}""".query(using EmailaddressRow.jdbcDecoder).selectOne
   }
+  override def selectByIds(compositeIds: Array[EmailaddressId]): ZStream[ZConnection, Throwable, EmailaddressRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val emailaddressid = compositeIds.map(_.emailaddressid)
+    sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
+          from person.emailaddress
+          where ("businessentityid", "emailaddressid")
+          in (select unnest(${businessentityid}), unnest(${emailaddressid}))
+       """.query(using EmailaddressRow.jdbcDecoder).selectStream()
+    
+  }
   override def update(row: EmailaddressRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update person.emailaddress

@@ -23,6 +23,7 @@ trait ProductdocumentRepo {
   def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow]
   def selectAll(implicit c: Connection): List[ProductdocumentRow]
   def selectById(compositeId: ProductdocumentId)(implicit c: Connection): Option[ProductdocumentRow]
+  def selectByIds(compositeIds: Array[ProductdocumentId])(implicit c: Connection): List[ProductdocumentRow]
   def update(row: ProductdocumentRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow]
   def upsert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow

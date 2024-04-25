@@ -58,6 +58,9 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
   override def selectById(compositeId: FlaffId): ZIO[ZConnection, Throwable, Option[FlaffRow]] = {
     ZIO.succeed(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[FlaffId]): ZStream[ZConnection, Throwable, FlaffRow] = {
+    ZStream.fromIterable(compositeIds.flatMap(map.get))
+  }
   override def update(row: FlaffRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.compositeId) match {

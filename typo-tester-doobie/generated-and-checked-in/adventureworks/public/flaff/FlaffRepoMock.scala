@@ -57,6 +57,9 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
   override def selectById(compositeId: FlaffId): ConnectionIO[Option[FlaffRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[FlaffId]): Stream[ConnectionIO, FlaffRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
+  }
   override def update(row: FlaffRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

@@ -91,6 +91,17 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "personid" = ${ParameterValue(compositeId.personid, null, BusinessentityId.toStatement)} AND "contacttypeid" = ${ParameterValue(compositeId.contacttypeid, null, ContacttypeId.toStatement)}
        """.as(BusinessentitycontactRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[BusinessentitycontactId])(implicit c: Connection): List[BusinessentitycontactRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val personid = compositeIds.map(_.personid)
+    val contacttypeid = compositeIds.map(_.contacttypeid)
+    SQL"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
+          from person.businessentitycontact
+          where ("businessentityid", "personid", "contacttypeid") 
+          in (select unnest(${businessentityid}), unnest(${personid}), unnest(${contacttypeid}))
+       """.as(BusinessentitycontactRow.rowParser(1).*)
+    
+  }
   override def update(row: BusinessentitycontactRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update person.businessentitycontact

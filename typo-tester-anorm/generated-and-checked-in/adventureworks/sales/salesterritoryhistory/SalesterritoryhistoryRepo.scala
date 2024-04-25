@@ -23,6 +23,7 @@ trait SalesterritoryhistoryRepo {
   def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def selectAll(implicit c: Connection): List[SalesterritoryhistoryRow]
   def selectById(compositeId: SalesterritoryhistoryId)(implicit c: Connection): Option[SalesterritoryhistoryRow]
+  def selectByIds(compositeIds: Array[SalesterritoryhistoryId])(implicit c: Connection): List[SalesterritoryhistoryRow]
   def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def upsert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow

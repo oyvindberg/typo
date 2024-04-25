@@ -77,6 +77,16 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def selectById(compositeId: ProductcosthistoryId): ZIO[ZConnection, Throwable, Option[ProductcosthistoryRow]] = {
     sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".query(using ProductcosthistoryRow.jdbcDecoder).selectOne
   }
+  override def selectByIds(compositeIds: Array[ProductcosthistoryId]): ZStream[ZConnection, Throwable, ProductcosthistoryRow] = {
+    val productid = compositeIds.map(_.productid)
+    val startdate = compositeIds.map(_.startdate)
+    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
+          from production.productcosthistory
+          where ("productid", "startdate")
+          in (select unnest(${productid}), unnest(${startdate}))
+       """.query(using ProductcosthistoryRow.jdbcDecoder).selectStream()
+    
+  }
   override def update(row: ProductcosthistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productcosthistory

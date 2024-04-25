@@ -77,6 +77,17 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
   override def selectById(compositeId: PersonphoneId): ZIO[ZConnection, Throwable, Option[PersonphoneRow]] = {
     sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Phone.setter)} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(PhonenumbertypeId.setter)}""".query(using PersonphoneRow.jdbcDecoder).selectOne
   }
+  override def selectByIds(compositeIds: Array[PersonphoneId]): ZStream[ZConnection, Throwable, PersonphoneRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val phonenumber = compositeIds.map(_.phonenumber)
+    val phonenumbertypeid = compositeIds.map(_.phonenumbertypeid)
+    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
+          from person.personphone
+          where ("businessentityid", "phonenumber", "phonenumbertypeid")
+          in (select unnest(${businessentityid}), unnest(${phonenumber}), unnest(${phonenumbertypeid}))
+       """.query(using PersonphoneRow.jdbcDecoder).selectStream()
+    
+  }
   override def update(row: PersonphoneRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update person.personphone

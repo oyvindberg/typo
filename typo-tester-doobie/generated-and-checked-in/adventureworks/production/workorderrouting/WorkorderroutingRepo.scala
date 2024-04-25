@@ -24,6 +24,7 @@ trait WorkorderroutingRepo {
   def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def selectAll: Stream[ConnectionIO, WorkorderroutingRow]
   def selectById(compositeId: WorkorderroutingId): ConnectionIO[Option[WorkorderroutingRow]]
+  def selectByIds(compositeIds: Array[WorkorderroutingId]): Stream[ConnectionIO, WorkorderroutingRow]
   def update(row: WorkorderroutingRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def upsert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow]

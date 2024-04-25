@@ -83,6 +83,17 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def selectById(compositeId: SalesterritoryhistoryId): ConnectionIO[Option[SalesterritoryhistoryRow]] = {
     sql"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sales.salesterritoryhistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))} AND "territoryid" = ${fromWrite(compositeId.territoryid)(Write.fromPut(SalesterritoryId.put))}""".query(using SalesterritoryhistoryRow.read).option
   }
+  override def selectByIds(compositeIds: Array[SalesterritoryhistoryId]): Stream[ConnectionIO, SalesterritoryhistoryRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val startdate = compositeIds.map(_.startdate)
+    val territoryid = compositeIds.map(_.territoryid)
+    sql"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
+          from sales.salesterritoryhistory
+          where ("businessentityid", "startdate", "territoryid") 
+          in (select unnest(${businessentityid}), unnest(${startdate}), unnest(${territoryid}))
+       """.query(using SalesterritoryhistoryRow.read).stream
+    
+  }
   override def update(row: SalesterritoryhistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.salesterritoryhistory

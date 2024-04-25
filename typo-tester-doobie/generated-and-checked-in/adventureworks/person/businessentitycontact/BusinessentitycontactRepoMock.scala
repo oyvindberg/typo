@@ -73,6 +73,9 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
   override def selectById(compositeId: BusinessentitycontactId): ConnectionIO[Option[BusinessentitycontactRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[BusinessentitycontactId]): Stream[ConnectionIO, BusinessentitycontactRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
+  }
   override def update(row: BusinessentitycontactRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

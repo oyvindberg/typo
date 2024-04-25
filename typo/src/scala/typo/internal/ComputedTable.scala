@@ -150,9 +150,10 @@ case class ComputedTable(
           RepoMethod.Upsert(dbTable.name, cols, id, unsavedParam, names.RowName)
         },
         maybeId.collect {
-          // todo: support composite ids
           case unary: IdComputed.Unary =>
             RepoMethod.SelectAllByIds(dbTable.name, cols, unary, sc.Param(unary.paramName.appended("s"), sc.Type.ArrayOf(unary.tpe), None), names.RowName)
+          case x: IdComputed.Composite if x.cols.forall(col => col.dbCol.nullability == Nullability.NoNulls) =>
+            RepoMethod.SelectAllByIds(dbTable.name, cols, x, sc.Param(x.paramName.appended("s"), sc.Type.ArrayOf(x.tpe), None), names.RowName)
         },
         for {
           name <- names.FieldOrIdValueName

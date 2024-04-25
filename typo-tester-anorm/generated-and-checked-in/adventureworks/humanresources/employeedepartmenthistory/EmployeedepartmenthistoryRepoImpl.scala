@@ -91,6 +91,18 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDate.toStatement)} AND "departmentid" = ${ParameterValue(compositeId.departmentid, null, DepartmentId.toStatement)} AND "shiftid" = ${ParameterValue(compositeId.shiftid, null, ShiftId.toStatement)}
        """.as(EmployeedepartmenthistoryRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[EmployeedepartmenthistoryId])(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val startdate = compositeIds.map(_.startdate)
+    val departmentid = compositeIds.map(_.departmentid)
+    val shiftid = compositeIds.map(_.shiftid)
+    SQL"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
+          from humanresources.employeedepartmenthistory
+          where ("businessentityid", "startdate", "departmentid", "shiftid") 
+          in (select unnest(${businessentityid}), unnest(${startdate}), unnest(${departmentid}), unnest(${shiftid}))
+       """.as(EmployeedepartmenthistoryRow.rowParser(1).*)
+    
+  }
   override def update(row: EmployeedepartmenthistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update humanresources.employeedepartmenthistory

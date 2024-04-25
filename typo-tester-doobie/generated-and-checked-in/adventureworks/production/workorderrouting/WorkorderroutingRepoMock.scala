@@ -73,6 +73,9 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
   override def selectById(compositeId: WorkorderroutingId): ConnectionIO[Option[WorkorderroutingRow]] = {
     delay(map.get(compositeId))
   }
+  override def selectByIds(compositeIds: Array[WorkorderroutingId]): Stream[ConnectionIO, WorkorderroutingRow] = {
+    Stream.emits(compositeIds.flatMap(map.get).toList)
+  }
   override def update(row: WorkorderroutingRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {

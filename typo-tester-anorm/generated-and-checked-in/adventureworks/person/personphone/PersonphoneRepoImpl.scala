@@ -87,6 +87,17 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "phonenumber" = ${ParameterValue(compositeId.phonenumber, null, Phone.toStatement)} AND "phonenumbertypeid" = ${ParameterValue(compositeId.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}
        """.as(PersonphoneRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[PersonphoneId])(implicit c: Connection): List[PersonphoneRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val phonenumber = compositeIds.map(_.phonenumber)
+    val phonenumbertypeid = compositeIds.map(_.phonenumbertypeid)
+    SQL"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
+          from person.personphone
+          where ("businessentityid", "phonenumber", "phonenumbertypeid") 
+          in (select unnest(${businessentityid}), unnest(${phonenumber}), unnest(${phonenumbertypeid}))
+       """.as(PersonphoneRow.rowParser(1).*)
+    
+  }
   override def update(row: PersonphoneRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update person.personphone

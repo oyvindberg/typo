@@ -61,6 +61,9 @@ class ProductmodelillustrationRepoMock(toRow: Function1[Productmodelillustration
   override def selectById(compositeId: ProductmodelillustrationId)(implicit c: Connection): Option[ProductmodelillustrationRow] = {
     map.get(compositeId)
   }
+  override def selectByIds(compositeIds: Array[ProductmodelillustrationId])(implicit c: Connection): List[ProductmodelillustrationRow] = {
+    compositeIds.flatMap(map.get).toList
+  }
   override def update(row: ProductmodelillustrationRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
       case Some(`row`) => false

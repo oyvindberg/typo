@@ -26,6 +26,7 @@ trait PersonphoneRepo {
   def select: SelectBuilder[PersonphoneFields, PersonphoneRow]
   def selectAll: ZStream[ZConnection, Throwable, PersonphoneRow]
   def selectById(compositeId: PersonphoneId): ZIO[ZConnection, Throwable, Option[PersonphoneRow]]
+  def selectByIds(compositeIds: Array[PersonphoneId]): ZStream[ZConnection, Throwable, PersonphoneRow]
   def update(row: PersonphoneRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[PersonphoneFields, PersonphoneRow]
   def upsert(unsaved: PersonphoneRow): ZIO[ZConnection, Throwable, UpdateResult[PersonphoneRow]]

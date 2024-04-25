@@ -76,6 +76,16 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def selectById(compositeId: CountryregioncurrencyId): ConnectionIO[Option[CountryregioncurrencyRow]] = {
     sql"""select "countryregioncode", "currencycode", "modifieddate"::text from sales.countryregioncurrency where "countryregioncode" = ${fromWrite(compositeId.countryregioncode)(Write.fromPut(CountryregionId.put))} AND "currencycode" = ${fromWrite(compositeId.currencycode)(Write.fromPut(CurrencyId.put))}""".query(using CountryregioncurrencyRow.read).option
   }
+  override def selectByIds(compositeIds: Array[CountryregioncurrencyId]): Stream[ConnectionIO, CountryregioncurrencyRow] = {
+    val countryregioncode = compositeIds.map(_.countryregioncode)
+    val currencycode = compositeIds.map(_.currencycode)
+    sql"""select "countryregioncode", "currencycode", "modifieddate"::text
+          from sales.countryregioncurrency
+          where ("countryregioncode", "currencycode") 
+          in (select unnest(${countryregioncode}), unnest(${currencycode}))
+       """.query(using CountryregioncurrencyRow.read).stream
+    
+  }
   override def update(row: CountryregioncurrencyRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.countryregioncurrency

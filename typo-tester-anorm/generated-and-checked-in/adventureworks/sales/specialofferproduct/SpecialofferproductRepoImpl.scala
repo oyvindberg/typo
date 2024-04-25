@@ -90,6 +90,16 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
           where "specialofferid" = ${ParameterValue(compositeId.specialofferid, null, SpecialofferId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)}
        """.as(SpecialofferproductRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[SpecialofferproductId])(implicit c: Connection): List[SpecialofferproductRow] = {
+    val specialofferid = compositeIds.map(_.specialofferid)
+    val productid = compositeIds.map(_.productid)
+    SQL"""select "specialofferid", "productid", "rowguid", "modifieddate"::text
+          from sales.specialofferproduct
+          where ("specialofferid", "productid") 
+          in (select unnest(${specialofferid}), unnest(${productid}))
+       """.as(SpecialofferproductRow.rowParser(1).*)
+    
+  }
   override def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.specialofferproduct

@@ -95,6 +95,16 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "emailaddressid" = ${ParameterValue(compositeId.emailaddressid, null, ToStatement.intToStatement)}
        """.as(EmailaddressRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[EmailaddressId])(implicit c: Connection): List[EmailaddressRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val emailaddressid = compositeIds.map(_.emailaddressid)
+    SQL"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
+          from person.emailaddress
+          where ("businessentityid", "emailaddressid") 
+          in (select unnest(${businessentityid}), unnest(${emailaddressid}))
+       """.as(EmailaddressRow.rowParser(1).*)
+    
+  }
   override def update(row: EmailaddressRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update person.emailaddress

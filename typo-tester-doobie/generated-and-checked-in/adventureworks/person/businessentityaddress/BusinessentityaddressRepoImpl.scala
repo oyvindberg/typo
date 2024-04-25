@@ -83,6 +83,17 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def selectById(compositeId: BusinessentityaddressId): ConnectionIO[Option[BusinessentityaddressRow]] = {
     sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from person.businessentityaddress where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "addressid" = ${fromWrite(compositeId.addressid)(Write.fromPut(AddressId.put))} AND "addresstypeid" = ${fromWrite(compositeId.addresstypeid)(Write.fromPut(AddresstypeId.put))}""".query(using BusinessentityaddressRow.read).option
   }
+  override def selectByIds(compositeIds: Array[BusinessentityaddressId]): Stream[ConnectionIO, BusinessentityaddressRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val addressid = compositeIds.map(_.addressid)
+    val addresstypeid = compositeIds.map(_.addresstypeid)
+    sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
+          from person.businessentityaddress
+          where ("businessentityid", "addressid", "addresstypeid") 
+          in (select unnest(${businessentityid}), unnest(${addressid}), unnest(${addresstypeid}))
+       """.query(using BusinessentityaddressRow.read).stream
+    
+  }
   override def update(row: BusinessentityaddressRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update person.businessentityaddress

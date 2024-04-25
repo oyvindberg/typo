@@ -248,13 +248,29 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         val sql = SQL(code"""select $joinedColNames from $relName where ${matchId(id)}""")
         code"""$sql.query(using ${lookupJdbcDecoder(rowType)}).selectOne"""
 
-      case RepoMethod.SelectAllByIds(relName, cols, unaryId, idsParam, rowType) =>
+      case RepoMethod.SelectAllByIds(relName, cols, computedId, idsParam, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
+        computedId match {
+          case x: IdComputed.Composite =>
+            val vals = x.cols.map(col => code"val ${col.name} = ${idsParam.name}.map(_.${col.name})").mkCode("\n")
+            val sql = SQL {
+              code"""|select ${dbNames(cols, isRead = true)}
+                     |from $relName
+                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")})
+                     |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, col.tpe, forbidInline = true)})").mkCode(", ")})
+                     |""".stripMargin
+            }
+            code"""|$vals
+                   |$sql.query(using ${lookupJdbcDecoder(rowType)}).selectStream()
+                   |""".stripMargin
 
-        val sql = SQL(
-          code"""select $joinedColNames from $relName where ${unaryId.col.dbName} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe)})"""
-        )
-        code"""$sql.query(using ${lookupJdbcDecoder(rowType)}).selectStream()"""
+          case unaryId: IdComputed.Unary =>
+            val sql = SQL(
+              code"""select $joinedColNames from $relName where ${unaryId.col.dbName} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe)})"""
+            )
+            code"""$sql.query(using ${lookupJdbcDecoder(rowType)}).selectStream()"""
+        }
+
       case RepoMethod.SelectByUnique(relName, keyColumns, allCols, rowType) =>
         val sql = SQL {
           code"""|select ${dbNames(allCols, isRead = true)}

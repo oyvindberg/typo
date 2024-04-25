@@ -20,6 +20,7 @@ trait FlaffRepo {
   def select: SelectBuilder[FlaffFields, FlaffRow]
   def selectAll(implicit c: Connection): List[FlaffRow]
   def selectById(compositeId: FlaffId)(implicit c: Connection): Option[FlaffRow]
+  def selectByIds(compositeIds: Array[FlaffId])(implicit c: Connection): List[FlaffRow]
   def update(row: FlaffRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[FlaffFields, FlaffRow]
   def upsert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow

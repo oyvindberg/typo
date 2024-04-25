@@ -85,6 +85,16 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           where "countryregioncode" = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND "currencycode" = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}
        """.as(CountryregioncurrencyRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): List[CountryregioncurrencyRow] = {
+    val countryregioncode = compositeIds.map(_.countryregioncode)
+    val currencycode = compositeIds.map(_.currencycode)
+    SQL"""select "countryregioncode", "currencycode", "modifieddate"::text
+          from sales.countryregioncurrency
+          where ("countryregioncode", "currencycode") 
+          in (select unnest(${countryregioncode}), unnest(${currencycode}))
+       """.as(CountryregioncurrencyRow.rowParser(1).*)
+    
+  }
   override def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.countryregioncurrency

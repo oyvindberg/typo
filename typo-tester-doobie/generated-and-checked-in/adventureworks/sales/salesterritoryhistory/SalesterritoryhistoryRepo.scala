@@ -24,6 +24,7 @@ trait SalesterritoryhistoryRepo {
   def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def selectAll: Stream[ConnectionIO, SalesterritoryhistoryRow]
   def selectById(compositeId: SalesterritoryhistoryId): ConnectionIO[Option[SalesterritoryhistoryRow]]
+  def selectByIds(compositeIds: Array[SalesterritoryhistoryId]): Stream[ConnectionIO, SalesterritoryhistoryRow]
   def update(row: SalesterritoryhistoryRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def upsert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow]

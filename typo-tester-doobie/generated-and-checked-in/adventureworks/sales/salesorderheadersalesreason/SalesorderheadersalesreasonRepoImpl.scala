@@ -76,6 +76,16 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
   override def selectById(compositeId: SalesorderheadersalesreasonId): ConnectionIO[Option[SalesorderheadersalesreasonRow]] = {
     sql"""select "salesorderid", "salesreasonid", "modifieddate"::text from sales.salesorderheadersalesreason where "salesorderid" = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND "salesreasonid" = ${fromWrite(compositeId.salesreasonid)(Write.fromPut(SalesreasonId.put))}""".query(using SalesorderheadersalesreasonRow.read).option
   }
+  override def selectByIds(compositeIds: Array[SalesorderheadersalesreasonId]): Stream[ConnectionIO, SalesorderheadersalesreasonRow] = {
+    val salesorderid = compositeIds.map(_.salesorderid)
+    val salesreasonid = compositeIds.map(_.salesreasonid)
+    sql"""select "salesorderid", "salesreasonid", "modifieddate"::text
+          from sales.salesorderheadersalesreason
+          where ("salesorderid", "salesreasonid") 
+          in (select unnest(${salesorderid}), unnest(${salesreasonid}))
+       """.query(using SalesorderheadersalesreasonRow.read).stream
+    
+  }
   override def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.salesorderheadersalesreason

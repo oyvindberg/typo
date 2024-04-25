@@ -85,6 +85,16 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
   override def selectById(compositeId: ProductvendorId): ZIO[ZConnection, Throwable, Option[ProductvendorRow]] = {
     sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)}""".query(using ProductvendorRow.jdbcDecoder).selectOne
   }
+  override def selectByIds(compositeIds: Array[ProductvendorId]): ZStream[ZConnection, Throwable, ProductvendorRow] = {
+    val productid = compositeIds.map(_.productid)
+    val businessentityid = compositeIds.map(_.businessentityid)
+    sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
+          from purchasing.productvendor
+          where ("productid", "businessentityid")
+          in (select unnest(${productid}), unnest(${businessentityid}))
+       """.query(using ProductvendorRow.jdbcDecoder).selectStream()
+    
+  }
   override def update(row: ProductvendorRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update purchasing.productvendor

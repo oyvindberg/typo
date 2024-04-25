@@ -79,6 +79,16 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def selectById(compositeId: EmployeepayhistoryId): ConnectionIO[Option[EmployeepayhistoryRow]] = {
     sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text from humanresources.employeepayhistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "ratechangedate" = ${fromWrite(compositeId.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}""".query(using EmployeepayhistoryRow.read).option
   }
+  override def selectByIds(compositeIds: Array[EmployeepayhistoryId]): Stream[ConnectionIO, EmployeepayhistoryRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val ratechangedate = compositeIds.map(_.ratechangedate)
+    sql"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
+          from humanresources.employeepayhistory
+          where ("businessentityid", "ratechangedate") 
+          in (select unnest(${businessentityid}), unnest(${ratechangedate}))
+       """.query(using EmployeepayhistoryRow.read).stream
+    
+  }
   override def update(row: EmployeepayhistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update humanresources.employeepayhistory

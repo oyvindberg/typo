@@ -78,6 +78,16 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def selectById(compositeId: ProductcosthistoryId): ConnectionIO[Option[ProductcosthistoryRow]] = {
     sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".query(using ProductcosthistoryRow.read).option
   }
+  override def selectByIds(compositeIds: Array[ProductcosthistoryId]): Stream[ConnectionIO, ProductcosthistoryRow] = {
+    val productid = compositeIds.map(_.productid)
+    val startdate = compositeIds.map(_.startdate)
+    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
+          from production.productcosthistory
+          where ("productid", "startdate") 
+          in (select unnest(${productid}), unnest(${startdate}))
+       """.query(using ProductcosthistoryRow.read).stream
+    
+  }
   override def update(row: ProductcosthistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productcosthistory

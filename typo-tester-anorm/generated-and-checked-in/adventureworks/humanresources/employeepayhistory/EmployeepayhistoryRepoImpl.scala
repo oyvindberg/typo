@@ -88,6 +88,16 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "ratechangedate" = ${ParameterValue(compositeId.ratechangedate, null, TypoLocalDateTime.toStatement)}
        """.as(EmployeepayhistoryRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): List[EmployeepayhistoryRow] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val ratechangedate = compositeIds.map(_.ratechangedate)
+    SQL"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
+          from humanresources.employeepayhistory
+          where ("businessentityid", "ratechangedate") 
+          in (select unnest(${businessentityid}), unnest(${ratechangedate}))
+       """.as(EmployeepayhistoryRow.rowParser(1).*)
+    
+  }
   override def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update humanresources.employeepayhistory

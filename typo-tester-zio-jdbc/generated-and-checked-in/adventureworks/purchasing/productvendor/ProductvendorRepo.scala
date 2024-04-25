@@ -26,6 +26,7 @@ trait ProductvendorRepo {
   def select: SelectBuilder[ProductvendorFields, ProductvendorRow]
   def selectAll: ZStream[ZConnection, Throwable, ProductvendorRow]
   def selectById(compositeId: ProductvendorId): ZIO[ZConnection, Throwable, Option[ProductvendorRow]]
+  def selectByIds(compositeIds: Array[ProductvendorId]): ZStream[ZConnection, Throwable, ProductvendorRow]
   def update(row: ProductvendorRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[ProductvendorFields, ProductvendorRow]
   def upsert(unsaved: ProductvendorRow): ZIO[ZConnection, Throwable, UpdateResult[ProductvendorRow]]

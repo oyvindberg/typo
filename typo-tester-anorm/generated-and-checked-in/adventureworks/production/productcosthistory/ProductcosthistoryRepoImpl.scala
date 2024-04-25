@@ -87,6 +87,16 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}
        """.as(ProductcosthistoryRow.rowParser(1).singleOpt)
   }
+  override def selectByIds(compositeIds: Array[ProductcosthistoryId])(implicit c: Connection): List[ProductcosthistoryRow] = {
+    val productid = compositeIds.map(_.productid)
+    val startdate = compositeIds.map(_.startdate)
+    SQL"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
+          from production.productcosthistory
+          where ("productid", "startdate") 
+          in (select unnest(${productid}), unnest(${startdate}))
+       """.as(ProductcosthistoryRow.rowParser(1).*)
+    
+  }
   override def update(row: ProductcosthistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productcosthistory

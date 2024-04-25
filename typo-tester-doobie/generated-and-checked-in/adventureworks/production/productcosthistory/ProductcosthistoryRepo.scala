@@ -24,6 +24,7 @@ trait ProductcosthistoryRepo {
   def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def selectAll: Stream[ConnectionIO, ProductcosthistoryRow]
   def selectById(compositeId: ProductcosthistoryId): ConnectionIO[Option[ProductcosthistoryRow]]
+  def selectByIds(compositeIds: Array[ProductcosthistoryId]): Stream[ConnectionIO, ProductcosthistoryRow]
   def update(row: ProductcosthistoryRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def upsert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow]

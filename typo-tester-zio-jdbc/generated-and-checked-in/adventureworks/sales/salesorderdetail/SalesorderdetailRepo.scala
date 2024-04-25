@@ -26,6 +26,7 @@ trait SalesorderdetailRepo {
   def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def selectAll: ZStream[ZConnection, Throwable, SalesorderdetailRow]
   def selectById(compositeId: SalesorderdetailId): ZIO[ZConnection, Throwable, Option[SalesorderdetailRow]]
+  def selectByIds(compositeIds: Array[SalesorderdetailId]): ZStream[ZConnection, Throwable, SalesorderdetailRow]
   def update(row: SalesorderdetailRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def upsert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderdetailRow]]

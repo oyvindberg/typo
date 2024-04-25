@@ -80,6 +80,16 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def selectById(compositeId: SpecialofferproductId): ZIO[ZConnection, Throwable, Option[SpecialofferproductRow]] = {
     sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text from sales.specialofferproduct where "specialofferid" = ${Segment.paramSegment(compositeId.specialofferid)(SpecialofferId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)}""".query(using SpecialofferproductRow.jdbcDecoder).selectOne
   }
+  override def selectByIds(compositeIds: Array[SpecialofferproductId]): ZStream[ZConnection, Throwable, SpecialofferproductRow] = {
+    val specialofferid = compositeIds.map(_.specialofferid)
+    val productid = compositeIds.map(_.productid)
+    sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text
+          from sales.specialofferproduct
+          where ("specialofferid", "productid")
+          in (select unnest(${specialofferid}), unnest(${productid}))
+       """.query(using SpecialofferproductRow.jdbcDecoder).selectStream()
+    
+  }
   override def update(row: SpecialofferproductRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.specialofferproduct

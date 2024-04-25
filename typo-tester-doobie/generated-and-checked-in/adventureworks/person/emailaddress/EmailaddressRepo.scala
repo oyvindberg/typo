@@ -24,6 +24,7 @@ trait EmailaddressRepo {
   def select: SelectBuilder[EmailaddressFields, EmailaddressRow]
   def selectAll: Stream[ConnectionIO, EmailaddressRow]
   def selectById(compositeId: EmailaddressId): ConnectionIO[Option[EmailaddressRow]]
+  def selectByIds(compositeIds: Array[EmailaddressId]): Stream[ConnectionIO, EmailaddressRow]
   def update(row: EmailaddressRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[EmailaddressFields, EmailaddressRow]
   def upsert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow]
