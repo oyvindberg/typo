@@ -45,6 +45,8 @@ case class EmployeedepartmenthistoryRow(
  }
 
 object EmployeedepartmenthistoryRow {
+  def apply(compositeId: EmployeedepartmenthistoryId, enddate: Option[TypoLocalDate], modifieddate: TypoLocalDateTime) =
+    new EmployeedepartmenthistoryRow(compositeId.businessentityid, compositeId.departmentid, compositeId.shiftid, compositeId.startdate, enddate, modifieddate)
   implicit lazy val decoder: Decoder[EmployeedepartmenthistoryRow] = Decoder.forProduct6[EmployeedepartmenthistoryRow, BusinessentityId, DepartmentId, ShiftId, TypoLocalDate, Option[TypoLocalDate], TypoLocalDateTime]("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(EmployeedepartmenthistoryRow.apply)(BusinessentityId.decoder, DepartmentId.decoder, ShiftId.decoder, TypoLocalDate.decoder, Decoder.decodeOption(TypoLocalDate.decoder), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[EmployeedepartmenthistoryRow] = Encoder.forProduct6[EmployeedepartmenthistoryRow, BusinessentityId, DepartmentId, ShiftId, TypoLocalDate, Option[TypoLocalDate], TypoLocalDateTime]("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(x => (x.businessentityid, x.departmentid, x.shiftid, x.startdate, x.enddate, x.modifieddate))(BusinessentityId.encoder, DepartmentId.encoder, ShiftId.encoder, TypoLocalDate.encoder, Encoder.encodeOption(TypoLocalDate.encoder), TypoLocalDateTime.encoder)
   implicit lazy val read: Read[EmployeedepartmenthistoryRow] = new Read[EmployeedepartmenthistoryRow](

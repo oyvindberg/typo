@@ -33,6 +33,8 @@ case class FlaffRow(
  }
 
 object FlaffRow {
+  def apply(compositeId: FlaffId, parentspecifier: Option[ShortText]) =
+    new FlaffRow(compositeId.code, compositeId.anotherCode, compositeId.someNumber, compositeId.specifier, parentspecifier)
   implicit lazy val decoder: Decoder[FlaffRow] = Decoder.forProduct5[FlaffRow, ShortText, /* max 20 chars */ String, Int, ShortText, Option[ShortText]]("code", "another_code", "some_number", "specifier", "parentspecifier")(FlaffRow.apply)(ShortText.decoder, Decoder.decodeString, Decoder.decodeInt, ShortText.decoder, Decoder.decodeOption(ShortText.decoder))
   implicit lazy val encoder: Encoder[FlaffRow] = Encoder.forProduct5[FlaffRow, ShortText, /* max 20 chars */ String, Int, ShortText, Option[ShortText]]("code", "another_code", "some_number", "specifier", "parentspecifier")(x => (x.code, x.anotherCode, x.someNumber, x.specifier, x.parentspecifier))(ShortText.encoder, Encoder.encodeString, Encoder.encodeInt, ShortText.encoder, Encoder.encodeOption(ShortText.encoder))
   implicit lazy val read: Read[FlaffRow] = new Read[FlaffRow](

@@ -45,6 +45,8 @@ case class ProductlistpricehistoryRow(
  }
 
 object ProductlistpricehistoryRow {
+  def apply(compositeId: ProductlistpricehistoryId, enddate: Option[TypoLocalDateTime], listprice: BigDecimal, modifieddate: TypoLocalDateTime) =
+    new ProductlistpricehistoryRow(compositeId.productid, compositeId.startdate, enddate, listprice, modifieddate)
   implicit lazy val reads: Reads[ProductlistpricehistoryRow] = Reads[ProductlistpricehistoryRow](json => JsResult.fromTry(
       Try(
         ProductlistpricehistoryRow(

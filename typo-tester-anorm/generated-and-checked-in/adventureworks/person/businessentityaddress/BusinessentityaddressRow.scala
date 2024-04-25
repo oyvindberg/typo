@@ -45,6 +45,8 @@ case class BusinessentityaddressRow(
  }
 
 object BusinessentityaddressRow {
+  def apply(compositeId: BusinessentityaddressId, rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
+    new BusinessentityaddressRow(compositeId.businessentityid, compositeId.addressid, compositeId.addresstypeid, rowguid, modifieddate)
   implicit lazy val reads: Reads[BusinessentityaddressRow] = Reads[BusinessentityaddressRow](json => JsResult.fromTry(
       Try(
         BusinessentityaddressRow(

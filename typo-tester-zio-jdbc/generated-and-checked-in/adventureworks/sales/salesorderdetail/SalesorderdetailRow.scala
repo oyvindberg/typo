@@ -58,6 +58,8 @@ case class SalesorderdetailRow(
  }
 
 object SalesorderdetailRow {
+  def apply(compositeId: SalesorderdetailId, carriertrackingnumber: Option[/* max 25 chars */ String], orderqty: TypoShort, productid: ProductId, specialofferid: SpecialofferId, unitprice: BigDecimal, unitpricediscount: BigDecimal, rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
+    new SalesorderdetailRow(compositeId.salesorderid, compositeId.salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)
   implicit lazy val jdbcDecoder: JdbcDecoder[SalesorderdetailRow] = new JdbcDecoder[SalesorderdetailRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, SalesorderdetailRow) =
       columIndex + 9 ->

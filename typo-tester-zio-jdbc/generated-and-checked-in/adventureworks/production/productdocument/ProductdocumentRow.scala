@@ -36,6 +36,8 @@ case class ProductdocumentRow(
  }
 
 object ProductdocumentRow {
+  def apply(compositeId: ProductdocumentId, modifieddate: TypoLocalDateTime) =
+    new ProductdocumentRow(compositeId.productid, modifieddate, compositeId.documentnode)
   implicit lazy val jdbcDecoder: JdbcDecoder[ProductdocumentRow] = new JdbcDecoder[ProductdocumentRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, ProductdocumentRow) =
       columIndex + 2 ->

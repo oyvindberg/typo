@@ -52,6 +52,8 @@ case class ProductinventoryRow(
  }
 
 object ProductinventoryRow {
+  def apply(compositeId: ProductinventoryId, shelf: /* max 10 chars */ String, bin: TypoShort, quantity: TypoShort, rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
+    new ProductinventoryRow(compositeId.productid, compositeId.locationid, shelf, bin, quantity, rowguid, modifieddate)
   implicit lazy val reads: Reads[ProductinventoryRow] = Reads[ProductinventoryRow](json => JsResult.fromTry(
       Try(
         ProductinventoryRow(

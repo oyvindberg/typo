@@ -42,6 +42,8 @@ case class BusinessentityaddressRow(
  }
 
 object BusinessentityaddressRow {
+  def apply(compositeId: BusinessentityaddressId, rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
+    new BusinessentityaddressRow(compositeId.businessentityid, compositeId.addressid, compositeId.addresstypeid, rowguid, modifieddate)
   implicit lazy val jdbcDecoder: JdbcDecoder[BusinessentityaddressRow] = new JdbcDecoder[BusinessentityaddressRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, BusinessentityaddressRow) =
       columIndex + 4 ->

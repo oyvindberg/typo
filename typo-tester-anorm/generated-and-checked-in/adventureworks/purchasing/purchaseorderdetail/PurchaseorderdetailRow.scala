@@ -58,6 +58,8 @@ case class PurchaseorderdetailRow(
  }
 
 object PurchaseorderdetailRow {
+  def apply(compositeId: PurchaseorderdetailId, duedate: TypoLocalDateTime, orderqty: TypoShort, productid: ProductId, unitprice: BigDecimal, receivedqty: BigDecimal, rejectedqty: BigDecimal, modifieddate: TypoLocalDateTime) =
+    new PurchaseorderdetailRow(compositeId.purchaseorderid, compositeId.purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
   implicit lazy val reads: Reads[PurchaseorderdetailRow] = Reads[PurchaseorderdetailRow](json => JsResult.fromTry(
       Try(
         PurchaseorderdetailRow(

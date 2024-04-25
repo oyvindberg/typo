@@ -40,6 +40,8 @@ case class BusinessentitycontactRow(
  }
 
 object BusinessentitycontactRow {
+  def apply(compositeId: BusinessentitycontactId, rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
+    new BusinessentitycontactRow(compositeId.businessentityid, compositeId.personid, compositeId.contacttypeid, rowguid, modifieddate)
   implicit lazy val decoder: Decoder[BusinessentitycontactRow] = Decoder.forProduct5[BusinessentitycontactRow, BusinessentityId, BusinessentityId, ContacttypeId, TypoUUID, TypoLocalDateTime]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(BusinessentitycontactRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, ContacttypeId.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[BusinessentitycontactRow] = Encoder.forProduct5[BusinessentitycontactRow, BusinessentityId, BusinessentityId, ContacttypeId, TypoUUID, TypoLocalDateTime]("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.personid, x.contacttypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, ContacttypeId.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[BusinessentitycontactRow] = new Read[BusinessentitycontactRow](

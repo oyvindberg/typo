@@ -34,6 +34,8 @@ case class PersoncreditcardRow(
  }
 
 object PersoncreditcardRow {
+  def apply(compositeId: PersoncreditcardId, modifieddate: TypoLocalDateTime) =
+    new PersoncreditcardRow(compositeId.businessentityid, compositeId.creditcardid, modifieddate)
   implicit lazy val decoder: Decoder[PersoncreditcardRow] = Decoder.forProduct3[PersoncreditcardRow, BusinessentityId, /* user-picked */ CustomCreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(PersoncreditcardRow.apply)(BusinessentityId.decoder, CustomCreditcardId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PersoncreditcardRow] = Encoder.forProduct3[PersoncreditcardRow, BusinessentityId, /* user-picked */ CustomCreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(x => (x.businessentityid, x.creditcardid, x.modifieddate))(BusinessentityId.encoder, CustomCreditcardId.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[PersoncreditcardRow] = new Read[PersoncreditcardRow](

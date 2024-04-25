@@ -44,6 +44,8 @@ case class EmailaddressRow(
  }
 
 object EmailaddressRow {
+  def apply(compositeId: EmailaddressId, emailaddress: Option[/* max 50 chars */ String], rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
+    new EmailaddressRow(compositeId.businessentityid, compositeId.emailaddressid, emailaddress, rowguid, modifieddate)
   implicit lazy val reads: Reads[EmailaddressRow] = Reads[EmailaddressRow](json => JsResult.fromTry(
       Try(
         EmailaddressRow(

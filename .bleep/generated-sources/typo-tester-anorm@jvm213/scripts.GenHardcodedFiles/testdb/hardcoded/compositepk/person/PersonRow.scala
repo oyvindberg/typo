@@ -34,6 +34,8 @@ case class PersonRow(
  }
 
 object PersonRow {
+  def apply(compositeId: PersonId, name: Option[String]) =
+    new PersonRow(compositeId.one, compositeId.two, name)
   implicit lazy val reads: Reads[PersonRow] = Reads[PersonRow](json => JsResult.fromTry(
       Try(
         PersonRow(

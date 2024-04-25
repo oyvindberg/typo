@@ -40,6 +40,8 @@ case class ProductcosthistoryRow(
  }
 
 object ProductcosthistoryRow {
+  def apply(compositeId: ProductcosthistoryId, enddate: Option[TypoLocalDateTime], standardcost: BigDecimal, modifieddate: TypoLocalDateTime) =
+    new ProductcosthistoryRow(compositeId.productid, compositeId.startdate, enddate, standardcost, modifieddate)
   implicit lazy val decoder: Decoder[ProductcosthistoryRow] = Decoder.forProduct5[ProductcosthistoryRow, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, TypoLocalDateTime]("productid", "startdate", "enddate", "standardcost", "modifieddate")(ProductcosthistoryRow.apply)(ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ProductcosthistoryRow] = Encoder.forProduct5[ProductcosthistoryRow, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, TypoLocalDateTime]("productid", "startdate", "enddate", "standardcost", "modifieddate")(x => (x.productid, x.startdate, x.enddate, x.standardcost, x.modifieddate))(ProductId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[ProductcosthistoryRow] = new Read[ProductcosthistoryRow](

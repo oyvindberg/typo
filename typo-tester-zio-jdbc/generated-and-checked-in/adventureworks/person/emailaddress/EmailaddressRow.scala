@@ -39,6 +39,8 @@ case class EmailaddressRow(
  }
 
 object EmailaddressRow {
+  def apply(compositeId: EmailaddressId, emailaddress: Option[/* max 50 chars */ String], rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
+    new EmailaddressRow(compositeId.businessentityid, compositeId.emailaddressid, emailaddress, rowguid, modifieddate)
   implicit lazy val jdbcDecoder: JdbcDecoder[EmailaddressRow] = new JdbcDecoder[EmailaddressRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, EmailaddressRow) =
       columIndex + 4 ->

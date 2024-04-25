@@ -35,6 +35,8 @@ case class PersoncreditcardRow(
  }
 
 object PersoncreditcardRow {
+  def apply(compositeId: PersoncreditcardId, modifieddate: TypoLocalDateTime) =
+    new PersoncreditcardRow(compositeId.businessentityid, compositeId.creditcardid, modifieddate)
   implicit lazy val jdbcDecoder: JdbcDecoder[PersoncreditcardRow] = new JdbcDecoder[PersoncreditcardRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, PersoncreditcardRow) =
       columIndex + 2 ->

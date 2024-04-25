@@ -38,6 +38,8 @@ case class ProductproductphotoRow(
  }
 
 object ProductproductphotoRow {
+  def apply(compositeId: ProductproductphotoId, primary: Flag, modifieddate: TypoLocalDateTime) =
+    new ProductproductphotoRow(compositeId.productid, compositeId.productphotoid, primary, modifieddate)
   implicit lazy val decoder: Decoder[ProductproductphotoRow] = Decoder.forProduct4[ProductproductphotoRow, ProductId, ProductphotoId, Flag, TypoLocalDateTime]("productid", "productphotoid", "primary", "modifieddate")(ProductproductphotoRow.apply)(ProductId.decoder, ProductphotoId.decoder, Flag.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ProductproductphotoRow] = Encoder.forProduct4[ProductproductphotoRow, ProductId, ProductphotoId, Flag, TypoLocalDateTime]("productid", "productphotoid", "primary", "modifieddate")(x => (x.productid, x.productphotoid, x.primary, x.modifieddate))(ProductId.encoder, ProductphotoId.encoder, Flag.encoder, TypoLocalDateTime.encoder)
   implicit lazy val read: Read[ProductproductphotoRow] = new Read[ProductproductphotoRow](

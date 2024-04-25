@@ -38,6 +38,8 @@ case class ProductmodelillustrationRow(
  }
 
 object ProductmodelillustrationRow {
+  def apply(compositeId: ProductmodelillustrationId, modifieddate: TypoLocalDateTime) =
+    new ProductmodelillustrationRow(compositeId.productmodelid, compositeId.illustrationid, modifieddate)
   implicit lazy val reads: Reads[ProductmodelillustrationRow] = Reads[ProductmodelillustrationRow](json => JsResult.fromTry(
       Try(
         ProductmodelillustrationRow(

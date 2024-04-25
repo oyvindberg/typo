@@ -46,6 +46,8 @@ case class EmployeedepartmenthistoryRow(
  }
 
 object EmployeedepartmenthistoryRow {
+  def apply(compositeId: EmployeedepartmenthistoryId, enddate: Option[TypoLocalDate], modifieddate: TypoLocalDateTime) =
+    new EmployeedepartmenthistoryRow(compositeId.businessentityid, compositeId.departmentid, compositeId.shiftid, compositeId.startdate, enddate, modifieddate)
   implicit lazy val jdbcDecoder: JdbcDecoder[EmployeedepartmenthistoryRow] = new JdbcDecoder[EmployeedepartmenthistoryRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, EmployeedepartmenthistoryRow) =
       columIndex + 5 ->

@@ -29,6 +29,8 @@ case class PersonRow(
  }
 
 object PersonRow {
+  def apply(compositeId: PersonId, name: Option[String]) =
+    new PersonRow(compositeId.one, compositeId.two, name)
   implicit lazy val jdbcDecoder: JdbcDecoder[PersonRow] = new JdbcDecoder[PersonRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, PersonRow) =
       columIndex + 2 ->

@@ -49,6 +49,8 @@ case class SalesterritoryhistoryRow(
  }
 
 object SalesterritoryhistoryRow {
+  def apply(compositeId: SalesterritoryhistoryId, enddate: Option[TypoLocalDateTime], rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
+    new SalesterritoryhistoryRow(compositeId.businessentityid, compositeId.territoryid, compositeId.startdate, enddate, rowguid, modifieddate)
   implicit lazy val reads: Reads[SalesterritoryhistoryRow] = Reads[SalesterritoryhistoryRow](json => JsResult.fromTry(
       Try(
         SalesterritoryhistoryRow(

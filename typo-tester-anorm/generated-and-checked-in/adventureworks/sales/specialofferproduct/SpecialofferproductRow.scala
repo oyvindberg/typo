@@ -41,6 +41,8 @@ case class SpecialofferproductRow(
  }
 
 object SpecialofferproductRow {
+  def apply(compositeId: SpecialofferproductId, rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
+    new SpecialofferproductRow(compositeId.specialofferid, compositeId.productid, rowguid, modifieddate)
   implicit lazy val reads: Reads[SpecialofferproductRow] = Reads[SpecialofferproductRow](json => JsResult.fromTry(
       Try(
         SpecialofferproductRow(

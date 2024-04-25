@@ -33,6 +33,8 @@ case class FlaffRow(
  }
 
 object FlaffRow {
+  def apply(compositeId: FlaffId, parentspecifier: Option[ShortText]) =
+    new FlaffRow(compositeId.code, compositeId.anotherCode, compositeId.someNumber, compositeId.specifier, parentspecifier)
   implicit lazy val jdbcDecoder: JdbcDecoder[FlaffRow] = new JdbcDecoder[FlaffRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, FlaffRow) =
       columIndex + 4 ->

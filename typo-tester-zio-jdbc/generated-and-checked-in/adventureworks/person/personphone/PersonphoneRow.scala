@@ -38,6 +38,8 @@ case class PersonphoneRow(
  }
 
 object PersonphoneRow {
+  def apply(compositeId: PersonphoneId, modifieddate: TypoLocalDateTime) =
+    new PersonphoneRow(compositeId.businessentityid, compositeId.phonenumber, compositeId.phonenumbertypeid, modifieddate)
   implicit lazy val jdbcDecoder: JdbcDecoder[PersonphoneRow] = new JdbcDecoder[PersonphoneRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, PersonphoneRow) =
       columIndex + 3 ->

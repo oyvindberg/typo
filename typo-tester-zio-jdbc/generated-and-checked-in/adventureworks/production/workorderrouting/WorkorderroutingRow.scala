@@ -61,6 +61,8 @@ case class WorkorderroutingRow(
  }
 
 object WorkorderroutingRow {
+  def apply(compositeId: WorkorderroutingId, locationid: LocationId, scheduledstartdate: TypoLocalDateTime, scheduledenddate: TypoLocalDateTime, actualstartdate: Option[TypoLocalDateTime], actualenddate: Option[TypoLocalDateTime], actualresourcehrs: Option[BigDecimal], plannedcost: BigDecimal, actualcost: Option[BigDecimal], modifieddate: TypoLocalDateTime) =
+    new WorkorderroutingRow(compositeId.workorderid, compositeId.productid, compositeId.operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)
   implicit lazy val jdbcDecoder: JdbcDecoder[WorkorderroutingRow] = new JdbcDecoder[WorkorderroutingRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, WorkorderroutingRow) =
       columIndex + 11 ->

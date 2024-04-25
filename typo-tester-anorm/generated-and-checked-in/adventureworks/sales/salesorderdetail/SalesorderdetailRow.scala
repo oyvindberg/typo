@@ -63,6 +63,8 @@ case class SalesorderdetailRow(
  }
 
 object SalesorderdetailRow {
+  def apply(compositeId: SalesorderdetailId, carriertrackingnumber: Option[/* max 25 chars */ String], orderqty: TypoShort, productid: ProductId, specialofferid: SpecialofferId, unitprice: BigDecimal, unitpricediscount: BigDecimal, rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
+    new SalesorderdetailRow(compositeId.salesorderid, compositeId.salesorderdetailid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, unitpricediscount, rowguid, modifieddate)
   implicit lazy val reads: Reads[SalesorderdetailRow] = Reads[SalesorderdetailRow](json => JsResult.fromTry(
       Try(
         SalesorderdetailRow(

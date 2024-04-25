@@ -41,6 +41,8 @@ case class PersonphoneRow(
  }
 
 object PersonphoneRow {
+  def apply(compositeId: PersonphoneId, modifieddate: TypoLocalDateTime) =
+    new PersonphoneRow(compositeId.businessentityid, compositeId.phonenumber, compositeId.phonenumbertypeid, modifieddate)
   implicit lazy val reads: Reads[PersonphoneRow] = Reads[PersonphoneRow](json => JsResult.fromTry(
       Try(
         PersonphoneRow(

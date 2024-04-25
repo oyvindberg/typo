@@ -38,6 +38,8 @@ case class FlaffRow(
  }
 
 object FlaffRow {
+  def apply(compositeId: FlaffId, parentspecifier: Option[ShortText]) =
+    new FlaffRow(compositeId.code, compositeId.anotherCode, compositeId.someNumber, compositeId.specifier, parentspecifier)
   implicit lazy val reads: Reads[FlaffRow] = Reads[FlaffRow](json => JsResult.fromTry(
       Try(
         FlaffRow(
