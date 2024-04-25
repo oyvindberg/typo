@@ -24,6 +24,9 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
   override def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean = {
     map.remove(currencycode).isDefined
   }
+  override def deleteByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): Int = {
+    currencycodes.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
     DeleteBuilderMock(DeleteParams.empty, CurrencyFields.structure.fields, map)
   }

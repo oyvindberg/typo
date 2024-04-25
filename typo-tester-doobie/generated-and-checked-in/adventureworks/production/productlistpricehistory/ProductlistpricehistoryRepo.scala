@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait ProductlistpricehistoryRepo {
   def delete(compositeId: ProductlistpricehistoryId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[ProductlistpricehistoryId]): ConnectionIO[Int]
   def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def insert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, ProductlistpricehistoryRow], batchSize: Int): ConnectionIO[Long]

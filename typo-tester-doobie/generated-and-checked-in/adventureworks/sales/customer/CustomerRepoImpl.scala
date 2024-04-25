@@ -28,6 +28,9 @@ class CustomerRepoImpl extends CustomerRepo {
   override def delete(customerid: CustomerId): ConnectionIO[Boolean] = {
     sql"""delete from sales.customer where "customerid" = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(customerids: Array[CustomerId]): ConnectionIO[Int] = {
+    sql"""delete from sales.customer where "customerid" = ANY(${customerids})""".update.run
+  }
   override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
     DeleteBuilder("sales.customer", CustomerFields.structure)
   }

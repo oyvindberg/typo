@@ -29,6 +29,9 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete(jobcandidateid: JobcandidateId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from humanresources.jobcandidate where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(jobcandidateids: Array[JobcandidateId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from humanresources.jobcandidate where "jobcandidateid" = ANY(${jobcandidateids})""".delete
+  }
   override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
     DeleteBuilder("humanresources.jobcandidate", JobcandidateFields.structure)
   }

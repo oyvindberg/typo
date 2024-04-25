@@ -29,6 +29,9 @@ class CreditcardRepoImpl extends CreditcardRepo {
   override def delete(creditcardid: /* user-picked */ CustomCreditcardId): ConnectionIO[Boolean] = {
     sql"""delete from sales.creditcard where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit put0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Int] = {
+    sql"""delete from sales.creditcard where "creditcardid" = ANY(${creditcardids})""".update.run
+  }
   override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
     DeleteBuilder("sales.creditcard", CreditcardFields.structure)
   }
@@ -84,7 +87,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
   override def selectById(creditcardid: /* user-picked */ CustomCreditcardId): ConnectionIO[Option[CreditcardRow]] = {
     sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".query(using CreditcardRow.read).option
   }
-  override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit puts: Put[Array[/* user-picked */ CustomCreditcardId]]): Stream[ConnectionIO, CreditcardRow] = {
+  override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): Stream[ConnectionIO, CreditcardRow] = {
     sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ANY(${creditcardids})""".query(using CreditcardRow.read).stream
   }
   override def update(row: CreditcardRow): ConnectionIO[Boolean] = {

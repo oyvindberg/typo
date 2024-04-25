@@ -18,6 +18,7 @@ import zio.stream.ZStream
 
 trait VendorRepo {
   def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[VendorFields, VendorRow]
   def insert(unsaved: VendorRow): ZIO[ZConnection, Throwable, VendorRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, VendorRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

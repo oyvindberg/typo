@@ -29,6 +29,17 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   override def delete(compositeId: BusinessentitycontactId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.businessentitycontact where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "personid" = ${Segment.paramSegment(compositeId.personid)(BusinessentityId.setter)} AND "contacttypeid" = ${Segment.paramSegment(compositeId.contacttypeid)(ContacttypeId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[BusinessentitycontactId]): ZIO[ZConnection, Throwable, Long] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val personid = compositeIds.map(_.personid)
+    val contacttypeid = compositeIds.map(_.contacttypeid)
+    sql"""delete
+          from person.businessentitycontact
+          where ("businessentityid", "personid", "contacttypeid")
+          in (select unnest(${businessentityid}), unnest(${personid}), unnest(${contacttypeid}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
     DeleteBuilder("person.businessentitycontact", BusinessentitycontactFields.structure)
   }

@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait WorkorderroutingRepo {
   def delete(compositeId: WorkorderroutingId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[WorkorderroutingId]): ConnectionIO[Int]
   def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def insert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRow], batchSize: Int): ConnectionIO[Long]

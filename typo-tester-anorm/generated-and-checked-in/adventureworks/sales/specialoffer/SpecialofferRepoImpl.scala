@@ -29,6 +29,13 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
   override def delete(specialofferid: SpecialofferId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.specialoffer where "specialofferid" = ${ParameterValue(specialofferid, null, SpecialofferId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(specialofferids: Array[SpecialofferId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from sales.specialoffer
+          where "specialofferid" = ANY(${specialofferids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
     DeleteBuilder("sales.specialoffer", SpecialofferFields.structure)
   }

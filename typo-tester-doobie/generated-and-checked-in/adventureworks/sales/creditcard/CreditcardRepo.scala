@@ -17,6 +17,7 @@ import typo.dsl.UpdateBuilder
 
 trait CreditcardRepo {
   def delete(creditcardid: /* user-picked */ CustomCreditcardId): ConnectionIO[Boolean]
+  def deleteByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit put0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Int]
   def delete: DeleteBuilder[CreditcardFields, CreditcardRow]
   def insert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, CreditcardRow], batchSize: Int): ConnectionIO[Long]
@@ -26,7 +27,7 @@ trait CreditcardRepo {
   def select: SelectBuilder[CreditcardFields, CreditcardRow]
   def selectAll: Stream[ConnectionIO, CreditcardRow]
   def selectById(creditcardid: /* user-picked */ CustomCreditcardId): ConnectionIO[Option[CreditcardRow]]
-  def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit puts: Put[Array[/* user-picked */ CustomCreditcardId]]): Stream[ConnectionIO, CreditcardRow]
+  def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): Stream[ConnectionIO, CreditcardRow]
   def update(row: CreditcardRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[CreditcardFields, CreditcardRow]
   def upsert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow]

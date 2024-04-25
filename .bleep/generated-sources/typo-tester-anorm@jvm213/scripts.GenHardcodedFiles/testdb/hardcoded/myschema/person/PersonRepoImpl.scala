@@ -32,6 +32,13 @@ class PersonRepoImpl extends PersonRepo {
   override def delete(id: PersonId)(implicit c: Connection): Boolean = {
     SQL"""delete from myschema.person where "id" = ${ParameterValue(id, null, PersonId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(ids: Array[PersonId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from myschema.person
+          where "id" = ANY(${ids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
     DeleteBuilder("myschema.person", PersonFields.structure)
   }

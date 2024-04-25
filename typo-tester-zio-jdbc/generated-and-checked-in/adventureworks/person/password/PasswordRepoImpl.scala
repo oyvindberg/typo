@@ -29,6 +29,9 @@ class PasswordRepoImpl extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.password where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from person.password where "businessentityid" = ANY(${businessentityids})""".delete
+  }
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
     DeleteBuilder("person.password", PasswordFields.structure)
   }

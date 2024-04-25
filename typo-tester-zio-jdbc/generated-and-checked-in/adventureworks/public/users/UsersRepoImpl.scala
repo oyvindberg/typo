@@ -28,6 +28,9 @@ class UsersRepoImpl extends UsersRepo {
   override def delete(userId: UsersId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from public.users where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from public.users where "user_id" = ANY(${userIds})""".delete
+  }
   override def delete: DeleteBuilder[UsersFields, UsersRow] = {
     DeleteBuilder("public.users", UsersFields.structure)
   }

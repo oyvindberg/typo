@@ -29,6 +29,9 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def delete(productsubcategoryid: ProductsubcategoryId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.productsubcategory where "productsubcategoryid" = ${Segment.paramSegment(productsubcategoryid)(ProductsubcategoryId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(productsubcategoryids: Array[ProductsubcategoryId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from production.productsubcategory where "productsubcategoryid" = ANY(${productsubcategoryids})""".delete
+  }
   override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
     DeleteBuilder("production.productsubcategory", ProductsubcategoryFields.structure)
   }

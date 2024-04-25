@@ -29,6 +29,17 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
   override def delete(compositeId: ProductmodelproductdescriptioncultureId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.productmodelproductdescriptionculture where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(ProductmodelId.setter)} AND "productdescriptionid" = ${Segment.paramSegment(compositeId.productdescriptionid)(ProductdescriptionId.setter)} AND "cultureid" = ${Segment.paramSegment(compositeId.cultureid)(CultureId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[ProductmodelproductdescriptioncultureId]): ZIO[ZConnection, Throwable, Long] = {
+    val productmodelid = compositeIds.map(_.productmodelid)
+    val productdescriptionid = compositeIds.map(_.productdescriptionid)
+    val cultureid = compositeIds.map(_.cultureid)
+    sql"""delete
+          from production.productmodelproductdescriptionculture
+          where ("productmodelid", "productdescriptionid", "cultureid")
+          in (select unnest(${productmodelid}), unnest(${productdescriptionid}), unnest(${cultureid}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
     DeleteBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure)
   }

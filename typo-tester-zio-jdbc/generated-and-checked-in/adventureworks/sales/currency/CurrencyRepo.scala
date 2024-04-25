@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait CurrencyRepo {
   def delete(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(currencycodes: Array[CurrencyId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[CurrencyFields, CurrencyRow]
   def insert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, CurrencyRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

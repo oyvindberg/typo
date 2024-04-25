@@ -29,6 +29,16 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
   override def delete(compositeId: ProductvendorId): ConnectionIO[Boolean] = {
     sql"""delete from purchasing.productvendor where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[ProductvendorId]): ConnectionIO[Int] = {
+    val productid = compositeIds.map(_.productid)
+    val businessentityid = compositeIds.map(_.businessentityid)
+    sql"""delete
+          from purchasing.productvendor
+          where ("productid", "businessentityid")
+          in (select unnest(${productid}), unnest(${businessentityid}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
     DeleteBuilder("purchasing.productvendor", ProductvendorFields.structure)
   }

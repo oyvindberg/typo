@@ -30,6 +30,16 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
   override def delete(compositeId: ProductvendorId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from purchasing.productvendor where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[ProductvendorId]): ZIO[ZConnection, Throwable, Long] = {
+    val productid = compositeIds.map(_.productid)
+    val businessentityid = compositeIds.map(_.businessentityid)
+    sql"""delete
+          from purchasing.productvendor
+          where ("productid", "businessentityid")
+          in (select unnest(${productid}), unnest(${businessentityid}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
     DeleteBuilder("purchasing.productvendor", ProductvendorFields.structure)
   }

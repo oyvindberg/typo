@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait UsersRepo {
   def delete(userId: UsersId)(implicit c: Connection): Boolean
+  def deleteByIds(userIds: Array[UsersId])(implicit c: Connection): Int
   def delete: DeleteBuilder[UsersFields, UsersRow]
   def insert(unsaved: UsersRow)(implicit c: Connection): UsersRow
   def insertStreaming(unsaved: Iterator[UsersRow], batchSize: Int)(implicit c: Connection): Long

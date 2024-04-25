@@ -28,6 +28,9 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   override def delete(billofmaterialsid: Int): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(billofmaterialsid).isDefined)
   }
+  override def deleteByIds(billofmaterialsids: Array[Int]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(billofmaterialsids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields.structure.fields, map)
   }

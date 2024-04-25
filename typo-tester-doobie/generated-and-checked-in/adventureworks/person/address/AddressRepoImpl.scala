@@ -29,6 +29,9 @@ class AddressRepoImpl extends AddressRepo {
   override def delete(addressid: AddressId): ConnectionIO[Boolean] = {
     sql"""delete from person.address where "addressid" = ${fromWrite(addressid)(Write.fromPut(AddressId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(addressids: Array[AddressId]): ConnectionIO[Int] = {
+    sql"""delete from person.address where "addressid" = ANY(${addressids})""".update.run
+  }
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
     DeleteBuilder("person.address", AddressFields.structure)
   }

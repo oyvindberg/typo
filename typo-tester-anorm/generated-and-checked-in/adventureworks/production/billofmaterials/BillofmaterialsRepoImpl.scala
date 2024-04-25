@@ -30,6 +30,13 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def delete(billofmaterialsid: Int)(implicit c: Connection): Boolean = {
     SQL"""delete from production.billofmaterials where "billofmaterialsid" = ${ParameterValue(billofmaterialsid, null, ToStatement.intToStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(billofmaterialsids: Array[Int])(implicit c: Connection): Int = {
+    SQL"""delete
+          from production.billofmaterials
+          where "billofmaterialsid" = ANY(${billofmaterialsids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     DeleteBuilder("production.billofmaterials", BillofmaterialsFields.structure)
   }

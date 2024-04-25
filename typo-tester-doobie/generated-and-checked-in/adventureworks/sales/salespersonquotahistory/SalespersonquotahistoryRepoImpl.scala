@@ -28,6 +28,16 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def delete(compositeId: SalespersonquotahistoryId): ConnectionIO[Boolean] = {
     sql"""delete from sales.salespersonquotahistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[SalespersonquotahistoryId]): ConnectionIO[Int] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val quotadate = compositeIds.map(_.quotadate)
+    sql"""delete
+          from sales.salespersonquotahistory
+          where ("businessentityid", "quotadate")
+          in (select unnest(${businessentityid}), unnest(${quotadate}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
     DeleteBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure)
   }

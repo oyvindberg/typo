@@ -24,6 +24,9 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def delete(id: MaritalStatusId): ConnectionIO[Boolean] = {
     sql"""delete from myschema.marital_status where "id" = ${fromWrite(id)(Write.fromPut(MaritalStatusId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(ids: Array[MaritalStatusId]): ConnectionIO[Int] = {
+    sql"""delete from myschema.marital_status where "id" = ANY(${ids})""".update.run
+  }
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
     DeleteBuilder("myschema.marital_status", MaritalStatusFields.structure)
   }

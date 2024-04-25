@@ -32,6 +32,9 @@ class PersonRepoImpl extends PersonRepo {
   override def delete(id: PersonId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from myschema.person where "id" = ${Segment.paramSegment(id)(PersonId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(ids: Array[PersonId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from myschema.person where "id" = ANY(${ids})""".delete
+  }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
     DeleteBuilder("myschema.person", PersonFields.structure)
   }

@@ -26,6 +26,9 @@ class IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId): ConnectionIO[Boolean] = {
     sql"""delete from production.illustration where "illustrationid" = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(illustrationids: Array[IllustrationId]): ConnectionIO[Int] = {
+    sql"""delete from production.illustration where "illustrationid" = ANY(${illustrationids})""".update.run
+  }
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
     DeleteBuilder("production.illustration", IllustrationFields.structure)
   }

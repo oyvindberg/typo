@@ -31,6 +31,13 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.salestaxrate where "salestaxrateid" = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from sales.salestaxrate
+          where "salestaxrateid" = ANY(${salestaxrateids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
     DeleteBuilder("sales.salestaxrate", SalestaxrateFields.structure)
   }

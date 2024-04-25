@@ -27,6 +27,13 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.scrapreason where "scrapreasonid" = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from production.scrapreason
+          where "scrapreasonid" = ANY(${scrapreasonids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
     DeleteBuilder("production.scrapreason", ScrapreasonFields.structure)
   }

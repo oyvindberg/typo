@@ -31,6 +31,16 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def delete(compositeId: SalesorderdetailId): ConnectionIO[Boolean] = {
     sql"""delete from sales.salesorderdetail where "salesorderid" = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND "salesorderdetailid" = ${fromWrite(compositeId.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[SalesorderdetailId]): ConnectionIO[Int] = {
+    val salesorderid = compositeIds.map(_.salesorderid)
+    val salesorderdetailid = compositeIds.map(_.salesorderdetailid)
+    sql"""delete
+          from sales.salesorderdetail
+          where ("salesorderid", "salesorderdetailid")
+          in (select unnest(${salesorderid}), unnest(${salesorderdetailid}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
     DeleteBuilder("sales.salesorderdetail", SalesorderdetailFields.structure)
   }

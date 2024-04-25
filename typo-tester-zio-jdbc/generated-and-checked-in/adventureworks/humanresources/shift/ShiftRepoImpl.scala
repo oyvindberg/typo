@@ -28,6 +28,9 @@ class ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from humanresources.shift where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(shiftids: Array[ShiftId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from humanresources.shift where "shiftid" = ANY(${shiftids})""".delete
+  }
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
     DeleteBuilder("humanresources.shift", ShiftFields.structure)
   }

@@ -26,6 +26,9 @@ class CultureRepoImpl extends CultureRepo {
   override def delete(cultureid: CultureId): ConnectionIO[Boolean] = {
     sql"""delete from production.culture where "cultureid" = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(cultureids: Array[CultureId]): ConnectionIO[Int] = {
+    sql"""delete from production.culture where "cultureid" = ANY(${cultureids})""".update.run
+  }
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
     DeleteBuilder("production.culture", CultureFields.structure)
   }

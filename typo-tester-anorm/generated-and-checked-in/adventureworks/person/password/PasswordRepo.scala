@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait PasswordRepo {
   def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean
+  def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int
   def delete: DeleteBuilder[PasswordFields, PasswordRow]
   def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow
   def insertStreaming(unsaved: Iterator[PasswordRow], batchSize: Int)(implicit c: Connection): Long

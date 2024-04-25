@@ -28,6 +28,9 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
   override def delete(unitmeasurecode: UnitmeasureId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(unitmeasurecode).isDefined)
   }
+  override def deleteByIds(unitmeasurecodes: Array[UnitmeasureId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(unitmeasurecodes.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
     DeleteBuilderMock(DeleteParams.empty, UnitmeasureFields.structure.fields, map)
   }

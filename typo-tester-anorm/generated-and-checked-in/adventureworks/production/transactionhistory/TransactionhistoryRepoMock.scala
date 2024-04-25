@@ -24,6 +24,9 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
   override def delete(transactionid: TransactionhistoryId)(implicit c: Connection): Boolean = {
     map.remove(transactionid).isDefined
   }
+  override def deleteByIds(transactionids: Array[TransactionhistoryId])(implicit c: Connection): Int = {
+    transactionids.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
     DeleteBuilderMock(DeleteParams.empty, TransactionhistoryFields.structure.fields, map)
   }

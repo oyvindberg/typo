@@ -28,6 +28,9 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
   override def delete(addresstypeid: AddresstypeId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.addresstype where "addresstypeid" = ${Segment.paramSegment(addresstypeid)(AddresstypeId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(addresstypeids: Array[AddresstypeId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from person.addresstype where "addresstypeid" = ANY(${addresstypeids})""".delete
+  }
   override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
     DeleteBuilder("person.addresstype", AddresstypeFields.structure)
   }

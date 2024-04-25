@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait IllustrationRepo {
   def delete(illustrationid: IllustrationId): ConnectionIO[Boolean]
+  def deleteByIds(illustrationids: Array[IllustrationId]): ConnectionIO[Int]
   def delete: DeleteBuilder[IllustrationFields, IllustrationRow]
   def insert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int): ConnectionIO[Long]

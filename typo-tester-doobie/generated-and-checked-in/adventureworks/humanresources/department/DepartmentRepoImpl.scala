@@ -26,6 +26,9 @@ class DepartmentRepoImpl extends DepartmentRepo {
   override def delete(departmentid: DepartmentId): ConnectionIO[Boolean] = {
     sql"""delete from humanresources.department where "departmentid" = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(departmentids: Array[DepartmentId]): ConnectionIO[Int] = {
+    sql"""delete from humanresources.department where "departmentid" = ANY(${departmentids})""".update.run
+  }
   override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
     DeleteBuilder("humanresources.department", DepartmentFields.structure)
   }

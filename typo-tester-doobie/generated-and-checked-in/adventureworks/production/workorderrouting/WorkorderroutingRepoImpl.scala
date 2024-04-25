@@ -29,6 +29,17 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete(compositeId: WorkorderroutingId): ConnectionIO[Boolean] = {
     sql"""delete from production.workorderrouting where "workorderid" = ${fromWrite(compositeId.workorderid)(Write.fromPut(WorkorderId.put))} AND "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(Meta.IntMeta.put))} AND "operationsequence" = ${fromWrite(compositeId.operationsequence)(Write.fromPut(TypoShort.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[WorkorderroutingId]): ConnectionIO[Int] = {
+    val workorderid = compositeIds.map(_.workorderid)
+    val productid = compositeIds.map(_.productid)
+    val operationsequence = compositeIds.map(_.operationsequence)
+    sql"""delete
+          from production.workorderrouting
+          where ("workorderid", "productid", "operationsequence")
+          in (select unnest(${workorderid}), unnest(${productid}), unnest(${operationsequence}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     DeleteBuilder("production.workorderrouting", WorkorderroutingFields.structure)
   }

@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait IdentityTestRepo {
   def delete(name: IdentityTestId): ConnectionIO[Boolean]
+  def deleteByIds(names: Array[IdentityTestId]): ConnectionIO[Int]
   def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow]
   def insert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, IdentityTestRow], batchSize: Int): ConnectionIO[Long]

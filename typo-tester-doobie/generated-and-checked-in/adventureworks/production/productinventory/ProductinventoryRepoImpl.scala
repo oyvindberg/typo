@@ -30,6 +30,16 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def delete(compositeId: ProductinventoryId): ConnectionIO[Boolean] = {
     sql"""delete from production.productinventory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[ProductinventoryId]): ConnectionIO[Int] = {
+    val productid = compositeIds.map(_.productid)
+    val locationid = compositeIds.map(_.locationid)
+    sql"""delete
+          from production.productinventory
+          where ("productid", "locationid")
+          in (select unnest(${productid}), unnest(${locationid}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
     DeleteBuilder("production.productinventory", ProductinventoryFields.structure)
   }

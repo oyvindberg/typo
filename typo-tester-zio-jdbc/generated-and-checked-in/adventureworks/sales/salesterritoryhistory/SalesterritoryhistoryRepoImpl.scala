@@ -30,6 +30,17 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def delete(compositeId: SalesterritoryhistoryId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.salesterritoryhistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)} AND "territoryid" = ${Segment.paramSegment(compositeId.territoryid)(SalesterritoryId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[SalesterritoryhistoryId]): ZIO[ZConnection, Throwable, Long] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val startdate = compositeIds.map(_.startdate)
+    val territoryid = compositeIds.map(_.territoryid)
+    sql"""delete
+          from sales.salesterritoryhistory
+          where ("businessentityid", "startdate", "territoryid")
+          in (select unnest(${businessentityid}), unnest(${startdate}), unnest(${territoryid}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
     DeleteBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure)
   }

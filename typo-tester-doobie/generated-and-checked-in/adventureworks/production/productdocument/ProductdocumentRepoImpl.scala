@@ -27,6 +27,16 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete(compositeId: ProductdocumentId): ConnectionIO[Boolean] = {
     sql"""delete from production.productdocument where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "documentnode" = ${fromWrite(compositeId.documentnode)(Write.fromPut(DocumentId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[ProductdocumentId]): ConnectionIO[Int] = {
+    val productid = compositeIds.map(_.productid)
+    val documentnode = compositeIds.map(_.documentnode)
+    sql"""delete
+          from production.productdocument
+          where ("productid", "documentnode")
+          in (select unnest(${productid}), unnest(${documentnode}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
     DeleteBuilder("production.productdocument", ProductdocumentFields.structure)
   }

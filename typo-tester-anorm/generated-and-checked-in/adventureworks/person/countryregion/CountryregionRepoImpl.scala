@@ -27,6 +27,13 @@ class CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.countryregion where "countryregioncode" = ${ParameterValue(countryregioncode, null, CountryregionId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from person.countryregion
+          where "countryregioncode" = ANY(${countryregioncodes})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
     DeleteBuilder("person.countryregion", CountryregionFields.structure)
   }

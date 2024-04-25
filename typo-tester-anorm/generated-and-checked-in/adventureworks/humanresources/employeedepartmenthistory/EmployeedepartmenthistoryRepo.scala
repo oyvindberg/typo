@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait EmployeedepartmenthistoryRepo {
   def delete(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Boolean
+  def deleteByIds(compositeIds: Array[EmployeedepartmenthistoryId])(implicit c: Connection): Int
   def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow]
   def insert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow
   def insertStreaming(unsaved: Iterator[EmployeedepartmenthistoryRow], batchSize: Int)(implicit c: Connection): Long

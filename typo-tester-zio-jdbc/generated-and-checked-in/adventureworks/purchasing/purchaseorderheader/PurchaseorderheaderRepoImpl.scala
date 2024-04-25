@@ -30,6 +30,9 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def delete(purchaseorderid: PurchaseorderheaderId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(PurchaseorderheaderId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(purchaseorderids: Array[PurchaseorderheaderId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ANY(${purchaseorderids})""".delete
+  }
   override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
     DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure)
   }

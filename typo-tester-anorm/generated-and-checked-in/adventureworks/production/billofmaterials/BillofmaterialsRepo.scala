@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait BillofmaterialsRepo {
   def delete(billofmaterialsid: Int)(implicit c: Connection): Boolean
+  def deleteByIds(billofmaterialsids: Array[Int])(implicit c: Connection): Int
   def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow
   def insertStreaming(unsaved: Iterator[BillofmaterialsRow], batchSize: Int)(implicit c: Connection): Long

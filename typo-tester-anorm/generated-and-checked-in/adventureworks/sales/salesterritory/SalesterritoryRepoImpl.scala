@@ -30,6 +30,13 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def delete(territoryid: SalesterritoryId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.salesterritory where "territoryid" = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from sales.salesterritory
+          where "territoryid" = ANY(${territoryids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
     DeleteBuilder("sales.salesterritory", SalesterritoryFields.structure)
   }

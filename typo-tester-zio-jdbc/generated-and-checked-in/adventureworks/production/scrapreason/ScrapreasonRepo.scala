@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait ScrapreasonRepo {
   def delete(scrapreasonid: ScrapreasonId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(scrapreasonids: Array[ScrapreasonId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow]
   def insert(unsaved: ScrapreasonRow): ZIO[ZConnection, Throwable, ScrapreasonRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ScrapreasonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

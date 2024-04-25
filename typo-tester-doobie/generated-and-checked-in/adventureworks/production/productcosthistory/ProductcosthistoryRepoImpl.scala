@@ -27,6 +27,16 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete(compositeId: ProductcosthistoryId): ConnectionIO[Boolean] = {
     sql"""delete from production.productcosthistory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[ProductcosthistoryId]): ConnectionIO[Int] = {
+    val productid = compositeIds.map(_.productid)
+    val startdate = compositeIds.map(_.startdate)
+    sql"""delete
+          from production.productcosthistory
+          where ("productid", "startdate")
+          in (select unnest(${productid}), unnest(${startdate}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     DeleteBuilder("production.productcosthistory", ProductcosthistoryFields.structure)
   }

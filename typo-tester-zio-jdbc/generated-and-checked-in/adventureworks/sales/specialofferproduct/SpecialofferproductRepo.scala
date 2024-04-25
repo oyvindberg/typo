@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait SpecialofferproductRepo {
   def delete(compositeId: SpecialofferproductId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[SpecialofferproductId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow]
   def insert(unsaved: SpecialofferproductRow): ZIO[ZConnection, Throwable, SpecialofferproductRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferproductRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

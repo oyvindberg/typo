@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait StateprovinceRepo {
   def delete(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(stateprovinceids: Array[StateprovinceId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow]
   def insert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, StateprovinceRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

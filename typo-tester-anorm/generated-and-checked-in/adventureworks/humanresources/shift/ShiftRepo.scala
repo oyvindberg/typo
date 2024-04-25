@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait ShiftRepo {
   def delete(shiftid: ShiftId)(implicit c: Connection): Boolean
+  def deleteByIds(shiftids: Array[ShiftId])(implicit c: Connection): Int
   def delete: DeleteBuilder[ShiftFields, ShiftRow]
   def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow
   def insertStreaming(unsaved: Iterator[ShiftRow], batchSize: Int)(implicit c: Connection): Long

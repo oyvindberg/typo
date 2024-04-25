@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait SalesterritoryhistoryRepo {
   def delete(compositeId: SalesterritoryhistoryId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[SalesterritoryhistoryId]): ConnectionIO[Int]
   def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def insert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRow], batchSize: Int): ConnectionIO[Long]

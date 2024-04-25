@@ -26,6 +26,9 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
   override def delete(shiftid: ShiftId): ConnectionIO[Boolean] = {
     delay(map.remove(shiftid).isDefined)
   }
+  override def deleteByIds(shiftids: Array[ShiftId]): ConnectionIO[Int] = {
+    delay(shiftids.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
     DeleteBuilderMock(DeleteParams.empty, ShiftFields.structure.fields, map)
   }

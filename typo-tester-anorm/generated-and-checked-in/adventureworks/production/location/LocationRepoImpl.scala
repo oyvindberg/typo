@@ -28,6 +28,13 @@ class LocationRepoImpl extends LocationRepo {
   override def delete(locationid: LocationId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.location where "locationid" = ${ParameterValue(locationid, null, LocationId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(locationids: Array[LocationId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from production.location
+          where "locationid" = ANY(${locationids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
     DeleteBuilder("production.location", LocationFields.structure)
   }

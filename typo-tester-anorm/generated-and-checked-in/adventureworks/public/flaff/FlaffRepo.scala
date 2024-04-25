@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait FlaffRepo {
   def delete(compositeId: FlaffId)(implicit c: Connection): Boolean
+  def deleteByIds(compositeIds: Array[FlaffId])(implicit c: Connection): Int
   def delete: DeleteBuilder[FlaffFields, FlaffRow]
   def insert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow
   def insertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int)(implicit c: Connection): Long

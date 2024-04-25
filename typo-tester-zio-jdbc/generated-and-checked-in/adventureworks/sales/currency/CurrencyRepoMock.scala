@@ -28,6 +28,9 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
   override def delete(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(currencycode).isDefined)
   }
+  override def deleteByIds(currencycodes: Array[CurrencyId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(currencycodes.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
     DeleteBuilderMock(DeleteParams.empty, CurrencyFields.structure.fields, map)
   }

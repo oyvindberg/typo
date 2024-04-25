@@ -18,6 +18,7 @@ import zio.stream.ZStream
 
 trait FootballClubRepo {
   def delete(id: FootballClubId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[FootballClubFields, FootballClubRow]
   def insert(unsaved: FootballClubRow): ZIO[ZConnection, Throwable, FootballClubRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FootballClubRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

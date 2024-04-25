@@ -33,6 +33,9 @@ class ProductRepoImpl extends ProductRepo {
   override def delete(productid: ProductId): ConnectionIO[Boolean] = {
     sql"""delete from production.product where "productid" = ${fromWrite(productid)(Write.fromPut(ProductId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(productids: Array[ProductId]): ConnectionIO[Int] = {
+    sql"""delete from production.product where "productid" = ANY(${productids})""".update.run
+  }
   override def delete: DeleteBuilder[ProductFields, ProductRow] = {
     DeleteBuilder("production.product", ProductFields.structure)
   }

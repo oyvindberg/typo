@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait FlaffRepo {
   def delete(compositeId: FlaffId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[FlaffFields, FlaffRow]
   def insert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, FlaffRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FlaffRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

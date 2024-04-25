@@ -15,6 +15,7 @@ import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
+import doobie.util.Put
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import fs2.Stream
@@ -26,6 +27,16 @@ import typo.dsl.UpdateBuilder
 class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId): ConnectionIO[Boolean] = {
     sql"""delete from sales.personcreditcard where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "creditcardid" = ${fromWrite(compositeId.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".update.run.map(_ > 0)
+  }
+  override def deleteByIds(compositeIds: Array[PersoncreditcardId])(implicit put0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Int] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val creditcardid = compositeIds.map(_.creditcardid)
+    sql"""delete
+          from sales.personcreditcard
+          where ("businessentityid", "creditcardid")
+          in (select unnest(${businessentityid}), unnest(${creditcardid}))
+       """.update.run
+    
   }
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     DeleteBuilder("sales.personcreditcard", PersoncreditcardFields.structure)
@@ -76,7 +87,7 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def selectById(compositeId: PersoncreditcardId): ConnectionIO[Option[PersoncreditcardRow]] = {
     sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "creditcardid" = ${fromWrite(compositeId.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".query(using PersoncreditcardRow.read).option
   }
-  override def selectByIds(compositeIds: Array[PersoncreditcardId]): Stream[ConnectionIO, PersoncreditcardRow] = {
+  override def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): Stream[ConnectionIO, PersoncreditcardRow] = {
     val businessentityid = compositeIds.map(_.businessentityid)
     val creditcardid = compositeIds.map(_.creditcardid)
     sql"""select "businessentityid", "creditcardid", "modifieddate"::text

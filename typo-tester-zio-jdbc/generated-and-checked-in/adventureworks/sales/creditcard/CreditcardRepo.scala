@@ -19,6 +19,7 @@ import zio.stream.ZStream
 
 trait CreditcardRepo {
   def delete(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[CreditcardFields, CreditcardRow]
   def insert(unsaved: CreditcardRow): ZIO[ZConnection, Throwable, CreditcardRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CreditcardRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
@@ -28,7 +29,7 @@ trait CreditcardRepo {
   def select: SelectBuilder[CreditcardFields, CreditcardRow]
   def selectAll: ZStream[ZConnection, Throwable, CreditcardRow]
   def selectById(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Option[CreditcardRow]]
-  def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZStream[ZConnection, Throwable, CreditcardRow]
+  def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZStream[ZConnection, Throwable, CreditcardRow]
   def update(row: CreditcardRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[CreditcardFields, CreditcardRow]
   def upsert(unsaved: CreditcardRow): ZIO[ZConnection, Throwable, UpdateResult[CreditcardRow]]

@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait BusinessentitycontactRepo {
   def delete(compositeId: BusinessentitycontactId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[BusinessentitycontactId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def insert(unsaved: BusinessentitycontactRow): ZIO[ZConnection, Throwable, BusinessentitycontactRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentitycontactRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

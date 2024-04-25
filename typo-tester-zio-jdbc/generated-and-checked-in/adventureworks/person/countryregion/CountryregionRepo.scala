@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait CountryregionRepo {
   def delete(countryregioncode: CountryregionId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(countryregioncodes: Array[CountryregionId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[CountryregionFields, CountryregionRow]
   def insert(unsaved: CountryregionRow): ZIO[ZConnection, Throwable, CountryregionRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregionRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

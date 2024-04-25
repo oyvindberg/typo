@@ -28,6 +28,9 @@ class PasswordRepoImpl extends PasswordRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     sql"""delete from person.password where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
+    sql"""delete from person.password where "businessentityid" = ANY(${businessentityids})""".update.run
+  }
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
     DeleteBuilder("person.password", PasswordFields.structure)
   }

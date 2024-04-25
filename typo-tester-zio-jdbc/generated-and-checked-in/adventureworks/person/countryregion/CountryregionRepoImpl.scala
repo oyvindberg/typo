@@ -27,6 +27,9 @@ class CountryregionRepoImpl extends CountryregionRepo {
   override def delete(countryregioncode: CountryregionId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.countryregion where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(CountryregionId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(countryregioncodes: Array[CountryregionId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from person.countryregion where "countryregioncode" = ANY(${countryregioncodes})""".delete
+  }
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
     DeleteBuilder("person.countryregion", CountryregionFields.structure)
   }

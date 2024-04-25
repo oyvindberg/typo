@@ -28,6 +28,13 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def delete(currencyrateid: CurrencyrateId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.currencyrate where "currencyrateid" = ${ParameterValue(currencyrateid, null, CurrencyrateId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(currencyrateids: Array[CurrencyrateId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from sales.currencyrate
+          where "currencyrateid" = ANY(${currencyrateids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow] = {
     DeleteBuilder("sales.currencyrate", CurrencyrateFields.structure)
   }

@@ -28,6 +28,17 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete(compositeId: PersonphoneId): ConnectionIO[Boolean] = {
     sql"""delete from person.personphone where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[PersonphoneId]): ConnectionIO[Int] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val phonenumber = compositeIds.map(_.phonenumber)
+    val phonenumbertypeid = compositeIds.map(_.phonenumbertypeid)
+    sql"""delete
+          from person.personphone
+          where ("businessentityid", "phonenumber", "phonenumbertypeid")
+          in (select unnest(${businessentityid}), unnest(${phonenumber}), unnest(${phonenumbertypeid}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
     DeleteBuilder("person.personphone", PersonphoneFields.structure)
   }

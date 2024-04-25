@@ -26,6 +26,9 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
   override def delete(contacttypeid: ContacttypeId): ConnectionIO[Boolean] = {
     sql"""delete from person.contacttype where "contacttypeid" = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(contacttypeids: Array[ContacttypeId]): ConnectionIO[Int] = {
+    sql"""delete from person.contacttype where "contacttypeid" = ANY(${contacttypeids})""".update.run
+  }
   override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
     DeleteBuilder("person.contacttype", ContacttypeFields.structure)
   }

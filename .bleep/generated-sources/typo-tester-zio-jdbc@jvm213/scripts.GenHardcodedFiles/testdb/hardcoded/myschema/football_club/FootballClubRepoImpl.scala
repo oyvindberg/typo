@@ -27,6 +27,9 @@ class FootballClubRepoImpl extends FootballClubRepo {
   override def delete(id: FootballClubId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from myschema.football_club where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from myschema.football_club where "id" = ANY(${ids})""".delete
+  }
   override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
     DeleteBuilder("myschema.football_club", FootballClubFields.structure)
   }

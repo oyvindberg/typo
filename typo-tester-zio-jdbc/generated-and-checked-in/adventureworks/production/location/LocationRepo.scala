@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait LocationRepo {
   def delete(locationid: LocationId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[LocationFields, LocationRow]
   def insert(unsaved: LocationRow): ZIO[ZConnection, Throwable, LocationRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

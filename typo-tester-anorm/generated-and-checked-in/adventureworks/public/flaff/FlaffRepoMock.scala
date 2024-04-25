@@ -23,6 +23,9 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
   override def delete(compositeId: FlaffId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
   }
+  override def deleteByIds(compositeIds: Array[FlaffId])(implicit c: Connection): Int = {
+    compositeIds.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
     DeleteBuilderMock(DeleteParams.empty, FlaffFields.structure.fields, map)
   }

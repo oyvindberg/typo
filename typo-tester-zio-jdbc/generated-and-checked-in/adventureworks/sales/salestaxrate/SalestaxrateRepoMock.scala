@@ -28,6 +28,9 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
   override def delete(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(salestaxrateid).isDefined)
   }
+  override def deleteByIds(salestaxrateids: Array[SalestaxrateId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(salestaxrateids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
     DeleteBuilderMock(DeleteParams.empty, SalestaxrateFields.structure.fields, map)
   }

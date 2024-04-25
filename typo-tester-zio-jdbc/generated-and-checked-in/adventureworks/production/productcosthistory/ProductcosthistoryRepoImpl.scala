@@ -28,6 +28,16 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete(compositeId: ProductcosthistoryId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.productcosthistory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[ProductcosthistoryId]): ZIO[ZConnection, Throwable, Long] = {
+    val productid = compositeIds.map(_.productid)
+    val startdate = compositeIds.map(_.startdate)
+    sql"""delete
+          from production.productcosthistory
+          where ("productid", "startdate")
+          in (select unnest(${productid}), unnest(${startdate}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     DeleteBuilder("production.productcosthistory", ProductcosthistoryFields.structure)
   }

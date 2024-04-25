@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait ScrapreasonRepo {
   def delete(scrapreasonid: ScrapreasonId)(implicit c: Connection): Boolean
+  def deleteByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): Int
   def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow]
   def insert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow
   def insertStreaming(unsaved: Iterator[ScrapreasonRow], batchSize: Int)(implicit c: Connection): Long

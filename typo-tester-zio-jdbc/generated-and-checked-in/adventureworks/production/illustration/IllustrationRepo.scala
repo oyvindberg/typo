@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait IllustrationRepo {
   def delete(illustrationid: IllustrationId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(illustrationids: Array[IllustrationId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[IllustrationFields, IllustrationRow]
   def insert(unsaved: IllustrationRow): ZIO[ZConnection, Throwable, IllustrationRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, IllustrationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

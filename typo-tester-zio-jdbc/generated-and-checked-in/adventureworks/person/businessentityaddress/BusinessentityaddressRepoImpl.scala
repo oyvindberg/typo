@@ -30,6 +30,17 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def delete(compositeId: BusinessentityaddressId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.businessentityaddress where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "addressid" = ${Segment.paramSegment(compositeId.addressid)(AddressId.setter)} AND "addresstypeid" = ${Segment.paramSegment(compositeId.addresstypeid)(AddresstypeId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[BusinessentityaddressId]): ZIO[ZConnection, Throwable, Long] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val addressid = compositeIds.map(_.addressid)
+    val addresstypeid = compositeIds.map(_.addresstypeid)
+    sql"""delete
+          from person.businessentityaddress
+          where ("businessentityid", "addressid", "addresstypeid")
+          in (select unnest(${businessentityid}), unnest(${addressid}), unnest(${addresstypeid}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
     DeleteBuilder("person.businessentityaddress", BusinessentityaddressFields.structure)
   }

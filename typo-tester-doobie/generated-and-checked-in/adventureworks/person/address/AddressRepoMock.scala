@@ -26,6 +26,9 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
   override def delete(addressid: AddressId): ConnectionIO[Boolean] = {
     delay(map.remove(addressid).isDefined)
   }
+  override def deleteByIds(addressids: Array[AddressId]): ConnectionIO[Int] = {
+    delay(addressids.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
     DeleteBuilderMock(DeleteParams.empty, AddressFields.structure.fields, map)
   }

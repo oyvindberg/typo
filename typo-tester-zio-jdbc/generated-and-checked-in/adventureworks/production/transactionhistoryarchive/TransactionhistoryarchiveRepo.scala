@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait TransactionhistoryarchiveRepo {
   def delete(transactionid: TransactionhistoryarchiveId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(transactionids: Array[TransactionhistoryarchiveId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow]
   def insert(unsaved: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, TransactionhistoryarchiveRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, TransactionhistoryarchiveRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

@@ -28,6 +28,16 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.productmodelillustration where "productmodelid" = ${Segment.paramSegment(compositeId.productmodelid)(ProductmodelId.setter)} AND "illustrationid" = ${Segment.paramSegment(compositeId.illustrationid)(IllustrationId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[ProductmodelillustrationId]): ZIO[ZConnection, Throwable, Long] = {
+    val productmodelid = compositeIds.map(_.productmodelid)
+    val illustrationid = compositeIds.map(_.illustrationid)
+    sql"""delete
+          from production.productmodelillustration
+          where ("productmodelid", "illustrationid")
+          in (select unnest(${productmodelid}), unnest(${illustrationid}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
     DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure)
   }

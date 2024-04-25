@@ -28,6 +28,16 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.countryregioncurrency where "countryregioncode" = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND "currencycode" = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): Int = {
+    val countryregioncode = compositeIds.map(_.countryregioncode)
+    val currencycode = compositeIds.map(_.currencycode)
+    SQL"""delete
+          from sales.countryregioncurrency
+          where ("countryregioncode", "currencycode")
+          in (select unnest(${countryregioncode}), unnest(${currencycode}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure)
   }

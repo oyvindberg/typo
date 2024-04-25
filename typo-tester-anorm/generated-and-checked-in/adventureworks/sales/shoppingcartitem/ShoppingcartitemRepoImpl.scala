@@ -28,6 +28,13 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${ParameterValue(shoppingcartitemid, null, ShoppingcartitemId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from sales.shoppingcartitem
+          where "shoppingcartitemid" = ANY(${shoppingcartitemids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure)
   }

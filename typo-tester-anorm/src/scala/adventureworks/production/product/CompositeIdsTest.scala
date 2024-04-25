@@ -8,9 +8,10 @@ import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.LocalDateTime
+import scala.annotation.nowarn
 import scala.util.Random
 
-class LookupCompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
+class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
   implicit class Foo(x: TypoLocalDateTime) {
     def map(f: LocalDateTime => LocalDateTime): TypoLocalDateTime = TypoLocalDateTime(f(x.value))
   }
@@ -40,9 +41,9 @@ class LookupCompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
       val wanted = Array(ph1.compositeId, ph2.compositeId, ph3.compositeId.copy(productid = ProductId(9999)))
 
       val repo = new ProductcosthistoryRepoImpl()
-      val found = repo.selectByIds(wanted)
-      assert(found.map(_.compositeId) === List(ph1.compositeId, ph2.compositeId))
+      assert(repo.selectByIds(wanted).map(_.compositeId) === List(ph1.compositeId, ph2.compositeId)): @nowarn
+      assert(repo.deleteByIds(wanted) === 2): @nowarn
+      assert(repo.selectAll.map(_.compositeId) === List(ph3.compositeId))
     }
   }
-
 }

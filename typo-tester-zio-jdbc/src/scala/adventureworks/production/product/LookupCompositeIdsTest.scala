@@ -6,7 +6,7 @@ import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.{TestInsert, withConnection}
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
-import zio.Chunk
+import zio.{Chunk, ZIO}
 
 import java.time.LocalDateTime
 import scala.util.Random
@@ -41,7 +41,12 @@ class LookupCompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
         ph3 <- testInsert.productionProductcosthistory(product.productid, startdate = now.map(_.plusDays(2)), enddate = Some(now.map(_.plusDays(3))))
         wanted = Array(ph1.compositeId, ph2.compositeId, ph3.compositeId.copy(productid = ProductId(9999)))
         found <- repo.selectByIds(wanted).runCollect
-      } yield assert(found.map(_.compositeId) === Chunk(ph1.compositeId, ph2.compositeId))
+        _ <- ZIO.succeed(assert(found.map(_.compositeId) === Chunk(ph1.compositeId, ph2.compositeId)))
+        deleted <- repo.deleteByIds(wanted)
+        _ <- ZIO.succeed(assert(deleted === 2L))
+        all <- repo.selectAll.runCollect
+        _ <- ZIO.succeed(assert(all.map(_.compositeId) === Chunk(ph3.compositeId)))
+      } yield true
     }
   }
 }

@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait AddresstypeRepo {
   def delete(addresstypeid: AddresstypeId): ConnectionIO[Boolean]
+  def deleteByIds(addresstypeids: Array[AddresstypeId]): ConnectionIO[Int]
   def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow]
   def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, AddresstypeRow], batchSize: Int): ConnectionIO[Long]

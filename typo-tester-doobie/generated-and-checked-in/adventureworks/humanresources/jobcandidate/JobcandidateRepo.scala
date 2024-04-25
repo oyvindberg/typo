@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait JobcandidateRepo {
   def delete(jobcandidateid: JobcandidateId): ConnectionIO[Boolean]
+  def deleteByIds(jobcandidateids: Array[JobcandidateId]): ConnectionIO[Int]
   def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow]
   def insert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int): ConnectionIO[Long]

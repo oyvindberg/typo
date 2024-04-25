@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait AddressRepo {
   def delete(addressid: AddressId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(addressids: Array[AddressId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[AddressFields, AddressRow]
   def insert(unsaved: AddressRow): ZIO[ZConnection, Throwable, AddressRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, AddressRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

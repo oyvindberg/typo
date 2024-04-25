@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait WorkorderroutingRepo {
   def delete(compositeId: WorkorderroutingId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[WorkorderroutingId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def insert(unsaved: WorkorderroutingRow): ZIO[ZConnection, Throwable, WorkorderroutingRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderroutingRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

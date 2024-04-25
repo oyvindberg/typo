@@ -29,6 +29,16 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def delete(compositeId: SpecialofferproductId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.specialofferproduct where "specialofferid" = ${Segment.paramSegment(compositeId.specialofferid)(SpecialofferId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[SpecialofferproductId]): ZIO[ZConnection, Throwable, Long] = {
+    val specialofferid = compositeIds.map(_.specialofferid)
+    val productid = compositeIds.map(_.productid)
+    sql"""delete
+          from sales.specialofferproduct
+          where ("specialofferid", "productid")
+          in (select unnest(${specialofferid}), unnest(${productid}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
     DeleteBuilder("sales.specialofferproduct", SpecialofferproductFields.structure)
   }

@@ -6,6 +6,8 @@ sealed trait IdComputed {
   def cols: NonEmptyList[ComputedColumn]
   def tpe: sc.Type
   final def param: sc.Param = sc.Param(paramName, tpe, None)
+  final def userDefinedCols: List[ComputedColumn] =
+    cols.toList.collect { case x if sc.Type.containsUserDefined(x.tpe) => x }
 }
 
 object IdComputed {

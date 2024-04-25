@@ -7,8 +7,10 @@ package adventureworks
 package sales
 package personcreditcard
 
+import adventureworks.userdefined.CustomCreditcardId
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.delay
+import doobie.util.Put
 import fs2.Stream
 import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
@@ -25,6 +27,9 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
                                map: scala.collection.mutable.Map[PersoncreditcardId, PersoncreditcardRow] = scala.collection.mutable.Map.empty) extends PersoncreditcardRepo {
   override def delete(compositeId: PersoncreditcardId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
+  }
+  override def deleteByIds(compositeIds: Array[PersoncreditcardId])(implicit put0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Int] = {
+    delay(compositeIds.map(id => map.remove(id)).count(_.isDefined))
   }
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     DeleteBuilderMock(DeleteParams.empty, PersoncreditcardFields.structure.fields, map)
@@ -73,7 +78,7 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
   override def selectById(compositeId: PersoncreditcardId): ConnectionIO[Option[PersoncreditcardRow]] = {
     delay(map.get(compositeId))
   }
-  override def selectByIds(compositeIds: Array[PersoncreditcardId]): Stream[ConnectionIO, PersoncreditcardRow] = {
+  override def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): Stream[ConnectionIO, PersoncreditcardRow] = {
     Stream.emits(compositeIds.flatMap(map.get).toList)
   }
   override def update(row: PersoncreditcardRow): ConnectionIO[Boolean] = {

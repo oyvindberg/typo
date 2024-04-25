@@ -28,6 +28,13 @@ class ShiftRepoImpl extends ShiftRepo {
   override def delete(shiftid: ShiftId)(implicit c: Connection): Boolean = {
     SQL"""delete from humanresources.shift where "shiftid" = ${ParameterValue(shiftid, null, ShiftId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(shiftids: Array[ShiftId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from humanresources.shift
+          where "shiftid" = ANY(${shiftids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
     DeleteBuilder("humanresources.shift", ShiftFields.structure)
   }

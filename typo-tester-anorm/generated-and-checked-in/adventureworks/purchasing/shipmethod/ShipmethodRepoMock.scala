@@ -24,6 +24,9 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
   override def delete(shipmethodid: ShipmethodId)(implicit c: Connection): Boolean = {
     map.remove(shipmethodid).isDefined
   }
+  override def deleteByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): Int = {
+    shipmethodids.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
     DeleteBuilderMock(DeleteParams.empty, ShipmethodFields.structure.fields, map)
   }

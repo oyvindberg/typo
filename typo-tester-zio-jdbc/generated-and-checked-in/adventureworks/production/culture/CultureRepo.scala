@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait CultureRepo {
   def delete(cultureid: CultureId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(cultureids: Array[CultureId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[CultureFields, CultureRow]
   def insert(unsaved: CultureRow): ZIO[ZConnection, Throwable, CultureRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

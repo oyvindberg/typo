@@ -32,6 +32,9 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
   override def delete(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.stateprovince where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(stateprovinceids: Array[StateprovinceId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from person.stateprovince where "stateprovinceid" = ANY(${stateprovinceids})""".delete
+  }
   override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
     DeleteBuilder("person.stateprovince", StateprovinceFields.structure)
   }

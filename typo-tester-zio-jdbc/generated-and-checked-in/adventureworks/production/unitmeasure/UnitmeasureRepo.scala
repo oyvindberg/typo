@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait UnitmeasureRepo {
   def delete(unitmeasurecode: UnitmeasureId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(unitmeasurecodes: Array[UnitmeasureId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow]
   def insert(unsaved: UnitmeasureRow): ZIO[ZConnection, Throwable, UnitmeasureRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UnitmeasureRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

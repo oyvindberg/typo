@@ -7,7 +7,9 @@ package adventureworks
 package sales
 package personcreditcard
 
+import adventureworks.userdefined.CustomCreditcardId
 import doobie.free.connection.ConnectionIO
+import doobie.util.Put
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -15,6 +17,7 @@ import typo.dsl.UpdateBuilder
 
 trait PersoncreditcardRepo {
   def delete(compositeId: PersoncreditcardId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[PersoncreditcardId])(implicit put0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Int]
   def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def insert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, PersoncreditcardRow], batchSize: Int): ConnectionIO[Long]
@@ -24,7 +27,7 @@ trait PersoncreditcardRepo {
   def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def selectAll: Stream[ConnectionIO, PersoncreditcardRow]
   def selectById(compositeId: PersoncreditcardId): ConnectionIO[Option[PersoncreditcardRow]]
-  def selectByIds(compositeIds: Array[PersoncreditcardId]): Stream[ConnectionIO, PersoncreditcardRow]
+  def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): Stream[ConnectionIO, PersoncreditcardRow]
   def update(row: PersoncreditcardRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def upsert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow]

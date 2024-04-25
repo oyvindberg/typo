@@ -27,6 +27,9 @@ class LocationRepoImpl extends LocationRepo {
   override def delete(locationid: LocationId): ConnectionIO[Boolean] = {
     sql"""delete from production.location where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(locationids: Array[LocationId]): ConnectionIO[Int] = {
+    sql"""delete from production.location where "locationid" = ANY(${locationids})""".update.run
+  }
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
     DeleteBuilder("production.location", LocationFields.structure)
   }

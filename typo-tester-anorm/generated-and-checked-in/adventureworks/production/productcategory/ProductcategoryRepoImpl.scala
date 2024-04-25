@@ -28,6 +28,13 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def delete(productcategoryid: ProductcategoryId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productcategory where "productcategoryid" = ${ParameterValue(productcategoryid, null, ProductcategoryId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(productcategoryids: Array[ProductcategoryId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from production.productcategory
+          where "productcategoryid" = ANY(${productcategoryids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[ProductcategoryFields, ProductcategoryRow] = {
     DeleteBuilder("production.productcategory", ProductcategoryFields.structure)
   }

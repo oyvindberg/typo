@@ -27,6 +27,9 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Boolean] = {
     sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(shoppingcartitemids: Array[ShoppingcartitemId]): ConnectionIO[Int] = {
+    sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ANY(${shoppingcartitemids})""".update.run
+  }
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure)
   }

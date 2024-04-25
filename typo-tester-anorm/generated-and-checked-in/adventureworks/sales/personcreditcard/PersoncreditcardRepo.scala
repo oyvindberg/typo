@@ -7,6 +7,8 @@ package adventureworks
 package sales
 package personcreditcard
 
+import adventureworks.userdefined.CustomCreditcardId
+import anorm.ToStatement
 import java.sql.Connection
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -14,6 +16,7 @@ import typo.dsl.UpdateBuilder
 
 trait PersoncreditcardRepo {
   def delete(compositeId: PersoncreditcardId)(implicit c: Connection): Boolean
+  def deleteByIds(compositeIds: Array[PersoncreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): Int
   def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def insert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow
   def insertStreaming(unsaved: Iterator[PersoncreditcardRow], batchSize: Int)(implicit c: Connection): Long
@@ -23,7 +26,7 @@ trait PersoncreditcardRepo {
   def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def selectAll(implicit c: Connection): List[PersoncreditcardRow]
   def selectById(compositeId: PersoncreditcardId)(implicit c: Connection): Option[PersoncreditcardRow]
-  def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit c: Connection): List[PersoncreditcardRow]
+  def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[PersoncreditcardRow]
   def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def upsert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow

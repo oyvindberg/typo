@@ -29,6 +29,16 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
   override def delete(compositeId: EmailaddressId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.emailaddress where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "emailaddressid" = ${Segment.paramSegment(compositeId.emailaddressid)(Setter.intSetter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[EmailaddressId]): ZIO[ZConnection, Throwable, Long] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val emailaddressid = compositeIds.map(_.emailaddressid)
+    sql"""delete
+          from person.emailaddress
+          where ("businessentityid", "emailaddressid")
+          in (select unnest(${businessentityid}), unnest(${emailaddressid}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
     DeleteBuilder("person.emailaddress", EmailaddressFields.structure)
   }

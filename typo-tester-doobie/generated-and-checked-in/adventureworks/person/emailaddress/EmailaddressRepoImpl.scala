@@ -28,6 +28,16 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
   override def delete(compositeId: EmailaddressId): ConnectionIO[Boolean] = {
     sql"""delete from person.emailaddress where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[EmailaddressId]): ConnectionIO[Int] = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val emailaddressid = compositeIds.map(_.emailaddressid)
+    sql"""delete
+          from person.emailaddress
+          where ("businessentityid", "emailaddressid")
+          in (select unnest(${businessentityid}), unnest(${emailaddressid}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
     DeleteBuilder("person.emailaddress", EmailaddressFields.structure)
   }

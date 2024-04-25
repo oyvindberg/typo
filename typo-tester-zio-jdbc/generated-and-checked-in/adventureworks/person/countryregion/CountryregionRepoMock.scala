@@ -28,6 +28,9 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
   override def delete(countryregioncode: CountryregionId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(countryregioncode).isDefined)
   }
+  override def deleteByIds(countryregioncodes: Array[CountryregionId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(countryregioncodes.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
     DeleteBuilderMock(DeleteParams.empty, CountryregionFields.structure.fields, map)
   }

@@ -27,6 +27,16 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def delete(compositeId: ProductmodelillustrationId): ConnectionIO[Boolean] = {
     sql"""delete from production.productmodelillustration where "productmodelid" = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND "illustrationid" = ${fromWrite(compositeId.illustrationid)(Write.fromPut(IllustrationId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[ProductmodelillustrationId]): ConnectionIO[Int] = {
+    val productmodelid = compositeIds.map(_.productmodelid)
+    val illustrationid = compositeIds.map(_.illustrationid)
+    sql"""delete
+          from production.productmodelillustration
+          where ("productmodelid", "illustrationid")
+          in (select unnest(${productmodelid}), unnest(${illustrationid}))
+       """.update.run
+    
+  }
   override def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
     DeleteBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure)
   }

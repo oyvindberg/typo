@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait EmailaddressRepo {
   def delete(compositeId: EmailaddressId)(implicit c: Connection): Boolean
+  def deleteByIds(compositeIds: Array[EmailaddressId])(implicit c: Connection): Int
   def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow]
   def insert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow
   def insertStreaming(unsaved: Iterator[EmailaddressRow], batchSize: Int)(implicit c: Connection): Long

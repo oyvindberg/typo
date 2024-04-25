@@ -25,6 +25,18 @@ class FlaffRepoImpl extends FlaffRepo {
   override def delete(compositeId: FlaffId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from public.flaff where "code" = ${Segment.paramSegment(compositeId.code)(ShortText.setter)} AND "another_code" = ${Segment.paramSegment(compositeId.anotherCode)(Setter.stringSetter)} AND "some_number" = ${Segment.paramSegment(compositeId.someNumber)(Setter.intSetter)} AND "specifier" = ${Segment.paramSegment(compositeId.specifier)(ShortText.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Long] = {
+    val code = compositeIds.map(_.code)
+    val anotherCode = compositeIds.map(_.anotherCode)
+    val someNumber = compositeIds.map(_.someNumber)
+    val specifier = compositeIds.map(_.specifier)
+    sql"""delete
+          from public.flaff
+          where ("code", "another_code", "some_number", "specifier")
+          in (select unnest(${code}), unnest(${anotherCode}), unnest(${someNumber}), unnest(${specifier}))
+       """.delete
+    
+  }
   override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
     DeleteBuilder("public.flaff", FlaffFields.structure)
   }

@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait SpecialofferproductRepo {
   def delete(compositeId: SpecialofferproductId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[SpecialofferproductId]): ConnectionIO[Int]
   def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow]
   def insert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, SpecialofferproductRow], batchSize: Int): ConnectionIO[Long]

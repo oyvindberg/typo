@@ -31,6 +31,9 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.salestaxrate where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(salestaxrateids: Array[SalestaxrateId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from sales.salestaxrate where "salestaxrateid" = ANY(${salestaxrateids})""".delete
+  }
   override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
     DeleteBuilder("sales.salestaxrate", SalestaxrateFields.structure)
   }

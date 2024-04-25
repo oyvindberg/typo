@@ -116,6 +116,12 @@ object RepoMethod {
       id: IdComputed
   ) extends Mutator
 
+  case class DeleteByIds(
+      relName: db.RelationName,
+      id: IdComputed,
+      idsParam: sc.Param
+  ) extends Selector
+
   case class DeleteBuilder(
       relName: db.RelationName,
       fieldsType: sc.Type,
@@ -140,7 +146,8 @@ object RepoMethod {
     case _: InsertUnsaved          => "Insert3"
     case _: InsertUnsavedStreaming => "Insert4"
     case _: Delete                 => "Delete1"
-    case _: DeleteBuilder          => "Delete2"
+    case _: DeleteByIds            => "Delete2"
+    case _: DeleteBuilder          => "Delete3"
     case _: SqlFile                => "SqlFile"
   }
 }

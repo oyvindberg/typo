@@ -11,7 +11,7 @@ import doobie.free.connection.delay
 import java.time.LocalDateTime
 import scala.util.Random
 
-class LookupCompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
+class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
   implicit class Foo(x: TypoLocalDateTime) {
     def map(f: LocalDateTime => LocalDateTime): TypoLocalDateTime = TypoLocalDateTime(f(x.value))
   }
@@ -41,7 +41,12 @@ class LookupCompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
         ph3 <- testInsert.productionProductcosthistory(product.productid, startdate = now.map(_.plusDays(2)), enddate = Some(now.map(_.plusDays(3))))
         wanted = Array(ph1.compositeId, ph2.compositeId, ph3.compositeId.copy(productid = ProductId(9999)))
         found <- repo.selectByIds(wanted).compile.toList
-      } yield assert(found.map(_.compositeId) === List(ph1.compositeId, ph2.compositeId))
+        _ <- delay(assert(found.map(_.compositeId) === List(ph1.compositeId, ph2.compositeId)))
+        deleted <- repo.deleteByIds(wanted)
+        _ <- delay(assert(deleted === 2))
+        all <- repo.selectAll.compile.toList
+        _ <- delay(assert(all.map(_.compositeId) === List(ph3.compositeId)))
+      } yield true
     }
   }
 }

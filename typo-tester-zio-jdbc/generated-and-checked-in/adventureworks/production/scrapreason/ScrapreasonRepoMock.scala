@@ -28,6 +28,9 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
   override def delete(scrapreasonid: ScrapreasonId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(scrapreasonid).isDefined)
   }
+  override def deleteByIds(scrapreasonids: Array[ScrapreasonId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(scrapreasonids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
     DeleteBuilderMock(DeleteParams.empty, ScrapreasonFields.structure.fields, map)
   }

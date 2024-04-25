@@ -29,6 +29,16 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def delete(compositeId: SpecialofferproductId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.specialofferproduct where "specialofferid" = ${ParameterValue(compositeId.specialofferid, null, SpecialofferId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[SpecialofferproductId])(implicit c: Connection): Int = {
+    val specialofferid = compositeIds.map(_.specialofferid)
+    val productid = compositeIds.map(_.productid)
+    SQL"""delete
+          from sales.specialofferproduct
+          where ("specialofferid", "productid")
+          in (select unnest(${specialofferid}), unnest(${productid}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
     DeleteBuilder("sales.specialofferproduct", SpecialofferproductFields.structure)
   }

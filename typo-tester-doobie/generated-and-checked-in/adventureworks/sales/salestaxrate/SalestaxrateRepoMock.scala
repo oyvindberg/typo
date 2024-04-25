@@ -26,6 +26,9 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
   override def delete(salestaxrateid: SalestaxrateId): ConnectionIO[Boolean] = {
     delay(map.remove(salestaxrateid).isDefined)
   }
+  override def deleteByIds(salestaxrateids: Array[SalestaxrateId]): ConnectionIO[Int] = {
+    delay(salestaxrateids.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
     DeleteBuilderMock(DeleteParams.empty, SalestaxrateFields.structure.fields, map)
   }

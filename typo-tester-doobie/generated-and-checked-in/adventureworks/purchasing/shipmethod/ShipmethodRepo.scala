@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait ShipmethodRepo {
   def delete(shipmethodid: ShipmethodId): ConnectionIO[Boolean]
+  def deleteByIds(shipmethodids: Array[ShipmethodId]): ConnectionIO[Int]
   def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow]
   def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, ShipmethodRow], batchSize: Int): ConnectionIO[Long]

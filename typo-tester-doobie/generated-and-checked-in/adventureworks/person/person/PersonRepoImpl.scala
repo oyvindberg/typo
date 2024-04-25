@@ -32,6 +32,9 @@ class PersonRepoImpl extends PersonRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     sql"""delete from person.person where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
+    sql"""delete from person.person where "businessentityid" = ANY(${businessentityids})""".update.run
+  }
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
     DeleteBuilder("person.person", PersonFields.structure)
   }

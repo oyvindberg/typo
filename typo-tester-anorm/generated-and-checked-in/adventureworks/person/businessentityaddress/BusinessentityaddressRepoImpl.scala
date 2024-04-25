@@ -30,6 +30,17 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def delete(compositeId: BusinessentityaddressId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.businessentityaddress where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "addressid" = ${ParameterValue(compositeId.addressid, null, AddressId.toStatement)} AND "addresstypeid" = ${ParameterValue(compositeId.addresstypeid, null, AddresstypeId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[BusinessentityaddressId])(implicit c: Connection): Int = {
+    val businessentityid = compositeIds.map(_.businessentityid)
+    val addressid = compositeIds.map(_.addressid)
+    val addresstypeid = compositeIds.map(_.addresstypeid)
+    SQL"""delete
+          from person.businessentityaddress
+          where ("businessentityid", "addressid", "addresstypeid")
+          in (select unnest(${businessentityid}), unnest(${addressid}), unnest(${addresstypeid}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
     DeleteBuilder("person.businessentityaddress", BusinessentityaddressFields.structure)
   }

@@ -30,6 +30,9 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def delete(territoryid: SalesterritoryId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.salesterritory where "territoryid" = ${Segment.paramSegment(territoryid)(SalesterritoryId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(territoryids: Array[SalesterritoryId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from sales.salesterritory where "territoryid" = ANY(${territoryids})""".delete
+  }
   override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
     DeleteBuilder("sales.salesterritory", SalesterritoryFields.structure)
   }

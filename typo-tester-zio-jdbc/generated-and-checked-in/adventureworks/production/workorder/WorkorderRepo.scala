@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait WorkorderRepo {
   def delete(workorderid: WorkorderId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(workorderids: Array[WorkorderId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[WorkorderFields, WorkorderRow]
   def insert(unsaved: WorkorderRow): ZIO[ZConnection, Throwable, WorkorderRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

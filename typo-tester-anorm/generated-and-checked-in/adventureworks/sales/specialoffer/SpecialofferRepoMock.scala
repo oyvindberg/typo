@@ -24,6 +24,9 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
   override def delete(specialofferid: SpecialofferId)(implicit c: Connection): Boolean = {
     map.remove(specialofferid).isDefined
   }
+  override def deleteByIds(specialofferids: Array[SpecialofferId])(implicit c: Connection): Int = {
+    specialofferids.map(id => map.remove(id)).count(_.isDefined)
+  }
   override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
     DeleteBuilderMock(DeleteParams.empty, SpecialofferFields.structure.fields, map)
   }

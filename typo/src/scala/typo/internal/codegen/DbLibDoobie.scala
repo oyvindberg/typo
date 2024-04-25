@@ -67,12 +67,15 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       code"def selectAll: ${fs2Stream.of(ConnectionIO, rowType)}"
     case RepoMethod.SelectById(_, _, id, rowType) =>
       code"def selectById(${id.param}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}"
-    case RepoMethod.SelectAllByIds(_, _, unaryId, idsParam, rowType) =>
-      unaryId match {
-        case IdComputed.UnaryUserSpecified(_, tpe) =>
-          code"def selectByIds($idsParam)(implicit puts: ${Put.of(sc.Type.ArrayOf(tpe))}): ${fs2Stream.of(ConnectionIO, rowType)}"
-        case _ =>
+    case RepoMethod.SelectAllByIds(_, _, idComputed, idsParam, rowType) =>
+      val usedDefineds =
+        idComputed.userDefinedCols.zipWithIndex
+          .map { case (col, i) => sc.Param(sc.Ident(s"puts$i"), Put.of(sc.Type.ArrayOf(col.tpe)), None) }
+      usedDefineds match {
+        case Nil =>
           code"def selectByIds($idsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
+        case nonEmpty =>
+          code"def selectByIds($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${fs2Stream.of(ConnectionIO, rowType)}"
       }
     case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
       val name = s"selectByUnique${keyColumns.map(x => Naming.titleCase(x.name.value)).mkString("And")}"
@@ -99,6 +102,17 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       code"def delete: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
     case RepoMethod.Delete(_, id) =>
       code"def delete(${id.param}): ${ConnectionIO.of(TypesScala.Boolean)}"
+    case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
+      val usedDefineds =
+        idComputed.userDefinedCols.zipWithIndex
+          .map { case (col, i) => sc.Param(sc.Ident(s"put$i"), Put.of(sc.Type.ArrayOf(col.tpe)), None) }
+      usedDefineds match {
+        case Nil =>
+          code"def deleteByIds(${idsParam}): ${ConnectionIO.of(TypesScala.Int)}"
+        case nonEmpty =>
+          code"def deleteByIds(${idsParam})(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Int)}"
+      }
+
     case RepoMethod.SqlFile(sqlScript) =>
       val params = sc.Params(sqlScript.params.map(p => sc.Param(p.name, p.tpe, None)))
 
@@ -305,6 +319,27 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       case RepoMethod.Delete(relName, id) =>
         val sql = SQL(code"""delete from $relName where ${matchId(id)}""")
         code"$sql.update.run.map(_ > 0)"
+      case RepoMethod.DeleteByIds(relName, computedId, idsParam) =>
+        computedId match {
+          case x: IdComputed.Composite =>
+            val vals = x.cols.map(col => code"val ${col.name} = ${idsParam.name}.map(_.${col.name})").mkCode("\n")
+            val sql = SQL {
+              code"""|delete
+                     |from $relName
+                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")})
+                     |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, col.tpe, forbidInline = true)})").mkCode(", ")})
+                     |""".stripMargin
+            }
+            code"""|$vals
+                   |$sql.update.run
+                   |""".stripMargin
+
+          case x: IdComputed.Unary =>
+            val sql = SQL(
+              code"""delete from $relName where ${code"${x.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, x.tpe, forbidInline = true)})"}"""
+            )
+            code"$sql.update.run"
+        }
 
       case RepoMethod.SqlFile(sqlScript) =>
         val renderedScript: sc.Code = sqlScript.sqlFile.decomposedSql.renderCode { (paramAtIndex: Int) =>
@@ -434,6 +469,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType.structure.fields, map)"
       case RepoMethod.Delete(_, id) =>
         code"$delayCIO(map.remove(${id.paramName}).isDefined)"
+      case RepoMethod.DeleteByIds(_, _, idsParam) =>
+        code"$delayCIO(${idsParam.name}.map(id => map.remove(id)).count(_.isDefined))"
       case RepoMethod.SqlFile(_) =>
         // should not happen (tm)
         code"???"

@@ -33,6 +33,13 @@ class DocumentRepoImpl extends DocumentRepo {
   override def delete(documentnode: DocumentId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.document where "documentnode" = ${ParameterValue(documentnode, null, DocumentId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(documentnodes: Array[DocumentId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from production.document
+          where "documentnode" = ANY(${documentnodes})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
     DeleteBuilder("production.document", DocumentFields.structure)
   }

@@ -27,6 +27,9 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
   override def delete(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.contacttype where "contacttypeid" = ${Segment.paramSegment(contacttypeid)(ContacttypeId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(contacttypeids: Array[ContacttypeId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from person.contacttype where "contacttypeid" = ANY(${contacttypeids})""".delete
+  }
   override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
     DeleteBuilder("person.contacttype", ContacttypeFields.structure)
   }

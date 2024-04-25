@@ -28,6 +28,9 @@ class ProductphotoRepoMock(toRow: Function1[ProductphotoRowUnsaved, Productphoto
   override def delete(productphotoid: ProductphotoId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(productphotoid).isDefined)
   }
+  override def deleteByIds(productphotoids: Array[ProductphotoId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(productphotoids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow] = {
     DeleteBuilderMock(DeleteParams.empty, ProductphotoFields.structure.fields, map)
   }

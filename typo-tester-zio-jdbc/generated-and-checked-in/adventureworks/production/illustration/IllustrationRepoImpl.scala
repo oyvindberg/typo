@@ -28,6 +28,9 @@ class IllustrationRepoImpl extends IllustrationRepo {
   override def delete(illustrationid: IllustrationId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.illustration where "illustrationid" = ${Segment.paramSegment(illustrationid)(IllustrationId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(illustrationids: Array[IllustrationId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from production.illustration where "illustrationid" = ANY(${illustrationids})""".delete
+  }
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
     DeleteBuilder("production.illustration", IllustrationFields.structure)
   }

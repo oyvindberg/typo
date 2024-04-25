@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait PhonenumbertypeRepo {
   def delete(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean
+  def deleteByIds(phonenumbertypeids: Array[PhonenumbertypeId])(implicit c: Connection): Int
   def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
   def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow
   def insertStreaming(unsaved: Iterator[PhonenumbertypeRow], batchSize: Int)(implicit c: Connection): Long

@@ -30,6 +30,13 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def delete(purchaseorderid: PurchaseorderheaderId)(implicit c: Connection): Boolean = {
     SQL"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ${ParameterValue(purchaseorderid, null, PurchaseorderheaderId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from purchasing.purchaseorderheader
+          where "purchaseorderid" = ANY(${purchaseorderids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
     DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure)
   }

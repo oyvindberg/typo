@@ -15,6 +15,7 @@ import typo.dsl.UpdateBuilder
 
 trait SalesorderheaderRepo {
   def delete(salesorderid: SalesorderheaderId): ConnectionIO[Boolean]
+  def deleteByIds(salesorderids: Array[SalesorderheaderId]): ConnectionIO[Int]
   def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow]
   def insert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderheaderRow], batchSize: Int): ConnectionIO[Long]

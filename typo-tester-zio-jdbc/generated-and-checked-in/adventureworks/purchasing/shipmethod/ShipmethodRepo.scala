@@ -17,6 +17,7 @@ import zio.stream.ZStream
 
 trait ShipmethodRepo {
   def delete(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(shipmethodids: Array[ShipmethodId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow]
   def insert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, ShipmethodRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]

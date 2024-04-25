@@ -29,6 +29,16 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def delete(compositeId: ProductproductphotoId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productproductphoto where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "productphotoid" = ${ParameterValue(compositeId.productphotoid, null, ProductphotoId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(compositeIds: Array[ProductproductphotoId])(implicit c: Connection): Int = {
+    val productid = compositeIds.map(_.productid)
+    val productphotoid = compositeIds.map(_.productphotoid)
+    SQL"""delete
+          from production.productproductphoto
+          where ("productid", "productphotoid")
+          in (select unnest(${productid}), unnest(${productphotoid}))
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
     DeleteBuilder("production.productproductphoto", ProductproductphotoFields.structure)
   }

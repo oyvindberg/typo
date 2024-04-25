@@ -29,6 +29,9 @@ class StoreRepoImpl extends StoreRepo {
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     sql"""delete from sales.store where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
+    sql"""delete from sales.store where "businessentityid" = ANY(${businessentityids})""".update.run
+  }
   override def delete: DeleteBuilder[StoreFields, StoreRow] = {
     DeleteBuilder("sales.store", StoreFields.structure)
   }

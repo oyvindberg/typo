@@ -28,6 +28,9 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
   override def delete(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(stateprovinceid).isDefined)
   }
+  override def deleteByIds(stateprovinceids: Array[StateprovinceId]): ZIO[ZConnection, Throwable, Long] = {
+    ZIO.succeed(stateprovinceids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  }
   override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
     DeleteBuilderMock(DeleteParams.empty, StateprovinceFields.structure.fields, map)
   }

@@ -28,6 +28,9 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def delete(transactionid: TransactionhistoryId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.transactionhistory where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(transactionids: Array[TransactionhistoryId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from production.transactionhistory where "transactionid" = ANY(${transactionids})""".delete
+  }
   override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
     DeleteBuilder("production.transactionhistory", TransactionhistoryFields.structure)
   }

@@ -27,6 +27,9 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def delete(phonenumbertypeid: PhonenumbertypeId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from person.phonenumbertype where "phonenumbertypeid" = ${Segment.paramSegment(phonenumbertypeid)(PhonenumbertypeId.setter)}""".delete.map(_ > 0)
   }
+  override def deleteByIds(phonenumbertypeids: Array[PhonenumbertypeId]): ZIO[ZConnection, Throwable, Long] = {
+    sql"""delete from person.phonenumbertype where "phonenumbertypeid" = ANY(${phonenumbertypeids})""".delete
+  }
   override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields.structure)
   }

@@ -27,6 +27,9 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
   override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     delay(map.remove(businessentityid).isDefined)
   }
+  override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
+    delay(businessentityids.map(id => map.remove(id)).count(_.isDefined))
+  }
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
     DeleteBuilderMock(DeleteParams.empty, PasswordFields.structure.fields, map)
   }

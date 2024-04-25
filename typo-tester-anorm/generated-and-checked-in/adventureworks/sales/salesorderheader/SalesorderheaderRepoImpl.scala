@@ -40,6 +40,13 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def delete(salesorderid: SalesorderheaderId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.salesorderheader where "salesorderid" = ${ParameterValue(salesorderid, null, SalesorderheaderId.toStatement)}""".executeUpdate() > 0
   }
+  override def deleteByIds(salesorderids: Array[SalesorderheaderId])(implicit c: Connection): Int = {
+    SQL"""delete
+          from sales.salesorderheader
+          where "salesorderid" = ANY(${salesorderids})
+       """.executeUpdate()
+    
+  }
   override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     DeleteBuilder("sales.salesorderheader", SalesorderheaderFields.structure)
   }

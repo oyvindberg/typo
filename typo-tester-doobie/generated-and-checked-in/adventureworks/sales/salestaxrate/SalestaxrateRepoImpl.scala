@@ -30,6 +30,9 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete(salestaxrateid: SalestaxrateId): ConnectionIO[Boolean] = {
     sql"""delete from sales.salestaxrate where "salestaxrateid" = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}""".update.run.map(_ > 0)
   }
+  override def deleteByIds(salestaxrateids: Array[SalestaxrateId]): ConnectionIO[Int] = {
+    sql"""delete from sales.salestaxrate where "salestaxrateid" = ANY(${salestaxrateids})""".update.run
+  }
   override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
     DeleteBuilder("sales.salestaxrate", SalestaxrateFields.structure)
   }

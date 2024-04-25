@@ -14,6 +14,7 @@ import typo.dsl.UpdateBuilder
 
 trait StateprovinceRepo {
   def delete(stateprovinceid: StateprovinceId)(implicit c: Connection): Boolean
+  def deleteByIds(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): Int
   def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow]
   def insert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow
   def insertStreaming(unsaved: Iterator[StateprovinceRow], batchSize: Int)(implicit c: Connection): Long
