@@ -5,18 +5,17 @@ package codegen
 class GenOrdering(customTypes: CustomTypes, pkg: sc.QIdent) {
   val orderingName = new sc.Ident("ordering")
 
-  def ordering(tpe: sc.Type, constituents: NonEmptyList[sc.Param]): sc.Given = {
+  def ordering(tpe: sc.Type, constituents0: NonEmptyList[sc.Param]): sc.Given = {
     val ordering = TypesScala.Ordering.of(tpe)
-
-    val impl =
-      constituents match {
-        case NonEmptyList(col, Nil) =>
-          code"${TypesScala.Ordering}.by(_.${col.name.code})"
-        case more =>
-          code"${TypesScala.Ordering}.by(x => (${more.map(col => code"x.${col.name.code}").mkCode(", ")}))"
-      }
+    val constituents = constituents0.toList.take(9) // max number supported by `Ordering`
+    val impl = constituents match {
+      case List(col) =>
+        code"${TypesScala.Ordering}.by(_.${col.name.code})"
+      case more =>
+        code"${TypesScala.Ordering}.by(x => (${more.map(col => code"x.${col.name.code}").mkCode(", ")}))"
+    }
     // don't demand that parts of the id are ordered, for instance if they are custom types or user-provided
-    val needsImplicits = constituents.toList.filterNot { x =>
+    val needsImplicits = constituents.filterNot { x =>
       val baseType = sc.Type.base(x.tpe)
       val hasOrdering = TypesScala.HasOrdering(baseType)
 
