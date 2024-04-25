@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, SalestaxrateRow],
                            map: scala.collection.mutable.Map[SalestaxrateId, SalestaxrateRow] = scala.collection.mutable.Map.empty) extends SalestaxrateRepo {
-  override def delete(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SalestaxrateFields.structure.fields, map)
+  }
+  override def deleteById(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(salestaxrateid).isDefined)
   }
   override def deleteByIds(salestaxrateids: Array[SalestaxrateId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(salestaxrateids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalestaxrateFields.structure.fields, map)
   }
   override def insert(unsaved: SalestaxrateRow): ZIO[ZConnection, Throwable, SalestaxrateRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
       unsaved
     }
   }
+  override def insert(unsaved: SalestaxrateRowUnsaved): ZIO[ZConnection, Throwable, SalestaxrateRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: SalestaxrateRowUnsaved): ZIO[ZConnection, Throwable, SalestaxrateRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
   override def selectByIds(salestaxrateids: Array[SalestaxrateId]): ZStream[ZConnection, Throwable, SalestaxrateRow] = {
     ZStream.fromIterable(salestaxrateids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SalestaxrateFields.structure.fields, map)
+  }
   override def update(row: SalestaxrateRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.salestaxrateid) match {
@@ -88,9 +91,6 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalestaxrateFields.structure.fields, map)
   }
   override def upsert(unsaved: SalestaxrateRow): ZIO[ZConnection, Throwable, UpdateResult[SalestaxrateRow]] = {
     ZIO.succeed {

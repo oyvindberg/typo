@@ -27,14 +27,14 @@ import zio.stream.ZStream
 
 class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
                          map: scala.collection.mutable.Map[/* user-picked */ CustomCreditcardId, CreditcardRow] = scala.collection.mutable.Map.empty) extends CreditcardRepo {
-  override def delete(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CreditcardFields.structure.fields, map)
+  }
+  override def deleteById(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(creditcardid).isDefined)
   }
   override def deleteByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(creditcardids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CreditcardFields.structure.fields, map)
   }
   override def insert(unsaved: CreditcardRow): ZIO[ZConnection, Throwable, CreditcardRow] = {
     ZIO.succeed {
@@ -47,6 +47,9 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
       unsaved
     }
   }
+  override def insert(unsaved: CreditcardRowUnsaved): ZIO[ZConnection, Throwable, CreditcardRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CreditcardRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -54,9 +57,6 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: CreditcardRowUnsaved): ZIO[ZConnection, Throwable, CreditcardRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CreditcardRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -80,6 +80,9 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
   override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZStream[ZConnection, Throwable, CreditcardRow] = {
     ZStream.fromIterable(creditcardids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CreditcardFields.structure.fields, map)
+  }
   override def update(row: CreditcardRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.creditcardid) match {
@@ -90,9 +93,6 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CreditcardFields.structure.fields, map)
   }
   override def upsert(unsaved: CreditcardRow): ZIO[ZConnection, Throwable, UpdateResult[CreditcardRow]] = {
     ZIO.succeed {

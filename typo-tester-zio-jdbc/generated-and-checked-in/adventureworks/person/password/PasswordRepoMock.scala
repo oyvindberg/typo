@@ -26,14 +26,14 @@ import zio.stream.ZStream
 
 class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
                        map: scala.collection.mutable.Map[BusinessentityId, PasswordRow] = scala.collection.mutable.Map.empty) extends PasswordRepo {
-  override def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PasswordFields.structure.fields, map)
+  }
+  override def deleteById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(businessentityid).isDefined)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(businessentityids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PasswordFields.structure.fields, map)
   }
   override def insert(unsaved: PasswordRow): ZIO[ZConnection, Throwable, PasswordRow] = {
     ZIO.succeed {
@@ -46,6 +46,9 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
       unsaved
     }
   }
+  override def insert(unsaved: PasswordRowUnsaved): ZIO[ZConnection, Throwable, PasswordRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PasswordRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -53,9 +56,6 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: PasswordRowUnsaved): ZIO[ZConnection, Throwable, PasswordRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PasswordRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -79,6 +79,9 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, PasswordRow] = {
     ZStream.fromIterable(businessentityids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PasswordFields.structure.fields, map)
+  }
   override def update(row: PasswordRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.businessentityid) match {
@@ -89,9 +92,6 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PasswordFields.structure.fields, map)
   }
   override def upsert(unsaved: PasswordRow): ZIO[ZConnection, Throwable, UpdateResult[PasswordRow]] = {
     ZIO.succeed {

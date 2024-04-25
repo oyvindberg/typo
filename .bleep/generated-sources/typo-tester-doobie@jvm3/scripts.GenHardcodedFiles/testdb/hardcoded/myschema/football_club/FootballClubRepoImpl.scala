@@ -24,14 +24,14 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class FootballClubRepoImpl extends FootballClubRepo {
-  override def delete(id: FootballClubId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
+    DeleteBuilder("myschema.football_club", FootballClubFields.structure)
+  }
+  override def deleteById(id: FootballClubId): ConnectionIO[Boolean] = {
     sql"""delete from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(ids: Array[FootballClubId]): ConnectionIO[Int] = {
     sql"""delete from myschema.football_club where "id" = ANY(${ids})""".update.run
-  }
-  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
-    DeleteBuilder("myschema.football_club", FootballClubFields.structure)
   }
   override def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")
@@ -48,12 +48,6 @@ class FootballClubRepoImpl extends FootballClubRepo {
   override def selectAll: Stream[ConnectionIO, FootballClubRow] = {
     sql"""select "id", "name" from myschema.football_club""".query(using FootballClubRow.read).stream
   }
-  override def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".query(using FootballClubRow.read).option
-  }
-  override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${ids})""".query(using FootballClubRow.read).stream
-  }
   override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): Stream[ConnectionIO, FootballClubRow] = {
     val where = fragments.whereAndOpt(
       fieldValues.map {
@@ -63,6 +57,15 @@ class FootballClubRepoImpl extends FootballClubRepo {
     )
     sql"""select "id", "name" from myschema.football_club $where""".query(using FootballClubRow.read).stream
   }
+  override def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]] = {
+    sql"""select "id", "name" from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".query(using FootballClubRow.read).option
+  }
+  override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
+    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${ids})""".query(using FootballClubRow.read).stream
+  }
+  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
+    UpdateBuilder("myschema.football_club", FootballClubFields.structure, FootballClubRow.read)
+  }
   override def update(row: FootballClubRow): ConnectionIO[Boolean] = {
     val id = row.id
     sql"""update myschema.football_club
@@ -71,9 +74,6 @@ class FootballClubRepoImpl extends FootballClubRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
-    UpdateBuilder("myschema.football_club", FootballClubFields.structure, FootballClubRow.read)
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ConnectionIO[Boolean] = {
     NonEmptyList.fromList(fieldValues) match {

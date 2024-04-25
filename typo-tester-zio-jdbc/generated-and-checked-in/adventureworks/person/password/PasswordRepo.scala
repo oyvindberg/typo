@@ -17,19 +17,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait PasswordRepo {
-  def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[PasswordFields, PasswordRow]
+  def deleteById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: PasswordRow): ZIO[ZConnection, Throwable, PasswordRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PasswordRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: PasswordRowUnsaved): ZIO[ZConnection, Throwable, PasswordRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PasswordRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PasswordRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[PasswordFields, PasswordRow]
   def selectAll: ZStream[ZConnection, Throwable, PasswordRow]
   def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[PasswordRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, PasswordRow]
-  def update(row: PasswordRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[PasswordFields, PasswordRow]
+  def update(row: PasswordRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: PasswordRow): ZIO[ZConnection, Throwable, UpdateResult[PasswordRow]]
 }

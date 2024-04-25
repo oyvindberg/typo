@@ -27,23 +27,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class SalespersonRepoImpl extends SalespersonRepo {
-  override def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[SalespersonFields, SalespersonRow] = {
+    DeleteBuilder("sales.salesperson", SalespersonFields.structure)
+  }
+  override def deleteById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.salesperson where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from sales.salesperson where "businessentityid" = ANY(${businessentityids})""".delete
-  }
-  override def delete: DeleteBuilder[SalespersonFields, SalespersonRow] = {
-    DeleteBuilder("sales.salesperson", SalespersonFields.structure)
   }
   override def insert(unsaved: SalespersonRow): ZIO[ZConnection, Throwable, SalespersonRow] = {
     sql"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4, ${Segment.paramSegment(unsaved.salesquota)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.bonus)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.commissionpct)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.salesytd)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.saleslastyear)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
        """.insertReturning(using SalespersonRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalespersonRow.text)
   }
   override def insert(unsaved: SalespersonRowUnsaved): ZIO[ZConnection, Throwable, SalespersonRow] = {
     val fs = List(
@@ -88,6 +85,9 @@ class SalespersonRepoImpl extends SalespersonRepo {
     q.insertReturning(using SalespersonRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalespersonRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalespersonRowUnsaved.text)
@@ -104,6 +104,9 @@ class SalespersonRepoImpl extends SalespersonRepo {
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, SalespersonRow] = {
     sql"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text from sales.salesperson where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(using SalespersonRow.jdbcDecoder).selectStream()
   }
+  override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
+    UpdateBuilder("sales.salesperson", SalespersonFields.structure, SalespersonRow.jdbcDecoder)
+  }
   override def update(row: SalespersonRow): ZIO[ZConnection, Throwable, Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update sales.salesperson
@@ -116,9 +119,6 @@ class SalespersonRepoImpl extends SalespersonRepo {
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
-    UpdateBuilder("sales.salesperson", SalespersonFields.structure, SalespersonRow.jdbcDecoder)
   }
   override def upsert(unsaved: SalespersonRow): ZIO[ZConnection, Throwable, UpdateResult[SalespersonRow]] = {
     sql"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")

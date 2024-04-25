@@ -27,23 +27,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class WorkorderRepoImpl extends WorkorderRepo {
-  override def delete(workorderid: WorkorderId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
+    DeleteBuilder("production.workorder", WorkorderFields.structure)
+  }
+  override def deleteById(workorderid: WorkorderId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.workorder where "workorderid" = ${Segment.paramSegment(workorderid)(WorkorderId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(workorderids: Array[WorkorderId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from production.workorder where "workorderid" = ANY(${workorderids})""".delete
-  }
-  override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
-    DeleteBuilder("production.workorder", WorkorderFields.structure)
   }
   override def insert(unsaved: WorkorderRow): ZIO[ZConnection, Throwable, WorkorderRow] = {
     sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
           values (${Segment.paramSegment(unsaved.workorderid)(WorkorderId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.orderqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.scrappedqty)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.duedate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.scrapreasonid)(Setter.optionParamSetter(ScrapreasonId.setter))}::int2, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
        """.insertReturning(using WorkorderRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""", batchSize, unsaved)(WorkorderRow.text)
   }
   override def insert(unsaved: WorkorderRowUnsaved): ZIO[ZConnection, Throwable, WorkorderRow] = {
     val fs = List(
@@ -76,6 +73,9 @@ class WorkorderRepoImpl extends WorkorderRepo {
     q.insertReturning(using WorkorderRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""", batchSize, unsaved)(WorkorderRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.workorder("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(WorkorderRowUnsaved.text)
@@ -92,6 +92,9 @@ class WorkorderRepoImpl extends WorkorderRepo {
   override def selectByIds(workorderids: Array[WorkorderId]): ZStream[ZConnection, Throwable, WorkorderRow] = {
     sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ANY(${Segment.paramSegment(workorderids)(WorkorderId.arraySetter)})""".query(using WorkorderRow.jdbcDecoder).selectStream()
   }
+  override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
+    UpdateBuilder("production.workorder", WorkorderFields.structure, WorkorderRow.jdbcDecoder)
+  }
   override def update(row: WorkorderRow): ZIO[ZConnection, Throwable, Boolean] = {
     val workorderid = row.workorderid
     sql"""update production.workorder
@@ -104,9 +107,6 @@ class WorkorderRepoImpl extends WorkorderRepo {
               "scrapreasonid" = ${Segment.paramSegment(row.scrapreasonid)(Setter.optionParamSetter(ScrapreasonId.setter))}::int2,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "workorderid" = ${Segment.paramSegment(workorderid)(WorkorderId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
-    UpdateBuilder("production.workorder", WorkorderFields.structure, WorkorderRow.jdbcDecoder)
   }
   override def upsert(unsaved: WorkorderRow): ZIO[ZConnection, Throwable, UpdateResult[WorkorderRow]] = {
     sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")

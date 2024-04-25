@@ -31,23 +31,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class ProductRepoImpl extends ProductRepo {
-  override def delete(productid: ProductId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ProductFields, ProductRow] = {
+    DeleteBuilder("production.product", ProductFields.structure)
+  }
+  override def deleteById(productid: ProductId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.product where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(productids: Array[ProductId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from production.product where "productid" = ANY(${productids})""".delete
-  }
-  override def delete: DeleteBuilder[ProductFields, ProductRow] = {
-    DeleteBuilder("production.product", ProductFields.structure)
   }
   override def insert(unsaved: ProductRow): ZIO[ZConnection, Throwable, ProductRow] = {
     sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.productnumber)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.makeflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.finishedgoodsflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.color)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.safetystocklevel)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.reorderpoint)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.standardcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.listprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.size)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.sizeunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar, ${Segment.paramSegment(unsaved.weightunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar, ${Segment.paramSegment(unsaved.weight)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.daystomanufacture)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.productline)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.`class`)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.style)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.productsubcategoryid)(Setter.optionParamSetter(ProductsubcategoryId.setter))}::int4, ${Segment.paramSegment(unsaved.productmodelid)(Setter.optionParamSetter(ProductmodelId.setter))}::int4, ${Segment.paramSegment(unsaved.sellstartdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.sellenddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.discontinueddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text
        """.insertReturning(using ProductRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductRow.text)
   }
   override def insert(unsaved: ProductRowUnsaved): ZIO[ZConnection, Throwable, ProductRow] = {
     val fs = List(
@@ -105,6 +102,9 @@ class ProductRepoImpl extends ProductRepo {
     q.insertReturning(using ProductRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.product("name", "productnumber", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "productid", "makeflag", "finishedgoodsflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductRowUnsaved.text)
@@ -120,6 +120,9 @@ class ProductRepoImpl extends ProductRepo {
   }
   override def selectByIds(productids: Array[ProductId]): ZStream[ZConnection, Throwable, ProductRow] = {
     sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product where "productid" = ANY(${Segment.paramSegment(productids)(ProductId.arraySetter)})""".query(using ProductRow.jdbcDecoder).selectStream()
+  }
+  override def update: UpdateBuilder[ProductFields, ProductRow] = {
+    UpdateBuilder("production.product", ProductFields.structure, ProductRow.jdbcDecoder)
   }
   override def update(row: ProductRow): ZIO[ZConnection, Throwable, Boolean] = {
     val productid = row.productid
@@ -149,9 +152,6 @@ class ProductRepoImpl extends ProductRepo {
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[ProductFields, ProductRow] = {
-    UpdateBuilder("production.product", ProductFields.structure, ProductRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductRow): ZIO[ZConnection, Throwable, UpdateResult[ProductRow]] = {
     sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")

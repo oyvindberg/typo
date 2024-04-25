@@ -14,16 +14,16 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait FlaffRepo {
-  def delete(compositeId: FlaffId): ConnectionIO[Boolean]
-  def deleteByIds(compositeIds: Array[FlaffId]): ConnectionIO[Int]
   def delete: DeleteBuilder[FlaffFields, FlaffRow]
+  def deleteById(compositeId: FlaffId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[FlaffId]): ConnectionIO[Int]
   def insert(unsaved: FlaffRow): ConnectionIO[FlaffRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, FlaffRow], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[FlaffFields, FlaffRow]
   def selectAll: Stream[ConnectionIO, FlaffRow]
   def selectById(compositeId: FlaffId): ConnectionIO[Option[FlaffRow]]
   def selectByIds(compositeIds: Array[FlaffId]): Stream[ConnectionIO, FlaffRow]
-  def update(row: FlaffRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[FlaffFields, FlaffRow]
+  def update(row: FlaffRow): ConnectionIO[Boolean]
   def upsert(unsaved: FlaffRow): ConnectionIO[FlaffRow]
 }

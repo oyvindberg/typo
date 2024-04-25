@@ -25,14 +25,14 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, MaritalStatusRow] = scala.collection.mutable.Map.empty) extends MaritalStatusRepo {
-  override def delete(id: MaritalStatusId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure.fields, map)
+  }
+  override def deleteById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(id).isDefined)
   }
   override def deleteByIds(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(ids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure.fields, map)
   }
   override def insert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, MaritalStatusRow] = {
     ZIO.succeed {
@@ -59,18 +59,18 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
   override def selectAll: ZStream[ZConnection, Throwable, MaritalStatusRow] = {
     ZStream.fromIterable(map.values)
   }
-  override def selectById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Option[MaritalStatusRow]] = {
-    ZIO.succeed(map.get(id))
-  }
-  override def selectByIds(ids: Array[MaritalStatusId]): ZStream[ZConnection, Throwable, MaritalStatusRow] = {
-    ZStream.fromIterable(ids.flatMap(map.get))
-  }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, MaritalStatusRow] = {
     ZStream.fromIterable {
       fieldValues.foldLeft(map.values) {
         case (acc, MaritalStatusFieldValue.id(value)) => acc.filter(_.id == value)
       }
     }
+  }
+  override def selectById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Option[MaritalStatusRow]] = {
+    ZIO.succeed(map.get(id))
+  }
+  override def selectByIds(ids: Array[MaritalStatusId]): ZStream[ZConnection, Throwable, MaritalStatusRow] = {
+    ZStream.fromIterable(ids.flatMap(map.get))
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
     UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields.structure.fields, map)

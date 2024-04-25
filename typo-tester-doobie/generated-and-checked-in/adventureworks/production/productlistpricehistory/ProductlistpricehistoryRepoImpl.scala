@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
-  override def delete(compositeId: ProductlistpricehistoryId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
+    DeleteBuilder("production.productlistpricehistory", ProductlistpricehistoryFields.structure)
+  }
+  override def deleteById(compositeId: ProductlistpricehistoryId): ConnectionIO[Boolean] = {
     sql"""delete from production.productlistpricehistory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductlistpricehistoryId]): ConnectionIO[Int] = {
@@ -37,17 +40,11 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
        """.update.run
     
   }
-  override def delete: DeleteBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
-    DeleteBuilder("production.productlistpricehistory", ProductlistpricehistoryFields.structure)
-  }
   override def insert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow] = {
     sql"""insert into production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text
        """.query(using ProductlistpricehistoryRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductlistpricehistoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductlistpricehistoryRow.text)
   }
   override def insert(unsaved: ProductlistpricehistoryRowUnsaved): ConnectionIO[ProductlistpricehistoryRow] = {
     val fs = List(
@@ -75,6 +72,9 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
     q.query(using ProductlistpricehistoryRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductlistpricehistoryRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductlistpricehistoryRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductlistpricehistoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductlistpricehistoryRowUnsaved.text)
@@ -98,6 +98,9 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
        """.query(using ProductlistpricehistoryRow.read).stream
     
   }
+  override def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
+    UpdateBuilder("production.productlistpricehistory", ProductlistpricehistoryFields.structure, ProductlistpricehistoryRow.read)
+  }
   override def update(row: ProductlistpricehistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productlistpricehistory
@@ -108,9 +111,6 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
-    UpdateBuilder("production.productlistpricehistory", ProductlistpricehistoryFields.structure, ProductlistpricehistoryRow.read)
   }
   override def upsert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow] = {
     sql"""insert into production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate")

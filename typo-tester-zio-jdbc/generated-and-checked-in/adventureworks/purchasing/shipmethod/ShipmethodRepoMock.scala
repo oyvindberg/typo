@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
                          map: scala.collection.mutable.Map[ShipmethodId, ShipmethodRow] = scala.collection.mutable.Map.empty) extends ShipmethodRepo {
-  override def delete(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ShipmethodFields.structure.fields, map)
+  }
+  override def deleteById(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(shipmethodid).isDefined)
   }
   override def deleteByIds(shipmethodids: Array[ShipmethodId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(shipmethodids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShipmethodFields.structure.fields, map)
   }
   override def insert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, ShipmethodRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
       unsaved
     }
   }
+  override def insert(unsaved: ShipmethodRowUnsaved): ZIO[ZConnection, Throwable, ShipmethodRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: ShipmethodRowUnsaved): ZIO[ZConnection, Throwable, ShipmethodRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
   override def selectByIds(shipmethodids: Array[ShipmethodId]): ZStream[ZConnection, Throwable, ShipmethodRow] = {
     ZStream.fromIterable(shipmethodids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ShipmethodFields.structure.fields, map)
+  }
   override def update(row: ShipmethodRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.shipmethodid) match {
@@ -88,9 +91,6 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShipmethodFields.structure.fields, map)
   }
   override def upsert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, UpdateResult[ShipmethodRow]] = {
     ZIO.succeed {

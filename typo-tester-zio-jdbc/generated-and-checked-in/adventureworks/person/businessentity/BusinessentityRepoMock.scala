@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, BusinessentityRow],
                              map: scala.collection.mutable.Map[BusinessentityId, BusinessentityRow] = scala.collection.mutable.Map.empty) extends BusinessentityRepo {
-  override def delete(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
+    DeleteBuilderMock(DeleteParams.empty, BusinessentityFields.structure.fields, map)
+  }
+  override def deleteById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(businessentityid).isDefined)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(businessentityids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
-    DeleteBuilderMock(DeleteParams.empty, BusinessentityFields.structure.fields, map)
   }
   override def insert(unsaved: BusinessentityRow): ZIO[ZConnection, Throwable, BusinessentityRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
       unsaved
     }
   }
+  override def insert(unsaved: BusinessentityRowUnsaved): ZIO[ZConnection, Throwable, BusinessentityRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: BusinessentityRowUnsaved): ZIO[ZConnection, Throwable, BusinessentityRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, BusinessentityRow] = {
     ZStream.fromIterable(businessentityids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
+    UpdateBuilderMock(UpdateParams.empty, BusinessentityFields.structure.fields, map)
+  }
   override def update(row: BusinessentityRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.businessentityid) match {
@@ -88,9 +91,6 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
-    UpdateBuilderMock(UpdateParams.empty, BusinessentityFields.structure.fields, map)
   }
   override def upsert(unsaved: BusinessentityRow): ZIO[ZConnection, Throwable, UpdateResult[BusinessentityRow]] = {
     ZIO.succeed {

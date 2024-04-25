@@ -24,14 +24,14 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class FootballClubRepoImpl extends FootballClubRepo {
-  override def delete(id: FootballClubId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
+    DeleteBuilder("myschema.football_club", FootballClubFields.structure)
+  }
+  override def deleteById(id: FootballClubId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from myschema.football_club where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from myschema.football_club where "id" = ANY(${ids})""".delete
-  }
-  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
-    DeleteBuilder("myschema.football_club", FootballClubFields.structure)
   }
   override def insert(unsaved: FootballClubRow): ZIO[ZConnection, Throwable, FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")
@@ -48,12 +48,6 @@ class FootballClubRepoImpl extends FootballClubRepo {
   override def selectAll: ZStream[ZConnection, Throwable, FootballClubRow] = {
     sql"""select "id", "name" from myschema.football_club""".query(using FootballClubRow.jdbcDecoder).selectStream()
   }
-  override def selectById(id: FootballClubId): ZIO[ZConnection, Throwable, Option[FootballClubRow]] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".query(using FootballClubRow.jdbcDecoder).selectOne
-  }
-  override def selectByIds(ids: Array[FootballClubId]): ZStream[ZConnection, Throwable, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${Segment.paramSegment(ids)(FootballClubId.arraySetter)})""".query(using FootballClubRow.jdbcDecoder).selectStream()
-  }
   override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, FootballClubRow] = {
     fieldValues match {
       case Nil      => selectAll
@@ -67,14 +61,20 @@ class FootballClubRepoImpl extends FootballClubRepo {
         sql"""select "id", "name" from myschema.football_club where $wheres""".query(using FootballClubRow.jdbcDecoder).selectStream()
     }
   }
+  override def selectById(id: FootballClubId): ZIO[ZConnection, Throwable, Option[FootballClubRow]] = {
+    sql"""select "id", "name" from myschema.football_club where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".query(using FootballClubRow.jdbcDecoder).selectOne
+  }
+  override def selectByIds(ids: Array[FootballClubId]): ZStream[ZConnection, Throwable, FootballClubRow] = {
+    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${Segment.paramSegment(ids)(FootballClubId.arraySetter)})""".query(using FootballClubRow.jdbcDecoder).selectStream()
+  }
+  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
+    UpdateBuilder("myschema.football_club", FootballClubFields.structure, FootballClubRow.jdbcDecoder)
+  }
   override def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Boolean] = {
     val id = row.id
     sql"""update myschema.football_club
           set "name" = ${Segment.paramSegment(row.name)(Setter.stringSetter)}
           where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
-    UpdateBuilder("myschema.football_club", FootballClubFields.structure, FootballClubRow.jdbcDecoder)
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean] = {
     NonEmptyChunk.fromIterableOption(fieldValues) match {

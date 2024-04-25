@@ -14,12 +14,12 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait DocumentRepo {
-  def delete(documentnode: DocumentId)(implicit c: Connection): Boolean
-  def deleteByIds(documentnodes: Array[DocumentId])(implicit c: Connection): Int
   def delete: DeleteBuilder[DocumentFields, DocumentRow]
+  def deleteById(documentnode: DocumentId)(implicit c: Connection): Boolean
+  def deleteByIds(documentnodes: Array[DocumentId])(implicit c: Connection): Int
   def insert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow
-  def insertStreaming(unsaved: Iterator[DocumentRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow
+  def insertStreaming(unsaved: Iterator[DocumentRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[DocumentRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[DocumentFields, DocumentRow]
@@ -27,7 +27,7 @@ trait DocumentRepo {
   def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow]
   def selectByIds(documentnodes: Array[DocumentId])(implicit c: Connection): List[DocumentRow]
   def selectByUniqueRowguid(rowguid: TypoUUID)(implicit c: Connection): Option[DocumentRow]
-  def update(row: DocumentRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[DocumentFields, DocumentRow]
+  def update(row: DocumentRow)(implicit c: Connection): Boolean
   def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow
 }

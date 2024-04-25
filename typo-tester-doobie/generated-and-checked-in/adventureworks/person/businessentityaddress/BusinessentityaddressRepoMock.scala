@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUnsaved, BusinessentityaddressRow],
                                     map: scala.collection.mutable.Map[BusinessentityaddressId, BusinessentityaddressRow] = scala.collection.mutable.Map.empty) extends BusinessentityaddressRepo {
-  override def delete(compositeId: BusinessentityaddressId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
+    DeleteBuilderMock(DeleteParams.empty, BusinessentityaddressFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: BusinessentityaddressId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
   }
   override def deleteByIds(compositeIds: Array[BusinessentityaddressId]): ConnectionIO[Int] = {
     delay(compositeIds.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
-    DeleteBuilderMock(DeleteParams.empty, BusinessentityaddressFields.structure.fields, map)
   }
   override def insert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow] = {
     delay {
@@ -42,6 +42,9 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
       unsaved
     }
   }
+  override def insert(unsaved: BusinessentityaddressRowUnsaved): ConnectionIO[BusinessentityaddressRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentityaddressRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
       }
       num
     }
-  }
-  override def insert(unsaved: BusinessentityaddressRowUnsaved): ConnectionIO[BusinessentityaddressRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BusinessentityaddressRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
   override def selectByIds(compositeIds: Array[BusinessentityaddressId]): Stream[ConnectionIO, BusinessentityaddressRow] = {
     Stream.emits(compositeIds.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
+    UpdateBuilderMock(UpdateParams.empty, BusinessentityaddressFields.structure.fields, map)
+  }
   override def update(row: BusinessentityaddressRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {
@@ -89,9 +92,6 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
-    UpdateBuilderMock(UpdateParams.empty, BusinessentityaddressFields.structure.fields, map)
   }
   override def upsert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow] = {
     delay {

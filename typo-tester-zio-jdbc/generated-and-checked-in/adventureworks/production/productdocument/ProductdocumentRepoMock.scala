@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class ProductdocumentRepoMock(toRow: Function1[ProductdocumentRowUnsaved, ProductdocumentRow],
                               map: scala.collection.mutable.Map[ProductdocumentId, ProductdocumentRow] = scala.collection.mutable.Map.empty) extends ProductdocumentRepo {
-  override def delete(compositeId: ProductdocumentId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ProductdocumentFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: ProductdocumentId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
   override def deleteByIds(compositeIds: Array[ProductdocumentId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(compositeIds.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductdocumentFields.structure.fields, map)
   }
   override def insert(unsaved: ProductdocumentRow): ZIO[ZConnection, Throwable, ProductdocumentRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class ProductdocumentRepoMock(toRow: Function1[ProductdocumentRowUnsaved, Produc
       unsaved
     }
   }
+  override def insert(unsaved: ProductdocumentRowUnsaved): ZIO[ZConnection, Throwable, ProductdocumentRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductdocumentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class ProductdocumentRepoMock(toRow: Function1[ProductdocumentRowUnsaved, Produc
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: ProductdocumentRowUnsaved): ZIO[ZConnection, Throwable, ProductdocumentRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductdocumentRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class ProductdocumentRepoMock(toRow: Function1[ProductdocumentRowUnsaved, Produc
   override def selectByIds(compositeIds: Array[ProductdocumentId]): ZStream[ZConnection, Throwable, ProductdocumentRow] = {
     ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
+  override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ProductdocumentFields.structure.fields, map)
+  }
   override def update(row: ProductdocumentRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.compositeId) match {
@@ -88,9 +91,6 @@ class ProductdocumentRepoMock(toRow: Function1[ProductdocumentRowUnsaved, Produc
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductdocumentFields.structure.fields, map)
   }
   override def upsert(unsaved: ProductdocumentRow): ZIO[ZConnection, Throwable, UpdateResult[ProductdocumentRow]] = {
     ZIO.succeed {

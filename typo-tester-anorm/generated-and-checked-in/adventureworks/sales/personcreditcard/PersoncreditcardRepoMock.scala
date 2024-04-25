@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, PersoncreditcardRow],
                                map: scala.collection.mutable.Map[PersoncreditcardId, PersoncreditcardRow] = scala.collection.mutable.Map.empty) extends PersoncreditcardRepo {
-  override def delete(compositeId: PersoncreditcardId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PersoncreditcardFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: PersoncreditcardId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
   }
   override def deleteByIds(compositeIds: Array[PersoncreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): Int = {
     compositeIds.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PersoncreditcardFields.structure.fields, map)
   }
   override def insert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
     val _ = if (map.contains(unsaved.compositeId))
@@ -40,14 +40,14 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
     
     unsaved
   }
+  override def insert(unsaved: PersoncreditcardRowUnsaved)(implicit c: Connection): PersoncreditcardRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[PersoncreditcardRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.compositeId -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: PersoncreditcardRowUnsaved)(implicit c: Connection): PersoncreditcardRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[PersoncreditcardRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -69,6 +69,9 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
   override def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[PersoncreditcardRow] = {
     compositeIds.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PersoncreditcardFields.structure.fields, map)
+  }
   override def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
       case Some(`row`) => false
@@ -77,9 +80,6 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PersoncreditcardFields.structure.fields, map)
   }
   override def upsert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
     map.put(unsaved.compositeId, unsaved): @nowarn

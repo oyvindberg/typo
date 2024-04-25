@@ -31,7 +31,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class PersonRepoImpl extends PersonRepo {
-  override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[PersonFields, PersonRow] = {
+    DeleteBuilder("person.person", PersonFields.structure)
+  }
+  override def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from person.person where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
@@ -41,9 +44,6 @@ class PersonRepoImpl extends PersonRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[PersonFields, PersonRow] = {
-    DeleteBuilder("person.person", PersonFields.structure)
-  }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.persontype, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.namestyle, null, NameStyle.toStatement)}::bool, ${ParameterValue(unsaved.title, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.firstname, null, /* user-picked */ FirstName.toStatement)}::varchar, ${ParameterValue(unsaved.middlename, null, ToStatement.optionToStatement(Name.toStatement, Name.parameterMetadata))}::varchar, ${ParameterValue(unsaved.lastname, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.suffix, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.emailpromotion, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.additionalcontactinfo, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -51,9 +51,6 @@ class PersonRepoImpl extends PersonRepo {
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[PersonRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersonRow.text, c)
   }
   override def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow = {
     val namedParameters = List(
@@ -99,6 +96,9 @@ class PersonRepoImpl extends PersonRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[PersonRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersonRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[PersonRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY person.person("businessentityid", "persontype", "title", "firstname", "middlename", "lastname", "suffix", "additionalcontactinfo", "demographics", "namestyle", "emailpromotion", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text, c)
@@ -124,6 +124,9 @@ class PersonRepoImpl extends PersonRepo {
        """.as(PersonRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[PersonFields, PersonRow] = {
+    UpdateBuilder("person.person", PersonFields.structure, PersonRow.rowParser)
+  }
   override def update(row: PersonRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update person.person
@@ -141,9 +144,6 @@ class PersonRepoImpl extends PersonRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilder("person.person", PersonFields.structure, PersonRow.rowParser)
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")

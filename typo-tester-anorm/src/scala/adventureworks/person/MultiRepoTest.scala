@@ -70,7 +70,7 @@ class PersonWithAddressesRepo(
       currentAddressesByType.get(ba.addresstypeid) match {
         case Some(address) if address.addressid == ba.addressid =>
         case _ =>
-          businessentityAddressRepo.delete(ba.compositeId)
+          businessentityAddressRepo.deleteById(ba.compositeId)
       }
     }
     // attach new addresses

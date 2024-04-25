@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, SalesorderheaderRow],
                                map: scala.collection.mutable.Map[SalesorderheaderId, SalesorderheaderRow] = scala.collection.mutable.Map.empty) extends SalesorderheaderRepo {
-  override def delete(salesorderid: SalesorderheaderId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SalesorderheaderFields.structure.fields, map)
+  }
+  override def deleteById(salesorderid: SalesorderheaderId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(salesorderid).isDefined)
   }
   override def deleteByIds(salesorderids: Array[SalesorderheaderId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(salesorderids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesorderheaderFields.structure.fields, map)
   }
   override def insert(unsaved: SalesorderheaderRow): ZIO[ZConnection, Throwable, SalesorderheaderRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
       unsaved
     }
   }
+  override def insert(unsaved: SalesorderheaderRowUnsaved): ZIO[ZConnection, Throwable, SalesorderheaderRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderheaderRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: SalesorderheaderRowUnsaved): ZIO[ZConnection, Throwable, SalesorderheaderRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderheaderRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
   override def selectByIds(salesorderids: Array[SalesorderheaderId]): ZStream[ZConnection, Throwable, SalesorderheaderRow] = {
     ZStream.fromIterable(salesorderids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SalesorderheaderFields.structure.fields, map)
+  }
   override def update(row: SalesorderheaderRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.salesorderid) match {
@@ -88,9 +91,6 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesorderheaderFields.structure.fields, map)
   }
   override def upsert(unsaved: SalesorderheaderRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderheaderRow]] = {
     ZIO.succeed {

@@ -16,19 +16,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait PersoncreditcardRepo {
-  def delete(compositeId: PersoncreditcardId): ConnectionIO[Boolean]
-  def deleteByIds(compositeIds: Array[PersoncreditcardId])(implicit put0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Int]
   def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow]
+  def deleteById(compositeId: PersoncreditcardId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[PersoncreditcardId])(implicit put0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Int]
   def insert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, PersoncreditcardRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: PersoncreditcardRowUnsaved): ConnectionIO[PersoncreditcardRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, PersoncreditcardRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersoncreditcardRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def selectAll: Stream[ConnectionIO, PersoncreditcardRow]
   def selectById(compositeId: PersoncreditcardId): ConnectionIO[Option[PersoncreditcardRow]]
   def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): Stream[ConnectionIO, PersoncreditcardRow]
-  def update(row: PersoncreditcardRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow]
+  def update(row: PersoncreditcardRow): ConnectionIO[Boolean]
   def upsert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow]
 }

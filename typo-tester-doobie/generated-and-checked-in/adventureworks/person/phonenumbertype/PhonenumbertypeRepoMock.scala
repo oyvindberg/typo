@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, PhonenumbertypeRow],
                               map: scala.collection.mutable.Map[PhonenumbertypeId, PhonenumbertypeRow] = scala.collection.mutable.Map.empty) extends PhonenumbertypeRepo {
-  override def delete(phonenumbertypeid: PhonenumbertypeId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PhonenumbertypeFields.structure.fields, map)
+  }
+  override def deleteById(phonenumbertypeid: PhonenumbertypeId): ConnectionIO[Boolean] = {
     delay(map.remove(phonenumbertypeid).isDefined)
   }
   override def deleteByIds(phonenumbertypeids: Array[PhonenumbertypeId]): ConnectionIO[Int] = {
     delay(phonenumbertypeids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PhonenumbertypeFields.structure.fields, map)
   }
   override def insert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     delay {
@@ -42,6 +42,9 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
       unsaved
     }
   }
+  override def insert(unsaved: PhonenumbertypeRowUnsaved): ConnectionIO[PhonenumbertypeRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
       }
       num
     }
-  }
-  override def insert(unsaved: PhonenumbertypeRowUnsaved): ConnectionIO[PhonenumbertypeRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId]): Stream[ConnectionIO, PhonenumbertypeRow] = {
     Stream.emits(phonenumbertypeids.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PhonenumbertypeFields.structure.fields, map)
+  }
   override def update(row: PhonenumbertypeRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.phonenumbertypeid) match {
@@ -89,9 +92,6 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PhonenumbertypeFields.structure.fields, map)
   }
   override def upsert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     delay {

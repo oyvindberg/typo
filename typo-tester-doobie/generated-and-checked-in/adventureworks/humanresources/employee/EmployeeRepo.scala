@@ -15,19 +15,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait EmployeeRepo {
-  def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean]
-  def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int]
   def delete: DeleteBuilder[EmployeeFields, EmployeeRow]
+  def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean]
+  def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int]
   def insert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, EmployeeRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: EmployeeRowUnsaved): ConnectionIO[EmployeeRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, EmployeeRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmployeeRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[EmployeeFields, EmployeeRow]
   def selectAll: Stream[ConnectionIO, EmployeeRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[EmployeeRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, EmployeeRow]
-  def update(row: EmployeeRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[EmployeeFields, EmployeeRow]
+  def update(row: EmployeeRow): ConnectionIO[Boolean]
   def upsert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow]
 }

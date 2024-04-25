@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait SalespersonquotahistoryRepo {
-  def delete(compositeId: SalespersonquotahistoryId): ConnectionIO[Boolean]
-  def deleteByIds(compositeIds: Array[SalespersonquotahistoryId]): ConnectionIO[Int]
   def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
+  def deleteById(compositeId: SalespersonquotahistoryId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[SalespersonquotahistoryId]): ConnectionIO[Int]
   def insert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, SalespersonquotahistoryRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: SalespersonquotahistoryRowUnsaved): ConnectionIO[SalespersonquotahistoryRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, SalespersonquotahistoryRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalespersonquotahistoryRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def selectAll: Stream[ConnectionIO, SalespersonquotahistoryRow]
   def selectById(compositeId: SalespersonquotahistoryId): ConnectionIO[Option[SalespersonquotahistoryRow]]
   def selectByIds(compositeIds: Array[SalespersonquotahistoryId]): Stream[ConnectionIO, SalespersonquotahistoryRow]
-  def update(row: SalespersonquotahistoryRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
+  def update(row: SalespersonquotahistoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow]
 }

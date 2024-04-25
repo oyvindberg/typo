@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait SpecialofferRepo {
-  def delete(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(specialofferids: Array[SpecialofferId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow]
+  def deleteById(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(specialofferids: Array[SpecialofferId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, SpecialofferRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: SpecialofferRowUnsaved): ZIO[ZConnection, Throwable, SpecialofferRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[SpecialofferFields, SpecialofferRow]
   def selectAll: ZStream[ZConnection, Throwable, SpecialofferRow]
   def selectById(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Option[SpecialofferRow]]
   def selectByIds(specialofferids: Array[SpecialofferId]): ZStream[ZConnection, Throwable, SpecialofferRow]
-  def update(row: SpecialofferRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[SpecialofferFields, SpecialofferRow]
+  def update(row: SpecialofferRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, UpdateResult[SpecialofferRow]]
 }

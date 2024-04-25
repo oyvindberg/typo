@@ -17,12 +17,12 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait UsersRepo {
-  def delete(userId: UsersId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[UsersFields, UsersRow]
+  def deleteById(userId: UsersId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UsersRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: UsersRowUnsaved): ZIO[ZConnection, Throwable, UsersRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[UsersFields, UsersRow]
@@ -30,7 +30,7 @@ trait UsersRepo {
   def selectById(userId: UsersId): ZIO[ZConnection, Throwable, Option[UsersRow]]
   def selectByIds(userIds: Array[UsersId]): ZStream[ZConnection, Throwable, UsersRow]
   def selectByUniqueEmail(email: TypoUnknownCitext): ZIO[ZConnection, Throwable, Option[UsersRow]]
-  def update(row: UsersRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[UsersFields, UsersRow]
+  def update(row: UsersRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UpdateResult[UsersRow]]
 }

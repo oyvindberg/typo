@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow],
                           map: scala.collection.mutable.Map[ScrapreasonId, ScrapreasonRow] = scala.collection.mutable.Map.empty) extends ScrapreasonRepo {
-  override def delete(scrapreasonid: ScrapreasonId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ScrapreasonFields.structure.fields, map)
+  }
+  override def deleteById(scrapreasonid: ScrapreasonId): ConnectionIO[Boolean] = {
     delay(map.remove(scrapreasonid).isDefined)
   }
   override def deleteByIds(scrapreasonids: Array[ScrapreasonId]): ConnectionIO[Int] = {
     delay(scrapreasonids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ScrapreasonFields.structure.fields, map)
   }
   override def insert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     delay {
@@ -42,6 +42,9 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
       unsaved
     }
   }
+  override def insert(unsaved: ScrapreasonRowUnsaved): ConnectionIO[ScrapreasonRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ScrapreasonRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
       }
       num
     }
-  }
-  override def insert(unsaved: ScrapreasonRowUnsaved): ConnectionIO[ScrapreasonRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ScrapreasonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
   override def selectByIds(scrapreasonids: Array[ScrapreasonId]): Stream[ConnectionIO, ScrapreasonRow] = {
     Stream.emits(scrapreasonids.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ScrapreasonFields.structure.fields, map)
+  }
   override def update(row: ScrapreasonRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.scrapreasonid) match {
@@ -89,9 +92,6 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ScrapreasonFields.structure.fields, map)
   }
   override def upsert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     delay {

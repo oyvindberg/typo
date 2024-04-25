@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait AddresstypeRepo {
-  def delete(addresstypeid: AddresstypeId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(addresstypeids: Array[AddresstypeId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow]
+  def deleteById(addresstypeid: AddresstypeId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(addresstypeids: Array[AddresstypeId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: AddresstypeRow): ZIO[ZConnection, Throwable, AddresstypeRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, AddresstypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: AddresstypeRowUnsaved): ZIO[ZConnection, Throwable, AddresstypeRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, AddresstypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, AddresstypeRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[AddresstypeFields, AddresstypeRow]
   def selectAll: ZStream[ZConnection, Throwable, AddresstypeRow]
   def selectById(addresstypeid: AddresstypeId): ZIO[ZConnection, Throwable, Option[AddresstypeRow]]
   def selectByIds(addresstypeids: Array[AddresstypeId]): ZStream[ZConnection, Throwable, AddresstypeRow]
-  def update(row: AddresstypeRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[AddresstypeFields, AddresstypeRow]
+  def update(row: AddresstypeRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: AddresstypeRow): ZIO[ZConnection, Throwable, UpdateResult[AddresstypeRow]]
 }

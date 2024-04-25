@@ -23,7 +23,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class IdentityTestRepoImpl extends IdentityTestRepo {
-  override def delete(name: IdentityTestId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
+    DeleteBuilder("public.identity-test", IdentityTestFields.structure)
+  }
+  override def deleteById(name: IdentityTestId)(implicit c: Connection): Boolean = {
     SQL"""delete from public.identity-test where "name" = ${ParameterValue(name, null, IdentityTestId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(names: Array[IdentityTestId])(implicit c: Connection): Int = {
@@ -33,9 +36,6 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
-    DeleteBuilder("public.identity-test", IdentityTestFields.structure)
-  }
   override def insert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow = {
     SQL"""insert into public.identity-test("always_generated", "default_generated", "name")
           values (${ParameterValue(unsaved.alwaysGenerated, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.defaultGenerated, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.name, null, IdentityTestId.toStatement)})
@@ -43,9 +43,6 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
        """
       .executeInsert(IdentityTestRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[IdentityTestRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY public.identity-test("always_generated", "default_generated", "name") FROM STDIN""", batchSize, unsaved)(IdentityTestRow.text, c)
   }
   override def insert(unsaved: IdentityTestRowUnsaved)(implicit c: Connection): IdentityTestRow = {
     val namedParameters = List(
@@ -70,6 +67,9 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
         .executeInsert(IdentityTestRow.rowParser(1).single)
     }
     
+  }
+  override def insertStreaming(unsaved: Iterator[IdentityTestRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY public.identity-test("always_generated", "default_generated", "name") FROM STDIN""", batchSize, unsaved)(IdentityTestRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[IdentityTestRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -96,6 +96,9 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
        """.as(IdentityTestRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
+    UpdateBuilder("public.identity-test", IdentityTestFields.structure, IdentityTestRow.rowParser)
+  }
   override def update(row: IdentityTestRow)(implicit c: Connection): Boolean = {
     val name = row.name
     SQL"""update public.identity-test
@@ -103,9 +106,6 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
               "default_generated" = ${ParameterValue(row.defaultGenerated, null, ToStatement.intToStatement)}::int4
           where "name" = ${ParameterValue(name, null, IdentityTestId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
-    UpdateBuilder("public.identity-test", IdentityTestFields.structure, IdentityTestRow.rowParser)
   }
   override def upsert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow = {
     SQL"""insert into public.identity-test("always_generated", "default_generated", "name")

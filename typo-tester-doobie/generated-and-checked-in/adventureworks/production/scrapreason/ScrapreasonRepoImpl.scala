@@ -23,23 +23,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ScrapreasonRepoImpl extends ScrapreasonRepo {
-  override def delete(scrapreasonid: ScrapreasonId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    DeleteBuilder("production.scrapreason", ScrapreasonFields.structure)
+  }
+  override def deleteById(scrapreasonid: ScrapreasonId): ConnectionIO[Boolean] = {
     sql"""delete from production.scrapreason where "scrapreasonid" = ${fromWrite(scrapreasonid)(Write.fromPut(ScrapreasonId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(scrapreasonids: Array[ScrapreasonId]): ConnectionIO[Int] = {
     sql"""delete from production.scrapreason where "scrapreasonid" = ANY(${scrapreasonids})""".update.run
-  }
-  override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    DeleteBuilder("production.scrapreason", ScrapreasonFields.structure)
   }
   override def insert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     sql"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
           values (${fromWrite(unsaved.scrapreasonid)(Write.fromPut(ScrapreasonId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "scrapreasonid", "name", "modifieddate"::text
        """.query(using ScrapreasonRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ScrapreasonRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.scrapreason("scrapreasonid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ScrapreasonRow.text)
   }
   override def insert(unsaved: ScrapreasonRowUnsaved): ConnectionIO[ScrapreasonRow] = {
     val fs = List(
@@ -68,6 +65,9 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
     q.query(using ScrapreasonRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ScrapreasonRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.scrapreason("scrapreasonid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ScrapreasonRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ScrapreasonRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.scrapreason("name", "scrapreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ScrapreasonRowUnsaved.text)
@@ -84,6 +84,9 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def selectByIds(scrapreasonids: Array[ScrapreasonId]): Stream[ConnectionIO, ScrapreasonRow] = {
     sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason where "scrapreasonid" = ANY(${scrapreasonids})""".query(using ScrapreasonRow.read).stream
   }
+  override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    UpdateBuilder("production.scrapreason", ScrapreasonFields.structure, ScrapreasonRow.read)
+  }
   override def update(row: ScrapreasonRow): ConnectionIO[Boolean] = {
     val scrapreasonid = row.scrapreasonid
     sql"""update production.scrapreason
@@ -93,9 +96,6 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    UpdateBuilder("production.scrapreason", ScrapreasonFields.structure, ScrapreasonRow.read)
   }
   override def upsert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     sql"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")

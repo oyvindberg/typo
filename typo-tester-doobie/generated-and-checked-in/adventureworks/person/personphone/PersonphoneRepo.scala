@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait PersonphoneRepo {
-  def delete(compositeId: PersonphoneId): ConnectionIO[Boolean]
-  def deleteByIds(compositeIds: Array[PersonphoneId]): ConnectionIO[Int]
   def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow]
+  def deleteById(compositeId: PersonphoneId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[PersonphoneId]): ConnectionIO[Int]
   def insert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, PersonphoneRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, PersonphoneRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonphoneRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[PersonphoneFields, PersonphoneRow]
   def selectAll: Stream[ConnectionIO, PersonphoneRow]
   def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]]
   def selectByIds(compositeIds: Array[PersonphoneId]): Stream[ConnectionIO, PersonphoneRow]
-  def update(row: PersonphoneRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[PersonphoneFields, PersonphoneRow]
+  def update(row: PersonphoneRow): ConnectionIO[Boolean]
   def upsert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow]
 }

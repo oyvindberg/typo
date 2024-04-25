@@ -24,23 +24,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class LocationRepoImpl extends LocationRepo {
-  override def delete(locationid: LocationId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[LocationFields, LocationRow] = {
+    DeleteBuilder("production.location", LocationFields.structure)
+  }
+  override def deleteById(locationid: LocationId): ConnectionIO[Boolean] = {
     sql"""delete from production.location where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(locationids: Array[LocationId]): ConnectionIO[Int] = {
     sql"""delete from production.location where "locationid" = ANY(${locationids})""".update.run
-  }
-  override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilder("production.location", LocationFields.structure)
   }
   override def insert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
           values (${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.costrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.availability)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "locationid", "name", "costrate", "availability", "modifieddate"::text
        """.query(using LocationRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using LocationRow.text)
   }
   override def insert(unsaved: LocationRowUnsaved): ConnectionIO[LocationRow] = {
     val fs = List(
@@ -77,6 +74,9 @@ class LocationRepoImpl extends LocationRepo {
     q.query(using LocationRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using LocationRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, LocationRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using LocationRowUnsaved.text)
@@ -93,6 +93,9 @@ class LocationRepoImpl extends LocationRepo {
   override def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow] = {
     sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ANY(${locationids})""".query(using LocationRow.read).stream
   }
+  override def update: UpdateBuilder[LocationFields, LocationRow] = {
+    UpdateBuilder("production.location", LocationFields.structure, LocationRow.read)
+  }
   override def update(row: LocationRow): ConnectionIO[Boolean] = {
     val locationid = row.locationid
     sql"""update production.location
@@ -104,9 +107,6 @@ class LocationRepoImpl extends LocationRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilder("production.location", LocationFields.structure, LocationRow.read)
   }
   override def upsert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")

@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait CountryregioncurrencyRepo {
-  def delete(compositeId: CountryregioncurrencyId): ConnectionIO[Boolean]
-  def deleteByIds(compositeIds: Array[CountryregioncurrencyId]): ConnectionIO[Int]
   def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
+  def deleteById(compositeId: CountryregioncurrencyId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[CountryregioncurrencyId]): ConnectionIO[Int]
   def insert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, CountryregioncurrencyRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: CountryregioncurrencyRowUnsaved): ConnectionIO[CountryregioncurrencyRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, CountryregioncurrencyRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregioncurrencyRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def selectAll: Stream[ConnectionIO, CountryregioncurrencyRow]
   def selectById(compositeId: CountryregioncurrencyId): ConnectionIO[Option[CountryregioncurrencyRow]]
   def selectByIds(compositeIds: Array[CountryregioncurrencyId]): Stream[ConnectionIO, CountryregioncurrencyRow]
-  def update(row: CountryregioncurrencyRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
+  def update(row: CountryregioncurrencyRow): ConnectionIO[Boolean]
   def upsert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow]
 }

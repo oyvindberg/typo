@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, SpecialofferRow],
                            map: scala.collection.mutable.Map[SpecialofferId, SpecialofferRow] = scala.collection.mutable.Map.empty) extends SpecialofferRepo {
-  override def delete(specialofferid: SpecialofferId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SpecialofferFields.structure.fields, map)
+  }
+  override def deleteById(specialofferid: SpecialofferId): ConnectionIO[Boolean] = {
     delay(map.remove(specialofferid).isDefined)
   }
   override def deleteByIds(specialofferids: Array[SpecialofferId]): ConnectionIO[Int] = {
     delay(specialofferids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SpecialofferFields.structure.fields, map)
   }
   override def insert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow] = {
     delay {
@@ -42,6 +42,9 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
       unsaved
     }
   }
+  override def insert(unsaved: SpecialofferRowUnsaved): ConnectionIO[SpecialofferRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SpecialofferRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
       }
       num
     }
-  }
-  override def insert(unsaved: SpecialofferRowUnsaved): ConnectionIO[SpecialofferRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SpecialofferRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
   override def selectByIds(specialofferids: Array[SpecialofferId]): Stream[ConnectionIO, SpecialofferRow] = {
     Stream.emits(specialofferids.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SpecialofferFields.structure.fields, map)
+  }
   override def update(row: SpecialofferRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.specialofferid) match {
@@ -89,9 +92,6 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SpecialofferFields.structure.fields, map)
   }
   override def upsert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow] = {
     delay {

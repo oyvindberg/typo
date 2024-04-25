@@ -17,12 +17,12 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait DocumentRepo {
-  def delete(documentnode: DocumentId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(documentnodes: Array[DocumentId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[DocumentFields, DocumentRow]
+  def deleteById(documentnode: DocumentId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(documentnodes: Array[DocumentId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, DocumentRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: DocumentRowUnsaved): ZIO[ZConnection, Throwable, DocumentRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[DocumentFields, DocumentRow]
@@ -30,7 +30,7 @@ trait DocumentRepo {
   def selectById(documentnode: DocumentId): ZIO[ZConnection, Throwable, Option[DocumentRow]]
   def selectByIds(documentnodes: Array[DocumentId]): ZStream[ZConnection, Throwable, DocumentRow]
   def selectByUniqueRowguid(rowguid: TypoUUID): ZIO[ZConnection, Throwable, Option[DocumentRow]]
-  def update(row: DocumentRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[DocumentFields, DocumentRow]
+  def update(row: DocumentRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, UpdateResult[DocumentRow]]
 }

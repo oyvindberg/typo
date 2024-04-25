@@ -27,7 +27,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
-  override def delete(billofmaterialsid: Int)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    DeleteBuilder("production.billofmaterials", BillofmaterialsFields.structure)
+  }
+  override def deleteById(billofmaterialsid: Int)(implicit c: Connection): Boolean = {
     SQL"""delete from production.billofmaterials where "billofmaterialsid" = ${ParameterValue(billofmaterialsid, null, ToStatement.intToStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(billofmaterialsids: Array[Int])(implicit c: Connection): Int = {
@@ -37,9 +40,6 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    DeleteBuilder("production.billofmaterials", BillofmaterialsFields.structure)
-  }
   override def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     SQL"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
           values (${ParameterValue(unsaved.billofmaterialsid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.productassemblyid, null, ToStatement.optionToStatement(ProductId.toStatement, ProductId.parameterMetadata))}::int4, ${ParameterValue(unsaved.componentid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar, ${ParameterValue(unsaved.bomlevel, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.perassemblyqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -47,9 +47,6 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
        """
       .executeInsert(BillofmaterialsRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[BillofmaterialsRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate") FROM STDIN""", batchSize, unsaved)(BillofmaterialsRow.text, c)
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow = {
     val namedParameters = List(
@@ -91,6 +88,9 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[BillofmaterialsRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate") FROM STDIN""", batchSize, unsaved)(BillofmaterialsRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[BillofmaterialsRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.billofmaterials("productassemblyid", "componentid", "enddate", "unitmeasurecode", "bomlevel", "billofmaterialsid", "startdate", "perassemblyqty", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BillofmaterialsRowUnsaved.text, c)
@@ -116,6 +116,9 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
        """.as(BillofmaterialsRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
+    UpdateBuilder("production.billofmaterials", BillofmaterialsFields.structure, BillofmaterialsRow.rowParser)
+  }
   override def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean = {
     val billofmaterialsid = row.billofmaterialsid
     SQL"""update production.billofmaterials
@@ -129,9 +132,6 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "billofmaterialsid" = ${ParameterValue(billofmaterialsid, null, ToStatement.intToStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    UpdateBuilder("production.billofmaterials", BillofmaterialsFields.structure, BillofmaterialsRow.rowParser)
   }
   override def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     SQL"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")

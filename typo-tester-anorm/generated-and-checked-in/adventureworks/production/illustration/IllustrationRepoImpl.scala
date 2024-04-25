@@ -25,7 +25,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class IllustrationRepoImpl extends IllustrationRepo {
-  override def delete(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
+    DeleteBuilder("production.illustration", IllustrationFields.structure)
+  }
+  override def deleteById(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.illustration where "illustrationid" = ${ParameterValue(illustrationid, null, IllustrationId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): Int = {
@@ -35,9 +38,6 @@ class IllustrationRepoImpl extends IllustrationRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
-    DeleteBuilder("production.illustration", IllustrationFields.structure)
-  }
   override def insert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     SQL"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
           values (${ParameterValue(unsaved.illustrationid, null, IllustrationId.toStatement)}::int4, ${ParameterValue(unsaved.diagram, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -45,9 +45,6 @@ class IllustrationRepoImpl extends IllustrationRepo {
        """
       .executeInsert(IllustrationRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[IllustrationRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.illustration("illustrationid", "diagram", "modifieddate") FROM STDIN""", batchSize, unsaved)(IllustrationRow.text, c)
   }
   override def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow = {
     val namedParameters = List(
@@ -77,6 +74,9 @@ class IllustrationRepoImpl extends IllustrationRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[IllustrationRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.illustration("illustrationid", "diagram", "modifieddate") FROM STDIN""", batchSize, unsaved)(IllustrationRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[IllustrationRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.illustration("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(IllustrationRowUnsaved.text, c)
@@ -102,6 +102,9 @@ class IllustrationRepoImpl extends IllustrationRepo {
        """.as(IllustrationRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
+    UpdateBuilder("production.illustration", IllustrationFields.structure, IllustrationRow.rowParser)
+  }
   override def update(row: IllustrationRow)(implicit c: Connection): Boolean = {
     val illustrationid = row.illustrationid
     SQL"""update production.illustration
@@ -109,9 +112,6 @@ class IllustrationRepoImpl extends IllustrationRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "illustrationid" = ${ParameterValue(illustrationid, null, IllustrationId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
-    UpdateBuilder("production.illustration", IllustrationFields.structure, IllustrationRow.rowParser)
   }
   override def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     SQL"""insert into production.illustration("illustrationid", "diagram", "modifieddate")

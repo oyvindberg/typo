@@ -22,23 +22,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class IdentityTestRepoImpl extends IdentityTestRepo {
-  override def delete(name: IdentityTestId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
+    DeleteBuilder("public.identity-test", IdentityTestFields.structure)
+  }
+  override def deleteById(name: IdentityTestId): ConnectionIO[Boolean] = {
     sql"""delete from public.identity-test where "name" = ${fromWrite(name)(Write.fromPut(IdentityTestId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(names: Array[IdentityTestId]): ConnectionIO[Int] = {
     sql"""delete from public.identity-test where "name" = ANY(${names})""".update.run
-  }
-  override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
-    DeleteBuilder("public.identity-test", IdentityTestFields.structure)
   }
   override def insert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow] = {
     sql"""insert into public.identity-test("always_generated", "default_generated", "name")
           values (${fromWrite(unsaved.alwaysGenerated)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.defaultGenerated)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(IdentityTestId.put))})
           returning "always_generated", "default_generated", "name"
        """.query(using IdentityTestRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, IdentityTestRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY public.identity-test("always_generated", "default_generated", "name") FROM STDIN""").copyIn(unsaved, batchSize)(using IdentityTestRow.text)
   }
   override def insert(unsaved: IdentityTestRowUnsaved): ConnectionIO[IdentityTestRow] = {
     val fs = List(
@@ -63,6 +60,9 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     q.query(using IdentityTestRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, IdentityTestRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY public.identity-test("always_generated", "default_generated", "name") FROM STDIN""").copyIn(unsaved, batchSize)(using IdentityTestRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IdentityTestRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY public.identity-test("name", "default_generated") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using IdentityTestRowUnsaved.text)
@@ -79,6 +79,9 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
   override def selectByIds(names: Array[IdentityTestId]): Stream[ConnectionIO, IdentityTestRow] = {
     sql"""select "always_generated", "default_generated", "name" from public.identity-test where "name" = ANY(${names})""".query(using IdentityTestRow.read).stream
   }
+  override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
+    UpdateBuilder("public.identity-test", IdentityTestFields.structure, IdentityTestRow.read)
+  }
   override def update(row: IdentityTestRow): ConnectionIO[Boolean] = {
     val name = row.name
     sql"""update public.identity-test
@@ -88,9 +91,6 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
-    UpdateBuilder("public.identity-test", IdentityTestFields.structure, IdentityTestRow.read)
   }
   override def upsert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow] = {
     sql"""insert into public.identity-test("always_generated", "default_generated", "name")

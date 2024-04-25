@@ -24,23 +24,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
-  override def delete(transactionid: TransactionhistoryId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
+    DeleteBuilder("production.transactionhistory", TransactionhistoryFields.structure)
+  }
+  override def deleteById(transactionid: TransactionhistoryId): ConnectionIO[Boolean] = {
     sql"""delete from production.transactionhistory where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(transactionids: Array[TransactionhistoryId]): ConnectionIO[Int] = {
     sql"""delete from production.transactionhistory where "transactionid" = ANY(${transactionids})""".update.run
-  }
-  override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    DeleteBuilder("production.transactionhistory", TransactionhistoryFields.structure)
   }
   override def insert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (${fromWrite(unsaved.transactionid)(Write.fromPut(TransactionhistoryId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.referenceorderid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.referenceorderlineid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.transactiondate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.transactiontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.actualcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
        """.query(using TransactionhistoryRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using TransactionhistoryRow.text)
   }
   override def insert(unsaved: TransactionhistoryRowUnsaved): ConnectionIO[TransactionhistoryRow] = {
     val fs = List(
@@ -81,6 +78,9 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     q.query(using TransactionhistoryRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using TransactionhistoryRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.transactionhistory("productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "transactionid", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using TransactionhistoryRowUnsaved.text)
@@ -97,6 +97,9 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def selectByIds(transactionids: Array[TransactionhistoryId]): Stream[ConnectionIO, TransactionhistoryRow] = {
     sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ANY(${transactionids})""".query(using TransactionhistoryRow.read).stream
   }
+  override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
+    UpdateBuilder("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.read)
+  }
   override def update(row: TransactionhistoryRow): ConnectionIO[Boolean] = {
     val transactionid = row.transactionid
     sql"""update production.transactionhistory
@@ -112,9 +115,6 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    UpdateBuilder("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.read)
   }
   override def upsert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")

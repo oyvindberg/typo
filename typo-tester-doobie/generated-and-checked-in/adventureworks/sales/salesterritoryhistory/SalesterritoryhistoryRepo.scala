@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait SalesterritoryhistoryRepo {
-  def delete(compositeId: SalesterritoryhistoryId): ConnectionIO[Boolean]
-  def deleteByIds(compositeIds: Array[SalesterritoryhistoryId]): ConnectionIO[Int]
   def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
+  def deleteById(compositeId: SalesterritoryhistoryId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[SalesterritoryhistoryId]): ConnectionIO[Int]
   def insert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: SalesterritoryhistoryRowUnsaved): ConnectionIO[SalesterritoryhistoryRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def selectAll: Stream[ConnectionIO, SalesterritoryhistoryRow]
   def selectById(compositeId: SalesterritoryhistoryId): ConnectionIO[Option[SalesterritoryhistoryRow]]
   def selectByIds(compositeIds: Array[SalesterritoryhistoryId]): Stream[ConnectionIO, SalesterritoryhistoryRow]
-  def update(row: SalesterritoryhistoryRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
+  def update(row: SalesterritoryhistoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow]
 }

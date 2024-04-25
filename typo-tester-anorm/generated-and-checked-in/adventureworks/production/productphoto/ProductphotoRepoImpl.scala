@@ -26,7 +26,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductphotoRepoImpl extends ProductphotoRepo {
-  override def delete(productphotoid: ProductphotoId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow] = {
+    DeleteBuilder("production.productphoto", ProductphotoFields.structure)
+  }
+  override def deleteById(productphotoid: ProductphotoId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productphoto where "productphotoid" = ${ParameterValue(productphotoid, null, ProductphotoId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(productphotoids: Array[ProductphotoId])(implicit c: Connection): Int = {
@@ -36,9 +39,6 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow] = {
-    DeleteBuilder("production.productphoto", ProductphotoFields.structure)
-  }
   override def insert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
     SQL"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
           values (${ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)}::int4, ${ParameterValue(unsaved.thumbnailphoto, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))}::bytea, ${ParameterValue(unsaved.thumbnailphotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.largephoto, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))}::bytea, ${ParameterValue(unsaved.largephotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -46,9 +46,6 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
        """
       .executeInsert(ProductphotoRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[ProductphotoRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductphotoRow.text, c)
   }
   override def insert(unsaved: ProductphotoRowUnsaved)(implicit c: Connection): ProductphotoRow = {
     val namedParameters = List(
@@ -81,6 +78,9 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[ProductphotoRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductphotoRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductphotoRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.productphoto("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductphotoRowUnsaved.text, c)
@@ -106,6 +106,9 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
        """.as(ProductphotoRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
+    UpdateBuilder("production.productphoto", ProductphotoFields.structure, ProductphotoRow.rowParser)
+  }
   override def update(row: ProductphotoRow)(implicit c: Connection): Boolean = {
     val productphotoid = row.productphotoid
     SQL"""update production.productphoto
@@ -116,9 +119,6 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productphotoid" = ${ParameterValue(productphotoid, null, ProductphotoId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
-    UpdateBuilder("production.productphoto", ProductphotoFields.structure, ProductphotoRow.rowParser)
   }
   override def upsert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
     SQL"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")

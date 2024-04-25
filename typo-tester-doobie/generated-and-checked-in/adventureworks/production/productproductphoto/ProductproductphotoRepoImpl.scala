@@ -25,7 +25,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
-  override def delete(compositeId: ProductproductphotoId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
+    DeleteBuilder("production.productproductphoto", ProductproductphotoFields.structure)
+  }
+  override def deleteById(compositeId: ProductproductphotoId): ConnectionIO[Boolean] = {
     sql"""delete from production.productproductphoto where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductproductphotoId]): ConnectionIO[Int] = {
@@ -38,17 +41,11 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
        """.update.run
     
   }
-  override def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    DeleteBuilder("production.productproductphoto", ProductproductphotoFields.structure)
-  }
   override def insert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow] = {
     sql"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4, ${fromWrite(unsaved.primary)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "productphotoid", "primary", "modifieddate"::text
        """.query(using ProductproductphotoRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductproductphotoRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductproductphotoRow.text)
   }
   override def insert(unsaved: ProductproductphotoRowUnsaved): ConnectionIO[ProductproductphotoRow] = {
     val fs = List(
@@ -78,6 +75,9 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     q.query(using ProductproductphotoRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductproductphotoRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductproductphotoRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductproductphotoRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductproductphotoRowUnsaved.text)
@@ -101,6 +101,9 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
        """.query(using ProductproductphotoRow.read).stream
     
   }
+  override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
+    UpdateBuilder("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.read)
+  }
   override def update(row: ProductproductphotoRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productproductphoto
@@ -110,9 +113,6 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    UpdateBuilder("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.read)
   }
   override def upsert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow] = {
     sql"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")

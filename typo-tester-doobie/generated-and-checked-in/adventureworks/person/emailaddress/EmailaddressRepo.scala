@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait EmailaddressRepo {
-  def delete(compositeId: EmailaddressId): ConnectionIO[Boolean]
-  def deleteByIds(compositeIds: Array[EmailaddressId]): ConnectionIO[Int]
   def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow]
+  def deleteById(compositeId: EmailaddressId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[EmailaddressId]): ConnectionIO[Int]
   def insert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, EmailaddressRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, EmailaddressRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmailaddressRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[EmailaddressFields, EmailaddressRow]
   def selectAll: Stream[ConnectionIO, EmailaddressRow]
   def selectById(compositeId: EmailaddressId): ConnectionIO[Option[EmailaddressRow]]
   def selectByIds(compositeIds: Array[EmailaddressId]): Stream[ConnectionIO, EmailaddressRow]
-  def update(row: EmailaddressRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[EmailaddressFields, EmailaddressRow]
+  def update(row: EmailaddressRow): ConnectionIO[Boolean]
   def upsert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow]
 }

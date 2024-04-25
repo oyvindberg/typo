@@ -26,7 +26,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class JobcandidateRepoImpl extends JobcandidateRepo {
-  override def delete(jobcandidateid: JobcandidateId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
+    DeleteBuilder("humanresources.jobcandidate", JobcandidateFields.structure)
+  }
+  override def deleteById(jobcandidateid: JobcandidateId)(implicit c: Connection): Boolean = {
     SQL"""delete from humanresources.jobcandidate where "jobcandidateid" = ${ParameterValue(jobcandidateid, null, JobcandidateId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(jobcandidateids: Array[JobcandidateId])(implicit c: Connection): Int = {
@@ -36,9 +39,6 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
-    DeleteBuilder("humanresources.jobcandidate", JobcandidateFields.structure)
-  }
   override def insert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
     SQL"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
           values (${ParameterValue(unsaved.jobcandidateid, null, JobcandidateId.toStatement)}::int4, ${ParameterValue(unsaved.businessentityid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.resume, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -46,9 +46,6 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
        """
       .executeInsert(JobcandidateRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[JobcandidateRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate") FROM STDIN""", batchSize, unsaved)(JobcandidateRow.text, c)
   }
   override def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateRow = {
     val namedParameters = List(
@@ -79,6 +76,9 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[JobcandidateRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate") FROM STDIN""", batchSize, unsaved)(JobcandidateRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[JobcandidateRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY humanresources.jobcandidate("businessentityid", "resume", "jobcandidateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(JobcandidateRowUnsaved.text, c)
@@ -104,6 +104,9 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
        """.as(JobcandidateRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
+    UpdateBuilder("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.rowParser)
+  }
   override def update(row: JobcandidateRow)(implicit c: Connection): Boolean = {
     val jobcandidateid = row.jobcandidateid
     SQL"""update humanresources.jobcandidate
@@ -112,9 +115,6 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "jobcandidateid" = ${ParameterValue(jobcandidateid, null, JobcandidateId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
-    UpdateBuilder("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.rowParser)
   }
   override def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
     SQL"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")

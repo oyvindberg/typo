@@ -25,7 +25,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
-  override def delete(compositeId: EmployeepayhistoryId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
+    DeleteBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields.structure)
+  }
+  override def deleteById(compositeId: EmployeepayhistoryId): ConnectionIO[Boolean] = {
     sql"""delete from humanresources.employeepayhistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "ratechangedate" = ${fromWrite(compositeId.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[EmployeepayhistoryId]): ConnectionIO[Int] = {
@@ -38,17 +41,11 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
        """.update.run
     
   }
-  override def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
-    DeleteBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields.structure)
-  }
   override def insert(unsaved: EmployeepayhistoryRow): ConnectionIO[EmployeepayhistoryRow] = {
     sql"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.ratechangedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.rate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.payfrequency)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
        """.query(using EmployeepayhistoryRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, EmployeepayhistoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using EmployeepayhistoryRow.text)
   }
   override def insert(unsaved: EmployeepayhistoryRowUnsaved): ConnectionIO[EmployeepayhistoryRow] = {
     val fs = List(
@@ -76,6 +73,9 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     q.query(using EmployeepayhistoryRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, EmployeepayhistoryRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using EmployeepayhistoryRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmployeepayhistoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using EmployeepayhistoryRowUnsaved.text)
@@ -99,6 +99,9 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
        """.query(using EmployeepayhistoryRow.read).stream
     
   }
+  override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
+    UpdateBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.read)
+  }
   override def update(row: EmployeepayhistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update humanresources.employeepayhistory
@@ -109,9 +112,6 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
-    UpdateBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.read)
   }
   override def upsert(unsaved: EmployeepayhistoryRow): ConnectionIO[EmployeepayhistoryRow] = {
     sql"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")

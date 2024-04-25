@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait ContacttypeRepo {
-  def delete(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(contacttypeids: Array[ContacttypeId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow]
+  def deleteById(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(contacttypeids: Array[ContacttypeId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ContacttypeRow): ZIO[ZConnection, Throwable, ContacttypeRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ContacttypeRowUnsaved): ZIO[ZConnection, Throwable, ContacttypeRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[ContacttypeFields, ContacttypeRow]
   def selectAll: ZStream[ZConnection, Throwable, ContacttypeRow]
   def selectById(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Option[ContacttypeRow]]
   def selectByIds(contacttypeids: Array[ContacttypeId]): ZStream[ZConnection, Throwable, ContacttypeRow]
-  def update(row: ContacttypeRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[ContacttypeFields, ContacttypeRow]
+  def update(row: ContacttypeRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ContacttypeRow): ZIO[ZConnection, Throwable, UpdateResult[ContacttypeRow]]
 }

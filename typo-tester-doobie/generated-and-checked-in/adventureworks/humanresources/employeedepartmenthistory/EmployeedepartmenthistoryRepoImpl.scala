@@ -26,7 +26,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
-  override def delete(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
+    DeleteBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields.structure)
+  }
+  override def deleteById(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Boolean] = {
     sql"""delete from humanresources.employeedepartmenthistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(Write.fromPut(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(Write.fromPut(ShiftId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[EmployeedepartmenthistoryId]): ConnectionIO[Int] = {
@@ -41,17 +44,11 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
        """.update.run
     
   }
-  override def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
-    DeleteBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields.structure)
-  }
   override def insert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow] = {
     sql"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int2, ${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int2, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDate.put))}::date, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDate.put))}::date, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
        """.query(using EmployeedepartmenthistoryRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, EmployeedepartmenthistoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using EmployeedepartmenthistoryRow.text)
   }
   override def insert(unsaved: EmployeedepartmenthistoryRowUnsaved): ConnectionIO[EmployeedepartmenthistoryRow] = {
     val fs = List(
@@ -80,6 +77,9 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     q.query(using EmployeedepartmenthistoryRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, EmployeedepartmenthistoryRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using EmployeedepartmenthistoryRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmployeedepartmenthistoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using EmployeedepartmenthistoryRowUnsaved.text)
@@ -105,6 +105,9 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
        """.query(using EmployeedepartmenthistoryRow.read).stream
     
   }
+  override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
+    UpdateBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields.structure, EmployeedepartmenthistoryRow.read)
+  }
   override def update(row: EmployeedepartmenthistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update humanresources.employeedepartmenthistory
@@ -114,9 +117,6 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
-    UpdateBuilder("humanresources.employeedepartmenthistory", EmployeedepartmenthistoryFields.structure, EmployeedepartmenthistoryRow.read)
   }
   override def upsert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow] = {
     sql"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")

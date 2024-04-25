@@ -23,14 +23,14 @@ import typo.dsl.UpdateBuilder.UpdateBuilderMock
 import typo.dsl.UpdateParams
 
 class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, FootballClubRow] = scala.collection.mutable.Map.empty) extends FootballClubRepo {
-  override def delete(id: FootballClubId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
+    DeleteBuilderMock(DeleteParams.empty, FootballClubFields.structure.fields, map)
+  }
+  override def deleteById(id: FootballClubId): ConnectionIO[Boolean] = {
     delay(map.remove(id).isDefined)
   }
   override def deleteByIds(ids: Array[FootballClubId]): ConnectionIO[Int] = {
     delay(ids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
-    DeleteBuilderMock(DeleteParams.empty, FootballClubFields.structure.fields, map)
   }
   override def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     delay {
@@ -58,12 +58,6 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
   override def selectAll: Stream[ConnectionIO, FootballClubRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]] = {
-    delay(map.get(id))
-  }
-  override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
-    Stream.emits(ids.flatMap(map.get).toList)
-  }
   override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): Stream[ConnectionIO, FootballClubRow] = {
     Stream.emits {
       fieldValues.foldLeft(map.values) {
@@ -71,6 +65,15 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
         case (acc, FootballClubFieldValue.name(value)) => acc.filter(_.name == value)
       }.toList
     }
+  }
+  override def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]] = {
+    delay(map.get(id))
+  }
+  override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
+    Stream.emits(ids.flatMap(map.get).toList)
+  }
+  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
+    UpdateBuilderMock(UpdateParams.empty, FootballClubFields.structure.fields, map)
   }
   override def update(row: FootballClubRow): ConnectionIO[Boolean] = {
     delay {
@@ -82,9 +85,6 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
-    UpdateBuilderMock(UpdateParams.empty, FootballClubFields.structure.fields, map)
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ConnectionIO[Boolean] = {
     delay {

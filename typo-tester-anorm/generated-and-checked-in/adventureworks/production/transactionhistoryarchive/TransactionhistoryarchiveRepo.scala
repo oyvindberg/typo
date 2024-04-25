@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait TransactionhistoryarchiveRepo {
-  def delete(transactionid: TransactionhistoryarchiveId)(implicit c: Connection): Boolean
-  def deleteByIds(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): Int
   def delete: DeleteBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow]
+  def deleteById(transactionid: TransactionhistoryarchiveId)(implicit c: Connection): Boolean
+  def deleteByIds(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): Int
   def insert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow
-  def insertStreaming(unsaved: Iterator[TransactionhistoryarchiveRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: TransactionhistoryarchiveRowUnsaved)(implicit c: Connection): TransactionhistoryarchiveRow
+  def insertStreaming(unsaved: Iterator[TransactionhistoryarchiveRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[TransactionhistoryarchiveRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow]
   def selectAll(implicit c: Connection): List[TransactionhistoryarchiveRow]
   def selectById(transactionid: TransactionhistoryarchiveId)(implicit c: Connection): Option[TransactionhistoryarchiveRow]
   def selectByIds(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): List[TransactionhistoryarchiveRow]
-  def update(row: TransactionhistoryarchiveRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow]
+  def update(row: TransactionhistoryarchiveRow)(implicit c: Connection): Boolean
   def upsert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow
 }

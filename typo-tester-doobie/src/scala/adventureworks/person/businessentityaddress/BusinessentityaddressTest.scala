@@ -100,7 +100,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
         }
         _ <- delay(assert(saved3.modifieddate == newModifiedDate))
         // delete
-        _ <- businessentityaddressRepo.delete(saved1.compositeId)
+        _ <- businessentityaddressRepo.deleteById(saved1.compositeId)
         _ <- businessentityaddressRepo.selectAll.compile.toList.map {
           case Nil   => ()
           case other => throw new MatchError(other)

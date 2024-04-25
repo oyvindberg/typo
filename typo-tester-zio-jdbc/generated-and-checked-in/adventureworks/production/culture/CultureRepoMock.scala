@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
                       map: scala.collection.mutable.Map[CultureId, CultureRow] = scala.collection.mutable.Map.empty) extends CultureRepo {
-  override def delete(cultureid: CultureId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[CultureFields, CultureRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CultureFields.structure.fields, map)
+  }
+  override def deleteById(cultureid: CultureId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(cultureid).isDefined)
   }
   override def deleteByIds(cultureids: Array[CultureId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(cultureids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[CultureFields, CultureRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CultureFields.structure.fields, map)
   }
   override def insert(unsaved: CultureRow): ZIO[ZConnection, Throwable, CultureRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
       unsaved
     }
   }
+  override def insert(unsaved: CultureRowUnsaved): ZIO[ZConnection, Throwable, CultureRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: CultureRowUnsaved): ZIO[ZConnection, Throwable, CultureRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
   override def selectByIds(cultureids: Array[CultureId]): ZStream[ZConnection, Throwable, CultureRow] = {
     ZStream.fromIterable(cultureids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[CultureFields, CultureRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CultureFields.structure.fields, map)
+  }
   override def update(row: CultureRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.cultureid) match {
@@ -88,9 +91,6 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[CultureFields, CultureRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CultureFields.structure.fields, map)
   }
   override def upsert(unsaved: CultureRow): ZIO[ZConnection, Throwable, UpdateResult[CultureRow]] = {
     ZIO.succeed {

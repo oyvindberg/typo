@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTestRow],
                            map: scala.collection.mutable.Map[IdentityTestId, IdentityTestRow] = scala.collection.mutable.Map.empty) extends IdentityTestRepo {
-  override def delete(name: IdentityTestId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
+    DeleteBuilderMock(DeleteParams.empty, IdentityTestFields.structure.fields, map)
+  }
+  override def deleteById(name: IdentityTestId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(name).isDefined)
   }
   override def deleteByIds(names: Array[IdentityTestId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(names.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
-    DeleteBuilderMock(DeleteParams.empty, IdentityTestFields.structure.fields, map)
   }
   override def insert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, IdentityTestRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
       unsaved
     }
   }
+  override def insert(unsaved: IdentityTestRowUnsaved): ZIO[ZConnection, Throwable, IdentityTestRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: IdentityTestRowUnsaved): ZIO[ZConnection, Throwable, IdentityTestRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
   override def selectByIds(names: Array[IdentityTestId]): ZStream[ZConnection, Throwable, IdentityTestRow] = {
     ZStream.fromIterable(names.flatMap(map.get))
   }
+  override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
+    UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure.fields, map)
+  }
   override def update(row: IdentityTestRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.name) match {
@@ -88,9 +91,6 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
-    UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure.fields, map)
   }
   override def upsert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, UpdateResult[IdentityTestRow]] = {
     ZIO.succeed {

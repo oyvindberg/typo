@@ -26,7 +26,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ShipmethodRepoImpl extends ShipmethodRepo {
-  override def delete(shipmethodid: ShipmethodId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
+    DeleteBuilder("purchasing.shipmethod", ShipmethodFields.structure)
+  }
+  override def deleteById(shipmethodid: ShipmethodId)(implicit c: Connection): Boolean = {
     SQL"""delete from purchasing.shipmethod where "shipmethodid" = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): Int = {
@@ -36,9 +39,6 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
-    DeleteBuilder("purchasing.shipmethod", ShipmethodFields.structure)
-  }
   override def insert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     SQL"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.shipbase, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.shiprate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -46,9 +46,6 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
        """
       .executeInsert(ShipmethodRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[ShipmethodRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShipmethodRow.text, c)
   }
   override def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow = {
     val namedParameters = List(
@@ -90,6 +87,9 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[ShipmethodRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShipmethodRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ShipmethodRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY purchasing.shipmethod("name", "shipmethodid", "shipbase", "shiprate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShipmethodRowUnsaved.text, c)
@@ -115,6 +115,9 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
        """.as(ShipmethodRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
+    UpdateBuilder("purchasing.shipmethod", ShipmethodFields.structure, ShipmethodRow.rowParser)
+  }
   override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
     val shipmethodid = row.shipmethodid
     SQL"""update purchasing.shipmethod
@@ -125,9 +128,6 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "shipmethodid" = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
-    UpdateBuilder("purchasing.shipmethod", ShipmethodFields.structure, ShipmethodRow.rowParser)
   }
   override def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     SQL"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")

@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
-  override def delete(compositeId: CountryregioncurrencyId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure)
+  }
+  override def deleteById(compositeId: CountryregioncurrencyId): ConnectionIO[Boolean] = {
     sql"""delete from sales.countryregioncurrency where "countryregioncode" = ${fromWrite(compositeId.countryregioncode)(Write.fromPut(CountryregionId.put))} AND "currencycode" = ${fromWrite(compositeId.currencycode)(Write.fromPut(CurrencyId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[CountryregioncurrencyId]): ConnectionIO[Int] = {
@@ -37,17 +40,11 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
        """.update.run
     
   }
-  override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure)
-  }
   override def insert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow] = {
     sql"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")
           values (${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "countryregioncode", "currencycode", "modifieddate"::text
        """.query(using CountryregioncurrencyRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, CountryregioncurrencyRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CountryregioncurrencyRow.text)
   }
   override def insert(unsaved: CountryregioncurrencyRowUnsaved): ConnectionIO[CountryregioncurrencyRow] = {
     val fs = List(
@@ -73,6 +70,9 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     q.query(using CountryregioncurrencyRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, CountryregioncurrencyRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CountryregioncurrencyRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregioncurrencyRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using CountryregioncurrencyRowUnsaved.text)
@@ -96,6 +96,9 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
        """.query(using CountryregioncurrencyRow.read).stream
     
   }
+  override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    UpdateBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.read)
+  }
   override def update(row: CountryregioncurrencyRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.countryregioncurrency
@@ -104,9 +107,6 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    UpdateBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.read)
   }
   override def upsert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow] = {
     sql"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")

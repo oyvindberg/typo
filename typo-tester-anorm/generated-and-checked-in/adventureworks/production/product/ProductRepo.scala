@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait ProductRepo {
-  def delete(productid: ProductId)(implicit c: Connection): Boolean
-  def deleteByIds(productids: Array[ProductId])(implicit c: Connection): Int
   def delete: DeleteBuilder[ProductFields, ProductRow]
+  def deleteById(productid: ProductId)(implicit c: Connection): Boolean
+  def deleteByIds(productids: Array[ProductId])(implicit c: Connection): Int
   def insert(unsaved: ProductRow)(implicit c: Connection): ProductRow
-  def insertStreaming(unsaved: Iterator[ProductRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: ProductRowUnsaved)(implicit c: Connection): ProductRow
+  def insertStreaming(unsaved: Iterator[ProductRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[ProductRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[ProductFields, ProductRow]
   def selectAll(implicit c: Connection): List[ProductRow]
   def selectById(productid: ProductId)(implicit c: Connection): Option[ProductRow]
   def selectByIds(productids: Array[ProductId])(implicit c: Connection): List[ProductRow]
-  def update(row: ProductRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[ProductFields, ProductRow]
+  def update(row: ProductRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ProductRow)(implicit c: Connection): ProductRow
 }

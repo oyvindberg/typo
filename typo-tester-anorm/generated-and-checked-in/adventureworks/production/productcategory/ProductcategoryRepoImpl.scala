@@ -25,7 +25,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductcategoryRepoImpl extends ProductcategoryRepo {
-  override def delete(productcategoryid: ProductcategoryId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ProductcategoryFields, ProductcategoryRow] = {
+    DeleteBuilder("production.productcategory", ProductcategoryFields.structure)
+  }
+  override def deleteById(productcategoryid: ProductcategoryId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productcategory where "productcategoryid" = ${ParameterValue(productcategoryid, null, ProductcategoryId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(productcategoryids: Array[ProductcategoryId])(implicit c: Connection): Int = {
@@ -35,9 +38,6 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    DeleteBuilder("production.productcategory", ProductcategoryFields.structure)
-  }
   override def insert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow = {
     SQL"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.productcategoryid, null, ProductcategoryId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -45,9 +45,6 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
        """
       .executeInsert(ProductcategoryRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[ProductcategoryRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productcategory("productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductcategoryRow.text, c)
   }
   override def insert(unsaved: ProductcategoryRowUnsaved)(implicit c: Connection): ProductcategoryRow = {
     val namedParameters = List(
@@ -81,6 +78,9 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[ProductcategoryRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productcategory("productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductcategoryRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductcategoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.productcategory("name", "productcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductcategoryRowUnsaved.text, c)
@@ -106,6 +106,9 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
        """.as(ProductcategoryRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[ProductcategoryFields, ProductcategoryRow] = {
+    UpdateBuilder("production.productcategory", ProductcategoryFields.structure, ProductcategoryRow.rowParser)
+  }
   override def update(row: ProductcategoryRow)(implicit c: Connection): Boolean = {
     val productcategoryid = row.productcategoryid
     SQL"""update production.productcategory
@@ -114,9 +117,6 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productcategoryid" = ${ParameterValue(productcategoryid, null, ProductcategoryId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    UpdateBuilder("production.productcategory", ProductcategoryFields.structure, ProductcategoryRow.rowParser)
   }
   override def upsert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow = {
     SQL"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")

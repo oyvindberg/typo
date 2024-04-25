@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait JobcandidateRepo {
-  def delete(jobcandidateid: JobcandidateId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(jobcandidateids: Array[JobcandidateId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow]
+  def deleteById(jobcandidateid: JobcandidateId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(jobcandidateids: Array[JobcandidateId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: JobcandidateRow): ZIO[ZConnection, Throwable, JobcandidateRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, JobcandidateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: JobcandidateRowUnsaved): ZIO[ZConnection, Throwable, JobcandidateRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, JobcandidateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, JobcandidateRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[JobcandidateFields, JobcandidateRow]
   def selectAll: ZStream[ZConnection, Throwable, JobcandidateRow]
   def selectById(jobcandidateid: JobcandidateId): ZIO[ZConnection, Throwable, Option[JobcandidateRow]]
   def selectByIds(jobcandidateids: Array[JobcandidateId]): ZStream[ZConnection, Throwable, JobcandidateRow]
-  def update(row: JobcandidateRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[JobcandidateFields, JobcandidateRow]
+  def update(row: JobcandidateRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: JobcandidateRow): ZIO[ZConnection, Throwable, UpdateResult[JobcandidateRow]]
 }

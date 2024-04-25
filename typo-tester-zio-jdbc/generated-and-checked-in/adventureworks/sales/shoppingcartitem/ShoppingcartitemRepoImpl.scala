@@ -25,23 +25,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
-  override def delete(shoppingcartitemid: ShoppingcartitemId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
+    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure)
+  }
+  override def deleteById(shoppingcartitemid: ShoppingcartitemId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(ShoppingcartitemId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(shoppingcartitemids: Array[ShoppingcartitemId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ANY(${shoppingcartitemids})""".delete
-  }
-  override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure)
   }
   override def insert(unsaved: ShoppingcartitemRow): ZIO[ZConnection, Throwable, ShoppingcartitemRow] = {
     sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
           values (${Segment.paramSegment(unsaved.shoppingcartitemid)(ShoppingcartitemId.setter)}::int4, ${Segment.paramSegment(unsaved.shoppingcartid)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.quantity)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.datecreated)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
        """.insertReturning(using ShoppingcartitemRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShoppingcartitemRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShoppingcartitemRow.text)
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved): ZIO[ZConnection, Throwable, ShoppingcartitemRow] = {
     val fs = List(
@@ -77,6 +74,9 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     q.insertReturning(using ShoppingcartitemRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShoppingcartitemRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShoppingcartitemRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ShoppingcartitemRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.shoppingcartitem("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShoppingcartitemRowUnsaved.text)
@@ -93,6 +93,9 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): ZStream[ZConnection, Throwable, ShoppingcartitemRow] = {
     sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem where "shoppingcartitemid" = ANY(${Segment.paramSegment(shoppingcartitemids)(ShoppingcartitemId.arraySetter)})""".query(using ShoppingcartitemRow.jdbcDecoder).selectStream()
   }
+  override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
+    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.jdbcDecoder)
+  }
   override def update(row: ShoppingcartitemRow): ZIO[ZConnection, Throwable, Boolean] = {
     val shoppingcartitemid = row.shoppingcartitemid
     sql"""update sales.shoppingcartitem
@@ -102,9 +105,6 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
               "datecreated" = ${Segment.paramSegment(row.datecreated)(TypoLocalDateTime.setter)}::timestamp,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(ShoppingcartitemId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.jdbcDecoder)
   }
   override def upsert(unsaved: ShoppingcartitemRow): ZIO[ZConnection, Throwable, UpdateResult[ShoppingcartitemRow]] = {
     sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")

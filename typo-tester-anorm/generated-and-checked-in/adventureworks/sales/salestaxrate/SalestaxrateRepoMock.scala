@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, SalestaxrateRow],
                            map: scala.collection.mutable.Map[SalestaxrateId, SalestaxrateRow] = scala.collection.mutable.Map.empty) extends SalestaxrateRepo {
-  override def delete(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SalestaxrateFields.structure.fields, map)
+  }
+  override def deleteById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean = {
     map.remove(salestaxrateid).isDefined
   }
   override def deleteByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): Int = {
     salestaxrateids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalestaxrateFields.structure.fields, map)
   }
   override def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     val _ = if (map.contains(unsaved.salestaxrateid))
@@ -38,14 +38,14 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
     
     unsaved
   }
+  override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[SalestaxrateRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.salestaxrateid -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SalestaxrateRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
   override def selectByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow] = {
     salestaxrateids.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SalestaxrateFields.structure.fields, map)
+  }
   override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {
     map.get(row.salestaxrateid) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalestaxrateFields.structure.fields, map)
   }
   override def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     map.put(unsaved.salestaxrateid, unsaved): @nowarn

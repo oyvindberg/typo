@@ -24,14 +24,14 @@ import typo.dsl.UpdateParams
 
 class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
                        map: scala.collection.mutable.Map[BusinessentityId, PasswordRow] = scala.collection.mutable.Map.empty) extends PasswordRepo {
-  override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
+    DeleteBuilderMock(DeleteParams.empty, PasswordFields.structure.fields, map)
+  }
+  override def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     delay(map.remove(businessentityid).isDefined)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
     delay(businessentityids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PasswordFields.structure.fields, map)
   }
   override def insert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     delay {
@@ -43,6 +43,9 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
       unsaved
     }
   }
+  override def insert(unsaved: PasswordRowUnsaved): ConnectionIO[PasswordRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PasswordRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -52,9 +55,6 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
       }
       num
     }
-  }
-  override def insert(unsaved: PasswordRowUnsaved): ConnectionIO[PasswordRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PasswordRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -80,6 +80,9 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PasswordRow] = {
     Stream.emits(businessentityids.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
+    UpdateBuilderMock(UpdateParams.empty, PasswordFields.structure.fields, map)
+  }
   override def update(row: PasswordRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.businessentityid) match {
@@ -90,9 +93,6 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PasswordFields.structure.fields, map)
   }
   override def upsert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     delay {

@@ -30,7 +30,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
-  override def delete(compositeId: SalesorderdetailId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
+    DeleteBuilder("sales.salesorderdetail", SalesorderdetailFields.structure)
+  }
+  override def deleteById(compositeId: SalesorderdetailId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.salesorderdetail where "salesorderid" = ${ParameterValue(compositeId.salesorderid, null, SalesorderheaderId.toStatement)} AND "salesorderdetailid" = ${ParameterValue(compositeId.salesorderdetailid, null, ToStatement.intToStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[SalesorderdetailId])(implicit c: Connection): Int = {
@@ -43,9 +46,6 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    DeleteBuilder("sales.salesorderdetail", SalesorderdetailFields.structure)
-  }
   override def insert(unsaved: SalesorderdetailRow)(implicit c: Connection): SalesorderdetailRow = {
     SQL"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.salesorderdetailid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.carriertrackingnumber, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.orderqty, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.specialofferid, null, SpecialofferId.toStatement)}::int4, ${ParameterValue(unsaved.unitprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.unitpricediscount, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -53,9 +53,6 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
        """
       .executeInsert(SalesorderdetailRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[SalesorderdetailRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderdetailRow.text, c)
   }
   override def insert(unsaved: SalesorderdetailRowUnsaved)(implicit c: Connection): SalesorderdetailRow = {
     val namedParameters = List(
@@ -98,6 +95,9 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[SalesorderdetailRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderdetailRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SalesorderdetailRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY sales.salesorderdetail("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesorderdetailRowUnsaved.text, c)
@@ -126,6 +126,9 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
        """.as(SalesorderdetailRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
+    UpdateBuilder("sales.salesorderdetail", SalesorderdetailFields.structure, SalesorderdetailRow.rowParser)
+  }
   override def update(row: SalesorderdetailRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update sales.salesorderdetail
@@ -139,9 +142,6 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "salesorderid" = ${ParameterValue(compositeId.salesorderid, null, SalesorderheaderId.toStatement)} AND "salesorderdetailid" = ${ParameterValue(compositeId.salesorderdetailid, null, ToStatement.intToStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    UpdateBuilder("sales.salesorderdetail", SalesorderdetailFields.structure, SalesorderdetailRow.rowParser)
   }
   override def upsert(unsaved: SalesorderdetailRow)(implicit c: Connection): SalesorderdetailRow = {
     SQL"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")

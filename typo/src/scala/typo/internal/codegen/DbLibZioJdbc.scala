@@ -179,70 +179,72 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         code"${composite.cols.map(cc => code"${cc.dbName} = ${runtimeInterpolateValue(code"${composite.paramName}.${cc.name}", cc.tpe)}").mkCode(" AND ")}"
     }
 
-  override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
-    case RepoMethod.SelectBuilder(_, fieldsType, rowType) =>
-      code"def select: ${sc.Type.dsl.SelectBuilder.of(fieldsType, rowType)}"
-    case RepoMethod.SelectAll(_, _, rowType) =>
-      code"def selectAll: ${ZStream.of(ZConnection, Throwable, rowType)}"
-    case RepoMethod.SelectById(_, _, id, rowType) =>
-      code"def selectById(${id.param}): ${ZIO.of(ZConnection, Throwable, TypesScala.Option.of(rowType))}"
-    case RepoMethod.SelectAllByIds(_, _, idComputed, idsParam, rowType) =>
-      val usedDefineds = idComputed.userDefinedCols.zipWithIndex
-        .map { case (col, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(col.tpe)), None) }
+  override def repoSig(repoMethod: RepoMethod): sc.Code = {
+    val name = repoMethod.methodName
+    repoMethod match {
+      case RepoMethod.SelectBuilder(_, fieldsType, rowType) =>
+        code"def $name: ${sc.Type.dsl.SelectBuilder.of(fieldsType, rowType)}"
+      case RepoMethod.SelectAll(_, _, rowType) =>
+        code"def $name: ${ZStream.of(ZConnection, Throwable, rowType)}"
+      case RepoMethod.SelectById(_, _, id, rowType) =>
+        code"def $name(${id.param}): ${ZIO.of(ZConnection, Throwable, TypesScala.Option.of(rowType))}"
+      case RepoMethod.SelectByIds(_, _, idComputed, idsParam, rowType) =>
+        val usedDefineds = idComputed.userDefinedCols.zipWithIndex
+          .map { case (col, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(col.tpe)), None) }
 
-      usedDefineds match {
-        case Nil =>
-          code"def selectByIds($idsParam): ${ZStream.of(ZConnection, Throwable, rowType)}"
-        case nonEmpty =>
-          code"def selectByIds($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ZStream.of(ZConnection, Throwable, rowType)}"
-      }
-    case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
-      val name = s"selectByUnique${keyColumns.map(x => Naming.titleCase(x.name.value)).mkString("And")}"
-      code"def $name(${keyColumns.map(_.param.code).mkCode(", ")}): ${ZIO.of(ZConnection, Throwable, TypesScala.Option.of(rowType))}"
-    case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
-      code"def selectByFieldValues($fieldValueOrIdsParam): ${ZStream.of(ZConnection, Throwable, rowType)}"
-    case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
-      code"def update: ${sc.Type.dsl.UpdateBuilder.of(fieldsType, rowType)}"
-    case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
-      code"def updateFieldValues(${id.param}, $varargs): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}"
-    case RepoMethod.Update(_, _, _, param, _) =>
-      code"def update($param): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}"
-    case RepoMethod.Insert(_, _, unsavedParam, rowType) =>
-      code"def insert($unsavedParam): ${ZIO.of(ZConnection, Throwable, rowType)}"
-    case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
-      code"def insert($unsavedParam): ${ZIO.of(ZConnection, Throwable, rowType)}"
-    case RepoMethod.InsertStreaming(_, _, rowType) =>
-      val in = ZStream.of(ZConnection, TypesJava.Throwable, rowType)
-      val out = ZIO.of(ZConnection, TypesJava.Throwable, TypesScala.Long)
-      code"def insertStreaming(unsaved: $in, batchSize: Int): $out"
-    case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
-      code"def upsert($unsavedParam): ${ZIO.of(ZConnection, Throwable, UpdateResult.of(rowType))}"
-    case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
-      val in = ZStream.of(ZConnection, TypesJava.Throwable, unsaved.tpe)
-      val out = ZIO.of(ZConnection, TypesJava.Throwable, TypesScala.Long)
-      code"def insertUnsavedStreaming(unsaved: $in, batchSize: Int): $out"
-    case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
-      code"def delete: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
-    case RepoMethod.Delete(_, id) =>
-      code"def delete(${id.param}): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}"
-    case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
-      val usedDefineds = idComputed.userDefinedCols.zipWithIndex
-        .map { case (col, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(col.tpe)), None) }
-      usedDefineds match {
-        case Nil =>
-          code"def deleteByIds(${idsParam}): ${ZIO.of(ZConnection, Throwable, TypesScala.Long)}"
-        case nonEmpty =>
-          code"def deleteByIds(${idsParam})(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ZIO.of(ZConnection, Throwable, TypesScala.Long)}"
-      }
-    case RepoMethod.SqlFile(sqlScript) =>
-      val params = sc.Params(sqlScript.params.map(p => sc.Param(p.name, p.tpe, None)))
+        usedDefineds match {
+          case Nil =>
+            code"def $name($idsParam): ${ZStream.of(ZConnection, Throwable, rowType)}"
+          case nonEmpty =>
+            code"def $name($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ZStream.of(ZConnection, Throwable, rowType)}"
+        }
+      case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
+        code"def $name(${keyColumns.map(_.param.code).mkCode(", ")}): ${ZIO.of(ZConnection, Throwable, TypesScala.Option.of(rowType))}"
+      case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
+        code"def $name($fieldValueOrIdsParam): ${ZStream.of(ZConnection, Throwable, rowType)}"
+      case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
+        code"def $name: ${sc.Type.dsl.UpdateBuilder.of(fieldsType, rowType)}"
+      case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
+        code"def $name(${id.param}, $varargs): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}"
+      case RepoMethod.Update(_, _, _, param, _) =>
+        code"def $name($param): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}"
+      case RepoMethod.Insert(_, _, unsavedParam, rowType) =>
+        code"def $name($unsavedParam): ${ZIO.of(ZConnection, Throwable, rowType)}"
+      case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
+        code"def $name($unsavedParam): ${ZIO.of(ZConnection, Throwable, rowType)}"
+      case RepoMethod.InsertStreaming(_, _, rowType) =>
+        val in = ZStream.of(ZConnection, TypesJava.Throwable, rowType)
+        val out = ZIO.of(ZConnection, TypesJava.Throwable, TypesScala.Long)
+        code"def $name(unsaved: $in, batchSize: Int): $out"
+      case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
+        code"def $name($unsavedParam): ${ZIO.of(ZConnection, Throwable, UpdateResult.of(rowType))}"
+      case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
+        val in = ZStream.of(ZConnection, TypesJava.Throwable, unsaved.tpe)
+        val out = ZIO.of(ZConnection, TypesJava.Throwable, TypesScala.Long)
+        code"def $name(unsaved: $in, batchSize: Int): $out"
+      case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
+        code"def $name: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
+      case RepoMethod.Delete(_, id) =>
+        code"def $name(${id.param}): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}"
+      case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
+        val usedDefineds = idComputed.userDefinedCols.zipWithIndex
+          .map { case (col, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(col.tpe)), None) }
+        usedDefineds match {
+          case Nil =>
+            code"def $name(${idsParam}): ${ZIO.of(ZConnection, Throwable, TypesScala.Long)}"
+          case nonEmpty =>
+            code"def $name(${idsParam})(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ZIO.of(ZConnection, Throwable, TypesScala.Long)}"
+        }
+      case RepoMethod.SqlFile(sqlScript) =>
+        val params = sc.Params(sqlScript.params.map(p => sc.Param(p.name, p.tpe, None)))
 
-      val retType = sqlScript.maybeRowName match {
-        case MaybeReturnsRows.Query(rowName) => ZStream.of(ZConnection, Throwable, rowName)
-        case MaybeReturnsRows.Update         => ZIO.of(ZConnection, Throwable, TypesScala.Long)
-      }
+        val retType = sqlScript.maybeRowName match {
+          case MaybeReturnsRows.Query(rowName) => ZStream.of(ZConnection, Throwable, rowName)
+          case MaybeReturnsRows.Update         => ZIO.of(ZConnection, Throwable, TypesScala.Long)
+        }
 
-      code"def apply$params: $retType"
+        code"def $name$params: $retType"
+    }
   }
 
   override def repoImpl(repoMethod: RepoMethod): sc.Code =
@@ -260,7 +262,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         val sql = SQL(code"""select $joinedColNames from $relName where ${matchId(id)}""")
         code"""$sql.query(using ${lookupJdbcDecoder(rowType)}).selectOne"""
 
-      case RepoMethod.SelectAllByIds(relName, cols, computedId, idsParam, rowType) =>
+      case RepoMethod.SelectByIds(relName, cols, computedId, idsParam, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
         computedId match {
           case x: IdComputed.Composite =>
@@ -499,7 +501,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         code"$ZStream.fromIterable(map.values)"
       case RepoMethod.SelectById(_, _, id, _) =>
         code"$ZIO.succeed(map.get(${id.paramName}))"
-      case RepoMethod.SelectAllByIds(_, _, _, idsParam, _) =>
+      case RepoMethod.SelectByIds(_, _, _, idsParam, _) =>
         code"$ZStream.fromIterable(${idsParam.name}.flatMap(map.get))"
       case RepoMethod.SelectByUnique(_, keyColumns, _, _) =>
         code"$ZIO.succeed(map.values.find(v => ${keyColumns.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")}))"

@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class TransactionhistoryarchiveRepoMock(toRow: Function1[TransactionhistoryarchiveRowUnsaved, TransactionhistoryarchiveRow],
                                         map: scala.collection.mutable.Map[TransactionhistoryarchiveId, TransactionhistoryarchiveRow] = scala.collection.mutable.Map.empty) extends TransactionhistoryarchiveRepo {
-  override def delete(transactionid: TransactionhistoryarchiveId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
+    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryarchiveFields.structure.fields, map)
+  }
+  override def deleteById(transactionid: TransactionhistoryarchiveId)(implicit c: Connection): Boolean = {
     map.remove(transactionid).isDefined
   }
   override def deleteByIds(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): Int = {
     transactionids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryarchiveFields.structure.fields, map)
   }
   override def insert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow = {
     val _ = if (map.contains(unsaved.transactionid))
@@ -38,14 +38,14 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
     
     unsaved
   }
+  override def insert(unsaved: TransactionhistoryarchiveRowUnsaved)(implicit c: Connection): TransactionhistoryarchiveRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[TransactionhistoryarchiveRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.transactionid -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: TransactionhistoryarchiveRowUnsaved)(implicit c: Connection): TransactionhistoryarchiveRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[TransactionhistoryarchiveRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
   override def selectByIds(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
     transactionids.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
+    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryarchiveFields.structure.fields, map)
+  }
   override def update(row: TransactionhistoryarchiveRow)(implicit c: Connection): Boolean = {
     map.get(row.transactionid) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryarchiveFields.structure.fields, map)
   }
   override def upsert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow = {
     map.put(unsaved.transactionid, unsaved): @nowarn

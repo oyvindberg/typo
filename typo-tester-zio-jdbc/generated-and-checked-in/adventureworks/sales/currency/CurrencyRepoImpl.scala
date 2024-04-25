@@ -24,23 +24,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class CurrencyRepoImpl extends CurrencyRepo {
-  override def delete(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
+    DeleteBuilder("sales.currency", CurrencyFields.structure)
+  }
+  override def deleteById(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.currency where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(currencycodes: Array[CurrencyId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from sales.currency where "currencycode" = ANY(${currencycodes})""".delete
-  }
-  override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
-    DeleteBuilder("sales.currency", CurrencyFields.structure)
   }
   override def insert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, CurrencyRow] = {
     sql"""insert into sales.currency("currencycode", "name", "modifieddate")
           values (${Segment.paramSegment(unsaved.currencycode)(CurrencyId.setter)}::bpchar, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "currencycode", "name", "modifieddate"::text
        """.insertReturning(using CurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CurrencyRow.text)
   }
   override def insert(unsaved: CurrencyRowUnsaved): ZIO[ZConnection, Throwable, CurrencyRow] = {
     val fs = List(
@@ -64,6 +61,9 @@ class CurrencyRepoImpl extends CurrencyRepo {
     q.insertReturning(using CurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CurrencyRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CurrencyRowUnsaved.text)
@@ -80,15 +80,15 @@ class CurrencyRepoImpl extends CurrencyRepo {
   override def selectByIds(currencycodes: Array[CurrencyId]): ZStream[ZConnection, Throwable, CurrencyRow] = {
     sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ANY(${Segment.paramSegment(currencycodes)(CurrencyId.arraySetter)})""".query(using CurrencyRow.jdbcDecoder).selectStream()
   }
+  override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
+    UpdateBuilder("sales.currency", CurrencyFields.structure, CurrencyRow.jdbcDecoder)
+  }
   override def update(row: CurrencyRow): ZIO[ZConnection, Throwable, Boolean] = {
     val currencycode = row.currencycode
     sql"""update sales.currency
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
-    UpdateBuilder("sales.currency", CurrencyFields.structure, CurrencyRow.jdbcDecoder)
   }
   override def upsert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyRow]] = {
     sql"""insert into sales.currency("currencycode", "name", "modifieddate")

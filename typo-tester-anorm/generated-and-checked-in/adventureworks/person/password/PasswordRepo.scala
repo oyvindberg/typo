@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait PasswordRepo {
-  def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean
-  def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int
   def delete: DeleteBuilder[PasswordFields, PasswordRow]
+  def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean
+  def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int
   def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow
-  def insertStreaming(unsaved: Iterator[PasswordRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: PasswordRowUnsaved)(implicit c: Connection): PasswordRow
+  def insertStreaming(unsaved: Iterator[PasswordRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[PasswordRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[PasswordFields, PasswordRow]
   def selectAll(implicit c: Connection): List[PasswordRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PasswordRow]
   def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PasswordRow]
-  def update(row: PasswordRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[PasswordFields, PasswordRow]
+  def update(row: PasswordRow)(implicit c: Connection): Boolean
   def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow
 }

@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait ProductdocumentRepo {
-  def delete(compositeId: ProductdocumentId): ConnectionIO[Boolean]
-  def deleteByIds(compositeIds: Array[ProductdocumentId]): ConnectionIO[Int]
   def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow]
+  def deleteById(compositeId: ProductdocumentId): ConnectionIO[Boolean]
+  def deleteByIds(compositeIds: Array[ProductdocumentId]): ConnectionIO[Int]
   def insert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, ProductdocumentRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ProductdocumentRowUnsaved): ConnectionIO[ProductdocumentRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ProductdocumentRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductdocumentRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow]
   def selectAll: Stream[ConnectionIO, ProductdocumentRow]
   def selectById(compositeId: ProductdocumentId): ConnectionIO[Option[ProductdocumentRow]]
   def selectByIds(compositeIds: Array[ProductdocumentId]): Stream[ConnectionIO, ProductdocumentRow]
-  def update(row: ProductdocumentRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow]
+  def update(row: ProductdocumentRow): ConnectionIO[Boolean]
   def upsert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow]
 }

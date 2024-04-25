@@ -35,23 +35,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
-  override def delete(salesorderid: SalesorderheaderId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    DeleteBuilder("sales.salesorderheader", SalesorderheaderFields.structure)
+  }
+  override def deleteById(salesorderid: SalesorderheaderId): ConnectionIO[Boolean] = {
     sql"""delete from sales.salesorderheader where "salesorderid" = ${fromWrite(salesorderid)(Write.fromPut(SalesorderheaderId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(salesorderids: Array[SalesorderheaderId]): ConnectionIO[Int] = {
     sql"""delete from sales.salesorderheader where "salesorderid" = ANY(${salesorderids})""".update.run
-  }
-  override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    DeleteBuilder("sales.salesorderheader", SalesorderheaderFields.structure)
   }
   override def insert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow] = {
     sql"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4, ${fromWrite(unsaved.revisionnumber)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.orderdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.shipdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.onlineorderflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.purchaseordernumber)(Write.fromPutOption(OrderNumber.put))}::varchar, ${fromWrite(unsaved.accountnumber)(Write.fromPutOption(AccountNumber.put))}::varchar, ${fromWrite(unsaved.customerid)(Write.fromPut(CustomerId.put))}::int4, ${fromWrite(unsaved.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.billtoaddressid)(Write.fromPut(AddressId.put))}::int4, ${fromWrite(unsaved.shiptoaddressid)(Write.fromPut(AddressId.put))}::int4, ${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4, ${fromWrite(unsaved.creditcardid)(Write.fromPutOption(/* user-picked */ CustomCreditcardId.put))}::int4, ${fromWrite(unsaved.creditcardapprovalcode)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.currencyrateid)(Write.fromPutOption(CurrencyrateId.put))}::int4, ${fromWrite(unsaved.subtotal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.taxamt)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.freight)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.totaldue)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.comment)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
        """.query(using SalesorderheaderRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderheaderRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalesorderheaderRow.text)
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved): ConnectionIO[SalesorderheaderRow] = {
     val fs = List(
@@ -126,6 +123,9 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     q.query(using SalesorderheaderRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, SalesorderheaderRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalesorderheaderRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesorderheaderRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY sales.salesorderheader("duedate", "shipdate", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "totaldue", "comment", "salesorderid", "revisionnumber", "orderdate", "status", "onlineorderflag", "subtotal", "taxamt", "freight", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalesorderheaderRowUnsaved.text)
@@ -141,6 +141,9 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   }
   override def selectByIds(salesorderids: Array[SalesorderheaderId]): Stream[ConnectionIO, SalesorderheaderRow] = {
     sql"""select "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text from sales.salesorderheader where "salesorderid" = ANY(${salesorderids})""".query(using SalesorderheaderRow.read).stream
+  }
+  override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
+    UpdateBuilder("sales.salesorderheader", SalesorderheaderFields.structure, SalesorderheaderRow.read)
   }
   override def update(row: SalesorderheaderRow): ConnectionIO[Boolean] = {
     val salesorderid = row.salesorderid
@@ -173,9 +176,6 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    UpdateBuilder("sales.salesorderheader", SalesorderheaderFields.structure, SalesorderheaderRow.read)
   }
   override def upsert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow] = {
     sql"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")

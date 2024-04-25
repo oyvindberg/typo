@@ -27,7 +27,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class WorkorderRepoImpl extends WorkorderRepo {
-  override def delete(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
+    DeleteBuilder("production.workorder", WorkorderFields.structure)
+  }
+  override def deleteById(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.workorder where "workorderid" = ${ParameterValue(workorderid, null, WorkorderId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(workorderids: Array[WorkorderId])(implicit c: Connection): Int = {
@@ -37,9 +40,6 @@ class WorkorderRepoImpl extends WorkorderRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
-    DeleteBuilder("production.workorder", WorkorderFields.structure)
-  }
   override def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     SQL"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
           values (${ParameterValue(unsaved.workorderid, null, WorkorderId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.scrappedqty, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.scrapreasonid, null, ToStatement.optionToStatement(ScrapreasonId.toStatement, ScrapreasonId.parameterMetadata))}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -47,9 +47,6 @@ class WorkorderRepoImpl extends WorkorderRepo {
        """
       .executeInsert(WorkorderRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[WorkorderRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""", batchSize, unsaved)(WorkorderRow.text, c)
   }
   override def insert(unsaved: WorkorderRowUnsaved)(implicit c: Connection): WorkorderRow = {
     val namedParameters = List(
@@ -85,6 +82,9 @@ class WorkorderRepoImpl extends WorkorderRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[WorkorderRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""", batchSize, unsaved)(WorkorderRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[WorkorderRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.workorder("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(WorkorderRowUnsaved.text, c)
@@ -110,6 +110,9 @@ class WorkorderRepoImpl extends WorkorderRepo {
        """.as(WorkorderRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
+    UpdateBuilder("production.workorder", WorkorderFields.structure, WorkorderRow.rowParser)
+  }
   override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
     val workorderid = row.workorderid
     SQL"""update production.workorder
@@ -123,9 +126,6 @@ class WorkorderRepoImpl extends WorkorderRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "workorderid" = ${ParameterValue(workorderid, null, WorkorderId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
-    UpdateBuilder("production.workorder", WorkorderFields.structure, WorkorderRow.rowParser)
   }
   override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     SQL"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")

@@ -47,7 +47,7 @@ case class PersonWithAddressesRepo(
       _ <- oldAttachedAddresses.traverse { ba =>
         currentAddressesByAddresstype.get(ba.addresstypeid) match {
           case Some(address) if address.addressid == ba.addressid => false.pure[ConnectionIO]
-          case _                                                  => businessentityAddressRepo.delete(ba.compositeId)
+          case _                                                  => businessentityAddressRepo.deleteById(ba.compositeId)
         }
       }
       currentAttachedAddresses <- currentAddressesWithAddresstype.traverse { case (addresstypeId, address) =>

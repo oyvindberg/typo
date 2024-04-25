@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUnsaved, CountryregioncurrencyRow],
                                     map: scala.collection.mutable.Map[CountryregioncurrencyId, CountryregioncurrencyRow] = scala.collection.mutable.Map.empty) extends CountryregioncurrencyRepo {
-  override def delete(compositeId: CountryregioncurrencyId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CountryregioncurrencyFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: CountryregioncurrencyId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
   }
   override def deleteByIds(compositeIds: Array[CountryregioncurrencyId]): ConnectionIO[Int] = {
     delay(compositeIds.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CountryregioncurrencyFields.structure.fields, map)
   }
   override def insert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow] = {
     delay {
@@ -42,6 +42,9 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
       unsaved
     }
   }
+  override def insert(unsaved: CountryregioncurrencyRowUnsaved): ConnectionIO[CountryregioncurrencyRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, CountryregioncurrencyRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
       }
       num
     }
-  }
-  override def insert(unsaved: CountryregioncurrencyRowUnsaved): ConnectionIO[CountryregioncurrencyRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregioncurrencyRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
   override def selectByIds(compositeIds: Array[CountryregioncurrencyId]): Stream[ConnectionIO, CountryregioncurrencyRow] = {
     Stream.emits(compositeIds.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CountryregioncurrencyFields.structure.fields, map)
+  }
   override def update(row: CountryregioncurrencyRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {
@@ -89,9 +92,6 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CountryregioncurrencyFields.structure.fields, map)
   }
   override def upsert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow] = {
     delay {

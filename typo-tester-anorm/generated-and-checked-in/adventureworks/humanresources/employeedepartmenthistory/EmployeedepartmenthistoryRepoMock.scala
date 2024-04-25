@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class EmployeedepartmenthistoryRepoMock(toRow: Function1[EmployeedepartmenthistoryRowUnsaved, EmployeedepartmenthistoryRow],
                                         map: scala.collection.mutable.Map[EmployeedepartmenthistoryId, EmployeedepartmenthistoryRow] = scala.collection.mutable.Map.empty) extends EmployeedepartmenthistoryRepo {
-  override def delete(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
+    DeleteBuilderMock(DeleteParams.empty, EmployeedepartmenthistoryFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: EmployeedepartmenthistoryId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
   }
   override def deleteByIds(compositeIds: Array[EmployeedepartmenthistoryId])(implicit c: Connection): Int = {
     compositeIds.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, EmployeedepartmenthistoryFields.structure.fields, map)
   }
   override def insert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow = {
     val _ = if (map.contains(unsaved.compositeId))
@@ -38,14 +38,14 @@ class EmployeedepartmenthistoryRepoMock(toRow: Function1[Employeedepartmenthisto
     
     unsaved
   }
+  override def insert(unsaved: EmployeedepartmenthistoryRowUnsaved)(implicit c: Connection): EmployeedepartmenthistoryRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[EmployeedepartmenthistoryRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.compositeId -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: EmployeedepartmenthistoryRowUnsaved)(implicit c: Connection): EmployeedepartmenthistoryRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[EmployeedepartmenthistoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class EmployeedepartmenthistoryRepoMock(toRow: Function1[Employeedepartmenthisto
   override def selectByIds(compositeIds: Array[EmployeedepartmenthistoryId])(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
     compositeIds.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
+    UpdateBuilderMock(UpdateParams.empty, EmployeedepartmenthistoryFields.structure.fields, map)
+  }
   override def update(row: EmployeedepartmenthistoryRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class EmployeedepartmenthistoryRepoMock(toRow: Function1[Employeedepartmenthisto
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, EmployeedepartmenthistoryFields.structure.fields, map)
   }
   override def upsert(unsaved: EmployeedepartmenthistoryRow)(implicit c: Connection): EmployeedepartmenthistoryRow = {
     map.put(unsaved.compositeId, unsaved): @nowarn

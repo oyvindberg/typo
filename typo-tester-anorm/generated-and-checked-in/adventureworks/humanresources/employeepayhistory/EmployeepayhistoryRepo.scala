@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait EmployeepayhistoryRepo {
-  def delete(compositeId: EmployeepayhistoryId)(implicit c: Connection): Boolean
-  def deleteByIds(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): Int
   def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
+  def deleteById(compositeId: EmployeepayhistoryId)(implicit c: Connection): Boolean
+  def deleteByIds(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): Int
   def insert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow
-  def insertStreaming(unsaved: Iterator[EmployeepayhistoryRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: EmployeepayhistoryRowUnsaved)(implicit c: Connection): EmployeepayhistoryRow
+  def insertStreaming(unsaved: Iterator[EmployeepayhistoryRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[EmployeepayhistoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def selectAll(implicit c: Connection): List[EmployeepayhistoryRow]
   def selectById(compositeId: EmployeepayhistoryId)(implicit c: Connection): Option[EmployeepayhistoryRow]
   def selectByIds(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): List[EmployeepayhistoryRow]
-  def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
+  def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean
   def upsert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow
 }

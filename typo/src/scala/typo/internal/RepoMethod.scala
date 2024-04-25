@@ -1,47 +1,47 @@
 package typo
 package internal
 
-sealed trait RepoMethod {
+sealed abstract class RepoMethod(val methodName: String, val tiebreaker: Int) {
   val comment: Option[String] = None
 }
 
 object RepoMethod {
-  sealed trait Mutator extends RepoMethod
-  sealed trait Selector extends RepoMethod
+  sealed abstract class Mutator(methodName: String, tiebreaker: Int = 0) extends RepoMethod(methodName, tiebreaker)
+  sealed abstract class Selector(methodName: String, tiebreaker: Int = 0) extends RepoMethod(methodName, tiebreaker)
 
   case class SelectAll(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],
       rowType: sc.Type
-  ) extends Selector
+  ) extends Selector("selectAll")
 
   case class SelectBuilder(
       relName: db.RelationName,
       fieldsType: sc.Type,
       rowType: sc.Type
-  ) extends Selector
+  ) extends Selector("select")
 
   case class SelectById(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],
       id: IdComputed,
       rowType: sc.Type
-  ) extends Selector
+  ) extends Selector("selectById")
 
-  case class SelectAllByIds(
+  case class SelectByIds(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],
       unaryId: IdComputed,
       idsParam: sc.Param,
       rowType: sc.Type
-  ) extends Selector
+  ) extends Selector("selectByIds")
 
   case class SelectByUnique(
       relName: db.RelationName,
       keyColumns: NonEmptyList[ComputedColumn],
       allColumns: NonEmptyList[ComputedColumn],
       rowType: sc.Type
-  ) extends Selector
+  ) extends Selector(s"selectByUnique${keyColumns.map(x => Naming.titleCase(x.name.value)).mkString("And")}")
 
   case class SelectByFieldValues(
       relName: db.RelationName,
@@ -49,13 +49,13 @@ object RepoMethod {
       fieldValueType: sc.Type.Qualified,
       fieldValueOrIdsParam: sc.Param,
       rowType: sc.Type
-  ) extends Selector
+  ) extends Selector("selectByFieldValues")
 
   case class UpdateBuilder(
       relName: db.RelationName,
       fieldsType: sc.Type,
       rowType: sc.Type
-  ) extends Mutator
+  ) extends Mutator("update", 2)
 
   case class UpdateFieldValues(
       relName: db.RelationName,
@@ -64,7 +64,7 @@ object RepoMethod {
       fieldValueType: sc.Type.Qualified,
       cases: NonEmptyList[ComputedColumn],
       rowType: sc.Type
-  ) extends Mutator
+  ) extends Mutator("updateFieldValues")
 
   case class Update(
       relName: db.RelationName,
@@ -72,7 +72,7 @@ object RepoMethod {
       id: IdComputed,
       param: sc.Param,
       colsNotId: NonEmptyList[ComputedColumn]
-  ) extends Mutator
+  ) extends Mutator("update", 1)
 
   case class Upsert(
       relName: db.RelationName,
@@ -80,14 +80,14 @@ object RepoMethod {
       id: IdComputed,
       unsavedParam: sc.Param,
       rowType: sc.Type
-  ) extends Mutator
+  ) extends Mutator("upsert")
 
   case class Insert(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],
       unsavedParam: sc.Param,
       rowType: sc.Type
-  ) extends Mutator
+  ) extends Mutator("insert", 2)
 
   case class InsertUnsaved(
       relName: db.RelationName,
@@ -96,58 +96,39 @@ object RepoMethod {
       unsavedParam: sc.Param,
       default: ComputedDefault,
       rowType: sc.Type
-  ) extends Mutator
+  ) extends Mutator("insert", 1)
 
   case class InsertStreaming(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],
       rowType: sc.Type
-  ) extends Mutator
+  ) extends Mutator("insertStreaming")
 
   case class InsertUnsavedStreaming(
       relName: db.RelationName,
       unsaved: ComputedRowUnsaved
-  ) extends Mutator {
+  ) extends Mutator("insertUnsavedStreaming") {
     override val comment: Option[String] = Some("/* NOTE: this functionality requires PostgreSQL 16 or later! */")
   }
 
   case class Delete(
       relName: db.RelationName,
       id: IdComputed
-  ) extends Mutator
+  ) extends Mutator("deleteById")
 
   case class DeleteByIds(
       relName: db.RelationName,
       id: IdComputed,
       idsParam: sc.Param
-  ) extends Selector
+  ) extends Mutator("deleteByIds")
 
   case class DeleteBuilder(
       relName: db.RelationName,
       fieldsType: sc.Type,
       rowType: sc.Type
-  ) extends Mutator
+  ) extends Mutator("delete")
 
-  case class SqlFile(sqlFile: ComputedSqlFile) extends RepoMethod
+  case class SqlFile(sqlFile: ComputedSqlFile) extends RepoMethod("apply", 0)
 
-  implicit val ordering: Ordering[RepoMethod] = Ordering.by {
-    case _: SelectBuilder          => "Select1"
-    case _: SelectAll              => "Select2"
-    case _: SelectById             => "Select3"
-    case _: SelectAllByIds         => "Select4"
-    case x: SelectByUnique         => s"SelectByUnique(${x.keyColumns.map(_.name.value).mkString(", ")})"
-    case _: SelectByFieldValues    => "SelectByFieldValues"
-    case _: UpdateFieldValues      => "UpdateFieldValues"
-    case _: Update                 => "Update1"
-    case _: UpdateBuilder          => "Update2"
-    case _: Upsert                 => "Upsert"
-    case _: Insert                 => "Insert1"
-    case _: InsertStreaming        => "Insert2"
-    case _: InsertUnsaved          => "Insert3"
-    case _: InsertUnsavedStreaming => "Insert4"
-    case _: Delete                 => "Delete1"
-    case _: DeleteByIds            => "Delete2"
-    case _: DeleteBuilder          => "Delete3"
-    case _: SqlFile                => "SqlFile"
-  }
+  implicit val ordering: Ordering[RepoMethod] = Ordering.by(x => (x.methodName, -x.tiebreaker))
 }

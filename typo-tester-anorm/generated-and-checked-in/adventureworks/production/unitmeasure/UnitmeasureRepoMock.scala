@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow],
                           map: scala.collection.mutable.Map[UnitmeasureId, UnitmeasureRow] = scala.collection.mutable.Map.empty) extends UnitmeasureRepo {
-  override def delete(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
+    DeleteBuilderMock(DeleteParams.empty, UnitmeasureFields.structure.fields, map)
+  }
+  override def deleteById(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Boolean = {
     map.remove(unitmeasurecode).isDefined
   }
   override def deleteByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): Int = {
     unitmeasurecodes.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    DeleteBuilderMock(DeleteParams.empty, UnitmeasureFields.structure.fields, map)
   }
   override def insert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
     val _ = if (map.contains(unsaved.unitmeasurecode))
@@ -38,14 +38,14 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
     
     unsaved
   }
+  override def insert(unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[UnitmeasureRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.unitmeasurecode -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[UnitmeasureRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
     unitmeasurecodes.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
+    UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields.structure.fields, map)
+  }
   override def update(row: UnitmeasureRow)(implicit c: Connection): Boolean = {
     map.get(row.unitmeasurecode) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields.structure.fields, map)
   }
   override def upsert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
     map.put(unsaved.unitmeasurecode, unsaved): @nowarn

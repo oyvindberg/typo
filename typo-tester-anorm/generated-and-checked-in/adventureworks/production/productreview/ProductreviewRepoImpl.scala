@@ -27,7 +27,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductreviewRepoImpl extends ProductreviewRepo {
-  override def delete(productreviewid: ProductreviewId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
+    DeleteBuilder("production.productreview", ProductreviewFields.structure)
+  }
+  override def deleteById(productreviewid: ProductreviewId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productreview where "productreviewid" = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(productreviewids: Array[ProductreviewId])(implicit c: Connection): Int = {
@@ -37,9 +40,6 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
-    DeleteBuilder("production.productreview", ProductreviewFields.structure)
-  }
   override def insert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     SQL"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
           values (${ParameterValue(unsaved.productreviewid, null, ProductreviewId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.reviewername, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.reviewdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.emailaddress, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.rating, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.comments, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -47,9 +47,6 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
        """
       .executeInsert(ProductreviewRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[ProductreviewRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductreviewRow.text, c)
   }
   override def insert(unsaved: ProductreviewRowUnsaved)(implicit c: Connection): ProductreviewRow = {
     val namedParameters = List(
@@ -87,6 +84,9 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[ProductreviewRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductreviewRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductreviewRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.productreview("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductreviewRowUnsaved.text, c)
@@ -112,6 +112,9 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
        """.as(ProductreviewRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
+    UpdateBuilder("production.productreview", ProductreviewFields.structure, ProductreviewRow.rowParser)
+  }
   override def update(row: ProductreviewRow)(implicit c: Connection): Boolean = {
     val productreviewid = row.productreviewid
     SQL"""update production.productreview
@@ -124,9 +127,6 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productreviewid" = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
-    UpdateBuilder("production.productreview", ProductreviewFields.structure, ProductreviewRow.rowParser)
   }
   override def upsert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     SQL"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")

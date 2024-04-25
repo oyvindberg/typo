@@ -14,12 +14,12 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait UsersRepo {
-  def delete(userId: UsersId)(implicit c: Connection): Boolean
-  def deleteByIds(userIds: Array[UsersId])(implicit c: Connection): Int
   def delete: DeleteBuilder[UsersFields, UsersRow]
+  def deleteById(userId: UsersId)(implicit c: Connection): Boolean
+  def deleteByIds(userIds: Array[UsersId])(implicit c: Connection): Int
   def insert(unsaved: UsersRow)(implicit c: Connection): UsersRow
-  def insertStreaming(unsaved: Iterator[UsersRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: UsersRowUnsaved)(implicit c: Connection): UsersRow
+  def insertStreaming(unsaved: Iterator[UsersRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[UsersRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[UsersFields, UsersRow]
@@ -27,7 +27,7 @@ trait UsersRepo {
   def selectById(userId: UsersId)(implicit c: Connection): Option[UsersRow]
   def selectByIds(userIds: Array[UsersId])(implicit c: Connection): List[UsersRow]
   def selectByUniqueEmail(email: TypoUnknownCitext)(implicit c: Connection): Option[UsersRow]
-  def update(row: UsersRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[UsersFields, UsersRow]
+  def update(row: UsersRow)(implicit c: Connection): Boolean
   def upsert(unsaved: UsersRow)(implicit c: Connection): UsersRow
 }

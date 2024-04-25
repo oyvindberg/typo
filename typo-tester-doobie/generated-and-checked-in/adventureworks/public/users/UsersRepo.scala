@@ -15,12 +15,12 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait UsersRepo {
-  def delete(userId: UsersId): ConnectionIO[Boolean]
-  def deleteByIds(userIds: Array[UsersId]): ConnectionIO[Int]
   def delete: DeleteBuilder[UsersFields, UsersRow]
+  def deleteById(userId: UsersId): ConnectionIO[Boolean]
+  def deleteByIds(userIds: Array[UsersId]): ConnectionIO[Int]
   def insert(unsaved: UsersRow): ConnectionIO[UsersRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: UsersRowUnsaved): ConnectionIO[UsersRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UsersRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[UsersFields, UsersRow]
@@ -28,7 +28,7 @@ trait UsersRepo {
   def selectById(userId: UsersId): ConnectionIO[Option[UsersRow]]
   def selectByIds(userIds: Array[UsersId]): Stream[ConnectionIO, UsersRow]
   def selectByUniqueEmail(email: TypoUnknownCitext): ConnectionIO[Option[UsersRow]]
-  def update(row: UsersRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[UsersFields, UsersRow]
+  def update(row: UsersRow): ConnectionIO[Boolean]
   def upsert(unsaved: UsersRow): ConnectionIO[UsersRow]
 }

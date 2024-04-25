@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class DepartmentRepoImpl extends DepartmentRepo {
-  override def delete(departmentid: DepartmentId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
+    DeleteBuilder("humanresources.department", DepartmentFields.structure)
+  }
+  override def deleteById(departmentid: DepartmentId)(implicit c: Connection): Boolean = {
     SQL"""delete from humanresources.department where "departmentid" = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(departmentids: Array[DepartmentId])(implicit c: Connection): Int = {
@@ -34,9 +37,6 @@ class DepartmentRepoImpl extends DepartmentRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
-    DeleteBuilder("humanresources.department", DepartmentFields.structure)
-  }
   override def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     SQL"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
           values (${ParameterValue(unsaved.departmentid, null, DepartmentId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.groupname, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -44,9 +44,6 @@ class DepartmentRepoImpl extends DepartmentRepo {
        """
       .executeInsert(DepartmentRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[DepartmentRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""", batchSize, unsaved)(DepartmentRow.text, c)
   }
   override def insert(unsaved: DepartmentRowUnsaved)(implicit c: Connection): DepartmentRow = {
     val namedParameters = List(
@@ -77,6 +74,9 @@ class DepartmentRepoImpl extends DepartmentRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[DepartmentRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""", batchSize, unsaved)(DepartmentRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[DepartmentRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY humanresources.department("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(DepartmentRowUnsaved.text, c)
@@ -102,6 +102,9 @@ class DepartmentRepoImpl extends DepartmentRepo {
        """.as(DepartmentRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
+    UpdateBuilder("humanresources.department", DepartmentFields.structure, DepartmentRow.rowParser)
+  }
   override def update(row: DepartmentRow)(implicit c: Connection): Boolean = {
     val departmentid = row.departmentid
     SQL"""update humanresources.department
@@ -110,9 +113,6 @@ class DepartmentRepoImpl extends DepartmentRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "departmentid" = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
-    UpdateBuilder("humanresources.department", DepartmentFields.structure, DepartmentRow.rowParser)
   }
   override def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     SQL"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")

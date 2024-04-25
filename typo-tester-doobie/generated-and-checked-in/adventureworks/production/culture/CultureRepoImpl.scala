@@ -23,23 +23,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class CultureRepoImpl extends CultureRepo {
-  override def delete(cultureid: CultureId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[CultureFields, CultureRow] = {
+    DeleteBuilder("production.culture", CultureFields.structure)
+  }
+  override def deleteById(cultureid: CultureId): ConnectionIO[Boolean] = {
     sql"""delete from production.culture where "cultureid" = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(cultureids: Array[CultureId]): ConnectionIO[Int] = {
     sql"""delete from production.culture where "cultureid" = ANY(${cultureids})""".update.run
-  }
-  override def delete: DeleteBuilder[CultureFields, CultureRow] = {
-    DeleteBuilder("production.culture", CultureFields.structure)
   }
   override def insert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     sql"""insert into production.culture("cultureid", "name", "modifieddate")
           values (${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "cultureid", "name", "modifieddate"::text
        """.query(using CultureRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, CultureRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CultureRow.text)
   }
   override def insert(unsaved: CultureRowUnsaved): ConnectionIO[CultureRow] = {
     val fs = List(
@@ -65,6 +62,9 @@ class CultureRepoImpl extends CultureRepo {
     q.query(using CultureRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, CultureRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CultureRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CultureRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using CultureRowUnsaved.text)
@@ -81,6 +81,9 @@ class CultureRepoImpl extends CultureRepo {
   override def selectByIds(cultureids: Array[CultureId]): Stream[ConnectionIO, CultureRow] = {
     sql"""select "cultureid", "name", "modifieddate"::text from production.culture where "cultureid" = ANY(${cultureids})""".query(using CultureRow.read).stream
   }
+  override def update: UpdateBuilder[CultureFields, CultureRow] = {
+    UpdateBuilder("production.culture", CultureFields.structure, CultureRow.read)
+  }
   override def update(row: CultureRow): ConnectionIO[Boolean] = {
     val cultureid = row.cultureid
     sql"""update production.culture
@@ -90,9 +93,6 @@ class CultureRepoImpl extends CultureRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[CultureFields, CultureRow] = {
-    UpdateBuilder("production.culture", CultureFields.structure, CultureRow.read)
   }
   override def upsert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     sql"""insert into production.culture("cultureid", "name", "modifieddate")

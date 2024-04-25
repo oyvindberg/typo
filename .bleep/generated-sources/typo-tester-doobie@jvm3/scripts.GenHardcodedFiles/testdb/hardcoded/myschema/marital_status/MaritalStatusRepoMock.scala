@@ -23,14 +23,14 @@ import typo.dsl.UpdateBuilder.UpdateBuilderMock
 import typo.dsl.UpdateParams
 
 class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, MaritalStatusRow] = scala.collection.mutable.Map.empty) extends MaritalStatusRepo {
-  override def delete(id: MaritalStatusId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure.fields, map)
+  }
+  override def deleteById(id: MaritalStatusId): ConnectionIO[Boolean] = {
     delay(map.remove(id).isDefined)
   }
   override def deleteByIds(ids: Array[MaritalStatusId]): ConnectionIO[Int] = {
     delay(ids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure.fields, map)
   }
   override def insert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     delay {
@@ -58,18 +58,18 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
   override def selectAll: Stream[ConnectionIO, MaritalStatusRow] = {
     Stream.emits(map.values.toList)
   }
-  override def selectById(id: MaritalStatusId): ConnectionIO[Option[MaritalStatusRow]] = {
-    delay(map.get(id))
-  }
-  override def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow] = {
-    Stream.emits(ids.flatMap(map.get).toList)
-  }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): Stream[ConnectionIO, MaritalStatusRow] = {
     Stream.emits {
       fieldValues.foldLeft(map.values) {
         case (acc, MaritalStatusFieldValue.id(value)) => acc.filter(_.id == value)
       }.toList
     }
+  }
+  override def selectById(id: MaritalStatusId): ConnectionIO[Option[MaritalStatusRow]] = {
+    delay(map.get(id))
+  }
+  override def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow] = {
+    Stream.emits(ids.flatMap(map.get).toList)
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
     UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields.structure.fields, map)

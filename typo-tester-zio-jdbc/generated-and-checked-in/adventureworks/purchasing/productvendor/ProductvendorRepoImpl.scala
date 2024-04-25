@@ -27,7 +27,10 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class ProductvendorRepoImpl extends ProductvendorRepo {
-  override def delete(compositeId: ProductvendorId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
+    DeleteBuilder("purchasing.productvendor", ProductvendorFields.structure)
+  }
+  override def deleteById(compositeId: ProductvendorId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from purchasing.productvendor where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductvendorId]): ZIO[ZConnection, Throwable, Long] = {
@@ -40,17 +43,11 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
        """.delete
     
   }
-  override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
-    DeleteBuilder("purchasing.productvendor", ProductvendorFields.structure)
-  }
   override def insert(unsaved: ProductvendorRow): ZIO[ZConnection, Throwable, ProductvendorRow] = {
     sql"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
           values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.averageleadtime)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.standardprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.lastreceiptcost)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.lastreceiptdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.minorderqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.maxorderqty)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.onorderqty)(Setter.optionParamSetter(Setter.intSetter))}::int4, ${Segment.paramSegment(unsaved.unitmeasurecode)(UnitmeasureId.setter)}::bpchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
        """.insertReturning(using ProductvendorRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductvendorRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductvendorRow.text)
   }
   override def insert(unsaved: ProductvendorRowUnsaved): ZIO[ZConnection, Throwable, ProductvendorRow] = {
     val fs = List(
@@ -82,6 +79,9 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
     q.insertReturning(using ProductvendorRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductvendorRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductvendorRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductvendorRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductvendorRowUnsaved.text)
@@ -105,6 +105,9 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
        """.query(using ProductvendorRow.jdbcDecoder).selectStream()
     
   }
+  override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
+    UpdateBuilder("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.jdbcDecoder)
+  }
   override def update(row: ProductvendorRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update purchasing.productvendor
@@ -118,9 +121,6 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
               "unitmeasurecode" = ${Segment.paramSegment(row.unitmeasurecode)(UnitmeasureId.setter)}::bpchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
-    UpdateBuilder("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductvendorRow): ZIO[ZConnection, Throwable, UpdateResult[ProductvendorRow]] = {
     sql"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")

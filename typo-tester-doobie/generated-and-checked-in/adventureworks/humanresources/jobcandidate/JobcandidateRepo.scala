@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait JobcandidateRepo {
-  def delete(jobcandidateid: JobcandidateId): ConnectionIO[Boolean]
-  def deleteByIds(jobcandidateids: Array[JobcandidateId]): ConnectionIO[Int]
   def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow]
+  def deleteById(jobcandidateid: JobcandidateId): ConnectionIO[Boolean]
+  def deleteByIds(jobcandidateids: Array[JobcandidateId]): ConnectionIO[Int]
   def insert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, JobcandidateRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[JobcandidateFields, JobcandidateRow]
   def selectAll: Stream[ConnectionIO, JobcandidateRow]
   def selectById(jobcandidateid: JobcandidateId): ConnectionIO[Option[JobcandidateRow]]
   def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow]
-  def update(row: JobcandidateRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[JobcandidateFields, JobcandidateRow]
+  def update(row: JobcandidateRow): ConnectionIO[Boolean]
   def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow]
 }

@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, ShoppingcartitemRow],
                                map: scala.collection.mutable.Map[ShoppingcartitemId, ShoppingcartitemRow] = scala.collection.mutable.Map.empty) extends ShoppingcartitemRepo {
-  override def delete(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ShoppingcartitemFields.structure.fields, map)
+  }
+  override def deleteById(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Boolean = {
     map.remove(shoppingcartitemid).isDefined
   }
   override def deleteByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): Int = {
     shoppingcartitemids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShoppingcartitemFields.structure.fields, map)
   }
   override def insert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
     val _ = if (map.contains(unsaved.shoppingcartitemid))
@@ -38,14 +38,14 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     
     unsaved
   }
+  override def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[ShoppingcartitemRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.shoppingcartitemid -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: ShoppingcartitemRowUnsaved)(implicit c: Connection): ShoppingcartitemRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ShoppingcartitemRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow] = {
     shoppingcartitemids.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ShoppingcartitemFields.structure.fields, map)
+  }
   override def update(row: ShoppingcartitemRow)(implicit c: Connection): Boolean = {
     map.get(row.shoppingcartitemid) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShoppingcartitemFields.structure.fields, map)
   }
   override def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
     map.put(unsaved.shoppingcartitemid, unsaved): @nowarn

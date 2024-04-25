@@ -25,7 +25,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class LocationRepoImpl extends LocationRepo {
-  override def delete(locationid: LocationId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[LocationFields, LocationRow] = {
+    DeleteBuilder("production.location", LocationFields.structure)
+  }
+  override def deleteById(locationid: LocationId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.location where "locationid" = ${ParameterValue(locationid, null, LocationId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(locationids: Array[LocationId])(implicit c: Connection): Int = {
@@ -35,9 +38,6 @@ class LocationRepoImpl extends LocationRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilder("production.location", LocationFields.structure)
-  }
   override def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     SQL"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
           values (${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.costrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.availability, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -45,9 +45,6 @@ class LocationRepoImpl extends LocationRepo {
        """
       .executeInsert(LocationRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[LocationRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""", batchSize, unsaved)(LocationRow.text, c)
   }
   override def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow = {
     val namedParameters = List(
@@ -85,6 +82,9 @@ class LocationRepoImpl extends LocationRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[LocationRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""", batchSize, unsaved)(LocationRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[LocationRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(LocationRowUnsaved.text, c)
@@ -110,6 +110,9 @@ class LocationRepoImpl extends LocationRepo {
        """.as(LocationRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[LocationFields, LocationRow] = {
+    UpdateBuilder("production.location", LocationFields.structure, LocationRow.rowParser)
+  }
   override def update(row: LocationRow)(implicit c: Connection): Boolean = {
     val locationid = row.locationid
     SQL"""update production.location
@@ -119,9 +122,6 @@ class LocationRepoImpl extends LocationRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "locationid" = ${ParameterValue(locationid, null, LocationId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilder("production.location", LocationFields.structure, LocationRow.rowParser)
   }
   override def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     SQL"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")

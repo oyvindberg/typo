@@ -22,14 +22,14 @@ import typo.dsl.UpdateParams
 
 class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
                     map: scala.collection.mutable.Map[UsersId, UsersRow] = scala.collection.mutable.Map.empty) extends UsersRepo {
-  override def delete(userId: UsersId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[UsersFields, UsersRow] = {
+    DeleteBuilderMock(DeleteParams.empty, UsersFields.structure.fields, map)
+  }
+  override def deleteById(userId: UsersId)(implicit c: Connection): Boolean = {
     map.remove(userId).isDefined
   }
   override def deleteByIds(userIds: Array[UsersId])(implicit c: Connection): Int = {
     userIds.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[UsersFields, UsersRow] = {
-    DeleteBuilderMock(DeleteParams.empty, UsersFields.structure.fields, map)
   }
   override def insert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
     val _ = if (map.contains(unsaved.userId))
@@ -39,14 +39,14 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
     
     unsaved
   }
+  override def insert(unsaved: UsersRowUnsaved)(implicit c: Connection): UsersRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[UsersRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.userId -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: UsersRowUnsaved)(implicit c: Connection): UsersRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[UsersRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -71,6 +71,9 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
   override def selectByUniqueEmail(email: TypoUnknownCitext)(implicit c: Connection): Option[UsersRow] = {
     map.values.find(v => email == v.email)
   }
+  override def update: UpdateBuilder[UsersFields, UsersRow] = {
+    UpdateBuilderMock(UpdateParams.empty, UsersFields.structure.fields, map)
+  }
   override def update(row: UsersRow)(implicit c: Connection): Boolean = {
     map.get(row.userId) match {
       case Some(`row`) => false
@@ -79,9 +82,6 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[UsersFields, UsersRow] = {
-    UpdateBuilderMock(UpdateParams.empty, UsersFields.structure.fields, map)
   }
   override def upsert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
     map.put(unsaved.userId, unsaved): @nowarn

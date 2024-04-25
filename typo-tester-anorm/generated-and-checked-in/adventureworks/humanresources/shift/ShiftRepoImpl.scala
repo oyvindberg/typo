@@ -25,7 +25,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ShiftRepoImpl extends ShiftRepo {
-  override def delete(shiftid: ShiftId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
+    DeleteBuilder("humanresources.shift", ShiftFields.structure)
+  }
+  override def deleteById(shiftid: ShiftId)(implicit c: Connection): Boolean = {
     SQL"""delete from humanresources.shift where "shiftid" = ${ParameterValue(shiftid, null, ShiftId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(shiftids: Array[ShiftId])(implicit c: Connection): Int = {
@@ -35,9 +38,6 @@ class ShiftRepoImpl extends ShiftRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilder("humanresources.shift", ShiftFields.structure)
-  }
   override def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     SQL"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
           values (${ParameterValue(unsaved.shiftid, null, ShiftId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.starttime, null, TypoLocalTime.toStatement)}::time, ${ParameterValue(unsaved.endtime, null, TypoLocalTime.toStatement)}::time, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -45,9 +45,6 @@ class ShiftRepoImpl extends ShiftRepo {
        """
       .executeInsert(ShiftRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[ShiftRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShiftRow.text, c)
   }
   override def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow = {
     val namedParameters = List(
@@ -79,6 +76,9 @@ class ShiftRepoImpl extends ShiftRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[ShiftRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShiftRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ShiftRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY humanresources.shift("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShiftRowUnsaved.text, c)
@@ -104,6 +104,9 @@ class ShiftRepoImpl extends ShiftRepo {
        """.as(ShiftRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
+    UpdateBuilder("humanresources.shift", ShiftFields.structure, ShiftRow.rowParser)
+  }
   override def update(row: ShiftRow)(implicit c: Connection): Boolean = {
     val shiftid = row.shiftid
     SQL"""update humanresources.shift
@@ -113,9 +116,6 @@ class ShiftRepoImpl extends ShiftRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "shiftid" = ${ParameterValue(shiftid, null, ShiftId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilder("humanresources.shift", ShiftFields.structure, ShiftRow.rowParser)
   }
   override def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     SQL"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")

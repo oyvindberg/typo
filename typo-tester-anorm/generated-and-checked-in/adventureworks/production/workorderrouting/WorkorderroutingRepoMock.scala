@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, WorkorderroutingRow],
                                map: scala.collection.mutable.Map[WorkorderroutingId, WorkorderroutingRow] = scala.collection.mutable.Map.empty) extends WorkorderroutingRepo {
-  override def delete(compositeId: WorkorderroutingId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
+    DeleteBuilderMock(DeleteParams.empty, WorkorderroutingFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: WorkorderroutingId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
   }
   override def deleteByIds(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): Int = {
     compositeIds.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    DeleteBuilderMock(DeleteParams.empty, WorkorderroutingFields.structure.fields, map)
   }
   override def insert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow = {
     val _ = if (map.contains(unsaved.compositeId))
@@ -38,14 +38,14 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
     
     unsaved
   }
+  override def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.compositeId -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[WorkorderroutingRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
   override def selectByIds(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): List[WorkorderroutingRow] = {
     compositeIds.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
+    UpdateBuilderMock(UpdateParams.empty, WorkorderroutingFields.structure.fields, map)
+  }
   override def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    UpdateBuilderMock(UpdateParams.empty, WorkorderroutingFields.structure.fields, map)
   }
   override def upsert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow = {
     map.put(unsaved.compositeId, unsaved): @nowarn

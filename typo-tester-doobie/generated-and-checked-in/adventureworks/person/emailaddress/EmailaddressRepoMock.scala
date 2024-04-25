@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, EmailaddressRow],
                            map: scala.collection.mutable.Map[EmailaddressId, EmailaddressRow] = scala.collection.mutable.Map.empty) extends EmailaddressRepo {
-  override def delete(compositeId: EmailaddressId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
+    DeleteBuilderMock(DeleteParams.empty, EmailaddressFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: EmailaddressId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
   }
   override def deleteByIds(compositeIds: Array[EmailaddressId]): ConnectionIO[Int] = {
     delay(compositeIds.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
-    DeleteBuilderMock(DeleteParams.empty, EmailaddressFields.structure.fields, map)
   }
   override def insert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     delay {
@@ -42,6 +42,9 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
       unsaved
     }
   }
+  override def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, EmailaddressRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
       }
       num
     }
-  }
-  override def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmailaddressRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
   override def selectByIds(compositeIds: Array[EmailaddressId]): Stream[ConnectionIO, EmailaddressRow] = {
     Stream.emits(compositeIds.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
+    UpdateBuilderMock(UpdateParams.empty, EmailaddressFields.structure.fields, map)
+  }
   override def update(row: EmailaddressRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {
@@ -89,9 +92,6 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
-    UpdateBuilderMock(UpdateParams.empty, EmailaddressFields.structure.fields, map)
   }
   override def upsert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     delay {

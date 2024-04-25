@@ -28,7 +28,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class StoreRepoImpl extends StoreRepo {
-  override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[StoreFields, StoreRow] = {
+    DeleteBuilder("sales.store", StoreFields.structure)
+  }
+  override def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.store where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
@@ -38,9 +41,6 @@ class StoreRepoImpl extends StoreRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[StoreFields, StoreRow] = {
-    DeleteBuilder("sales.store", StoreFields.structure)
-  }
   override def insert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
     SQL"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.salespersonid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -48,9 +48,6 @@ class StoreRepoImpl extends StoreRepo {
        """
       .executeInsert(StoreRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[StoreRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StoreRow.text, c)
   }
   override def insert(unsaved: StoreRowUnsaved)(implicit c: Connection): StoreRow = {
     val namedParameters = List(
@@ -83,6 +80,9 @@ class StoreRepoImpl extends StoreRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[StoreRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StoreRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[StoreRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StoreRowUnsaved.text, c)
@@ -108,6 +108,9 @@ class StoreRepoImpl extends StoreRepo {
        """.as(StoreRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[StoreFields, StoreRow] = {
+    UpdateBuilder("sales.store", StoreFields.structure, StoreRow.rowParser)
+  }
   override def update(row: StoreRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update sales.store
@@ -118,9 +121,6 @@ class StoreRepoImpl extends StoreRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[StoreFields, StoreRow] = {
-    UpdateBuilder("sales.store", StoreFields.structure, StoreRow.rowParser)
   }
   override def upsert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
     SQL"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")

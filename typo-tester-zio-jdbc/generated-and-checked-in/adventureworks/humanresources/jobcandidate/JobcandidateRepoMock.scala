@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, JobcandidateRow],
                            map: scala.collection.mutable.Map[JobcandidateId, JobcandidateRow] = scala.collection.mutable.Map.empty) extends JobcandidateRepo {
-  override def delete(jobcandidateid: JobcandidateId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
+    DeleteBuilderMock(DeleteParams.empty, JobcandidateFields.structure.fields, map)
+  }
+  override def deleteById(jobcandidateid: JobcandidateId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(jobcandidateid).isDefined)
   }
   override def deleteByIds(jobcandidateids: Array[JobcandidateId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(jobcandidateids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
-    DeleteBuilderMock(DeleteParams.empty, JobcandidateFields.structure.fields, map)
   }
   override def insert(unsaved: JobcandidateRow): ZIO[ZConnection, Throwable, JobcandidateRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
       unsaved
     }
   }
+  override def insert(unsaved: JobcandidateRowUnsaved): ZIO[ZConnection, Throwable, JobcandidateRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, JobcandidateRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: JobcandidateRowUnsaved): ZIO[ZConnection, Throwable, JobcandidateRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, JobcandidateRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): ZStream[ZConnection, Throwable, JobcandidateRow] = {
     ZStream.fromIterable(jobcandidateids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
+    UpdateBuilderMock(UpdateParams.empty, JobcandidateFields.structure.fields, map)
+  }
   override def update(row: JobcandidateRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.jobcandidateid) match {
@@ -88,9 +91,6 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
-    UpdateBuilderMock(UpdateParams.empty, JobcandidateFields.structure.fields, map)
   }
   override def upsert(unsaved: JobcandidateRow): ZIO[ZConnection, Throwable, UpdateResult[JobcandidateRow]] = {
     ZIO.succeed {

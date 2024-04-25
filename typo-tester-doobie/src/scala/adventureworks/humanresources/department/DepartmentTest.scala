@@ -28,7 +28,7 @@ class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
         saved3 <- departmentRepo.selectAll.compile.lastOrError
         _ <- delay(assert(saved3.name == Name("baz")))
         // delete
-        _ <- departmentRepo.delete(saved1.departmentid)
+        _ <- departmentRepo.deleteById(saved1.departmentid)
         _ <- departmentRepo.selectAll.compile.toList.map(x => assert(x === List()))
       } yield succeed
     }

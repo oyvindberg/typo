@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait TransactionhistoryRepo {
-  def delete(transactionid: TransactionhistoryId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(transactionids: Array[TransactionhistoryId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow]
+  def deleteById(transactionid: TransactionhistoryId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(transactionids: Array[TransactionhistoryId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: TransactionhistoryRow): ZIO[ZConnection, Throwable, TransactionhistoryRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, TransactionhistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: TransactionhistoryRowUnsaved): ZIO[ZConnection, Throwable, TransactionhistoryRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, TransactionhistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, TransactionhistoryRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow]
   def selectAll: ZStream[ZConnection, Throwable, TransactionhistoryRow]
   def selectById(transactionid: TransactionhistoryId): ZIO[ZConnection, Throwable, Option[TransactionhistoryRow]]
   def selectByIds(transactionids: Array[TransactionhistoryId]): ZStream[ZConnection, Throwable, TransactionhistoryRow]
-  def update(row: TransactionhistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow]
+  def update(row: TransactionhistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: TransactionhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[TransactionhistoryRow]]
 }

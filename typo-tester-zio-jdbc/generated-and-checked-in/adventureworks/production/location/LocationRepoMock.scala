@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
                        map: scala.collection.mutable.Map[LocationId, LocationRow] = scala.collection.mutable.Map.empty) extends LocationRepo {
-  override def delete(locationid: LocationId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[LocationFields, LocationRow] = {
+    DeleteBuilderMock(DeleteParams.empty, LocationFields.structure.fields, map)
+  }
+  override def deleteById(locationid: LocationId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(locationid).isDefined)
   }
   override def deleteByIds(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(locationids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilderMock(DeleteParams.empty, LocationFields.structure.fields, map)
   }
   override def insert(unsaved: LocationRow): ZIO[ZConnection, Throwable, LocationRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
       unsaved
     }
   }
+  override def insert(unsaved: LocationRowUnsaved): ZIO[ZConnection, Throwable, LocationRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: LocationRowUnsaved): ZIO[ZConnection, Throwable, LocationRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
   override def selectByIds(locationids: Array[LocationId]): ZStream[ZConnection, Throwable, LocationRow] = {
     ZStream.fromIterable(locationids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[LocationFields, LocationRow] = {
+    UpdateBuilderMock(UpdateParams.empty, LocationFields.structure.fields, map)
+  }
   override def update(row: LocationRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.locationid) match {
@@ -88,9 +91,6 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilderMock(UpdateParams.empty, LocationFields.structure.fields, map)
   }
   override def upsert(unsaved: LocationRow): ZIO[ZConnection, Throwable, UpdateResult[LocationRow]] = {
     ZIO.succeed {

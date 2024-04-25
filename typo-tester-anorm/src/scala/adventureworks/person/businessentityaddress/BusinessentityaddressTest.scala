@@ -89,7 +89,7 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
       assert(saved3.modifieddate == newModifiedDate): @nowarn
 
       // delete
-      businessentityaddressRepo.delete(saved1.compositeId): @nowarn
+      businessentityaddressRepo.deleteById(saved1.compositeId): @nowarn
 
       val List() = businessentityaddressRepo.selectAll: @unchecked
 

@@ -24,23 +24,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
-  override def delete(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
+    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure)
+  }
+  override def deleteById(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Boolean] = {
     sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(shoppingcartitemids: Array[ShoppingcartitemId]): ConnectionIO[Int] = {
     sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ANY(${shoppingcartitemids})""".update.run
-  }
-  override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure)
   }
   override def insert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
           values (${fromWrite(unsaved.shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}::int4, ${fromWrite(unsaved.shoppingcartid)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.datecreated)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
        """.query(using ShoppingcartitemRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ShoppingcartitemRow.text)
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved): ConnectionIO[ShoppingcartitemRow] = {
     val fs = List(
@@ -78,6 +75,9 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     q.query(using ShoppingcartitemRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ShoppingcartitemRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY sales.shoppingcartitem("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ShoppingcartitemRowUnsaved.text)
@@ -94,6 +94,9 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): Stream[ConnectionIO, ShoppingcartitemRow] = {
     sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem where "shoppingcartitemid" = ANY(${shoppingcartitemids})""".query(using ShoppingcartitemRow.read).stream
   }
+  override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
+    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.read)
+  }
   override def update(row: ShoppingcartitemRow): ConnectionIO[Boolean] = {
     val shoppingcartitemid = row.shoppingcartitemid
     sql"""update sales.shoppingcartitem
@@ -106,9 +109,6 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.read)
   }
   override def upsert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")

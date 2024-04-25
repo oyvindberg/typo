@@ -21,14 +21,14 @@ import typo.dsl.UpdateParams
 
 class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUnsaved, CountryregioncurrencyRow],
                                     map: scala.collection.mutable.Map[CountryregioncurrencyId, CountryregioncurrencyRow] = scala.collection.mutable.Map.empty) extends CountryregioncurrencyRepo {
-  override def delete(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CountryregioncurrencyFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: CountryregioncurrencyId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
   }
   override def deleteByIds(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): Int = {
     compositeIds.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CountryregioncurrencyFields.structure.fields, map)
   }
   override def insert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
     val _ = if (map.contains(unsaved.compositeId))
@@ -38,14 +38,14 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
     
     unsaved
   }
+  override def insert(unsaved: CountryregioncurrencyRowUnsaved)(implicit c: Connection): CountryregioncurrencyRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[CountryregioncurrencyRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.compositeId -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: CountryregioncurrencyRowUnsaved)(implicit c: Connection): CountryregioncurrencyRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[CountryregioncurrencyRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -67,6 +67,9 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
   override def selectByIds(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): List[CountryregioncurrencyRow] = {
     compositeIds.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CountryregioncurrencyFields.structure.fields, map)
+  }
   override def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
       case Some(`row`) => false
@@ -75,9 +78,6 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
         true
       case None => false
     }
-  }
-  override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CountryregioncurrencyFields.structure.fields, map)
   }
   override def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
     map.put(unsaved.compositeId, unsaved): @nowarn

@@ -27,23 +27,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class CustomerRepoImpl extends CustomerRepo {
-  override def delete(customerid: CustomerId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
+    DeleteBuilder("sales.customer", CustomerFields.structure)
+  }
+  override def deleteById(customerid: CustomerId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from sales.customer where "customerid" = ${Segment.paramSegment(customerid)(CustomerId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(customerids: Array[CustomerId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from sales.customer where "customerid" = ANY(${customerids})""".delete
-  }
-  override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
-    DeleteBuilder("sales.customer", CustomerFields.structure)
   }
   override def insert(unsaved: CustomerRow): ZIO[ZConnection, Throwable, CustomerRow] = {
     sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.customerid)(CustomerId.setter)}::int4, ${Segment.paramSegment(unsaved.personid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4, ${Segment.paramSegment(unsaved.storeid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4, ${Segment.paramSegment(unsaved.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
        """.insertReturning(using CustomerRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CustomerRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(CustomerRow.text)
   }
   override def insert(unsaved: CustomerRowUnsaved): ZIO[ZConnection, Throwable, CustomerRow] = {
     val fs = List(
@@ -76,6 +73,9 @@ class CustomerRepoImpl extends CustomerRepo {
     q.insertReturning(using CustomerRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CustomerRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(CustomerRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CustomerRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY sales.customer("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CustomerRowUnsaved.text)
@@ -92,6 +92,9 @@ class CustomerRepoImpl extends CustomerRepo {
   override def selectByIds(customerids: Array[CustomerId]): ZStream[ZConnection, Throwable, CustomerRow] = {
     sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ANY(${Segment.paramSegment(customerids)(CustomerId.arraySetter)})""".query(using CustomerRow.jdbcDecoder).selectStream()
   }
+  override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
+    UpdateBuilder("sales.customer", CustomerFields.structure, CustomerRow.jdbcDecoder)
+  }
   override def update(row: CustomerRow): ZIO[ZConnection, Throwable, Boolean] = {
     val customerid = row.customerid
     sql"""update sales.customer
@@ -101,9 +104,6 @@ class CustomerRepoImpl extends CustomerRepo {
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "customerid" = ${Segment.paramSegment(customerid)(CustomerId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
-    UpdateBuilder("sales.customer", CustomerFields.structure, CustomerRow.jdbcDecoder)
   }
   override def upsert(unsaved: CustomerRow): ZIO[ZConnection, Throwable, UpdateResult[CustomerRow]] = {
     sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")

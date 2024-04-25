@@ -34,19 +34,21 @@ of your tests it's still very beneficial!
 ```scala mdoc:silent
 import adventureworks.person.address.*
 import typo.dsl.*
+import typo.dsl.DeleteBuilder.DeleteBuilderMock
+import typo.dsl.UpdateBuilder.UpdateBuilderMock
 import java.sql.Connection
 import scala.annotation.nowarn
 
 class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
                       map: scala.collection.mutable.Map[AddressId, AddressRow] = scala.collection.mutable.Map.empty) extends AddressRepo {
-  override def delete(addressid: AddressId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[AddressFields, AddressRow] = {
+    DeleteBuilderMock(DeleteParams.empty, AddressFields.structure.fields, map)
+  }
+  override def deleteById(addressid: AddressId)(implicit c: Connection): Boolean = {
     map.remove(addressid).isDefined
   }
   override def deleteByIds(addressids: Array[AddressId])(implicit c: Connection): Int = {
     addressids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def delete: DeleteBuilder[AddressFields, AddressRow] = {
-    DeleteBuilder.DeleteBuilderMock(DeleteParams.empty, AddressFields.structure.fields, map)
   }
   override def insert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
     val _ = if (map.contains(unsaved.addressid))
@@ -56,14 +58,14 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
 
     unsaved
   }
+  override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Iterator[AddressRow], batchSize: Int)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.addressid -> row)
     }
     unsaved.size.toLong
-  }
-  override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[AddressRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
@@ -85,6 +87,9 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
   override def selectByIds(addressids: Array[AddressId])(implicit c: Connection): List[AddressRow] = {
     addressids.flatMap(map.get).toList
   }
+  override def update: UpdateBuilder[AddressFields, AddressRow] = {
+    UpdateBuilderMock(UpdateParams.empty, AddressFields.structure.fields, map)
+  }
   override def update(row: AddressRow)(implicit c: Connection): Boolean = {
     map.get(row.addressid) match {
       case Some(`row`) => false
@@ -94,13 +99,11 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
       case None => false
     }
   }
-  override def update: UpdateBuilder[AddressFields, AddressRow] = {
-    UpdateBuilder.UpdateBuilderMock(UpdateParams.empty, AddressFields.structure.fields, map)
-  }
   override def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
     map.put(unsaved.addressid, unsaved): @nowarn
     unsaved
   }
 }
+
 ```
 

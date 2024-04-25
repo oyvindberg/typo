@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow],
                           map: scala.collection.mutable.Map[ScrapreasonId, ScrapreasonRow] = scala.collection.mutable.Map.empty) extends ScrapreasonRepo {
-  override def delete(scrapreasonid: ScrapreasonId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    DeleteBuilderMock(DeleteParams.empty, ScrapreasonFields.structure.fields, map)
+  }
+  override def deleteById(scrapreasonid: ScrapreasonId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(scrapreasonid).isDefined)
   }
   override def deleteByIds(scrapreasonids: Array[ScrapreasonId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(scrapreasonids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ScrapreasonFields.structure.fields, map)
   }
   override def insert(unsaved: ScrapreasonRow): ZIO[ZConnection, Throwable, ScrapreasonRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
       unsaved
     }
   }
+  override def insert(unsaved: ScrapreasonRowUnsaved): ZIO[ZConnection, Throwable, ScrapreasonRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ScrapreasonRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: ScrapreasonRowUnsaved): ZIO[ZConnection, Throwable, ScrapreasonRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ScrapreasonRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
   override def selectByIds(scrapreasonids: Array[ScrapreasonId]): ZStream[ZConnection, Throwable, ScrapreasonRow] = {
     ZStream.fromIterable(scrapreasonids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
+    UpdateBuilderMock(UpdateParams.empty, ScrapreasonFields.structure.fields, map)
+  }
   override def update(row: ScrapreasonRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.scrapreasonid) match {
@@ -88,9 +91,6 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ScrapreasonFields.structure.fields, map)
   }
   override def upsert(unsaved: ScrapreasonRow): ZIO[ZConnection, Throwable, UpdateResult[ScrapreasonRow]] = {
     ZIO.succeed {

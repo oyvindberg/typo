@@ -24,23 +24,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class DepartmentRepoImpl extends DepartmentRepo {
-  override def delete(departmentid: DepartmentId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
+    DeleteBuilder("humanresources.department", DepartmentFields.structure)
+  }
+  override def deleteById(departmentid: DepartmentId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from humanresources.department where "departmentid" = ${Segment.paramSegment(departmentid)(DepartmentId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(departmentids: Array[DepartmentId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from humanresources.department where "departmentid" = ANY(${departmentids})""".delete
-  }
-  override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
-    DeleteBuilder("humanresources.department", DepartmentFields.structure)
   }
   override def insert(unsaved: DepartmentRow): ZIO[ZConnection, Throwable, DepartmentRow] = {
     sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
           values (${Segment.paramSegment(unsaved.departmentid)(DepartmentId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.groupname)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "departmentid", "name", "groupname", "modifieddate"::text
        """.insertReturning(using DepartmentRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DepartmentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""", batchSize, unsaved)(DepartmentRow.text)
   }
   override def insert(unsaved: DepartmentRowUnsaved): ZIO[ZConnection, Throwable, DepartmentRow] = {
     val fs = List(
@@ -68,6 +65,9 @@ class DepartmentRepoImpl extends DepartmentRepo {
     q.insertReturning(using DepartmentRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DepartmentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""", batchSize, unsaved)(DepartmentRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, DepartmentRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY humanresources.department("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(DepartmentRowUnsaved.text)
@@ -84,6 +84,9 @@ class DepartmentRepoImpl extends DepartmentRepo {
   override def selectByIds(departmentids: Array[DepartmentId]): ZStream[ZConnection, Throwable, DepartmentRow] = {
     sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ANY(${Segment.paramSegment(departmentids)(DepartmentId.arraySetter)})""".query(using DepartmentRow.jdbcDecoder).selectStream()
   }
+  override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
+    UpdateBuilder("humanresources.department", DepartmentFields.structure, DepartmentRow.jdbcDecoder)
+  }
   override def update(row: DepartmentRow): ZIO[ZConnection, Throwable, Boolean] = {
     val departmentid = row.departmentid
     sql"""update humanresources.department
@@ -91,9 +94,6 @@ class DepartmentRepoImpl extends DepartmentRepo {
               "groupname" = ${Segment.paramSegment(row.groupname)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "departmentid" = ${Segment.paramSegment(departmentid)(DepartmentId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
-    UpdateBuilder("humanresources.department", DepartmentFields.structure, DepartmentRow.jdbcDecoder)
   }
   override def upsert(unsaved: DepartmentRow): ZIO[ZConnection, Throwable, UpdateResult[DepartmentRow]] = {
     sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")

@@ -26,7 +26,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
-  override def delete(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
+    DeleteBuilder("production.productsubcategory", ProductsubcategoryFields.structure)
+  }
+  override def deleteById(productsubcategoryid: ProductsubcategoryId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productsubcategory where "productsubcategoryid" = ${ParameterValue(productsubcategoryid, null, ProductsubcategoryId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(productsubcategoryids: Array[ProductsubcategoryId])(implicit c: Connection): Int = {
@@ -36,9 +39,6 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    DeleteBuilder("production.productsubcategory", ProductsubcategoryFields.structure)
-  }
   override def insert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     SQL"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.productsubcategoryid, null, ProductsubcategoryId.toStatement)}::int4, ${ParameterValue(unsaved.productcategoryid, null, ProductcategoryId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -46,9 +46,6 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
        """
       .executeInsert(ProductsubcategoryRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[ProductsubcategoryRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductsubcategoryRow.text, c)
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved)(implicit c: Connection): ProductsubcategoryRow = {
     val namedParameters = List(
@@ -83,6 +80,9 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[ProductsubcategoryRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductsubcategoryRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductsubcategoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.productsubcategory("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductsubcategoryRowUnsaved.text, c)
@@ -108,6 +108,9 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
        """.as(ProductsubcategoryRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
+    UpdateBuilder("production.productsubcategory", ProductsubcategoryFields.structure, ProductsubcategoryRow.rowParser)
+  }
   override def update(row: ProductsubcategoryRow)(implicit c: Connection): Boolean = {
     val productsubcategoryid = row.productsubcategoryid
     SQL"""update production.productsubcategory
@@ -117,9 +120,6 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productsubcategoryid" = ${ParameterValue(productsubcategoryid, null, ProductsubcategoryId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    UpdateBuilder("production.productsubcategory", ProductsubcategoryFields.structure, ProductsubcategoryRow.rowParser)
   }
   override def upsert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     SQL"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")

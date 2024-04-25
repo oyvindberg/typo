@@ -25,23 +25,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class CustomerRepoImpl extends CustomerRepo {
-  override def delete(customerid: CustomerId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
+    DeleteBuilder("sales.customer", CustomerFields.structure)
+  }
+  override def deleteById(customerid: CustomerId): ConnectionIO[Boolean] = {
     sql"""delete from sales.customer where "customerid" = ${fromWrite(customerid)(Write.fromPut(CustomerId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(customerids: Array[CustomerId]): ConnectionIO[Int] = {
     sql"""delete from sales.customer where "customerid" = ANY(${customerids})""".update.run
-  }
-  override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
-    DeleteBuilder("sales.customer", CustomerFields.structure)
   }
   override def insert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
     sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.customerid)(Write.fromPut(CustomerId.put))}::int4, ${fromWrite(unsaved.personid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.storeid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
        """.query(using CustomerRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, CustomerRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CustomerRow.text)
   }
   override def insert(unsaved: CustomerRowUnsaved): ConnectionIO[CustomerRow] = {
     val fs = List(
@@ -76,6 +73,9 @@ class CustomerRepoImpl extends CustomerRepo {
     q.query(using CustomerRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, CustomerRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CustomerRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CustomerRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY sales.customer("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using CustomerRowUnsaved.text)
@@ -92,6 +92,9 @@ class CustomerRepoImpl extends CustomerRepo {
   override def selectByIds(customerids: Array[CustomerId]): Stream[ConnectionIO, CustomerRow] = {
     sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ANY(${customerids})""".query(using CustomerRow.read).stream
   }
+  override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
+    UpdateBuilder("sales.customer", CustomerFields.structure, CustomerRow.read)
+  }
   override def update(row: CustomerRow): ConnectionIO[Boolean] = {
     val customerid = row.customerid
     sql"""update sales.customer
@@ -104,9 +107,6 @@ class CustomerRepoImpl extends CustomerRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
-    UpdateBuilder("sales.customer", CustomerFields.structure, CustomerRow.read)
   }
   override def upsert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
     sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")

@@ -25,23 +25,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
-  override def delete(productsubcategoryid: ProductsubcategoryId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
+    DeleteBuilder("production.productsubcategory", ProductsubcategoryFields.structure)
+  }
+  override def deleteById(productsubcategoryid: ProductsubcategoryId): ConnectionIO[Boolean] = {
     sql"""delete from production.productsubcategory where "productsubcategoryid" = ${fromWrite(productsubcategoryid)(Write.fromPut(ProductsubcategoryId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(productsubcategoryids: Array[ProductsubcategoryId]): ConnectionIO[Int] = {
     sql"""delete from production.productsubcategory where "productsubcategoryid" = ANY(${productsubcategoryids})""".update.run
-  }
-  override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    DeleteBuilder("production.productsubcategory", ProductsubcategoryFields.structure)
   }
   override def insert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow] = {
     sql"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.productsubcategoryid)(Write.fromPut(ProductsubcategoryId.put))}::int4, ${fromWrite(unsaved.productcategoryid)(Write.fromPut(ProductcategoryId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text
        """.query(using ProductsubcategoryRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductsubcategoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductsubcategoryRow.text)
   }
   override def insert(unsaved: ProductsubcategoryRowUnsaved): ConnectionIO[ProductsubcategoryRow] = {
     val fs = List(
@@ -75,6 +72,9 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     q.query(using ProductsubcategoryRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductsubcategoryRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductsubcategoryRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductsubcategoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.productsubcategory("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductsubcategoryRowUnsaved.text)
@@ -91,6 +91,9 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def selectByIds(productsubcategoryids: Array[ProductsubcategoryId]): Stream[ConnectionIO, ProductsubcategoryRow] = {
     sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory where "productsubcategoryid" = ANY(${productsubcategoryids})""".query(using ProductsubcategoryRow.read).stream
   }
+  override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
+    UpdateBuilder("production.productsubcategory", ProductsubcategoryFields.structure, ProductsubcategoryRow.read)
+  }
   override def update(row: ProductsubcategoryRow): ConnectionIO[Boolean] = {
     val productsubcategoryid = row.productsubcategoryid
     sql"""update production.productsubcategory
@@ -102,9 +105,6 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    UpdateBuilder("production.productsubcategory", ProductsubcategoryFields.structure, ProductsubcategoryRow.read)
   }
   override def upsert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow] = {
     sql"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")

@@ -25,7 +25,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
-  override def delete(compositeId: SalesterritoryhistoryId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
+    DeleteBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure)
+  }
+  override def deleteById(compositeId: SalesterritoryhistoryId): ConnectionIO[Boolean] = {
     sql"""delete from sales.salesterritoryhistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))} AND "territoryid" = ${fromWrite(compositeId.territoryid)(Write.fromPut(SalesterritoryId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[SalesterritoryhistoryId]): ConnectionIO[Int] = {
@@ -39,17 +42,11 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
        """.update.run
     
   }
-  override def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
-    DeleteBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure)
-  }
   override def insert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow] = {
     sql"""insert into sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
        """.query(using SalesterritoryhistoryRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalesterritoryhistoryRow.text)
   }
   override def insert(unsaved: SalesterritoryhistoryRowUnsaved): ConnectionIO[SalesterritoryhistoryRow] = {
     val fs = List(
@@ -81,6 +78,9 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     q.query(using SalesterritoryhistoryRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalesterritoryhistoryRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalesterritoryhistoryRowUnsaved.text)
@@ -105,6 +105,9 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
        """.query(using SalesterritoryhistoryRow.read).stream
     
   }
+  override def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
+    UpdateBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure, SalesterritoryhistoryRow.read)
+  }
   override def update(row: SalesterritoryhistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.salesterritoryhistory
@@ -115,9 +118,6 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
-    UpdateBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure, SalesterritoryhistoryRow.read)
   }
   override def upsert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow] = {
     sql"""insert into sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")

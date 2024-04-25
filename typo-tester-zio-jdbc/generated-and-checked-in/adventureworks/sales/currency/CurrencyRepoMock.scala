@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
                        map: scala.collection.mutable.Map[CurrencyId, CurrencyRow] = scala.collection.mutable.Map.empty) extends CurrencyRepo {
-  override def delete(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
+    DeleteBuilderMock(DeleteParams.empty, CurrencyFields.structure.fields, map)
+  }
+  override def deleteById(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(currencycode).isDefined)
   }
   override def deleteByIds(currencycodes: Array[CurrencyId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(currencycodes.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CurrencyFields.structure.fields, map)
   }
   override def insert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, CurrencyRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
       unsaved
     }
   }
+  override def insert(unsaved: CurrencyRowUnsaved): ZIO[ZConnection, Throwable, CurrencyRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: CurrencyRowUnsaved): ZIO[ZConnection, Throwable, CurrencyRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
   override def selectByIds(currencycodes: Array[CurrencyId]): ZStream[ZConnection, Throwable, CurrencyRow] = {
     ZStream.fromIterable(currencycodes.flatMap(map.get))
   }
+  override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
+    UpdateBuilderMock(UpdateParams.empty, CurrencyFields.structure.fields, map)
+  }
   override def update(row: CurrencyRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.currencycode) match {
@@ -88,9 +91,6 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CurrencyFields.structure.fields, map)
   }
   override def upsert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyRow]] = {
     ZIO.succeed {

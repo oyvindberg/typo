@@ -26,23 +26,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class StoreRepoImpl extends StoreRepo {
-  override def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[StoreFields, StoreRow] = {
+    DeleteBuilder("sales.store", StoreFields.structure)
+  }
+  override def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     sql"""delete from sales.store where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
     sql"""delete from sales.store where "businessentityid" = ANY(${businessentityids})""".update.run
-  }
-  override def delete: DeleteBuilder[StoreFields, StoreRow] = {
-    DeleteBuilder("sales.store", StoreFields.structure)
   }
   override def insert(unsaved: StoreRow): ConnectionIO[StoreRow] = {
     sql"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
        """.query(using StoreRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, StoreRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using StoreRow.text)
   }
   override def insert(unsaved: StoreRowUnsaved): ConnectionIO[StoreRow] = {
     val fs = List(
@@ -74,6 +71,9 @@ class StoreRepoImpl extends StoreRepo {
     q.query(using StoreRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, StoreRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using StoreRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, StoreRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using StoreRowUnsaved.text)
@@ -90,6 +90,9 @@ class StoreRepoImpl extends StoreRepo {
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, StoreRow] = {
     sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store where "businessentityid" = ANY(${businessentityids})""".query(using StoreRow.read).stream
   }
+  override def update: UpdateBuilder[StoreFields, StoreRow] = {
+    UpdateBuilder("sales.store", StoreFields.structure, StoreRow.read)
+  }
   override def update(row: StoreRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update sales.store
@@ -102,9 +105,6 @@ class StoreRepoImpl extends StoreRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[StoreFields, StoreRow] = {
-    UpdateBuilder("sales.store", StoreFields.structure, StoreRow.read)
   }
   override def upsert(unsaved: StoreRow): ConnectionIO[StoreRow] = {
     sql"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")

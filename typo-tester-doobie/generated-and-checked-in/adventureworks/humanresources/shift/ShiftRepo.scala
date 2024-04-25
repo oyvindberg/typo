@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait ShiftRepo {
-  def delete(shiftid: ShiftId): ConnectionIO[Boolean]
-  def deleteByIds(shiftids: Array[ShiftId]): ConnectionIO[Int]
   def delete: DeleteBuilder[ShiftFields, ShiftRow]
+  def deleteById(shiftid: ShiftId): ConnectionIO[Boolean]
+  def deleteByIds(shiftids: Array[ShiftId]): ConnectionIO[Int]
   def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShiftRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ShiftFields, ShiftRow]
   def selectAll: Stream[ConnectionIO, ShiftRow]
   def selectById(shiftid: ShiftId): ConnectionIO[Option[ShiftRow]]
   def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow]
-  def update(row: ShiftRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[ShiftFields, ShiftRow]
+  def update(row: ShiftRow): ConnectionIO[Boolean]
   def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow]
 }

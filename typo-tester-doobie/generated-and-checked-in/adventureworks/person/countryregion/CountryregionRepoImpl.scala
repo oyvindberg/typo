@@ -23,23 +23,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class CountryregionRepoImpl extends CountryregionRepo {
-  override def delete(countryregioncode: CountryregionId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
+    DeleteBuilder("person.countryregion", CountryregionFields.structure)
+  }
+  override def deleteById(countryregioncode: CountryregionId): ConnectionIO[Boolean] = {
     sql"""delete from person.countryregion where "countryregioncode" = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(countryregioncodes: Array[CountryregionId]): ConnectionIO[Int] = {
     sql"""delete from person.countryregion where "countryregioncode" = ANY(${countryregioncodes})""".update.run
-  }
-  override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
-    DeleteBuilder("person.countryregion", CountryregionFields.structure)
   }
   override def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
           values (${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "countryregioncode", "name", "modifieddate"::text
        """.query(using CountryregionRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CountryregionRow.text)
   }
   override def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow] = {
     val fs = List(
@@ -65,6 +62,9 @@ class CountryregionRepoImpl extends CountryregionRepo {
     q.query(using CountryregionRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CountryregionRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregionRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using CountryregionRowUnsaved.text)
@@ -81,6 +81,9 @@ class CountryregionRepoImpl extends CountryregionRepo {
   override def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow] = {
     sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ANY(${countryregioncodes})""".query(using CountryregionRow.read).stream
   }
+  override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
+    UpdateBuilder("person.countryregion", CountryregionFields.structure, CountryregionRow.read)
+  }
   override def update(row: CountryregionRow): ConnectionIO[Boolean] = {
     val countryregioncode = row.countryregioncode
     sql"""update person.countryregion
@@ -90,9 +93,6 @@ class CountryregionRepoImpl extends CountryregionRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
-    UpdateBuilder("person.countryregion", CountryregionFields.structure, CountryregionRow.read)
   }
   override def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")

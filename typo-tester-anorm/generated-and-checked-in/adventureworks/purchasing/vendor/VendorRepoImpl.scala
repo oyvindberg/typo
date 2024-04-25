@@ -30,7 +30,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class VendorRepoImpl extends VendorRepo {
-  override def delete(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[VendorFields, VendorRow] = {
+    DeleteBuilder("purchasing.vendor", VendorFields.structure)
+  }
+  override def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     SQL"""delete from purchasing.vendor where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
@@ -40,9 +43,6 @@ class VendorRepoImpl extends VendorRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[VendorFields, VendorRow] = {
-    DeleteBuilder("purchasing.vendor", VendorFields.structure)
-  }
   override def insert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
     SQL"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.accountnumber, null, AccountNumber.toStatement)}::varchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.creditrating, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.preferredvendorstatus, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.activeflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.purchasingwebserviceurl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -50,9 +50,6 @@ class VendorRepoImpl extends VendorRepo {
        """
       .executeInsert(VendorRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[VendorRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") FROM STDIN""", batchSize, unsaved)(VendorRow.text, c)
   }
   override def insert(unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow = {
     val namedParameters = List(
@@ -90,6 +87,9 @@ class VendorRepoImpl extends VendorRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[VendorRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") FROM STDIN""", batchSize, unsaved)(VendorRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[VendorRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(VendorRowUnsaved.text, c)
@@ -115,6 +115,9 @@ class VendorRepoImpl extends VendorRepo {
        """.as(VendorRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[VendorFields, VendorRow] = {
+    UpdateBuilder("purchasing.vendor", VendorFields.structure, VendorRow.rowParser)
+  }
   override def update(row: VendorRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
     SQL"""update purchasing.vendor
@@ -127,9 +130,6 @@ class VendorRepoImpl extends VendorRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[VendorFields, VendorRow] = {
-    UpdateBuilder("purchasing.vendor", VendorFields.structure, VendorRow.rowParser)
   }
   override def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
     SQL"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")

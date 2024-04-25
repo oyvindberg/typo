@@ -15,19 +15,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait VendorRepo {
-  def delete(businessentityid: BusinessentityId): ConnectionIO[Boolean]
-  def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int]
   def delete: DeleteBuilder[VendorFields, VendorRow]
+  def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean]
+  def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int]
   def insert(unsaved: VendorRow): ConnectionIO[VendorRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, VendorRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: VendorRowUnsaved): ConnectionIO[VendorRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, VendorRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, VendorRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[VendorFields, VendorRow]
   def selectAll: Stream[ConnectionIO, VendorRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[VendorRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, VendorRow]
-  def update(row: VendorRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[VendorFields, VendorRow]
+  def update(row: VendorRow): ConnectionIO[Boolean]
   def upsert(unsaved: VendorRow): ConnectionIO[VendorRow]
 }

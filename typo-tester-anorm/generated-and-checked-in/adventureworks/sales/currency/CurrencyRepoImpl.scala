@@ -24,7 +24,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class CurrencyRepoImpl extends CurrencyRepo {
-  override def delete(currencycode: CurrencyId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
+    DeleteBuilder("sales.currency", CurrencyFields.structure)
+  }
+  override def deleteById(currencycode: CurrencyId)(implicit c: Connection): Boolean = {
     SQL"""delete from sales.currency where "currencycode" = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): Int = {
@@ -34,9 +37,6 @@ class CurrencyRepoImpl extends CurrencyRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
-    DeleteBuilder("sales.currency", CurrencyFields.structure)
-  }
   override def insert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
     SQL"""insert into sales.currency("currencycode", "name", "modifieddate")
           values (${ParameterValue(unsaved.currencycode, null, CurrencyId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -44,9 +44,6 @@ class CurrencyRepoImpl extends CurrencyRepo {
        """
       .executeInsert(CurrencyRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[CurrencyRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CurrencyRow.text, c)
   }
   override def insert(unsaved: CurrencyRowUnsaved)(implicit c: Connection): CurrencyRow = {
     val namedParameters = List(
@@ -73,6 +70,9 @@ class CurrencyRepoImpl extends CurrencyRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[CurrencyRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CurrencyRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[CurrencyRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CurrencyRowUnsaved.text, c)
@@ -98,6 +98,9 @@ class CurrencyRepoImpl extends CurrencyRepo {
        """.as(CurrencyRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
+    UpdateBuilder("sales.currency", CurrencyFields.structure, CurrencyRow.rowParser)
+  }
   override def update(row: CurrencyRow)(implicit c: Connection): Boolean = {
     val currencycode = row.currencycode
     SQL"""update sales.currency
@@ -105,9 +108,6 @@ class CurrencyRepoImpl extends CurrencyRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "currencycode" = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
-    UpdateBuilder("sales.currency", CurrencyFields.structure, CurrencyRow.rowParser)
   }
   override def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
     SQL"""insert into sales.currency("currencycode", "name", "modifieddate")

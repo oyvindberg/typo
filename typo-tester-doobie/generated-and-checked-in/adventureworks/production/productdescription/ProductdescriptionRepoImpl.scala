@@ -24,23 +24,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
-  override def delete(productdescriptionid: ProductdescriptionId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
+    DeleteBuilder("production.productdescription", ProductdescriptionFields.structure)
+  }
+  override def deleteById(productdescriptionid: ProductdescriptionId): ConnectionIO[Boolean] = {
     sql"""delete from production.productdescription where "productdescriptionid" = ${fromWrite(productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(productdescriptionids: Array[ProductdescriptionId]): ConnectionIO[Int] = {
     sql"""delete from production.productdescription where "productdescriptionid" = ANY(${productdescriptionids})""".update.run
-  }
-  override def delete: DeleteBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
-    DeleteBuilder("production.productdescription", ProductdescriptionFields.structure)
   }
   override def insert(unsaved: ProductdescriptionRow): ConnectionIO[ProductdescriptionRow] = {
     sql"""insert into production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}::int4, ${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productdescriptionid", "description", "rowguid", "modifieddate"::text
        """.query(using ProductdescriptionRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductdescriptionRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductdescriptionRow.text)
   }
   override def insert(unsaved: ProductdescriptionRowUnsaved): ConnectionIO[ProductdescriptionRow] = {
     val fs = List(
@@ -73,6 +70,9 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     q.query(using ProductdescriptionRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductdescriptionRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductdescriptionRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductdescriptionRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.productdescription("description", "productdescriptionid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductdescriptionRowUnsaved.text)
@@ -89,6 +89,9 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def selectByIds(productdescriptionids: Array[ProductdescriptionId]): Stream[ConnectionIO, ProductdescriptionRow] = {
     sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from production.productdescription where "productdescriptionid" = ANY(${productdescriptionids})""".query(using ProductdescriptionRow.read).stream
   }
+  override def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
+    UpdateBuilder("production.productdescription", ProductdescriptionFields.structure, ProductdescriptionRow.read)
+  }
   override def update(row: ProductdescriptionRow): ConnectionIO[Boolean] = {
     val productdescriptionid = row.productdescriptionid
     sql"""update production.productdescription
@@ -99,9 +102,6 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
-    UpdateBuilder("production.productdescription", ProductdescriptionFields.structure, ProductdescriptionRow.read)
   }
   override def upsert(unsaved: ProductdescriptionRow): ConnectionIO[ProductdescriptionRow] = {
     sql"""insert into production.productdescription("productdescriptionid", "description", "rowguid", "modifieddate")

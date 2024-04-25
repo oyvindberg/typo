@@ -24,23 +24,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class UsersRepoImpl extends UsersRepo {
-  override def delete(userId: UsersId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[UsersFields, UsersRow] = {
+    DeleteBuilder("public.users", UsersFields.structure)
+  }
+  override def deleteById(userId: UsersId): ConnectionIO[Boolean] = {
     sql"""delete from public.users where "user_id" = ${fromWrite(userId)(Write.fromPut(UsersId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(userIds: Array[UsersId]): ConnectionIO[Int] = {
     sql"""delete from public.users where "user_id" = ANY(${userIds})""".update.run
-  }
-  override def delete: DeleteBuilder[UsersFields, UsersRow] = {
-    DeleteBuilder("public.users", UsersFields.structure)
   }
   override def insert(unsaved: UsersRow): ConnectionIO[UsersRow] = {
     sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
           values (${fromWrite(unsaved.userId)(Write.fromPut(UsersId.put))}::uuid, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.lastName)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.email)(Write.fromPut(TypoUnknownCitext.put))}::citext, ${fromWrite(unsaved.password)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.createdAt)(Write.fromPut(TypoInstant.put))}::timestamptz, ${fromWrite(unsaved.verifiedOn)(Write.fromPutOption(TypoInstant.put))}::timestamptz)
           returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
        """.query(using UsersRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""").copyIn(unsaved, batchSize)(using UsersRow.text)
   }
   override def insert(unsaved: UsersRowUnsaved): ConnectionIO[UsersRow] = {
     val fs = List(
@@ -70,6 +67,9 @@ class UsersRepoImpl extends UsersRepo {
     q.query(using UsersRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""").copyIn(unsaved, batchSize)(using UsersRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UsersRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY public.users("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using UsersRowUnsaved.text)
@@ -92,6 +92,9 @@ class UsersRepoImpl extends UsersRepo {
           where "email" = ${fromWrite(email)(Write.fromPut(TypoUnknownCitext.put))}
        """.query(using UsersRow.read).option
   }
+  override def update: UpdateBuilder[UsersFields, UsersRow] = {
+    UpdateBuilder("public.users", UsersFields.structure, UsersRow.read)
+  }
   override def update(row: UsersRow): ConnectionIO[Boolean] = {
     val userId = row.userId
     sql"""update public.users
@@ -105,9 +108,6 @@ class UsersRepoImpl extends UsersRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[UsersFields, UsersRow] = {
-    UpdateBuilder("public.users", UsersFields.structure, UsersRow.read)
   }
   override def upsert(unsaved: UsersRow): ConnectionIO[UsersRow] = {
     sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")

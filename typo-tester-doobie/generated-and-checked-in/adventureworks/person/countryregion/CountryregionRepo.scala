@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait CountryregionRepo {
-  def delete(countryregioncode: CountryregionId): ConnectionIO[Boolean]
-  def deleteByIds(countryregioncodes: Array[CountryregionId]): ConnectionIO[Int]
   def delete: DeleteBuilder[CountryregionFields, CountryregionRow]
+  def deleteById(countryregioncode: CountryregionId): ConnectionIO[Boolean]
+  def deleteByIds(countryregioncodes: Array[CountryregionId]): ConnectionIO[Int]
   def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregionRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[CountryregionFields, CountryregionRow]
   def selectAll: Stream[ConnectionIO, CountryregionRow]
   def selectById(countryregioncode: CountryregionId): ConnectionIO[Option[CountryregionRow]]
   def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow]
-  def update(row: CountryregionRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[CountryregionFields, CountryregionRow]
+  def update(row: CountryregionRow): ConnectionIO[Boolean]
   def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow]
 }

@@ -60,68 +60,70 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         code"${composite.cols.map(cc => code"${cc.dbName.code} = ${runtimeInterpolateValue(code"${composite.paramName}.${cc.name}", cc.tpe)}").mkCode(" AND ")}"
     }
 
-  override def repoSig(repoMethod: RepoMethod): sc.Code = repoMethod match {
-    case RepoMethod.SelectBuilder(_, fieldsType, rowType) =>
-      code"def select: ${sc.Type.dsl.SelectBuilder.of(fieldsType, rowType)}"
-    case RepoMethod.SelectAll(_, _, rowType) =>
-      code"def selectAll: ${fs2Stream.of(ConnectionIO, rowType)}"
-    case RepoMethod.SelectById(_, _, id, rowType) =>
-      code"def selectById(${id.param}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}"
-    case RepoMethod.SelectAllByIds(_, _, idComputed, idsParam, rowType) =>
-      val usedDefineds =
-        idComputed.userDefinedCols.zipWithIndex
-          .map { case (col, i) => sc.Param(sc.Ident(s"puts$i"), Put.of(sc.Type.ArrayOf(col.tpe)), None) }
-      usedDefineds match {
-        case Nil =>
-          code"def selectByIds($idsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
-        case nonEmpty =>
-          code"def selectByIds($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${fs2Stream.of(ConnectionIO, rowType)}"
-      }
-    case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
-      val name = s"selectByUnique${keyColumns.map(x => Naming.titleCase(x.name.value)).mkString("And")}"
-      code"def $name(${keyColumns.map(_.param.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}"
-    case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
-      code"def selectByFieldValues($fieldValueOrIdsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
-    case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
-      code"def update: ${sc.Type.dsl.UpdateBuilder.of(fieldsType, rowType)}"
-    case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
-      code"def updateFieldValues(${id.param}, $varargs): ${ConnectionIO.of(TypesScala.Boolean)}"
-    case RepoMethod.Update(_, _, _, param, _) =>
-      code"def update($param): ${ConnectionIO.of(TypesScala.Boolean)}"
-    case RepoMethod.Insert(_, _, unsavedParam, rowType) =>
-      code"def insert($unsavedParam): ${ConnectionIO.of(rowType)}"
-    case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
-      code"def insert($unsavedParam): ${ConnectionIO.of(rowType)}"
-    case RepoMethod.InsertStreaming(_, _, rowType) =>
-      code"def insertStreaming(unsaved: ${fs2Stream.of(ConnectionIO, rowType)}, batchSize: ${TypesScala.Int}): ${ConnectionIO.of(TypesScala.Long)}"
-    case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
-      code"def insertUnsavedStreaming(unsaved: ${fs2Stream.of(ConnectionIO, unsaved.tpe)}, batchSize: ${TypesScala.Int}): ${ConnectionIO.of(TypesScala.Long)}"
-    case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
-      code"def upsert($unsavedParam): ${ConnectionIO.of(rowType)}"
-    case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
-      code"def delete: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
-    case RepoMethod.Delete(_, id) =>
-      code"def delete(${id.param}): ${ConnectionIO.of(TypesScala.Boolean)}"
-    case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
-      val usedDefineds =
-        idComputed.userDefinedCols.zipWithIndex
-          .map { case (col, i) => sc.Param(sc.Ident(s"put$i"), Put.of(sc.Type.ArrayOf(col.tpe)), None) }
-      usedDefineds match {
-        case Nil =>
-          code"def deleteByIds(${idsParam}): ${ConnectionIO.of(TypesScala.Int)}"
-        case nonEmpty =>
-          code"def deleteByIds(${idsParam})(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Int)}"
-      }
+  override def repoSig(repoMethod: RepoMethod): sc.Code = {
+    val name = repoMethod.methodName
+    repoMethod match {
+      case RepoMethod.SelectBuilder(_, fieldsType, rowType) =>
+        code"def $name: ${sc.Type.dsl.SelectBuilder.of(fieldsType, rowType)}"
+      case RepoMethod.SelectAll(_, _, rowType) =>
+        code"def $name: ${fs2Stream.of(ConnectionIO, rowType)}"
+      case RepoMethod.SelectById(_, _, id, rowType) =>
+        code"def $name(${id.param}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}"
+      case RepoMethod.SelectByIds(_, _, idComputed, idsParam, rowType) =>
+        val usedDefineds =
+          idComputed.userDefinedCols.zipWithIndex
+            .map { case (col, i) => sc.Param(sc.Ident(s"puts$i"), Put.of(sc.Type.ArrayOf(col.tpe)), None) }
+        usedDefineds match {
+          case Nil =>
+            code"def $name($idsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
+          case nonEmpty =>
+            code"def $name($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${fs2Stream.of(ConnectionIO, rowType)}"
+        }
+      case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
+        code"def $name(${keyColumns.map(_.param.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}"
+      case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
+        code"def $name($fieldValueOrIdsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
+      case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
+        code"def $name: ${sc.Type.dsl.UpdateBuilder.of(fieldsType, rowType)}"
+      case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
+        code"def $name(${id.param}, $varargs): ${ConnectionIO.of(TypesScala.Boolean)}"
+      case RepoMethod.Update(_, _, _, param, _) =>
+        code"def $name($param): ${ConnectionIO.of(TypesScala.Boolean)}"
+      case RepoMethod.Insert(_, _, unsavedParam, rowType) =>
+        code"def $name($unsavedParam): ${ConnectionIO.of(rowType)}"
+      case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
+        code"def $name($unsavedParam): ${ConnectionIO.of(rowType)}"
+      case RepoMethod.InsertStreaming(_, _, rowType) =>
+        code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, rowType)}, batchSize: ${TypesScala.Int}): ${ConnectionIO.of(TypesScala.Long)}"
+      case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
+        code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, unsaved.tpe)}, batchSize: ${TypesScala.Int}): ${ConnectionIO.of(TypesScala.Long)}"
+      case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
+        code"def $name($unsavedParam): ${ConnectionIO.of(rowType)}"
+      case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
+        code"def $name: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
+      case RepoMethod.Delete(_, id) =>
+        code"def $name(${id.param}): ${ConnectionIO.of(TypesScala.Boolean)}"
+      case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
+        val usedDefineds =
+          idComputed.userDefinedCols.zipWithIndex
+            .map { case (col, i) => sc.Param(sc.Ident(s"put$i"), Put.of(sc.Type.ArrayOf(col.tpe)), None) }
+        usedDefineds match {
+          case Nil =>
+            code"def $name(${idsParam}): ${ConnectionIO.of(TypesScala.Int)}"
+          case nonEmpty =>
+            code"def $name(${idsParam})(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Int)}"
+        }
 
-    case RepoMethod.SqlFile(sqlScript) =>
-      val params = sc.Params(sqlScript.params.map(p => sc.Param(p.name, p.tpe, None)))
+      case RepoMethod.SqlFile(sqlScript) =>
+        val params = sc.Params(sqlScript.params.map(p => sc.Param(p.name, p.tpe, None)))
 
-      val retType = sqlScript.maybeRowName match {
-        case MaybeReturnsRows.Query(rowName) => fs2Stream.of(ConnectionIO, rowName)
-        case MaybeReturnsRows.Update         => ConnectionIO.of(TypesScala.Int)
-      }
+        val retType = sqlScript.maybeRowName match {
+          case MaybeReturnsRows.Query(rowName) => fs2Stream.of(ConnectionIO, rowName)
+          case MaybeReturnsRows.Update         => ConnectionIO.of(TypesScala.Int)
+        }
 
-      code"def apply$params: $retType"
+        code"def $name$params: $retType"
+    }
   }
 
   def query(sql: sc.Code, rowType: sc.Type): sc.Code =
@@ -143,7 +145,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         val sql = SQL(code"""select $joinedColNames from $relName where ${matchId(id)}""")
         code"""${query(sql, rowType)}.option"""
 
-      case RepoMethod.SelectAllByIds(relName, cols, computedId, idsParam, rowType) =>
+      case RepoMethod.SelectByIds(relName, cols, computedId, idsParam, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
         computedId match {
           case x: IdComputed.Composite =>
@@ -383,7 +385,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         code"$fs2Stream.emits(map.values.toList)"
       case RepoMethod.SelectById(_, _, id, _) =>
         code"$delayCIO(map.get(${id.paramName}))"
-      case RepoMethod.SelectAllByIds(_, _, _, idsParam, _) =>
+      case RepoMethod.SelectByIds(_, _, _, idsParam, _) =>
         code"$fs2Stream.emits(${idsParam.name}.flatMap(map.get).toList)"
       case RepoMethod.SelectByUnique(_, keyColumns, _, _) =>
         code"${delayCIO}(map.values.find(v => ${keyColumns.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")}))"

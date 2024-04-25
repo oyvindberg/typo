@@ -13,19 +13,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait ProductdescriptionRepo {
-  def delete(productdescriptionid: ProductdescriptionId)(implicit c: Connection): Boolean
-  def deleteByIds(productdescriptionids: Array[ProductdescriptionId])(implicit c: Connection): Int
   def delete: DeleteBuilder[ProductdescriptionFields, ProductdescriptionRow]
+  def deleteById(productdescriptionid: ProductdescriptionId)(implicit c: Connection): Boolean
+  def deleteByIds(productdescriptionids: Array[ProductdescriptionId])(implicit c: Connection): Int
   def insert(unsaved: ProductdescriptionRow)(implicit c: Connection): ProductdescriptionRow
-  def insertStreaming(unsaved: Iterator[ProductdescriptionRow], batchSize: Int)(implicit c: Connection): Long
   def insert(unsaved: ProductdescriptionRowUnsaved)(implicit c: Connection): ProductdescriptionRow
+  def insertStreaming(unsaved: Iterator[ProductdescriptionRow], batchSize: Int)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[ProductdescriptionRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[ProductdescriptionFields, ProductdescriptionRow]
   def selectAll(implicit c: Connection): List[ProductdescriptionRow]
   def selectById(productdescriptionid: ProductdescriptionId)(implicit c: Connection): Option[ProductdescriptionRow]
   def selectByIds(productdescriptionids: Array[ProductdescriptionId])(implicit c: Connection): List[ProductdescriptionRow]
-  def update(row: ProductdescriptionRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow]
+  def update(row: ProductdescriptionRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ProductdescriptionRow)(implicit c: Connection): ProductdescriptionRow
 }

@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait StateprovinceRepo {
-  def delete(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(stateprovinceids: Array[StateprovinceId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow]
+  def deleteById(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(stateprovinceids: Array[StateprovinceId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, StateprovinceRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: StateprovinceRowUnsaved): ZIO[ZConnection, Throwable, StateprovinceRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[StateprovinceFields, StateprovinceRow]
   def selectAll: ZStream[ZConnection, Throwable, StateprovinceRow]
   def selectById(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Option[StateprovinceRow]]
   def selectByIds(stateprovinceids: Array[StateprovinceId]): ZStream[ZConnection, Throwable, StateprovinceRow]
-  def update(row: StateprovinceRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[StateprovinceFields, StateprovinceRow]
+  def update(row: StateprovinceRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, UpdateResult[StateprovinceRow]]
 }

@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait BillofmaterialsRepo {
-  def delete(billofmaterialsid: Int): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(billofmaterialsids: Array[Int]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow]
+  def deleteById(billofmaterialsid: Int): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(billofmaterialsids: Array[Int]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: BillofmaterialsRow): ZIO[ZConnection, Throwable, BillofmaterialsRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BillofmaterialsRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: BillofmaterialsRowUnsaved): ZIO[ZConnection, Throwable, BillofmaterialsRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BillofmaterialsRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, BillofmaterialsRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def selectAll: ZStream[ZConnection, Throwable, BillofmaterialsRow]
   def selectById(billofmaterialsid: Int): ZIO[ZConnection, Throwable, Option[BillofmaterialsRow]]
   def selectByIds(billofmaterialsids: Array[Int]): ZStream[ZConnection, Throwable, BillofmaterialsRow]
-  def update(row: BillofmaterialsRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow]
+  def update(row: BillofmaterialsRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: BillofmaterialsRow): ZIO[ZConnection, Throwable, UpdateResult[BillofmaterialsRow]]
 }

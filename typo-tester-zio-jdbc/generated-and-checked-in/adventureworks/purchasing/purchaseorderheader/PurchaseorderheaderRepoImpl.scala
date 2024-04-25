@@ -27,23 +27,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
-  override def delete(purchaseorderid: PurchaseorderheaderId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
+    DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure)
+  }
+  override def deleteById(purchaseorderid: PurchaseorderheaderId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(PurchaseorderheaderId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(purchaseorderids: Array[PurchaseorderheaderId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ANY(${purchaseorderids})""".delete
-  }
-  override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure)
   }
   override def insert(unsaved: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, PurchaseorderheaderRow] = {
     sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
           values (${Segment.paramSegment(unsaved.purchaseorderid)(PurchaseorderheaderId.setter)}::int4, ${Segment.paramSegment(unsaved.revisionnumber)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.status)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.employeeid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.vendorid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.shipmethodid)(ShipmethodId.setter)}::int4, ${Segment.paramSegment(unsaved.orderdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.shipdate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.subtotal)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.taxamt)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.freight)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text
        """.insertReturning(using PurchaseorderheaderRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PurchaseorderheaderRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate") FROM STDIN""", batchSize, unsaved)(PurchaseorderheaderRow.text)
   }
   override def insert(unsaved: PurchaseorderheaderRowUnsaved): ZIO[ZConnection, Throwable, PurchaseorderheaderRow] = {
     val fs = List(
@@ -97,6 +94,9 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     q.insertReturning(using PurchaseorderheaderRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PurchaseorderheaderRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate") FROM STDIN""", batchSize, unsaved)(PurchaseorderheaderRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PurchaseorderheaderRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY purchasing.purchaseorderheader("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PurchaseorderheaderRowUnsaved.text)
@@ -113,6 +113,9 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId]): ZStream[ZConnection, Throwable, PurchaseorderheaderRow] = {
     sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader where "purchaseorderid" = ANY(${Segment.paramSegment(purchaseorderids)(PurchaseorderheaderId.arraySetter)})""".query(using PurchaseorderheaderRow.jdbcDecoder).selectStream()
   }
+  override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
+    UpdateBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.jdbcDecoder)
+  }
   override def update(row: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, Boolean] = {
     val purchaseorderid = row.purchaseorderid
     sql"""update purchasing.purchaseorderheader
@@ -128,9 +131,6 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
               "freight" = ${Segment.paramSegment(row.freight)(Setter.bigDecimalScalaSetter)}::numeric,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(PurchaseorderheaderId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    UpdateBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.jdbcDecoder)
   }
   override def upsert(unsaved: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, UpdateResult[PurchaseorderheaderRow]] = {
     sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")

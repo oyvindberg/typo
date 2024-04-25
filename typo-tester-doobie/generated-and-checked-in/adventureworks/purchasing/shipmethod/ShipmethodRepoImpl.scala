@@ -25,23 +25,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ShipmethodRepoImpl extends ShipmethodRepo {
-  override def delete(shipmethodid: ShipmethodId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
+    DeleteBuilder("purchasing.shipmethod", ShipmethodFields.structure)
+  }
+  override def deleteById(shipmethodid: ShipmethodId): ConnectionIO[Boolean] = {
     sql"""delete from purchasing.shipmethod where "shipmethodid" = ${fromWrite(shipmethodid)(Write.fromPut(ShipmethodId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(shipmethodids: Array[ShipmethodId]): ConnectionIO[Int] = {
     sql"""delete from purchasing.shipmethod where "shipmethodid" = ANY(${shipmethodids})""".update.run
-  }
-  override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
-    DeleteBuilder("purchasing.shipmethod", ShipmethodFields.structure)
   }
   override def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     sql"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.shipbase)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.shiprate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
        """.query(using ShipmethodRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ShipmethodRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ShipmethodRow.text)
   }
   override def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow] = {
     val fs = List(
@@ -82,6 +79,9 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
     q.query(using ShipmethodRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ShipmethodRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ShipmethodRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShipmethodRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY purchasing.shipmethod("name", "shipmethodid", "shipbase", "shiprate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ShipmethodRowUnsaved.text)
@@ -98,6 +98,9 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
   override def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow] = {
     sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod where "shipmethodid" = ANY(${shipmethodids})""".query(using ShipmethodRow.read).stream
   }
+  override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
+    UpdateBuilder("purchasing.shipmethod", ShipmethodFields.structure, ShipmethodRow.read)
+  }
   override def update(row: ShipmethodRow): ConnectionIO[Boolean] = {
     val shipmethodid = row.shipmethodid
     sql"""update purchasing.shipmethod
@@ -110,9 +113,6 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
-    UpdateBuilder("purchasing.shipmethod", ShipmethodFields.structure, ShipmethodRow.read)
   }
   override def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     sql"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")

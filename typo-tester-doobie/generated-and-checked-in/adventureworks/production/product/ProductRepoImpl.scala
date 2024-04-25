@@ -30,23 +30,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductRepoImpl extends ProductRepo {
-  override def delete(productid: ProductId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[ProductFields, ProductRow] = {
+    DeleteBuilder("production.product", ProductFields.structure)
+  }
+  override def deleteById(productid: ProductId): ConnectionIO[Boolean] = {
     sql"""delete from production.product where "productid" = ${fromWrite(productid)(Write.fromPut(ProductId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(productids: Array[ProductId]): ConnectionIO[Int] = {
     sql"""delete from production.product where "productid" = ANY(${productids})""".update.run
-  }
-  override def delete: DeleteBuilder[ProductFields, ProductRow] = {
-    DeleteBuilder("production.product", ProductFields.structure)
   }
   override def insert(unsaved: ProductRow): ConnectionIO[ProductRow] = {
     sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.productnumber)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.makeflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.finishedgoodsflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.color)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.safetystocklevel)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.reorderpoint)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.size)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.sizeunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.weightunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.weight)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.daystomanufacture)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.productline)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.`class`)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.style)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.productsubcategoryid)(Write.fromPutOption(ProductsubcategoryId.put))}::int4, ${fromWrite(unsaved.productmodelid)(Write.fromPutOption(ProductmodelId.put))}::int4, ${fromWrite(unsaved.sellstartdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.sellenddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.discontinueddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text
        """.query(using ProductRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductRow.text)
   }
   override def insert(unsaved: ProductRowUnsaved): ConnectionIO[ProductRow] = {
     val fs = List(
@@ -106,6 +103,9 @@ class ProductRepoImpl extends ProductRepo {
     q.query(using ProductRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY production.product("name", "productnumber", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "productid", "makeflag", "finishedgoodsflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductRowUnsaved.text)
@@ -121,6 +121,9 @@ class ProductRepoImpl extends ProductRepo {
   }
   override def selectByIds(productids: Array[ProductId]): Stream[ConnectionIO, ProductRow] = {
     sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product where "productid" = ANY(${productids})""".query(using ProductRow.read).stream
+  }
+  override def update: UpdateBuilder[ProductFields, ProductRow] = {
+    UpdateBuilder("production.product", ProductFields.structure, ProductRow.read)
   }
   override def update(row: ProductRow): ConnectionIO[Boolean] = {
     val productid = row.productid
@@ -153,9 +156,6 @@ class ProductRepoImpl extends ProductRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[ProductFields, ProductRow] = {
-    UpdateBuilder("production.product", ProductFields.structure, ProductRow.read)
   }
   override def upsert(unsaved: ProductRow): ConnectionIO[ProductRow] = {
     sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")

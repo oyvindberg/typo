@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
                       map: scala.collection.mutable.Map[AddressId, AddressRow] = scala.collection.mutable.Map.empty) extends AddressRepo {
-  override def delete(addressid: AddressId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[AddressFields, AddressRow] = {
+    DeleteBuilderMock(DeleteParams.empty, AddressFields.structure.fields, map)
+  }
+  override def deleteById(addressid: AddressId): ConnectionIO[Boolean] = {
     delay(map.remove(addressid).isDefined)
   }
   override def deleteByIds(addressids: Array[AddressId]): ConnectionIO[Int] = {
     delay(addressids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[AddressFields, AddressRow] = {
-    DeleteBuilderMock(DeleteParams.empty, AddressFields.structure.fields, map)
   }
   override def insert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     delay {
@@ -42,6 +42,9 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
       unsaved
     }
   }
+  override def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, AddressRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
       }
       num
     }
-  }
-  override def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, AddressRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
   override def selectByIds(addressids: Array[AddressId]): Stream[ConnectionIO, AddressRow] = {
     Stream.emits(addressids.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[AddressFields, AddressRow] = {
+    UpdateBuilderMock(UpdateParams.empty, AddressFields.structure.fields, map)
+  }
   override def update(row: AddressRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.addressid) match {
@@ -89,9 +92,6 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[AddressFields, AddressRow] = {
-    UpdateBuilderMock(UpdateParams.empty, AddressFields.structure.fields, map)
   }
   override def upsert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     delay {

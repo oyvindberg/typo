@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved, SpecialofferproductRow],
                                   map: scala.collection.mutable.Map[SpecialofferproductId, SpecialofferproductRow] = scala.collection.mutable.Map.empty) extends SpecialofferproductRepo {
-  override def delete(compositeId: SpecialofferproductId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
+    DeleteBuilderMock(DeleteParams.empty, SpecialofferproductFields.structure.fields, map)
+  }
+  override def deleteById(compositeId: SpecialofferproductId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
   }
   override def deleteByIds(compositeIds: Array[SpecialofferproductId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(compositeIds.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SpecialofferproductFields.structure.fields, map)
   }
   override def insert(unsaved: SpecialofferproductRow): ZIO[ZConnection, Throwable, SpecialofferproductRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
       unsaved
     }
   }
+  override def insert(unsaved: SpecialofferproductRowUnsaved): ZIO[ZConnection, Throwable, SpecialofferproductRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferproductRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: SpecialofferproductRowUnsaved): ZIO[ZConnection, Throwable, SpecialofferproductRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferproductRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
   override def selectByIds(compositeIds: Array[SpecialofferproductId]): ZStream[ZConnection, Throwable, SpecialofferproductRow] = {
     ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
+  override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
+    UpdateBuilderMock(UpdateParams.empty, SpecialofferproductFields.structure.fields, map)
+  }
   override def update(row: SpecialofferproductRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.compositeId) match {
@@ -88,9 +91,6 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SpecialofferproductFields.structure.fields, map)
   }
   override def upsert(unsaved: SpecialofferproductRow): ZIO[ZConnection, Throwable, UpdateResult[SpecialofferproductRow]] = {
     ZIO.succeed {

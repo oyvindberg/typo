@@ -25,14 +25,14 @@ import zio.stream.ZStream
 
 class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, IllustrationRow],
                            map: scala.collection.mutable.Map[IllustrationId, IllustrationRow] = scala.collection.mutable.Map.empty) extends IllustrationRepo {
-  override def delete(illustrationid: IllustrationId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
+    DeleteBuilderMock(DeleteParams.empty, IllustrationFields.structure.fields, map)
+  }
+  override def deleteById(illustrationid: IllustrationId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(illustrationid).isDefined)
   }
   override def deleteByIds(illustrationids: Array[IllustrationId]): ZIO[ZConnection, Throwable, Long] = {
     ZIO.succeed(illustrationids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
-    DeleteBuilderMock(DeleteParams.empty, IllustrationFields.structure.fields, map)
   }
   override def insert(unsaved: IllustrationRow): ZIO[ZConnection, Throwable, IllustrationRow] = {
     ZIO.succeed {
@@ -45,6 +45,9 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
       unsaved
     }
   }
+  override def insert(unsaved: IllustrationRowUnsaved): ZIO[ZConnection, Throwable, IllustrationRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, IllustrationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
@@ -52,9 +55,6 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
         acc + 1
       }
     }.runLast.map(_.getOrElse(0L))
-  }
-  override def insert(unsaved: IllustrationRowUnsaved): ZIO[ZConnection, Throwable, IllustrationRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, IllustrationRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
@@ -78,6 +78,9 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
   override def selectByIds(illustrationids: Array[IllustrationId]): ZStream[ZConnection, Throwable, IllustrationRow] = {
     ZStream.fromIterable(illustrationids.flatMap(map.get))
   }
+  override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
+    UpdateBuilderMock(UpdateParams.empty, IllustrationFields.structure.fields, map)
+  }
   override def update(row: IllustrationRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.illustrationid) match {
@@ -88,9 +91,6 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
-    UpdateBuilderMock(UpdateParams.empty, IllustrationFields.structure.fields, map)
   }
   override def upsert(unsaved: IllustrationRow): ZIO[ZConnection, Throwable, UpdateResult[IllustrationRow]] = {
     ZIO.succeed {

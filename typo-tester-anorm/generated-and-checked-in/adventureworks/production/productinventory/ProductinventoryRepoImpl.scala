@@ -28,7 +28,10 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class ProductinventoryRepoImpl extends ProductinventoryRepo {
-  override def delete(compositeId: ProductinventoryId)(implicit c: Connection): Boolean = {
+  override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
+    DeleteBuilder("production.productinventory", ProductinventoryFields.structure)
+  }
+  override def deleteById(compositeId: ProductinventoryId)(implicit c: Connection): Boolean = {
     SQL"""delete from production.productinventory where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "locationid" = ${ParameterValue(compositeId.locationid, null, LocationId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[ProductinventoryId])(implicit c: Connection): Int = {
@@ -41,9 +44,6 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
        """.executeUpdate()
     
   }
-  override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
-    DeleteBuilder("production.productinventory", ProductinventoryFields.structure)
-  }
   override def insert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     SQL"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int2, ${ParameterValue(unsaved.shelf, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.bin, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.quantity, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
@@ -51,9 +51,6 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
        """
       .executeInsert(ProductinventoryRow.rowParser(1).single)
     
-  }
-  override def insertStreaming(unsaved: Iterator[ProductinventoryRow], batchSize: Int)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductinventoryRow.text, c)
   }
   override def insert(unsaved: ProductinventoryRowUnsaved)(implicit c: Connection): ProductinventoryRow = {
     val namedParameters = List(
@@ -90,6 +87,9 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     }
     
   }
+  override def insertStreaming(unsaved: Iterator[ProductinventoryRow], batchSize: Int)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductinventoryRow.text, c)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductinventoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductinventoryRowUnsaved.text, c)
@@ -118,6 +118,9 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
        """.as(ProductinventoryRow.rowParser(1).*)
     
   }
+  override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
+    UpdateBuilder("production.productinventory", ProductinventoryFields.structure, ProductinventoryRow.rowParser)
+  }
   override def update(row: ProductinventoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update production.productinventory
@@ -128,9 +131,6 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "locationid" = ${ParameterValue(compositeId.locationid, null, LocationId.toStatement)}
        """.executeUpdate() > 0
-  }
-  override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
-    UpdateBuilder("production.productinventory", ProductinventoryFields.structure, ProductinventoryRow.rowParser)
   }
   override def upsert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     SQL"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")

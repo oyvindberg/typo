@@ -21,14 +21,14 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class MaritalStatusRepoImpl extends MaritalStatusRepo {
-  override def delete(id: MaritalStatusId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
+    DeleteBuilder("myschema.marital_status", MaritalStatusFields.structure)
+  }
+  override def deleteById(id: MaritalStatusId): ConnectionIO[Boolean] = {
     sql"""delete from myschema.marital_status where "id" = ${fromWrite(id)(Write.fromPut(MaritalStatusId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(ids: Array[MaritalStatusId]): ConnectionIO[Int] = {
     sql"""delete from myschema.marital_status where "id" = ANY(${ids})""".update.run
-  }
-  override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilder("myschema.marital_status", MaritalStatusFields.structure)
   }
   override def insert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     sql"""insert into myschema.marital_status("id")
@@ -45,12 +45,6 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def selectAll: Stream[ConnectionIO, MaritalStatusRow] = {
     sql"""select "id" from myschema.marital_status""".query(using MaritalStatusRow.read).stream
   }
-  override def selectById(id: MaritalStatusId): ConnectionIO[Option[MaritalStatusRow]] = {
-    sql"""select "id" from myschema.marital_status where "id" = ${fromWrite(id)(Write.fromPut(MaritalStatusId.put))}""".query(using MaritalStatusRow.read).option
-  }
-  override def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow] = {
-    sql"""select "id" from myschema.marital_status where "id" = ANY(${ids})""".query(using MaritalStatusRow.read).stream
-  }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): Stream[ConnectionIO, MaritalStatusRow] = {
     val where = fragments.whereAndOpt(
       fieldValues.map {
@@ -58,6 +52,12 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
       }
     )
     sql"""select "id" from myschema.marital_status $where""".query(using MaritalStatusRow.read).stream
+  }
+  override def selectById(id: MaritalStatusId): ConnectionIO[Option[MaritalStatusRow]] = {
+    sql"""select "id" from myschema.marital_status where "id" = ${fromWrite(id)(Write.fromPut(MaritalStatusId.put))}""".query(using MaritalStatusRow.read).option
+  }
+  override def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow] = {
+    sql"""select "id" from myschema.marital_status where "id" = ANY(${ids})""".query(using MaritalStatusRow.read).stream
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
     UpdateBuilder("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.read)

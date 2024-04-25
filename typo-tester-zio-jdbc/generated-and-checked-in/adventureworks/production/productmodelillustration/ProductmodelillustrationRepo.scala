@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait ProductmodelillustrationRepo {
-  def delete(compositeId: ProductmodelillustrationId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(compositeIds: Array[ProductmodelillustrationId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow]
+  def deleteById(compositeId: ProductmodelillustrationId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[ProductmodelillustrationId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ProductmodelillustrationRow): ZIO[ZConnection, Throwable, ProductmodelillustrationRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelillustrationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ProductmodelillustrationRowUnsaved): ZIO[ZConnection, Throwable, ProductmodelillustrationRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelillustrationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelillustrationRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow]
   def selectAll: ZStream[ZConnection, Throwable, ProductmodelillustrationRow]
   def selectById(compositeId: ProductmodelillustrationId): ZIO[ZConnection, Throwable, Option[ProductmodelillustrationRow]]
   def selectByIds(compositeIds: Array[ProductmodelillustrationId]): ZStream[ZConnection, Throwable, ProductmodelillustrationRow]
-  def update(row: ProductmodelillustrationRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow]
+  def update(row: ProductmodelillustrationRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ProductmodelillustrationRow): ZIO[ZConnection, Throwable, UpdateResult[ProductmodelillustrationRow]]
 }

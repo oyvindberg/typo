@@ -26,23 +26,20 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class ProductreviewRepoImpl extends ProductreviewRepo {
-  override def delete(productreviewid: ProductreviewId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
+    DeleteBuilder("production.productreview", ProductreviewFields.structure)
+  }
+  override def deleteById(productreviewid: ProductreviewId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.productreview where "productreviewid" = ${Segment.paramSegment(productreviewid)(ProductreviewId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(productreviewids: Array[ProductreviewId]): ZIO[ZConnection, Throwable, Long] = {
     sql"""delete from production.productreview where "productreviewid" = ANY(${productreviewids})""".delete
-  }
-  override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
-    DeleteBuilder("production.productreview", ProductreviewFields.structure)
   }
   override def insert(unsaved: ProductreviewRow): ZIO[ZConnection, Throwable, ProductreviewRow] = {
     sql"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
           values (${Segment.paramSegment(unsaved.productreviewid)(ProductreviewId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.reviewername)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.reviewdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.emailaddress)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.rating)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.comments)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
        """.insertReturning(using ProductreviewRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductreviewRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductreviewRow.text)
   }
   override def insert(unsaved: ProductreviewRowUnsaved): ZIO[ZConnection, Throwable, ProductreviewRow] = {
     val fs = List(
@@ -77,6 +74,9 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     q.insertReturning(using ProductreviewRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductreviewRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductreviewRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductreviewRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.productreview("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductreviewRowUnsaved.text)
@@ -93,6 +93,9 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
   override def selectByIds(productreviewids: Array[ProductreviewId]): ZStream[ZConnection, Throwable, ProductreviewRow] = {
     sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview where "productreviewid" = ANY(${Segment.paramSegment(productreviewids)(ProductreviewId.arraySetter)})""".query(using ProductreviewRow.jdbcDecoder).selectStream()
   }
+  override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
+    UpdateBuilder("production.productreview", ProductreviewFields.structure, ProductreviewRow.jdbcDecoder)
+  }
   override def update(row: ProductreviewRow): ZIO[ZConnection, Throwable, Boolean] = {
     val productreviewid = row.productreviewid
     sql"""update production.productreview
@@ -104,9 +107,6 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
               "comments" = ${Segment.paramSegment(row.comments)(Setter.optionParamSetter(Setter.stringSetter))},
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "productreviewid" = ${Segment.paramSegment(productreviewid)(ProductreviewId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
-    UpdateBuilder("production.productreview", ProductreviewFields.structure, ProductreviewRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductreviewRow): ZIO[ZConnection, Throwable, UpdateResult[ProductreviewRow]] = {
     sql"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")

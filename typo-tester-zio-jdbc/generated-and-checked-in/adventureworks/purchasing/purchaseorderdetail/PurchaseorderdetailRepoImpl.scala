@@ -18,16 +18,6 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
-  override def deleteByIds(compositeIds: Array[PurchaseorderdetailId]): ZIO[ZConnection, Throwable, Long] = {
-    val purchaseorderid = compositeIds.map(_.purchaseorderid)
-    val purchaseorderdetailid = compositeIds.map(_.purchaseorderdetailid)
-    sql"""delete
-          from purchasing.purchaseorderdetail
-          where ("purchaseorderid", "purchaseorderdetailid")
-          in (select unnest(${purchaseorderid}), unnest(${purchaseorderdetailid}))
-       """.delete
-    
-  }
   override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
     SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields.structure, PurchaseorderdetailRow.jdbcDecoder)
   }

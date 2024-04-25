@@ -16,19 +16,19 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait SalespersonquotahistoryRepo {
-  def delete(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(compositeIds: Array[SalespersonquotahistoryId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
+  def deleteById(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[SalespersonquotahistoryId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, SalespersonquotahistoryRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: SalespersonquotahistoryRowUnsaved): ZIO[ZConnection, Throwable, SalespersonquotahistoryRow]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonquotahistoryRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def selectAll: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow]
   def selectById(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Option[SalespersonquotahistoryRow]]
   def selectByIds(compositeIds: Array[SalespersonquotahistoryId]): ZStream[ZConnection, Throwable, SalespersonquotahistoryRow]
-  def update(row: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
+  def update(row: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, UpdateResult[SalespersonquotahistoryRow]]
 }

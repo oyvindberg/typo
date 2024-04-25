@@ -16,16 +16,16 @@ import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
 trait FlaffRepo {
-  def delete(compositeId: FlaffId): ZIO[ZConnection, Throwable, Boolean]
-  def deleteByIds(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Long]
   def delete: DeleteBuilder[FlaffFields, FlaffRow]
+  def deleteById(compositeId: FlaffId): ZIO[ZConnection, Throwable, Boolean]
+  def deleteByIds(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, FlaffRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FlaffRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[FlaffFields, FlaffRow]
   def selectAll: ZStream[ZConnection, Throwable, FlaffRow]
   def selectById(compositeId: FlaffId): ZIO[ZConnection, Throwable, Option[FlaffRow]]
   def selectByIds(compositeIds: Array[FlaffId]): ZStream[ZConnection, Throwable, FlaffRow]
-  def update(row: FlaffRow): ZIO[ZConnection, Throwable, Boolean]
   def update: UpdateBuilder[FlaffFields, FlaffRow]
+  def update(row: FlaffRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, UpdateResult[FlaffRow]]
 }

@@ -23,14 +23,14 @@ import typo.dsl.UpdateParams
 
 class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow],
                           map: scala.collection.mutable.Map[AddresstypeId, AddresstypeRow] = scala.collection.mutable.Map.empty) extends AddresstypeRepo {
-  override def delete(addresstypeid: AddresstypeId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
+    DeleteBuilderMock(DeleteParams.empty, AddresstypeFields.structure.fields, map)
+  }
+  override def deleteById(addresstypeid: AddresstypeId): ConnectionIO[Boolean] = {
     delay(map.remove(addresstypeid).isDefined)
   }
   override def deleteByIds(addresstypeids: Array[AddresstypeId]): ConnectionIO[Int] = {
     delay(addresstypeids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
-    DeleteBuilderMock(DeleteParams.empty, AddresstypeFields.structure.fields, map)
   }
   override def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     delay {
@@ -42,6 +42,9 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
       unsaved
     }
   }
+  override def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, AddresstypeRow], batchSize: Int): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
@@ -51,9 +54,6 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
       }
       num
     }
-  }
-  override def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow] = {
-    insert(toRow(unsaved))
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, AddresstypeRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
@@ -79,6 +79,9 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
   override def selectByIds(addresstypeids: Array[AddresstypeId]): Stream[ConnectionIO, AddresstypeRow] = {
     Stream.emits(addresstypeids.flatMap(map.get).toList)
   }
+  override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
+    UpdateBuilderMock(UpdateParams.empty, AddresstypeFields.structure.fields, map)
+  }
   override def update(row: AddresstypeRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.addresstypeid) match {
@@ -89,9 +92,6 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
         case None => false
       }
     }
-  }
-  override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
-    UpdateBuilderMock(UpdateParams.empty, AddresstypeFields.structure.fields, map)
   }
   override def upsert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     delay {

@@ -23,23 +23,20 @@ import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 
 class DepartmentRepoImpl extends DepartmentRepo {
-  override def delete(departmentid: DepartmentId): ConnectionIO[Boolean] = {
+  override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
+    DeleteBuilder("humanresources.department", DepartmentFields.structure)
+  }
+  override def deleteById(departmentid: DepartmentId): ConnectionIO[Boolean] = {
     sql"""delete from humanresources.department where "departmentid" = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(departmentids: Array[DepartmentId]): ConnectionIO[Int] = {
     sql"""delete from humanresources.department where "departmentid" = ANY(${departmentids})""".update.run
-  }
-  override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
-    DeleteBuilder("humanresources.department", DepartmentFields.structure)
   }
   override def insert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
           values (${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "departmentid", "name", "groupname", "modifieddate"::text
        """.query(using DepartmentRow.read).unique
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, DepartmentRow], batchSize: Int): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using DepartmentRow.text)
   }
   override def insert(unsaved: DepartmentRowUnsaved): ConnectionIO[DepartmentRow] = {
     val fs = List(
@@ -69,6 +66,9 @@ class DepartmentRepoImpl extends DepartmentRepo {
     q.query(using DepartmentRow.read).unique
     
   }
+  override def insertStreaming(unsaved: Stream[ConnectionIO, DepartmentRow], batchSize: Int): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using DepartmentRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, DepartmentRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY humanresources.department("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using DepartmentRowUnsaved.text)
@@ -85,6 +85,9 @@ class DepartmentRepoImpl extends DepartmentRepo {
   override def selectByIds(departmentids: Array[DepartmentId]): Stream[ConnectionIO, DepartmentRow] = {
     sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ANY(${departmentids})""".query(using DepartmentRow.read).stream
   }
+  override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
+    UpdateBuilder("humanresources.department", DepartmentFields.structure, DepartmentRow.read)
+  }
   override def update(row: DepartmentRow): ConnectionIO[Boolean] = {
     val departmentid = row.departmentid
     sql"""update humanresources.department
@@ -95,9 +98,6 @@ class DepartmentRepoImpl extends DepartmentRepo {
       .update
       .run
       .map(_ > 0)
-  }
-  override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
-    UpdateBuilder("humanresources.department", DepartmentFields.structure, DepartmentRow.read)
   }
   override def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")

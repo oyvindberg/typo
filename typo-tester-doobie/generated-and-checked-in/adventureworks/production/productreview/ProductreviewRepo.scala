@@ -14,19 +14,19 @@ import typo.dsl.SelectBuilder
 import typo.dsl.UpdateBuilder
 
 trait ProductreviewRepo {
-  def delete(productreviewid: ProductreviewId): ConnectionIO[Boolean]
-  def deleteByIds(productreviewids: Array[ProductreviewId]): ConnectionIO[Int]
   def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow]
+  def deleteById(productreviewid: ProductreviewId): ConnectionIO[Boolean]
+  def deleteByIds(productreviewids: Array[ProductreviewId]): ConnectionIO[Int]
   def insert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, ProductreviewRow], batchSize: Int): ConnectionIO[Long]
   def insert(unsaved: ProductreviewRowUnsaved): ConnectionIO[ProductreviewRow]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ProductreviewRow], batchSize: Int): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductreviewRowUnsaved], batchSize: Int): ConnectionIO[Long]
   def select: SelectBuilder[ProductreviewFields, ProductreviewRow]
   def selectAll: Stream[ConnectionIO, ProductreviewRow]
   def selectById(productreviewid: ProductreviewId): ConnectionIO[Option[ProductreviewRow]]
   def selectByIds(productreviewids: Array[ProductreviewId]): Stream[ConnectionIO, ProductreviewRow]
-  def update(row: ProductreviewRow): ConnectionIO[Boolean]
   def update: UpdateBuilder[ProductreviewFields, ProductreviewRow]
+  def update(row: ProductreviewRow): ConnectionIO[Boolean]
   def upsert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow]
 }

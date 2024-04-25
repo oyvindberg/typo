@@ -25,7 +25,10 @@ import zio.jdbc.sqlInterpolator
 import zio.stream.ZStream
 
 class ProductdocumentRepoImpl extends ProductdocumentRepo {
-  override def delete(compositeId: ProductdocumentId): ZIO[ZConnection, Throwable, Boolean] = {
+  override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    DeleteBuilder("production.productdocument", ProductdocumentFields.structure)
+  }
+  override def deleteById(compositeId: ProductdocumentId): ZIO[ZConnection, Throwable, Boolean] = {
     sql"""delete from production.productdocument where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductdocumentId]): ZIO[ZConnection, Throwable, Long] = {
@@ -38,17 +41,11 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
        """.delete
     
   }
-  override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    DeleteBuilder("production.productdocument", ProductdocumentFields.structure)
-  }
   override def insert(unsaved: ProductdocumentRow): ZIO[ZConnection, Throwable, ProductdocumentRow] = {
     sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")
           values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.documentnode)(DocumentId.setter)})
           returning "productid", "modifieddate"::text, "documentnode"
        """.insertReturning(using ProductdocumentRow.jdbcDecoder).map(_.updatedKeys.head)
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductdocumentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN""", batchSize, unsaved)(ProductdocumentRow.text)
   }
   override def insert(unsaved: ProductdocumentRowUnsaved): ZIO[ZConnection, Throwable, ProductdocumentRow] = {
     val fs = List(
@@ -75,6 +72,9 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     q.insertReturning(using ProductdocumentRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductdocumentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN""", batchSize, unsaved)(ProductdocumentRow.text)
+  }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductdocumentRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductdocumentRowUnsaved.text)
@@ -98,14 +98,14 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
        """.query(using ProductdocumentRow.jdbcDecoder).selectStream()
     
   }
+  override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
+    UpdateBuilder("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.jdbcDecoder)
+  }
   override def update(row: ProductdocumentRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update production.productdocument
           set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".update.map(_ > 0)
-  }
-  override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    UpdateBuilder("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.jdbcDecoder)
   }
   override def upsert(unsaved: ProductdocumentRow): ZIO[ZConnection, Throwable, UpdateResult[ProductdocumentRow]] = {
     sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")
