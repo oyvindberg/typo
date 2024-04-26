@@ -28,6 +28,7 @@ trait SalesorderheaderRepo {
   def selectAll: ZStream[ZConnection, Throwable, SalesorderheaderRow]
   def selectById(salesorderid: SalesorderheaderId): ZIO[ZConnection, Throwable, Option[SalesorderheaderRow]]
   def selectByIds(salesorderids: Array[SalesorderheaderId]): ZStream[ZConnection, Throwable, SalesorderheaderRow]
+  def selectByIdsTracked(salesorderids: Array[SalesorderheaderId]): ZIO[ZConnection, Throwable, Map[SalesorderheaderId, Option[SalesorderheaderRow]]]
   def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow]
   def update(row: SalesorderheaderRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: SalesorderheaderRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderheaderRow]]

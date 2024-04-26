@@ -109,6 +109,10 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
        """.as(ProductmodelproductdescriptioncultureRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(compositeIds: Array[ProductmodelproductdescriptioncultureId])(implicit c: Connection): Map[ProductmodelproductdescriptioncultureId, Option[ProductmodelproductdescriptioncultureRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
     UpdateBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.rowParser)
   }

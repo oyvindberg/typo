@@ -111,6 +111,10 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
        """.as(ShoppingcartitemRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): Map[ShoppingcartitemId, Option[ShoppingcartitemRow]] = {
+    val byId = selectByIds(shoppingcartitemids).view.map(x => (x.shoppingcartitemid, x)).toMap
+    shoppingcartitemids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.rowParser)
   }

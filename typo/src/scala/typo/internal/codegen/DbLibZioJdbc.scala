@@ -189,8 +189,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       case RepoMethod.SelectById(_, _, id, rowType) =>
         code"def $name(${id.param}): ${ZIO.of(ZConnection, Throwable, TypesScala.Option.of(rowType))}"
       case RepoMethod.SelectByIds(_, _, idComputed, idsParam, rowType) =>
-        val usedDefineds = idComputed.userDefinedCols.zipWithIndex
-          .map { case (col, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(col.tpe)), None) }
+        val usedDefineds = idComputed.userDefinedCols.zipWithIndex.map { case (col, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(col.tpe)), None) }
 
         usedDefineds match {
           case Nil =>
@@ -198,6 +197,16 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
           case nonEmpty =>
             code"def $name($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ZStream.of(ZConnection, Throwable, rowType)}"
         }
+      case RepoMethod.SelectByIdsTracked(x) =>
+        val usedDefineds = x.idComputed.userDefinedCols.zipWithIndex.map { case (col, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(col.tpe)), None) }
+        val returnType = ZIO.of(ZConnection, Throwable, TypesScala.Map.of(x.idComputed.tpe, TypesScala.Option.of(x.rowType)))
+        usedDefineds match {
+          case Nil =>
+            code"def $name(${x.idsParam}): $returnType"
+          case nonEmpty =>
+            code"def $name(${x.idsParam})(implicit ${nonEmpty.map(_.code).mkCode(", ")}): $returnType"
+        }
+
       case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
         code"def $name(${keyColumns.map(_.param.code).mkCode(", ")}): ${ZIO.of(ZConnection, Throwable, TypesScala.Option.of(rowType))}"
       case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
@@ -284,6 +293,11 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
             )
             code"""$sql.query(using ${lookupJdbcDecoder(rowType)}).selectStream()"""
         }
+      case RepoMethod.SelectByIdsTracked(x) =>
+        code"""|${x.methodName}(${x.idsParam.name}).runCollect.map { rows =>
+               |  val byId = rows.view.map(x => (x.${x.idComputed.paramName}, x)).toMap
+               |  ${x.idsParam.name}.view.map(id => (id, byId.get(id))).toMap
+               |}""".stripMargin
 
       case RepoMethod.SelectByUnique(relName, keyColumns, allCols, rowType) =>
         val sql = SQL {
@@ -503,6 +517,11 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         code"$ZIO.succeed(map.get(${id.paramName}))"
       case RepoMethod.SelectByIds(_, _, _, idsParam, _) =>
         code"$ZStream.fromIterable(${idsParam.name}.flatMap(map.get))"
+      case RepoMethod.SelectByIdsTracked(x) =>
+        code"""|${x.methodName}(${x.idsParam.name}).runCollect.map { rows =>
+               |  val byId = rows.view.map(x => (x.${x.idComputed.paramName}, x)).toMap
+               |  ${x.idsParam.name}.view.map(id => (id, byId.get(id))).toMap
+               |}""".stripMargin
       case RepoMethod.SelectByUnique(_, keyColumns, _, _) =>
         code"$ZIO.succeed(map.values.find(v => ${keyColumns.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")}))"
 

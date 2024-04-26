@@ -79,6 +79,12 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
   override def selectByIds(cultureids: Array[CultureId]): Stream[ConnectionIO, CultureRow] = {
     Stream.emits(cultureids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(cultureids: Array[CultureId]): ConnectionIO[Map[CultureId, Option[CultureRow]]] = {
+    selectByIds(cultureids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.cultureid, x)).toMap
+      cultureids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
     UpdateBuilderMock(UpdateParams.empty, CultureFields.structure.fields, map)
   }

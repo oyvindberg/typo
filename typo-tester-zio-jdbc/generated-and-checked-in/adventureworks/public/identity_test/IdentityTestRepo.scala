@@ -28,6 +28,7 @@ trait IdentityTestRepo {
   def selectAll: ZStream[ZConnection, Throwable, IdentityTestRow]
   def selectById(name: IdentityTestId): ZIO[ZConnection, Throwable, Option[IdentityTestRow]]
   def selectByIds(names: Array[IdentityTestId]): ZStream[ZConnection, Throwable, IdentityTestRow]
+  def selectByIdsTracked(names: Array[IdentityTestId]): ZIO[ZConnection, Throwable, Map[IdentityTestId, Option[IdentityTestRow]]]
   def update: UpdateBuilder[IdentityTestFields, IdentityTestRow]
   def update(row: IdentityTestRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, UpdateResult[IdentityTestRow]]

@@ -79,6 +79,12 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
   override def selectByIds(specialofferids: Array[SpecialofferId]): Stream[ConnectionIO, SpecialofferRow] = {
     Stream.emits(specialofferids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(specialofferids: Array[SpecialofferId]): ConnectionIO[Map[SpecialofferId, Option[SpecialofferRow]]] = {
+    selectByIds(specialofferids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.specialofferid, x)).toMap
+      specialofferids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
     UpdateBuilderMock(UpdateParams.empty, SpecialofferFields.structure.fields, map)
   }

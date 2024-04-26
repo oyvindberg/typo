@@ -99,6 +99,12 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
   override def selectByIds(stateprovinceids: Array[StateprovinceId]): ZStream[ZConnection, Throwable, StateprovinceRow] = {
     sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ANY(${Segment.paramSegment(stateprovinceids)(StateprovinceId.arraySetter)})""".query(using StateprovinceRow.jdbcDecoder).selectStream()
   }
+  override def selectByIdsTracked(stateprovinceids: Array[StateprovinceId]): ZIO[ZConnection, Throwable, Map[StateprovinceId, Option[StateprovinceRow]]] = {
+    selectByIds(stateprovinceids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.stateprovinceid, x)).toMap
+      stateprovinceids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
     UpdateBuilder("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.jdbcDecoder)
   }

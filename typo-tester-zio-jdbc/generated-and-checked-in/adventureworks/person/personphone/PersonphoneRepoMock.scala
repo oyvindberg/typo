@@ -78,6 +78,12 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
   override def selectByIds(compositeIds: Array[PersonphoneId]): ZStream[ZConnection, Throwable, PersonphoneRow] = {
     ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
+  override def selectByIdsTracked(compositeIds: Array[PersonphoneId]): ZIO[ZConnection, Throwable, Map[PersonphoneId, Option[PersonphoneRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
     UpdateBuilderMock(UpdateParams.empty, PersonphoneFields.structure.fields, map)
   }

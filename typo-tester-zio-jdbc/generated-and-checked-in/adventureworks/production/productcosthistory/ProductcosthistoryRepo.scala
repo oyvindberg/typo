@@ -28,6 +28,7 @@ trait ProductcosthistoryRepo {
   def selectAll: ZStream[ZConnection, Throwable, ProductcosthistoryRow]
   def selectById(compositeId: ProductcosthistoryId): ZIO[ZConnection, Throwable, Option[ProductcosthistoryRow]]
   def selectByIds(compositeIds: Array[ProductcosthistoryId]): ZStream[ZConnection, Throwable, ProductcosthistoryRow]
+  def selectByIdsTracked(compositeIds: Array[ProductcosthistoryId]): ZIO[ZConnection, Throwable, Map[ProductcosthistoryId, Option[ProductcosthistoryRow]]]
   def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def update(row: ProductcosthistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ProductcosthistoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductcosthistoryRow]]

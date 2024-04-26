@@ -25,6 +25,7 @@ trait BusinessentitycontactRepo {
   def selectAll(implicit c: Connection): List[BusinessentitycontactRow]
   def selectById(compositeId: BusinessentitycontactId)(implicit c: Connection): Option[BusinessentitycontactRow]
   def selectByIds(compositeIds: Array[BusinessentitycontactId])(implicit c: Connection): List[BusinessentitycontactRow]
+  def selectByIdsTracked(compositeIds: Array[BusinessentitycontactId])(implicit c: Connection): Map[BusinessentitycontactId, Option[BusinessentitycontactRow]]
   def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def update(row: BusinessentitycontactRow)(implicit c: Connection): Boolean
   def upsert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow

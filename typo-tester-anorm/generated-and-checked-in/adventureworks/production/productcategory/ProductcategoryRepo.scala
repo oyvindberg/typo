@@ -25,6 +25,7 @@ trait ProductcategoryRepo {
   def selectAll(implicit c: Connection): List[ProductcategoryRow]
   def selectById(productcategoryid: ProductcategoryId)(implicit c: Connection): Option[ProductcategoryRow]
   def selectByIds(productcategoryids: Array[ProductcategoryId])(implicit c: Connection): List[ProductcategoryRow]
+  def selectByIdsTracked(productcategoryids: Array[ProductcategoryId])(implicit c: Connection): Map[ProductcategoryId, Option[ProductcategoryRow]]
   def update: UpdateBuilder[ProductcategoryFields, ProductcategoryRow]
   def update(row: ProductcategoryRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow

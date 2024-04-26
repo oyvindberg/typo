@@ -105,6 +105,10 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
        """.as(SalesorderheadersalesreasonRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(compositeIds: Array[SalesorderheadersalesreasonId])(implicit c: Connection): Map[SalesorderheadersalesreasonId, Option[SalesorderheadersalesreasonRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
     UpdateBuilder("sales.salesorderheadersalesreason", SalesorderheadersalesreasonFields.structure, SalesorderheadersalesreasonRow.rowParser)
   }

@@ -99,6 +99,12 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def selectByIds(billofmaterialsids: Array[Int]): Stream[ConnectionIO, BillofmaterialsRow] = {
     sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials where "billofmaterialsid" = ANY(${billofmaterialsids})""".query(using BillofmaterialsRow.read).stream
   }
+  override def selectByIdsTracked(billofmaterialsids: Array[Int]): ConnectionIO[Map[Int, Option[BillofmaterialsRow]]] = {
+    selectByIds(billofmaterialsids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.billofmaterialsid, x)).toMap
+      billofmaterialsids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     UpdateBuilder("production.billofmaterials", BillofmaterialsFields.structure, BillofmaterialsRow.read)
   }

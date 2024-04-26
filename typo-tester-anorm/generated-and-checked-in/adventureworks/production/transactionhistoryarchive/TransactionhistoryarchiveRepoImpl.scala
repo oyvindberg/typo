@@ -110,6 +110,10 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
        """.as(TransactionhistoryarchiveRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): Map[TransactionhistoryarchiveId, Option[TransactionhistoryarchiveRow]] = {
+    val byId = selectByIds(transactionids).view.map(x => (x.transactionid, x)).toMap
+    transactionids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
     UpdateBuilder("production.transactionhistoryarchive", TransactionhistoryarchiveFields.structure, TransactionhistoryarchiveRow.rowParser)
   }

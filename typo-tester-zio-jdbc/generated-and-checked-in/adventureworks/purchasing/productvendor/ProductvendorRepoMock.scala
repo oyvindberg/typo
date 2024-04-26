@@ -78,6 +78,12 @@ class ProductvendorRepoMock(toRow: Function1[ProductvendorRowUnsaved, Productven
   override def selectByIds(compositeIds: Array[ProductvendorId]): ZStream[ZConnection, Throwable, ProductvendorRow] = {
     ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
+  override def selectByIdsTracked(compositeIds: Array[ProductvendorId]): ZIO[ZConnection, Throwable, Map[ProductvendorId, Option[ProductvendorRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
     UpdateBuilderMock(UpdateParams.empty, ProductvendorFields.structure.fields, map)
   }

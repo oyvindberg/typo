@@ -26,6 +26,7 @@ trait ProductvendorRepo {
   def selectAll: Stream[ConnectionIO, ProductvendorRow]
   def selectById(compositeId: ProductvendorId): ConnectionIO[Option[ProductvendorRow]]
   def selectByIds(compositeIds: Array[ProductvendorId]): Stream[ConnectionIO, ProductvendorRow]
+  def selectByIdsTracked(compositeIds: Array[ProductvendorId]): ConnectionIO[Map[ProductvendorId, Option[ProductvendorRow]]]
   def update: UpdateBuilder[ProductvendorFields, ProductvendorRow]
   def update(row: ProductvendorRow): ConnectionIO[Boolean]
   def upsert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow]

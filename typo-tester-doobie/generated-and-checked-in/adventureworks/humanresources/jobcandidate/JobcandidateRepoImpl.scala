@@ -86,6 +86,12 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow] = {
     sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ANY(${jobcandidateids})""".query(using JobcandidateRow.read).stream
   }
+  override def selectByIdsTracked(jobcandidateids: Array[JobcandidateId]): ConnectionIO[Map[JobcandidateId, Option[JobcandidateRow]]] = {
+    selectByIds(jobcandidateids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.jobcandidateid, x)).toMap
+      jobcandidateids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
     UpdateBuilder("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.read)
   }

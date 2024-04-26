@@ -68,6 +68,10 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
   override def selectByIds(userIds: Array[UsersId])(implicit c: Connection): List[UsersRow] = {
     userIds.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(userIds: Array[UsersId])(implicit c: Connection): Map[UsersId, Option[UsersRow]] = {
+    val byId = selectByIds(userIds).view.map(x => (x.userId, x)).toMap
+    userIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def selectByUniqueEmail(email: TypoUnknownCitext)(implicit c: Connection): Option[UsersRow] = {
     map.values.find(v => email == v.email)
   }

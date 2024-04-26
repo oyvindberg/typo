@@ -78,6 +78,12 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   override def selectByIds(billofmaterialsids: Array[Int]): ZStream[ZConnection, Throwable, BillofmaterialsRow] = {
     ZStream.fromIterable(billofmaterialsids.flatMap(map.get))
   }
+  override def selectByIdsTracked(billofmaterialsids: Array[Int]): ZIO[ZConnection, Throwable, Map[Int, Option[BillofmaterialsRow]]] = {
+    selectByIds(billofmaterialsids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.billofmaterialsid, x)).toMap
+      billofmaterialsids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields.structure.fields, map)
   }

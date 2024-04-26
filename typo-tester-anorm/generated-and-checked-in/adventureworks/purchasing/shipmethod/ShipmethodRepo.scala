@@ -25,6 +25,7 @@ trait ShipmethodRepo {
   def selectAll(implicit c: Connection): List[ShipmethodRow]
   def selectById(shipmethodid: ShipmethodId)(implicit c: Connection): Option[ShipmethodRow]
   def selectByIds(shipmethodids: Array[ShipmethodId])(implicit c: Connection): List[ShipmethodRow]
+  def selectByIdsTracked(shipmethodids: Array[ShipmethodId])(implicit c: Connection): Map[ShipmethodId, Option[ShipmethodRow]]
   def update: UpdateBuilder[ShipmethodFields, ShipmethodRow]
   def update(row: ShipmethodRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow

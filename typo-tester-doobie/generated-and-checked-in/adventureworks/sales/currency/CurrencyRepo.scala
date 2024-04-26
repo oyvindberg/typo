@@ -26,6 +26,7 @@ trait CurrencyRepo {
   def selectAll: Stream[ConnectionIO, CurrencyRow]
   def selectById(currencycode: CurrencyId): ConnectionIO[Option[CurrencyRow]]
   def selectByIds(currencycodes: Array[CurrencyId]): Stream[ConnectionIO, CurrencyRow]
+  def selectByIdsTracked(currencycodes: Array[CurrencyId]): ConnectionIO[Map[CurrencyId, Option[CurrencyRow]]]
   def update: UpdateBuilder[CurrencyFields, CurrencyRow]
   def update(row: CurrencyRow): ConnectionIO[Boolean]
   def upsert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow]

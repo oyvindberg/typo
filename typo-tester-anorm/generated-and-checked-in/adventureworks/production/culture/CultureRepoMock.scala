@@ -67,6 +67,10 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
   override def selectByIds(cultureids: Array[CultureId])(implicit c: Connection): List[CultureRow] = {
     cultureids.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(cultureids: Array[CultureId])(implicit c: Connection): Map[CultureId, Option[CultureRow]] = {
+    val byId = selectByIds(cultureids).view.map(x => (x.cultureid, x)).toMap
+    cultureids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
     UpdateBuilderMock(UpdateParams.empty, CultureFields.structure.fields, map)
   }

@@ -80,6 +80,12 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PasswordRow] = {
     Stream.emits(businessentityids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, Option[PasswordRow]]] = {
+    selectByIds(businessentityids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.businessentityid, x)).toMap
+      businessentityids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
     UpdateBuilderMock(UpdateParams.empty, PasswordFields.structure.fields, map)
   }

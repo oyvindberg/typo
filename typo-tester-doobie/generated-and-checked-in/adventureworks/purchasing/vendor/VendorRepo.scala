@@ -27,6 +27,7 @@ trait VendorRepo {
   def selectAll: Stream[ConnectionIO, VendorRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[VendorRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, VendorRow]
+  def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, Option[VendorRow]]]
   def update: UpdateBuilder[VendorFields, VendorRow]
   def update(row: VendorRow): ConnectionIO[Boolean]
   def upsert(unsaved: VendorRow): ConnectionIO[VendorRow]

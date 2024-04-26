@@ -79,6 +79,12 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
   override def selectByIds(departmentids: Array[DepartmentId]): Stream[ConnectionIO, DepartmentRow] = {
     Stream.emits(departmentids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(departmentids: Array[DepartmentId]): ConnectionIO[Map[DepartmentId, Option[DepartmentRow]]] = {
+    selectByIds(departmentids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.departmentid, x)).toMap
+      departmentids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
     UpdateBuilderMock(UpdateParams.empty, DepartmentFields.structure.fields, map)
   }

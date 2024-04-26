@@ -28,6 +28,7 @@ trait SalestaxrateRepo {
   def selectAll: ZStream[ZConnection, Throwable, SalestaxrateRow]
   def selectById(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Option[SalestaxrateRow]]
   def selectByIds(salestaxrateids: Array[SalestaxrateId]): ZStream[ZConnection, Throwable, SalestaxrateRow]
+  def selectByIdsTracked(salestaxrateids: Array[SalestaxrateId]): ZIO[ZConnection, Throwable, Map[SalestaxrateId, Option[SalestaxrateRow]]]
   def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow]
   def update(row: SalestaxrateRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: SalestaxrateRow): ZIO[ZConnection, Throwable, UpdateResult[SalestaxrateRow]]

@@ -81,6 +81,12 @@ class CountryregionRepoImpl extends CountryregionRepo {
   override def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow] = {
     sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ANY(${countryregioncodes})""".query(using CountryregionRow.read).stream
   }
+  override def selectByIdsTracked(countryregioncodes: Array[CountryregionId]): ConnectionIO[Map[CountryregionId, Option[CountryregionRow]]] = {
+    selectByIds(countryregioncodes).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.countryregioncode, x)).toMap
+      countryregioncodes.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
     UpdateBuilder("person.countryregion", CountryregionFields.structure, CountryregionRow.read)
   }

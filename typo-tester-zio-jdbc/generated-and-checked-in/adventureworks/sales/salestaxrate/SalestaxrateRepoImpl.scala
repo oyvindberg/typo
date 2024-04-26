@@ -97,6 +97,12 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def selectByIds(salestaxrateids: Array[SalestaxrateId]): ZStream[ZConnection, Throwable, SalestaxrateRow] = {
     sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate where "salestaxrateid" = ANY(${Segment.paramSegment(salestaxrateids)(SalestaxrateId.arraySetter)})""".query(using SalestaxrateRow.jdbcDecoder).selectStream()
   }
+  override def selectByIdsTracked(salestaxrateids: Array[SalestaxrateId]): ZIO[ZConnection, Throwable, Map[SalestaxrateId, Option[SalestaxrateRow]]] = {
+    selectByIds(salestaxrateids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.salestaxrateid, x)).toMap
+      salestaxrateids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
     UpdateBuilder("sales.salestaxrate", SalestaxrateFields.structure, SalestaxrateRow.jdbcDecoder)
   }

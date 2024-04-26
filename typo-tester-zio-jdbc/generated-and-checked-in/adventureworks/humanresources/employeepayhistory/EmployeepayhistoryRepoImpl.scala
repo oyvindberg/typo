@@ -98,6 +98,12 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
        """.query(using EmployeepayhistoryRow.jdbcDecoder).selectStream()
     
   }
+  override def selectByIdsTracked(compositeIds: Array[EmployeepayhistoryId]): ZIO[ZConnection, Throwable, Map[EmployeepayhistoryId, Option[EmployeepayhistoryRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     UpdateBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.jdbcDecoder)
   }

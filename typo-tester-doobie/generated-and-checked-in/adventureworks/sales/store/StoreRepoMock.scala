@@ -80,6 +80,12 @@ class StoreRepoMock(toRow: Function1[StoreRowUnsaved, StoreRow],
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, StoreRow] = {
     Stream.emits(businessentityids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, Option[StoreRow]]] = {
+    selectByIds(businessentityids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.businessentityid, x)).toMap
+      businessentityids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[StoreFields, StoreRow] = {
     UpdateBuilderMock(UpdateParams.empty, StoreFields.structure.fields, map)
   }

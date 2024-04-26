@@ -116,6 +116,10 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
        """.as(BillofmaterialsRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(billofmaterialsids: Array[Int])(implicit c: Connection): Map[Int, Option[BillofmaterialsRow]] = {
+    val byId = selectByIds(billofmaterialsids).view.map(x => (x.billofmaterialsid, x)).toMap
+    billofmaterialsids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     UpdateBuilder("production.billofmaterials", BillofmaterialsFields.structure, BillofmaterialsRow.rowParser)
   }

@@ -79,6 +79,12 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
   override def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow] = {
     Stream.emits(shipmethodids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(shipmethodids: Array[ShipmethodId]): ConnectionIO[Map[ShipmethodId, Option[ShipmethodRow]]] = {
+    selectByIds(shipmethodids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.shipmethodid, x)).toMap
+      shipmethodids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
     UpdateBuilderMock(UpdateParams.empty, ShipmethodFields.structure.fields, map)
   }

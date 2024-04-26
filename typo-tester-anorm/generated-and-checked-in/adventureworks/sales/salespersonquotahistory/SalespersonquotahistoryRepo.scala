@@ -25,6 +25,7 @@ trait SalespersonquotahistoryRepo {
   def selectAll(implicit c: Connection): List[SalespersonquotahistoryRow]
   def selectById(compositeId: SalespersonquotahistoryId)(implicit c: Connection): Option[SalespersonquotahistoryRow]
   def selectByIds(compositeIds: Array[SalespersonquotahistoryId])(implicit c: Connection): List[SalespersonquotahistoryRow]
+  def selectByIdsTracked(compositeIds: Array[SalespersonquotahistoryId])(implicit c: Connection): Map[SalespersonquotahistoryId, Option[SalespersonquotahistoryRow]]
   def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean
   def upsert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow

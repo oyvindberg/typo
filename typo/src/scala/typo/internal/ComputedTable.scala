@@ -149,12 +149,15 @@ case class ComputedTable(
           val unsavedParam = sc.Param(sc.Ident("unsaved"), names.RowName, None)
           RepoMethod.Upsert(dbTable.name, cols, id, unsavedParam, names.RowName)
         },
-        maybeId.collect {
-          case unary: IdComputed.Unary =>
-            RepoMethod.SelectByIds(dbTable.name, cols, unary, sc.Param(unary.paramName.appended("s"), sc.Type.ArrayOf(unary.tpe), None), names.RowName)
-          case x: IdComputed.Composite if x.cols.forall(col => col.dbCol.nullability == Nullability.NoNulls) =>
-            RepoMethod.SelectByIds(dbTable.name, cols, x, sc.Param(x.paramName.appended("s"), sc.Type.ArrayOf(x.tpe), None), names.RowName)
-        },
+        maybeId
+          .collect {
+            case unary: IdComputed.Unary =>
+              RepoMethod.SelectByIds(dbTable.name, cols, unary, sc.Param(unary.paramName.appended("s"), sc.Type.ArrayOf(unary.tpe), None), names.RowName)
+            case x: IdComputed.Composite if x.cols.forall(col => col.dbCol.nullability == Nullability.NoNulls) =>
+              RepoMethod.SelectByIds(dbTable.name, cols, x, sc.Param(x.paramName.appended("s"), sc.Type.ArrayOf(x.tpe), None), names.RowName)
+          }
+          .toList
+          .flatMap { x => List(x, RepoMethod.SelectByIdsTracked(x)) },
         for {
           name <- names.FieldOrIdValueName
           fieldValueName <- names.FieldValueName

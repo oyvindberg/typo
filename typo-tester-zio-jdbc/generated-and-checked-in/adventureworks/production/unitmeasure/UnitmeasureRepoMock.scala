@@ -78,6 +78,12 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): ZStream[ZConnection, Throwable, UnitmeasureRow] = {
     ZStream.fromIterable(unitmeasurecodes.flatMap(map.get))
   }
+  override def selectByIdsTracked(unitmeasurecodes: Array[UnitmeasureId]): ZIO[ZConnection, Throwable, Map[UnitmeasureId, Option[UnitmeasureRow]]] = {
+    selectByIds(unitmeasurecodes).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.unitmeasurecode, x)).toMap
+      unitmeasurecodes.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
     UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields.structure.fields, map)
   }

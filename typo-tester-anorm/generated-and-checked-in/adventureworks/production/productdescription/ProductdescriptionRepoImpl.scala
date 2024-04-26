@@ -106,6 +106,10 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
        """.as(ProductdescriptionRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(productdescriptionids: Array[ProductdescriptionId])(implicit c: Connection): Map[ProductdescriptionId, Option[ProductdescriptionRow]] = {
+    val byId = selectByIds(productdescriptionids).view.map(x => (x.productdescriptionid, x)).toMap
+    productdescriptionids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
     UpdateBuilder("production.productdescription", ProductdescriptionFields.structure, ProductdescriptionRow.rowParser)
   }

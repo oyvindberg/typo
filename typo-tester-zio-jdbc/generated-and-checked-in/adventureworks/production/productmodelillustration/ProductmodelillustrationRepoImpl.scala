@@ -95,6 +95,12 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
        """.query(using ProductmodelillustrationRow.jdbcDecoder).selectStream()
     
   }
+  override def selectByIdsTracked(compositeIds: Array[ProductmodelillustrationId]): ZIO[ZConnection, Throwable, Map[ProductmodelillustrationId, Option[ProductmodelillustrationRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
     UpdateBuilder("production.productmodelillustration", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.jdbcDecoder)
   }

@@ -25,6 +25,7 @@ trait SpecialofferproductRepo {
   def selectAll(implicit c: Connection): List[SpecialofferproductRow]
   def selectById(compositeId: SpecialofferproductId)(implicit c: Connection): Option[SpecialofferproductRow]
   def selectByIds(compositeIds: Array[SpecialofferproductId])(implicit c: Connection): List[SpecialofferproductRow]
+  def selectByIdsTracked(compositeIds: Array[SpecialofferproductId])(implicit c: Connection): Map[SpecialofferproductId, Option[SpecialofferproductRow]]
   def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow]
   def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean
   def upsert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow

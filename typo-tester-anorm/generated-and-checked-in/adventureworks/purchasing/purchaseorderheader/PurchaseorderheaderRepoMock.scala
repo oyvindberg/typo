@@ -67,6 +67,10 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow] = {
     purchaseorderids.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): Map[PurchaseorderheaderId, Option[PurchaseorderheaderRow]] = {
+    val byId = selectByIds(purchaseorderids).view.map(x => (x.purchaseorderid, x)).toMap
+    purchaseorderids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
     UpdateBuilderMock(UpdateParams.empty, PurchaseorderheaderFields.structure.fields, map)
   }

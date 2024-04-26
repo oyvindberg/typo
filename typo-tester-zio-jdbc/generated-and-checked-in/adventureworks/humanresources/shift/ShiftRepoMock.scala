@@ -78,6 +78,12 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
   override def selectByIds(shiftids: Array[ShiftId]): ZStream[ZConnection, Throwable, ShiftRow] = {
     ZStream.fromIterable(shiftids.flatMap(map.get))
   }
+  override def selectByIdsTracked(shiftids: Array[ShiftId]): ZIO[ZConnection, Throwable, Map[ShiftId, Option[ShiftRow]]] = {
+    selectByIds(shiftids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.shiftid, x)).toMap
+      shiftids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
     UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure.fields, map)
   }

@@ -114,6 +114,10 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
        """.as(BusinessentityaddressRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(compositeIds: Array[BusinessentityaddressId])(implicit c: Connection): Map[BusinessentityaddressId, Option[BusinessentityaddressRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
     UpdateBuilder("person.businessentityaddress", BusinessentityaddressFields.structure, BusinessentityaddressRow.rowParser)
   }

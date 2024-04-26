@@ -115,6 +115,10 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
        """.as(SalestaxrateRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): Map[SalestaxrateId, Option[SalestaxrateRow]] = {
+    val byId = selectByIds(salestaxrateids).view.map(x => (x.salestaxrateid, x)).toMap
+    salestaxrateids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
     UpdateBuilder("sales.salestaxrate", SalestaxrateFields.structure, SalestaxrateRow.rowParser)
   }

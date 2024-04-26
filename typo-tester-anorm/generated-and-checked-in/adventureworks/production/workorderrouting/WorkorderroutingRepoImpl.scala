@@ -119,6 +119,10 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
        """.as(WorkorderroutingRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): Map[WorkorderroutingId, Option[WorkorderroutingRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     UpdateBuilder("production.workorderrouting", WorkorderroutingFields.structure, WorkorderroutingRow.rowParser)
   }

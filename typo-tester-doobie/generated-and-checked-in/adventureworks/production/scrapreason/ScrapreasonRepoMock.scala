@@ -79,6 +79,12 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
   override def selectByIds(scrapreasonids: Array[ScrapreasonId]): Stream[ConnectionIO, ScrapreasonRow] = {
     Stream.emits(scrapreasonids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(scrapreasonids: Array[ScrapreasonId]): ConnectionIO[Map[ScrapreasonId, Option[ScrapreasonRow]]] = {
+    selectByIds(scrapreasonids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.scrapreasonid, x)).toMap
+      scrapreasonids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
     UpdateBuilderMock(UpdateParams.empty, ScrapreasonFields.structure.fields, map)
   }

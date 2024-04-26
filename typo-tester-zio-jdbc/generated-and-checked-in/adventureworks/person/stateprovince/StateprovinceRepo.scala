@@ -28,6 +28,7 @@ trait StateprovinceRepo {
   def selectAll: ZStream[ZConnection, Throwable, StateprovinceRow]
   def selectById(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Option[StateprovinceRow]]
   def selectByIds(stateprovinceids: Array[StateprovinceId]): ZStream[ZConnection, Throwable, StateprovinceRow]
+  def selectByIdsTracked(stateprovinceids: Array[StateprovinceId]): ZIO[ZConnection, Throwable, Map[StateprovinceId, Option[StateprovinceRow]]]
   def update: UpdateBuilder[StateprovinceFields, StateprovinceRow]
   def update(row: StateprovinceRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, UpdateResult[StateprovinceRow]]

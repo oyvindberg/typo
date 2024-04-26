@@ -26,6 +26,7 @@ trait SalesorderheaderRepo {
   def selectAll: Stream[ConnectionIO, SalesorderheaderRow]
   def selectById(salesorderid: SalesorderheaderId): ConnectionIO[Option[SalesorderheaderRow]]
   def selectByIds(salesorderids: Array[SalesorderheaderId]): Stream[ConnectionIO, SalesorderheaderRow]
+  def selectByIdsTracked(salesorderids: Array[SalesorderheaderId]): ConnectionIO[Map[SalesorderheaderId, Option[SalesorderheaderRow]]]
   def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow]
   def update(row: SalesorderheaderRow): ConnectionIO[Boolean]
   def upsert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow]

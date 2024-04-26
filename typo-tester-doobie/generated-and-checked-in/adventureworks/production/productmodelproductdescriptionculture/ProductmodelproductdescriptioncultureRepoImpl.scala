@@ -100,6 +100,12 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
        """.query(using ProductmodelproductdescriptioncultureRow.read).stream
     
   }
+  override def selectByIdsTracked(compositeIds: Array[ProductmodelproductdescriptioncultureId]): ConnectionIO[Map[ProductmodelproductdescriptioncultureId, Option[ProductmodelproductdescriptioncultureRow]]] = {
+    selectByIds(compositeIds).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
     UpdateBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.read)
   }

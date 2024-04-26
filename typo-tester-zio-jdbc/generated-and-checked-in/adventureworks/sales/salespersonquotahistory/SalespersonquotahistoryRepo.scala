@@ -28,6 +28,7 @@ trait SalespersonquotahistoryRepo {
   def selectAll: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow]
   def selectById(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Option[SalespersonquotahistoryRow]]
   def selectByIds(compositeIds: Array[SalespersonquotahistoryId]): ZStream[ZConnection, Throwable, SalespersonquotahistoryRow]
+  def selectByIdsTracked(compositeIds: Array[SalespersonquotahistoryId]): ZIO[ZConnection, Throwable, Map[SalespersonquotahistoryId, Option[SalespersonquotahistoryRow]]]
   def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def update(row: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, UpdateResult[SalespersonquotahistoryRow]]

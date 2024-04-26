@@ -28,6 +28,7 @@ trait BusinessentitycontactRepo {
   def selectAll: ZStream[ZConnection, Throwable, BusinessentitycontactRow]
   def selectById(compositeId: BusinessentitycontactId): ZIO[ZConnection, Throwable, Option[BusinessentitycontactRow]]
   def selectByIds(compositeIds: Array[BusinessentitycontactId]): ZStream[ZConnection, Throwable, BusinessentitycontactRow]
+  def selectByIdsTracked(compositeIds: Array[BusinessentitycontactId]): ZIO[ZConnection, Throwable, Map[BusinessentitycontactId, Option[BusinessentitycontactRow]]]
   def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def update(row: BusinessentitycontactRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: BusinessentitycontactRow): ZIO[ZConnection, Throwable, UpdateResult[BusinessentitycontactRow]]

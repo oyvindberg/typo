@@ -78,6 +78,12 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
   override def selectByIds(cultureids: Array[CultureId]): ZStream[ZConnection, Throwable, CultureRow] = {
     ZStream.fromIterable(cultureids.flatMap(map.get))
   }
+  override def selectByIdsTracked(cultureids: Array[CultureId]): ZIO[ZConnection, Throwable, Map[CultureId, Option[CultureRow]]] = {
+    selectByIds(cultureids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.cultureid, x)).toMap
+      cultureids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
     UpdateBuilderMock(UpdateParams.empty, CultureFields.structure.fields, map)
   }

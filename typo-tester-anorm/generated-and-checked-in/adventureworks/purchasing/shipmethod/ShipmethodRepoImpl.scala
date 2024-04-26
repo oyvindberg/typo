@@ -115,6 +115,10 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
        """.as(ShipmethodRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(shipmethodids: Array[ShipmethodId])(implicit c: Connection): Map[ShipmethodId, Option[ShipmethodRow]] = {
+    val byId = selectByIds(shipmethodids).view.map(x => (x.shipmethodid, x)).toMap
+    shipmethodids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
     UpdateBuilder("purchasing.shipmethod", ShipmethodFields.structure, ShipmethodRow.rowParser)
   }

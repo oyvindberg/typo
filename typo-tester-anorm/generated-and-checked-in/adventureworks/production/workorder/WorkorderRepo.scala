@@ -25,6 +25,7 @@ trait WorkorderRepo {
   def selectAll(implicit c: Connection): List[WorkorderRow]
   def selectById(workorderid: WorkorderId)(implicit c: Connection): Option[WorkorderRow]
   def selectByIds(workorderids: Array[WorkorderId])(implicit c: Connection): List[WorkorderRow]
+  def selectByIdsTracked(workorderids: Array[WorkorderId])(implicit c: Connection): Map[WorkorderId, Option[WorkorderRow]]
   def update: UpdateBuilder[WorkorderFields, WorkorderRow]
   def update(row: WorkorderRow)(implicit c: Connection): Boolean
   def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow

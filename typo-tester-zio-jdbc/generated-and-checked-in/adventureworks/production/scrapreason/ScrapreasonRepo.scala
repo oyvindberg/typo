@@ -28,6 +28,7 @@ trait ScrapreasonRepo {
   def selectAll: ZStream[ZConnection, Throwable, ScrapreasonRow]
   def selectById(scrapreasonid: ScrapreasonId): ZIO[ZConnection, Throwable, Option[ScrapreasonRow]]
   def selectByIds(scrapreasonids: Array[ScrapreasonId]): ZStream[ZConnection, Throwable, ScrapreasonRow]
+  def selectByIdsTracked(scrapreasonids: Array[ScrapreasonId]): ZIO[ZConnection, Throwable, Map[ScrapreasonId, Option[ScrapreasonRow]]]
   def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow]
   def update(row: ScrapreasonRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ScrapreasonRow): ZIO[ZConnection, Throwable, UpdateResult[ScrapreasonRow]]

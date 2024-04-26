@@ -141,6 +141,12 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def selectByIds(salesorderids: Array[SalesorderheaderId]): ZStream[ZConnection, Throwable, SalesorderheaderRow] = {
     sql"""select "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text from sales.salesorderheader where "salesorderid" = ANY(${Segment.paramSegment(salesorderids)(SalesorderheaderId.arraySetter)})""".query(using SalesorderheaderRow.jdbcDecoder).selectStream()
   }
+  override def selectByIdsTracked(salesorderids: Array[SalesorderheaderId]): ZIO[ZConnection, Throwable, Map[SalesorderheaderId, Option[SalesorderheaderRow]]] = {
+    selectByIds(salesorderids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.salesorderid, x)).toMap
+      salesorderids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     UpdateBuilder("sales.salesorderheader", SalesorderheaderFields.structure, SalesorderheaderRow.jdbcDecoder)
   }

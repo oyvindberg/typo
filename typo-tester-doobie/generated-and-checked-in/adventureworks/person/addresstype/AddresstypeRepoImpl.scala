@@ -89,6 +89,12 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
   override def selectByIds(addresstypeids: Array[AddresstypeId]): Stream[ConnectionIO, AddresstypeRow] = {
     sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype where "addresstypeid" = ANY(${addresstypeids})""".query(using AddresstypeRow.read).stream
   }
+  override def selectByIdsTracked(addresstypeids: Array[AddresstypeId]): ConnectionIO[Map[AddresstypeId, Option[AddresstypeRow]]] = {
+    selectByIds(addresstypeids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.addresstypeid, x)).toMap
+      addresstypeids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
     UpdateBuilder("person.addresstype", AddresstypeFields.structure, AddresstypeRow.read)
   }

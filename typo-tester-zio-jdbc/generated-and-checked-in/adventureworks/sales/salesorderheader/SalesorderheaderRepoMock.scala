@@ -78,6 +78,12 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
   override def selectByIds(salesorderids: Array[SalesorderheaderId]): ZStream[ZConnection, Throwable, SalesorderheaderRow] = {
     ZStream.fromIterable(salesorderids.flatMap(map.get))
   }
+  override def selectByIdsTracked(salesorderids: Array[SalesorderheaderId]): ZIO[ZConnection, Throwable, Map[SalesorderheaderId, Option[SalesorderheaderRow]]] = {
+    selectByIds(salesorderids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.salesorderid, x)).toMap
+      salesorderids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     UpdateBuilderMock(UpdateParams.empty, SalesorderheaderFields.structure.fields, map)
   }

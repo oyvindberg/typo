@@ -111,6 +111,10 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
        """.as(SalespersonquotahistoryRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(compositeIds: Array[SalespersonquotahistoryId])(implicit c: Connection): Map[SalespersonquotahistoryId, Option[SalespersonquotahistoryRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
     UpdateBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.rowParser)
   }

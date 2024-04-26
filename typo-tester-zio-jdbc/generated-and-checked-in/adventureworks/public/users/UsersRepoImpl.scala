@@ -85,6 +85,12 @@ class UsersRepoImpl extends UsersRepo {
   override def selectByIds(userIds: Array[UsersId]): ZStream[ZConnection, Throwable, UsersRow] = {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ANY(${Segment.paramSegment(userIds)(UsersId.arraySetter)})""".query(using UsersRow.jdbcDecoder).selectStream()
   }
+  override def selectByIdsTracked(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Map[UsersId, Option[UsersRow]]] = {
+    selectByIds(userIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.userId, x)).toMap
+      userIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def selectByUniqueEmail(email: TypoUnknownCitext): ZIO[ZConnection, Throwable, Option[UsersRow]] = {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
           from public.users

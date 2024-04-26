@@ -29,6 +29,7 @@ trait VendorRepo {
   def selectAll: ZStream[ZConnection, Throwable, VendorRow]
   def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[VendorRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, VendorRow]
+  def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, Option[VendorRow]]]
   def update: UpdateBuilder[VendorFields, VendorRow]
   def update(row: VendorRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: VendorRow): ZIO[ZConnection, Throwable, UpdateResult[VendorRow]]

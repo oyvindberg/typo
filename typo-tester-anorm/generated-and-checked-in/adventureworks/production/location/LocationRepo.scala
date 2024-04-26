@@ -25,6 +25,7 @@ trait LocationRepo {
   def selectAll(implicit c: Connection): List[LocationRow]
   def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow]
   def selectByIds(locationids: Array[LocationId])(implicit c: Connection): List[LocationRow]
+  def selectByIdsTracked(locationids: Array[LocationId])(implicit c: Connection): Map[LocationId, Option[LocationRow]]
   def update: UpdateBuilder[LocationFields, LocationRow]
   def update(row: LocationRow)(implicit c: Connection): Boolean
   def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow

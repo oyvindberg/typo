@@ -26,6 +26,7 @@ trait CultureRepo {
   def selectAll: Stream[ConnectionIO, CultureRow]
   def selectById(cultureid: CultureId): ConnectionIO[Option[CultureRow]]
   def selectByIds(cultureids: Array[CultureId]): Stream[ConnectionIO, CultureRow]
+  def selectByIdsTracked(cultureids: Array[CultureId]): ConnectionIO[Map[CultureId, Option[CultureRow]]]
   def update: UpdateBuilder[CultureFields, CultureRow]
   def update(row: CultureRow): ConnectionIO[Boolean]
   def upsert(unsaved: CultureRow): ConnectionIO[CultureRow]

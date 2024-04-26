@@ -117,6 +117,10 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
        """.as(StateprovinceRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): Map[StateprovinceId, Option[StateprovinceRow]] = {
+    val byId = selectByIds(stateprovinceids).view.map(x => (x.stateprovinceid, x)).toMap
+    stateprovinceids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
     UpdateBuilder("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.rowParser)
   }

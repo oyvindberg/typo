@@ -101,6 +101,12 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
        """.query(using ProductproductphotoRow.read).stream
     
   }
+  override def selectByIdsTracked(compositeIds: Array[ProductproductphotoId]): ConnectionIO[Map[ProductproductphotoId, Option[ProductproductphotoRow]]] = {
+    selectByIds(compositeIds).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
     UpdateBuilder("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.read)
   }

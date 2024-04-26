@@ -25,6 +25,7 @@ trait CurrencyRepo {
   def selectAll(implicit c: Connection): List[CurrencyRow]
   def selectById(currencycode: CurrencyId)(implicit c: Connection): Option[CurrencyRow]
   def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow]
+  def selectByIdsTracked(currencycodes: Array[CurrencyId])(implicit c: Connection): Map[CurrencyId, Option[CurrencyRow]]
   def update: UpdateBuilder[CurrencyFields, CurrencyRow]
   def update(row: CurrencyRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow

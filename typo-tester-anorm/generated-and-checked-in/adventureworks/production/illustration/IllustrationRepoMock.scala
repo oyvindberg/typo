@@ -67,6 +67,10 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
   override def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow] = {
     illustrationids.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(illustrationids: Array[IllustrationId])(implicit c: Connection): Map[IllustrationId, Option[IllustrationRow]] = {
+    val byId = selectByIds(illustrationids).view.map(x => (x.illustrationid, x)).toMap
+    illustrationids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
     UpdateBuilderMock(UpdateParams.empty, IllustrationFields.structure.fields, map)
   }

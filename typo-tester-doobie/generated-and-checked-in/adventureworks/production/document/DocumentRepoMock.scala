@@ -80,6 +80,12 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   override def selectByIds(documentnodes: Array[DocumentId]): Stream[ConnectionIO, DocumentRow] = {
     Stream.emits(documentnodes.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(documentnodes: Array[DocumentId]): ConnectionIO[Map[DocumentId, Option[DocumentRow]]] = {
+    selectByIds(documentnodes).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.documentnode, x)).toMap
+      documentnodes.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def selectByUniqueRowguid(rowguid: TypoUUID): ConnectionIO[Option[DocumentRow]] = {
     delay(map.values.find(v => rowguid == v.rowguid))
   }

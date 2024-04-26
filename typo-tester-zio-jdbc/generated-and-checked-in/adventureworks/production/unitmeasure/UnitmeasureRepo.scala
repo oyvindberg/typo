@@ -28,6 +28,7 @@ trait UnitmeasureRepo {
   def selectAll: ZStream[ZConnection, Throwable, UnitmeasureRow]
   def selectById(unitmeasurecode: UnitmeasureId): ZIO[ZConnection, Throwable, Option[UnitmeasureRow]]
   def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): ZStream[ZConnection, Throwable, UnitmeasureRow]
+  def selectByIdsTracked(unitmeasurecodes: Array[UnitmeasureId]): ZIO[ZConnection, Throwable, Map[UnitmeasureId, Option[UnitmeasureRow]]]
   def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow]
   def update(row: UnitmeasureRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: UnitmeasureRow): ZIO[ZConnection, Throwable, UpdateResult[UnitmeasureRow]]

@@ -78,6 +78,12 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
   override def selectByIds(salestaxrateids: Array[SalestaxrateId]): ZStream[ZConnection, Throwable, SalestaxrateRow] = {
     ZStream.fromIterable(salestaxrateids.flatMap(map.get))
   }
+  override def selectByIdsTracked(salestaxrateids: Array[SalestaxrateId]): ZIO[ZConnection, Throwable, Map[SalestaxrateId, Option[SalestaxrateRow]]] = {
+    selectByIds(salestaxrateids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.salestaxrateid, x)).toMap
+      salestaxrateids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
     UpdateBuilderMock(UpdateParams.empty, SalestaxrateFields.structure.fields, map)
   }

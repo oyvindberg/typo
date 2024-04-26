@@ -79,6 +79,12 @@ class ProductcategoryRepoMock(toRow: Function1[ProductcategoryRowUnsaved, Produc
   override def selectByIds(productcategoryids: Array[ProductcategoryId]): Stream[ConnectionIO, ProductcategoryRow] = {
     Stream.emits(productcategoryids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(productcategoryids: Array[ProductcategoryId]): ConnectionIO[Map[ProductcategoryId, Option[ProductcategoryRow]]] = {
+    selectByIds(productcategoryids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.productcategoryid, x)).toMap
+      productcategoryids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ProductcategoryFields, ProductcategoryRow] = {
     UpdateBuilderMock(UpdateParams.empty, ProductcategoryFields.structure.fields, map)
   }

@@ -26,6 +26,7 @@ trait EmployeepayhistoryRepo {
   def selectAll: Stream[ConnectionIO, EmployeepayhistoryRow]
   def selectById(compositeId: EmployeepayhistoryId): ConnectionIO[Option[EmployeepayhistoryRow]]
   def selectByIds(compositeIds: Array[EmployeepayhistoryId]): Stream[ConnectionIO, EmployeepayhistoryRow]
+  def selectByIdsTracked(compositeIds: Array[EmployeepayhistoryId]): ConnectionIO[Map[EmployeepayhistoryId, Option[EmployeepayhistoryRow]]]
   def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def update(row: EmployeepayhistoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: EmployeepayhistoryRow): ConnectionIO[EmployeepayhistoryRow]

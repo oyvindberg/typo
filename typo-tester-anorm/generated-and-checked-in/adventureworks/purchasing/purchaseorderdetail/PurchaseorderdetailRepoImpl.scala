@@ -40,4 +40,8 @@ class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
        """.as(PurchaseorderdetailRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(compositeIds: Array[PurchaseorderdetailId])(implicit c: Connection): Map[PurchaseorderdetailId, Option[PurchaseorderdetailRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
 }

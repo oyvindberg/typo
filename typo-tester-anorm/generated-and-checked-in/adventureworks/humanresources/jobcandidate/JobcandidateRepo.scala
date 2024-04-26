@@ -25,6 +25,7 @@ trait JobcandidateRepo {
   def selectAll(implicit c: Connection): List[JobcandidateRow]
   def selectById(jobcandidateid: JobcandidateId)(implicit c: Connection): Option[JobcandidateRow]
   def selectByIds(jobcandidateids: Array[JobcandidateId])(implicit c: Connection): List[JobcandidateRow]
+  def selectByIdsTracked(jobcandidateids: Array[JobcandidateId])(implicit c: Connection): Map[JobcandidateId, Option[JobcandidateRow]]
   def update: UpdateBuilder[JobcandidateFields, JobcandidateRow]
   def update(row: JobcandidateRow)(implicit c: Connection): Boolean
   def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow

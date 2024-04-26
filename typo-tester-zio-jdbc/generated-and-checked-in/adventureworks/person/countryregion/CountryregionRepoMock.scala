@@ -78,6 +78,12 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
   override def selectByIds(countryregioncodes: Array[CountryregionId]): ZStream[ZConnection, Throwable, CountryregionRow] = {
     ZStream.fromIterable(countryregioncodes.flatMap(map.get))
   }
+  override def selectByIdsTracked(countryregioncodes: Array[CountryregionId]): ZIO[ZConnection, Throwable, Map[CountryregionId, Option[CountryregionRow]]] = {
+    selectByIds(countryregioncodes).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.countryregioncode, x)).toMap
+      countryregioncodes.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
     UpdateBuilderMock(UpdateParams.empty, CountryregionFields.structure.fields, map)
   }

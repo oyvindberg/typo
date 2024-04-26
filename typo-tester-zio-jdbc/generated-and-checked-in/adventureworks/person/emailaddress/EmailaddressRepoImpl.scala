@@ -104,6 +104,12 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
        """.query(using EmailaddressRow.jdbcDecoder).selectStream()
     
   }
+  override def selectByIdsTracked(compositeIds: Array[EmailaddressId]): ZIO[ZConnection, Throwable, Map[EmailaddressId, Option[EmailaddressRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
     UpdateBuilder("person.emailaddress", EmailaddressFields.structure, EmailaddressRow.jdbcDecoder)
   }

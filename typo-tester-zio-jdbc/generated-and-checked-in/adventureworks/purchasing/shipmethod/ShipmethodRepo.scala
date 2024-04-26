@@ -28,6 +28,7 @@ trait ShipmethodRepo {
   def selectAll: ZStream[ZConnection, Throwable, ShipmethodRow]
   def selectById(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Option[ShipmethodRow]]
   def selectByIds(shipmethodids: Array[ShipmethodId]): ZStream[ZConnection, Throwable, ShipmethodRow]
+  def selectByIdsTracked(shipmethodids: Array[ShipmethodId]): ZIO[ZConnection, Throwable, Map[ShipmethodId, Option[ShipmethodRow]]]
   def update: UpdateBuilder[ShipmethodFields, ShipmethodRow]
   def update(row: ShipmethodRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, UpdateResult[ShipmethodRow]]

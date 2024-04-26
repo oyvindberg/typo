@@ -67,7 +67,7 @@ making it easy to understand the purpose of every column.
 
 ```scala mdoc
 
-import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.customtypes.*
 import adventureworks.person.address.AddressId
 import adventureworks.person.stateprovince.StateprovinceId
 import java.util.UUID
@@ -96,6 +96,7 @@ case class AddressRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
+)
 ```
 
 ### Repository interface
@@ -217,6 +218,7 @@ import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
+import adventureworks.userdefined.FirstName
 
 /** View: humanresources.vemployee */
 case class VemployeeViewRow(

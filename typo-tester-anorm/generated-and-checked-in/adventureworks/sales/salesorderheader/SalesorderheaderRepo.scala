@@ -25,6 +25,7 @@ trait SalesorderheaderRepo {
   def selectAll(implicit c: Connection): List[SalesorderheaderRow]
   def selectById(salesorderid: SalesorderheaderId)(implicit c: Connection): Option[SalesorderheaderRow]
   def selectByIds(salesorderids: Array[SalesorderheaderId])(implicit c: Connection): List[SalesorderheaderRow]
+  def selectByIdsTracked(salesorderids: Array[SalesorderheaderId])(implicit c: Connection): Map[SalesorderheaderId, Option[SalesorderheaderRow]]
   def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow]
   def update(row: SalesorderheaderRow)(implicit c: Connection): Boolean
   def upsert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow

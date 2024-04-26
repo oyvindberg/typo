@@ -78,6 +78,12 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
   override def selectByIds(locationids: Array[LocationId]): ZStream[ZConnection, Throwable, LocationRow] = {
     ZStream.fromIterable(locationids.flatMap(map.get))
   }
+  override def selectByIdsTracked(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Map[LocationId, Option[LocationRow]]] = {
+    selectByIds(locationids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.locationid, x)).toMap
+      locationids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
     UpdateBuilderMock(UpdateParams.empty, LocationFields.structure.fields, map)
   }

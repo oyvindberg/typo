@@ -27,6 +27,7 @@ trait CreditcardRepo {
   def selectAll(implicit c: Connection): List[CreditcardRow]
   def selectById(creditcardid: /* user-picked */ CustomCreditcardId)(implicit c: Connection): Option[CreditcardRow]
   def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[CreditcardRow]
+  def selectByIdsTracked(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): Map[/* user-picked */ CustomCreditcardId, Option[CreditcardRow]]
   def update: UpdateBuilder[CreditcardFields, CreditcardRow]
   def update(row: CreditcardRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow

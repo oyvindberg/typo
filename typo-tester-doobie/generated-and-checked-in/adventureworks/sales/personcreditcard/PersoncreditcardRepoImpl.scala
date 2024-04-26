@@ -97,6 +97,12 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
        """.query(using PersoncreditcardRow.read).stream
     
   }
+  override def selectByIdsTracked(compositeIds: Array[PersoncreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Map[PersoncreditcardId, Option[PersoncreditcardRow]]] = {
+    selectByIds(compositeIds).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     UpdateBuilder("sales.personcreditcard", PersoncreditcardFields.structure, PersoncreditcardRow.read)
   }

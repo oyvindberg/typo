@@ -86,6 +86,12 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): ZStream[ZConnection, Throwable, JobcandidateRow] = {
     sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ANY(${Segment.paramSegment(jobcandidateids)(JobcandidateId.arraySetter)})""".query(using JobcandidateRow.jdbcDecoder).selectStream()
   }
+  override def selectByIdsTracked(jobcandidateids: Array[JobcandidateId]): ZIO[ZConnection, Throwable, Map[JobcandidateId, Option[JobcandidateRow]]] = {
+    selectByIds(jobcandidateids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.jobcandidateid, x)).toMap
+      jobcandidateids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
     UpdateBuilder("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.jdbcDecoder)
   }

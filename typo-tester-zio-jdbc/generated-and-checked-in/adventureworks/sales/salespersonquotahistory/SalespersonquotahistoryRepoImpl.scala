@@ -101,6 +101,12 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
        """.query(using SalespersonquotahistoryRow.jdbcDecoder).selectStream()
     
   }
+  override def selectByIdsTracked(compositeIds: Array[SalespersonquotahistoryId]): ZIO[ZConnection, Throwable, Map[SalespersonquotahistoryId, Option[SalespersonquotahistoryRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
     UpdateBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.jdbcDecoder)
   }

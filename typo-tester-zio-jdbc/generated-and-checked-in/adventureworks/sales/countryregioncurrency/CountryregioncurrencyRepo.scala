@@ -28,6 +28,7 @@ trait CountryregioncurrencyRepo {
   def selectAll: ZStream[ZConnection, Throwable, CountryregioncurrencyRow]
   def selectById(compositeId: CountryregioncurrencyId): ZIO[ZConnection, Throwable, Option[CountryregioncurrencyRow]]
   def selectByIds(compositeIds: Array[CountryregioncurrencyId]): ZStream[ZConnection, Throwable, CountryregioncurrencyRow]
+  def selectByIdsTracked(compositeIds: Array[CountryregioncurrencyId]): ZIO[ZConnection, Throwable, Map[CountryregioncurrencyId, Option[CountryregioncurrencyRow]]]
   def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def update(row: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CountryregioncurrencyRow]]

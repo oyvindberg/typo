@@ -105,6 +105,12 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
        """.query(using BusinessentityaddressRow.read).stream
     
   }
+  override def selectByIdsTracked(compositeIds: Array[BusinessentityaddressId]): ConnectionIO[Map[BusinessentityaddressId, Option[BusinessentityaddressRow]]] = {
+    selectByIds(compositeIds).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
     UpdateBuilder("person.businessentityaddress", BusinessentityaddressFields.structure, BusinessentityaddressRow.read)
   }

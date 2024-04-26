@@ -120,6 +120,10 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
        """.as(SpecialofferRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(specialofferids: Array[SpecialofferId])(implicit c: Connection): Map[SpecialofferId, Option[SpecialofferRow]] = {
+    val byId = selectByIds(specialofferids).view.map(x => (x.specialofferid, x)).toMap
+    specialofferids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
     UpdateBuilder("sales.specialoffer", SpecialofferFields.structure, SpecialofferRow.rowParser)
   }

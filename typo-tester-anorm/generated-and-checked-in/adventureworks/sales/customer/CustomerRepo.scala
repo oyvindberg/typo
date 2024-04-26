@@ -25,6 +25,7 @@ trait CustomerRepo {
   def selectAll(implicit c: Connection): List[CustomerRow]
   def selectById(customerid: CustomerId)(implicit c: Connection): Option[CustomerRow]
   def selectByIds(customerids: Array[CustomerId])(implicit c: Connection): List[CustomerRow]
+  def selectByIdsTracked(customerids: Array[CustomerId])(implicit c: Connection): Map[CustomerId, Option[CustomerRow]]
   def update: UpdateBuilder[CustomerFields, CustomerRow]
   def update(row: CustomerRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow

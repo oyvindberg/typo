@@ -25,6 +25,7 @@ trait BillofmaterialsRepo {
   def selectAll(implicit c: Connection): List[BillofmaterialsRow]
   def selectById(billofmaterialsid: Int)(implicit c: Connection): Option[BillofmaterialsRow]
   def selectByIds(billofmaterialsids: Array[Int])(implicit c: Connection): List[BillofmaterialsRow]
+  def selectByIdsTracked(billofmaterialsids: Array[Int])(implicit c: Connection): Map[Int, Option[BillofmaterialsRow]]
   def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean
   def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow
