@@ -72,8 +72,12 @@ import adventureworks.person.address.AddressId
 import adventureworks.person.stateprovince.StateprovinceId
 import java.util.UUID
 
+/** Table: person.address
+    Street address information for customers, employees, and vendors.
+    Primary key: addressid */
 case class AddressRow(
-  /** Primary key for Address records. */
+  /** Primary key for Address records.
+      Default: nextval('person.address_addressid_seq'::regclass) */
   addressid: AddressId,
   /** First street address line. */
   addressline1: /* max 60 chars */ String,
@@ -87,10 +91,11 @@ case class AddressRow(
   /** Postal code for the street address. */
   postalcode: /* max 15 chars */ String,
   /** Latitude and longitude of this address. */
-  spatiallocation: Option[Array[Byte]],
-  rowguid: UUID,
+  spatiallocation: Option[TypoBytea],
+  /** Default: uuid_generate_v1() */
+  rowguid: TypoUUID,
+  /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
 ```
 
 ### Repository interface
@@ -104,18 +109,23 @@ import java.sql.Connection
 import typo.dsl.{DeleteBuilder, SelectBuilder, UpdateBuilder}
 
 trait AddressRepo {
-  def delete(addressid: AddressId)(implicit c: Connection): Boolean
   def delete: DeleteBuilder[AddressFields, AddressRow]
+  def deleteById(addressid: AddressId)(implicit c: Connection): Boolean
+  def deleteByIds(addressids: Array[AddressId])(implicit c: Connection): Int
   def insert(unsaved: AddressRow)(implicit c: Connection): AddressRow
   def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow
+  def insertStreaming(unsaved: Iterator[AddressRow], batchSize: Int)(implicit c: Connection): Long
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[AddressRowUnsaved], batchSize: Int)(implicit c: Connection): Long
   def select: SelectBuilder[AddressFields, AddressRow]
   def selectAll(implicit c: Connection): List[AddressRow]
   def selectById(addressid: AddressId)(implicit c: Connection): Option[AddressRow]
   def selectByIds(addressids: Array[AddressId])(implicit c: Connection): List[AddressRow]
-  def update(row: AddressRow)(implicit c: Connection): Boolean
   def update: UpdateBuilder[AddressFields, AddressRow]
+  def update(row: AddressRow)(implicit c: Connection): Boolean
   def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow
 }
+
 ```
 
 ### Simplified Insertion
@@ -125,6 +135,7 @@ without the need for complex code. A special structure is provided for creating 
 
 ```scala mdoc
 import adventureworks.customtypes.Defaulted
+
 
 /** This class corresponds to a row in table `person.address` which has not been persisted yet */
 case class AddressRowUnsaved(
@@ -140,15 +151,15 @@ case class AddressRowUnsaved(
   /** Postal code for the street address. */
   postalcode: /* max 15 chars */ String,
   /** Latitude and longitude of this address. */
-  spatiallocation: Option[Array[Byte]],
+  spatiallocation: Option[TypoBytea],
   /** Default: nextval('person.address_addressid_seq'::regclass)
       Primary key for Address records. */
   addressid: Defaulted[AddressId] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[UUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-) 
+)
 ```
 
 ### Readonly repositories
@@ -207,23 +218,25 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
 
+/** View: humanresources.vemployee */
 case class VemployeeViewRow(
-  /** Points to [[person.person.PersonRow.businessentityid]] */
+  /** Points to [[employee.EmployeeRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Points to [[person.person.PersonRow.title]] */
-  title: /* max 8 chars */ String,
+  title: Option[/* max 8 chars */ String],
   /** Points to [[person.person.PersonRow.firstname]] */
-  firstname: Name,
+  firstname: /* user-picked */ FirstName,
   /** Points to [[person.person.PersonRow.middlename]] */
-  middlename: Name,
+  middlename: Option[Name],
   /** Points to [[person.person.PersonRow.lastname]] */
   lastname: Name,
   /** Points to [[person.person.PersonRow.suffix]] */
-  suffix: /* max 10 chars */ String,
+  suffix: Option[/* max 10 chars */ String],
   /** Points to [[employee.EmployeeRow.jobtitle]] */
   jobtitle: /* max 50 chars */ String,
   /** Points to [[person.personphone.PersonphoneRow.phonenumber]] */
   phonenumber: Option[Phone],
+  /** Points to [[person.phonenumbertype.PhonenumbertypeRow.name]] */
   phonenumbertype: Option[Name],
   /** Points to [[person.emailaddress.EmailaddressRow.emailaddress]] */
   emailaddress: Option[/* max 50 chars */ String],
@@ -232,15 +245,17 @@ case class VemployeeViewRow(
   /** Points to [[person.address.AddressRow.addressline1]] */
   addressline1: /* max 60 chars */ String,
   /** Points to [[person.address.AddressRow.addressline2]] */
-  addressline2: /* max 60 chars */ String,
+  addressline2: Option[/* max 60 chars */ String],
   /** Points to [[person.address.AddressRow.city]] */
   city: /* max 30 chars */ String,
+  /** Points to [[person.stateprovince.StateprovinceRow.name]] */
   stateprovincename: Name,
   /** Points to [[person.address.AddressRow.postalcode]] */
   postalcode: /* max 15 chars */ String,
+  /** Points to [[person.countryregion.CountryregionRow.name]] */
   countryregionname: Name,
   /** Points to [[person.person.PersonRow.additionalcontactinfo]] */
-  additionalcontactinfo: TypoXml
+  additionalcontactinfo: Option[TypoXml]
 )
 ```
 
