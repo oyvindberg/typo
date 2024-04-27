@@ -108,6 +108,12 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
        """.query(using WorkorderroutingRow.jdbcDecoder).selectStream()
     
   }
+  override def selectByIdsTracked(compositeIds: Array[WorkorderroutingId]): ZIO[ZConnection, Throwable, Map[WorkorderroutingId, Option[WorkorderroutingRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     UpdateBuilder("production.workorderrouting", WorkorderroutingFields.structure, WorkorderroutingRow.jdbcDecoder)
   }

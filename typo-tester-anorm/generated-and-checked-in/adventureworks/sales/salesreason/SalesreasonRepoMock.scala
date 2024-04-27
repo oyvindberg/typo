@@ -67,6 +67,10 @@ class SalesreasonRepoMock(toRow: Function1[SalesreasonRowUnsaved, SalesreasonRow
   override def selectByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): List[SalesreasonRow] = {
     salesreasonids.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(salesreasonids: Array[SalesreasonId])(implicit c: Connection): Map[SalesreasonId, Option[SalesreasonRow]] = {
+    val byId = selectByIds(salesreasonids).view.map(x => (x.salesreasonid, x)).toMap
+    salesreasonids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
     UpdateBuilderMock(UpdateParams.empty, SalesreasonFields.structure.fields, map)
   }

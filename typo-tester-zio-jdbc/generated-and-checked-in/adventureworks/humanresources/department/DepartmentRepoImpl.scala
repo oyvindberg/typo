@@ -84,6 +84,12 @@ class DepartmentRepoImpl extends DepartmentRepo {
   override def selectByIds(departmentids: Array[DepartmentId]): ZStream[ZConnection, Throwable, DepartmentRow] = {
     sql"""select "departmentid", "name", "groupname", "modifieddate"::text from humanresources.department where "departmentid" = ANY(${Segment.paramSegment(departmentids)(DepartmentId.arraySetter)})""".query(using DepartmentRow.jdbcDecoder).selectStream()
   }
+  override def selectByIdsTracked(departmentids: Array[DepartmentId]): ZIO[ZConnection, Throwable, Map[DepartmentId, Option[DepartmentRow]]] = {
+    selectByIds(departmentids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.departmentid, x)).toMap
+      departmentids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
     UpdateBuilder("humanresources.department", DepartmentFields.structure, DepartmentRow.jdbcDecoder)
   }

@@ -26,6 +26,7 @@ trait UnitmeasureRepo {
   def selectAll: Stream[ConnectionIO, UnitmeasureRow]
   def selectById(unitmeasurecode: UnitmeasureId): ConnectionIO[Option[UnitmeasureRow]]
   def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): Stream[ConnectionIO, UnitmeasureRow]
+  def selectByIdsTracked(unitmeasurecodes: Array[UnitmeasureId]): ConnectionIO[Map[UnitmeasureId, Option[UnitmeasureRow]]]
   def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow]
   def update(row: UnitmeasureRow): ConnectionIO[Boolean]
   def upsert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow]

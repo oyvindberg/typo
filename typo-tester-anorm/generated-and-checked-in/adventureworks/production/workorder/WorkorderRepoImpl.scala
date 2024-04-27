@@ -110,6 +110,10 @@ class WorkorderRepoImpl extends WorkorderRepo {
        """.as(WorkorderRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(workorderids: Array[WorkorderId])(implicit c: Connection): Map[WorkorderId, Option[WorkorderRow]] = {
+    val byId = selectByIds(workorderids).view.map(x => (x.workorderid, x)).toMap
+    workorderids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
     UpdateBuilder("production.workorder", WorkorderFields.structure, WorkorderRow.rowParser)
   }

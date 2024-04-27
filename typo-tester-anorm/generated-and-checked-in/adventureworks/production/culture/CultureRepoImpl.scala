@@ -98,6 +98,10 @@ class CultureRepoImpl extends CultureRepo {
        """.as(CultureRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(cultureids: Array[CultureId])(implicit c: Connection): Map[CultureId, Option[CultureRow]] = {
+    val byId = selectByIds(cultureids).view.map(x => (x.cultureid, x)).toMap
+    cultureids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
     UpdateBuilder("production.culture", CultureFields.structure, CultureRow.rowParser)
   }

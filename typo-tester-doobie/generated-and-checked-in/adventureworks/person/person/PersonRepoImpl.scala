@@ -106,6 +106,12 @@ class PersonRepoImpl extends PersonRepo {
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PersonRow] = {
     sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person where "businessentityid" = ANY(${businessentityids})""".query(using PersonRow.read).stream
   }
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, Option[PersonRow]]] = {
+    selectByIds(businessentityids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.businessentityid, x)).toMap
+      businessentityids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder("person.person", PersonFields.structure, PersonRow.read)
   }

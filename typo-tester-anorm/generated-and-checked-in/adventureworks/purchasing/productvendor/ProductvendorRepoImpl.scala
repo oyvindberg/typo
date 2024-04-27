@@ -116,6 +116,10 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
        """.as(ProductvendorRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(compositeIds: Array[ProductvendorId])(implicit c: Connection): Map[ProductvendorId, Option[ProductvendorRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
     UpdateBuilder("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.rowParser)
   }

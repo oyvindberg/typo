@@ -105,6 +105,12 @@ class PersonRepoImpl extends PersonRepo {
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, PersonRow] = {
     sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from person.person where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(using PersonRow.jdbcDecoder).selectStream()
   }
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, Option[PersonRow]]] = {
+    selectByIds(businessentityids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.businessentityid, x)).toMap
+      businessentityids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder("person.person", PersonFields.structure, PersonRow.jdbcDecoder)
   }

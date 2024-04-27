@@ -67,6 +67,10 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
     unitmeasurecodes.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): Map[UnitmeasureId, Option[UnitmeasureRow]] = {
+    val byId = selectByIds(unitmeasurecodes).view.map(x => (x.unitmeasurecode, x)).toMap
+    unitmeasurecodes.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
     UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields.structure.fields, map)
   }

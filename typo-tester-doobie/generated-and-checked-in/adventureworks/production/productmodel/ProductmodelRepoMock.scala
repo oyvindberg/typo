@@ -79,6 +79,12 @@ class ProductmodelRepoMock(toRow: Function1[ProductmodelRowUnsaved, Productmodel
   override def selectByIds(productmodelids: Array[ProductmodelId]): Stream[ConnectionIO, ProductmodelRow] = {
     Stream.emits(productmodelids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(productmodelids: Array[ProductmodelId]): ConnectionIO[Map[ProductmodelId, Option[ProductmodelRow]]] = {
+    selectByIds(productmodelids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.productmodelid, x)).toMap
+      productmodelids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ProductmodelFields, ProductmodelRow] = {
     UpdateBuilderMock(UpdateParams.empty, ProductmodelFields.structure.fields, map)
   }

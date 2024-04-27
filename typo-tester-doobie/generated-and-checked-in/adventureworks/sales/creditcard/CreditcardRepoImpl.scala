@@ -90,6 +90,12 @@ class CreditcardRepoImpl extends CreditcardRepo {
   override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): Stream[ConnectionIO, CreditcardRow] = {
     sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ANY(${creditcardids})""".query(using CreditcardRow.read).stream
   }
+  override def selectByIdsTracked(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Map[/* user-picked */ CustomCreditcardId, Option[CreditcardRow]]] = {
+    selectByIds(creditcardids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.creditcardid, x)).toMap
+      creditcardids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
     UpdateBuilder("sales.creditcard", CreditcardFields.structure, CreditcardRow.read)
   }

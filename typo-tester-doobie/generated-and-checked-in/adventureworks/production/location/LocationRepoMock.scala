@@ -79,6 +79,12 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
   override def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow] = {
     Stream.emits(locationids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(locationids: Array[LocationId]): ConnectionIO[Map[LocationId, Option[LocationRow]]] = {
+    selectByIds(locationids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.locationid, x)).toMap
+      locationids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
     UpdateBuilderMock(UpdateParams.empty, LocationFields.structure.fields, map)
   }

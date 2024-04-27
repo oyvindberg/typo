@@ -28,6 +28,7 @@ trait ContacttypeRepo {
   def selectAll: ZStream[ZConnection, Throwable, ContacttypeRow]
   def selectById(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Option[ContacttypeRow]]
   def selectByIds(contacttypeids: Array[ContacttypeId]): ZStream[ZConnection, Throwable, ContacttypeRow]
+  def selectByIdsTracked(contacttypeids: Array[ContacttypeId]): ZIO[ZConnection, Throwable, Map[ContacttypeId, Option[ContacttypeRow]]]
   def update: UpdateBuilder[ContacttypeFields, ContacttypeRow]
   def update(row: ContacttypeRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ContacttypeRow): ZIO[ZConnection, Throwable, UpdateResult[ContacttypeRow]]

@@ -26,6 +26,7 @@ trait PhonenumbertypeRepo {
   def selectAll: Stream[ConnectionIO, PhonenumbertypeRow]
   def selectById(phonenumbertypeid: PhonenumbertypeId): ConnectionIO[Option[PhonenumbertypeRow]]
   def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId]): Stream[ConnectionIO, PhonenumbertypeRow]
+  def selectByIdsTracked(phonenumbertypeids: Array[PhonenumbertypeId]): ConnectionIO[Map[PhonenumbertypeId, Option[PhonenumbertypeRow]]]
   def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
   def update(row: PhonenumbertypeRow): ConnectionIO[Boolean]
   def upsert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow]

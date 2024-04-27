@@ -115,6 +115,10 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
        """.as(EmailaddressRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(compositeIds: Array[EmailaddressId])(implicit c: Connection): Map[EmailaddressId, Option[EmailaddressRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
     UpdateBuilder("person.emailaddress", EmailaddressFields.structure, EmailaddressRow.rowParser)
   }

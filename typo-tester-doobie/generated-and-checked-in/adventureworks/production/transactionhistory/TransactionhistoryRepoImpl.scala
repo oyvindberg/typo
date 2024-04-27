@@ -97,6 +97,12 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def selectByIds(transactionids: Array[TransactionhistoryId]): Stream[ConnectionIO, TransactionhistoryRow] = {
     sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ANY(${transactionids})""".query(using TransactionhistoryRow.read).stream
   }
+  override def selectByIdsTracked(transactionids: Array[TransactionhistoryId]): ConnectionIO[Map[TransactionhistoryId, Option[TransactionhistoryRow]]] = {
+    selectByIds(transactionids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.transactionid, x)).toMap
+      transactionids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
     UpdateBuilder("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.read)
   }

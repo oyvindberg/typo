@@ -78,6 +78,12 @@ class EmployeedepartmenthistoryRepoMock(toRow: Function1[Employeedepartmenthisto
   override def selectByIds(compositeIds: Array[EmployeedepartmenthistoryId]): ZStream[ZConnection, Throwable, EmployeedepartmenthistoryRow] = {
     ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
+  override def selectByIdsTracked(compositeIds: Array[EmployeedepartmenthistoryId]): ZIO[ZConnection, Throwable, Map[EmployeedepartmenthistoryId, Option[EmployeedepartmenthistoryRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
     UpdateBuilderMock(UpdateParams.empty, EmployeedepartmenthistoryFields.structure.fields, map)
   }

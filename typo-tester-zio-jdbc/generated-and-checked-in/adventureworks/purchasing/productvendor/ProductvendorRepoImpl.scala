@@ -105,6 +105,12 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
        """.query(using ProductvendorRow.jdbcDecoder).selectStream()
     
   }
+  override def selectByIdsTracked(compositeIds: Array[ProductvendorId]): ZIO[ZConnection, Throwable, Map[ProductvendorId, Option[ProductvendorRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
     UpdateBuilder("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.jdbcDecoder)
   }

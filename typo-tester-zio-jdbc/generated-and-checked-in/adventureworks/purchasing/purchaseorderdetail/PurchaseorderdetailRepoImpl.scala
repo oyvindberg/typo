@@ -37,4 +37,10 @@ class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
        """.query(using PurchaseorderdetailRow.jdbcDecoder).selectStream()
     
   }
+  override def selectByIdsTracked(compositeIds: Array[PurchaseorderdetailId]): ZIO[ZConnection, Throwable, Map[PurchaseorderdetailId, Option[PurchaseorderdetailRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
 }

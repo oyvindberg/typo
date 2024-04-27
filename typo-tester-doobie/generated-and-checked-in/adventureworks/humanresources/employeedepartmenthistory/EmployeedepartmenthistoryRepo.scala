@@ -26,6 +26,7 @@ trait EmployeedepartmenthistoryRepo {
   def selectAll: Stream[ConnectionIO, EmployeedepartmenthistoryRow]
   def selectById(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Option[EmployeedepartmenthistoryRow]]
   def selectByIds(compositeIds: Array[EmployeedepartmenthistoryId]): Stream[ConnectionIO, EmployeedepartmenthistoryRow]
+  def selectByIdsTracked(compositeIds: Array[EmployeedepartmenthistoryId]): ConnectionIO[Map[EmployeedepartmenthistoryId, Option[EmployeedepartmenthistoryRow]]]
   def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow]
   def update(row: EmployeedepartmenthistoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow]

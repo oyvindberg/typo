@@ -79,6 +79,12 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
   override def selectByIds(currencyrateids: Array[CurrencyrateId]): Stream[ConnectionIO, CurrencyrateRow] = {
     Stream.emits(currencyrateids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(currencyrateids: Array[CurrencyrateId]): ConnectionIO[Map[CurrencyrateId, Option[CurrencyrateRow]]] = {
+    selectByIds(currencyrateids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.currencyrateid, x)).toMap
+      currencyrateids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
     UpdateBuilderMock(UpdateParams.empty, CurrencyrateFields.structure.fields, map)
   }

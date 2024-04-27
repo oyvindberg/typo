@@ -26,6 +26,7 @@ trait ProductreviewRepo {
   def selectAll: Stream[ConnectionIO, ProductreviewRow]
   def selectById(productreviewid: ProductreviewId): ConnectionIO[Option[ProductreviewRow]]
   def selectByIds(productreviewids: Array[ProductreviewId]): Stream[ConnectionIO, ProductreviewRow]
+  def selectByIdsTracked(productreviewids: Array[ProductreviewId]): ConnectionIO[Map[ProductreviewId, Option[ProductreviewRow]]]
   def update: UpdateBuilder[ProductreviewFields, ProductreviewRow]
   def update(row: ProductreviewRow): ConnectionIO[Boolean]
   def upsert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow]

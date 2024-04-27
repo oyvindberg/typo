@@ -78,6 +78,12 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
   override def selectByIds(illustrationids: Array[IllustrationId]): ZStream[ZConnection, Throwable, IllustrationRow] = {
     ZStream.fromIterable(illustrationids.flatMap(map.get))
   }
+  override def selectByIdsTracked(illustrationids: Array[IllustrationId]): ZIO[ZConnection, Throwable, Map[IllustrationId, Option[IllustrationRow]]] = {
+    selectByIds(illustrationids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.illustrationid, x)).toMap
+      illustrationids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
     UpdateBuilderMock(UpdateParams.empty, IllustrationFields.structure.fields, map)
   }

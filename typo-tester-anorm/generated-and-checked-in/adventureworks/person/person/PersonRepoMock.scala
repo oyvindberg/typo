@@ -68,6 +68,10 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PersonRow] = {
     businessentityids.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId])(implicit c: Connection): Map[BusinessentityId, Option[PersonRow]] = {
+    val byId = selectByIds(businessentityids).view.map(x => (x.businessentityid, x)).toMap
+    businessentityids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilderMock(UpdateParams.empty, PersonFields.structure.fields, map)
   }

@@ -26,6 +26,7 @@ trait DocumentRepo {
   def selectAll(implicit c: Connection): List[DocumentRow]
   def selectById(documentnode: DocumentId)(implicit c: Connection): Option[DocumentRow]
   def selectByIds(documentnodes: Array[DocumentId])(implicit c: Connection): List[DocumentRow]
+  def selectByIdsTracked(documentnodes: Array[DocumentId])(implicit c: Connection): Map[DocumentId, Option[DocumentRow]]
   def selectByUniqueRowguid(rowguid: TypoUUID)(implicit c: Connection): Option[DocumentRow]
   def update: UpdateBuilder[DocumentFields, DocumentRow]
   def update(row: DocumentRow)(implicit c: Connection): Boolean

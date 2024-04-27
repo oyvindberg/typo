@@ -78,6 +78,12 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
   override def selectByIds(compositeIds: Array[CountryregioncurrencyId]): ZStream[ZConnection, Throwable, CountryregioncurrencyRow] = {
     ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
+  override def selectByIdsTracked(compositeIds: Array[CountryregioncurrencyId]): ZIO[ZConnection, Throwable, Map[CountryregioncurrencyId, Option[CountryregioncurrencyRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     UpdateBuilderMock(UpdateParams.empty, CountryregioncurrencyFields.structure.fields, map)
   }

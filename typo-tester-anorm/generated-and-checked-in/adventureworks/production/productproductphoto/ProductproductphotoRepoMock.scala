@@ -67,6 +67,10 @@ class ProductproductphotoRepoMock(toRow: Function1[ProductproductphotoRowUnsaved
   override def selectByIds(compositeIds: Array[ProductproductphotoId])(implicit c: Connection): List[ProductproductphotoRow] = {
     compositeIds.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(compositeIds: Array[ProductproductphotoId])(implicit c: Connection): Map[ProductproductphotoId, Option[ProductproductphotoRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
     UpdateBuilderMock(UpdateParams.empty, ProductproductphotoFields.structure.fields, map)
   }

@@ -67,6 +67,10 @@ class BusinessentityaddressRepoMock(toRow: Function1[BusinessentityaddressRowUns
   override def selectByIds(compositeIds: Array[BusinessentityaddressId])(implicit c: Connection): List[BusinessentityaddressRow] = {
     compositeIds.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(compositeIds: Array[BusinessentityaddressId])(implicit c: Connection): Map[BusinessentityaddressId, Option[BusinessentityaddressRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
     UpdateBuilderMock(UpdateParams.empty, BusinessentityaddressFields.structure.fields, map)
   }

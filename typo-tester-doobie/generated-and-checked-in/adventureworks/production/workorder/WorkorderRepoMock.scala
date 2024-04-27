@@ -79,6 +79,12 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
   override def selectByIds(workorderids: Array[WorkorderId]): Stream[ConnectionIO, WorkorderRow] = {
     Stream.emits(workorderids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(workorderids: Array[WorkorderId]): ConnectionIO[Map[WorkorderId, Option[WorkorderRow]]] = {
+    selectByIds(workorderids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.workorderid, x)).toMap
+      workorderids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
     UpdateBuilderMock(UpdateParams.empty, WorkorderFields.structure.fields, map)
   }

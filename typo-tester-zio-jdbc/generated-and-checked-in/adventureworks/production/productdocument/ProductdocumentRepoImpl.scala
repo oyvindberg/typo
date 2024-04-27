@@ -98,6 +98,12 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
        """.query(using ProductdocumentRow.jdbcDecoder).selectStream()
     
   }
+  override def selectByIdsTracked(compositeIds: Array[ProductdocumentId]): ZIO[ZConnection, Throwable, Map[ProductdocumentId, Option[ProductdocumentRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
     UpdateBuilder("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.jdbcDecoder)
   }

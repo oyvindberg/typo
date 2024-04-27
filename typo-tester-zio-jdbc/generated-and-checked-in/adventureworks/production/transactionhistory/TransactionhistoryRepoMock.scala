@@ -78,6 +78,12 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
   override def selectByIds(transactionids: Array[TransactionhistoryId]): ZStream[ZConnection, Throwable, TransactionhistoryRow] = {
     ZStream.fromIterable(transactionids.flatMap(map.get))
   }
+  override def selectByIdsTracked(transactionids: Array[TransactionhistoryId]): ZIO[ZConnection, Throwable, Map[TransactionhistoryId, Option[TransactionhistoryRow]]] = {
+    selectByIds(transactionids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.transactionid, x)).toMap
+      transactionids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
     UpdateBuilderMock(UpdateParams.empty, TransactionhistoryFields.structure.fields, map)
   }

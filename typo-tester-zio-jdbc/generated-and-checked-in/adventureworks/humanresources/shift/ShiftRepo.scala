@@ -28,6 +28,7 @@ trait ShiftRepo {
   def selectAll: ZStream[ZConnection, Throwable, ShiftRow]
   def selectById(shiftid: ShiftId): ZIO[ZConnection, Throwable, Option[ShiftRow]]
   def selectByIds(shiftids: Array[ShiftId]): ZStream[ZConnection, Throwable, ShiftRow]
+  def selectByIdsTracked(shiftids: Array[ShiftId]): ZIO[ZConnection, Throwable, Map[ShiftId, Option[ShiftRow]]]
   def update: UpdateBuilder[ShiftFields, ShiftRow]
   def update(row: ShiftRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, UpdateResult[ShiftRow]]

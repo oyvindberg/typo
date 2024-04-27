@@ -92,6 +92,12 @@ class WorkorderRepoImpl extends WorkorderRepo {
   override def selectByIds(workorderids: Array[WorkorderId]): ZStream[ZConnection, Throwable, WorkorderRow] = {
     sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ANY(${Segment.paramSegment(workorderids)(WorkorderId.arraySetter)})""".query(using WorkorderRow.jdbcDecoder).selectStream()
   }
+  override def selectByIdsTracked(workorderids: Array[WorkorderId]): ZIO[ZConnection, Throwable, Map[WorkorderId, Option[WorkorderRow]]] = {
+    selectByIds(workorderids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.workorderid, x)).toMap
+      workorderids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
     UpdateBuilder("production.workorder", WorkorderFields.structure, WorkorderRow.jdbcDecoder)
   }

@@ -79,6 +79,12 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
   override def selectByIds(contacttypeids: Array[ContacttypeId]): Stream[ConnectionIO, ContacttypeRow] = {
     Stream.emits(contacttypeids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(contacttypeids: Array[ContacttypeId]): ConnectionIO[Map[ContacttypeId, Option[ContacttypeRow]]] = {
+    selectByIds(contacttypeids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.contacttypeid, x)).toMap
+      contacttypeids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
     UpdateBuilderMock(UpdateParams.empty, ContacttypeFields.structure.fields, map)
   }

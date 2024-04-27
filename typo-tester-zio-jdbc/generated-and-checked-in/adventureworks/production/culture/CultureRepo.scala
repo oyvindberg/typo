@@ -28,6 +28,7 @@ trait CultureRepo {
   def selectAll: ZStream[ZConnection, Throwable, CultureRow]
   def selectById(cultureid: CultureId): ZIO[ZConnection, Throwable, Option[CultureRow]]
   def selectByIds(cultureids: Array[CultureId]): ZStream[ZConnection, Throwable, CultureRow]
+  def selectByIdsTracked(cultureids: Array[CultureId]): ZIO[ZConnection, Throwable, Map[CultureId, Option[CultureRow]]]
   def update: UpdateBuilder[CultureFields, CultureRow]
   def update(row: CultureRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CultureRow): ZIO[ZConnection, Throwable, UpdateResult[CultureRow]]

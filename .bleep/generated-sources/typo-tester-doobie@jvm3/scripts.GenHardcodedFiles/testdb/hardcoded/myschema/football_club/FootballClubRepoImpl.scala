@@ -63,6 +63,12 @@ class FootballClubRepoImpl extends FootballClubRepo {
   override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
     sql"""select "id", "name" from myschema.football_club where "id" = ANY(${ids})""".query(using FootballClubRow.read).stream
   }
+  override def selectByIdsTracked(ids: Array[FootballClubId]): ConnectionIO[Map[FootballClubId, Option[FootballClubRow]]] = {
+    selectByIds(ids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.id, x)).toMap
+      ids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
     UpdateBuilder("myschema.football_club", FootballClubFields.structure, FootballClubRow.read)
   }

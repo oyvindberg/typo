@@ -79,6 +79,12 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId]): Stream[ConnectionIO, PhonenumbertypeRow] = {
     Stream.emits(phonenumbertypeids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(phonenumbertypeids: Array[PhonenumbertypeId]): ConnectionIO[Map[PhonenumbertypeId, Option[PhonenumbertypeRow]]] = {
+    selectByIds(phonenumbertypeids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.phonenumbertypeid, x)).toMap
+      phonenumbertypeids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     UpdateBuilderMock(UpdateParams.empty, PhonenumbertypeFields.structure.fields, map)
   }

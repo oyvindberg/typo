@@ -28,6 +28,7 @@ trait SpecialofferRepo {
   def selectAll: ZStream[ZConnection, Throwable, SpecialofferRow]
   def selectById(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Option[SpecialofferRow]]
   def selectByIds(specialofferids: Array[SpecialofferId]): ZStream[ZConnection, Throwable, SpecialofferRow]
+  def selectByIdsTracked(specialofferids: Array[SpecialofferId]): ZIO[ZConnection, Throwable, Map[SpecialofferId, Option[SpecialofferRow]]]
   def update: UpdateBuilder[SpecialofferFields, SpecialofferRow]
   def update(row: SpecialofferRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, UpdateResult[SpecialofferRow]]

@@ -106,6 +106,10 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
        """.as(PersoncreditcardRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(compositeIds: Array[PersoncreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): Map[PersoncreditcardId, Option[PersoncreditcardRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     UpdateBuilder("sales.personcreditcard", PersoncreditcardFields.structure, PersoncreditcardRow.rowParser)
   }

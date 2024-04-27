@@ -31,10 +31,14 @@ object RepoMethod {
   case class SelectByIds(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],
-      unaryId: IdComputed,
+      idComputed: IdComputed,
       idsParam: sc.Param,
       rowType: sc.Type
   ) extends Selector("selectByIds")
+
+  case class SelectByIdsTracked(
+      selectByIds: SelectByIds
+  ) extends Selector("selectByIdsTracked")
 
   case class SelectByUnique(
       relName: db.RelationName,

@@ -67,6 +67,10 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
   override def selectByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow] = {
     territoryids.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(territoryids: Array[SalesterritoryId])(implicit c: Connection): Map[SalesterritoryId, Option[SalesterritoryRow]] = {
+    val byId = selectByIds(territoryids).view.map(x => (x.territoryid, x)).toMap
+    territoryids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
     UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields.structure.fields, map)
   }

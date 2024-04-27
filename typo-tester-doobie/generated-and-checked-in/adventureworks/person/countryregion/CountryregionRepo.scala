@@ -26,6 +26,7 @@ trait CountryregionRepo {
   def selectAll: Stream[ConnectionIO, CountryregionRow]
   def selectById(countryregioncode: CountryregionId): ConnectionIO[Option[CountryregionRow]]
   def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow]
+  def selectByIdsTracked(countryregioncodes: Array[CountryregionId]): ConnectionIO[Map[CountryregionId, Option[CountryregionRow]]]
   def update: UpdateBuilder[CountryregionFields, CountryregionRow]
   def update(row: CountryregionRow): ConnectionIO[Boolean]
   def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow]

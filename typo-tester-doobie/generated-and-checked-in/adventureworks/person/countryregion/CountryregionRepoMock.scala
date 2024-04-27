@@ -79,6 +79,12 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
   override def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow] = {
     Stream.emits(countryregioncodes.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(countryregioncodes: Array[CountryregionId]): ConnectionIO[Map[CountryregionId, Option[CountryregionRow]]] = {
+    selectByIds(countryregioncodes).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.countryregioncode, x)).toMap
+      countryregioncodes.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
     UpdateBuilderMock(UpdateParams.empty, CountryregionFields.structure.fields, map)
   }

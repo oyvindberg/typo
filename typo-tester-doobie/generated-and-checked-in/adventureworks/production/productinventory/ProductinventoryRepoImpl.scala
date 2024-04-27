@@ -109,6 +109,12 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
        """.query(using ProductinventoryRow.read).stream
     
   }
+  override def selectByIdsTracked(compositeIds: Array[ProductinventoryId]): ConnectionIO[Map[ProductinventoryId, Option[ProductinventoryRow]]] = {
+    selectByIds(compositeIds).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
     UpdateBuilder("production.productinventory", ProductinventoryFields.structure, ProductinventoryRow.read)
   }

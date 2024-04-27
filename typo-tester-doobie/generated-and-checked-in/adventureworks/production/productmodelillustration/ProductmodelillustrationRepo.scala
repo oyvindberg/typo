@@ -26,6 +26,7 @@ trait ProductmodelillustrationRepo {
   def selectAll: Stream[ConnectionIO, ProductmodelillustrationRow]
   def selectById(compositeId: ProductmodelillustrationId): ConnectionIO[Option[ProductmodelillustrationRow]]
   def selectByIds(compositeIds: Array[ProductmodelillustrationId]): Stream[ConnectionIO, ProductmodelillustrationRow]
+  def selectByIdsTracked(compositeIds: Array[ProductmodelillustrationId]): ConnectionIO[Map[ProductmodelillustrationId, Option[ProductmodelillustrationRow]]]
   def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow]
   def update(row: ProductmodelillustrationRow): ConnectionIO[Boolean]
   def upsert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow]

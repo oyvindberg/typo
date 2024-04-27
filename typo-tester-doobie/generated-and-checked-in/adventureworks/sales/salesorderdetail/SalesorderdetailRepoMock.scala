@@ -79,6 +79,12 @@ class SalesorderdetailRepoMock(toRow: Function1[SalesorderdetailRowUnsaved, Sale
   override def selectByIds(compositeIds: Array[SalesorderdetailId]): Stream[ConnectionIO, SalesorderdetailRow] = {
     Stream.emits(compositeIds.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(compositeIds: Array[SalesorderdetailId]): ConnectionIO[Map[SalesorderdetailId, Option[SalesorderdetailRow]]] = {
+    selectByIds(compositeIds).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
     UpdateBuilderMock(UpdateParams.empty, SalesorderdetailFields.structure.fields, map)
   }

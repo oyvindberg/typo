@@ -107,6 +107,10 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
        """.as(ProductcosthistoryRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(compositeIds: Array[ProductcosthistoryId])(implicit c: Connection): Map[ProductcosthistoryId, Option[ProductcosthistoryRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     UpdateBuilder("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.rowParser)
   }

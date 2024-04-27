@@ -105,6 +105,12 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
        """.query(using SalesterritoryhistoryRow.jdbcDecoder).selectStream()
     
   }
+  override def selectByIdsTracked(compositeIds: Array[SalesterritoryhistoryId]): ZIO[ZConnection, Throwable, Map[SalesterritoryhistoryId, Option[SalesterritoryhistoryRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
     UpdateBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure, SalesterritoryhistoryRow.jdbcDecoder)
   }

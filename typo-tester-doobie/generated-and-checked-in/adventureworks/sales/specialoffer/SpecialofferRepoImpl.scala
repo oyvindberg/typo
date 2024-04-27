@@ -102,6 +102,12 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
   override def selectByIds(specialofferids: Array[SpecialofferId]): Stream[ConnectionIO, SpecialofferRow] = {
     sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer where "specialofferid" = ANY(${specialofferids})""".query(using SpecialofferRow.read).stream
   }
+  override def selectByIdsTracked(specialofferids: Array[SpecialofferId]): ConnectionIO[Map[SpecialofferId, Option[SpecialofferRow]]] = {
+    selectByIds(specialofferids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.specialofferid, x)).toMap
+      specialofferids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
     UpdateBuilder("sales.specialoffer", SpecialofferFields.structure, SpecialofferRow.read)
   }

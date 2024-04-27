@@ -79,6 +79,12 @@ class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, EmployeeRow] = {
     ZStream.fromIterable(businessentityids.flatMap(map.get))
   }
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, Option[EmployeeRow]]] = {
+    selectByIds(businessentityids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.businessentityid, x)).toMap
+      businessentityids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
     UpdateBuilderMock(UpdateParams.empty, EmployeeFields.structure.fields, map)
   }

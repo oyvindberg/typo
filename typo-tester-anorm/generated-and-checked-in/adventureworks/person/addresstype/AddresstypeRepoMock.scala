@@ -67,6 +67,10 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
   override def selectByIds(addresstypeids: Array[AddresstypeId])(implicit c: Connection): List[AddresstypeRow] = {
     addresstypeids.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(addresstypeids: Array[AddresstypeId])(implicit c: Connection): Map[AddresstypeId, Option[AddresstypeRow]] = {
+    val byId = selectByIds(addresstypeids).view.map(x => (x.addresstypeid, x)).toMap
+    addresstypeids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
     UpdateBuilderMock(UpdateParams.empty, AddresstypeFields.structure.fields, map)
   }

@@ -131,6 +131,10 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
        """.as(PurchaseorderheaderRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): Map[PurchaseorderheaderId, Option[PurchaseorderheaderRow]] = {
+    val byId = selectByIds(purchaseorderids).view.map(x => (x.purchaseorderid, x)).toMap
+    purchaseorderids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
     UpdateBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.rowParser)
   }

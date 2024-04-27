@@ -26,6 +26,7 @@ trait CustomerRepo {
   def selectAll: Stream[ConnectionIO, CustomerRow]
   def selectById(customerid: CustomerId): ConnectionIO[Option[CustomerRow]]
   def selectByIds(customerids: Array[CustomerId]): Stream[ConnectionIO, CustomerRow]
+  def selectByIdsTracked(customerids: Array[CustomerId]): ConnectionIO[Map[CustomerId, Option[CustomerRow]]]
   def update: UpdateBuilder[CustomerFields, CustomerRow]
   def update(row: CustomerRow): ConnectionIO[Boolean]
   def upsert(unsaved: CustomerRow): ConnectionIO[CustomerRow]

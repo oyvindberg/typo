@@ -63,6 +63,12 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
   override def selectByIds(compositeIds: Array[FlaffId]): Stream[ConnectionIO, FlaffRow] = {
     Stream.emits(compositeIds.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(compositeIds: Array[FlaffId]): ConnectionIO[Map[FlaffId, Option[FlaffRow]]] = {
+    selectByIds(compositeIds).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
     UpdateBuilderMock(UpdateParams.empty, FlaffFields.structure.fields, map)
   }

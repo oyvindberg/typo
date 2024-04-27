@@ -74,6 +74,10 @@ class FlaffRepoImpl extends FlaffRepo {
        """.as(FlaffRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(compositeIds: Array[FlaffId])(implicit c: Connection): Map[FlaffId, Option[FlaffRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
     UpdateBuilder("public.flaff", FlaffFields.structure, FlaffRow.rowParser)
   }

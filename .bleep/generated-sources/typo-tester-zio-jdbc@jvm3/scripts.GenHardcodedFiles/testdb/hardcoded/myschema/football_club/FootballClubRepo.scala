@@ -27,6 +27,7 @@ trait FootballClubRepo {
   def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, FootballClubRow]
   def selectById(id: FootballClubId): ZIO[ZConnection, Throwable, Option[FootballClubRow]]
   def selectByIds(ids: Array[FootballClubId]): ZStream[ZConnection, Throwable, FootballClubRow]
+  def selectByIdsTracked(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Map[FootballClubId, Option[FootballClubRow]]]
   def update: UpdateBuilder[FootballClubFields, FootballClubRow]
   def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Boolean]
   def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean]

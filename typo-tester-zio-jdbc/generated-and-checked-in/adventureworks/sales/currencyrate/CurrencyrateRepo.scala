@@ -28,6 +28,7 @@ trait CurrencyrateRepo {
   def selectAll: ZStream[ZConnection, Throwable, CurrencyrateRow]
   def selectById(currencyrateid: CurrencyrateId): ZIO[ZConnection, Throwable, Option[CurrencyrateRow]]
   def selectByIds(currencyrateids: Array[CurrencyrateId]): ZStream[ZConnection, Throwable, CurrencyrateRow]
+  def selectByIdsTracked(currencyrateids: Array[CurrencyrateId]): ZIO[ZConnection, Throwable, Map[CurrencyrateId, Option[CurrencyrateRow]]]
   def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow]
   def update(row: CurrencyrateRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CurrencyrateRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyrateRow]]

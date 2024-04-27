@@ -67,6 +67,10 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
   override def selectByIds(names: Array[IdentityTestId])(implicit c: Connection): List[IdentityTestRow] = {
     names.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(names: Array[IdentityTestId])(implicit c: Connection): Map[IdentityTestId, Option[IdentityTestRow]] = {
+    val byId = selectByIds(names).view.map(x => (x.name, x)).toMap
+    names.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
     UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure.fields, map)
   }

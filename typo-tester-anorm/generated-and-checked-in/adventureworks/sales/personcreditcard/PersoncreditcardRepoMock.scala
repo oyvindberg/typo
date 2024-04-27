@@ -69,6 +69,10 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
   override def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[PersoncreditcardRow] = {
     compositeIds.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(compositeIds: Array[PersoncreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): Map[PersoncreditcardId, Option[PersoncreditcardRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     UpdateBuilderMock(UpdateParams.empty, PersoncreditcardFields.structure.fields, map)
   }

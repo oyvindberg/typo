@@ -28,6 +28,7 @@ trait CountryregionRepo {
   def selectAll: ZStream[ZConnection, Throwable, CountryregionRow]
   def selectById(countryregioncode: CountryregionId): ZIO[ZConnection, Throwable, Option[CountryregionRow]]
   def selectByIds(countryregioncodes: Array[CountryregionId]): ZStream[ZConnection, Throwable, CountryregionRow]
+  def selectByIdsTracked(countryregioncodes: Array[CountryregionId]): ZIO[ZConnection, Throwable, Map[CountryregionId, Option[CountryregionRow]]]
   def update: UpdateBuilder[CountryregionFields, CountryregionRow]
   def update(row: CountryregionRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CountryregionRow): ZIO[ZConnection, Throwable, UpdateResult[CountryregionRow]]

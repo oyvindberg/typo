@@ -79,6 +79,12 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
   override def selectByIds(stateprovinceids: Array[StateprovinceId]): Stream[ConnectionIO, StateprovinceRow] = {
     Stream.emits(stateprovinceids.flatMap(map.get).toList)
   }
+  override def selectByIdsTracked(stateprovinceids: Array[StateprovinceId]): ConnectionIO[Map[StateprovinceId, Option[StateprovinceRow]]] = {
+    selectByIds(stateprovinceids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.stateprovinceid, x)).toMap
+      stateprovinceids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
     UpdateBuilderMock(UpdateParams.empty, StateprovinceFields.structure.fields, map)
   }

@@ -86,6 +86,12 @@ class ShiftRepoImpl extends ShiftRepo {
   override def selectByIds(shiftids: Array[ShiftId]): ZStream[ZConnection, Throwable, ShiftRow] = {
     sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ANY(${Segment.paramSegment(shiftids)(ShiftId.arraySetter)})""".query(using ShiftRow.jdbcDecoder).selectStream()
   }
+  override def selectByIdsTracked(shiftids: Array[ShiftId]): ZIO[ZConnection, Throwable, Map[ShiftId, Option[ShiftRow]]] = {
+    selectByIds(shiftids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.shiftid, x)).toMap
+      shiftids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
     UpdateBuilder("humanresources.shift", ShiftFields.structure, ShiftRow.jdbcDecoder)
   }

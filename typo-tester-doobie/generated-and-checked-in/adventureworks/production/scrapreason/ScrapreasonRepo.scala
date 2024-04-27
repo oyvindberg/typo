@@ -26,6 +26,7 @@ trait ScrapreasonRepo {
   def selectAll: Stream[ConnectionIO, ScrapreasonRow]
   def selectById(scrapreasonid: ScrapreasonId): ConnectionIO[Option[ScrapreasonRow]]
   def selectByIds(scrapreasonids: Array[ScrapreasonId]): Stream[ConnectionIO, ScrapreasonRow]
+  def selectByIdsTracked(scrapreasonids: Array[ScrapreasonId]): ConnectionIO[Map[ScrapreasonId, Option[ScrapreasonRow]]]
   def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow]
   def update(row: ScrapreasonRow): ConnectionIO[Boolean]
   def upsert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow]

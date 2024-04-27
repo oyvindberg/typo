@@ -134,6 +134,10 @@ class EmployeeRepoImpl extends EmployeeRepo {
        """.as(EmployeeRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId])(implicit c: Connection): Map[BusinessentityId, Option[EmployeeRow]] = {
+    val byId = selectByIds(businessentityids).view.map(x => (x.businessentityid, x)).toMap
+    businessentityids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
     UpdateBuilder("humanresources.employee", EmployeeFields.structure, EmployeeRow.rowParser)
   }

@@ -99,6 +99,12 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
        """.query(using ProductdocumentRow.read).stream
     
   }
+  override def selectByIdsTracked(compositeIds: Array[ProductdocumentId]): ConnectionIO[Map[ProductdocumentId, Option[ProductdocumentRow]]] = {
+    selectByIds(compositeIds).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
     UpdateBuilder("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.read)
   }

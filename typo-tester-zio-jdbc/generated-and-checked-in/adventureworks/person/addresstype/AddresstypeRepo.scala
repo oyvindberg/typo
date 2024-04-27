@@ -28,6 +28,7 @@ trait AddresstypeRepo {
   def selectAll: ZStream[ZConnection, Throwable, AddresstypeRow]
   def selectById(addresstypeid: AddresstypeId): ZIO[ZConnection, Throwable, Option[AddresstypeRow]]
   def selectByIds(addresstypeids: Array[AddresstypeId]): ZStream[ZConnection, Throwable, AddresstypeRow]
+  def selectByIdsTracked(addresstypeids: Array[AddresstypeId]): ZIO[ZConnection, Throwable, Map[AddresstypeId, Option[AddresstypeRow]]]
   def update: UpdateBuilder[AddresstypeFields, AddresstypeRow]
   def update(row: AddresstypeRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: AddresstypeRow): ZIO[ZConnection, Throwable, UpdateResult[AddresstypeRow]]

@@ -97,6 +97,12 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
        """.query(using ProductcosthistoryRow.jdbcDecoder).selectStream()
     
   }
+  override def selectByIdsTracked(compositeIds: Array[ProductcosthistoryId]): ZIO[ZConnection, Throwable, Map[ProductcosthistoryId, Option[ProductcosthistoryRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     UpdateBuilder("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.jdbcDecoder)
   }

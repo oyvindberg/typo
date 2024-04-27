@@ -100,6 +100,12 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
   override def selectByIds(stateprovinceids: Array[StateprovinceId]): Stream[ConnectionIO, StateprovinceRow] = {
     sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ANY(${stateprovinceids})""".query(using StateprovinceRow.read).stream
   }
+  override def selectByIdsTracked(stateprovinceids: Array[StateprovinceId]): ConnectionIO[Map[StateprovinceId, Option[StateprovinceRow]]] = {
+    selectByIds(stateprovinceids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.stateprovinceid, x)).toMap
+      stateprovinceids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
     UpdateBuilder("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.read)
   }

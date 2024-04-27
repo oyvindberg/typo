@@ -25,6 +25,7 @@ trait PersonphoneRepo {
   def selectAll(implicit c: Connection): List[PersonphoneRow]
   def selectById(compositeId: PersonphoneId)(implicit c: Connection): Option[PersonphoneRow]
   def selectByIds(compositeIds: Array[PersonphoneId])(implicit c: Connection): List[PersonphoneRow]
+  def selectByIdsTracked(compositeIds: Array[PersonphoneId])(implicit c: Connection): Map[PersonphoneId, Option[PersonphoneRow]]
   def update: UpdateBuilder[PersonphoneFields, PersonphoneRow]
   def update(row: PersonphoneRow)(implicit c: Connection): Boolean
   def upsert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow

@@ -100,6 +100,12 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
        """.query(using SpecialofferproductRow.jdbcDecoder).selectStream()
     
   }
+  override def selectByIdsTracked(compositeIds: Array[SpecialofferproductId]): ZIO[ZConnection, Throwable, Map[SpecialofferproductId, Option[SpecialofferproductRow]]] = {
+    selectByIds(compositeIds).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
     UpdateBuilder("sales.specialofferproduct", SpecialofferproductFields.structure, SpecialofferproductRow.jdbcDecoder)
   }

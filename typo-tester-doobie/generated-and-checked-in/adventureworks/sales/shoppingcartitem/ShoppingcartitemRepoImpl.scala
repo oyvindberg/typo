@@ -94,6 +94,12 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): Stream[ConnectionIO, ShoppingcartitemRow] = {
     sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem where "shoppingcartitemid" = ANY(${shoppingcartitemids})""".query(using ShoppingcartitemRow.read).stream
   }
+  override def selectByIdsTracked(shoppingcartitemids: Array[ShoppingcartitemId]): ConnectionIO[Map[ShoppingcartitemId, Option[ShoppingcartitemRow]]] = {
+    selectByIds(shoppingcartitemids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.shoppingcartitemid, x)).toMap
+      shoppingcartitemids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.read)
   }

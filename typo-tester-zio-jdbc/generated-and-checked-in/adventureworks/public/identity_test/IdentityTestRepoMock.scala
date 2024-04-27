@@ -78,6 +78,12 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
   override def selectByIds(names: Array[IdentityTestId]): ZStream[ZConnection, Throwable, IdentityTestRow] = {
     ZStream.fromIterable(names.flatMap(map.get))
   }
+  override def selectByIdsTracked(names: Array[IdentityTestId]): ZIO[ZConnection, Throwable, Map[IdentityTestId, Option[IdentityTestRow]]] = {
+    selectByIds(names).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.name, x)).toMap
+      names.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
     UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure.fields, map)
   }

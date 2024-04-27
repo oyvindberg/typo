@@ -84,6 +84,12 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId]): Stream[ConnectionIO, PhonenumbertypeRow] = {
     sql"""select "phonenumbertypeid", "name", "modifieddate"::text from person.phonenumbertype where "phonenumbertypeid" = ANY(${phonenumbertypeids})""".query(using PhonenumbertypeRow.read).stream
   }
+  override def selectByIdsTracked(phonenumbertypeids: Array[PhonenumbertypeId]): ConnectionIO[Map[PhonenumbertypeId, Option[PhonenumbertypeRow]]] = {
+    selectByIds(phonenumbertypeids).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.phonenumbertypeid, x)).toMap
+      phonenumbertypeids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.read)
   }

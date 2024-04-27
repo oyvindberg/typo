@@ -28,6 +28,7 @@ trait TransactionhistoryarchiveRepo {
   def selectAll: ZStream[ZConnection, Throwable, TransactionhistoryarchiveRow]
   def selectById(transactionid: TransactionhistoryarchiveId): ZIO[ZConnection, Throwable, Option[TransactionhistoryarchiveRow]]
   def selectByIds(transactionids: Array[TransactionhistoryarchiveId]): ZStream[ZConnection, Throwable, TransactionhistoryarchiveRow]
+  def selectByIdsTracked(transactionids: Array[TransactionhistoryarchiveId]): ZIO[ZConnection, Throwable, Map[TransactionhistoryarchiveId, Option[TransactionhistoryarchiveRow]]]
   def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow]
   def update(row: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, UpdateResult[TransactionhistoryarchiveRow]]

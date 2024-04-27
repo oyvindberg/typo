@@ -78,6 +78,12 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
   override def selectByIds(workorderids: Array[WorkorderId]): ZStream[ZConnection, Throwable, WorkorderRow] = {
     ZStream.fromIterable(workorderids.flatMap(map.get))
   }
+  override def selectByIdsTracked(workorderids: Array[WorkorderId]): ZIO[ZConnection, Throwable, Map[WorkorderId, Option[WorkorderRow]]] = {
+    selectByIds(workorderids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.workorderid, x)).toMap
+      workorderids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
     UpdateBuilderMock(UpdateParams.empty, WorkorderFields.structure.fields, map)
   }

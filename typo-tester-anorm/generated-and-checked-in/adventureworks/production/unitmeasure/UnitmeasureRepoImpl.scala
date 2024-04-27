@@ -98,6 +98,10 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
        """.as(UnitmeasureRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): Map[UnitmeasureId, Option[UnitmeasureRow]] = {
+    val byId = selectByIds(unitmeasurecodes).view.map(x => (x.unitmeasurecode, x)).toMap
+    unitmeasurecodes.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
     UpdateBuilder("production.unitmeasure", UnitmeasureFields.structure, UnitmeasureRow.rowParser)
   }

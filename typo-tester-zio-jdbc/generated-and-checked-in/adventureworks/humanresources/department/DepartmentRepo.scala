@@ -28,6 +28,7 @@ trait DepartmentRepo {
   def selectAll: ZStream[ZConnection, Throwable, DepartmentRow]
   def selectById(departmentid: DepartmentId): ZIO[ZConnection, Throwable, Option[DepartmentRow]]
   def selectByIds(departmentids: Array[DepartmentId]): ZStream[ZConnection, Throwable, DepartmentRow]
+  def selectByIdsTracked(departmentids: Array[DepartmentId]): ZIO[ZConnection, Throwable, Map[DepartmentId, Option[DepartmentRow]]]
   def update: UpdateBuilder[DepartmentFields, DepartmentRow]
   def update(row: DepartmentRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: DepartmentRow): ZIO[ZConnection, Throwable, UpdateResult[DepartmentRow]]

@@ -92,6 +92,12 @@ class LocationRepoImpl extends LocationRepo {
   override def selectByIds(locationids: Array[LocationId]): ZStream[ZConnection, Throwable, LocationRow] = {
     sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ANY(${Segment.paramSegment(locationids)(LocationId.arraySetter)})""".query(using LocationRow.jdbcDecoder).selectStream()
   }
+  override def selectByIdsTracked(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Map[LocationId, Option[LocationRow]]] = {
+    selectByIds(locationids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.locationid, x)).toMap
+      locationids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
     UpdateBuilder("production.location", LocationFields.structure, LocationRow.jdbcDecoder)
   }

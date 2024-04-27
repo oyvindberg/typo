@@ -116,6 +116,12 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
        """.query(using SalesorderdetailRow.read).stream
     
   }
+  override def selectByIdsTracked(compositeIds: Array[SalesorderdetailId]): ConnectionIO[Map[SalesorderdetailId, Option[SalesorderdetailRow]]] = {
+    selectByIds(compositeIds).compile.toList.map { rows =>
+      val byId = rows.view.map(x => (x.compositeId, x)).toMap
+      compositeIds.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
     UpdateBuilder("sales.salesorderdetail", SalesorderdetailFields.structure, SalesorderdetailRow.read)
   }

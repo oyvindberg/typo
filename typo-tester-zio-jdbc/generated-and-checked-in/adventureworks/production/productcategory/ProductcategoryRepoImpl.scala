@@ -88,6 +88,12 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def selectByIds(productcategoryids: Array[ProductcategoryId]): ZStream[ZConnection, Throwable, ProductcategoryRow] = {
     sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory where "productcategoryid" = ANY(${Segment.paramSegment(productcategoryids)(ProductcategoryId.arraySetter)})""".query(using ProductcategoryRow.jdbcDecoder).selectStream()
   }
+  override def selectByIdsTracked(productcategoryids: Array[ProductcategoryId]): ZIO[ZConnection, Throwable, Map[ProductcategoryId, Option[ProductcategoryRow]]] = {
+    selectByIds(productcategoryids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.productcategoryid, x)).toMap
+      productcategoryids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[ProductcategoryFields, ProductcategoryRow] = {
     UpdateBuilder("production.productcategory", ProductcategoryFields.structure, ProductcategoryRow.jdbcDecoder)
   }

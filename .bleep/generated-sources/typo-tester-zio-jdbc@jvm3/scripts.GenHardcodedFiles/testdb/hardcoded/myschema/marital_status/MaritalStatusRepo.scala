@@ -27,6 +27,7 @@ trait MaritalStatusRepo {
   def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, MaritalStatusRow]
   def selectById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Option[MaritalStatusRow]]
   def selectByIds(ids: Array[MaritalStatusId]): ZStream[ZConnection, Throwable, MaritalStatusRow]
+  def selectByIdsTracked(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Map[MaritalStatusId, Option[MaritalStatusRow]]]
   def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow]
   def upsert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, UpdateResult[MaritalStatusRow]]
 }

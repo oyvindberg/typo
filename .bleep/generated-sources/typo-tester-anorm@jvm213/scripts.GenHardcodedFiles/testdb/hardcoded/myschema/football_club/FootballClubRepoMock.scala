@@ -62,6 +62,10 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
   override def selectByIds(ids: Array[FootballClubId])(implicit c: Connection): List[FootballClubRow] = {
     ids.flatMap(map.get).toList
   }
+  override def selectByIdsTracked(ids: Array[FootballClubId])(implicit c: Connection): Map[FootballClubId, Option[FootballClubRow]] = {
+    val byId = selectByIds(ids).view.map(x => (x.id, x)).toMap
+    ids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
     UpdateBuilderMock(UpdateParams.empty, FootballClubFields.structure.fields, map)
   }

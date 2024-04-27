@@ -109,6 +109,10 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
        """.as(PersonphoneRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(compositeIds: Array[PersonphoneId])(implicit c: Connection): Map[PersonphoneId, Option[PersonphoneRow]] = {
+    val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
+    compositeIds.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
     UpdateBuilder("person.personphone", PersonphoneFields.structure, PersonphoneRow.rowParser)
   }

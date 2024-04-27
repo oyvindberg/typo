@@ -101,6 +101,10 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
        """.as(ContacttypeRow.rowParser(1).*)
     
   }
+  override def selectByIdsTracked(contacttypeids: Array[ContacttypeId])(implicit c: Connection): Map[ContacttypeId, Option[ContacttypeRow]] = {
+    val byId = selectByIds(contacttypeids).view.map(x => (x.contacttypeid, x)).toMap
+    contacttypeids.view.map(id => (id, byId.get(id))).toMap
+  }
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
     UpdateBuilder("person.contacttype", ContacttypeFields.structure, ContacttypeRow.rowParser)
   }

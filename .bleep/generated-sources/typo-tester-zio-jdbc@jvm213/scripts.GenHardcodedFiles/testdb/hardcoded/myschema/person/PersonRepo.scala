@@ -30,6 +30,7 @@ trait PersonRepo {
   def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, PersonRow]
   def selectById(id: PersonId): ZIO[ZConnection, Throwable, Option[PersonRow]]
   def selectByIds(ids: Array[PersonId]): ZStream[ZConnection, Throwable, PersonRow]
+  def selectByIdsTracked(ids: Array[PersonId]): ZIO[ZConnection, Throwable, Map[PersonId, Option[PersonRow]]]
   def update: UpdateBuilder[PersonFields, PersonRow]
   def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean]
   def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean]

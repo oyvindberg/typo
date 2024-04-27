@@ -26,6 +26,7 @@ trait ProductsubcategoryRepo {
   def selectAll: Stream[ConnectionIO, ProductsubcategoryRow]
   def selectById(productsubcategoryid: ProductsubcategoryId): ConnectionIO[Option[ProductsubcategoryRow]]
   def selectByIds(productsubcategoryids: Array[ProductsubcategoryId]): Stream[ConnectionIO, ProductsubcategoryRow]
+  def selectByIdsTracked(productsubcategoryids: Array[ProductsubcategoryId]): ConnectionIO[Map[ProductsubcategoryId, Option[ProductsubcategoryRow]]]
   def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow]
   def update(row: ProductsubcategoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow]

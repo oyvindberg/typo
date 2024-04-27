@@ -104,6 +104,12 @@ class SalespersonRepoImpl extends SalespersonRepo {
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, SalespersonRow] = {
     sql"""select "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text from sales.salesperson where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(using SalespersonRow.jdbcDecoder).selectStream()
   }
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, Option[SalespersonRow]]] = {
+    selectByIds(businessentityids).runCollect.map { rows =>
+      val byId = rows.view.map(x => (x.businessentityid, x)).toMap
+      businessentityids.view.map(id => (id, byId.get(id))).toMap
+    }
+  }
   override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
     UpdateBuilder("sales.salesperson", SalespersonFields.structure, SalespersonRow.jdbcDecoder)
   }
