@@ -122,6 +122,7 @@ trait AddressRepo {
   def selectAll(implicit c: Connection): List[AddressRow]
   def selectById(addressid: AddressId)(implicit c: Connection): Option[AddressRow]
   def selectByIds(addressids: Array[AddressId])(implicit c: Connection): List[AddressRow]
+  def selectByIdsTracked(addressids: Array[AddressId])(implicit c: Connection): Map[AddressId, Option[AddressRow]]
   def update: UpdateBuilder[AddressFields, AddressRow]
   def update(row: AddressRow)(implicit c: Connection): Boolean
   def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow
