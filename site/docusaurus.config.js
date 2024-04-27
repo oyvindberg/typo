@@ -82,8 +82,8 @@ const config = {
         copyright: `Copyright © ${new Date().getFullYear()} Øyvind Raddum Berg`,
       },
       prism: {
-        theme: require("prism-react-renderer/themes/github"),
-        darkTheme: require("prism-react-renderer/themes/oceanicNext"),
+        theme: require("prism-react-renderer").themes.github,
+        darkTheme: require("prism-react-renderer").themes.oceanicNext,
         additionalLanguages: ["java", "scala", "yaml"],
       },
     }),
