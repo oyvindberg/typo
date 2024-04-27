@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunksite=self.webpackChunksite||[]).push([[9855],{7728:e=>{e.exports=JSON.parse('{"label":"doobie","permalink":"/typo/blog/tags/doobie","allTagsPath":"/typo/blog/tags","count":1,"unlisted":false}')}}]);

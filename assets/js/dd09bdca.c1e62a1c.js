@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunksite=self.webpackChunksite||[]).push([[5388],{1384:s=>{s.exports=JSON.parse('{"label":"zio-jdbc","permalink":"/typo/blog/tags/zio-jdbc","allTagsPath":"/typo/blog/tags","count":1,"unlisted":false}')}}]);

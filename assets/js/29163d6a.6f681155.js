@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunksite=self.webpackChunksite||[]).push([[8367],{9541:e=>{e.exports=JSON.parse('{"label":"compile-times","permalink":"/typo/blog/tags/compile-times","allTagsPath":"/typo/blog/tags","count":1,"unlisted":false}')}}]);
