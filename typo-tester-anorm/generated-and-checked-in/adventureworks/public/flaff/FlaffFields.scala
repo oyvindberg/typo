@@ -10,6 +10,10 @@ package flaff
 import adventureworks.public.ShortText
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
@@ -27,6 +31,11 @@ trait FlaffFields {
       .withColumnPair(anotherCode, _.anotherCode)
       .withColumnPair(someNumber, _.someNumber)
       .withColumnPair(parentspecifier, _.specifier)
+  def compositeIdIs(compositeId: FlaffId): SqlExpr[Boolean, Required] =
+    code.isEqual(compositeId.code).and(anotherCode.isEqual(compositeId.anotherCode)).and(someNumber.isEqual(compositeId.someNumber)).and(specifier.isEqual(compositeId.specifier))
+  def compositeIdIn(compositeIds: Array[FlaffId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(code)(_.code), TuplePart(anotherCode)(_.anotherCode), TuplePart(someNumber)(_.someNumber), TuplePart(specifier)(_.specifier))
+  
 }
 
 object FlaffFields {

@@ -19,6 +19,10 @@ import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.production.productmodel.ProductmodelRow
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -38,6 +42,11 @@ trait ProductmodelproductdescriptioncultureFields {
   def fkProductmodel: ForeignKey[ProductmodelFields, ProductmodelRow] =
     ForeignKey[ProductmodelFields, ProductmodelRow]("production.FK_ProductModelProductDescriptionCulture_ProductModel_ProductMo", Nil)
       .withColumnPair(productmodelid, _.productmodelid)
+  def compositeIdIs(compositeId: ProductmodelproductdescriptioncultureId): SqlExpr[Boolean, Required] =
+    productmodelid.isEqual(compositeId.productmodelid).and(productdescriptionid.isEqual(compositeId.productdescriptionid)).and(cultureid.isEqual(compositeId.cultureid))
+  def compositeIdIn(compositeIds: Array[ProductmodelproductdescriptioncultureId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(productmodelid)(_.productmodelid), TuplePart(productdescriptionid)(_.productdescriptionid), TuplePart(cultureid)(_.cultureid))
+  
 }
 
 object ProductmodelproductdescriptioncultureFields {

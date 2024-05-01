@@ -20,6 +20,10 @@ import adventureworks.humanresources.shift.ShiftRow
 import adventureworks.person.businessentity.BusinessentityId
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -42,6 +46,11 @@ trait EmployeedepartmenthistoryFields {
   def fkShift: ForeignKey[ShiftFields, ShiftRow] =
     ForeignKey[ShiftFields, ShiftRow]("humanresources.FK_EmployeeDepartmentHistory_Shift_ShiftID", Nil)
       .withColumnPair(shiftid, _.shiftid)
+  def compositeIdIs(compositeId: EmployeedepartmenthistoryId): SqlExpr[Boolean, Required] =
+    businessentityid.isEqual(compositeId.businessentityid).and(startdate.isEqual(compositeId.startdate)).and(departmentid.isEqual(compositeId.departmentid)).and(shiftid.isEqual(compositeId.shiftid))
+  def compositeIdIn(compositeIds: Array[EmployeedepartmenthistoryId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(businessentityid)(_.businessentityid), TuplePart(startdate)(_.startdate), TuplePart(departmentid)(_.departmentid), TuplePart(shiftid)(_.shiftid))
+  
 }
 
 object EmployeedepartmenthistoryFields {

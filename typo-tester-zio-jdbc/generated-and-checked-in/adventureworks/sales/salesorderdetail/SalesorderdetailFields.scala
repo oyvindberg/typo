@@ -19,6 +19,10 @@ import adventureworks.sales.specialofferproduct.SpecialofferproductFields
 import adventureworks.sales.specialofferproduct.SpecialofferproductRow
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -43,6 +47,11 @@ trait SalesorderdetailFields {
     ForeignKey[SpecialofferproductFields, SpecialofferproductRow]("sales.FK_SalesOrderDetail_SpecialOfferProduct_SpecialOfferIDProductID", Nil)
       .withColumnPair(specialofferid, _.specialofferid)
       .withColumnPair(productid, _.productid)
+  def compositeIdIs(compositeId: SalesorderdetailId): SqlExpr[Boolean, Required] =
+    salesorderid.isEqual(compositeId.salesorderid).and(salesorderdetailid.isEqual(compositeId.salesorderdetailid))
+  def compositeIdIn(compositeIds: Array[SalesorderdetailId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(salesorderid)(_.salesorderid), TuplePart(salesorderdetailid)(_.salesorderdetailid))
+  
 }
 
 object SalesorderdetailFields {

@@ -211,7 +211,27 @@ object SqlExpr {
     def desc(implicit O: Ordering[T], N: Nullability[N]): SortOrder[T, N] = SortOrder(expr, ascending = false, nullsFirst = false)
   }
 
-  final case class RowExpr(exprs: List[SqlExpr.SqlExprNoHkt[?]]) extends SqlExpr[List[?], Required] {
+  case class CompositeIn[Tuple, Row](tuples: Array[Tuple])(val parts: CompositeIn.TuplePart[Tuple, ?, Row]*) extends SqlExpr[Boolean, Required] {
+    override def render(ctx: RenderCtx): SqlFragment = {
+      val fieldNames: Seq[SqlFragment] =
+        parts.map(part => sql"${part.field.render(ctx)}")
+
+      val unnests: Seq[SqlFragment] =
+        parts
+          .map { case part: CompositeIn.TuplePart[Tuple, t, Row] =>
+            val partExpr: Const[Array[t], Required] = part.asConst(tuples.map(part.extract)(part.CT))
+            sql"unnest(${partExpr.render(ctx)})"
+          }
+
+      sql"(${fieldNames.mkFragment(", ")}) in (select ${unnests.mkFragment(", ")})"
+    }
+  }
+
+  object CompositeIn {
+    case class TuplePart[Tuple, T, Row](field: IdField[T, Row])(val extract: Tuple => T)(implicit val asConst: Const.As[Array[T], Required], val CT: ClassTag[T])
+  }
+
+  case class RowExpr(exprs: List[SqlExpr.SqlExprNoHkt[?]]) extends SqlExpr[List[?], Required] {
     override def render(ctx: RenderCtx): SqlFragment = exprs.map(_.render(ctx)).mkFragment(sql"(", sql",", sql")")
   }
 

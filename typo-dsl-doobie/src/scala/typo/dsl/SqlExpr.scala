@@ -4,6 +4,7 @@ import cats.implicits.toFoldableOps
 import doobie.Fragment
 import doobie.implicits.toSqlInterpolator
 import doobie.util.{Put, Write}
+import typo.dsl.internal.mkFragment.FragmentOps
 
 import scala.reflect.ClassTag
 
@@ -199,6 +200,29 @@ object SqlExpr {
       fr"${expr.render(ctx)} = ANY(${Write.fromPut(ev).toFragment(values)})"
   }
 
+  case class CompositeIn[Tuple, Row](tuples: Array[Tuple])(val parts: CompositeIn.TuplePart[Tuple, ?, Row]*) extends SqlExpr[Boolean, Required] {
+    override def render(ctx: RenderCtx): Fragment = {
+      val fieldNames: Seq[Fragment] =
+        parts.map(part => fr"${part.field.render(ctx)}")
+
+      val unnests: Seq[Fragment] =
+        parts.map { case part: CompositeIn.TuplePart[Tuple, t, Row] =>
+          val partExpr: Const[Array[t], Required] = part.asConst(tuples.map(part.extract)(part.CT))
+          sql"unnest(${partExpr.render(ctx)})"
+        }
+
+      sql"(${fieldNames.mkFragment(fr",")}) in (select ${unnests.mkFragment(fr",")})"
+    }
+  }
+
+  object CompositeIn {
+    case class TuplePart[Tuple, T, Row](field: IdField[T, Row])(val extract: Tuple => T)(implicit val asConst: Const.As[Array[T], Required], val CT: ClassTag[T])
+  }
+
+  case class RowExpr(exprs: List[SqlExpr.SqlExprNoHkt[?]]) extends SqlExpr[List[?], Required] {
+    override def render(ctx: RenderCtx): Fragment = fr"(${exprs.map(_.render(ctx)).intercalate(fr",")})"
+  }
+
   final case class IsNull[T](expr: SqlExpr[T, Option]) extends SqlExpr[Boolean, Required] {
     override def render(ctx: RenderCtx): Fragment =
       fr"${expr.render(ctx)} IS NULL"
@@ -225,10 +249,6 @@ object SqlExpr {
   implicit class SqlExprSortSyntax[T, N[_]](private val expr: SqlExpr[T, N]) extends AnyVal {
     def asc(implicit O: Ordering[T], N: Nullability[N]): SortOrder[T, N] = SortOrder(expr, ascending = true, nullsFirst = false)
     def desc(implicit O: Ordering[T], N: Nullability[N]): SortOrder[T, N] = SortOrder(expr, ascending = false, nullsFirst = false)
-  }
-
-  final case class RowExpr(exprs: List[SqlExpr.SqlExprNoHkt[?]]) extends SqlExpr[List[?], Required] {
-    override def render(ctx: RenderCtx): Fragment = fr"(${exprs.map(_.render(ctx)).intercalate(fr",")})"
   }
 
   implicit class SqlExprArraySyntax[T, N[_]](private val expr: SqlExpr[Array[T], N]) extends AnyVal {

@@ -17,6 +17,10 @@ import adventureworks.person.phonenumbertype.PhonenumbertypeRow
 import adventureworks.public.Phone
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -33,6 +37,11 @@ trait PersonphoneFields {
   def fkPhonenumbertype: ForeignKey[PhonenumbertypeFields, PhonenumbertypeRow] =
     ForeignKey[PhonenumbertypeFields, PhonenumbertypeRow]("person.FK_PersonPhone_PhoneNumberType_PhoneNumberTypeID", Nil)
       .withColumnPair(phonenumbertypeid, _.phonenumbertypeid)
+  def compositeIdIs(compositeId: PersonphoneId): SqlExpr[Boolean, Required] =
+    businessentityid.isEqual(compositeId.businessentityid).and(phonenumber.isEqual(compositeId.phonenumber)).and(phonenumbertypeid.isEqual(compositeId.phonenumbertypeid))
+  def compositeIdIn(compositeIds: Array[PersonphoneId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(businessentityid)(_.businessentityid), TuplePart(phonenumber)(_.phonenumber), TuplePart(phonenumbertypeid)(_.phonenumbertypeid))
+  
 }
 
 object PersonphoneFields {

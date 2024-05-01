@@ -1,18 +1,18 @@
 package adventureworks.production.product
 
 import adventureworks.customtypes.{TypoLocalDateTime, TypoUUID, TypoXml}
-import adventureworks.person.businessentity.{BusinessentityId, BusinessentityRepo, BusinessentityRepoImpl, BusinessentityRepoMock, BusinessentityRow}
+import adventureworks.person.businessentity.*
 import adventureworks.person.emailaddress.{EmailaddressRepo, EmailaddressRepoImpl, EmailaddressRepoMock, EmailaddressRow}
 import adventureworks.person.person.{PersonRepo, PersonRepoImpl, PersonRepoMock, PersonRow}
-import adventureworks.production.productcosthistory.*
+import adventureworks.production.productcosthistory.ProductcosthistoryRepoImpl
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.{Name, NameStyle}
-import adventureworks.{TestInsert, withConnection}
 import adventureworks.userdefined.FirstName
+import adventureworks.{TestInsert, withConnection}
 import org.scalactic.TypeCheckedTripleEquals
-import org.scalatest.funsuite.AnyFunSuite
-import doobie.free.connection.delay
 import org.scalatest.Assertion
+import org.scalatest.funsuite.AnyFunSuite
+import zio.{Chunk, ZIO}
 
 import java.time.LocalDateTime
 import scala.util.Random
@@ -46,12 +46,12 @@ class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
         ph2 <- testInsert.productionProductcosthistory(product.productid, startdate = now.map(_.plusDays(1)), enddate = Some(now.map(_.plusDays(2))))
         ph3 <- testInsert.productionProductcosthistory(product.productid, startdate = now.map(_.plusDays(2)), enddate = Some(now.map(_.plusDays(3))))
         wanted = Array(ph1.compositeId, ph2.compositeId, ph3.compositeId.copy(productid = ProductId(9999)))
-        found <- repo.selectByIds(wanted).compile.toList
-        _ <- delay(assert(found.map(_.compositeId).toSet === Set(ph1.compositeId, ph2.compositeId)))
+        found <- repo.selectByIds(wanted).runCollect
+        _ <- ZIO.succeed(assert(found.map(_.compositeId).toSet === Set(ph1.compositeId, ph2.compositeId)))
         deleted <- repo.deleteByIds(wanted)
-        _ <- delay(assert(deleted === 2))
-        all <- repo.selectAll.compile.toList
-        _ <- delay(assert(all.map(_.compositeId) === List(ph3.compositeId)))
+        _ <- ZIO.succeed(assert(deleted === 2L))
+        all <- repo.selectAll.runCollect
+        _ <- ZIO.succeed(assert(all.map(_.compositeId) === Chunk(ph3.compositeId)))
       } yield true
     }
   }
@@ -92,17 +92,17 @@ class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
         _ <- emailaddressRepo.insert(EmailaddressRow(businessentity2.businessentityid, 1, Some("A@B.C"), TypoUUID.randomUUID, TypoLocalDateTime(now)))
         _ <- emailaddressRepo.insert(EmailaddressRow(businessentity2.businessentityid, 2, Some("AA@BB.CC"), TypoUUID.randomUUID, TypoLocalDateTime(now)))
         _ <- emailaddressRepo.insert(EmailaddressRow(businessentity2.businessentityid, 3, Some("AAA@BBB.CCC"), TypoUUID.randomUUID, TypoLocalDateTime(now)))
-        res1 <- emailaddressRepo.select.where(_.compositeIdIs(emailaddress1_1.compositeId)).toList
-        _ <- delay(assert(res1 === List(emailaddress1_1)))
+        res1 <- emailaddressRepo.select.where(_.compositeIdIs(emailaddress1_1.compositeId)).toChunk
+        _ <- ZIO.attempt(assert(res1.toList === List(emailaddress1_1)))
         query2 = emailaddressRepo.select
           .where(
             _.compositeIdIn(
               Array(emailaddress1_2.compositeId, emailaddress1_3.compositeId)
             )
           )
-        res2 <- query2.toList
-        _ <- delay(query2.sql.foreach(x => println(x)))
-      } yield assert(res2 === List(emailaddress1_2, emailaddress1_3))
+        res2 <- query2.toChunk
+        _ <- ZIO.attempt(query2.sql.foreach(x => println(x)))
+      } yield assert(res2.toList === List(emailaddress1_2, emailaddress1_3))
     }
   }
 

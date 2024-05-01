@@ -55,6 +55,12 @@ trait Structure[Fields, Row] {
         x.N.toOpt(untypedEval(x.expr, row))
       case x: SqlExpr.RowExpr =>
         x.exprs.map(expr => untypedEval(expr, row))
+      case x: SqlExpr.CompositeIn[t, Row] @unchecked /* for 2.13 */ =>
+        val thisRow: Seq[?] = x.parts.map(part => untypedEval(part.field, row))
+        x.tuples.exists { tuple =>
+          val thatRow: Seq[?] = x.parts.map(part => part.extract(tuple))
+          thisRow == thatRow
+        }
     }
 
   final def join[Fields2, Row2](other: Structure[Fields2, Row2]): Structure[Joined[Fields, Fields2], (Row, Row2)] =

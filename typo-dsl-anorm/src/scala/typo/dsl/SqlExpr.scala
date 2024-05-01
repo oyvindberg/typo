@@ -199,6 +199,30 @@ object SqlExpr {
     }
   }
 
+  case class CompositeIn[Tuple, Row](tuples: Array[Tuple])(val parts: CompositeIn.TuplePart[Tuple, ?, Row]*) extends SqlExpr[Boolean, Required] {
+    override def render(ctx: RenderCtx, counter: AtomicInteger): Fragment = {
+      val fieldNames: Seq[Fragment] =
+        parts.map(part => frag"${part.field.render(ctx, counter)}")
+
+      val unnests: Seq[Fragment] =
+        parts.map { case part: CompositeIn.TuplePart[Tuple, t, Row] =>
+          val partExpr: Const[Array[t], Required] = part.asConst(tuples.map(part.extract)(using part.CT))
+          frag"unnest(${partExpr.render(ctx, counter)})"
+        }
+
+      frag"(${fieldNames.mkFragment(", ")}) in (select ${unnests.mkFragment(", ")})"
+    }
+  }
+
+  object CompositeIn {
+    case class TuplePart[Tuple, T, Row](field: IdField[T, Row])(val extract: Tuple => T)(implicit val asConst: Const.As[Array[T], Required], val CT: ClassTag[T])
+  }
+
+  case class RowExpr(exprs: List[SqlExpr.SqlExprNoHkt[?]]) extends SqlExpr[List[?], Required] {
+    override def render(ctx: RenderCtx, counter: AtomicInteger): Fragment =
+      frag"(" ++ exprs.map(_.render(ctx, counter)).mkFragment(",") ++ frag")"
+  }
+
   final case class IsNull[T](expr: SqlExpr[T, Option]) extends SqlExpr[Boolean, Required] {
     override def render(ctx: RenderCtx, counter: AtomicInteger): Fragment =
       frag"${expr.render(ctx, counter)} IS NULL"
@@ -225,11 +249,6 @@ object SqlExpr {
   implicit class SqlExprSortSyntax[T, N[_]](private val expr: SqlExpr[T, N]) extends AnyVal {
     def asc(implicit O: Ordering[T], N: Nullability[N]): SortOrder[T, N] = SortOrder(expr, ascending = true, nullsFirst = false)
     def desc(implicit O: Ordering[T], N: Nullability[N]): SortOrder[T, N] = SortOrder(expr, ascending = false, nullsFirst = false)
-  }
-
-  final case class RowExpr(exprs: List[SqlExpr.SqlExprNoHkt[?]]) extends SqlExpr[List[?], Required] {
-    override def render(ctx: RenderCtx, counter: AtomicInteger): Fragment =
-      frag"(" ++ exprs.map(_.render(ctx, counter)).mkFragment(",") ++ frag")"
   }
 
   implicit class SqlExprArraySyntax[T, N[_]](private val expr: SqlExpr[Array[T], N]) extends AnyVal {

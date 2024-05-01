@@ -98,6 +98,8 @@ object sc {
 
     object dsl {
       val Bijection = Qualified("typo.dsl.Bijection")
+      val CompositeIn = Qualified("typo.dsl.SqlExpr.CompositeIn")
+      val CompositeTuplePart = Qualified("typo.dsl.SqlExpr.CompositeIn.TuplePart")
       val DeleteBuilder = Qualified("typo.dsl.DeleteBuilder")
       val DeleteBuilderMock = Qualified("typo.dsl.DeleteBuilder.DeleteBuilderMock")
       val DeleteParams = Qualified("typo.dsl.DeleteParams")
@@ -112,6 +114,7 @@ object sc {
       val SelectBuilderMock = Qualified("typo.dsl.SelectBuilderMock")
       val SelectBuilderSql = Qualified("typo.dsl.SelectBuilderSql")
       val SelectParams = Qualified("typo.dsl.SelectParams")
+      val SqlExpr = Qualified("typo.dsl.SqlExpr")
       val StructureRelation = Qualified("typo.dsl.Structure.Relation")
       val UpdatedValue = Qualified("typo.dsl.UpdatedValue")
       val UpdateBuilder = Qualified("typo.dsl.UpdateBuilder")

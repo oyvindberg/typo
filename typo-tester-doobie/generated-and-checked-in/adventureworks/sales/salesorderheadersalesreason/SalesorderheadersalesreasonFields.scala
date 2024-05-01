@@ -16,6 +16,10 @@ import adventureworks.sales.salesreason.SalesreasonId
 import adventureworks.sales.salesreason.SalesreasonRow
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -31,6 +35,11 @@ trait SalesorderheadersalesreasonFields {
   def fkSalesorderheader: ForeignKey[SalesorderheaderFields, SalesorderheaderRow] =
     ForeignKey[SalesorderheaderFields, SalesorderheaderRow]("sales.FK_SalesOrderHeaderSalesReason_SalesOrderHeader_SalesOrderID", Nil)
       .withColumnPair(salesorderid, _.salesorderid)
+  def compositeIdIs(compositeId: SalesorderheadersalesreasonId): SqlExpr[Boolean, Required] =
+    salesorderid.isEqual(compositeId.salesorderid).and(salesreasonid.isEqual(compositeId.salesreasonid))
+  def compositeIdIn(compositeIds: Array[SalesorderheadersalesreasonId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(salesorderid)(_.salesorderid), TuplePart(salesreasonid)(_.salesreasonid))
+  
 }
 
 object SalesorderheadersalesreasonFields {

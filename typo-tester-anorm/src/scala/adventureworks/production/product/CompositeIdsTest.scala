@@ -1,10 +1,16 @@
 package adventureworks.production.product
 
-import adventureworks.customtypes.{TypoLocalDateTime, TypoXml}
+import adventureworks.customtypes.{TypoLocalDateTime, TypoUUID, TypoXml}
+import adventureworks.person.businessentity.{BusinessentityId, BusinessentityRepo, BusinessentityRepoImpl, BusinessentityRepoMock, BusinessentityRow}
+import adventureworks.person.emailaddress.{EmailaddressRepo, EmailaddressRepoImpl, EmailaddressRepoMock, EmailaddressRow}
+import adventureworks.person.person.{PersonRepo, PersonRepoImpl, PersonRepoMock, PersonRow}
 import adventureworks.production.productcosthistory.*
 import adventureworks.production.unitmeasure.UnitmeasureId
+import adventureworks.public.{Name, NameStyle}
+import adventureworks.userdefined.FirstName
 import adventureworks.{TestInsert, withConnection}
 import org.scalactic.TypeCheckedTripleEquals
+import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.LocalDateTime
@@ -45,5 +51,62 @@ class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(repo.deleteByIds(wanted) === 2): @nowarn
       assert(repo.selectAll.map(_.compositeId) === List(ph3.compositeId))
     }
+  }
+
+  def testDsl(
+      emailaddressRepo: EmailaddressRepo,
+      businessentityRepo: BusinessentityRepo,
+      personRepo: PersonRepo
+  ): Assertion = {
+    val now = LocalDateTime.of(2021, 1, 1, 0, 0)
+
+    def personRow(businessentityid: BusinessentityId, i: Int) =
+      new PersonRow(
+        businessentityid = businessentityid,
+        persontype = "SC",
+        namestyle = NameStyle(true),
+        title = None,
+        firstname = FirstName(s"first name $i"),
+        middlename = None,
+        lastname = Name(s"last name $i"),
+        suffix = None,
+        emailpromotion = 1,
+        additionalcontactinfo = None,
+        demographics = None,
+        rowguid = TypoUUID.randomUUID,
+        modifieddate = TypoLocalDateTime(now)
+      )
+
+    withConnection { implicit c =>
+      val businessentity1 = businessentityRepo.insert(BusinessentityRow(BusinessentityId(1), TypoUUID.randomUUID, TypoLocalDateTime(now)))
+      personRepo.insert(personRow(businessentity1.businessentityid, 1)): @nowarn
+      val businessentity2 = businessentityRepo.insert(BusinessentityRow(BusinessentityId(2), TypoUUID.randomUUID, TypoLocalDateTime(now)))
+      personRepo.insert(personRow(businessentity2.businessentityid, 2)): @nowarn
+      val emailaddress1_1 = emailaddressRepo.insert(EmailaddressRow(businessentity1.businessentityid, 1, Some("a@b.c"), TypoUUID.randomUUID, TypoLocalDateTime(now)))
+      val emailaddress1_2 = emailaddressRepo.insert(EmailaddressRow(businessentity1.businessentityid, 2, Some("aa@bb.cc"), TypoUUID.randomUUID, TypoLocalDateTime(now)))
+      val emailaddress1_3 = emailaddressRepo.insert(EmailaddressRow(businessentity1.businessentityid, 3, Some("aaa@bbb.ccc"), TypoUUID.randomUUID, TypoLocalDateTime(now)))
+      emailaddressRepo.insert(EmailaddressRow(businessentity2.businessentityid, 1, Some("A@B.C"), TypoUUID.randomUUID, TypoLocalDateTime(now))): @nowarn
+      emailaddressRepo.insert(EmailaddressRow(businessentity2.businessentityid, 2, Some("AA@BB.CC"), TypoUUID.randomUUID, TypoLocalDateTime(now))): @nowarn
+      emailaddressRepo.insert(EmailaddressRow(businessentity2.businessentityid, 3, Some("AAA@BBB.CCC"), TypoUUID.randomUUID, TypoLocalDateTime(now))): @nowarn
+      val res1 = emailaddressRepo.select.where(_.compositeIdIs(emailaddress1_1.compositeId)).toList
+      assert(res1 === List(emailaddress1_1)): @nowarn
+      val query2 = emailaddressRepo.select
+        .where(
+          _.compositeIdIn(
+            Array(emailaddress1_2.compositeId, emailaddress1_3.compositeId)
+          )
+        )
+      val res2 = query2.toList
+      query2.sql.foreach(x => println(x))
+      assert(res2 === List(emailaddress1_2, emailaddress1_3))
+    }
+  }
+
+  test("dsl pg") {
+    testDsl(new EmailaddressRepoImpl(), new BusinessentityRepoImpl(), new PersonRepoImpl())
+  }
+
+  test("dsl in-memory") {
+    testDsl(new EmailaddressRepoMock(_.toRow(???, ???, ???)), new BusinessentityRepoMock(_.toRow(???, ???, ???)), new PersonRepoMock(_.toRow(???, ???, ???, ???)))
   }
 }

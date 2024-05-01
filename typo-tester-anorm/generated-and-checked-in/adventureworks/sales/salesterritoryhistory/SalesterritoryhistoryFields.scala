@@ -17,6 +17,10 @@ import adventureworks.sales.salesterritory.SalesterritoryId
 import adventureworks.sales.salesterritory.SalesterritoryRow
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -36,6 +40,11 @@ trait SalesterritoryhistoryFields {
   def fkSalesterritory: ForeignKey[SalesterritoryFields, SalesterritoryRow] =
     ForeignKey[SalesterritoryFields, SalesterritoryRow]("sales.FK_SalesTerritoryHistory_SalesTerritory_TerritoryID", Nil)
       .withColumnPair(territoryid, _.territoryid)
+  def compositeIdIs(compositeId: SalesterritoryhistoryId): SqlExpr[Boolean, Required] =
+    businessentityid.isEqual(compositeId.businessentityid).and(startdate.isEqual(compositeId.startdate)).and(territoryid.isEqual(compositeId.territoryid))
+  def compositeIdIn(compositeIds: Array[SalesterritoryhistoryId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(businessentityid)(_.businessentityid), TuplePart(startdate)(_.startdate), TuplePart(territoryid)(_.territoryid))
+  
 }
 
 object SalesterritoryhistoryFields {
