@@ -12,39 +12,40 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait BusinessentityaddressFields[Row] {
-  val businessentityid: IdField[BusinessentityId, Row]
-  val addressid: IdField[AddressId, Row]
-  val addresstypeid: IdField[AddresstypeId, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait BusinessentityaddressFields {
+  def businessentityid: IdField[BusinessentityId, BusinessentityaddressRow]
+  def addressid: IdField[AddressId, BusinessentityaddressRow]
+  def addresstypeid: IdField[AddresstypeId, BusinessentityaddressRow]
+  def rowguid: Field[TypoUUID, BusinessentityaddressRow]
+  def modifieddate: Field[TypoLocalDateTime, BusinessentityaddressRow]
 }
 
 object BusinessentityaddressFields {
-  val structure: Relation[BusinessentityaddressFields, BusinessentityaddressRow, BusinessentityaddressRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[BusinessentityaddressFields, BusinessentityaddressRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => BusinessentityaddressRow, val merge: (Row, BusinessentityaddressRow) => Row)
-    extends Relation[BusinessentityaddressFields, BusinessentityaddressRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[BusinessentityaddressFields, BusinessentityaddressRow] {
   
-    override val fields: BusinessentityaddressFields[Row] = new BusinessentityaddressFields[Row] {
-      override val businessentityid = new IdField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val addressid = new IdField[AddressId, Row](prefix, "addressid", None, Some("int4"))(x => extract(x).addressid, (row, value) => merge(row, extract(row).copy(addressid = value)))
-      override val addresstypeid = new IdField[AddresstypeId, Row](prefix, "addresstypeid", None, Some("int4"))(x => extract(x).addresstypeid, (row, value) => merge(row, extract(row).copy(addresstypeid = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: BusinessentityaddressFields = new BusinessentityaddressFields {
+      override def businessentityid = IdField[BusinessentityId, BusinessentityaddressRow](_path, "businessentityid", None, Some("int4"), x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def addressid = IdField[AddressId, BusinessentityaddressRow](_path, "addressid", None, Some("int4"), x => x.addressid, (row, value) => row.copy(addressid = value))
+      override def addresstypeid = IdField[AddresstypeId, BusinessentityaddressRow](_path, "addresstypeid", None, Some("int4"), x => x.addresstypeid, (row, value) => row.copy(addresstypeid = value))
+      override def rowguid = Field[TypoUUID, BusinessentityaddressRow](_path, "rowguid", None, Some("uuid"), x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, BusinessentityaddressRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.businessentityid, fields.addressid, fields.addresstypeid, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, BusinessentityaddressRow]] =
+      List[FieldLikeNoHkt[?, BusinessentityaddressRow]](fields.businessentityid, fields.addressid, fields.addresstypeid, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => BusinessentityaddressRow, merge: (NewRow, BusinessentityaddressRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

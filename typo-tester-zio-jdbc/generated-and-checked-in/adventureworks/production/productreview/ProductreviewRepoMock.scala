@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, ProductreviewRow],
                             map: scala.collection.mutable.Map[ProductreviewId, ProductreviewRow] = scala.collection.mutable.Map.empty) extends ProductreviewRepo {
   override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductreviewFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, ProductreviewFields.structure, map)
   }
   override def deleteById(productreviewid: ProductreviewId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(productreviewid).isDefined)
@@ -85,7 +85,7 @@ class ProductreviewRepoMock(toRow: Function1[ProductreviewRowUnsaved, Productrev
     }
   }
   override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductreviewFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, ProductreviewFields.structure, map)
   }
   override def update(row: ProductreviewRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

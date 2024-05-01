@@ -8,35 +8,36 @@ package hardcoded
 package compositepk
 package person
 
+import typo.dsl.Path
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait PersonFields[Row] {
-  val one: IdField[Long, Row]
-  val two: IdField[Option[String], Row]
-  val name: OptField[String, Row]
+trait PersonFields {
+  def one: IdField[Long, PersonRow]
+  def two: IdField[Option[String], PersonRow]
+  def name: OptField[String, PersonRow]
 }
 
 object PersonFields {
-  val structure: Relation[PersonFields, PersonRow, PersonRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PersonFields, PersonRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PersonRow, val merge: (Row, PersonRow) => Row)
-    extends Relation[PersonFields, PersonRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PersonFields, PersonRow] {
   
-    override val fields: PersonFields[Row] = new PersonFields[Row] {
-      override val one = new IdField[Long, Row](prefix, "one", None, Some("int8"))(x => extract(x).one, (row, value) => merge(row, extract(row).copy(one = value)))
-      override val two = new IdField[Option[String], Row](prefix, "two", None, None)(x => extract(x).two, (row, value) => merge(row, extract(row).copy(two = value)))
-      override val name = new OptField[String, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+    override lazy val fields: PersonFields = new PersonFields {
+      override def one = IdField[Long, PersonRow](_path, "one", None, Some("int8"), x => x.one, (row, value) => row.copy(one = value))
+      override def two = IdField[Option[String], PersonRow](_path, "two", None, None, x => x.two, (row, value) => row.copy(two = value))
+      override def name = OptField[String, PersonRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.one, fields.two, fields.name)
+    override lazy val columns: List[FieldLikeNoHkt[?, PersonRow]] =
+      List[FieldLikeNoHkt[?, PersonRow]](fields.one, fields.two, fields.name)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PersonRow, merge: (NewRow, PersonRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

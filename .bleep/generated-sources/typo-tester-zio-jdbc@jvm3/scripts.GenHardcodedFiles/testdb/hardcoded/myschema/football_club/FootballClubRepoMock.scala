@@ -26,7 +26,7 @@ import zio.stream.ZStream
 
 class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, FootballClubRow] = scala.collection.mutable.Map.empty) extends FootballClubRepo {
   override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
-    DeleteBuilderMock(DeleteParams.empty, FootballClubFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, FootballClubFields.structure, map)
   }
   override def deleteById(id: FootballClubId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(id).isDefined)
@@ -80,7 +80,7 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     }
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
-    UpdateBuilderMock(UpdateParams.empty, FootballClubFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, FootballClubFields.structure, map)
   }
   override def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

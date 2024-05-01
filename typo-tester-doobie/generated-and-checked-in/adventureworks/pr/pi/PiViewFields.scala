@@ -12,44 +12,45 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait PiViewFields[Row] {
-  val id: Field[ProductId, Row]
-  val productid: Field[ProductId, Row]
-  val locationid: Field[LocationId, Row]
-  val shelf: Field[/* max 10 chars */ String, Row]
-  val bin: Field[TypoShort, Row]
-  val quantity: Field[TypoShort, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait PiViewFields {
+  def id: Field[ProductId, PiViewRow]
+  def productid: Field[ProductId, PiViewRow]
+  def locationid: Field[LocationId, PiViewRow]
+  def shelf: Field[/* max 10 chars */ String, PiViewRow]
+  def bin: Field[TypoShort, PiViewRow]
+  def quantity: Field[TypoShort, PiViewRow]
+  def rowguid: Field[TypoUUID, PiViewRow]
+  def modifieddate: Field[TypoLocalDateTime, PiViewRow]
 }
 
 object PiViewFields {
-  val structure: Relation[PiViewFields, PiViewRow, PiViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PiViewFields, PiViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PiViewRow, val merge: (Row, PiViewRow) => Row)
-    extends Relation[PiViewFields, PiViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PiViewFields, PiViewRow] {
   
-    override val fields: PiViewFields[Row] = new PiViewFields[Row] {
-      override val id = new Field[ProductId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val locationid = new Field[LocationId, Row](prefix, "locationid", None, None)(x => extract(x).locationid, (row, value) => merge(row, extract(row).copy(locationid = value)))
-      override val shelf = new Field[/* max 10 chars */ String, Row](prefix, "shelf", None, None)(x => extract(x).shelf, (row, value) => merge(row, extract(row).copy(shelf = value)))
-      override val bin = new Field[TypoShort, Row](prefix, "bin", None, None)(x => extract(x).bin, (row, value) => merge(row, extract(row).copy(bin = value)))
-      override val quantity = new Field[TypoShort, Row](prefix, "quantity", None, None)(x => extract(x).quantity, (row, value) => merge(row, extract(row).copy(quantity = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: PiViewFields = new PiViewFields {
+      override def id = Field[ProductId, PiViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def productid = Field[ProductId, PiViewRow](_path, "productid", None, None, x => x.productid, (row, value) => row.copy(productid = value))
+      override def locationid = Field[LocationId, PiViewRow](_path, "locationid", None, None, x => x.locationid, (row, value) => row.copy(locationid = value))
+      override def shelf = Field[/* max 10 chars */ String, PiViewRow](_path, "shelf", None, None, x => x.shelf, (row, value) => row.copy(shelf = value))
+      override def bin = Field[TypoShort, PiViewRow](_path, "bin", None, None, x => x.bin, (row, value) => row.copy(bin = value))
+      override def quantity = Field[TypoShort, PiViewRow](_path, "quantity", None, None, x => x.quantity, (row, value) => row.copy(quantity = value))
+      override def rowguid = Field[TypoUUID, PiViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, PiViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.productid, fields.locationid, fields.shelf, fields.bin, fields.quantity, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, PiViewRow]] =
+      List[FieldLikeNoHkt[?, PiViewRow]](fields.id, fields.productid, fields.locationid, fields.shelf, fields.bin, fields.quantity, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PiViewRow, merge: (NewRow, PiViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

@@ -11,54 +11,55 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait PurchaseorderheaderFields[Row] {
-  val purchaseorderid: IdField[PurchaseorderheaderId, Row]
-  val revisionnumber: Field[TypoShort, Row]
-  val status: Field[TypoShort, Row]
-  val employeeid: Field[BusinessentityId, Row]
-  val vendorid: Field[BusinessentityId, Row]
-  val shipmethodid: Field[ShipmethodId, Row]
-  val orderdate: Field[TypoLocalDateTime, Row]
-  val shipdate: OptField[TypoLocalDateTime, Row]
-  val subtotal: Field[BigDecimal, Row]
-  val taxamt: Field[BigDecimal, Row]
-  val freight: Field[BigDecimal, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait PurchaseorderheaderFields {
+  def purchaseorderid: IdField[PurchaseorderheaderId, PurchaseorderheaderRow]
+  def revisionnumber: Field[TypoShort, PurchaseorderheaderRow]
+  def status: Field[TypoShort, PurchaseorderheaderRow]
+  def employeeid: Field[BusinessentityId, PurchaseorderheaderRow]
+  def vendorid: Field[BusinessentityId, PurchaseorderheaderRow]
+  def shipmethodid: Field[ShipmethodId, PurchaseorderheaderRow]
+  def orderdate: Field[TypoLocalDateTime, PurchaseorderheaderRow]
+  def shipdate: OptField[TypoLocalDateTime, PurchaseorderheaderRow]
+  def subtotal: Field[BigDecimal, PurchaseorderheaderRow]
+  def taxamt: Field[BigDecimal, PurchaseorderheaderRow]
+  def freight: Field[BigDecimal, PurchaseorderheaderRow]
+  def modifieddate: Field[TypoLocalDateTime, PurchaseorderheaderRow]
 }
 
 object PurchaseorderheaderFields {
-  val structure: Relation[PurchaseorderheaderFields, PurchaseorderheaderRow, PurchaseorderheaderRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PurchaseorderheaderFields, PurchaseorderheaderRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PurchaseorderheaderRow, val merge: (Row, PurchaseorderheaderRow) => Row)
-    extends Relation[PurchaseorderheaderFields, PurchaseorderheaderRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PurchaseorderheaderFields, PurchaseorderheaderRow] {
   
-    override val fields: PurchaseorderheaderFields[Row] = new PurchaseorderheaderFields[Row] {
-      override val purchaseorderid = new IdField[PurchaseorderheaderId, Row](prefix, "purchaseorderid", None, Some("int4"))(x => extract(x).purchaseorderid, (row, value) => merge(row, extract(row).copy(purchaseorderid = value)))
-      override val revisionnumber = new Field[TypoShort, Row](prefix, "revisionnumber", None, Some("int2"))(x => extract(x).revisionnumber, (row, value) => merge(row, extract(row).copy(revisionnumber = value)))
-      override val status = new Field[TypoShort, Row](prefix, "status", None, Some("int2"))(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
-      override val employeeid = new Field[BusinessentityId, Row](prefix, "employeeid", None, Some("int4"))(x => extract(x).employeeid, (row, value) => merge(row, extract(row).copy(employeeid = value)))
-      override val vendorid = new Field[BusinessentityId, Row](prefix, "vendorid", None, Some("int4"))(x => extract(x).vendorid, (row, value) => merge(row, extract(row).copy(vendorid = value)))
-      override val shipmethodid = new Field[ShipmethodId, Row](prefix, "shipmethodid", None, Some("int4"))(x => extract(x).shipmethodid, (row, value) => merge(row, extract(row).copy(shipmethodid = value)))
-      override val orderdate = new Field[TypoLocalDateTime, Row](prefix, "orderdate", Some("text"), Some("timestamp"))(x => extract(x).orderdate, (row, value) => merge(row, extract(row).copy(orderdate = value)))
-      override val shipdate = new OptField[TypoLocalDateTime, Row](prefix, "shipdate", Some("text"), Some("timestamp"))(x => extract(x).shipdate, (row, value) => merge(row, extract(row).copy(shipdate = value)))
-      override val subtotal = new Field[BigDecimal, Row](prefix, "subtotal", None, Some("numeric"))(x => extract(x).subtotal, (row, value) => merge(row, extract(row).copy(subtotal = value)))
-      override val taxamt = new Field[BigDecimal, Row](prefix, "taxamt", None, Some("numeric"))(x => extract(x).taxamt, (row, value) => merge(row, extract(row).copy(taxamt = value)))
-      override val freight = new Field[BigDecimal, Row](prefix, "freight", None, Some("numeric"))(x => extract(x).freight, (row, value) => merge(row, extract(row).copy(freight = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: PurchaseorderheaderFields = new PurchaseorderheaderFields {
+      override def purchaseorderid = IdField[PurchaseorderheaderId, PurchaseorderheaderRow](_path, "purchaseorderid", None, Some("int4"), x => x.purchaseorderid, (row, value) => row.copy(purchaseorderid = value))
+      override def revisionnumber = Field[TypoShort, PurchaseorderheaderRow](_path, "revisionnumber", None, Some("int2"), x => x.revisionnumber, (row, value) => row.copy(revisionnumber = value))
+      override def status = Field[TypoShort, PurchaseorderheaderRow](_path, "status", None, Some("int2"), x => x.status, (row, value) => row.copy(status = value))
+      override def employeeid = Field[BusinessentityId, PurchaseorderheaderRow](_path, "employeeid", None, Some("int4"), x => x.employeeid, (row, value) => row.copy(employeeid = value))
+      override def vendorid = Field[BusinessentityId, PurchaseorderheaderRow](_path, "vendorid", None, Some("int4"), x => x.vendorid, (row, value) => row.copy(vendorid = value))
+      override def shipmethodid = Field[ShipmethodId, PurchaseorderheaderRow](_path, "shipmethodid", None, Some("int4"), x => x.shipmethodid, (row, value) => row.copy(shipmethodid = value))
+      override def orderdate = Field[TypoLocalDateTime, PurchaseorderheaderRow](_path, "orderdate", Some("text"), Some("timestamp"), x => x.orderdate, (row, value) => row.copy(orderdate = value))
+      override def shipdate = OptField[TypoLocalDateTime, PurchaseorderheaderRow](_path, "shipdate", Some("text"), Some("timestamp"), x => x.shipdate, (row, value) => row.copy(shipdate = value))
+      override def subtotal = Field[BigDecimal, PurchaseorderheaderRow](_path, "subtotal", None, Some("numeric"), x => x.subtotal, (row, value) => row.copy(subtotal = value))
+      override def taxamt = Field[BigDecimal, PurchaseorderheaderRow](_path, "taxamt", None, Some("numeric"), x => x.taxamt, (row, value) => row.copy(taxamt = value))
+      override def freight = Field[BigDecimal, PurchaseorderheaderRow](_path, "freight", None, Some("numeric"), x => x.freight, (row, value) => row.copy(freight = value))
+      override def modifieddate = Field[TypoLocalDateTime, PurchaseorderheaderRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.purchaseorderid, fields.revisionnumber, fields.status, fields.employeeid, fields.vendorid, fields.shipmethodid, fields.orderdate, fields.shipdate, fields.subtotal, fields.taxamt, fields.freight, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, PurchaseorderheaderRow]] =
+      List[FieldLikeNoHkt[?, PurchaseorderheaderRow]](fields.purchaseorderid, fields.revisionnumber, fields.status, fields.employeeid, fields.vendorid, fields.shipmethodid, fields.orderdate, fields.shipdate, fields.subtotal, fields.taxamt, fields.freight, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PurchaseorderheaderRow, merge: (NewRow, PurchaseorderheaderRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

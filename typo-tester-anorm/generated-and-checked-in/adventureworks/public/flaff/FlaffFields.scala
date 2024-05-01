@@ -8,39 +8,40 @@ package public
 package flaff
 
 import adventureworks.public.ShortText
+import typo.dsl.Path
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait FlaffFields[Row] {
-  val code: IdField[ShortText, Row]
-  val anotherCode: IdField[/* max 20 chars */ String, Row]
-  val someNumber: IdField[Int, Row]
-  val specifier: IdField[ShortText, Row]
-  val parentspecifier: OptField[ShortText, Row]
+trait FlaffFields {
+  def code: IdField[ShortText, FlaffRow]
+  def anotherCode: IdField[/* max 20 chars */ String, FlaffRow]
+  def someNumber: IdField[Int, FlaffRow]
+  def specifier: IdField[ShortText, FlaffRow]
+  def parentspecifier: OptField[ShortText, FlaffRow]
 }
 
 object FlaffFields {
-  val structure: Relation[FlaffFields, FlaffRow, FlaffRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[FlaffFields, FlaffRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => FlaffRow, val merge: (Row, FlaffRow) => Row)
-    extends Relation[FlaffFields, FlaffRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[FlaffFields, FlaffRow] {
   
-    override val fields: FlaffFields[Row] = new FlaffFields[Row] {
-      override val code = new IdField[ShortText, Row](prefix, "code", None, Some("text"))(x => extract(x).code, (row, value) => merge(row, extract(row).copy(code = value)))
-      override val anotherCode = new IdField[/* max 20 chars */ String, Row](prefix, "another_code", None, None)(x => extract(x).anotherCode, (row, value) => merge(row, extract(row).copy(anotherCode = value)))
-      override val someNumber = new IdField[Int, Row](prefix, "some_number", None, Some("int4"))(x => extract(x).someNumber, (row, value) => merge(row, extract(row).copy(someNumber = value)))
-      override val specifier = new IdField[ShortText, Row](prefix, "specifier", None, Some("text"))(x => extract(x).specifier, (row, value) => merge(row, extract(row).copy(specifier = value)))
-      override val parentspecifier = new OptField[ShortText, Row](prefix, "parentspecifier", None, Some("text"))(x => extract(x).parentspecifier, (row, value) => merge(row, extract(row).copy(parentspecifier = value)))
+    override lazy val fields: FlaffFields = new FlaffFields {
+      override def code = IdField[ShortText, FlaffRow](_path, "code", None, Some("text"), x => x.code, (row, value) => row.copy(code = value))
+      override def anotherCode = IdField[/* max 20 chars */ String, FlaffRow](_path, "another_code", None, None, x => x.anotherCode, (row, value) => row.copy(anotherCode = value))
+      override def someNumber = IdField[Int, FlaffRow](_path, "some_number", None, Some("int4"), x => x.someNumber, (row, value) => row.copy(someNumber = value))
+      override def specifier = IdField[ShortText, FlaffRow](_path, "specifier", None, Some("text"), x => x.specifier, (row, value) => row.copy(specifier = value))
+      override def parentspecifier = OptField[ShortText, FlaffRow](_path, "parentspecifier", None, Some("text"), x => x.parentspecifier, (row, value) => row.copy(parentspecifier = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.code, fields.anotherCode, fields.someNumber, fields.specifier, fields.parentspecifier)
+    override lazy val columns: List[FieldLikeNoHkt[?, FlaffRow]] =
+      List[FieldLikeNoHkt[?, FlaffRow]](fields.code, fields.anotherCode, fields.someNumber, fields.specifier, fields.parentspecifier)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => FlaffRow, merge: (NewRow, FlaffRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

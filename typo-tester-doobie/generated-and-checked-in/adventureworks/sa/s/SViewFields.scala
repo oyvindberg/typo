@@ -12,43 +12,44 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait SViewFields[Row] {
-  val id: Field[BusinessentityId, Row]
-  val businessentityid: Field[BusinessentityId, Row]
-  val name: Field[Name, Row]
-  val salespersonid: OptField[BusinessentityId, Row]
-  val demographics: OptField[TypoXml, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SViewFields {
+  def id: Field[BusinessentityId, SViewRow]
+  def businessentityid: Field[BusinessentityId, SViewRow]
+  def name: Field[Name, SViewRow]
+  def salespersonid: OptField[BusinessentityId, SViewRow]
+  def demographics: OptField[TypoXml, SViewRow]
+  def rowguid: Field[TypoUUID, SViewRow]
+  def modifieddate: Field[TypoLocalDateTime, SViewRow]
 }
 
 object SViewFields {
-  val structure: Relation[SViewFields, SViewRow, SViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SViewFields, SViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SViewRow, val merge: (Row, SViewRow) => Row)
-    extends Relation[SViewFields, SViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SViewFields, SViewRow] {
   
-    override val fields: SViewFields[Row] = new SViewFields[Row] {
-      override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val salespersonid = new OptField[BusinessentityId, Row](prefix, "salespersonid", None, None)(x => extract(x).salespersonid, (row, value) => merge(row, extract(row).copy(salespersonid = value)))
-      override val demographics = new OptField[TypoXml, Row](prefix, "demographics", None, None)(x => extract(x).demographics, (row, value) => merge(row, extract(row).copy(demographics = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SViewFields = new SViewFields {
+      override def id = Field[BusinessentityId, SViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def businessentityid = Field[BusinessentityId, SViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def name = Field[Name, SViewRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def salespersonid = OptField[BusinessentityId, SViewRow](_path, "salespersonid", None, None, x => x.salespersonid, (row, value) => row.copy(salespersonid = value))
+      override def demographics = OptField[TypoXml, SViewRow](_path, "demographics", None, None, x => x.demographics, (row, value) => row.copy(demographics = value))
+      override def rowguid = Field[TypoUUID, SViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, SViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.businessentityid, fields.name, fields.salespersonid, fields.demographics, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SViewRow]] =
+      List[FieldLikeNoHkt[?, SViewRow]](fields.id, fields.businessentityid, fields.name, fields.salespersonid, fields.demographics, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SViewRow, merge: (NewRow, SViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

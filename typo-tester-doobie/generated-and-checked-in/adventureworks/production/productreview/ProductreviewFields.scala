@@ -10,46 +10,47 @@ package productreview
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait ProductreviewFields[Row] {
-  val productreviewid: IdField[ProductreviewId, Row]
-  val productid: Field[ProductId, Row]
-  val reviewername: Field[Name, Row]
-  val reviewdate: Field[TypoLocalDateTime, Row]
-  val emailaddress: Field[/* max 50 chars */ String, Row]
-  val rating: Field[Int, Row]
-  val comments: OptField[/* max 3850 chars */ String, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait ProductreviewFields {
+  def productreviewid: IdField[ProductreviewId, ProductreviewRow]
+  def productid: Field[ProductId, ProductreviewRow]
+  def reviewername: Field[Name, ProductreviewRow]
+  def reviewdate: Field[TypoLocalDateTime, ProductreviewRow]
+  def emailaddress: Field[/* max 50 chars */ String, ProductreviewRow]
+  def rating: Field[Int, ProductreviewRow]
+  def comments: OptField[/* max 3850 chars */ String, ProductreviewRow]
+  def modifieddate: Field[TypoLocalDateTime, ProductreviewRow]
 }
 
 object ProductreviewFields {
-  val structure: Relation[ProductreviewFields, ProductreviewRow, ProductreviewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[ProductreviewFields, ProductreviewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => ProductreviewRow, val merge: (Row, ProductreviewRow) => Row)
-    extends Relation[ProductreviewFields, ProductreviewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[ProductreviewFields, ProductreviewRow] {
   
-    override val fields: ProductreviewFields[Row] = new ProductreviewFields[Row] {
-      override val productreviewid = new IdField[ProductreviewId, Row](prefix, "productreviewid", None, Some("int4"))(x => extract(x).productreviewid, (row, value) => merge(row, extract(row).copy(productreviewid = value)))
-      override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val reviewername = new Field[Name, Row](prefix, "reviewername", None, Some("varchar"))(x => extract(x).reviewername, (row, value) => merge(row, extract(row).copy(reviewername = value)))
-      override val reviewdate = new Field[TypoLocalDateTime, Row](prefix, "reviewdate", Some("text"), Some("timestamp"))(x => extract(x).reviewdate, (row, value) => merge(row, extract(row).copy(reviewdate = value)))
-      override val emailaddress = new Field[/* max 50 chars */ String, Row](prefix, "emailaddress", None, None)(x => extract(x).emailaddress, (row, value) => merge(row, extract(row).copy(emailaddress = value)))
-      override val rating = new Field[Int, Row](prefix, "rating", None, Some("int4"))(x => extract(x).rating, (row, value) => merge(row, extract(row).copy(rating = value)))
-      override val comments = new OptField[/* max 3850 chars */ String, Row](prefix, "comments", None, None)(x => extract(x).comments, (row, value) => merge(row, extract(row).copy(comments = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: ProductreviewFields = new ProductreviewFields {
+      override def productreviewid = IdField[ProductreviewId, ProductreviewRow](_path, "productreviewid", None, Some("int4"), x => x.productreviewid, (row, value) => row.copy(productreviewid = value))
+      override def productid = Field[ProductId, ProductreviewRow](_path, "productid", None, Some("int4"), x => x.productid, (row, value) => row.copy(productid = value))
+      override def reviewername = Field[Name, ProductreviewRow](_path, "reviewername", None, Some("varchar"), x => x.reviewername, (row, value) => row.copy(reviewername = value))
+      override def reviewdate = Field[TypoLocalDateTime, ProductreviewRow](_path, "reviewdate", Some("text"), Some("timestamp"), x => x.reviewdate, (row, value) => row.copy(reviewdate = value))
+      override def emailaddress = Field[/* max 50 chars */ String, ProductreviewRow](_path, "emailaddress", None, None, x => x.emailaddress, (row, value) => row.copy(emailaddress = value))
+      override def rating = Field[Int, ProductreviewRow](_path, "rating", None, Some("int4"), x => x.rating, (row, value) => row.copy(rating = value))
+      override def comments = OptField[/* max 3850 chars */ String, ProductreviewRow](_path, "comments", None, None, x => x.comments, (row, value) => row.copy(comments = value))
+      override def modifieddate = Field[TypoLocalDateTime, ProductreviewRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.productreviewid, fields.productid, fields.reviewername, fields.reviewdate, fields.emailaddress, fields.rating, fields.comments, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, ProductreviewRow]] =
+      List[FieldLikeNoHkt[?, ProductreviewRow]](fields.productreviewid, fields.productid, fields.reviewername, fields.reviewdate, fields.emailaddress, fields.rating, fields.comments, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => ProductreviewRow, merge: (NewRow, ProductreviewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

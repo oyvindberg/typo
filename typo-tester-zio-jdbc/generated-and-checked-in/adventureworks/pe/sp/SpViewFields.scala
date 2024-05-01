@@ -14,46 +14,47 @@ import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait SpViewFields[Row] {
-  val id: Field[StateprovinceId, Row]
-  val stateprovinceid: Field[StateprovinceId, Row]
-  val stateprovincecode: Field[/* bpchar, max 3 chars */ String, Row]
-  val countryregioncode: Field[CountryregionId, Row]
-  val isonlystateprovinceflag: Field[Flag, Row]
-  val name: Field[Name, Row]
-  val territoryid: Field[SalesterritoryId, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SpViewFields {
+  def id: Field[StateprovinceId, SpViewRow]
+  def stateprovinceid: Field[StateprovinceId, SpViewRow]
+  def stateprovincecode: Field[/* bpchar, max 3 chars */ String, SpViewRow]
+  def countryregioncode: Field[CountryregionId, SpViewRow]
+  def isonlystateprovinceflag: Field[Flag, SpViewRow]
+  def name: Field[Name, SpViewRow]
+  def territoryid: Field[SalesterritoryId, SpViewRow]
+  def rowguid: Field[TypoUUID, SpViewRow]
+  def modifieddate: Field[TypoLocalDateTime, SpViewRow]
 }
 
 object SpViewFields {
-  val structure: Relation[SpViewFields, SpViewRow, SpViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SpViewFields, SpViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SpViewRow, val merge: (Row, SpViewRow) => Row)
-    extends Relation[SpViewFields, SpViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SpViewFields, SpViewRow] {
   
-    override val fields: SpViewFields[Row] = new SpViewFields[Row] {
-      override val id = new Field[StateprovinceId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val stateprovinceid = new Field[StateprovinceId, Row](prefix, "stateprovinceid", None, None)(x => extract(x).stateprovinceid, (row, value) => merge(row, extract(row).copy(stateprovinceid = value)))
-      override val stateprovincecode = new Field[/* bpchar, max 3 chars */ String, Row](prefix, "stateprovincecode", None, None)(x => extract(x).stateprovincecode, (row, value) => merge(row, extract(row).copy(stateprovincecode = value)))
-      override val countryregioncode = new Field[CountryregionId, Row](prefix, "countryregioncode", None, None)(x => extract(x).countryregioncode, (row, value) => merge(row, extract(row).copy(countryregioncode = value)))
-      override val isonlystateprovinceflag = new Field[Flag, Row](prefix, "isonlystateprovinceflag", None, None)(x => extract(x).isonlystateprovinceflag, (row, value) => merge(row, extract(row).copy(isonlystateprovinceflag = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val territoryid = new Field[SalesterritoryId, Row](prefix, "territoryid", None, None)(x => extract(x).territoryid, (row, value) => merge(row, extract(row).copy(territoryid = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SpViewFields = new SpViewFields {
+      override def id = Field[StateprovinceId, SpViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def stateprovinceid = Field[StateprovinceId, SpViewRow](_path, "stateprovinceid", None, None, x => x.stateprovinceid, (row, value) => row.copy(stateprovinceid = value))
+      override def stateprovincecode = Field[/* bpchar, max 3 chars */ String, SpViewRow](_path, "stateprovincecode", None, None, x => x.stateprovincecode, (row, value) => row.copy(stateprovincecode = value))
+      override def countryregioncode = Field[CountryregionId, SpViewRow](_path, "countryregioncode", None, None, x => x.countryregioncode, (row, value) => row.copy(countryregioncode = value))
+      override def isonlystateprovinceflag = Field[Flag, SpViewRow](_path, "isonlystateprovinceflag", None, None, x => x.isonlystateprovinceflag, (row, value) => row.copy(isonlystateprovinceflag = value))
+      override def name = Field[Name, SpViewRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def territoryid = Field[SalesterritoryId, SpViewRow](_path, "territoryid", None, None, x => x.territoryid, (row, value) => row.copy(territoryid = value))
+      override def rowguid = Field[TypoUUID, SpViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, SpViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.stateprovinceid, fields.stateprovincecode, fields.countryregioncode, fields.isonlystateprovinceflag, fields.name, fields.territoryid, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SpViewRow]] =
+      List[FieldLikeNoHkt[?, SpViewRow]](fields.id, fields.stateprovinceid, fields.stateprovincecode, fields.countryregioncode, fields.isonlystateprovinceflag, fields.name, fields.territoryid, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SpViewRow, merge: (NewRow, SpViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

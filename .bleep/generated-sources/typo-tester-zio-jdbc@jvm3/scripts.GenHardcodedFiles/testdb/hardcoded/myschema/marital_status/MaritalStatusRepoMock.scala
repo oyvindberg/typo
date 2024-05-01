@@ -26,7 +26,7 @@ import zio.stream.ZStream
 
 class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, MaritalStatusRow] = scala.collection.mutable.Map.empty) extends MaritalStatusRepo {
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure, map)
   }
   override def deleteById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(id).isDefined)
@@ -79,7 +79,7 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     }
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields.structure, map)
   }
   override def upsert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, UpdateResult[MaritalStatusRow]] = {
     ZIO.succeed {

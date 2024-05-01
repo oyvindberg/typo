@@ -22,7 +22,7 @@ import typo.dsl.UpdateParams
 
 class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, FootballClubRow] = scala.collection.mutable.Map.empty) extends FootballClubRepo {
   override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
-    DeleteBuilderMock(DeleteParams.empty, FootballClubFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, FootballClubFields.structure, map)
   }
   override def deleteById(id: FootballClubId)(implicit c: Connection): Boolean = {
     map.remove(id).isDefined
@@ -67,7 +67,7 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     ids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
-    UpdateBuilderMock(UpdateParams.empty, FootballClubFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, FootballClubFields.structure, map)
   }
   override def update(row: FootballClubRow)(implicit c: Connection): Boolean = {
     map.get(row.id) match {

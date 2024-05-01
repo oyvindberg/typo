@@ -10,37 +10,38 @@ package productcategory
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait ProductcategoryFields[Row] {
-  val productcategoryid: IdField[ProductcategoryId, Row]
-  val name: Field[Name, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait ProductcategoryFields {
+  def productcategoryid: IdField[ProductcategoryId, ProductcategoryRow]
+  def name: Field[Name, ProductcategoryRow]
+  def rowguid: Field[TypoUUID, ProductcategoryRow]
+  def modifieddate: Field[TypoLocalDateTime, ProductcategoryRow]
 }
 
 object ProductcategoryFields {
-  val structure: Relation[ProductcategoryFields, ProductcategoryRow, ProductcategoryRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[ProductcategoryFields, ProductcategoryRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => ProductcategoryRow, val merge: (Row, ProductcategoryRow) => Row)
-    extends Relation[ProductcategoryFields, ProductcategoryRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[ProductcategoryFields, ProductcategoryRow] {
   
-    override val fields: ProductcategoryFields[Row] = new ProductcategoryFields[Row] {
-      override val productcategoryid = new IdField[ProductcategoryId, Row](prefix, "productcategoryid", None, Some("int4"))(x => extract(x).productcategoryid, (row, value) => merge(row, extract(row).copy(productcategoryid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: ProductcategoryFields = new ProductcategoryFields {
+      override def productcategoryid = IdField[ProductcategoryId, ProductcategoryRow](_path, "productcategoryid", None, Some("int4"), x => x.productcategoryid, (row, value) => row.copy(productcategoryid = value))
+      override def name = Field[Name, ProductcategoryRow](_path, "name", None, Some("varchar"), x => x.name, (row, value) => row.copy(name = value))
+      override def rowguid = Field[TypoUUID, ProductcategoryRow](_path, "rowguid", None, Some("uuid"), x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, ProductcategoryRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.productcategoryid, fields.name, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, ProductcategoryRow]] =
+      List[FieldLikeNoHkt[?, ProductcategoryRow]](fields.productcategoryid, fields.name, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => ProductcategoryRow, merge: (NewRow, ProductcategoryRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

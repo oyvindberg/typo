@@ -26,7 +26,7 @@ import typo.dsl.UpdateParams
 class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
                          map: scala.collection.mutable.Map[/* user-picked */ CustomCreditcardId, CreditcardRow] = scala.collection.mutable.Map.empty) extends CreditcardRepo {
   override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CreditcardFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, CreditcardFields.structure, map)
   }
   override def deleteById(creditcardid: /* user-picked */ CustomCreditcardId): ConnectionIO[Boolean] = {
     delay(map.remove(creditcardid).isDefined)
@@ -88,7 +88,7 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
     }
   }
   override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CreditcardFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, CreditcardFields.structure, map)
   }
   override def update(row: CreditcardRow): ConnectionIO[Boolean] = {
     delay {

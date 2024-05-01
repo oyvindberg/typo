@@ -12,43 +12,44 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait EdhViewFields[Row] {
-  val id: Field[BusinessentityId, Row]
-  val businessentityid: Field[BusinessentityId, Row]
-  val departmentid: Field[DepartmentId, Row]
-  val shiftid: Field[ShiftId, Row]
-  val startdate: Field[TypoLocalDate, Row]
-  val enddate: OptField[TypoLocalDate, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait EdhViewFields {
+  def id: Field[BusinessentityId, EdhViewRow]
+  def businessentityid: Field[BusinessentityId, EdhViewRow]
+  def departmentid: Field[DepartmentId, EdhViewRow]
+  def shiftid: Field[ShiftId, EdhViewRow]
+  def startdate: Field[TypoLocalDate, EdhViewRow]
+  def enddate: OptField[TypoLocalDate, EdhViewRow]
+  def modifieddate: Field[TypoLocalDateTime, EdhViewRow]
 }
 
 object EdhViewFields {
-  val structure: Relation[EdhViewFields, EdhViewRow, EdhViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[EdhViewFields, EdhViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => EdhViewRow, val merge: (Row, EdhViewRow) => Row)
-    extends Relation[EdhViewFields, EdhViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[EdhViewFields, EdhViewRow] {
   
-    override val fields: EdhViewFields[Row] = new EdhViewFields[Row] {
-      override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val departmentid = new Field[DepartmentId, Row](prefix, "departmentid", None, None)(x => extract(x).departmentid, (row, value) => merge(row, extract(row).copy(departmentid = value)))
-      override val shiftid = new Field[ShiftId, Row](prefix, "shiftid", None, None)(x => extract(x).shiftid, (row, value) => merge(row, extract(row).copy(shiftid = value)))
-      override val startdate = new Field[TypoLocalDate, Row](prefix, "startdate", Some("text"), None)(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
-      override val enddate = new OptField[TypoLocalDate, Row](prefix, "enddate", Some("text"), None)(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: EdhViewFields = new EdhViewFields {
+      override def id = Field[BusinessentityId, EdhViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def businessentityid = Field[BusinessentityId, EdhViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def departmentid = Field[DepartmentId, EdhViewRow](_path, "departmentid", None, None, x => x.departmentid, (row, value) => row.copy(departmentid = value))
+      override def shiftid = Field[ShiftId, EdhViewRow](_path, "shiftid", None, None, x => x.shiftid, (row, value) => row.copy(shiftid = value))
+      override def startdate = Field[TypoLocalDate, EdhViewRow](_path, "startdate", Some("text"), None, x => x.startdate, (row, value) => row.copy(startdate = value))
+      override def enddate = OptField[TypoLocalDate, EdhViewRow](_path, "enddate", Some("text"), None, x => x.enddate, (row, value) => row.copy(enddate = value))
+      override def modifieddate = Field[TypoLocalDateTime, EdhViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.businessentityid, fields.departmentid, fields.shiftid, fields.startdate, fields.enddate, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, EdhViewRow]] =
+      List[FieldLikeNoHkt[?, EdhViewRow]](fields.id, fields.businessentityid, fields.departmentid, fields.shiftid, fields.startdate, fields.enddate, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => EdhViewRow, merge: (NewRow, EdhViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

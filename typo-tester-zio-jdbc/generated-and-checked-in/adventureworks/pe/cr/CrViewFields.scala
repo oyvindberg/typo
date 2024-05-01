@@ -10,34 +10,35 @@ package cr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait CrViewFields[Row] {
-  val countryregioncode: Field[CountryregionId, Row]
-  val name: Field[Name, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait CrViewFields {
+  def countryregioncode: Field[CountryregionId, CrViewRow]
+  def name: Field[Name, CrViewRow]
+  def modifieddate: Field[TypoLocalDateTime, CrViewRow]
 }
 
 object CrViewFields {
-  val structure: Relation[CrViewFields, CrViewRow, CrViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[CrViewFields, CrViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => CrViewRow, val merge: (Row, CrViewRow) => Row)
-    extends Relation[CrViewFields, CrViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[CrViewFields, CrViewRow] {
   
-    override val fields: CrViewFields[Row] = new CrViewFields[Row] {
-      override val countryregioncode = new Field[CountryregionId, Row](prefix, "countryregioncode", None, None)(x => extract(x).countryregioncode, (row, value) => merge(row, extract(row).copy(countryregioncode = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: CrViewFields = new CrViewFields {
+      override def countryregioncode = Field[CountryregionId, CrViewRow](_path, "countryregioncode", None, None, x => x.countryregioncode, (row, value) => row.copy(countryregioncode = value))
+      override def name = Field[Name, CrViewRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def modifieddate = Field[TypoLocalDateTime, CrViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.countryregioncode, fields.name, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, CrViewRow]] =
+      List[FieldLikeNoHkt[?, CrViewRow]](fields.countryregioncode, fields.name, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => CrViewRow, merge: (NewRow, CrViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

@@ -10,36 +10,37 @@ package um
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait UmViewFields[Row] {
-  val id: Field[UnitmeasureId, Row]
-  val unitmeasurecode: Field[UnitmeasureId, Row]
-  val name: Field[Name, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait UmViewFields {
+  def id: Field[UnitmeasureId, UmViewRow]
+  def unitmeasurecode: Field[UnitmeasureId, UmViewRow]
+  def name: Field[Name, UmViewRow]
+  def modifieddate: Field[TypoLocalDateTime, UmViewRow]
 }
 
 object UmViewFields {
-  val structure: Relation[UmViewFields, UmViewRow, UmViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[UmViewFields, UmViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => UmViewRow, val merge: (Row, UmViewRow) => Row)
-    extends Relation[UmViewFields, UmViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[UmViewFields, UmViewRow] {
   
-    override val fields: UmViewFields[Row] = new UmViewFields[Row] {
-      override val id = new Field[UnitmeasureId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val unitmeasurecode = new Field[UnitmeasureId, Row](prefix, "unitmeasurecode", None, None)(x => extract(x).unitmeasurecode, (row, value) => merge(row, extract(row).copy(unitmeasurecode = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: UmViewFields = new UmViewFields {
+      override def id = Field[UnitmeasureId, UmViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def unitmeasurecode = Field[UnitmeasureId, UmViewRow](_path, "unitmeasurecode", None, None, x => x.unitmeasurecode, (row, value) => row.copy(unitmeasurecode = value))
+      override def name = Field[Name, UmViewRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def modifieddate = Field[TypoLocalDateTime, UmViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.unitmeasurecode, fields.name, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, UmViewRow]] =
+      List[FieldLikeNoHkt[?, UmViewRow]](fields.id, fields.unitmeasurecode, fields.name, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => UmViewRow, merge: (NewRow, UmViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

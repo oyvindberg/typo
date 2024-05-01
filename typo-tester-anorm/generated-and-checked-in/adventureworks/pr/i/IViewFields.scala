@@ -10,37 +10,38 @@ package i
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import adventureworks.production.illustration.IllustrationId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait IViewFields[Row] {
-  val id: Field[IllustrationId, Row]
-  val illustrationid: Field[IllustrationId, Row]
-  val diagram: OptField[TypoXml, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait IViewFields {
+  def id: Field[IllustrationId, IViewRow]
+  def illustrationid: Field[IllustrationId, IViewRow]
+  def diagram: OptField[TypoXml, IViewRow]
+  def modifieddate: Field[TypoLocalDateTime, IViewRow]
 }
 
 object IViewFields {
-  val structure: Relation[IViewFields, IViewRow, IViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[IViewFields, IViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => IViewRow, val merge: (Row, IViewRow) => Row)
-    extends Relation[IViewFields, IViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[IViewFields, IViewRow] {
   
-    override val fields: IViewFields[Row] = new IViewFields[Row] {
-      override val id = new Field[IllustrationId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val illustrationid = new Field[IllustrationId, Row](prefix, "illustrationid", None, None)(x => extract(x).illustrationid, (row, value) => merge(row, extract(row).copy(illustrationid = value)))
-      override val diagram = new OptField[TypoXml, Row](prefix, "diagram", None, None)(x => extract(x).diagram, (row, value) => merge(row, extract(row).copy(diagram = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: IViewFields = new IViewFields {
+      override def id = Field[IllustrationId, IViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def illustrationid = Field[IllustrationId, IViewRow](_path, "illustrationid", None, None, x => x.illustrationid, (row, value) => row.copy(illustrationid = value))
+      override def diagram = OptField[TypoXml, IViewRow](_path, "diagram", None, None, x => x.diagram, (row, value) => row.copy(diagram = value))
+      override def modifieddate = Field[TypoLocalDateTime, IViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.illustrationid, fields.diagram, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, IViewRow]] =
+      List[FieldLikeNoHkt[?, IViewRow]](fields.id, fields.illustrationid, fields.diagram, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => IViewRow, merge: (NewRow, IViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

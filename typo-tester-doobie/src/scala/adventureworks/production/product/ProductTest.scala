@@ -90,6 +90,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         }
         _ <- delay(assert(saved3.modifieddate == newModifiedDate))
         _ <- productRepo.update(saved3.copy(size = None)).map(res => assert(res))
+
         query = productRepo.select
           .where(_.`class` === "H ")
           .where(x => (x.daystomanufacture > 25).or(x.daystomanufacture <= 0))

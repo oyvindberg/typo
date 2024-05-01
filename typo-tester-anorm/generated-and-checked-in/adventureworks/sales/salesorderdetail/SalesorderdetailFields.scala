@@ -13,50 +13,51 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait SalesorderdetailFields[Row] {
-  val salesorderid: IdField[SalesorderheaderId, Row]
-  val salesorderdetailid: IdField[Int, Row]
-  val carriertrackingnumber: OptField[/* max 25 chars */ String, Row]
-  val orderqty: Field[TypoShort, Row]
-  val productid: Field[ProductId, Row]
-  val specialofferid: Field[SpecialofferId, Row]
-  val unitprice: Field[BigDecimal, Row]
-  val unitpricediscount: Field[BigDecimal, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SalesorderdetailFields {
+  def salesorderid: IdField[SalesorderheaderId, SalesorderdetailRow]
+  def salesorderdetailid: IdField[Int, SalesorderdetailRow]
+  def carriertrackingnumber: OptField[/* max 25 chars */ String, SalesorderdetailRow]
+  def orderqty: Field[TypoShort, SalesorderdetailRow]
+  def productid: Field[ProductId, SalesorderdetailRow]
+  def specialofferid: Field[SpecialofferId, SalesorderdetailRow]
+  def unitprice: Field[BigDecimal, SalesorderdetailRow]
+  def unitpricediscount: Field[BigDecimal, SalesorderdetailRow]
+  def rowguid: Field[TypoUUID, SalesorderdetailRow]
+  def modifieddate: Field[TypoLocalDateTime, SalesorderdetailRow]
 }
 
 object SalesorderdetailFields {
-  val structure: Relation[SalesorderdetailFields, SalesorderdetailRow, SalesorderdetailRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SalesorderdetailFields, SalesorderdetailRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SalesorderdetailRow, val merge: (Row, SalesorderdetailRow) => Row)
-    extends Relation[SalesorderdetailFields, SalesorderdetailRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SalesorderdetailFields, SalesorderdetailRow] {
   
-    override val fields: SalesorderdetailFields[Row] = new SalesorderdetailFields[Row] {
-      override val salesorderid = new IdField[SalesorderheaderId, Row](prefix, "salesorderid", None, Some("int4"))(x => extract(x).salesorderid, (row, value) => merge(row, extract(row).copy(salesorderid = value)))
-      override val salesorderdetailid = new IdField[Int, Row](prefix, "salesorderdetailid", None, Some("int4"))(x => extract(x).salesorderdetailid, (row, value) => merge(row, extract(row).copy(salesorderdetailid = value)))
-      override val carriertrackingnumber = new OptField[/* max 25 chars */ String, Row](prefix, "carriertrackingnumber", None, None)(x => extract(x).carriertrackingnumber, (row, value) => merge(row, extract(row).copy(carriertrackingnumber = value)))
-      override val orderqty = new Field[TypoShort, Row](prefix, "orderqty", None, Some("int2"))(x => extract(x).orderqty, (row, value) => merge(row, extract(row).copy(orderqty = value)))
-      override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val specialofferid = new Field[SpecialofferId, Row](prefix, "specialofferid", None, Some("int4"))(x => extract(x).specialofferid, (row, value) => merge(row, extract(row).copy(specialofferid = value)))
-      override val unitprice = new Field[BigDecimal, Row](prefix, "unitprice", None, Some("numeric"))(x => extract(x).unitprice, (row, value) => merge(row, extract(row).copy(unitprice = value)))
-      override val unitpricediscount = new Field[BigDecimal, Row](prefix, "unitpricediscount", None, Some("numeric"))(x => extract(x).unitpricediscount, (row, value) => merge(row, extract(row).copy(unitpricediscount = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SalesorderdetailFields = new SalesorderdetailFields {
+      override def salesorderid = IdField[SalesorderheaderId, SalesorderdetailRow](_path, "salesorderid", None, Some("int4"), x => x.salesorderid, (row, value) => row.copy(salesorderid = value))
+      override def salesorderdetailid = IdField[Int, SalesorderdetailRow](_path, "salesorderdetailid", None, Some("int4"), x => x.salesorderdetailid, (row, value) => row.copy(salesorderdetailid = value))
+      override def carriertrackingnumber = OptField[/* max 25 chars */ String, SalesorderdetailRow](_path, "carriertrackingnumber", None, None, x => x.carriertrackingnumber, (row, value) => row.copy(carriertrackingnumber = value))
+      override def orderqty = Field[TypoShort, SalesorderdetailRow](_path, "orderqty", None, Some("int2"), x => x.orderqty, (row, value) => row.copy(orderqty = value))
+      override def productid = Field[ProductId, SalesorderdetailRow](_path, "productid", None, Some("int4"), x => x.productid, (row, value) => row.copy(productid = value))
+      override def specialofferid = Field[SpecialofferId, SalesorderdetailRow](_path, "specialofferid", None, Some("int4"), x => x.specialofferid, (row, value) => row.copy(specialofferid = value))
+      override def unitprice = Field[BigDecimal, SalesorderdetailRow](_path, "unitprice", None, Some("numeric"), x => x.unitprice, (row, value) => row.copy(unitprice = value))
+      override def unitpricediscount = Field[BigDecimal, SalesorderdetailRow](_path, "unitpricediscount", None, Some("numeric"), x => x.unitpricediscount, (row, value) => row.copy(unitpricediscount = value))
+      override def rowguid = Field[TypoUUID, SalesorderdetailRow](_path, "rowguid", None, Some("uuid"), x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, SalesorderdetailRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.salesorderid, fields.salesorderdetailid, fields.carriertrackingnumber, fields.orderqty, fields.productid, fields.specialofferid, fields.unitprice, fields.unitpricediscount, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SalesorderdetailRow]] =
+      List[FieldLikeNoHkt[?, SalesorderdetailRow]](fields.salesorderid, fields.salesorderdetailid, fields.carriertrackingnumber, fields.orderqty, fields.productid, fields.specialofferid, fields.unitprice, fields.unitpricediscount, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SalesorderdetailRow, merge: (NewRow, SalesorderdetailRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTestRow],
                            map: scala.collection.mutable.Map[IdentityTestId, IdentityTestRow] = scala.collection.mutable.Map.empty) extends IdentityTestRepo {
   override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
-    DeleteBuilderMock(DeleteParams.empty, IdentityTestFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, IdentityTestFields.structure, map)
   }
   override def deleteById(name: IdentityTestId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(name).isDefined)
@@ -85,7 +85,7 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
     }
   }
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
-    UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure, map)
   }
   override def update(row: IdentityTestRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

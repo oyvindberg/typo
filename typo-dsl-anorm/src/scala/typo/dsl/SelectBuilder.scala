@@ -2,7 +2,9 @@ package typo.dsl
 
 import java.sql.Connection
 
-trait SelectBuilder[Fields[_], Row] {
+trait SelectBuilder[Fields, Row] {
+  def renderCtx: RenderCtx
+  def structure: Structure[Fields, Row]
 
   /** Add a where clause to the query.
     *
@@ -15,18 +17,18 @@ trait SelectBuilder[Fields[_], Row] {
     *    .where(x => x.productline === "foo")
     * }}}
     */
-  final def where[N[_]: Nullability](v: Fields[Hidden] => SqlExpr[Boolean, N, Hidden]): SelectBuilder[Fields, Row] =
-    withParams(params.where(fields => v(fields.asInstanceOf[Fields[Hidden]]).asInstanceOf[SqlExpr[Boolean, N, Row]].?))
+  final def where[N[_]: Nullability](v: Fields => SqlExpr[Boolean, N]): SelectBuilder[Fields, Row] =
+    withParams(params.where(fields => v(fields).?))
 
-  final def maybeWhere[N[_]: Nullability, T](ot: Option[T])(v: (Fields[Hidden], T) => SqlExpr[Boolean, N, Hidden]): SelectBuilder[Fields, Row] =
+  final def maybeWhere[N[_]: Nullability, T](ot: Option[T])(v: (Fields, T) => SqlExpr[Boolean, N]): SelectBuilder[Fields, Row] =
     ot match {
       case Some(t) => where(fields => v(fields, t))
       case None    => this
     }
 
   /** Same as [[where]], but requires the expression to not be nullable */
-  final def whereStrict(v: Fields[Hidden] => SqlExpr[Boolean, Required, Hidden]): SelectBuilder[Fields, Row] =
-    withParams(params.where(fields => v(fields.asInstanceOf[Fields[Hidden]]).asInstanceOf[SqlExpr[Boolean, Required, Row]].?))
+  final def whereStrict(v: Fields => SqlExpr[Boolean, Required]): SelectBuilder[Fields, Row] =
+    withParams(params.where(fields => v(fields).?))
 
   /** Add an order by clause to the query.
     *
@@ -42,16 +44,16 @@ trait SelectBuilder[Fields[_], Row] {
     *        .orderBy { case ((_, _), productModel) => productModel(_.name).desc.withNullsFirst }
     * }}}
     */
-  final def orderBy[T, N[_]](v: Fields[Hidden] => SortOrder[T, N, Hidden]): SelectBuilder[Fields, Row] =
-    withParams(params.orderBy(v.asInstanceOf[Fields[Row] => SortOrderNoHkt[?, Row]]))
+  final def orderBy[T, N[_]](v: Fields => SortOrder[T, N]): SelectBuilder[Fields, Row] =
+    withParams(params.orderBy(v))
 
-  final def seek[T, N[_]](v: Fields[Row] => SortOrder[T, N, Row])(value: SqlExpr.Const[T, N, Row]): SelectBuilder[Fields, Row] =
-    withParams(params.seek(SelectParams.Seek[Fields, Row, T, N](v, value)))
+  final def seek[T, N[_]](v: Fields => SortOrder[T, N])(value: SqlExpr.Const[T, N]): SelectBuilder[Fields, Row] =
+    withParams(params.seek(SelectParams.Seek[Fields, T, N](v, value)))
 
-  final def maybeSeek[T, N[_]](v: Fields[Row] => SortOrder[T, N, Row])(maybeValue: Option[SqlExpr.Const[T, N, Row]]): SelectBuilder[Fields, Row] =
+  final def maybeSeek[T, N[_]](v: Fields => SortOrder[T, N])(maybeValue: Option[SqlExpr.Const[T, N]]): SelectBuilder[Fields, Row] =
     maybeValue match {
       case Some(value) => seek(v)(value)
-      case None        => orderBy(v.asInstanceOf[Fields[Hidden] => SortOrder[T, N, Hidden]])
+      case None        => orderBy(v)
     }
 
   final def offset(v: Int): SelectBuilder[Fields, Row] =
@@ -66,10 +68,10 @@ trait SelectBuilder[Fields[_], Row] {
   def sql: Option[Fragment]
 
   /** start constructing a join */
-  final def join[F2[_], Row2](other: SelectBuilder[F2, Row2]): PartialJoin[F2, Row2] =
+  final def join[F2, Row2](other: SelectBuilder[F2, Row2]): PartialJoin[F2, Row2] =
     new PartialJoin[F2, Row2](other)
 
-  final class PartialJoin[Fields2[_], Row2](other: SelectBuilder[Fields2, Row2]) {
+  final class PartialJoin[Fields2, Row2](other: SelectBuilder[Fields2, Row2]) {
 
     /** inner join with the given predicate
       * {{{
@@ -78,12 +80,12 @@ trait SelectBuilder[Fields[_], Row] {
       *   .on { case (p, um) => p.sizeunitmeasurecode === um.unitmeasurecode }
       * }}}
       */
-    def on[N[_]: Nullability](pred: Joined[Fields, Fields2, Hidden] => SqlExpr[Boolean, N, Hidden]): SelectBuilder[Joined[Fields, Fields2, *], (Row, Row2)] =
-      joinOn(other)(pred.asInstanceOf[Joined[Fields, Fields2, (Row, Row2)] => SqlExpr[Boolean, N, (Row, Row2)]])
+    def on[N[_]: Nullability](pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)] =
+      joinOn(other)(pred)
 
     /** Variant of `on` that requires the join predicate to not be nullable */
-    def onStrict(pred: Joined[Fields, Fields2, Hidden] => SqlExpr[Boolean, Required, Hidden]): SelectBuilder[Joined[Fields, Fields2, *], (Row, Row2)] =
-      joinOn(other)(pred.asInstanceOf[Joined[Fields, Fields2, (Row, Row2)] => SqlExpr[Boolean, Required, (Row, Row2)]])
+    def onStrict(pred: Joined[Fields, Fields2] => SqlExpr[Boolean, Required]): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)] =
+      joinOn(other)(pred)
 
     /** left join with the given predicate
       * {{{
@@ -92,23 +94,23 @@ trait SelectBuilder[Fields[_], Row] {
       * .leftOn { case (p, pm) => p.productmodelid === pm.productmodelid }
       * }}}
       */
-    def leftOn[N[_]: Nullability](pred: Joined[Fields, Fields2, Hidden] => SqlExpr[Boolean, N, Hidden]): SelectBuilder[LeftJoined[Fields, Fields2, *], (Row, Option[Row2])] =
-      leftJoinOn(other)(pred.asInstanceOf[Joined[Fields, Fields2, (Row, Row2)] => SqlExpr[Boolean, N, (Row, Row2)]])
+    def leftOn[N[_]: Nullability](pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]): SelectBuilder[LeftJoined[Fields, Fields2], (Row, Option[Row2])] =
+      leftJoinOn(other)(pred)
 
     /** Variant of `leftOn` that requires the join predicate to not be nullable */
-    def leftOnStrict(pred: Joined[Fields, Fields2, Hidden] => SqlExpr[Boolean, Required, Hidden]): SelectBuilder[LeftJoined[Fields, Fields2, *], (Row, Option[Row2])] =
-      leftJoinOn(other)(pred.asInstanceOf[Joined[Fields, Fields2, (Row, Row2)] => SqlExpr[Boolean, Required, (Row, Row2)]])
+    def leftOnStrict(pred: Joined[Fields, Fields2] => SqlExpr[Boolean, Required]): SelectBuilder[LeftJoined[Fields, Fields2], (Row, Option[Row2])] =
+      leftJoinOn(other)(pred)
   }
 
   protected def params: SelectParams[Fields, Row]
 
   protected def withParams(sqlParams: SelectParams[Fields, Row]): SelectBuilder[Fields, Row]
 
-  protected def joinOn[Fields2[_], N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(
-      pred: Joined[Fields, Fields2, (Row, Row2)] => SqlExpr[Boolean, N, (Row, Row2)]
-  ): SelectBuilder[Joined[Fields, Fields2, *], (Row, Row2)]
+  protected def joinOn[Fields2, N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(
+      pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]
+  ): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)]
 
-  protected def leftJoinOn[Fields2[_], N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(
-      pred: Joined[Fields, Fields2, (Row, Row2)] => SqlExpr[Boolean, N, (Row, Row2)]
-  ): SelectBuilder[LeftJoined[Fields, Fields2, *], (Row, Option[Row2])]
+  protected def leftJoinOn[Fields2, N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(
+      pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]
+  ): SelectBuilder[LeftJoined[Fields, Fields2], (Row, Option[Row2])]
 }

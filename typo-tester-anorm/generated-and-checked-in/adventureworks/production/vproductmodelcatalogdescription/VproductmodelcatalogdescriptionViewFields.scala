@@ -11,79 +11,80 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait VproductmodelcatalogdescriptionViewFields[Row] {
-  val productmodelid: Field[ProductmodelId, Row]
-  val name: Field[Name, Row]
-  val Summary: OptField[String, Row]
-  val manufacturer: OptField[String, Row]
-  val copyright: OptField[/* max 30 chars */ String, Row]
-  val producturl: OptField[/* max 256 chars */ String, Row]
-  val warrantyperiod: OptField[/* max 256 chars */ String, Row]
-  val warrantydescription: OptField[/* max 256 chars */ String, Row]
-  val noofyears: OptField[/* max 256 chars */ String, Row]
-  val maintenancedescription: OptField[/* max 256 chars */ String, Row]
-  val wheel: OptField[/* max 256 chars */ String, Row]
-  val saddle: OptField[/* max 256 chars */ String, Row]
-  val pedal: OptField[/* max 256 chars */ String, Row]
-  val bikeframe: OptField[String, Row]
-  val crankset: OptField[/* max 256 chars */ String, Row]
-  val pictureangle: OptField[/* max 256 chars */ String, Row]
-  val picturesize: OptField[/* max 256 chars */ String, Row]
-  val productphotoid: OptField[/* max 256 chars */ String, Row]
-  val material: OptField[/* max 256 chars */ String, Row]
-  val color: OptField[/* max 256 chars */ String, Row]
-  val productline: OptField[/* max 256 chars */ String, Row]
-  val style: OptField[/* max 256 chars */ String, Row]
-  val riderexperience: OptField[/* max 1024 chars */ String, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait VproductmodelcatalogdescriptionViewFields {
+  def productmodelid: Field[ProductmodelId, VproductmodelcatalogdescriptionViewRow]
+  def name: Field[Name, VproductmodelcatalogdescriptionViewRow]
+  def Summary: OptField[String, VproductmodelcatalogdescriptionViewRow]
+  def manufacturer: OptField[String, VproductmodelcatalogdescriptionViewRow]
+  def copyright: OptField[/* max 30 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def producturl: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def warrantyperiod: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def warrantydescription: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def noofyears: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def maintenancedescription: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def wheel: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def saddle: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def pedal: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def bikeframe: OptField[String, VproductmodelcatalogdescriptionViewRow]
+  def crankset: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def pictureangle: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def picturesize: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def productphotoid: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def material: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def color: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def productline: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def style: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def riderexperience: OptField[/* max 1024 chars */ String, VproductmodelcatalogdescriptionViewRow]
+  def rowguid: Field[TypoUUID, VproductmodelcatalogdescriptionViewRow]
+  def modifieddate: Field[TypoLocalDateTime, VproductmodelcatalogdescriptionViewRow]
 }
 
 object VproductmodelcatalogdescriptionViewFields {
-  val structure: Relation[VproductmodelcatalogdescriptionViewFields, VproductmodelcatalogdescriptionViewRow, VproductmodelcatalogdescriptionViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[VproductmodelcatalogdescriptionViewFields, VproductmodelcatalogdescriptionViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => VproductmodelcatalogdescriptionViewRow, val merge: (Row, VproductmodelcatalogdescriptionViewRow) => Row)
-    extends Relation[VproductmodelcatalogdescriptionViewFields, VproductmodelcatalogdescriptionViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[VproductmodelcatalogdescriptionViewFields, VproductmodelcatalogdescriptionViewRow] {
   
-    override val fields: VproductmodelcatalogdescriptionViewFields[Row] = new VproductmodelcatalogdescriptionViewFields[Row] {
-      override val productmodelid = new Field[ProductmodelId, Row](prefix, "productmodelid", None, None)(x => extract(x).productmodelid, (row, value) => merge(row, extract(row).copy(productmodelid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val Summary = new OptField[String, Row](prefix, "Summary", None, None)(x => extract(x).Summary, (row, value) => merge(row, extract(row).copy(Summary = value)))
-      override val manufacturer = new OptField[String, Row](prefix, "manufacturer", None, None)(x => extract(x).manufacturer, (row, value) => merge(row, extract(row).copy(manufacturer = value)))
-      override val copyright = new OptField[/* max 30 chars */ String, Row](prefix, "copyright", None, None)(x => extract(x).copyright, (row, value) => merge(row, extract(row).copy(copyright = value)))
-      override val producturl = new OptField[/* max 256 chars */ String, Row](prefix, "producturl", None, None)(x => extract(x).producturl, (row, value) => merge(row, extract(row).copy(producturl = value)))
-      override val warrantyperiod = new OptField[/* max 256 chars */ String, Row](prefix, "warrantyperiod", None, None)(x => extract(x).warrantyperiod, (row, value) => merge(row, extract(row).copy(warrantyperiod = value)))
-      override val warrantydescription = new OptField[/* max 256 chars */ String, Row](prefix, "warrantydescription", None, None)(x => extract(x).warrantydescription, (row, value) => merge(row, extract(row).copy(warrantydescription = value)))
-      override val noofyears = new OptField[/* max 256 chars */ String, Row](prefix, "noofyears", None, None)(x => extract(x).noofyears, (row, value) => merge(row, extract(row).copy(noofyears = value)))
-      override val maintenancedescription = new OptField[/* max 256 chars */ String, Row](prefix, "maintenancedescription", None, None)(x => extract(x).maintenancedescription, (row, value) => merge(row, extract(row).copy(maintenancedescription = value)))
-      override val wheel = new OptField[/* max 256 chars */ String, Row](prefix, "wheel", None, None)(x => extract(x).wheel, (row, value) => merge(row, extract(row).copy(wheel = value)))
-      override val saddle = new OptField[/* max 256 chars */ String, Row](prefix, "saddle", None, None)(x => extract(x).saddle, (row, value) => merge(row, extract(row).copy(saddle = value)))
-      override val pedal = new OptField[/* max 256 chars */ String, Row](prefix, "pedal", None, None)(x => extract(x).pedal, (row, value) => merge(row, extract(row).copy(pedal = value)))
-      override val bikeframe = new OptField[String, Row](prefix, "bikeframe", None, None)(x => extract(x).bikeframe, (row, value) => merge(row, extract(row).copy(bikeframe = value)))
-      override val crankset = new OptField[/* max 256 chars */ String, Row](prefix, "crankset", None, None)(x => extract(x).crankset, (row, value) => merge(row, extract(row).copy(crankset = value)))
-      override val pictureangle = new OptField[/* max 256 chars */ String, Row](prefix, "pictureangle", None, None)(x => extract(x).pictureangle, (row, value) => merge(row, extract(row).copy(pictureangle = value)))
-      override val picturesize = new OptField[/* max 256 chars */ String, Row](prefix, "picturesize", None, None)(x => extract(x).picturesize, (row, value) => merge(row, extract(row).copy(picturesize = value)))
-      override val productphotoid = new OptField[/* max 256 chars */ String, Row](prefix, "productphotoid", None, None)(x => extract(x).productphotoid, (row, value) => merge(row, extract(row).copy(productphotoid = value)))
-      override val material = new OptField[/* max 256 chars */ String, Row](prefix, "material", None, None)(x => extract(x).material, (row, value) => merge(row, extract(row).copy(material = value)))
-      override val color = new OptField[/* max 256 chars */ String, Row](prefix, "color", None, None)(x => extract(x).color, (row, value) => merge(row, extract(row).copy(color = value)))
-      override val productline = new OptField[/* max 256 chars */ String, Row](prefix, "productline", None, None)(x => extract(x).productline, (row, value) => merge(row, extract(row).copy(productline = value)))
-      override val style = new OptField[/* max 256 chars */ String, Row](prefix, "style", None, None)(x => extract(x).style, (row, value) => merge(row, extract(row).copy(style = value)))
-      override val riderexperience = new OptField[/* max 1024 chars */ String, Row](prefix, "riderexperience", None, None)(x => extract(x).riderexperience, (row, value) => merge(row, extract(row).copy(riderexperience = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: VproductmodelcatalogdescriptionViewFields = new VproductmodelcatalogdescriptionViewFields {
+      override def productmodelid = Field[ProductmodelId, VproductmodelcatalogdescriptionViewRow](_path, "productmodelid", None, None, x => x.productmodelid, (row, value) => row.copy(productmodelid = value))
+      override def name = Field[Name, VproductmodelcatalogdescriptionViewRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def Summary = OptField[String, VproductmodelcatalogdescriptionViewRow](_path, "Summary", None, None, x => x.Summary, (row, value) => row.copy(Summary = value))
+      override def manufacturer = OptField[String, VproductmodelcatalogdescriptionViewRow](_path, "manufacturer", None, None, x => x.manufacturer, (row, value) => row.copy(manufacturer = value))
+      override def copyright = OptField[/* max 30 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "copyright", None, None, x => x.copyright, (row, value) => row.copy(copyright = value))
+      override def producturl = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "producturl", None, None, x => x.producturl, (row, value) => row.copy(producturl = value))
+      override def warrantyperiod = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "warrantyperiod", None, None, x => x.warrantyperiod, (row, value) => row.copy(warrantyperiod = value))
+      override def warrantydescription = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "warrantydescription", None, None, x => x.warrantydescription, (row, value) => row.copy(warrantydescription = value))
+      override def noofyears = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "noofyears", None, None, x => x.noofyears, (row, value) => row.copy(noofyears = value))
+      override def maintenancedescription = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "maintenancedescription", None, None, x => x.maintenancedescription, (row, value) => row.copy(maintenancedescription = value))
+      override def wheel = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "wheel", None, None, x => x.wheel, (row, value) => row.copy(wheel = value))
+      override def saddle = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "saddle", None, None, x => x.saddle, (row, value) => row.copy(saddle = value))
+      override def pedal = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "pedal", None, None, x => x.pedal, (row, value) => row.copy(pedal = value))
+      override def bikeframe = OptField[String, VproductmodelcatalogdescriptionViewRow](_path, "bikeframe", None, None, x => x.bikeframe, (row, value) => row.copy(bikeframe = value))
+      override def crankset = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "crankset", None, None, x => x.crankset, (row, value) => row.copy(crankset = value))
+      override def pictureangle = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "pictureangle", None, None, x => x.pictureangle, (row, value) => row.copy(pictureangle = value))
+      override def picturesize = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "picturesize", None, None, x => x.picturesize, (row, value) => row.copy(picturesize = value))
+      override def productphotoid = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "productphotoid", None, None, x => x.productphotoid, (row, value) => row.copy(productphotoid = value))
+      override def material = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "material", None, None, x => x.material, (row, value) => row.copy(material = value))
+      override def color = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "color", None, None, x => x.color, (row, value) => row.copy(color = value))
+      override def productline = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "productline", None, None, x => x.productline, (row, value) => row.copy(productline = value))
+      override def style = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "style", None, None, x => x.style, (row, value) => row.copy(style = value))
+      override def riderexperience = OptField[/* max 1024 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "riderexperience", None, None, x => x.riderexperience, (row, value) => row.copy(riderexperience = value))
+      override def rowguid = Field[TypoUUID, VproductmodelcatalogdescriptionViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, VproductmodelcatalogdescriptionViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.productmodelid, fields.name, fields.Summary, fields.manufacturer, fields.copyright, fields.producturl, fields.warrantyperiod, fields.warrantydescription, fields.noofyears, fields.maintenancedescription, fields.wheel, fields.saddle, fields.pedal, fields.bikeframe, fields.crankset, fields.pictureangle, fields.picturesize, fields.productphotoid, fields.material, fields.color, fields.productline, fields.style, fields.riderexperience, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, VproductmodelcatalogdescriptionViewRow]] =
+      List[FieldLikeNoHkt[?, VproductmodelcatalogdescriptionViewRow]](fields.productmodelid, fields.name, fields.Summary, fields.manufacturer, fields.copyright, fields.producturl, fields.warrantyperiod, fields.warrantydescription, fields.noofyears, fields.maintenancedescription, fields.wheel, fields.saddle, fields.pedal, fields.bikeframe, fields.crankset, fields.pictureangle, fields.picturesize, fields.productphotoid, fields.material, fields.color, fields.productline, fields.style, fields.riderexperience, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => VproductmodelcatalogdescriptionViewRow, merge: (NewRow, VproductmodelcatalogdescriptionViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

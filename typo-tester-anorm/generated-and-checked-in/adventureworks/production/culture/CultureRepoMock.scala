@@ -22,7 +22,7 @@ import typo.dsl.UpdateParams
 class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
                       map: scala.collection.mutable.Map[CultureId, CultureRow] = scala.collection.mutable.Map.empty) extends CultureRepo {
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CultureFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, CultureFields.structure, map)
   }
   override def deleteById(cultureid: CultureId)(implicit c: Connection): Boolean = {
     map.remove(cultureid).isDefined
@@ -72,7 +72,7 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     cultureids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CultureFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, CultureFields.structure, map)
   }
   override def update(row: CultureRow)(implicit c: Connection): Boolean = {
     map.get(row.cultureid) match {

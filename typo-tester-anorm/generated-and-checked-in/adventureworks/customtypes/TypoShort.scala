@@ -15,7 +15,6 @@ import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import scala.math.Numeric
 import typo.dsl.Bijection
 
 /** Short primitive */

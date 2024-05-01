@@ -23,7 +23,7 @@ import typo.dsl.UpdateParams
 class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
                        map: scala.collection.mutable.Map[BusinessentityId, PasswordRow] = scala.collection.mutable.Map.empty) extends PasswordRepo {
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PasswordFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, PasswordFields.structure, map)
   }
   override def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
     map.remove(businessentityid).isDefined
@@ -73,7 +73,7 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
     businessentityids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PasswordFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, PasswordFields.structure, map)
   }
   override def update(row: PasswordRow)(implicit c: Connection): Boolean = {
     map.get(row.businessentityid) match {

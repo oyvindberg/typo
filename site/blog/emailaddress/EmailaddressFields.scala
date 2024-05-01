@@ -14,7 +14,7 @@ import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 
-trait EmailaddressFields[Row] {
+trait EmailaddressFields {
   val businessentityid: IdField[BusinessentityId, Row]
   val emailaddressid: IdField[Int, Row]
   val emailaddress: OptField[/* max 50 chars */ String, Row]

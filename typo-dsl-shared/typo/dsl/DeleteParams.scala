@@ -1,18 +1,11 @@
 package typo.dsl
 
-case class DeleteParams[Fields[_], Row](
-    where: List[Fields[Row] => SqlExpr[Boolean, Required, Row]]
-) {
-  def where(v: Fields[Row] => SqlExpr[Boolean, Required, Row]): DeleteParams[Fields, Row] =
+case class DeleteParams[Fields](where: List[Fields => SqlExpr[Boolean, Required]]) {
+  def where(v: Fields => SqlExpr[Boolean, Required]): DeleteParams[Fields] =
     copy(where = where :+ v)
 }
 
 object DeleteParams {
-  def empty[Fields[_], Row]: DeleteParams[Fields, Row] =
-    DeleteParams[Fields, Row](List.empty)
-
-  def applyParams[Fields[_], Row](fields: Fields[Row], rows: List[Row], params: DeleteParams[Fields, Row]): List[Row] = {
-    val filtered = params.where.foldLeft(rows) { (acc, where) => acc.filter(o => where(fields).eval(o)) }
-    filtered
-  }
+  def empty[Fields]: DeleteParams[Fields] =
+    DeleteParams[Fields](List.empty)
 }

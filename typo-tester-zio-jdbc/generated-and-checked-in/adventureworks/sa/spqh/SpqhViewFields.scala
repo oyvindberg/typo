@@ -10,40 +10,41 @@ package spqh
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait SpqhViewFields[Row] {
-  val id: Field[BusinessentityId, Row]
-  val businessentityid: Field[BusinessentityId, Row]
-  val quotadate: Field[TypoLocalDateTime, Row]
-  val salesquota: Field[BigDecimal, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SpqhViewFields {
+  def id: Field[BusinessentityId, SpqhViewRow]
+  def businessentityid: Field[BusinessentityId, SpqhViewRow]
+  def quotadate: Field[TypoLocalDateTime, SpqhViewRow]
+  def salesquota: Field[BigDecimal, SpqhViewRow]
+  def rowguid: Field[TypoUUID, SpqhViewRow]
+  def modifieddate: Field[TypoLocalDateTime, SpqhViewRow]
 }
 
 object SpqhViewFields {
-  val structure: Relation[SpqhViewFields, SpqhViewRow, SpqhViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SpqhViewFields, SpqhViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SpqhViewRow, val merge: (Row, SpqhViewRow) => Row)
-    extends Relation[SpqhViewFields, SpqhViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SpqhViewFields, SpqhViewRow] {
   
-    override val fields: SpqhViewFields[Row] = new SpqhViewFields[Row] {
-      override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val quotadate = new Field[TypoLocalDateTime, Row](prefix, "quotadate", Some("text"), None)(x => extract(x).quotadate, (row, value) => merge(row, extract(row).copy(quotadate = value)))
-      override val salesquota = new Field[BigDecimal, Row](prefix, "salesquota", None, None)(x => extract(x).salesquota, (row, value) => merge(row, extract(row).copy(salesquota = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SpqhViewFields = new SpqhViewFields {
+      override def id = Field[BusinessentityId, SpqhViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def businessentityid = Field[BusinessentityId, SpqhViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def quotadate = Field[TypoLocalDateTime, SpqhViewRow](_path, "quotadate", Some("text"), None, x => x.quotadate, (row, value) => row.copy(quotadate = value))
+      override def salesquota = Field[BigDecimal, SpqhViewRow](_path, "salesquota", None, None, x => x.salesquota, (row, value) => row.copy(salesquota = value))
+      override def rowguid = Field[TypoUUID, SpqhViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, SpqhViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.businessentityid, fields.quotadate, fields.salesquota, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SpqhViewRow]] =
+      List[FieldLikeNoHkt[?, SpqhViewRow]](fields.id, fields.businessentityid, fields.quotadate, fields.salesquota, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SpqhViewRow, merge: (NewRow, SpqhViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

@@ -12,55 +12,56 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait PohViewFields[Row] {
-  val id: Field[PurchaseorderheaderId, Row]
-  val purchaseorderid: Field[PurchaseorderheaderId, Row]
-  val revisionnumber: Field[TypoShort, Row]
-  val status: Field[TypoShort, Row]
-  val employeeid: Field[BusinessentityId, Row]
-  val vendorid: Field[BusinessentityId, Row]
-  val shipmethodid: Field[ShipmethodId, Row]
-  val orderdate: Field[TypoLocalDateTime, Row]
-  val shipdate: OptField[TypoLocalDateTime, Row]
-  val subtotal: Field[BigDecimal, Row]
-  val taxamt: Field[BigDecimal, Row]
-  val freight: Field[BigDecimal, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait PohViewFields {
+  def id: Field[PurchaseorderheaderId, PohViewRow]
+  def purchaseorderid: Field[PurchaseorderheaderId, PohViewRow]
+  def revisionnumber: Field[TypoShort, PohViewRow]
+  def status: Field[TypoShort, PohViewRow]
+  def employeeid: Field[BusinessentityId, PohViewRow]
+  def vendorid: Field[BusinessentityId, PohViewRow]
+  def shipmethodid: Field[ShipmethodId, PohViewRow]
+  def orderdate: Field[TypoLocalDateTime, PohViewRow]
+  def shipdate: OptField[TypoLocalDateTime, PohViewRow]
+  def subtotal: Field[BigDecimal, PohViewRow]
+  def taxamt: Field[BigDecimal, PohViewRow]
+  def freight: Field[BigDecimal, PohViewRow]
+  def modifieddate: Field[TypoLocalDateTime, PohViewRow]
 }
 
 object PohViewFields {
-  val structure: Relation[PohViewFields, PohViewRow, PohViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PohViewFields, PohViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PohViewRow, val merge: (Row, PohViewRow) => Row)
-    extends Relation[PohViewFields, PohViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PohViewFields, PohViewRow] {
   
-    override val fields: PohViewFields[Row] = new PohViewFields[Row] {
-      override val id = new Field[PurchaseorderheaderId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val purchaseorderid = new Field[PurchaseorderheaderId, Row](prefix, "purchaseorderid", None, None)(x => extract(x).purchaseorderid, (row, value) => merge(row, extract(row).copy(purchaseorderid = value)))
-      override val revisionnumber = new Field[TypoShort, Row](prefix, "revisionnumber", None, None)(x => extract(x).revisionnumber, (row, value) => merge(row, extract(row).copy(revisionnumber = value)))
-      override val status = new Field[TypoShort, Row](prefix, "status", None, None)(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
-      override val employeeid = new Field[BusinessentityId, Row](prefix, "employeeid", None, None)(x => extract(x).employeeid, (row, value) => merge(row, extract(row).copy(employeeid = value)))
-      override val vendorid = new Field[BusinessentityId, Row](prefix, "vendorid", None, None)(x => extract(x).vendorid, (row, value) => merge(row, extract(row).copy(vendorid = value)))
-      override val shipmethodid = new Field[ShipmethodId, Row](prefix, "shipmethodid", None, None)(x => extract(x).shipmethodid, (row, value) => merge(row, extract(row).copy(shipmethodid = value)))
-      override val orderdate = new Field[TypoLocalDateTime, Row](prefix, "orderdate", Some("text"), None)(x => extract(x).orderdate, (row, value) => merge(row, extract(row).copy(orderdate = value)))
-      override val shipdate = new OptField[TypoLocalDateTime, Row](prefix, "shipdate", Some("text"), None)(x => extract(x).shipdate, (row, value) => merge(row, extract(row).copy(shipdate = value)))
-      override val subtotal = new Field[BigDecimal, Row](prefix, "subtotal", None, None)(x => extract(x).subtotal, (row, value) => merge(row, extract(row).copy(subtotal = value)))
-      override val taxamt = new Field[BigDecimal, Row](prefix, "taxamt", None, None)(x => extract(x).taxamt, (row, value) => merge(row, extract(row).copy(taxamt = value)))
-      override val freight = new Field[BigDecimal, Row](prefix, "freight", None, None)(x => extract(x).freight, (row, value) => merge(row, extract(row).copy(freight = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: PohViewFields = new PohViewFields {
+      override def id = Field[PurchaseorderheaderId, PohViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def purchaseorderid = Field[PurchaseorderheaderId, PohViewRow](_path, "purchaseorderid", None, None, x => x.purchaseorderid, (row, value) => row.copy(purchaseorderid = value))
+      override def revisionnumber = Field[TypoShort, PohViewRow](_path, "revisionnumber", None, None, x => x.revisionnumber, (row, value) => row.copy(revisionnumber = value))
+      override def status = Field[TypoShort, PohViewRow](_path, "status", None, None, x => x.status, (row, value) => row.copy(status = value))
+      override def employeeid = Field[BusinessentityId, PohViewRow](_path, "employeeid", None, None, x => x.employeeid, (row, value) => row.copy(employeeid = value))
+      override def vendorid = Field[BusinessentityId, PohViewRow](_path, "vendorid", None, None, x => x.vendorid, (row, value) => row.copy(vendorid = value))
+      override def shipmethodid = Field[ShipmethodId, PohViewRow](_path, "shipmethodid", None, None, x => x.shipmethodid, (row, value) => row.copy(shipmethodid = value))
+      override def orderdate = Field[TypoLocalDateTime, PohViewRow](_path, "orderdate", Some("text"), None, x => x.orderdate, (row, value) => row.copy(orderdate = value))
+      override def shipdate = OptField[TypoLocalDateTime, PohViewRow](_path, "shipdate", Some("text"), None, x => x.shipdate, (row, value) => row.copy(shipdate = value))
+      override def subtotal = Field[BigDecimal, PohViewRow](_path, "subtotal", None, None, x => x.subtotal, (row, value) => row.copy(subtotal = value))
+      override def taxamt = Field[BigDecimal, PohViewRow](_path, "taxamt", None, None, x => x.taxamt, (row, value) => row.copy(taxamt = value))
+      override def freight = Field[BigDecimal, PohViewRow](_path, "freight", None, None, x => x.freight, (row, value) => row.copy(freight = value))
+      override def modifieddate = Field[TypoLocalDateTime, PohViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.purchaseorderid, fields.revisionnumber, fields.status, fields.employeeid, fields.vendorid, fields.shipmethodid, fields.orderdate, fields.shipdate, fields.subtotal, fields.taxamt, fields.freight, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, PohViewRow]] =
+      List[FieldLikeNoHkt[?, PohViewRow]](fields.id, fields.purchaseorderid, fields.revisionnumber, fields.status, fields.employeeid, fields.vendorid, fields.shipmethodid, fields.orderdate, fields.shipdate, fields.subtotal, fields.taxamt, fields.freight, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PohViewRow, merge: (NewRow, PohViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

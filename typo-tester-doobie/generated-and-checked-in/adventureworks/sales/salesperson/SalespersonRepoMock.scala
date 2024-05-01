@@ -25,7 +25,7 @@ import typo.dsl.UpdateParams
 class SalespersonRepoMock(toRow: Function1[SalespersonRowUnsaved, SalespersonRow],
                           map: scala.collection.mutable.Map[BusinessentityId, SalespersonRow] = scala.collection.mutable.Map.empty) extends SalespersonRepo {
   override def delete: DeleteBuilder[SalespersonFields, SalespersonRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalespersonFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalespersonFields.structure, map)
   }
   override def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
     delay(map.remove(businessentityid).isDefined)
@@ -87,7 +87,7 @@ class SalespersonRepoMock(toRow: Function1[SalespersonRowUnsaved, SalespersonRow
     }
   }
   override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalespersonFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalespersonFields.structure, map)
   }
   override def update(row: SalespersonRow): ConnectionIO[Boolean] = {
     delay {

@@ -10,41 +10,42 @@ package e
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait EViewFields[Row] {
-  val id: Field[Int, Row]
-  val businessentityid: Field[BusinessentityId, Row]
-  val emailaddressid: Field[Int, Row]
-  val emailaddress: OptField[/* max 50 chars */ String, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait EViewFields {
+  def id: Field[Int, EViewRow]
+  def businessentityid: Field[BusinessentityId, EViewRow]
+  def emailaddressid: Field[Int, EViewRow]
+  def emailaddress: OptField[/* max 50 chars */ String, EViewRow]
+  def rowguid: Field[TypoUUID, EViewRow]
+  def modifieddate: Field[TypoLocalDateTime, EViewRow]
 }
 
 object EViewFields {
-  val structure: Relation[EViewFields, EViewRow, EViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[EViewFields, EViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => EViewRow, val merge: (Row, EViewRow) => Row)
-    extends Relation[EViewFields, EViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[EViewFields, EViewRow] {
   
-    override val fields: EViewFields[Row] = new EViewFields[Row] {
-      override val id = new Field[Int, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val emailaddressid = new Field[Int, Row](prefix, "emailaddressid", None, None)(x => extract(x).emailaddressid, (row, value) => merge(row, extract(row).copy(emailaddressid = value)))
-      override val emailaddress = new OptField[/* max 50 chars */ String, Row](prefix, "emailaddress", None, None)(x => extract(x).emailaddress, (row, value) => merge(row, extract(row).copy(emailaddress = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: EViewFields = new EViewFields {
+      override def id = Field[Int, EViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def businessentityid = Field[BusinessentityId, EViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def emailaddressid = Field[Int, EViewRow](_path, "emailaddressid", None, None, x => x.emailaddressid, (row, value) => row.copy(emailaddressid = value))
+      override def emailaddress = OptField[/* max 50 chars */ String, EViewRow](_path, "emailaddress", None, None, x => x.emailaddress, (row, value) => row.copy(emailaddress = value))
+      override def rowguid = Field[TypoUUID, EViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, EViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.businessentityid, fields.emailaddressid, fields.emailaddress, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, EViewRow]] =
+      List[FieldLikeNoHkt[?, EViewRow]](fields.id, fields.businessentityid, fields.emailaddressid, fields.emailaddress, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => EViewRow, merge: (NewRow, EViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

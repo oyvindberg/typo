@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, EmailaddressRow],
                            map: scala.collection.mutable.Map[EmailaddressId, EmailaddressRow] = scala.collection.mutable.Map.empty) extends EmailaddressRepo {
   override def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow] = {
-    DeleteBuilderMock(DeleteParams.empty, EmailaddressFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, EmailaddressFields.structure, map)
   }
   override def deleteById(compositeId: EmailaddressId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
@@ -85,7 +85,7 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
     }
   }
   override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
-    UpdateBuilderMock(UpdateParams.empty, EmailaddressFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, EmailaddressFields.structure, map)
   }
   override def update(row: EmailaddressRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

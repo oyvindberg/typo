@@ -12,65 +12,66 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
 import adventureworks.userdefined.FirstName
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait VemployeeViewFields[Row] {
-  val businessentityid: Field[BusinessentityId, Row]
-  val title: OptField[/* max 8 chars */ String, Row]
-  val firstname: Field[/* user-picked */ FirstName, Row]
-  val middlename: OptField[Name, Row]
-  val lastname: Field[Name, Row]
-  val suffix: OptField[/* max 10 chars */ String, Row]
-  val jobtitle: Field[/* max 50 chars */ String, Row]
-  val phonenumber: OptField[Phone, Row]
-  val phonenumbertype: OptField[Name, Row]
-  val emailaddress: OptField[/* max 50 chars */ String, Row]
-  val emailpromotion: Field[Int, Row]
-  val addressline1: Field[/* max 60 chars */ String, Row]
-  val addressline2: OptField[/* max 60 chars */ String, Row]
-  val city: Field[/* max 30 chars */ String, Row]
-  val stateprovincename: Field[Name, Row]
-  val postalcode: Field[/* max 15 chars */ String, Row]
-  val countryregionname: Field[Name, Row]
-  val additionalcontactinfo: OptField[TypoXml, Row]
+trait VemployeeViewFields {
+  def businessentityid: Field[BusinessentityId, VemployeeViewRow]
+  def title: OptField[/* max 8 chars */ String, VemployeeViewRow]
+  def firstname: Field[/* user-picked */ FirstName, VemployeeViewRow]
+  def middlename: OptField[Name, VemployeeViewRow]
+  def lastname: Field[Name, VemployeeViewRow]
+  def suffix: OptField[/* max 10 chars */ String, VemployeeViewRow]
+  def jobtitle: Field[/* max 50 chars */ String, VemployeeViewRow]
+  def phonenumber: OptField[Phone, VemployeeViewRow]
+  def phonenumbertype: OptField[Name, VemployeeViewRow]
+  def emailaddress: OptField[/* max 50 chars */ String, VemployeeViewRow]
+  def emailpromotion: Field[Int, VemployeeViewRow]
+  def addressline1: Field[/* max 60 chars */ String, VemployeeViewRow]
+  def addressline2: OptField[/* max 60 chars */ String, VemployeeViewRow]
+  def city: Field[/* max 30 chars */ String, VemployeeViewRow]
+  def stateprovincename: Field[Name, VemployeeViewRow]
+  def postalcode: Field[/* max 15 chars */ String, VemployeeViewRow]
+  def countryregionname: Field[Name, VemployeeViewRow]
+  def additionalcontactinfo: OptField[TypoXml, VemployeeViewRow]
 }
 
 object VemployeeViewFields {
-  val structure: Relation[VemployeeViewFields, VemployeeViewRow, VemployeeViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[VemployeeViewFields, VemployeeViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => VemployeeViewRow, val merge: (Row, VemployeeViewRow) => Row)
-    extends Relation[VemployeeViewFields, VemployeeViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[VemployeeViewFields, VemployeeViewRow] {
   
-    override val fields: VemployeeViewFields[Row] = new VemployeeViewFields[Row] {
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val title = new OptField[/* max 8 chars */ String, Row](prefix, "title", None, None)(x => extract(x).title, (row, value) => merge(row, extract(row).copy(title = value)))
-      override val firstname = new Field[/* user-picked */ FirstName, Row](prefix, "firstname", None, None)(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
-      override val middlename = new OptField[Name, Row](prefix, "middlename", None, None)(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
-      override val lastname = new Field[Name, Row](prefix, "lastname", None, None)(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
-      override val suffix = new OptField[/* max 10 chars */ String, Row](prefix, "suffix", None, None)(x => extract(x).suffix, (row, value) => merge(row, extract(row).copy(suffix = value)))
-      override val jobtitle = new Field[/* max 50 chars */ String, Row](prefix, "jobtitle", None, None)(x => extract(x).jobtitle, (row, value) => merge(row, extract(row).copy(jobtitle = value)))
-      override val phonenumber = new OptField[Phone, Row](prefix, "phonenumber", None, None)(x => extract(x).phonenumber, (row, value) => merge(row, extract(row).copy(phonenumber = value)))
-      override val phonenumbertype = new OptField[Name, Row](prefix, "phonenumbertype", None, None)(x => extract(x).phonenumbertype, (row, value) => merge(row, extract(row).copy(phonenumbertype = value)))
-      override val emailaddress = new OptField[/* max 50 chars */ String, Row](prefix, "emailaddress", None, None)(x => extract(x).emailaddress, (row, value) => merge(row, extract(row).copy(emailaddress = value)))
-      override val emailpromotion = new Field[Int, Row](prefix, "emailpromotion", None, None)(x => extract(x).emailpromotion, (row, value) => merge(row, extract(row).copy(emailpromotion = value)))
-      override val addressline1 = new Field[/* max 60 chars */ String, Row](prefix, "addressline1", None, None)(x => extract(x).addressline1, (row, value) => merge(row, extract(row).copy(addressline1 = value)))
-      override val addressline2 = new OptField[/* max 60 chars */ String, Row](prefix, "addressline2", None, None)(x => extract(x).addressline2, (row, value) => merge(row, extract(row).copy(addressline2 = value)))
-      override val city = new Field[/* max 30 chars */ String, Row](prefix, "city", None, None)(x => extract(x).city, (row, value) => merge(row, extract(row).copy(city = value)))
-      override val stateprovincename = new Field[Name, Row](prefix, "stateprovincename", None, None)(x => extract(x).stateprovincename, (row, value) => merge(row, extract(row).copy(stateprovincename = value)))
-      override val postalcode = new Field[/* max 15 chars */ String, Row](prefix, "postalcode", None, None)(x => extract(x).postalcode, (row, value) => merge(row, extract(row).copy(postalcode = value)))
-      override val countryregionname = new Field[Name, Row](prefix, "countryregionname", None, None)(x => extract(x).countryregionname, (row, value) => merge(row, extract(row).copy(countryregionname = value)))
-      override val additionalcontactinfo = new OptField[TypoXml, Row](prefix, "additionalcontactinfo", None, None)(x => extract(x).additionalcontactinfo, (row, value) => merge(row, extract(row).copy(additionalcontactinfo = value)))
+    override lazy val fields: VemployeeViewFields = new VemployeeViewFields {
+      override def businessentityid = Field[BusinessentityId, VemployeeViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def title = OptField[/* max 8 chars */ String, VemployeeViewRow](_path, "title", None, None, x => x.title, (row, value) => row.copy(title = value))
+      override def firstname = Field[/* user-picked */ FirstName, VemployeeViewRow](_path, "firstname", None, None, x => x.firstname, (row, value) => row.copy(firstname = value))
+      override def middlename = OptField[Name, VemployeeViewRow](_path, "middlename", None, None, x => x.middlename, (row, value) => row.copy(middlename = value))
+      override def lastname = Field[Name, VemployeeViewRow](_path, "lastname", None, None, x => x.lastname, (row, value) => row.copy(lastname = value))
+      override def suffix = OptField[/* max 10 chars */ String, VemployeeViewRow](_path, "suffix", None, None, x => x.suffix, (row, value) => row.copy(suffix = value))
+      override def jobtitle = Field[/* max 50 chars */ String, VemployeeViewRow](_path, "jobtitle", None, None, x => x.jobtitle, (row, value) => row.copy(jobtitle = value))
+      override def phonenumber = OptField[Phone, VemployeeViewRow](_path, "phonenumber", None, None, x => x.phonenumber, (row, value) => row.copy(phonenumber = value))
+      override def phonenumbertype = OptField[Name, VemployeeViewRow](_path, "phonenumbertype", None, None, x => x.phonenumbertype, (row, value) => row.copy(phonenumbertype = value))
+      override def emailaddress = OptField[/* max 50 chars */ String, VemployeeViewRow](_path, "emailaddress", None, None, x => x.emailaddress, (row, value) => row.copy(emailaddress = value))
+      override def emailpromotion = Field[Int, VemployeeViewRow](_path, "emailpromotion", None, None, x => x.emailpromotion, (row, value) => row.copy(emailpromotion = value))
+      override def addressline1 = Field[/* max 60 chars */ String, VemployeeViewRow](_path, "addressline1", None, None, x => x.addressline1, (row, value) => row.copy(addressline1 = value))
+      override def addressline2 = OptField[/* max 60 chars */ String, VemployeeViewRow](_path, "addressline2", None, None, x => x.addressline2, (row, value) => row.copy(addressline2 = value))
+      override def city = Field[/* max 30 chars */ String, VemployeeViewRow](_path, "city", None, None, x => x.city, (row, value) => row.copy(city = value))
+      override def stateprovincename = Field[Name, VemployeeViewRow](_path, "stateprovincename", None, None, x => x.stateprovincename, (row, value) => row.copy(stateprovincename = value))
+      override def postalcode = Field[/* max 15 chars */ String, VemployeeViewRow](_path, "postalcode", None, None, x => x.postalcode, (row, value) => row.copy(postalcode = value))
+      override def countryregionname = Field[Name, VemployeeViewRow](_path, "countryregionname", None, None, x => x.countryregionname, (row, value) => row.copy(countryregionname = value))
+      override def additionalcontactinfo = OptField[TypoXml, VemployeeViewRow](_path, "additionalcontactinfo", None, None, x => x.additionalcontactinfo, (row, value) => row.copy(additionalcontactinfo = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.businessentityid, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.jobtitle, fields.phonenumber, fields.phonenumbertype, fields.emailaddress, fields.emailpromotion, fields.addressline1, fields.addressline2, fields.city, fields.stateprovincename, fields.postalcode, fields.countryregionname, fields.additionalcontactinfo)
+    override lazy val columns: List[FieldLikeNoHkt[?, VemployeeViewRow]] =
+      List[FieldLikeNoHkt[?, VemployeeViewRow]](fields.businessentityid, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.jobtitle, fields.phonenumber, fields.phonenumbertype, fields.emailaddress, fields.emailpromotion, fields.addressline1, fields.addressline2, fields.city, fields.stateprovincename, fields.postalcode, fields.countryregionname, fields.additionalcontactinfo)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => VemployeeViewRow, merge: (NewRow, VemployeeViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

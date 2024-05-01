@@ -11,55 +11,56 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait WrViewFields[Row] {
-  val id: Field[WorkorderId, Row]
-  val workorderid: Field[WorkorderId, Row]
-  val productid: Field[Int, Row]
-  val operationsequence: Field[TypoShort, Row]
-  val locationid: Field[LocationId, Row]
-  val scheduledstartdate: Field[TypoLocalDateTime, Row]
-  val scheduledenddate: Field[TypoLocalDateTime, Row]
-  val actualstartdate: OptField[TypoLocalDateTime, Row]
-  val actualenddate: OptField[TypoLocalDateTime, Row]
-  val actualresourcehrs: OptField[BigDecimal, Row]
-  val plannedcost: Field[BigDecimal, Row]
-  val actualcost: OptField[BigDecimal, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait WrViewFields {
+  def id: Field[WorkorderId, WrViewRow]
+  def workorderid: Field[WorkorderId, WrViewRow]
+  def productid: Field[Int, WrViewRow]
+  def operationsequence: Field[TypoShort, WrViewRow]
+  def locationid: Field[LocationId, WrViewRow]
+  def scheduledstartdate: Field[TypoLocalDateTime, WrViewRow]
+  def scheduledenddate: Field[TypoLocalDateTime, WrViewRow]
+  def actualstartdate: OptField[TypoLocalDateTime, WrViewRow]
+  def actualenddate: OptField[TypoLocalDateTime, WrViewRow]
+  def actualresourcehrs: OptField[BigDecimal, WrViewRow]
+  def plannedcost: Field[BigDecimal, WrViewRow]
+  def actualcost: OptField[BigDecimal, WrViewRow]
+  def modifieddate: Field[TypoLocalDateTime, WrViewRow]
 }
 
 object WrViewFields {
-  val structure: Relation[WrViewFields, WrViewRow, WrViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[WrViewFields, WrViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => WrViewRow, val merge: (Row, WrViewRow) => Row)
-    extends Relation[WrViewFields, WrViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[WrViewFields, WrViewRow] {
   
-    override val fields: WrViewFields[Row] = new WrViewFields[Row] {
-      override val id = new Field[WorkorderId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val workorderid = new Field[WorkorderId, Row](prefix, "workorderid", None, None)(x => extract(x).workorderid, (row, value) => merge(row, extract(row).copy(workorderid = value)))
-      override val productid = new Field[Int, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val operationsequence = new Field[TypoShort, Row](prefix, "operationsequence", None, None)(x => extract(x).operationsequence, (row, value) => merge(row, extract(row).copy(operationsequence = value)))
-      override val locationid = new Field[LocationId, Row](prefix, "locationid", None, None)(x => extract(x).locationid, (row, value) => merge(row, extract(row).copy(locationid = value)))
-      override val scheduledstartdate = new Field[TypoLocalDateTime, Row](prefix, "scheduledstartdate", Some("text"), None)(x => extract(x).scheduledstartdate, (row, value) => merge(row, extract(row).copy(scheduledstartdate = value)))
-      override val scheduledenddate = new Field[TypoLocalDateTime, Row](prefix, "scheduledenddate", Some("text"), None)(x => extract(x).scheduledenddate, (row, value) => merge(row, extract(row).copy(scheduledenddate = value)))
-      override val actualstartdate = new OptField[TypoLocalDateTime, Row](prefix, "actualstartdate", Some("text"), None)(x => extract(x).actualstartdate, (row, value) => merge(row, extract(row).copy(actualstartdate = value)))
-      override val actualenddate = new OptField[TypoLocalDateTime, Row](prefix, "actualenddate", Some("text"), None)(x => extract(x).actualenddate, (row, value) => merge(row, extract(row).copy(actualenddate = value)))
-      override val actualresourcehrs = new OptField[BigDecimal, Row](prefix, "actualresourcehrs", None, None)(x => extract(x).actualresourcehrs, (row, value) => merge(row, extract(row).copy(actualresourcehrs = value)))
-      override val plannedcost = new Field[BigDecimal, Row](prefix, "plannedcost", None, None)(x => extract(x).plannedcost, (row, value) => merge(row, extract(row).copy(plannedcost = value)))
-      override val actualcost = new OptField[BigDecimal, Row](prefix, "actualcost", None, None)(x => extract(x).actualcost, (row, value) => merge(row, extract(row).copy(actualcost = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: WrViewFields = new WrViewFields {
+      override def id = Field[WorkorderId, WrViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def workorderid = Field[WorkorderId, WrViewRow](_path, "workorderid", None, None, x => x.workorderid, (row, value) => row.copy(workorderid = value))
+      override def productid = Field[Int, WrViewRow](_path, "productid", None, None, x => x.productid, (row, value) => row.copy(productid = value))
+      override def operationsequence = Field[TypoShort, WrViewRow](_path, "operationsequence", None, None, x => x.operationsequence, (row, value) => row.copy(operationsequence = value))
+      override def locationid = Field[LocationId, WrViewRow](_path, "locationid", None, None, x => x.locationid, (row, value) => row.copy(locationid = value))
+      override def scheduledstartdate = Field[TypoLocalDateTime, WrViewRow](_path, "scheduledstartdate", Some("text"), None, x => x.scheduledstartdate, (row, value) => row.copy(scheduledstartdate = value))
+      override def scheduledenddate = Field[TypoLocalDateTime, WrViewRow](_path, "scheduledenddate", Some("text"), None, x => x.scheduledenddate, (row, value) => row.copy(scheduledenddate = value))
+      override def actualstartdate = OptField[TypoLocalDateTime, WrViewRow](_path, "actualstartdate", Some("text"), None, x => x.actualstartdate, (row, value) => row.copy(actualstartdate = value))
+      override def actualenddate = OptField[TypoLocalDateTime, WrViewRow](_path, "actualenddate", Some("text"), None, x => x.actualenddate, (row, value) => row.copy(actualenddate = value))
+      override def actualresourcehrs = OptField[BigDecimal, WrViewRow](_path, "actualresourcehrs", None, None, x => x.actualresourcehrs, (row, value) => row.copy(actualresourcehrs = value))
+      override def plannedcost = Field[BigDecimal, WrViewRow](_path, "plannedcost", None, None, x => x.plannedcost, (row, value) => row.copy(plannedcost = value))
+      override def actualcost = OptField[BigDecimal, WrViewRow](_path, "actualcost", None, None, x => x.actualcost, (row, value) => row.copy(actualcost = value))
+      override def modifieddate = Field[TypoLocalDateTime, WrViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.workorderid, fields.productid, fields.operationsequence, fields.locationid, fields.scheduledstartdate, fields.scheduledenddate, fields.actualstartdate, fields.actualenddate, fields.actualresourcehrs, fields.plannedcost, fields.actualcost, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, WrViewRow]] =
+      List[FieldLikeNoHkt[?, WrViewRow]](fields.id, fields.workorderid, fields.productid, fields.operationsequence, fields.locationid, fields.scheduledstartdate, fields.scheduledenddate, fields.actualstartdate, fields.actualenddate, fields.actualresourcehrs, fields.plannedcost, fields.actualcost, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => WrViewRow, merge: (NewRow, WrViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

@@ -11,48 +11,49 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait WorkorderFields[Row] {
-  val workorderid: IdField[WorkorderId, Row]
-  val productid: Field[ProductId, Row]
-  val orderqty: Field[Int, Row]
-  val scrappedqty: Field[TypoShort, Row]
-  val startdate: Field[TypoLocalDateTime, Row]
-  val enddate: OptField[TypoLocalDateTime, Row]
-  val duedate: Field[TypoLocalDateTime, Row]
-  val scrapreasonid: OptField[ScrapreasonId, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait WorkorderFields {
+  def workorderid: IdField[WorkorderId, WorkorderRow]
+  def productid: Field[ProductId, WorkorderRow]
+  def orderqty: Field[Int, WorkorderRow]
+  def scrappedqty: Field[TypoShort, WorkorderRow]
+  def startdate: Field[TypoLocalDateTime, WorkorderRow]
+  def enddate: OptField[TypoLocalDateTime, WorkorderRow]
+  def duedate: Field[TypoLocalDateTime, WorkorderRow]
+  def scrapreasonid: OptField[ScrapreasonId, WorkorderRow]
+  def modifieddate: Field[TypoLocalDateTime, WorkorderRow]
 }
 
 object WorkorderFields {
-  val structure: Relation[WorkorderFields, WorkorderRow, WorkorderRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[WorkorderFields, WorkorderRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => WorkorderRow, val merge: (Row, WorkorderRow) => Row)
-    extends Relation[WorkorderFields, WorkorderRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[WorkorderFields, WorkorderRow] {
   
-    override val fields: WorkorderFields[Row] = new WorkorderFields[Row] {
-      override val workorderid = new IdField[WorkorderId, Row](prefix, "workorderid", None, Some("int4"))(x => extract(x).workorderid, (row, value) => merge(row, extract(row).copy(workorderid = value)))
-      override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val orderqty = new Field[Int, Row](prefix, "orderqty", None, Some("int4"))(x => extract(x).orderqty, (row, value) => merge(row, extract(row).copy(orderqty = value)))
-      override val scrappedqty = new Field[TypoShort, Row](prefix, "scrappedqty", None, Some("int2"))(x => extract(x).scrappedqty, (row, value) => merge(row, extract(row).copy(scrappedqty = value)))
-      override val startdate = new Field[TypoLocalDateTime, Row](prefix, "startdate", Some("text"), Some("timestamp"))(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
-      override val enddate = new OptField[TypoLocalDateTime, Row](prefix, "enddate", Some("text"), Some("timestamp"))(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
-      override val duedate = new Field[TypoLocalDateTime, Row](prefix, "duedate", Some("text"), Some("timestamp"))(x => extract(x).duedate, (row, value) => merge(row, extract(row).copy(duedate = value)))
-      override val scrapreasonid = new OptField[ScrapreasonId, Row](prefix, "scrapreasonid", None, Some("int2"))(x => extract(x).scrapreasonid, (row, value) => merge(row, extract(row).copy(scrapreasonid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: WorkorderFields = new WorkorderFields {
+      override def workorderid = IdField[WorkorderId, WorkorderRow](_path, "workorderid", None, Some("int4"), x => x.workorderid, (row, value) => row.copy(workorderid = value))
+      override def productid = Field[ProductId, WorkorderRow](_path, "productid", None, Some("int4"), x => x.productid, (row, value) => row.copy(productid = value))
+      override def orderqty = Field[Int, WorkorderRow](_path, "orderqty", None, Some("int4"), x => x.orderqty, (row, value) => row.copy(orderqty = value))
+      override def scrappedqty = Field[TypoShort, WorkorderRow](_path, "scrappedqty", None, Some("int2"), x => x.scrappedqty, (row, value) => row.copy(scrappedqty = value))
+      override def startdate = Field[TypoLocalDateTime, WorkorderRow](_path, "startdate", Some("text"), Some("timestamp"), x => x.startdate, (row, value) => row.copy(startdate = value))
+      override def enddate = OptField[TypoLocalDateTime, WorkorderRow](_path, "enddate", Some("text"), Some("timestamp"), x => x.enddate, (row, value) => row.copy(enddate = value))
+      override def duedate = Field[TypoLocalDateTime, WorkorderRow](_path, "duedate", Some("text"), Some("timestamp"), x => x.duedate, (row, value) => row.copy(duedate = value))
+      override def scrapreasonid = OptField[ScrapreasonId, WorkorderRow](_path, "scrapreasonid", None, Some("int2"), x => x.scrapreasonid, (row, value) => row.copy(scrapreasonid = value))
+      override def modifieddate = Field[TypoLocalDateTime, WorkorderRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.workorderid, fields.productid, fields.orderqty, fields.scrappedqty, fields.startdate, fields.enddate, fields.duedate, fields.scrapreasonid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, WorkorderRow]] =
+      List[FieldLikeNoHkt[?, WorkorderRow]](fields.workorderid, fields.productid, fields.orderqty, fields.scrappedqty, fields.startdate, fields.enddate, fields.duedate, fields.scrapreasonid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => WorkorderRow, merge: (NewRow, WorkorderRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

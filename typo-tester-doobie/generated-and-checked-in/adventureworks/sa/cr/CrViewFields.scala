@@ -10,42 +10,43 @@ package cr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
 import adventureworks.sales.currencyrate.CurrencyrateId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait CrViewFields[Row] {
-  val currencyrateid: Field[CurrencyrateId, Row]
-  val currencyratedate: Field[TypoLocalDateTime, Row]
-  val fromcurrencycode: Field[CurrencyId, Row]
-  val tocurrencycode: Field[CurrencyId, Row]
-  val averagerate: Field[BigDecimal, Row]
-  val endofdayrate: Field[BigDecimal, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait CrViewFields {
+  def currencyrateid: Field[CurrencyrateId, CrViewRow]
+  def currencyratedate: Field[TypoLocalDateTime, CrViewRow]
+  def fromcurrencycode: Field[CurrencyId, CrViewRow]
+  def tocurrencycode: Field[CurrencyId, CrViewRow]
+  def averagerate: Field[BigDecimal, CrViewRow]
+  def endofdayrate: Field[BigDecimal, CrViewRow]
+  def modifieddate: Field[TypoLocalDateTime, CrViewRow]
 }
 
 object CrViewFields {
-  val structure: Relation[CrViewFields, CrViewRow, CrViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[CrViewFields, CrViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => CrViewRow, val merge: (Row, CrViewRow) => Row)
-    extends Relation[CrViewFields, CrViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[CrViewFields, CrViewRow] {
   
-    override val fields: CrViewFields[Row] = new CrViewFields[Row] {
-      override val currencyrateid = new Field[CurrencyrateId, Row](prefix, "currencyrateid", None, None)(x => extract(x).currencyrateid, (row, value) => merge(row, extract(row).copy(currencyrateid = value)))
-      override val currencyratedate = new Field[TypoLocalDateTime, Row](prefix, "currencyratedate", Some("text"), None)(x => extract(x).currencyratedate, (row, value) => merge(row, extract(row).copy(currencyratedate = value)))
-      override val fromcurrencycode = new Field[CurrencyId, Row](prefix, "fromcurrencycode", None, None)(x => extract(x).fromcurrencycode, (row, value) => merge(row, extract(row).copy(fromcurrencycode = value)))
-      override val tocurrencycode = new Field[CurrencyId, Row](prefix, "tocurrencycode", None, None)(x => extract(x).tocurrencycode, (row, value) => merge(row, extract(row).copy(tocurrencycode = value)))
-      override val averagerate = new Field[BigDecimal, Row](prefix, "averagerate", None, None)(x => extract(x).averagerate, (row, value) => merge(row, extract(row).copy(averagerate = value)))
-      override val endofdayrate = new Field[BigDecimal, Row](prefix, "endofdayrate", None, None)(x => extract(x).endofdayrate, (row, value) => merge(row, extract(row).copy(endofdayrate = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: CrViewFields = new CrViewFields {
+      override def currencyrateid = Field[CurrencyrateId, CrViewRow](_path, "currencyrateid", None, None, x => x.currencyrateid, (row, value) => row.copy(currencyrateid = value))
+      override def currencyratedate = Field[TypoLocalDateTime, CrViewRow](_path, "currencyratedate", Some("text"), None, x => x.currencyratedate, (row, value) => row.copy(currencyratedate = value))
+      override def fromcurrencycode = Field[CurrencyId, CrViewRow](_path, "fromcurrencycode", None, None, x => x.fromcurrencycode, (row, value) => row.copy(fromcurrencycode = value))
+      override def tocurrencycode = Field[CurrencyId, CrViewRow](_path, "tocurrencycode", None, None, x => x.tocurrencycode, (row, value) => row.copy(tocurrencycode = value))
+      override def averagerate = Field[BigDecimal, CrViewRow](_path, "averagerate", None, None, x => x.averagerate, (row, value) => row.copy(averagerate = value))
+      override def endofdayrate = Field[BigDecimal, CrViewRow](_path, "endofdayrate", None, None, x => x.endofdayrate, (row, value) => row.copy(endofdayrate = value))
+      override def modifieddate = Field[TypoLocalDateTime, CrViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.currencyrateid, fields.currencyratedate, fields.fromcurrencycode, fields.tocurrencycode, fields.averagerate, fields.endofdayrate, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, CrViewRow]] =
+      List[FieldLikeNoHkt[?, CrViewRow]](fields.currencyrateid, fields.currencyratedate, fields.fromcurrencycode, fields.tocurrencycode, fields.averagerate, fields.endofdayrate, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => CrViewRow, merge: (NewRow, CrViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

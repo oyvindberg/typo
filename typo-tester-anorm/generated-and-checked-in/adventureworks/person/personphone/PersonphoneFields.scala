@@ -11,37 +11,38 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait PersonphoneFields[Row] {
-  val businessentityid: IdField[BusinessentityId, Row]
-  val phonenumber: IdField[Phone, Row]
-  val phonenumbertypeid: IdField[PhonenumbertypeId, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait PersonphoneFields {
+  def businessentityid: IdField[BusinessentityId, PersonphoneRow]
+  def phonenumber: IdField[Phone, PersonphoneRow]
+  def phonenumbertypeid: IdField[PhonenumbertypeId, PersonphoneRow]
+  def modifieddate: Field[TypoLocalDateTime, PersonphoneRow]
 }
 
 object PersonphoneFields {
-  val structure: Relation[PersonphoneFields, PersonphoneRow, PersonphoneRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PersonphoneFields, PersonphoneRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PersonphoneRow, val merge: (Row, PersonphoneRow) => Row)
-    extends Relation[PersonphoneFields, PersonphoneRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PersonphoneFields, PersonphoneRow] {
   
-    override val fields: PersonphoneFields[Row] = new PersonphoneFields[Row] {
-      override val businessentityid = new IdField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val phonenumber = new IdField[Phone, Row](prefix, "phonenumber", None, Some("varchar"))(x => extract(x).phonenumber, (row, value) => merge(row, extract(row).copy(phonenumber = value)))
-      override val phonenumbertypeid = new IdField[PhonenumbertypeId, Row](prefix, "phonenumbertypeid", None, Some("int4"))(x => extract(x).phonenumbertypeid, (row, value) => merge(row, extract(row).copy(phonenumbertypeid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: PersonphoneFields = new PersonphoneFields {
+      override def businessentityid = IdField[BusinessentityId, PersonphoneRow](_path, "businessentityid", None, Some("int4"), x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def phonenumber = IdField[Phone, PersonphoneRow](_path, "phonenumber", None, Some("varchar"), x => x.phonenumber, (row, value) => row.copy(phonenumber = value))
+      override def phonenumbertypeid = IdField[PhonenumbertypeId, PersonphoneRow](_path, "phonenumbertypeid", None, Some("int4"), x => x.phonenumbertypeid, (row, value) => row.copy(phonenumbertypeid = value))
+      override def modifieddate = Field[TypoLocalDateTime, PersonphoneRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.businessentityid, fields.phonenumber, fields.phonenumbertypeid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, PersonphoneRow]] =
+      List[FieldLikeNoHkt[?, PersonphoneRow]](fields.businessentityid, fields.phonenumber, fields.phonenumbertypeid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PersonphoneRow, merge: (NewRow, PersonphoneRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

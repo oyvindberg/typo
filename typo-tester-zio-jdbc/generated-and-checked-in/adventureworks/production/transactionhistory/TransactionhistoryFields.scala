@@ -9,47 +9,48 @@ package transactionhistory
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait TransactionhistoryFields[Row] {
-  val transactionid: IdField[TransactionhistoryId, Row]
-  val productid: Field[ProductId, Row]
-  val referenceorderid: Field[Int, Row]
-  val referenceorderlineid: Field[Int, Row]
-  val transactiondate: Field[TypoLocalDateTime, Row]
-  val transactiontype: Field[/* bpchar, max 1 chars */ String, Row]
-  val quantity: Field[Int, Row]
-  val actualcost: Field[BigDecimal, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait TransactionhistoryFields {
+  def transactionid: IdField[TransactionhistoryId, TransactionhistoryRow]
+  def productid: Field[ProductId, TransactionhistoryRow]
+  def referenceorderid: Field[Int, TransactionhistoryRow]
+  def referenceorderlineid: Field[Int, TransactionhistoryRow]
+  def transactiondate: Field[TypoLocalDateTime, TransactionhistoryRow]
+  def transactiontype: Field[/* bpchar, max 1 chars */ String, TransactionhistoryRow]
+  def quantity: Field[Int, TransactionhistoryRow]
+  def actualcost: Field[BigDecimal, TransactionhistoryRow]
+  def modifieddate: Field[TypoLocalDateTime, TransactionhistoryRow]
 }
 
 object TransactionhistoryFields {
-  val structure: Relation[TransactionhistoryFields, TransactionhistoryRow, TransactionhistoryRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[TransactionhistoryFields, TransactionhistoryRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => TransactionhistoryRow, val merge: (Row, TransactionhistoryRow) => Row)
-    extends Relation[TransactionhistoryFields, TransactionhistoryRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[TransactionhistoryFields, TransactionhistoryRow] {
   
-    override val fields: TransactionhistoryFields[Row] = new TransactionhistoryFields[Row] {
-      override val transactionid = new IdField[TransactionhistoryId, Row](prefix, "transactionid", None, Some("int4"))(x => extract(x).transactionid, (row, value) => merge(row, extract(row).copy(transactionid = value)))
-      override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val referenceorderid = new Field[Int, Row](prefix, "referenceorderid", None, Some("int4"))(x => extract(x).referenceorderid, (row, value) => merge(row, extract(row).copy(referenceorderid = value)))
-      override val referenceorderlineid = new Field[Int, Row](prefix, "referenceorderlineid", None, Some("int4"))(x => extract(x).referenceorderlineid, (row, value) => merge(row, extract(row).copy(referenceorderlineid = value)))
-      override val transactiondate = new Field[TypoLocalDateTime, Row](prefix, "transactiondate", Some("text"), Some("timestamp"))(x => extract(x).transactiondate, (row, value) => merge(row, extract(row).copy(transactiondate = value)))
-      override val transactiontype = new Field[/* bpchar, max 1 chars */ String, Row](prefix, "transactiontype", None, Some("bpchar"))(x => extract(x).transactiontype, (row, value) => merge(row, extract(row).copy(transactiontype = value)))
-      override val quantity = new Field[Int, Row](prefix, "quantity", None, Some("int4"))(x => extract(x).quantity, (row, value) => merge(row, extract(row).copy(quantity = value)))
-      override val actualcost = new Field[BigDecimal, Row](prefix, "actualcost", None, Some("numeric"))(x => extract(x).actualcost, (row, value) => merge(row, extract(row).copy(actualcost = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: TransactionhistoryFields = new TransactionhistoryFields {
+      override def transactionid = IdField[TransactionhistoryId, TransactionhistoryRow](_path, "transactionid", None, Some("int4"), x => x.transactionid, (row, value) => row.copy(transactionid = value))
+      override def productid = Field[ProductId, TransactionhistoryRow](_path, "productid", None, Some("int4"), x => x.productid, (row, value) => row.copy(productid = value))
+      override def referenceorderid = Field[Int, TransactionhistoryRow](_path, "referenceorderid", None, Some("int4"), x => x.referenceorderid, (row, value) => row.copy(referenceorderid = value))
+      override def referenceorderlineid = Field[Int, TransactionhistoryRow](_path, "referenceorderlineid", None, Some("int4"), x => x.referenceorderlineid, (row, value) => row.copy(referenceorderlineid = value))
+      override def transactiondate = Field[TypoLocalDateTime, TransactionhistoryRow](_path, "transactiondate", Some("text"), Some("timestamp"), x => x.transactiondate, (row, value) => row.copy(transactiondate = value))
+      override def transactiontype = Field[/* bpchar, max 1 chars */ String, TransactionhistoryRow](_path, "transactiontype", None, Some("bpchar"), x => x.transactiontype, (row, value) => row.copy(transactiontype = value))
+      override def quantity = Field[Int, TransactionhistoryRow](_path, "quantity", None, Some("int4"), x => x.quantity, (row, value) => row.copy(quantity = value))
+      override def actualcost = Field[BigDecimal, TransactionhistoryRow](_path, "actualcost", None, Some("numeric"), x => x.actualcost, (row, value) => row.copy(actualcost = value))
+      override def modifieddate = Field[TypoLocalDateTime, TransactionhistoryRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.transactionid, fields.productid, fields.referenceorderid, fields.referenceorderlineid, fields.transactiondate, fields.transactiontype, fields.quantity, fields.actualcost, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, TransactionhistoryRow]] =
+      List[FieldLikeNoHkt[?, TransactionhistoryRow]](fields.transactionid, fields.productid, fields.referenceorderid, fields.referenceorderlineid, fields.transactiondate, fields.transactiontype, fields.quantity, fields.actualcost, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => TransactionhistoryRow, merge: (NewRow, TransactionhistoryRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

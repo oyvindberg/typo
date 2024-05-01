@@ -14,57 +14,58 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import adventureworks.userdefined.FirstName
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait PViewFields[Row] {
-  val id: Field[BusinessentityId, Row]
-  val businessentityid: Field[BusinessentityId, Row]
-  val persontype: Field[/* bpchar, max 2 chars */ String, Row]
-  val namestyle: Field[NameStyle, Row]
-  val title: OptField[/* max 8 chars */ String, Row]
-  val firstname: Field[/* user-picked */ FirstName, Row]
-  val middlename: OptField[Name, Row]
-  val lastname: Field[Name, Row]
-  val suffix: OptField[/* max 10 chars */ String, Row]
-  val emailpromotion: Field[Int, Row]
-  val additionalcontactinfo: OptField[TypoXml, Row]
-  val demographics: OptField[TypoXml, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait PViewFields {
+  def id: Field[BusinessentityId, PViewRow]
+  def businessentityid: Field[BusinessentityId, PViewRow]
+  def persontype: Field[/* bpchar, max 2 chars */ String, PViewRow]
+  def namestyle: Field[NameStyle, PViewRow]
+  def title: OptField[/* max 8 chars */ String, PViewRow]
+  def firstname: Field[/* user-picked */ FirstName, PViewRow]
+  def middlename: OptField[Name, PViewRow]
+  def lastname: Field[Name, PViewRow]
+  def suffix: OptField[/* max 10 chars */ String, PViewRow]
+  def emailpromotion: Field[Int, PViewRow]
+  def additionalcontactinfo: OptField[TypoXml, PViewRow]
+  def demographics: OptField[TypoXml, PViewRow]
+  def rowguid: Field[TypoUUID, PViewRow]
+  def modifieddate: Field[TypoLocalDateTime, PViewRow]
 }
 
 object PViewFields {
-  val structure: Relation[PViewFields, PViewRow, PViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PViewFields, PViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PViewRow, val merge: (Row, PViewRow) => Row)
-    extends Relation[PViewFields, PViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PViewFields, PViewRow] {
   
-    override val fields: PViewFields[Row] = new PViewFields[Row] {
-      override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val persontype = new Field[/* bpchar, max 2 chars */ String, Row](prefix, "persontype", None, None)(x => extract(x).persontype, (row, value) => merge(row, extract(row).copy(persontype = value)))
-      override val namestyle = new Field[NameStyle, Row](prefix, "namestyle", None, None)(x => extract(x).namestyle, (row, value) => merge(row, extract(row).copy(namestyle = value)))
-      override val title = new OptField[/* max 8 chars */ String, Row](prefix, "title", None, None)(x => extract(x).title, (row, value) => merge(row, extract(row).copy(title = value)))
-      override val firstname = new Field[/* user-picked */ FirstName, Row](prefix, "firstname", None, None)(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
-      override val middlename = new OptField[Name, Row](prefix, "middlename", None, None)(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
-      override val lastname = new Field[Name, Row](prefix, "lastname", None, None)(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
-      override val suffix = new OptField[/* max 10 chars */ String, Row](prefix, "suffix", None, None)(x => extract(x).suffix, (row, value) => merge(row, extract(row).copy(suffix = value)))
-      override val emailpromotion = new Field[Int, Row](prefix, "emailpromotion", None, None)(x => extract(x).emailpromotion, (row, value) => merge(row, extract(row).copy(emailpromotion = value)))
-      override val additionalcontactinfo = new OptField[TypoXml, Row](prefix, "additionalcontactinfo", None, None)(x => extract(x).additionalcontactinfo, (row, value) => merge(row, extract(row).copy(additionalcontactinfo = value)))
-      override val demographics = new OptField[TypoXml, Row](prefix, "demographics", None, None)(x => extract(x).demographics, (row, value) => merge(row, extract(row).copy(demographics = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: PViewFields = new PViewFields {
+      override def id = Field[BusinessentityId, PViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def businessentityid = Field[BusinessentityId, PViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def persontype = Field[/* bpchar, max 2 chars */ String, PViewRow](_path, "persontype", None, None, x => x.persontype, (row, value) => row.copy(persontype = value))
+      override def namestyle = Field[NameStyle, PViewRow](_path, "namestyle", None, None, x => x.namestyle, (row, value) => row.copy(namestyle = value))
+      override def title = OptField[/* max 8 chars */ String, PViewRow](_path, "title", None, None, x => x.title, (row, value) => row.copy(title = value))
+      override def firstname = Field[/* user-picked */ FirstName, PViewRow](_path, "firstname", None, None, x => x.firstname, (row, value) => row.copy(firstname = value))
+      override def middlename = OptField[Name, PViewRow](_path, "middlename", None, None, x => x.middlename, (row, value) => row.copy(middlename = value))
+      override def lastname = Field[Name, PViewRow](_path, "lastname", None, None, x => x.lastname, (row, value) => row.copy(lastname = value))
+      override def suffix = OptField[/* max 10 chars */ String, PViewRow](_path, "suffix", None, None, x => x.suffix, (row, value) => row.copy(suffix = value))
+      override def emailpromotion = Field[Int, PViewRow](_path, "emailpromotion", None, None, x => x.emailpromotion, (row, value) => row.copy(emailpromotion = value))
+      override def additionalcontactinfo = OptField[TypoXml, PViewRow](_path, "additionalcontactinfo", None, None, x => x.additionalcontactinfo, (row, value) => row.copy(additionalcontactinfo = value))
+      override def demographics = OptField[TypoXml, PViewRow](_path, "demographics", None, None, x => x.demographics, (row, value) => row.copy(demographics = value))
+      override def rowguid = Field[TypoUUID, PViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, PViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.businessentityid, fields.persontype, fields.namestyle, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.emailpromotion, fields.additionalcontactinfo, fields.demographics, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, PViewRow]] =
+      List[FieldLikeNoHkt[?, PViewRow]](fields.id, fields.businessentityid, fields.persontype, fields.namestyle, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.emailpromotion, fields.additionalcontactinfo, fields.demographics, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PViewRow, merge: (NewRow, PViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

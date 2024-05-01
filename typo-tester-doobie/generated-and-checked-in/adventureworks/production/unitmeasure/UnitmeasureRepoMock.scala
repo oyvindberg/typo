@@ -24,7 +24,7 @@ import typo.dsl.UpdateParams
 class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow],
                           map: scala.collection.mutable.Map[UnitmeasureId, UnitmeasureRow] = scala.collection.mutable.Map.empty) extends UnitmeasureRepo {
   override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    DeleteBuilderMock(DeleteParams.empty, UnitmeasureFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, UnitmeasureFields.structure, map)
   }
   override def deleteById(unitmeasurecode: UnitmeasureId): ConnectionIO[Boolean] = {
     delay(map.remove(unitmeasurecode).isDefined)
@@ -86,7 +86,7 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
     }
   }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields.structure, map)
   }
   override def update(row: UnitmeasureRow): ConnectionIO[Boolean] = {
     delay {

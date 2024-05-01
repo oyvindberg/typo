@@ -14,7 +14,7 @@ class SeekTest extends AnyFunSuite with TypeCheckedTripleEquals {
       .seek(_.weight.asc)(SqlExpr.asConstOpt(Some(BigDecimal(22.2))))
       .seek(_.listprice.asc)(BigDecimal(33.3))
     assertResult(query.sql.get.toString)(
-      s"""Fragment("select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product WHERE ((name, weight, listprice)  > (? , ? , ? ) ) ORDER BY name  ASC   , weight  ASC   , listprice  ASC   ")"""
+      s"""Fragment("select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product product0 WHERE ((product0.name, product0.weight, product0.listprice)  > (? , ? , ? ) ) ORDER BY product0.name  ASC   , product0.weight  ASC   , product0.listprice  ASC   ")"""
     )
   }
 
@@ -24,7 +24,7 @@ class SeekTest extends AnyFunSuite with TypeCheckedTripleEquals {
       .seek(_.weight.desc)(Some(BigDecimal(22.2)))
       .seek(_.listprice.desc)(BigDecimal(33.3))
     assertResult(query.sql.get.toString)(
-      s"""Fragment("select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product WHERE ((name, weight, listprice)  < (? , ? , ? ) ) ORDER BY name  DESC   , weight  DESC   , listprice  DESC   ")"""
+      s"""Fragment("select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product product0 WHERE ((product0.name, product0.weight, product0.listprice)  < (? , ? , ? ) ) ORDER BY product0.name  DESC   , product0.weight  DESC   , product0.listprice  DESC   ")"""
     )
   }
 
@@ -34,7 +34,7 @@ class SeekTest extends AnyFunSuite with TypeCheckedTripleEquals {
       .seek(_.weight.desc)(Some(BigDecimal(22.2)))
       .seek(_.listprice.desc)(BigDecimal(33.3))
     assertResult(query.sql.get.toString)(
-      s"""Fragment("select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product WHERE (((name > ? )  OR ((name = ? )  AND (weight < ? ) ) )  OR (((name = ? )  AND (weight = ? ) )  AND (listprice < ? ) ) ) ORDER BY name  ASC   , weight  DESC   , listprice  DESC   ")"""
+      s"""Fragment("select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product product0 WHERE (((product0.name > ? )  OR ((product0.name = ? )  AND (product0.weight < ? ) ) )  OR (((product0.name = ? )  AND (product0.weight = ? ) )  AND (product0.listprice < ? ) ) ) ORDER BY product0.name  ASC   , product0.weight  DESC   , product0.listprice  DESC   ")"""
     )
   }
 }

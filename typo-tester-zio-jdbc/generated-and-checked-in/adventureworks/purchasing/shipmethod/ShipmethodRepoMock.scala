@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
                          map: scala.collection.mutable.Map[ShipmethodId, ShipmethodRow] = scala.collection.mutable.Map.empty) extends ShipmethodRepo {
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShipmethodFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, ShipmethodFields.structure, map)
   }
   override def deleteById(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(shipmethodid).isDefined)
@@ -85,7 +85,7 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
     }
   }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShipmethodFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, ShipmethodFields.structure, map)
   }
   override def update(row: ShipmethodRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

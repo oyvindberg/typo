@@ -103,9 +103,11 @@ object sc {
       val DeleteParams = Qualified("typo.dsl.DeleteParams")
       val Field = Qualified("typo.dsl.SqlExpr.Field")
       val FieldLikeNoHkt = Qualified("typo.dsl.SqlExpr.FieldLikeNoHkt")
-      val FieldValue = Qualified("typo.dsl.FieldValue")
+      val ForeignKey = Qualified("typo.dsl.ForeignKey")
       val IdField = Qualified("typo.dsl.SqlExpr.IdField")
       val OptField = Qualified("typo.dsl.SqlExpr.OptField")
+      val Path = Qualified("typo.dsl.Path")
+      val Required = Qualified("typo.dsl.Required")
       val SelectBuilder = Qualified("typo.dsl.SelectBuilder")
       val SelectBuilderMock = Qualified("typo.dsl.SelectBuilderMock")
       val SelectBuilderSql = Qualified("typo.dsl.SelectBuilderSql")
@@ -140,6 +142,8 @@ object sc {
         TypesScala.Long,
         TypesScala.Map,
         TypesScala.None,
+        TypesScala.Nil,
+        TypesScala.Numeric,
         TypesScala.Option,
         TypesScala.Ordering,
         TypesScala.Right,

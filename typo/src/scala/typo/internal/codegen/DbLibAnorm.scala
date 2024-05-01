@@ -553,7 +553,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                |  case ${TypesScala.None} => false
                |}""".stripMargin
       case RepoMethod.UpdateBuilder(_, fieldsType, _) =>
-        code"${sc.Type.dsl.UpdateBuilderMock}(${sc.Type.dsl.UpdateParams}.empty, $fieldsType.structure.fields, map)"
+        code"${sc.Type.dsl.UpdateBuilderMock}(${sc.Type.dsl.UpdateParams}.empty, $fieldsType.structure, map)"
       case RepoMethod.Update(_, _, _, param, _) =>
         code"""map.get(${param.name}.${id.paramName}) match {
               |  case ${TypesScala.Some}(`${param.name}`) => false
@@ -586,7 +586,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                |}
                |unsaved.size.toLong""".stripMargin
       case RepoMethod.DeleteBuilder(_, fieldsType, _) =>
-        code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType.structure.fields, map)"
+        code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType.structure, map)"
       case RepoMethod.Delete(_, id) =>
         code"map.remove(${id.paramName}).isDefined"
       case RepoMethod.DeleteByIds(_, _, idsParam) =>

@@ -18,7 +18,7 @@ import typo.dsl.Structure.Relation
 
 class EmailaddressStructure[Row](val prefix: Option[String], val extract: Row => EmailaddressRow, val merge: (Row, EmailaddressRow) => Row)
   extends Relation[EmailaddressFields, EmailaddressRow, Row]
-    with EmailaddressFields[Row] { outer =>
+    with EmailaddressFields { outer =>
 
   override val businessentityid = new IdField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
   override val emailaddressid = new IdField[Int, Row](prefix, "emailaddressid", None, Some("int4"))(x => extract(x).emailaddressid, (row, value) => merge(row, extract(row).copy(emailaddressid = value)))

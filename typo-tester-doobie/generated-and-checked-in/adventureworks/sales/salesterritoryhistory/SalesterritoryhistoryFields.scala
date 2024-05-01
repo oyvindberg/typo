@@ -11,42 +11,43 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait SalesterritoryhistoryFields[Row] {
-  val businessentityid: IdField[BusinessentityId, Row]
-  val territoryid: IdField[SalesterritoryId, Row]
-  val startdate: IdField[TypoLocalDateTime, Row]
-  val enddate: OptField[TypoLocalDateTime, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SalesterritoryhistoryFields {
+  def businessentityid: IdField[BusinessentityId, SalesterritoryhistoryRow]
+  def territoryid: IdField[SalesterritoryId, SalesterritoryhistoryRow]
+  def startdate: IdField[TypoLocalDateTime, SalesterritoryhistoryRow]
+  def enddate: OptField[TypoLocalDateTime, SalesterritoryhistoryRow]
+  def rowguid: Field[TypoUUID, SalesterritoryhistoryRow]
+  def modifieddate: Field[TypoLocalDateTime, SalesterritoryhistoryRow]
 }
 
 object SalesterritoryhistoryFields {
-  val structure: Relation[SalesterritoryhistoryFields, SalesterritoryhistoryRow, SalesterritoryhistoryRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SalesterritoryhistoryFields, SalesterritoryhistoryRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SalesterritoryhistoryRow, val merge: (Row, SalesterritoryhistoryRow) => Row)
-    extends Relation[SalesterritoryhistoryFields, SalesterritoryhistoryRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SalesterritoryhistoryFields, SalesterritoryhistoryRow] {
   
-    override val fields: SalesterritoryhistoryFields[Row] = new SalesterritoryhistoryFields[Row] {
-      override val businessentityid = new IdField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val territoryid = new IdField[SalesterritoryId, Row](prefix, "territoryid", None, Some("int4"))(x => extract(x).territoryid, (row, value) => merge(row, extract(row).copy(territoryid = value)))
-      override val startdate = new IdField[TypoLocalDateTime, Row](prefix, "startdate", Some("text"), Some("timestamp"))(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
-      override val enddate = new OptField[TypoLocalDateTime, Row](prefix, "enddate", Some("text"), Some("timestamp"))(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SalesterritoryhistoryFields = new SalesterritoryhistoryFields {
+      override def businessentityid = IdField[BusinessentityId, SalesterritoryhistoryRow](_path, "businessentityid", None, Some("int4"), x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def territoryid = IdField[SalesterritoryId, SalesterritoryhistoryRow](_path, "territoryid", None, Some("int4"), x => x.territoryid, (row, value) => row.copy(territoryid = value))
+      override def startdate = IdField[TypoLocalDateTime, SalesterritoryhistoryRow](_path, "startdate", Some("text"), Some("timestamp"), x => x.startdate, (row, value) => row.copy(startdate = value))
+      override def enddate = OptField[TypoLocalDateTime, SalesterritoryhistoryRow](_path, "enddate", Some("text"), Some("timestamp"), x => x.enddate, (row, value) => row.copy(enddate = value))
+      override def rowguid = Field[TypoUUID, SalesterritoryhistoryRow](_path, "rowguid", None, Some("uuid"), x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, SalesterritoryhistoryRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.businessentityid, fields.territoryid, fields.startdate, fields.enddate, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SalesterritoryhistoryRow]] =
+      List[FieldLikeNoHkt[?, SalesterritoryhistoryRow]](fields.businessentityid, fields.territoryid, fields.startdate, fields.enddate, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SalesterritoryhistoryRow, merge: (NewRow, SalesterritoryhistoryRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

@@ -23,7 +23,7 @@ import typo.dsl.UpdateParams
 
 class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala.collection.mutable.Map.empty) extends FlaffRepo {
   override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
-    DeleteBuilderMock(DeleteParams.empty, FlaffFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, FlaffFields.structure, map)
   }
   override def deleteById(compositeId: FlaffId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
@@ -70,7 +70,7 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
     }
   }
   override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
-    UpdateBuilderMock(UpdateParams.empty, FlaffFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, FlaffFields.structure, map)
   }
   override def update(row: FlaffRow): ConnectionIO[Boolean] = {
     delay {

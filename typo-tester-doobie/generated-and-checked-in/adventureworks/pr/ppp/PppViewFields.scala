@@ -11,36 +11,37 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait PppViewFields[Row] {
-  val productid: Field[ProductId, Row]
-  val productphotoid: Field[ProductphotoId, Row]
-  val primary: Field[Flag, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait PppViewFields {
+  def productid: Field[ProductId, PppViewRow]
+  def productphotoid: Field[ProductphotoId, PppViewRow]
+  def primary: Field[Flag, PppViewRow]
+  def modifieddate: Field[TypoLocalDateTime, PppViewRow]
 }
 
 object PppViewFields {
-  val structure: Relation[PppViewFields, PppViewRow, PppViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PppViewFields, PppViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PppViewRow, val merge: (Row, PppViewRow) => Row)
-    extends Relation[PppViewFields, PppViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PppViewFields, PppViewRow] {
   
-    override val fields: PppViewFields[Row] = new PppViewFields[Row] {
-      override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val productphotoid = new Field[ProductphotoId, Row](prefix, "productphotoid", None, None)(x => extract(x).productphotoid, (row, value) => merge(row, extract(row).copy(productphotoid = value)))
-      override val primary = new Field[Flag, Row](prefix, "primary", None, None)(x => extract(x).primary, (row, value) => merge(row, extract(row).copy(primary = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: PppViewFields = new PppViewFields {
+      override def productid = Field[ProductId, PppViewRow](_path, "productid", None, None, x => x.productid, (row, value) => row.copy(productid = value))
+      override def productphotoid = Field[ProductphotoId, PppViewRow](_path, "productphotoid", None, None, x => x.productphotoid, (row, value) => row.copy(productphotoid = value))
+      override def primary = Field[Flag, PppViewRow](_path, "primary", None, None, x => x.primary, (row, value) => row.copy(primary = value))
+      override def modifieddate = Field[TypoLocalDateTime, PppViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.productid, fields.productphotoid, fields.primary, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, PppViewRow]] =
+      List[FieldLikeNoHkt[?, PppViewRow]](fields.productid, fields.productphotoid, fields.primary, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PppViewRow, merge: (NewRow, PppViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

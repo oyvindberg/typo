@@ -11,37 +11,38 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait SpecialofferproductFields[Row] {
-  val specialofferid: IdField[SpecialofferId, Row]
-  val productid: IdField[ProductId, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SpecialofferproductFields {
+  def specialofferid: IdField[SpecialofferId, SpecialofferproductRow]
+  def productid: IdField[ProductId, SpecialofferproductRow]
+  def rowguid: Field[TypoUUID, SpecialofferproductRow]
+  def modifieddate: Field[TypoLocalDateTime, SpecialofferproductRow]
 }
 
 object SpecialofferproductFields {
-  val structure: Relation[SpecialofferproductFields, SpecialofferproductRow, SpecialofferproductRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SpecialofferproductFields, SpecialofferproductRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SpecialofferproductRow, val merge: (Row, SpecialofferproductRow) => Row)
-    extends Relation[SpecialofferproductFields, SpecialofferproductRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SpecialofferproductFields, SpecialofferproductRow] {
   
-    override val fields: SpecialofferproductFields[Row] = new SpecialofferproductFields[Row] {
-      override val specialofferid = new IdField[SpecialofferId, Row](prefix, "specialofferid", None, Some("int4"))(x => extract(x).specialofferid, (row, value) => merge(row, extract(row).copy(specialofferid = value)))
-      override val productid = new IdField[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SpecialofferproductFields = new SpecialofferproductFields {
+      override def specialofferid = IdField[SpecialofferId, SpecialofferproductRow](_path, "specialofferid", None, Some("int4"), x => x.specialofferid, (row, value) => row.copy(specialofferid = value))
+      override def productid = IdField[ProductId, SpecialofferproductRow](_path, "productid", None, Some("int4"), x => x.productid, (row, value) => row.copy(productid = value))
+      override def rowguid = Field[TypoUUID, SpecialofferproductRow](_path, "rowguid", None, Some("uuid"), x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, SpecialofferproductRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.specialofferid, fields.productid, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SpecialofferproductRow]] =
+      List[FieldLikeNoHkt[?, SpecialofferproductRow]](fields.specialofferid, fields.productid, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SpecialofferproductRow, merge: (NewRow, SpecialofferproductRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

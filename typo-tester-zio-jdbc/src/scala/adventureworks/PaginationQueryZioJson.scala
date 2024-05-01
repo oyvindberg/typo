@@ -7,11 +7,11 @@ import zio.json.ast.Json
 import zio.json.{JsonDecoder, JsonEncoder}
 import zio.{Chunk, ZIO}
 
-class PaginationQueryZioJson[Fields[_], Row](underlying: PaginationQuery[Fields, Row, Json]) {
-  def andOn[T, N[_]](v: Fields[Row] => SortOrder[T, N, Row])(implicit
+class PaginationQueryZioJson[Fields, Row](underlying: PaginationQuery[Fields, Row, Json]) {
+  def andOn[T, N[_]](v: Fields => SortOrder[T, N])(implicit
       e: JsonEncoder[N[T]],
       d: JsonDecoder[N[T]],
-      asConst: SqlExpr.Const.As[T, N, Row]
+      asConst: SqlExpr.Const.As[T, N]
   ): PaginationQueryZioJson[Fields, Row] =
     new PaginationQueryZioJson(underlying.andOn(v)(PaginationQueryZioJson.abstractCodec)(asConst))
 
@@ -33,11 +33,11 @@ object PaginationQueryZioJson {
   implicit val clientCursorDecoder: JsonDecoder[ClientCursor[Json]] =
     JsonDecoder[Map[String, Json]].map(parts => ClientCursor(parts.map { case (k, v) => (SortOrderRepr(k), v) }))
 
-  implicit class PaginationQuerySyntax[Fields[_], Row](private val query: SelectBuilder[Fields, Row]) extends AnyVal {
-    def seekPaginationOn[T, N[_]](v: Fields[Row] => SortOrder[T, N, Row])(implicit
+  implicit class PaginationQuerySyntax[Fields, Row](private val query: SelectBuilder[Fields, Row]) extends AnyVal {
+    def seekPaginationOn[T, N[_]](v: Fields => SortOrder[T, N])(implicit
         e: JsonEncoder[N[T]],
         d: JsonDecoder[N[T]],
-        asConst: SqlExpr.Const.As[T, N, Row]
+        asConst: SqlExpr.Const.As[T, N]
     ): PaginationQueryZioJson[Fields, Row] =
       new PaginationQueryZioJson(new PaginationQuery(query, Nil).andOn(v)(PaginationQueryZioJson.abstractCodec))
   }

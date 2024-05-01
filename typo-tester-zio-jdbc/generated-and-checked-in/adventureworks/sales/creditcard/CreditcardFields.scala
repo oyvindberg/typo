@@ -10,41 +10,42 @@ package creditcard
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.userdefined.CustomCreditcardId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait CreditcardFields[Row] {
-  val creditcardid: IdField[/* user-picked */ CustomCreditcardId, Row]
-  val cardtype: Field[/* max 50 chars */ String, Row]
-  val cardnumber: Field[/* max 25 chars */ String, Row]
-  val expmonth: Field[TypoShort, Row]
-  val expyear: Field[TypoShort, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait CreditcardFields {
+  def creditcardid: IdField[/* user-picked */ CustomCreditcardId, CreditcardRow]
+  def cardtype: Field[/* max 50 chars */ String, CreditcardRow]
+  def cardnumber: Field[/* max 25 chars */ String, CreditcardRow]
+  def expmonth: Field[TypoShort, CreditcardRow]
+  def expyear: Field[TypoShort, CreditcardRow]
+  def modifieddate: Field[TypoLocalDateTime, CreditcardRow]
 }
 
 object CreditcardFields {
-  val structure: Relation[CreditcardFields, CreditcardRow, CreditcardRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[CreditcardFields, CreditcardRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => CreditcardRow, val merge: (Row, CreditcardRow) => Row)
-    extends Relation[CreditcardFields, CreditcardRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[CreditcardFields, CreditcardRow] {
   
-    override val fields: CreditcardFields[Row] = new CreditcardFields[Row] {
-      override val creditcardid = new IdField[/* user-picked */ CustomCreditcardId, Row](prefix, "creditcardid", None, Some("int4"))(x => extract(x).creditcardid, (row, value) => merge(row, extract(row).copy(creditcardid = value)))
-      override val cardtype = new Field[/* max 50 chars */ String, Row](prefix, "cardtype", None, None)(x => extract(x).cardtype, (row, value) => merge(row, extract(row).copy(cardtype = value)))
-      override val cardnumber = new Field[/* max 25 chars */ String, Row](prefix, "cardnumber", None, None)(x => extract(x).cardnumber, (row, value) => merge(row, extract(row).copy(cardnumber = value)))
-      override val expmonth = new Field[TypoShort, Row](prefix, "expmonth", None, Some("int2"))(x => extract(x).expmonth, (row, value) => merge(row, extract(row).copy(expmonth = value)))
-      override val expyear = new Field[TypoShort, Row](prefix, "expyear", None, Some("int2"))(x => extract(x).expyear, (row, value) => merge(row, extract(row).copy(expyear = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: CreditcardFields = new CreditcardFields {
+      override def creditcardid = IdField[/* user-picked */ CustomCreditcardId, CreditcardRow](_path, "creditcardid", None, Some("int4"), x => x.creditcardid, (row, value) => row.copy(creditcardid = value))
+      override def cardtype = Field[/* max 50 chars */ String, CreditcardRow](_path, "cardtype", None, None, x => x.cardtype, (row, value) => row.copy(cardtype = value))
+      override def cardnumber = Field[/* max 25 chars */ String, CreditcardRow](_path, "cardnumber", None, None, x => x.cardnumber, (row, value) => row.copy(cardnumber = value))
+      override def expmonth = Field[TypoShort, CreditcardRow](_path, "expmonth", None, Some("int2"), x => x.expmonth, (row, value) => row.copy(expmonth = value))
+      override def expyear = Field[TypoShort, CreditcardRow](_path, "expyear", None, Some("int2"), x => x.expyear, (row, value) => row.copy(expyear = value))
+      override def modifieddate = Field[TypoLocalDateTime, CreditcardRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.creditcardid, fields.cardtype, fields.cardnumber, fields.expmonth, fields.expyear, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, CreditcardRow]] =
+      List[FieldLikeNoHkt[?, CreditcardRow]](fields.creditcardid, fields.cardtype, fields.cardnumber, fields.expmonth, fields.expyear, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => CreditcardRow, merge: (NewRow, CreditcardRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

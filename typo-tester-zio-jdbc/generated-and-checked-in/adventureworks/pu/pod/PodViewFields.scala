@@ -11,48 +11,49 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait PodViewFields[Row] {
-  val id: Field[Int, Row]
-  val purchaseorderid: Field[PurchaseorderheaderId, Row]
-  val purchaseorderdetailid: Field[Int, Row]
-  val duedate: Field[TypoLocalDateTime, Row]
-  val orderqty: Field[TypoShort, Row]
-  val productid: Field[ProductId, Row]
-  val unitprice: Field[BigDecimal, Row]
-  val receivedqty: Field[BigDecimal, Row]
-  val rejectedqty: Field[BigDecimal, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait PodViewFields {
+  def id: Field[Int, PodViewRow]
+  def purchaseorderid: Field[PurchaseorderheaderId, PodViewRow]
+  def purchaseorderdetailid: Field[Int, PodViewRow]
+  def duedate: Field[TypoLocalDateTime, PodViewRow]
+  def orderqty: Field[TypoShort, PodViewRow]
+  def productid: Field[ProductId, PodViewRow]
+  def unitprice: Field[BigDecimal, PodViewRow]
+  def receivedqty: Field[BigDecimal, PodViewRow]
+  def rejectedqty: Field[BigDecimal, PodViewRow]
+  def modifieddate: Field[TypoLocalDateTime, PodViewRow]
 }
 
 object PodViewFields {
-  val structure: Relation[PodViewFields, PodViewRow, PodViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PodViewFields, PodViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PodViewRow, val merge: (Row, PodViewRow) => Row)
-    extends Relation[PodViewFields, PodViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PodViewFields, PodViewRow] {
   
-    override val fields: PodViewFields[Row] = new PodViewFields[Row] {
-      override val id = new Field[Int, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val purchaseorderid = new Field[PurchaseorderheaderId, Row](prefix, "purchaseorderid", None, None)(x => extract(x).purchaseorderid, (row, value) => merge(row, extract(row).copy(purchaseorderid = value)))
-      override val purchaseorderdetailid = new Field[Int, Row](prefix, "purchaseorderdetailid", None, None)(x => extract(x).purchaseorderdetailid, (row, value) => merge(row, extract(row).copy(purchaseorderdetailid = value)))
-      override val duedate = new Field[TypoLocalDateTime, Row](prefix, "duedate", Some("text"), None)(x => extract(x).duedate, (row, value) => merge(row, extract(row).copy(duedate = value)))
-      override val orderqty = new Field[TypoShort, Row](prefix, "orderqty", None, None)(x => extract(x).orderqty, (row, value) => merge(row, extract(row).copy(orderqty = value)))
-      override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val unitprice = new Field[BigDecimal, Row](prefix, "unitprice", None, None)(x => extract(x).unitprice, (row, value) => merge(row, extract(row).copy(unitprice = value)))
-      override val receivedqty = new Field[BigDecimal, Row](prefix, "receivedqty", None, None)(x => extract(x).receivedqty, (row, value) => merge(row, extract(row).copy(receivedqty = value)))
-      override val rejectedqty = new Field[BigDecimal, Row](prefix, "rejectedqty", None, None)(x => extract(x).rejectedqty, (row, value) => merge(row, extract(row).copy(rejectedqty = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: PodViewFields = new PodViewFields {
+      override def id = Field[Int, PodViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def purchaseorderid = Field[PurchaseorderheaderId, PodViewRow](_path, "purchaseorderid", None, None, x => x.purchaseorderid, (row, value) => row.copy(purchaseorderid = value))
+      override def purchaseorderdetailid = Field[Int, PodViewRow](_path, "purchaseorderdetailid", None, None, x => x.purchaseorderdetailid, (row, value) => row.copy(purchaseorderdetailid = value))
+      override def duedate = Field[TypoLocalDateTime, PodViewRow](_path, "duedate", Some("text"), None, x => x.duedate, (row, value) => row.copy(duedate = value))
+      override def orderqty = Field[TypoShort, PodViewRow](_path, "orderqty", None, None, x => x.orderqty, (row, value) => row.copy(orderqty = value))
+      override def productid = Field[ProductId, PodViewRow](_path, "productid", None, None, x => x.productid, (row, value) => row.copy(productid = value))
+      override def unitprice = Field[BigDecimal, PodViewRow](_path, "unitprice", None, None, x => x.unitprice, (row, value) => row.copy(unitprice = value))
+      override def receivedqty = Field[BigDecimal, PodViewRow](_path, "receivedqty", None, None, x => x.receivedqty, (row, value) => row.copy(receivedqty = value))
+      override def rejectedqty = Field[BigDecimal, PodViewRow](_path, "rejectedqty", None, None, x => x.rejectedqty, (row, value) => row.copy(rejectedqty = value))
+      override def modifieddate = Field[TypoLocalDateTime, PodViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.purchaseorderid, fields.purchaseorderdetailid, fields.duedate, fields.orderqty, fields.productid, fields.unitprice, fields.receivedqty, fields.rejectedqty, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, PodViewRow]] =
+      List[FieldLikeNoHkt[?, PodViewRow]](fields.id, fields.purchaseorderid, fields.purchaseorderdetailid, fields.duedate, fields.orderqty, fields.productid, fields.unitprice, fields.receivedqty, fields.rejectedqty, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PodViewRow, merge: (NewRow, PodViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

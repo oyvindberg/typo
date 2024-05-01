@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow],
                           map: scala.collection.mutable.Map[ContacttypeId, ContacttypeRow] = scala.collection.mutable.Map.empty) extends ContacttypeRepo {
   override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ContacttypeFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, ContacttypeFields.structure, map)
   }
   override def deleteById(contacttypeid: ContacttypeId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(contacttypeid).isDefined)
@@ -85,7 +85,7 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
     }
   }
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ContacttypeFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, ContacttypeFields.structure, map)
   }
   override def update(row: ContacttypeRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

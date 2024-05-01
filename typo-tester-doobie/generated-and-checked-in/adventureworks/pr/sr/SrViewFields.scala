@@ -10,36 +10,37 @@ package sr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait SrViewFields[Row] {
-  val id: Field[ScrapreasonId, Row]
-  val scrapreasonid: Field[ScrapreasonId, Row]
-  val name: Field[Name, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SrViewFields {
+  def id: Field[ScrapreasonId, SrViewRow]
+  def scrapreasonid: Field[ScrapreasonId, SrViewRow]
+  def name: Field[Name, SrViewRow]
+  def modifieddate: Field[TypoLocalDateTime, SrViewRow]
 }
 
 object SrViewFields {
-  val structure: Relation[SrViewFields, SrViewRow, SrViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SrViewFields, SrViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SrViewRow, val merge: (Row, SrViewRow) => Row)
-    extends Relation[SrViewFields, SrViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SrViewFields, SrViewRow] {
   
-    override val fields: SrViewFields[Row] = new SrViewFields[Row] {
-      override val id = new Field[ScrapreasonId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val scrapreasonid = new Field[ScrapreasonId, Row](prefix, "scrapreasonid", None, None)(x => extract(x).scrapreasonid, (row, value) => merge(row, extract(row).copy(scrapreasonid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SrViewFields = new SrViewFields {
+      override def id = Field[ScrapreasonId, SrViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def scrapreasonid = Field[ScrapreasonId, SrViewRow](_path, "scrapreasonid", None, None, x => x.scrapreasonid, (row, value) => row.copy(scrapreasonid = value))
+      override def name = Field[Name, SrViewRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def modifieddate = Field[TypoLocalDateTime, SrViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.scrapreasonid, fields.name, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SrViewRow]] =
+      List[FieldLikeNoHkt[?, SrViewRow]](fields.id, fields.scrapreasonid, fields.name, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SrViewRow, merge: (NewRow, SrViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

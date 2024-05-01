@@ -40,7 +40,7 @@ class PaginationTest extends AnyFunSuite with TypeCheckedTripleEquals {
     def patch(c: ClientCursor[Json]): ClientCursor[Json] =
       businessentityRepo match {
         case _: BusinessentityRepoMock =>
-          c.copy(parts = c.parts.map { case (k, v) => (SortOrderRepr(k.expr.replace("businessentity1.", "")), v) })
+          c.copy(parts = c.parts.map { case (k, v) => (SortOrderRepr(k.expr.replace("businessentity0.", "")), v) })
         case _ => c
       }
 
@@ -77,8 +77,8 @@ class PaginationTest extends AnyFunSuite with TypeCheckedTripleEquals {
               patch(
                 ClientCursor(
                   Map(
-                    SortOrderRepr("businessentity1.modifieddate") -> Json.fromString("2020-12-29T00:00:00"),
-                    SortOrderRepr("(businessentity1.businessentityid - ? ) :2") -> Json.fromInt(1)
+                    SortOrderRepr("businessentity0.modifieddate") -> Json.fromString("2020-12-29T00:00:00"),
+                    SortOrderRepr("(businessentity0.businessentityid - ? ) :2") -> Json.fromInt(1)
                   )
                 )
               )
@@ -96,8 +96,8 @@ class PaginationTest extends AnyFunSuite with TypeCheckedTripleEquals {
               patch(
                 ClientCursor(
                   Map(
-                    SortOrderRepr("businessentity1.modifieddate") -> Json.fromString("2020-12-25T00:00:00"),
-                    SortOrderRepr("(businessentity1.businessentityid - ? ) :2") -> Json.fromInt(15)
+                    SortOrderRepr("businessentity0.modifieddate") -> Json.fromString("2020-12-25T00:00:00"),
+                    SortOrderRepr("(businessentity0.businessentityid - ? ) :2") -> Json.fromInt(15)
                   )
                 )
               )

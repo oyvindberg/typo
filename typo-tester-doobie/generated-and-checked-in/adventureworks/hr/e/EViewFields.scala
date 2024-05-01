@@ -13,61 +13,62 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait EViewFields[Row] {
-  val id: Field[BusinessentityId, Row]
-  val businessentityid: Field[BusinessentityId, Row]
-  val nationalidnumber: Field[/* max 15 chars */ String, Row]
-  val loginid: Field[/* max 256 chars */ String, Row]
-  val jobtitle: Field[/* max 50 chars */ String, Row]
-  val birthdate: Field[TypoLocalDate, Row]
-  val maritalstatus: Field[/* bpchar, max 1 chars */ String, Row]
-  val gender: Field[/* bpchar, max 1 chars */ String, Row]
-  val hiredate: Field[TypoLocalDate, Row]
-  val salariedflag: Field[Flag, Row]
-  val vacationhours: Field[TypoShort, Row]
-  val sickleavehours: Field[TypoShort, Row]
-  val currentflag: Field[Flag, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
-  val organizationnode: OptField[String, Row]
+trait EViewFields {
+  def id: Field[BusinessentityId, EViewRow]
+  def businessentityid: Field[BusinessentityId, EViewRow]
+  def nationalidnumber: Field[/* max 15 chars */ String, EViewRow]
+  def loginid: Field[/* max 256 chars */ String, EViewRow]
+  def jobtitle: Field[/* max 50 chars */ String, EViewRow]
+  def birthdate: Field[TypoLocalDate, EViewRow]
+  def maritalstatus: Field[/* bpchar, max 1 chars */ String, EViewRow]
+  def gender: Field[/* bpchar, max 1 chars */ String, EViewRow]
+  def hiredate: Field[TypoLocalDate, EViewRow]
+  def salariedflag: Field[Flag, EViewRow]
+  def vacationhours: Field[TypoShort, EViewRow]
+  def sickleavehours: Field[TypoShort, EViewRow]
+  def currentflag: Field[Flag, EViewRow]
+  def rowguid: Field[TypoUUID, EViewRow]
+  def modifieddate: Field[TypoLocalDateTime, EViewRow]
+  def organizationnode: OptField[String, EViewRow]
 }
 
 object EViewFields {
-  val structure: Relation[EViewFields, EViewRow, EViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[EViewFields, EViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => EViewRow, val merge: (Row, EViewRow) => Row)
-    extends Relation[EViewFields, EViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[EViewFields, EViewRow] {
   
-    override val fields: EViewFields[Row] = new EViewFields[Row] {
-      override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val nationalidnumber = new Field[/* max 15 chars */ String, Row](prefix, "nationalidnumber", None, None)(x => extract(x).nationalidnumber, (row, value) => merge(row, extract(row).copy(nationalidnumber = value)))
-      override val loginid = new Field[/* max 256 chars */ String, Row](prefix, "loginid", None, None)(x => extract(x).loginid, (row, value) => merge(row, extract(row).copy(loginid = value)))
-      override val jobtitle = new Field[/* max 50 chars */ String, Row](prefix, "jobtitle", None, None)(x => extract(x).jobtitle, (row, value) => merge(row, extract(row).copy(jobtitle = value)))
-      override val birthdate = new Field[TypoLocalDate, Row](prefix, "birthdate", Some("text"), None)(x => extract(x).birthdate, (row, value) => merge(row, extract(row).copy(birthdate = value)))
-      override val maritalstatus = new Field[/* bpchar, max 1 chars */ String, Row](prefix, "maritalstatus", None, None)(x => extract(x).maritalstatus, (row, value) => merge(row, extract(row).copy(maritalstatus = value)))
-      override val gender = new Field[/* bpchar, max 1 chars */ String, Row](prefix, "gender", None, None)(x => extract(x).gender, (row, value) => merge(row, extract(row).copy(gender = value)))
-      override val hiredate = new Field[TypoLocalDate, Row](prefix, "hiredate", Some("text"), None)(x => extract(x).hiredate, (row, value) => merge(row, extract(row).copy(hiredate = value)))
-      override val salariedflag = new Field[Flag, Row](prefix, "salariedflag", None, None)(x => extract(x).salariedflag, (row, value) => merge(row, extract(row).copy(salariedflag = value)))
-      override val vacationhours = new Field[TypoShort, Row](prefix, "vacationhours", None, None)(x => extract(x).vacationhours, (row, value) => merge(row, extract(row).copy(vacationhours = value)))
-      override val sickleavehours = new Field[TypoShort, Row](prefix, "sickleavehours", None, None)(x => extract(x).sickleavehours, (row, value) => merge(row, extract(row).copy(sickleavehours = value)))
-      override val currentflag = new Field[Flag, Row](prefix, "currentflag", None, None)(x => extract(x).currentflag, (row, value) => merge(row, extract(row).copy(currentflag = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
-      override val organizationnode = new OptField[String, Row](prefix, "organizationnode", None, None)(x => extract(x).organizationnode, (row, value) => merge(row, extract(row).copy(organizationnode = value)))
+    override lazy val fields: EViewFields = new EViewFields {
+      override def id = Field[BusinessentityId, EViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def businessentityid = Field[BusinessentityId, EViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def nationalidnumber = Field[/* max 15 chars */ String, EViewRow](_path, "nationalidnumber", None, None, x => x.nationalidnumber, (row, value) => row.copy(nationalidnumber = value))
+      override def loginid = Field[/* max 256 chars */ String, EViewRow](_path, "loginid", None, None, x => x.loginid, (row, value) => row.copy(loginid = value))
+      override def jobtitle = Field[/* max 50 chars */ String, EViewRow](_path, "jobtitle", None, None, x => x.jobtitle, (row, value) => row.copy(jobtitle = value))
+      override def birthdate = Field[TypoLocalDate, EViewRow](_path, "birthdate", Some("text"), None, x => x.birthdate, (row, value) => row.copy(birthdate = value))
+      override def maritalstatus = Field[/* bpchar, max 1 chars */ String, EViewRow](_path, "maritalstatus", None, None, x => x.maritalstatus, (row, value) => row.copy(maritalstatus = value))
+      override def gender = Field[/* bpchar, max 1 chars */ String, EViewRow](_path, "gender", None, None, x => x.gender, (row, value) => row.copy(gender = value))
+      override def hiredate = Field[TypoLocalDate, EViewRow](_path, "hiredate", Some("text"), None, x => x.hiredate, (row, value) => row.copy(hiredate = value))
+      override def salariedflag = Field[Flag, EViewRow](_path, "salariedflag", None, None, x => x.salariedflag, (row, value) => row.copy(salariedflag = value))
+      override def vacationhours = Field[TypoShort, EViewRow](_path, "vacationhours", None, None, x => x.vacationhours, (row, value) => row.copy(vacationhours = value))
+      override def sickleavehours = Field[TypoShort, EViewRow](_path, "sickleavehours", None, None, x => x.sickleavehours, (row, value) => row.copy(sickleavehours = value))
+      override def currentflag = Field[Flag, EViewRow](_path, "currentflag", None, None, x => x.currentflag, (row, value) => row.copy(currentflag = value))
+      override def rowguid = Field[TypoUUID, EViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, EViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
+      override def organizationnode = OptField[String, EViewRow](_path, "organizationnode", None, None, x => x.organizationnode, (row, value) => row.copy(organizationnode = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.businessentityid, fields.nationalidnumber, fields.loginid, fields.jobtitle, fields.birthdate, fields.maritalstatus, fields.gender, fields.hiredate, fields.salariedflag, fields.vacationhours, fields.sickleavehours, fields.currentflag, fields.rowguid, fields.modifieddate, fields.organizationnode)
+    override lazy val columns: List[FieldLikeNoHkt[?, EViewRow]] =
+      List[FieldLikeNoHkt[?, EViewRow]](fields.id, fields.businessentityid, fields.nationalidnumber, fields.loginid, fields.jobtitle, fields.birthdate, fields.maritalstatus, fields.gender, fields.hiredate, fields.salariedflag, fields.vacationhours, fields.sickleavehours, fields.currentflag, fields.rowguid, fields.modifieddate, fields.organizationnode)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => EViewRow, merge: (NewRow, EViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

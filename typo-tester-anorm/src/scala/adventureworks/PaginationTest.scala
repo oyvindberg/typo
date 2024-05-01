@@ -40,7 +40,7 @@ class PaginationTest extends AnyFunSuite with TypeCheckedTripleEquals {
     def patch(c: ClientCursor[JsValue]): ClientCursor[JsValue] =
       businessentityRepo match {
         case _: BusinessentityRepoMock =>
-          c.copy(parts = c.parts.map { case (k, v) => (SortOrderRepr(k.expr.replace("businessentity2.", "")), v) })
+          c.copy(parts = c.parts.map { case (k, v) => (SortOrderRepr(k.expr.replace("businessentity0.", "")), v) })
         case _ => c
       }
 
@@ -74,8 +74,8 @@ class PaginationTest extends AnyFunSuite with TypeCheckedTripleEquals {
           patch(
             ClientCursor(
               Map(
-                SortOrderRepr("businessentity2.modifieddate") -> JsString("2020-12-29T00:00:00"),
-                SortOrderRepr("(businessentity2.businessentityid - {param1}::INTEGER):2") -> JsNumber(BigDecimal(1))
+                SortOrderRepr("businessentity0.modifieddate") -> JsString("2020-12-29T00:00:00"),
+                SortOrderRepr("(businessentity0.businessentityid - {param1}::INTEGER):2") -> JsNumber(BigDecimal(1))
               )
             )
           )
@@ -90,8 +90,8 @@ class PaginationTest extends AnyFunSuite with TypeCheckedTripleEquals {
           patch(
             ClientCursor(
               Map(
-                SortOrderRepr("businessentity2.modifieddate") -> JsString("2020-12-25T00:00:00"),
-                SortOrderRepr("(businessentity2.businessentityid - {param1}::INTEGER):2") -> JsNumber(BigDecimal(15))
+                SortOrderRepr("businessentity0.modifieddate") -> JsString("2020-12-25T00:00:00"),
+                SortOrderRepr("(businessentity0.businessentityid - {param1}::INTEGER):2") -> JsNumber(BigDecimal(15))
               )
             )
           )

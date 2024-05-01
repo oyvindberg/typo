@@ -12,40 +12,41 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait BeaViewFields[Row] {
-  val id: Field[BusinessentityId, Row]
-  val businessentityid: Field[BusinessentityId, Row]
-  val addressid: Field[AddressId, Row]
-  val addresstypeid: Field[AddresstypeId, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait BeaViewFields {
+  def id: Field[BusinessentityId, BeaViewRow]
+  def businessentityid: Field[BusinessentityId, BeaViewRow]
+  def addressid: Field[AddressId, BeaViewRow]
+  def addresstypeid: Field[AddresstypeId, BeaViewRow]
+  def rowguid: Field[TypoUUID, BeaViewRow]
+  def modifieddate: Field[TypoLocalDateTime, BeaViewRow]
 }
 
 object BeaViewFields {
-  val structure: Relation[BeaViewFields, BeaViewRow, BeaViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[BeaViewFields, BeaViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => BeaViewRow, val merge: (Row, BeaViewRow) => Row)
-    extends Relation[BeaViewFields, BeaViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[BeaViewFields, BeaViewRow] {
   
-    override val fields: BeaViewFields[Row] = new BeaViewFields[Row] {
-      override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val addressid = new Field[AddressId, Row](prefix, "addressid", None, None)(x => extract(x).addressid, (row, value) => merge(row, extract(row).copy(addressid = value)))
-      override val addresstypeid = new Field[AddresstypeId, Row](prefix, "addresstypeid", None, None)(x => extract(x).addresstypeid, (row, value) => merge(row, extract(row).copy(addresstypeid = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: BeaViewFields = new BeaViewFields {
+      override def id = Field[BusinessentityId, BeaViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def businessentityid = Field[BusinessentityId, BeaViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def addressid = Field[AddressId, BeaViewRow](_path, "addressid", None, None, x => x.addressid, (row, value) => row.copy(addressid = value))
+      override def addresstypeid = Field[AddresstypeId, BeaViewRow](_path, "addresstypeid", None, None, x => x.addresstypeid, (row, value) => row.copy(addresstypeid = value))
+      override def rowguid = Field[TypoUUID, BeaViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, BeaViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.businessentityid, fields.addressid, fields.addresstypeid, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, BeaViewRow]] =
+      List[FieldLikeNoHkt[?, BeaViewRow]](fields.id, fields.businessentityid, fields.addressid, fields.addresstypeid, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => BeaViewRow, merge: (NewRow, BeaViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

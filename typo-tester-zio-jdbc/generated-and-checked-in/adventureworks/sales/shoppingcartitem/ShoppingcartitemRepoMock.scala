@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, ShoppingcartitemRow],
                                map: scala.collection.mutable.Map[ShoppingcartitemId, ShoppingcartitemRow] = scala.collection.mutable.Map.empty) extends ShoppingcartitemRepo {
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShoppingcartitemFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, ShoppingcartitemFields.structure, map)
   }
   override def deleteById(shoppingcartitemid: ShoppingcartitemId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(shoppingcartitemid).isDefined)
@@ -85,7 +85,7 @@ class ShoppingcartitemRepoMock(toRow: Function1[ShoppingcartitemRowUnsaved, Shop
     }
   }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShoppingcartitemFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, ShoppingcartitemFields.structure, map)
   }
   override def update(row: ShoppingcartitemRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

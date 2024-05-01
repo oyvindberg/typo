@@ -1,6 +1,6 @@
 package typo.dsl.pagination
 
-import typo.dsl.SortOrderNoHkt
+import typo.dsl.{RenderCtx, SortOrderNoHkt}
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -11,9 +11,9 @@ import java.util.concurrent.atomic.AtomicInteger
 case class SortOrderRepr(expr: String) extends AnyVal
 
 object SortOrderRepr {
-  def from[NT, R](x: SortOrderNoHkt[NT, R]): SortOrderRepr = {
+  def from[NT](x: SortOrderNoHkt[NT], ctx: RenderCtx): SortOrderRepr = {
     // note `x.expr`! the value is independent of ascending/descending and nulls first/last
-    val fragment = x.expr.render(new AtomicInteger(0))
+    val fragment = x.expr.render(ctx, new AtomicInteger(0))
     // todo: deconstructing the sql string and replacing `?` with the value would yield a more readable result
     val sql = fragment.params match {
       case Nil      => fragment.sql

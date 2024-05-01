@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
                        map: scala.collection.mutable.Map[LocationId, LocationRow] = scala.collection.mutable.Map.empty) extends LocationRepo {
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilderMock(DeleteParams.empty, LocationFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, LocationFields.structure, map)
   }
   override def deleteById(locationid: LocationId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(locationid).isDefined)
@@ -85,7 +85,7 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
     }
   }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilderMock(UpdateParams.empty, LocationFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, LocationFields.structure, map)
   }
   override def update(row: LocationRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

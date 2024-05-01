@@ -24,7 +24,7 @@ import typo.dsl.UpdateParams
 
 class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, MaritalStatusRow] = scala.collection.mutable.Map.empty) extends MaritalStatusRepo {
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, MaritalStatusFields.structure, map)
   }
   override def deleteById(id: MaritalStatusId): ConnectionIO[Boolean] = {
     delay(map.remove(id).isDefined)
@@ -78,7 +78,7 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
     }
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, MaritalStatusFields.structure, map)
   }
   override def upsert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow] = {
     delay {

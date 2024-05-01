@@ -22,7 +22,7 @@ import typo.dsl.UpdateParams
 class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, TransactionhistoryRow],
                                  map: scala.collection.mutable.Map[TransactionhistoryId, TransactionhistoryRow] = scala.collection.mutable.Map.empty) extends TransactionhistoryRepo {
   override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryFields.structure, map)
   }
   override def deleteById(transactionid: TransactionhistoryId)(implicit c: Connection): Boolean = {
     map.remove(transactionid).isDefined
@@ -72,7 +72,7 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
     transactionids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryFields.structure, map)
   }
   override def update(row: TransactionhistoryRow)(implicit c: Connection): Boolean = {
     map.get(row.transactionid) match {
