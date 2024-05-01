@@ -16,7 +16,7 @@ object PrimaryKeys {
               && tc.constraintSchema == kcu.constraintSchema
               && tc.constraintName == kcu.constraintName
           )
-          .sortBy(_.ordinalPosition)
+          .sortBy(_.positionInUniqueConstraint)
           .map(kcu => db.ColName(kcu.columnName.get))
         val relName = db.RelationName(tc.tableSchema, tc.tableName.get)
         val constraintName = db.RelationName(tc.constraintSchema, tc.constraintName.get)

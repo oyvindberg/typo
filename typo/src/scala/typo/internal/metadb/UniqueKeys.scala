@@ -14,7 +14,7 @@ object UniqueKeys {
           .filter { kcu =>
             kcu.constraintCatalog == tc.constraintCatalog && kcu.constraintSchema == tc.constraintSchema && kcu.constraintName == tc.constraintName
           }
-          .sortBy(_.ordinalPosition)
+          .sortBy(_.positionInUniqueConstraint)
           .map(kcu => db.ColName(kcu.columnName.get))
 
       for {

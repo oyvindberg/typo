@@ -22,7 +22,7 @@ object ForeignKeys {
         }
 
       kcus
-        .sortBy(_.ordinalPosition)
+        .sortBy(_.positionInUniqueConstraint)
         .map(kcu => db.ColName(kcu.columnName.get))
     }
 
@@ -59,7 +59,7 @@ object ForeignKeys {
               kcu.constraintSchema == rc.uniqueConstraintSchema &&
               kcu.constraintName == rc.uniqueConstraintName
             }
-            .sortBy(_.ordinalPosition)
+            .sortBy(_.positionInUniqueConstraint)
             .map(kcu => db.ColName(kcu.columnName.get))
         }
     }
