@@ -19,7 +19,7 @@ trait MaritalStatusRepo {
   def deleteById(id: MaritalStatusId): ConnectionIO[Boolean]
   def deleteByIds(ids: Array[MaritalStatusId]): ConnectionIO[Int]
   def insert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, MaritalStatusRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, MaritalStatusRow], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow]
   def selectAll: Stream[ConnectionIO, MaritalStatusRow]
   def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): Stream[ConnectionIO, MaritalStatusRow]

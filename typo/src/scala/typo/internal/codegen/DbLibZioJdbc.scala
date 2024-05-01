@@ -224,13 +224,13 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       case RepoMethod.InsertStreaming(_, _, rowType) =>
         val in = ZStream.of(ZConnection, TypesJava.Throwable, rowType)
         val out = ZIO.of(ZConnection, TypesJava.Throwable, TypesScala.Long)
-        code"def $name(unsaved: $in, batchSize: Int): $out"
+        code"def $name(unsaved: $in, batchSize: Int = 10000): $out"
       case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
         code"def $name($unsavedParam): ${ZIO.of(ZConnection, Throwable, UpdateResult.of(rowType))}"
       case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
         val in = ZStream.of(ZConnection, TypesJava.Throwable, unsaved.tpe)
         val out = ZIO.of(ZConnection, TypesJava.Throwable, TypesScala.Long)
-        code"def $name(unsaved: $in, batchSize: Int): $out"
+        code"def $name(unsaved: $in, batchSize: ${TypesScala.Int} = 10000): $out"
       case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
         code"def $name: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
       case RepoMethod.Delete(_, id) =>

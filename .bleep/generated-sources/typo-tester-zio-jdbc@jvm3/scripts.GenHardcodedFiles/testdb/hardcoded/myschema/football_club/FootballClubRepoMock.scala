@@ -45,7 +45,7 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
       unsaved
     }
   }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FootballClubRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FootballClubRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
         map += (row.id -> row)

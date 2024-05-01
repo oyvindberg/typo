@@ -46,7 +46,7 @@ class FlaffRepoImpl extends FlaffRepo {
           returning "code", "another_code", "some_number", "specifier", "parentspecifier"
        """.insertReturning(using FlaffRow.jdbcDecoder).map(_.updatedKeys.head)
   }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FlaffRow], batchSize: Int): ZIO[ZConnection, Throwable, Long] = {
+  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FlaffRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier") FROM STDIN""", batchSize, unsaved)(FlaffRow.text)
   }
   override def select: SelectBuilder[FlaffFields, FlaffRow] = {

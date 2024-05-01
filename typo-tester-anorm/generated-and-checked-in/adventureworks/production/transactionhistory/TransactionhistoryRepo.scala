@@ -18,9 +18,9 @@ trait TransactionhistoryRepo {
   def deleteByIds(transactionids: Array[TransactionhistoryId])(implicit c: Connection): Int
   def insert(unsaved: TransactionhistoryRow)(implicit c: Connection): TransactionhistoryRow
   def insert(unsaved: TransactionhistoryRowUnsaved)(implicit c: Connection): TransactionhistoryRow
-  def insertStreaming(unsaved: Iterator[TransactionhistoryRow], batchSize: Int)(implicit c: Connection): Long
+  def insertStreaming(unsaved: Iterator[TransactionhistoryRow], batchSize: Int = 10000)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Iterator[TransactionhistoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long
+  def insertUnsavedStreaming(unsaved: Iterator[TransactionhistoryRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow]
   def selectAll(implicit c: Connection): List[TransactionhistoryRow]
   def selectById(transactionid: TransactionhistoryId)(implicit c: Connection): Option[TransactionhistoryRow]

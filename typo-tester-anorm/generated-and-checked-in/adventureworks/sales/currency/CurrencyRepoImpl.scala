@@ -70,11 +70,11 @@ class CurrencyRepoImpl extends CurrencyRepo {
     }
     
   }
-  override def insertStreaming(unsaved: Iterator[CurrencyRow], batchSize: Int)(implicit c: Connection): Long = {
+  override def insertStreaming(unsaved: Iterator[CurrencyRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CurrencyRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Iterator[CurrencyRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+  override def insertUnsavedStreaming(unsaved: Iterator[CurrencyRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CurrencyRowUnsaved.text, c)
   }
   override def select: SelectBuilder[CurrencyFields, CurrencyRow] = {

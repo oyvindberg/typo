@@ -19,9 +19,9 @@ trait ShipmethodRepo {
   def deleteByIds(shipmethodids: Array[ShipmethodId]): ConnectionIO[Int]
   def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow]
   def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, ShipmethodRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ShipmethodRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShipmethodRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShipmethodRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[ShipmethodFields, ShipmethodRow]
   def selectAll: Stream[ConnectionIO, ShipmethodRow]
   def selectById(shipmethodid: ShipmethodId): ConnectionIO[Option[ShipmethodRow]]

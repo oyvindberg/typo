@@ -21,9 +21,9 @@ trait LocationRepo {
   def deleteByIds(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: LocationRow): ZIO[ZConnection, Throwable, LocationRow]
   def insert(unsaved: LocationRowUnsaved): ZIO[ZConnection, Throwable, LocationRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[LocationFields, LocationRow]
   def selectAll: ZStream[ZConnection, Throwable, LocationRow]
   def selectById(locationid: LocationId): ZIO[ZConnection, Throwable, Option[LocationRow]]

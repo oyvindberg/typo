@@ -19,9 +19,9 @@ trait JobcandidateRepo {
   def deleteByIds(jobcandidateids: Array[JobcandidateId]): ConnectionIO[Int]
   def insert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow]
   def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, JobcandidateRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, JobcandidateRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[JobcandidateFields, JobcandidateRow]
   def selectAll: Stream[ConnectionIO, JobcandidateRow]
   def selectById(jobcandidateid: JobcandidateId): ConnectionIO[Option[JobcandidateRow]]

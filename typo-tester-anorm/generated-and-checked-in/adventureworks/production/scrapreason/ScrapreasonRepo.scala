@@ -18,9 +18,9 @@ trait ScrapreasonRepo {
   def deleteByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): Int
   def insert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow
   def insert(unsaved: ScrapreasonRowUnsaved)(implicit c: Connection): ScrapreasonRow
-  def insertStreaming(unsaved: Iterator[ScrapreasonRow], batchSize: Int)(implicit c: Connection): Long
+  def insertStreaming(unsaved: Iterator[ScrapreasonRow], batchSize: Int = 10000)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Iterator[ScrapreasonRowUnsaved], batchSize: Int)(implicit c: Connection): Long
+  def insertUnsavedStreaming(unsaved: Iterator[ScrapreasonRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[ScrapreasonFields, ScrapreasonRow]
   def selectAll(implicit c: Connection): List[ScrapreasonRow]
   def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow]

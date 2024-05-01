@@ -60,11 +60,11 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     q.query(using IdentityTestRow.read).unique
     
   }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, IdentityTestRow], batchSize: Int): ConnectionIO[Long] = {
+  override def insertStreaming(unsaved: Stream[ConnectionIO, IdentityTestRow], batchSize: Int = 10000): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY public.identity-test("always_generated", "default_generated", "name") FROM STDIN""").copyIn(unsaved, batchSize)(using IdentityTestRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IdentityTestRowUnsaved], batchSize: Int): ConnectionIO[Long] = {
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IdentityTestRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY public.identity-test("name", "default_generated") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using IdentityTestRowUnsaved.text)
   }
   override def select: SelectBuilder[IdentityTestFields, IdentityTestRow] = {

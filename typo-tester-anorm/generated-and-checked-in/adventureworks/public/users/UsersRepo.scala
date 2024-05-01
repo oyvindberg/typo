@@ -19,9 +19,9 @@ trait UsersRepo {
   def deleteByIds(userIds: Array[UsersId])(implicit c: Connection): Int
   def insert(unsaved: UsersRow)(implicit c: Connection): UsersRow
   def insert(unsaved: UsersRowUnsaved)(implicit c: Connection): UsersRow
-  def insertStreaming(unsaved: Iterator[UsersRow], batchSize: Int)(implicit c: Connection): Long
+  def insertStreaming(unsaved: Iterator[UsersRow], batchSize: Int = 10000)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Iterator[UsersRowUnsaved], batchSize: Int)(implicit c: Connection): Long
+  def insertUnsavedStreaming(unsaved: Iterator[UsersRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[UsersFields, UsersRow]
   def selectAll(implicit c: Connection): List[UsersRow]
   def selectById(userId: UsersId)(implicit c: Connection): Option[UsersRow]

@@ -19,9 +19,9 @@ trait PhonenumbertypeRepo {
   def deleteByIds(phonenumbertypeids: Array[PhonenumbertypeId]): ConnectionIO[Int]
   def insert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow]
   def insert(unsaved: PhonenumbertypeRowUnsaved): ConnectionIO[PhonenumbertypeRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
   def selectAll: Stream[ConnectionIO, PhonenumbertypeRow]
   def selectById(phonenumbertypeid: PhonenumbertypeId): ConnectionIO[Option[PhonenumbertypeRow]]

@@ -19,9 +19,9 @@ trait StateprovinceRepo {
   def deleteByIds(stateprovinceids: Array[StateprovinceId]): ConnectionIO[Int]
   def insert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow]
   def insert(unsaved: StateprovinceRowUnsaved): ConnectionIO[StateprovinceRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, StateprovinceRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, StateprovinceRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, StateprovinceRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, StateprovinceRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[StateprovinceFields, StateprovinceRow]
   def selectAll: Stream[ConnectionIO, StateprovinceRow]
   def selectById(stateprovinceid: StateprovinceId): ConnectionIO[Option[StateprovinceRow]]

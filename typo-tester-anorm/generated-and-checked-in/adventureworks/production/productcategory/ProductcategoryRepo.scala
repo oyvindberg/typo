@@ -18,9 +18,9 @@ trait ProductcategoryRepo {
   def deleteByIds(productcategoryids: Array[ProductcategoryId])(implicit c: Connection): Int
   def insert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow
   def insert(unsaved: ProductcategoryRowUnsaved)(implicit c: Connection): ProductcategoryRow
-  def insertStreaming(unsaved: Iterator[ProductcategoryRow], batchSize: Int)(implicit c: Connection): Long
+  def insertStreaming(unsaved: Iterator[ProductcategoryRow], batchSize: Int = 10000)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Iterator[ProductcategoryRowUnsaved], batchSize: Int)(implicit c: Connection): Long
+  def insertUnsavedStreaming(unsaved: Iterator[ProductcategoryRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[ProductcategoryFields, ProductcategoryRow]
   def selectAll(implicit c: Connection): List[ProductcategoryRow]
   def selectById(productcategoryid: ProductcategoryId)(implicit c: Connection): Option[ProductcategoryRow]

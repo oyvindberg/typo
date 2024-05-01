@@ -45,7 +45,7 @@ class FlaffRepoImpl extends FlaffRepo {
           returning "code", "another_code", "some_number", "specifier", "parentspecifier"
        """.query(using FlaffRow.read).unique
   }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, FlaffRow], batchSize: Int): ConnectionIO[Long] = {
+  override def insertStreaming(unsaved: Stream[ConnectionIO, FlaffRow], batchSize: Int = 10000): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier") FROM STDIN""").copyIn(unsaved, batchSize)(using FlaffRow.text)
   }
   override def select: SelectBuilder[FlaffFields, FlaffRow] = {

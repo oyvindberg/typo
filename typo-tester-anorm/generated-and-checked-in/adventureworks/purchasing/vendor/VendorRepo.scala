@@ -19,9 +19,9 @@ trait VendorRepo {
   def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int
   def insert(unsaved: VendorRow)(implicit c: Connection): VendorRow
   def insert(unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow
-  def insertStreaming(unsaved: Iterator[VendorRow], batchSize: Int)(implicit c: Connection): Long
+  def insertStreaming(unsaved: Iterator[VendorRow], batchSize: Int = 10000)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Iterator[VendorRowUnsaved], batchSize: Int)(implicit c: Connection): Long
+  def insertUnsavedStreaming(unsaved: Iterator[VendorRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[VendorFields, VendorRow]
   def selectAll(implicit c: Connection): List[VendorRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[VendorRow]

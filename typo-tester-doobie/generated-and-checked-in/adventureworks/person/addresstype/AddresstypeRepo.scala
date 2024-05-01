@@ -19,9 +19,9 @@ trait AddresstypeRepo {
   def deleteByIds(addresstypeids: Array[AddresstypeId]): ConnectionIO[Int]
   def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow]
   def insert(unsaved: AddresstypeRowUnsaved): ConnectionIO[AddresstypeRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, AddresstypeRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, AddresstypeRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, AddresstypeRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, AddresstypeRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[AddresstypeFields, AddresstypeRow]
   def selectAll: Stream[ConnectionIO, AddresstypeRow]
   def selectById(addresstypeid: AddresstypeId): ConnectionIO[Option[AddresstypeRow]]

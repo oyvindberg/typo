@@ -21,9 +21,9 @@ trait CustomerRepo {
   def deleteByIds(customerids: Array[CustomerId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: CustomerRow): ZIO[ZConnection, Throwable, CustomerRow]
   def insert(unsaved: CustomerRowUnsaved): ZIO[ZConnection, Throwable, CustomerRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CustomerRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CustomerRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CustomerRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CustomerRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[CustomerFields, CustomerRow]
   def selectAll: ZStream[ZConnection, Throwable, CustomerRow]
   def selectById(customerid: CustomerId): ZIO[ZConnection, Throwable, Option[CustomerRow]]

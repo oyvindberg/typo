@@ -19,9 +19,9 @@ trait ProductmodelRepo {
   def deleteByIds(productmodelids: Array[ProductmodelId]): ConnectionIO[Int]
   def insert(unsaved: ProductmodelRow): ConnectionIO[ProductmodelRow]
   def insert(unsaved: ProductmodelRowUnsaved): ConnectionIO[ProductmodelRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, ProductmodelRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ProductmodelRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductmodelRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductmodelRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[ProductmodelFields, ProductmodelRow]
   def selectAll: Stream[ConnectionIO, ProductmodelRow]
   def selectById(productmodelid: ProductmodelId): ConnectionIO[Option[ProductmodelRow]]

@@ -20,9 +20,9 @@ trait UsersRepo {
   def deleteByIds(userIds: Array[UsersId]): ConnectionIO[Int]
   def insert(unsaved: UsersRow): ConnectionIO[UsersRow]
   def insert(unsaved: UsersRowUnsaved): ConnectionIO[UsersRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UsersRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UsersRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[UsersFields, UsersRow]
   def selectAll: Stream[ConnectionIO, UsersRow]
   def selectById(userId: UsersId): ConnectionIO[Option[UsersRow]]

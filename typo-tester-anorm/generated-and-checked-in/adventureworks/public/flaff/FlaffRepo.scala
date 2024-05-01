@@ -17,7 +17,7 @@ trait FlaffRepo {
   def deleteById(compositeId: FlaffId)(implicit c: Connection): Boolean
   def deleteByIds(compositeIds: Array[FlaffId])(implicit c: Connection): Int
   def insert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow
-  def insertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int)(implicit c: Connection): Long
+  def insertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[FlaffFields, FlaffRow]
   def selectAll(implicit c: Connection): List[FlaffRow]
   def selectById(compositeId: FlaffId)(implicit c: Connection): Option[FlaffRow]

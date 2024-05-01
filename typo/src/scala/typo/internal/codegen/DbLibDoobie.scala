@@ -102,9 +102,9 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
         code"def $name($unsavedParam): ${ConnectionIO.of(rowType)}"
       case RepoMethod.InsertStreaming(_, _, rowType) =>
-        code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, rowType)}, batchSize: ${TypesScala.Int}): ${ConnectionIO.of(TypesScala.Long)}"
+        code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, rowType)}, batchSize: ${TypesScala.Int} = 10000): ${ConnectionIO.of(TypesScala.Long)}"
       case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
-        code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, unsaved.tpe)}, batchSize: ${TypesScala.Int}): ${ConnectionIO.of(TypesScala.Long)}"
+        code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, unsaved.tpe)}, batchSize: ${TypesScala.Int} = 10000): ${ConnectionIO.of(TypesScala.Long)}"
       case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
         code"def $name($unsavedParam): ${ConnectionIO.of(rowType)}"
       case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>

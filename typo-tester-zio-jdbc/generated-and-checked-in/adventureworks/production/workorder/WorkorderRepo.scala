@@ -21,9 +21,9 @@ trait WorkorderRepo {
   def deleteByIds(workorderids: Array[WorkorderId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: WorkorderRow): ZIO[ZConnection, Throwable, WorkorderRow]
   def insert(unsaved: WorkorderRowUnsaved): ZIO[ZConnection, Throwable, WorkorderRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[WorkorderFields, WorkorderRow]
   def selectAll: ZStream[ZConnection, Throwable, WorkorderRow]
   def selectById(workorderid: WorkorderId): ZIO[ZConnection, Throwable, Option[WorkorderRow]]

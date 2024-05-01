@@ -56,7 +56,7 @@ class PgtestnullRepoImpl extends PgtestnullRepo {
       .executeInsert(PgtestnullRow.rowParser(1).single)
     
   }
-  override def insertStreaming(unsaved: Iterator[PgtestnullRow], batchSize: Int)(implicit c: Connection): Long = {
+  override def insertStreaming(unsaved: Iterator[PgtestnullRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY public.pgtestnull("bool", "box", "bpchar", "bytea", "char", "circle", "date", "float4", "float8", "hstore", "inet", "int2", "int2vector", "int4", "int8", "interval", "json", "jsonb", "line", "lseg", "money", "mydomain", "myenum", "name", "numeric", "path", "point", "polygon", "text", "time", "timestamp", "timestampz", "timez", "uuid", "varchar", "vector", "xml", "boxes", "bpchares", "chares", "circlees", "datees", "float4es", "float8es", "inetes", "int2es", "int2vectores", "int4es", "int8es", "intervales", "jsones", "jsonbes", "linees", "lseges", "moneyes", "myenumes", "namees", "numerices", "pathes", "pointes", "polygones", "textes", "timees", "timestampes", "timestampzes", "timezes", "uuides", "varchares", "xmles") FROM STDIN""", batchSize, unsaved)(PgtestnullRow.text, c)
   }
   override def select: SelectBuilder[PgtestnullFields, PgtestnullRow] = {

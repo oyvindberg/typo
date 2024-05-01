@@ -20,9 +20,9 @@ trait StoreRepo {
   def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int]
   def insert(unsaved: StoreRow): ConnectionIO[StoreRow]
   def insert(unsaved: StoreRowUnsaved): ConnectionIO[StoreRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, StoreRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, StoreRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, StoreRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, StoreRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[StoreFields, StoreRow]
   def selectAll: Stream[ConnectionIO, StoreRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[StoreRow]]

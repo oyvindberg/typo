@@ -20,9 +20,9 @@ trait EmployeeRepo {
   def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int]
   def insert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow]
   def insert(unsaved: EmployeeRowUnsaved): ConnectionIO[EmployeeRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, EmployeeRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, EmployeeRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmployeeRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmployeeRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[EmployeeFields, EmployeeRow]
   def selectAll: Stream[ConnectionIO, EmployeeRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[EmployeeRow]]

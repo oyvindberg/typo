@@ -45,7 +45,7 @@ class FlaffRepoImpl extends FlaffRepo {
       .executeInsert(FlaffRow.rowParser(1).single)
     
   }
-  override def insertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int)(implicit c: Connection): Long = {
+  override def insertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier") FROM STDIN""", batchSize, unsaved)(FlaffRow.text, c)
   }
   override def select: SelectBuilder[FlaffFields, FlaffRow] = {

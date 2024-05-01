@@ -21,9 +21,9 @@ trait IdentityTestRepo {
   def deleteByIds(names: Array[IdentityTestId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, IdentityTestRow]
   def insert(unsaved: IdentityTestRowUnsaved): ZIO[ZConnection, Throwable, IdentityTestRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[IdentityTestFields, IdentityTestRow]
   def selectAll: ZStream[ZConnection, Throwable, IdentityTestRow]
   def selectById(name: IdentityTestId): ZIO[ZConnection, Throwable, Option[IdentityTestRow]]

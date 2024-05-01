@@ -22,9 +22,9 @@ trait VendorRepo {
   def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: VendorRow): ZIO[ZConnection, Throwable, VendorRow]
   def insert(unsaved: VendorRowUnsaved): ZIO[ZConnection, Throwable, VendorRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, VendorRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, VendorRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, VendorRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, VendorRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[VendorFields, VendorRow]
   def selectAll: ZStream[ZConnection, Throwable, VendorRow]
   def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[VendorRow]]

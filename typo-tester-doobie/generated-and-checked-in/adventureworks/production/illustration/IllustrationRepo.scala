@@ -19,9 +19,9 @@ trait IllustrationRepo {
   def deleteByIds(illustrationids: Array[IllustrationId]): ConnectionIO[Int]
   def insert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow]
   def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IllustrationRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IllustrationRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[IllustrationFields, IllustrationRow]
   def selectAll: Stream[ConnectionIO, IllustrationRow]
   def selectById(illustrationid: IllustrationId): ConnectionIO[Option[IllustrationRow]]

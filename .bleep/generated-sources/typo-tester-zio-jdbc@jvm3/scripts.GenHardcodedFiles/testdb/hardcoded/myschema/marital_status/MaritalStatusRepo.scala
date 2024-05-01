@@ -21,7 +21,7 @@ trait MaritalStatusRepo {
   def deleteById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Boolean]
   def deleteByIds(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, MaritalStatusRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, MaritalStatusRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, MaritalStatusRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow]
   def selectAll: ZStream[ZConnection, Throwable, MaritalStatusRow]
   def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, MaritalStatusRow]

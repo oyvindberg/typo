@@ -19,9 +19,9 @@ trait ContacttypeRepo {
   def deleteByIds(contacttypeids: Array[ContacttypeId]): ConnectionIO[Int]
   def insert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow]
   def insert(unsaved: ContacttypeRowUnsaved): ConnectionIO[ContacttypeRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ContacttypeRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ContacttypeRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[ContacttypeFields, ContacttypeRow]
   def selectAll: Stream[ConnectionIO, ContacttypeRow]
   def selectById(contacttypeid: ContacttypeId): ConnectionIO[Option[ContacttypeRow]]

@@ -18,9 +18,9 @@ trait IllustrationRepo {
   def deleteByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): Int
   def insert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow
   def insert(unsaved: IllustrationRowUnsaved)(implicit c: Connection): IllustrationRow
-  def insertStreaming(unsaved: Iterator[IllustrationRow], batchSize: Int)(implicit c: Connection): Long
+  def insertStreaming(unsaved: Iterator[IllustrationRow], batchSize: Int = 10000)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Iterator[IllustrationRowUnsaved], batchSize: Int)(implicit c: Connection): Long
+  def insertUnsavedStreaming(unsaved: Iterator[IllustrationRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[IllustrationFields, IllustrationRow]
   def selectAll(implicit c: Connection): List[IllustrationRow]
   def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow]

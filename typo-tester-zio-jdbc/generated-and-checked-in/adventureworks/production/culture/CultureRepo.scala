@@ -21,9 +21,9 @@ trait CultureRepo {
   def deleteByIds(cultureids: Array[CultureId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: CultureRow): ZIO[ZConnection, Throwable, CultureRow]
   def insert(unsaved: CultureRowUnsaved): ZIO[ZConnection, Throwable, CultureRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[CultureFields, CultureRow]
   def selectAll: ZStream[ZConnection, Throwable, CultureRow]
   def selectById(cultureid: CultureId): ZIO[ZConnection, Throwable, Option[CultureRow]]

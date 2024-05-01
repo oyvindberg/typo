@@ -188,13 +188,13 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       case RepoMethod.Insert(_, _, unsavedParam, rowType) =>
         code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType"
       case RepoMethod.InsertStreaming(_, _, rowType) =>
-        code"def $name(unsaved: ${TypesScala.Iterator.of(rowType)}, batchSize: ${TypesScala.Int})(implicit c: ${TypesJava.Connection}): ${TypesScala.Long}"
+        code"def $name(unsaved: ${TypesScala.Iterator.of(rowType)}, batchSize: ${TypesScala.Int} = 10000)(implicit c: ${TypesJava.Connection}): ${TypesScala.Long}"
       case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
         code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType"
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
         code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType"
       case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
-        code"def $name(unsaved: ${TypesScala.Iterator.of(unsaved.tpe)}, batchSize: ${TypesScala.Int})(implicit c: ${TypesJava.Connection}): ${TypesScala.Long}"
+        code"def $name(unsaved: ${TypesScala.Iterator.of(unsaved.tpe)}, batchSize: ${TypesScala.Int} = 10000)(implicit c: ${TypesJava.Connection}): ${TypesScala.Long}"
       case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
         code"def $name: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
       case RepoMethod.Delete(_, id) =>

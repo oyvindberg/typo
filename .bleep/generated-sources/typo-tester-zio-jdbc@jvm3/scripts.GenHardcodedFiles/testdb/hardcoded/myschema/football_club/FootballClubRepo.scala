@@ -21,7 +21,7 @@ trait FootballClubRepo {
   def deleteById(id: FootballClubId): ZIO[ZConnection, Throwable, Boolean]
   def deleteByIds(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: FootballClubRow): ZIO[ZConnection, Throwable, FootballClubRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FootballClubRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FootballClubRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[FootballClubFields, FootballClubRow]
   def selectAll: ZStream[ZConnection, Throwable, FootballClubRow]
   def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, FootballClubRow]

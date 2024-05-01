@@ -21,9 +21,9 @@ trait DepartmentRepo {
   def deleteByIds(departmentids: Array[DepartmentId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: DepartmentRow): ZIO[ZConnection, Throwable, DepartmentRow]
   def insert(unsaved: DepartmentRowUnsaved): ZIO[ZConnection, Throwable, DepartmentRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DepartmentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DepartmentRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, DepartmentRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, DepartmentRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[DepartmentFields, DepartmentRow]
   def selectAll: ZStream[ZConnection, Throwable, DepartmentRow]
   def selectById(departmentid: DepartmentId): ZIO[ZConnection, Throwable, Option[DepartmentRow]]

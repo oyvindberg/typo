@@ -18,9 +18,9 @@ trait UnitmeasureRepo {
   def deleteByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): Int
   def insert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow
   def insert(unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow
-  def insertStreaming(unsaved: Iterator[UnitmeasureRow], batchSize: Int)(implicit c: Connection): Long
+  def insertStreaming(unsaved: Iterator[UnitmeasureRow], batchSize: Int = 10000)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Iterator[UnitmeasureRowUnsaved], batchSize: Int)(implicit c: Connection): Long
+  def insertUnsavedStreaming(unsaved: Iterator[UnitmeasureRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow]
   def selectAll(implicit c: Connection): List[UnitmeasureRow]
   def selectById(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Option[UnitmeasureRow]

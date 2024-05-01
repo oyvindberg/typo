@@ -43,7 +43,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
       .executeInsert(MaritalStatusRow.rowParser(1).single)
     
   }
-  override def insertStreaming(unsaved: Iterator[MaritalStatusRow], batchSize: Int)(implicit c: Connection): Long = {
+  override def insertStreaming(unsaved: Iterator[MaritalStatusRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY myschema.marital_status("id") FROM STDIN""", batchSize, unsaved)(MaritalStatusRow.text, c)
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {

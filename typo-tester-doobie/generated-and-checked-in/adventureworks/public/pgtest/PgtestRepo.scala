@@ -16,7 +16,7 @@ import typo.dsl.UpdateBuilder
 trait PgtestRepo {
   def delete: DeleteBuilder[PgtestFields, PgtestRow]
   def insert(unsaved: PgtestRow): ConnectionIO[PgtestRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, PgtestRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, PgtestRow], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[PgtestFields, PgtestRow]
   def selectAll: Stream[ConnectionIO, PgtestRow]
   def update: UpdateBuilder[PgtestFields, PgtestRow]

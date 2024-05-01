@@ -19,9 +19,9 @@ trait PersonphoneRepo {
   def deleteByIds(compositeIds: Array[PersonphoneId]): ConnectionIO[Int]
   def insert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow]
   def insert(unsaved: PersonphoneRowUnsaved): ConnectionIO[PersonphoneRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, PersonphoneRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, PersonphoneRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonphoneRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonphoneRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[PersonphoneFields, PersonphoneRow]
   def selectAll: Stream[ConnectionIO, PersonphoneRow]
   def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]]

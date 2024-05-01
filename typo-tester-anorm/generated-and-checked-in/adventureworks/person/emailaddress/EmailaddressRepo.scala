@@ -18,9 +18,9 @@ trait EmailaddressRepo {
   def deleteByIds(compositeIds: Array[EmailaddressId])(implicit c: Connection): Int
   def insert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow
   def insert(unsaved: EmailaddressRowUnsaved)(implicit c: Connection): EmailaddressRow
-  def insertStreaming(unsaved: Iterator[EmailaddressRow], batchSize: Int)(implicit c: Connection): Long
+  def insertStreaming(unsaved: Iterator[EmailaddressRow], batchSize: Int = 10000)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Iterator[EmailaddressRowUnsaved], batchSize: Int)(implicit c: Connection): Long
+  def insertUnsavedStreaming(unsaved: Iterator[EmailaddressRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[EmailaddressFields, EmailaddressRow]
   def selectAll(implicit c: Connection): List[EmailaddressRow]
   def selectById(compositeId: EmailaddressId)(implicit c: Connection): Option[EmailaddressRow]

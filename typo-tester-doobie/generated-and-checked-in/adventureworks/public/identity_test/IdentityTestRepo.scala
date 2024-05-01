@@ -19,9 +19,9 @@ trait IdentityTestRepo {
   def deleteByIds(names: Array[IdentityTestId]): ConnectionIO[Int]
   def insert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow]
   def insert(unsaved: IdentityTestRowUnsaved): ConnectionIO[IdentityTestRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, IdentityTestRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, IdentityTestRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IdentityTestRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IdentityTestRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[IdentityTestFields, IdentityTestRow]
   def selectAll: Stream[ConnectionIO, IdentityTestRow]
   def selectById(name: IdentityTestId): ConnectionIO[Option[IdentityTestRow]]

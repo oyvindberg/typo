@@ -18,9 +18,9 @@ trait SpecialofferRepo {
   def deleteByIds(specialofferids: Array[SpecialofferId])(implicit c: Connection): Int
   def insert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow
   def insert(unsaved: SpecialofferRowUnsaved)(implicit c: Connection): SpecialofferRow
-  def insertStreaming(unsaved: Iterator[SpecialofferRow], batchSize: Int)(implicit c: Connection): Long
+  def insertStreaming(unsaved: Iterator[SpecialofferRow], batchSize: Int = 10000)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Iterator[SpecialofferRowUnsaved], batchSize: Int)(implicit c: Connection): Long
+  def insertUnsavedStreaming(unsaved: Iterator[SpecialofferRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[SpecialofferFields, SpecialofferRow]
   def selectAll(implicit c: Connection): List[SpecialofferRow]
   def selectById(specialofferid: SpecialofferId)(implicit c: Connection): Option[SpecialofferRow]

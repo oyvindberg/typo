@@ -22,9 +22,9 @@ trait DocumentRepo {
   def deleteByIds(documentnodes: Array[DocumentId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, DocumentRow]
   def insert(unsaved: DocumentRowUnsaved): ZIO[ZConnection, Throwable, DocumentRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[DocumentFields, DocumentRow]
   def selectAll: ZStream[ZConnection, Throwable, DocumentRow]
   def selectById(documentnode: DocumentId): ZIO[ZConnection, Throwable, Option[DocumentRow]]

@@ -42,14 +42,14 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
   override def insert(unsaved: UsersRowUnsaved)(implicit c: Connection): UsersRow = {
     insert(toRow(unsaved))
   }
-  override def insertStreaming(unsaved: Iterator[UsersRow], batchSize: Int)(implicit c: Connection): Long = {
+  override def insertStreaming(unsaved: Iterator[UsersRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.userId -> row)
     }
     unsaved.size.toLong
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Iterator[UsersRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+  override def insertUnsavedStreaming(unsaved: Iterator[UsersRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { unsavedRow =>
       val row = toRow(unsavedRow)
       map += (row.userId -> row)

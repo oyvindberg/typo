@@ -19,9 +19,9 @@ trait TransactionhistoryRepo {
   def deleteByIds(transactionids: Array[TransactionhistoryId]): ConnectionIO[Int]
   def insert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow]
   def insert(unsaved: TransactionhistoryRowUnsaved): ConnectionIO[TransactionhistoryRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow]
   def selectAll: Stream[ConnectionIO, TransactionhistoryRow]
   def selectById(transactionid: TransactionhistoryId): ConnectionIO[Option[TransactionhistoryRow]]

@@ -19,9 +19,9 @@ trait CurrencyRepo {
   def deleteByIds(currencycodes: Array[CurrencyId]): ConnectionIO[Int]
   def insert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow]
   def insert(unsaved: CurrencyRowUnsaved): ConnectionIO[CurrencyRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, CurrencyRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, CurrencyRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CurrencyRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CurrencyRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[CurrencyFields, CurrencyRow]
   def selectAll: Stream[ConnectionIO, CurrencyRow]
   def selectById(currencycode: CurrencyId): ConnectionIO[Option[CurrencyRow]]

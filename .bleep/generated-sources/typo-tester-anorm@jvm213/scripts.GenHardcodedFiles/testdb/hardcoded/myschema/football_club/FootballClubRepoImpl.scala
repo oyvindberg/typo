@@ -44,7 +44,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
       .executeInsert(FootballClubRow.rowParser(1).single)
     
   }
-  override def insertStreaming(unsaved: Iterator[FootballClubRow], batchSize: Int)(implicit c: Connection): Long = {
+  override def insertStreaming(unsaved: Iterator[FootballClubRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY myschema.football_club("id", "name") FROM STDIN""", batchSize, unsaved)(FootballClubRow.text, c)
   }
   override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {

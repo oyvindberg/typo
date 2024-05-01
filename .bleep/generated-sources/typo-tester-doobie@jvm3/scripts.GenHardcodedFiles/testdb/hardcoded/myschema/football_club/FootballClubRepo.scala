@@ -19,7 +19,7 @@ trait FootballClubRepo {
   def deleteById(id: FootballClubId): ConnectionIO[Boolean]
   def deleteByIds(ids: Array[FootballClubId]): ConnectionIO[Int]
   def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[FootballClubFields, FootballClubRow]
   def selectAll: Stream[ConnectionIO, FootballClubRow]
   def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): Stream[ConnectionIO, FootballClubRow]

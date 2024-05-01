@@ -20,9 +20,9 @@ trait DocumentRepo {
   def deleteByIds(documentnodes: Array[DocumentId]): ConnectionIO[Int]
   def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow]
   def insert(unsaved: DocumentRowUnsaved): ConnectionIO[DocumentRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, DocumentRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, DocumentRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[DocumentFields, DocumentRow]
   def selectAll: Stream[ConnectionIO, DocumentRow]
   def selectById(documentnode: DocumentId): ConnectionIO[Option[DocumentRow]]

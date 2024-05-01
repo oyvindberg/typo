@@ -18,9 +18,9 @@ trait WorkorderroutingRepo {
   def deleteByIds(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): Int
   def insert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow
   def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow
-  def insertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int)(implicit c: Connection): Long
+  def insertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int = 10000)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Iterator[WorkorderroutingRowUnsaved], batchSize: Int)(implicit c: Connection): Long
+  def insertUnsavedStreaming(unsaved: Iterator[WorkorderroutingRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def selectAll(implicit c: Connection): List[WorkorderroutingRow]
   def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow]

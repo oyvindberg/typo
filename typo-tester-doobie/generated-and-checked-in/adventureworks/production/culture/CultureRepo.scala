@@ -19,9 +19,9 @@ trait CultureRepo {
   def deleteByIds(cultureids: Array[CultureId]): ConnectionIO[Int]
   def insert(unsaved: CultureRow): ConnectionIO[CultureRow]
   def insert(unsaved: CultureRowUnsaved): ConnectionIO[CultureRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, CultureRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, CultureRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CultureRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CultureRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[CultureFields, CultureRow]
   def selectAll: Stream[ConnectionIO, CultureRow]
   def selectById(cultureid: CultureId): ConnectionIO[Option[CultureRow]]

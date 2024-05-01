@@ -19,9 +19,9 @@ trait SalesreasonRepo {
   def deleteByIds(salesreasonids: Array[SalesreasonId]): ConnectionIO[Int]
   def insert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow]
   def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, SalesreasonRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, SalesreasonRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesreasonRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesreasonRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[SalesreasonFields, SalesreasonRow]
   def selectAll: Stream[ConnectionIO, SalesreasonRow]
   def selectById(salesreasonid: SalesreasonId): ConnectionIO[Option[SalesreasonRow]]

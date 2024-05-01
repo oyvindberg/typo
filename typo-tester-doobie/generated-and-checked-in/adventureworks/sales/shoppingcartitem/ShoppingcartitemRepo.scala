@@ -19,9 +19,9 @@ trait ShoppingcartitemRepo {
   def deleteByIds(shoppingcartitemids: Array[ShoppingcartitemId]): ConnectionIO[Int]
   def insert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow]
   def insert(unsaved: ShoppingcartitemRowUnsaved): ConnectionIO[ShoppingcartitemRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
   def selectAll: Stream[ConnectionIO, ShoppingcartitemRow]
   def selectById(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Option[ShoppingcartitemRow]]

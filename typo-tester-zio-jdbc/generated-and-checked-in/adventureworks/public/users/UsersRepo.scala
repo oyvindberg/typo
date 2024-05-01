@@ -22,9 +22,9 @@ trait UsersRepo {
   def deleteByIds(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UsersRow]
   def insert(unsaved: UsersRowUnsaved): ZIO[ZConnection, Throwable, UsersRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[UsersFields, UsersRow]
   def selectAll: ZStream[ZConnection, Throwable, UsersRow]
   def selectById(userId: UsersId): ZIO[ZConnection, Throwable, Option[UsersRow]]

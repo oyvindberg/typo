@@ -18,9 +18,9 @@ trait LocationRepo {
   def deleteByIds(locationids: Array[LocationId])(implicit c: Connection): Int
   def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow
   def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow
-  def insertStreaming(unsaved: Iterator[LocationRow], batchSize: Int)(implicit c: Connection): Long
+  def insertStreaming(unsaved: Iterator[LocationRow], batchSize: Int = 10000)(implicit c: Connection): Long
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Iterator[LocationRowUnsaved], batchSize: Int)(implicit c: Connection): Long
+  def insertUnsavedStreaming(unsaved: Iterator[LocationRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[LocationFields, LocationRow]
   def selectAll(implicit c: Connection): List[LocationRow]
   def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow]

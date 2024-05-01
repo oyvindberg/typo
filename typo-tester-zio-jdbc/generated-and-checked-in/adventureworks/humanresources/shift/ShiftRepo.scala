@@ -21,9 +21,9 @@ trait ShiftRepo {
   def deleteByIds(shiftids: Array[ShiftId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, ShiftRow]
   def insert(unsaved: ShiftRowUnsaved): ZIO[ZConnection, Throwable, ShiftRow]
-  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRowUnsaved], batchSize: Int): ZIO[ZConnection, Throwable, Long]
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[ShiftFields, ShiftRow]
   def selectAll: ZStream[ZConnection, Throwable, ShiftRow]
   def selectById(shiftid: ShiftId): ZIO[ZConnection, Throwable, Option[ShiftRow]]

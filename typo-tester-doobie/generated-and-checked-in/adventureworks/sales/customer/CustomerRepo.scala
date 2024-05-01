@@ -19,9 +19,9 @@ trait CustomerRepo {
   def deleteByIds(customerids: Array[CustomerId]): ConnectionIO[Int]
   def insert(unsaved: CustomerRow): ConnectionIO[CustomerRow]
   def insert(unsaved: CustomerRowUnsaved): ConnectionIO[CustomerRow]
-  def insertStreaming(unsaved: Stream[ConnectionIO, CustomerRow], batchSize: Int): ConnectionIO[Long]
+  def insertStreaming(unsaved: Stream[ConnectionIO, CustomerRow], batchSize: Int = 10000): ConnectionIO[Long]
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CustomerRowUnsaved], batchSize: Int): ConnectionIO[Long]
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CustomerRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[CustomerFields, CustomerRow]
   def selectAll: Stream[ConnectionIO, CustomerRow]
   def selectById(customerid: CustomerId): ConnectionIO[Option[CustomerRow]]
