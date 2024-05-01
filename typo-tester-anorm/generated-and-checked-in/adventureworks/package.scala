@@ -20,7 +20,16 @@ package object adventureworks {
   implicit lazy val OffsetTimeWrites: play.api.libs.json.Writes[java.time.OffsetTime] = play.api.libs.json.Writes.StringWrites.contramap(_.toString)
   implicit lazy val ShortArrayToStatement: anorm.ToStatement[Array[scala.Short]] = anorm.ToStatement[Array[scala.Short]]((ps, index, v) => ps.setArray(index, ps.getConnection.createArrayOf("int2", v.map(v => v: java.lang.Short))))
   implicit def arrayParameterMetaData[T](implicit T: anorm.ParameterMetaData[T]): anorm.ParameterMetaData[Array[T]] = new anorm.ParameterMetaData[Array[T]] {
-    override def sqlType: java.lang.String = "_" + T.sqlType
+    override def sqlType: java.lang.String =
+      T.sqlType match {
+        case "INTEGER" => "int4[]"
+        case "FLOAT" => "float4[]"
+        case "DOUBLE PRECISION" => "float8[]"
+        case "DECIMAL" => "float8[]"
+        case "VARCHAR" => "text[]"
+        case other => s"${other}[]"
+      }
+    
     override def jdbcType: scala.Int = java.sql.Types.ARRAY
   }
 }
