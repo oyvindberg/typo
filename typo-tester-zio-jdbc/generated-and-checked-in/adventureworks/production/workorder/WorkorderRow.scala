@@ -8,6 +8,7 @@ package production
 package workorder
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
@@ -48,7 +49,10 @@ case class WorkorderRow(
   scrapreasonid: Option[ScrapreasonId],
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(workorderid: Defaulted[WorkorderId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): WorkorderRowUnsaved =
+     WorkorderRowUnsaved(productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, workorderid, modifieddate)
+ }
 
 object WorkorderRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[WorkorderRow] = new JdbcDecoder[WorkorderRow] {

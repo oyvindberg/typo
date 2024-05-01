@@ -8,6 +8,7 @@ package purchasing
 package shipmethod
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
@@ -39,7 +40,10 @@ case class ShipmethodRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(shipmethodid: Defaulted[ShipmethodId], shipbase: Defaulted[BigDecimal] = Defaulted.Provided(this.shipbase), shiprate: Defaulted[BigDecimal] = Defaulted.Provided(this.shiprate), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ShipmethodRowUnsaved =
+     ShipmethodRowUnsaved(name, shipmethodid, shipbase, shiprate, rowguid, modifieddate)
+ }
 
 object ShipmethodRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[ShipmethodRow] = new JdbcDecoder[ShipmethodRow] {

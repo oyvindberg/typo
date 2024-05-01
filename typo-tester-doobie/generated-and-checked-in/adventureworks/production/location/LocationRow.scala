@@ -7,6 +7,7 @@ package adventureworks
 package production
 package location
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
@@ -36,7 +37,10 @@ case class LocationRow(
   availability: BigDecimal,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(locationid: Defaulted[LocationId], costrate: Defaulted[BigDecimal] = Defaulted.Provided(this.costrate), availability: Defaulted[BigDecimal] = Defaulted.Provided(this.availability), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): LocationRowUnsaved =
+     LocationRowUnsaved(name, locationid, costrate, availability, modifieddate)
+ }
 
 object LocationRow {
   implicit lazy val decoder: Decoder[LocationRow] = Decoder.forProduct5[LocationRow, LocationId, Name, BigDecimal, BigDecimal, TypoLocalDateTime]("locationid", "name", "costrate", "availability", "modifieddate")(LocationRow.apply)(LocationId.decoder, Name.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)

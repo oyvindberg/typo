@@ -8,6 +8,7 @@ package production
 package productphoto
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import anorm.Column
@@ -39,7 +40,10 @@ case class ProductphotoRow(
   largephotofilename: Option[/* max 50 chars */ String],
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(productphotoid: Defaulted[ProductphotoId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductphotoRowUnsaved =
+     ProductphotoRowUnsaved(thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, productphotoid, modifieddate)
+ }
 
 object ProductphotoRow {
   implicit lazy val reads: Reads[ProductphotoRow] = Reads[ProductphotoRow](json => JsResult.fromTry(

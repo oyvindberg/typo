@@ -8,6 +8,7 @@ package sales
 package salesreason
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
@@ -33,7 +34,10 @@ case class SalesreasonRow(
   reasontype: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(salesreasonid: Defaulted[SalesreasonId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SalesreasonRowUnsaved =
+     SalesreasonRowUnsaved(name, reasontype, salesreasonid, modifieddate)
+ }
 
 object SalesreasonRow {
   implicit lazy val reads: Reads[SalesreasonRow] = Reads[SalesreasonRow](json => JsResult.fromTry(

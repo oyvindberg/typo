@@ -8,6 +8,7 @@ package sales
 package shoppingcartitem
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import anorm.Column
@@ -43,7 +44,10 @@ case class ShoppingcartitemRow(
   datecreated: TypoLocalDateTime,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(shoppingcartitemid: Defaulted[ShoppingcartitemId], quantity: Defaulted[Int] = Defaulted.Provided(this.quantity), datecreated: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.datecreated), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ShoppingcartitemRowUnsaved =
+     ShoppingcartitemRowUnsaved(shoppingcartid, productid, shoppingcartitemid, quantity, datecreated, modifieddate)
+ }
 
 object ShoppingcartitemRow {
   implicit lazy val reads: Reads[ShoppingcartitemRow] = Reads[ShoppingcartitemRow](json => JsResult.fromTry(

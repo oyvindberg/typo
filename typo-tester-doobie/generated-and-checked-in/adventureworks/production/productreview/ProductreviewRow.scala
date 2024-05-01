@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productreview
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
@@ -42,7 +43,10 @@ case class ProductreviewRow(
   comments: Option[/* max 3850 chars */ String],
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(productreviewid: Defaulted[ProductreviewId], reviewdate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.reviewdate), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductreviewRowUnsaved =
+     ProductreviewRowUnsaved(productid, reviewername, emailaddress, rating, comments, productreviewid, reviewdate, modifieddate)
+ }
 
 object ProductreviewRow {
   implicit lazy val decoder: Decoder[ProductreviewRow] = Decoder.forProduct8[ProductreviewRow, ProductreviewId, ProductId, Name, TypoLocalDateTime, /* max 50 chars */ String, Int, Option[/* max 3850 chars */ String], TypoLocalDateTime]("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")(ProductreviewRow.apply)(ProductreviewId.decoder, ProductId.decoder, Name.decoder, TypoLocalDateTime.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)

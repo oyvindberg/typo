@@ -7,6 +7,7 @@ package adventureworks
 package public
 package identity_test
 
+import adventureworks.customtypes.Defaulted
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
@@ -23,7 +24,10 @@ case class IdentityTestRow(
   /** Identity BY DEFAULT, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
   defaultGenerated: Int,
   name: IdentityTestId
-)
+){
+   def toUnsavedRow(defaultGenerated: Defaulted[Int] = Defaulted.Provided(this.defaultGenerated)): IdentityTestRowUnsaved =
+     IdentityTestRowUnsaved(name, defaultGenerated)
+ }
 
 object IdentityTestRow {
   implicit lazy val decoder: Decoder[IdentityTestRow] = Decoder.forProduct3[IdentityTestRow, Int, Int, IdentityTestId]("always_generated", "default_generated", "name")(IdentityTestRow.apply)(Decoder.decodeInt, Decoder.decodeInt, IdentityTestId.decoder)

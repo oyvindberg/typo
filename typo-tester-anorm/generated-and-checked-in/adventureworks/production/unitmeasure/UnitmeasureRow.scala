@@ -8,6 +8,7 @@ package production
 package unitmeasure
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
@@ -30,7 +31,10 @@ case class UnitmeasureRow(
   name: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): UnitmeasureRowUnsaved =
+     UnitmeasureRowUnsaved(unitmeasurecode, name, modifieddate)
+ }
 
 object UnitmeasureRow {
   implicit lazy val reads: Reads[UnitmeasureRow] = Reads[UnitmeasureRow](json => JsResult.fromTry(

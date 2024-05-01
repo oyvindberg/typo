@@ -15,6 +15,7 @@ import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
+import testdb.hardcoded.customtypes.Defaulted
 
 /** Table: compositepk.person
     Composite primary key: one, two */
@@ -26,6 +27,8 @@ case class PersonRow(
   name: Option[String]
 ){
    val compositeId: PersonId = PersonId(one, two)
+   def toUnsavedRow(one: Defaulted[Long], two: Defaulted[Option[String]]): PersonRowUnsaved =
+     PersonRowUnsaved(name, one, two)
  }
 
 object PersonRow {

@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package jobcandidate
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
@@ -31,7 +32,10 @@ case class JobcandidateRow(
   resume: Option[TypoXml],
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(jobcandidateid: Defaulted[JobcandidateId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): JobcandidateRowUnsaved =
+     JobcandidateRowUnsaved(businessentityid, resume, jobcandidateid, modifieddate)
+ }
 
 object JobcandidateRow {
   implicit lazy val decoder: Decoder[JobcandidateRow] = Decoder.forProduct4[JobcandidateRow, JobcandidateId, Option[BusinessentityId], Option[TypoXml], TypoLocalDateTime]("jobcandidateid", "businessentityid", "resume", "modifieddate")(JobcandidateRow.apply)(JobcandidateId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoXml.decoder), TypoLocalDateTime.decoder)

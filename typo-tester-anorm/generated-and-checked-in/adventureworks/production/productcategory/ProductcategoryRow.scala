@@ -8,6 +8,7 @@ package production
 package productcategory
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
@@ -34,7 +35,10 @@ case class ProductcategoryRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(productcategoryid: Defaulted[ProductcategoryId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductcategoryRowUnsaved =
+     ProductcategoryRowUnsaved(name, productcategoryid, rowguid, modifieddate)
+ }
 
 object ProductcategoryRow {
   implicit lazy val reads: Reads[ProductcategoryRow] = Reads[ProductcategoryRow](json => JsResult.fromTry(

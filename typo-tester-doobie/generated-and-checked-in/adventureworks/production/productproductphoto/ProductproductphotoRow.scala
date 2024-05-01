@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productproductphoto
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
@@ -35,6 +36,8 @@ case class ProductproductphotoRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductproductphotoId = ProductproductphotoId(productid, productphotoid)
+   def toUnsavedRow(primary: Defaulted[Flag] = Defaulted.Provided(this.primary), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductproductphotoRowUnsaved =
+     ProductproductphotoRowUnsaved(productid, productphotoid, primary, modifieddate)
  }
 
 object ProductproductphotoRow {

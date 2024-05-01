@@ -10,6 +10,7 @@ package person
 
 import java.sql.ResultSet
 import testdb.hardcoded.Text
+import testdb.hardcoded.customtypes.Defaulted
 import testdb.hardcoded.myschema.Number
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
@@ -42,7 +43,10 @@ case class PersonRow(
   sector: Sector,
   /** Default: one */
   favoriteNumber: Number
-)
+){
+   def toUnsavedRow(id: Defaulted[PersonId], maritalStatusId: Defaulted[MaritalStatusId] = Defaulted.Provided(this.maritalStatusId), sector: Defaulted[Sector] = Defaulted.Provided(this.sector), favoriteNumber: Defaulted[Number] = Defaulted.Provided(this.favoriteNumber)): PersonRowUnsaved =
+     PersonRowUnsaved(favouriteFootballClubId, name, nickName, blogUrl, email, phone, likesPizza, workEmail, id, maritalStatusId, sector, favoriteNumber)
+ }
 
 object PersonRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[PersonRow] = new JdbcDecoder[PersonRow] {

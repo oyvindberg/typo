@@ -8,6 +8,7 @@ package sales
 package creditcard
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.userdefined.CustomCreditcardId
@@ -40,7 +41,10 @@ case class CreditcardRow(
   expyear: TypoShort,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(creditcardid: Defaulted[/* user-picked */ CustomCreditcardId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CreditcardRowUnsaved =
+     CreditcardRowUnsaved(cardtype, cardnumber, expmonth, expyear, creditcardid, modifieddate)
+ }
 
 object CreditcardRow {
   implicit lazy val reads: Reads[CreditcardRow] = Reads[CreditcardRow](json => JsResult.fromTry(

@@ -8,6 +8,7 @@ package sales
 package customer
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
@@ -44,7 +45,10 @@ case class CustomerRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(customerid: Defaulted[CustomerId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CustomerRowUnsaved =
+     CustomerRowUnsaved(personid, storeid, territoryid, customerid, rowguid, modifieddate)
+ }
 
 object CustomerRow {
   implicit lazy val reads: Reads[CustomerRow] = Reads[CustomerRow](json => JsResult.fromTry(

@@ -7,6 +7,7 @@ package adventureworks
 package person
 package businessentity
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import doobie.enumerated.Nullability
@@ -27,7 +28,10 @@ case class BusinessentityRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(businessentityid: Defaulted[BusinessentityId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): BusinessentityRowUnsaved =
+     BusinessentityRowUnsaved(businessentityid, rowguid, modifieddate)
+ }
 
 object BusinessentityRow {
   implicit lazy val decoder: Decoder[BusinessentityRow] = Decoder.forProduct3[BusinessentityRow, BusinessentityId, TypoUUID, TypoLocalDateTime]("businessentityid", "rowguid", "modifieddate")(BusinessentityRow.apply)(BusinessentityId.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)

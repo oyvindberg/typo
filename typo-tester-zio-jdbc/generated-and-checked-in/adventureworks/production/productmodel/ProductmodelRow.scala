@@ -8,6 +8,7 @@ package production
 package productmodel
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
@@ -36,7 +37,10 @@ case class ProductmodelRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(productmodelid: Defaulted[ProductmodelId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductmodelRowUnsaved =
+     ProductmodelRowUnsaved(name, catalogdescription, instructions, productmodelid, rowguid, modifieddate)
+ }
 
 object ProductmodelRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[ProductmodelRow] = new JdbcDecoder[ProductmodelRow] {

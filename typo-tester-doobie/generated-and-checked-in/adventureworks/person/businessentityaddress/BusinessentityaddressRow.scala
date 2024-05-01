@@ -7,6 +7,7 @@ package adventureworks
 package person
 package businessentityaddress
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
@@ -38,6 +39,8 @@ case class BusinessentityaddressRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: BusinessentityaddressId = BusinessentityaddressId(businessentityid, addressid, addresstypeid)
+   def toUnsavedRow(rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): BusinessentityaddressRowUnsaved =
+     BusinessentityaddressRowUnsaved(businessentityid, addressid, addresstypeid, rowguid, modifieddate)
  }
 
 object BusinessentityaddressRow {

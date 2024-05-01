@@ -8,6 +8,7 @@ package production
 package transactionhistory
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import java.sql.ResultSet
@@ -44,7 +45,10 @@ case class TransactionhistoryRow(
   actualcost: BigDecimal,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(transactionid: Defaulted[TransactionhistoryId], referenceorderlineid: Defaulted[Int] = Defaulted.Provided(this.referenceorderlineid), transactiondate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.transactiondate), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): TransactionhistoryRowUnsaved =
+     TransactionhistoryRowUnsaved(productid, referenceorderid, transactiontype, quantity, actualcost, transactionid, referenceorderlineid, transactiondate, modifieddate)
+ }
 
 object TransactionhistoryRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[TransactionhistoryRow] = new JdbcDecoder[TransactionhistoryRow] {

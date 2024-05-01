@@ -7,6 +7,7 @@ package adventureworks
 package person
 package contacttype
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
@@ -27,7 +28,10 @@ case class ContacttypeRow(
   name: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(contacttypeid: Defaulted[ContacttypeId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ContacttypeRowUnsaved =
+     ContacttypeRowUnsaved(name, contacttypeid, modifieddate)
+ }
 
 object ContacttypeRow {
   implicit lazy val decoder: Decoder[ContacttypeRow] = Decoder.forProduct3[ContacttypeRow, ContacttypeId, Name, TypoLocalDateTime]("contacttypeid", "name", "modifieddate")(ContacttypeRow.apply)(ContacttypeId.decoder, Name.decoder, TypoLocalDateTime.decoder)

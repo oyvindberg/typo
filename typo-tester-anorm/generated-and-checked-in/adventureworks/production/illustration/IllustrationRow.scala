@@ -8,6 +8,7 @@ package production
 package illustration
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import anorm.Column
@@ -33,7 +34,10 @@ case class IllustrationRow(
   diagram: Option[TypoXml],
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(illustrationid: Defaulted[IllustrationId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): IllustrationRowUnsaved =
+     IllustrationRowUnsaved(diagram, illustrationid, modifieddate)
+ }
 
 object IllustrationRow {
   implicit lazy val reads: Reads[IllustrationRow] = Reads[IllustrationRow](json => JsResult.fromTry(

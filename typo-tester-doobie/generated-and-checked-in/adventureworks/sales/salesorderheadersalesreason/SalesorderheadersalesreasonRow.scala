@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesorderheadersalesreason
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
@@ -31,6 +32,8 @@ case class SalesorderheadersalesreasonRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SalesorderheadersalesreasonId = SalesorderheadersalesreasonId(salesorderid, salesreasonid)
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SalesorderheadersalesreasonRowUnsaved =
+     SalesorderheadersalesreasonRowUnsaved(salesorderid, salesreasonid, modifieddate)
  }
 
 object SalesorderheadersalesreasonRow {

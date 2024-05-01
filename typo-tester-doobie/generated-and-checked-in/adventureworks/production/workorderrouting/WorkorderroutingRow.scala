@@ -7,6 +7,7 @@ package adventureworks
 package production
 package workorderrouting
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
@@ -58,6 +59,8 @@ case class WorkorderroutingRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: WorkorderroutingId = WorkorderroutingId(workorderid, productid, operationsequence)
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): WorkorderroutingRowUnsaved =
+     WorkorderroutingRowUnsaved(workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)
  }
 
 object WorkorderroutingRow {

@@ -8,6 +8,7 @@ package production
 package culture
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import java.sql.ResultSet
@@ -27,7 +28,10 @@ case class CultureRow(
   name: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CultureRowUnsaved =
+     CultureRowUnsaved(cultureid, name, modifieddate)
+ }
 
 object CultureRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[CultureRow] = new JdbcDecoder[CultureRow] {

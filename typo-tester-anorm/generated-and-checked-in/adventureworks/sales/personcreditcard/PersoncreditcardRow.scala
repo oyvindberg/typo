@@ -8,6 +8,7 @@ package sales
 package personcreditcard
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.userdefined.CustomCreditcardId
@@ -35,6 +36,8 @@ case class PersoncreditcardRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: PersoncreditcardId = PersoncreditcardId(businessentityid, creditcardid)
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PersoncreditcardRowUnsaved =
+     PersoncreditcardRowUnsaved(businessentityid, creditcardid, modifieddate)
  }
 
 object PersoncreditcardRow {

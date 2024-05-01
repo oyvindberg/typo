@@ -8,6 +8,7 @@ package production
 package billofmaterials
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
@@ -55,7 +56,10 @@ case class BillofmaterialsRow(
   perassemblyqty: BigDecimal,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(billofmaterialsid: Defaulted[Int], startdate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.startdate), perassemblyqty: Defaulted[BigDecimal] = Defaulted.Provided(this.perassemblyqty), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): BillofmaterialsRowUnsaved =
+     BillofmaterialsRowUnsaved(productassemblyid, componentid, enddate, unitmeasurecode, bomlevel, billofmaterialsid, startdate, perassemblyqty, modifieddate)
+ }
 
 object BillofmaterialsRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[BillofmaterialsRow] = new JdbcDecoder[BillofmaterialsRow] {

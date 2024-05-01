@@ -7,6 +7,7 @@ package adventureworks
 package purchasing
 package productvendor
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
@@ -56,6 +57,8 @@ case class ProductvendorRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductvendorId = ProductvendorId(productid, businessentityid)
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductvendorRowUnsaved =
+     ProductvendorRowUnsaved(productid, businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)
  }
 
 object ProductvendorRow {

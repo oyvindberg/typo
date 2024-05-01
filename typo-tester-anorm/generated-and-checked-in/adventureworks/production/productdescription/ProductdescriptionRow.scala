@@ -8,6 +8,7 @@ package production
 package productdescription
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import anorm.Column
@@ -35,7 +36,10 @@ case class ProductdescriptionRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(productdescriptionid: Defaulted[ProductdescriptionId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductdescriptionRowUnsaved =
+     ProductdescriptionRowUnsaved(description, productdescriptionid, rowguid, modifieddate)
+ }
 
 object ProductdescriptionRow {
   implicit lazy val reads: Reads[ProductdescriptionRow] = Reads[ProductdescriptionRow](json => JsResult.fromTry(

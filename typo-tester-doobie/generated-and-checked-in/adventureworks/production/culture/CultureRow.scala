@@ -7,6 +7,7 @@ package adventureworks
 package production
 package culture
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
@@ -26,7 +27,10 @@ case class CultureRow(
   name: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CultureRowUnsaved =
+     CultureRowUnsaved(cultureid, name, modifieddate)
+ }
 
 object CultureRow {
   implicit lazy val decoder: Decoder[CultureRow] = Decoder.forProduct3[CultureRow, CultureId, Name, TypoLocalDateTime]("cultureid", "name", "modifieddate")(CultureRow.apply)(CultureId.decoder, Name.decoder, TypoLocalDateTime.decoder)

@@ -8,6 +8,7 @@ package production
 package productinventory
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
@@ -44,6 +45,8 @@ case class ProductinventoryRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductinventoryId = ProductinventoryId(productid, locationid)
+   def toUnsavedRow(quantity: Defaulted[TypoShort] = Defaulted.Provided(this.quantity), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductinventoryRowUnsaved =
+     ProductinventoryRowUnsaved(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
  }
 
 object ProductinventoryRow {

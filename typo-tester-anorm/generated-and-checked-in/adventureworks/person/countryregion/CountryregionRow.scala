@@ -8,6 +8,7 @@ package person
 package countryregion
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
@@ -30,7 +31,10 @@ case class CountryregionRow(
   name: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CountryregionRowUnsaved =
+     CountryregionRowUnsaved(countryregioncode, name, modifieddate)
+ }
 
 object CountryregionRow {
   implicit lazy val reads: Reads[CountryregionRow] = Reads[CountryregionRow](json => JsResult.fromTry(

@@ -8,6 +8,7 @@ package person
 package phonenumbertype
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import java.sql.ResultSet
@@ -28,7 +29,10 @@ case class PhonenumbertypeRow(
   name: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(phonenumbertypeid: Defaulted[PhonenumbertypeId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PhonenumbertypeRowUnsaved =
+     PhonenumbertypeRowUnsaved(name, phonenumbertypeid, modifieddate)
+ }
 
 object PhonenumbertypeRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[PhonenumbertypeRow] = new JdbcDecoder[PhonenumbertypeRow] {

@@ -8,6 +8,7 @@ package person
 package contacttype
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
@@ -31,7 +32,10 @@ case class ContacttypeRow(
   name: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(contacttypeid: Defaulted[ContacttypeId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ContacttypeRowUnsaved =
+     ContacttypeRowUnsaved(name, contacttypeid, modifieddate)
+ }
 
 object ContacttypeRow {
   implicit lazy val reads: Reads[ContacttypeRow] = Reads[ContacttypeRow](json => JsResult.fromTry(

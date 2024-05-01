@@ -8,6 +8,7 @@ package person
 package password
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
@@ -37,7 +38,10 @@ case class PasswordRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PasswordRowUnsaved =
+     PasswordRowUnsaved(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
+ }
 
 object PasswordRow {
   implicit lazy val reads: Reads[PasswordRow] = Reads[PasswordRow](json => JsResult.fromTry(

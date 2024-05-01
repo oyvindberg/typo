@@ -8,6 +8,7 @@ package humanresources
 package department
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import java.sql.ResultSet
@@ -30,7 +31,10 @@ case class DepartmentRow(
   groupname: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(departmentid: Defaulted[DepartmentId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): DepartmentRowUnsaved =
+     DepartmentRowUnsaved(name, groupname, departmentid, modifieddate)
+ }
 
 object DepartmentRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[DepartmentRow] = new JdbcDecoder[DepartmentRow] {

@@ -10,6 +10,7 @@ package person
 
 import java.sql.ResultSet
 import testdb.hardcoded.Text
+import testdb.hardcoded.customtypes.Defaulted
 import zio.jdbc.JdbcDecoder
 import zio.json.JsonDecoder
 import zio.json.JsonEncoder
@@ -26,6 +27,8 @@ case class PersonRow(
   name: Option[String]
 ){
    val compositeId: PersonId = PersonId(one, two)
+   def toUnsavedRow(one: Defaulted[Long], two: Defaulted[Option[String]]): PersonRowUnsaved =
+     PersonRowUnsaved(name, one, two)
  }
 
 object PersonRow {

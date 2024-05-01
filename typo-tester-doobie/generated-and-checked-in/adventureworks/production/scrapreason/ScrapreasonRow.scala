@@ -7,6 +7,7 @@ package adventureworks
 package production
 package scrapreason
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
@@ -27,7 +28,10 @@ case class ScrapreasonRow(
   name: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(scrapreasonid: Defaulted[ScrapreasonId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ScrapreasonRowUnsaved =
+     ScrapreasonRowUnsaved(name, scrapreasonid, modifieddate)
+ }
 
 object ScrapreasonRow {
   implicit lazy val decoder: Decoder[ScrapreasonRow] = Decoder.forProduct3[ScrapreasonRow, ScrapreasonId, Name, TypoLocalDateTime]("scrapreasonid", "name", "modifieddate")(ScrapreasonRow.apply)(ScrapreasonId.decoder, Name.decoder, TypoLocalDateTime.decoder)

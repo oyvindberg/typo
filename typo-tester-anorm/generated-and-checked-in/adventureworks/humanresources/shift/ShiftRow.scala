@@ -8,6 +8,7 @@ package humanresources
 package shift
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoLocalTime
 import adventureworks.public.Name
@@ -36,7 +37,10 @@ case class ShiftRow(
   endtime: TypoLocalTime,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(shiftid: Defaulted[ShiftId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ShiftRowUnsaved =
+     ShiftRowUnsaved(name, starttime, endtime, shiftid, modifieddate)
+ }
 
 object ShiftRow {
   implicit lazy val reads: Reads[ShiftRow] = Reads[ShiftRow](json => JsResult.fromTry(

@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package specialofferproduct
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
@@ -34,6 +35,8 @@ case class SpecialofferproductRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SpecialofferproductId = SpecialofferproductId(specialofferid, productid)
+   def toUnsavedRow(rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SpecialofferproductRowUnsaved =
+     SpecialofferproductRowUnsaved(specialofferid, productid, rowguid, modifieddate)
  }
 
 object SpecialofferproductRow {

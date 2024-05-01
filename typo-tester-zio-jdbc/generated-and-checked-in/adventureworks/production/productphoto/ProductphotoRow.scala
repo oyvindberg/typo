@@ -8,6 +8,7 @@ package production
 package productphoto
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import java.sql.ResultSet
@@ -34,7 +35,10 @@ case class ProductphotoRow(
   largephotofilename: Option[/* max 50 chars */ String],
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(productphotoid: Defaulted[ProductphotoId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductphotoRowUnsaved =
+     ProductphotoRowUnsaved(thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, productphotoid, modifieddate)
+ }
 
 object ProductphotoRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[ProductphotoRow] = new JdbcDecoder[ProductphotoRow] {

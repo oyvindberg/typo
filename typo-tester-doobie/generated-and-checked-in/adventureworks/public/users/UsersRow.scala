@@ -7,6 +7,7 @@ package adventureworks
 package public
 package users
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import doobie.enumerated.Nullability
@@ -28,7 +29,10 @@ case class UsersRow(
   /** Default: now() */
   createdAt: TypoInstant,
   verifiedOn: Option[TypoInstant]
-)
+){
+   def toUnsavedRow(createdAt: Defaulted[TypoInstant] = Defaulted.Provided(this.createdAt)): UsersRowUnsaved =
+     UsersRowUnsaved(userId, name, lastName, email, password, verifiedOn, createdAt)
+ }
 
 object UsersRow {
   implicit lazy val decoder: Decoder[UsersRow] = Decoder.forProduct7[UsersRow, UsersId, String, Option[String], TypoUnknownCitext, String, TypoInstant, Option[TypoInstant]]("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")(UsersRow.apply)(UsersId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), TypoUnknownCitext.decoder, Decoder.decodeString, TypoInstant.decoder, Decoder.decodeOption(TypoInstant.decoder))

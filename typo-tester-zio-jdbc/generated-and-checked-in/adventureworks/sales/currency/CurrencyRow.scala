@@ -8,6 +8,7 @@ package sales
 package currency
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import java.sql.ResultSet
@@ -27,7 +28,10 @@ case class CurrencyRow(
   name: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CurrencyRowUnsaved =
+     CurrencyRowUnsaved(currencycode, name, modifieddate)
+ }
 
 object CurrencyRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[CurrencyRow] = new JdbcDecoder[CurrencyRow] {

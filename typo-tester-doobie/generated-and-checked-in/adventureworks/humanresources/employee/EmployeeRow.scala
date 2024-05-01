@@ -7,6 +7,7 @@ package adventureworks
 package humanresources
 package employee
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
@@ -67,7 +68,10 @@ case class EmployeeRow(
   /** Where the employee is located in corporate hierarchy.
       Default: '/'::character varying */
   organizationnode: Option[String]
-)
+){
+   def toUnsavedRow(salariedflag: Defaulted[Flag] = Defaulted.Provided(this.salariedflag), vacationhours: Defaulted[TypoShort] = Defaulted.Provided(this.vacationhours), sickleavehours: Defaulted[TypoShort] = Defaulted.Provided(this.sickleavehours), currentflag: Defaulted[Flag] = Defaulted.Provided(this.currentflag), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate), organizationnode: Defaulted[Option[String]] = Defaulted.Provided(this.organizationnode)): EmployeeRowUnsaved =
+     EmployeeRowUnsaved(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
+ }
 
 object EmployeeRow {
   implicit lazy val decoder: Decoder[EmployeeRow] = Decoder.forProduct15[EmployeeRow, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Flag, TypoShort, TypoShort, Flag, TypoUUID, TypoLocalDateTime, Option[String]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(EmployeeRow.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Flag.decoder, TypoShort.decoder, TypoShort.decoder, Flag.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(Decoder.decodeString))

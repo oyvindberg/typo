@@ -8,6 +8,7 @@ package sales
 package salesorderheader
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
@@ -106,7 +107,10 @@ case class SalesorderheaderRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(salesorderid: Defaulted[SalesorderheaderId], revisionnumber: Defaulted[TypoShort] = Defaulted.Provided(this.revisionnumber), orderdate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.orderdate), status: Defaulted[TypoShort] = Defaulted.Provided(this.status), onlineorderflag: Defaulted[Flag] = Defaulted.Provided(this.onlineorderflag), subtotal: Defaulted[BigDecimal] = Defaulted.Provided(this.subtotal), taxamt: Defaulted[BigDecimal] = Defaulted.Provided(this.taxamt), freight: Defaulted[BigDecimal] = Defaulted.Provided(this.freight), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SalesorderheaderRowUnsaved =
+     SalesorderheaderRowUnsaved(duedate, shipdate, purchaseordernumber, accountnumber, customerid, salespersonid, territoryid, billtoaddressid, shiptoaddressid, shipmethodid, creditcardid, creditcardapprovalcode, currencyrateid, totaldue, comment, salesorderid, revisionnumber, orderdate, status, onlineorderflag, subtotal, taxamt, freight, rowguid, modifieddate)
+ }
 
 object SalesorderheaderRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[SalesorderheaderRow] = new JdbcDecoder[SalesorderheaderRow] {

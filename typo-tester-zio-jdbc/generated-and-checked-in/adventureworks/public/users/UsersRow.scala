@@ -8,6 +8,7 @@ package public
 package users
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import java.sql.ResultSet
@@ -28,7 +29,10 @@ case class UsersRow(
   /** Default: now() */
   createdAt: TypoInstant,
   verifiedOn: Option[TypoInstant]
-)
+){
+   def toUnsavedRow(createdAt: Defaulted[TypoInstant] = Defaulted.Provided(this.createdAt)): UsersRowUnsaved =
+     UsersRowUnsaved(userId, name, lastName, email, password, verifiedOn, createdAt)
+ }
 
 object UsersRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[UsersRow] = new JdbcDecoder[UsersRow] {

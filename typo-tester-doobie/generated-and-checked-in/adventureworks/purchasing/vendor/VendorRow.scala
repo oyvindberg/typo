@@ -7,6 +7,7 @@ package adventureworks
 package purchasing
 package vendor
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
@@ -45,7 +46,10 @@ case class VendorRow(
   purchasingwebserviceurl: Option[/* max 1024 chars */ String],
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(preferredvendorstatus: Defaulted[Flag] = Defaulted.Provided(this.preferredvendorstatus), activeflag: Defaulted[Flag] = Defaulted.Provided(this.activeflag), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): VendorRowUnsaved =
+     VendorRowUnsaved(businessentityid, accountnumber, name, creditrating, purchasingwebserviceurl, preferredvendorstatus, activeflag, modifieddate)
+ }
 
 object VendorRow {
   implicit lazy val decoder: Decoder[VendorRow] = Decoder.forProduct8[VendorRow, BusinessentityId, AccountNumber, Name, TypoShort, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(VendorRow.apply)(BusinessentityId.decoder, AccountNumber.decoder, Name.decoder, TypoShort.decoder, Flag.decoder, Flag.decoder, Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)

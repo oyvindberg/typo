@@ -8,6 +8,7 @@ package humanresources
 package department
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.RowParser
@@ -33,7 +34,10 @@ case class DepartmentRow(
   groupname: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(departmentid: Defaulted[DepartmentId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): DepartmentRowUnsaved =
+     DepartmentRowUnsaved(name, groupname, departmentid, modifieddate)
+ }
 
 object DepartmentRow {
   implicit lazy val reads: Reads[DepartmentRow] = Reads[DepartmentRow](json => JsResult.fromTry(

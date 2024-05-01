@@ -8,6 +8,7 @@ package humanresources
 package jobcandidate
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
@@ -37,7 +38,10 @@ case class JobcandidateRow(
   resume: Option[TypoXml],
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(jobcandidateid: Defaulted[JobcandidateId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): JobcandidateRowUnsaved =
+     JobcandidateRowUnsaved(businessentityid, resume, jobcandidateid, modifieddate)
+ }
 
 object JobcandidateRow {
   implicit lazy val reads: Reads[JobcandidateRow] = Reads[JobcandidateRow](json => JsResult.fromTry(

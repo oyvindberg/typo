@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productdescription
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import doobie.enumerated.Nullability
@@ -30,7 +31,10 @@ case class ProductdescriptionRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(productdescriptionid: Defaulted[ProductdescriptionId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductdescriptionRowUnsaved =
+     ProductdescriptionRowUnsaved(description, productdescriptionid, rowguid, modifieddate)
+ }
 
 object ProductdescriptionRow {
   implicit lazy val decoder: Decoder[ProductdescriptionRow] = Decoder.forProduct4[ProductdescriptionRow, ProductdescriptionId, /* max 400 chars */ String, TypoUUID, TypoLocalDateTime]("productdescriptionid", "description", "rowguid", "modifieddate")(ProductdescriptionRow.apply)(ProductdescriptionId.decoder, Decoder.decodeString, TypoUUID.decoder, TypoLocalDateTime.decoder)

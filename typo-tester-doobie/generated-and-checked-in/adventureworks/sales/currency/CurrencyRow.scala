@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package currency
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
@@ -26,7 +27,10 @@ case class CurrencyRow(
   name: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CurrencyRowUnsaved =
+     CurrencyRowUnsaved(currencycode, name, modifieddate)
+ }
 
 object CurrencyRow {
   implicit lazy val decoder: Decoder[CurrencyRow] = Decoder.forProduct3[CurrencyRow, CurrencyId, Name, TypoLocalDateTime]("currencycode", "name", "modifieddate")(CurrencyRow.apply)(CurrencyId.decoder, Name.decoder, TypoLocalDateTime.decoder)

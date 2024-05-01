@@ -8,6 +8,7 @@ package humanresources
 package employee
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
@@ -67,7 +68,10 @@ case class EmployeeRow(
   /** Where the employee is located in corporate hierarchy.
       Default: '/'::character varying */
   organizationnode: Option[String]
-)
+){
+   def toUnsavedRow(salariedflag: Defaulted[Flag] = Defaulted.Provided(this.salariedflag), vacationhours: Defaulted[TypoShort] = Defaulted.Provided(this.vacationhours), sickleavehours: Defaulted[TypoShort] = Defaulted.Provided(this.sickleavehours), currentflag: Defaulted[Flag] = Defaulted.Provided(this.currentflag), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate), organizationnode: Defaulted[Option[String]] = Defaulted.Provided(this.organizationnode)): EmployeeRowUnsaved =
+     EmployeeRowUnsaved(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
+ }
 
 object EmployeeRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[EmployeeRow] = new JdbcDecoder[EmployeeRow] {

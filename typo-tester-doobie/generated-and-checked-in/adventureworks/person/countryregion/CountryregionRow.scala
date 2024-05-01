@@ -7,6 +7,7 @@ package adventureworks
 package person
 package countryregion
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import doobie.enumerated.Nullability
@@ -26,7 +27,10 @@ case class CountryregionRow(
   name: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CountryregionRowUnsaved =
+     CountryregionRowUnsaved(countryregioncode, name, modifieddate)
+ }
 
 object CountryregionRow {
   implicit lazy val decoder: Decoder[CountryregionRow] = Decoder.forProduct3[CountryregionRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(CountryregionRow.apply)(CountryregionId.decoder, Name.decoder, TypoLocalDateTime.decoder)

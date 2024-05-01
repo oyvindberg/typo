@@ -8,6 +8,7 @@ package production
 package location
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
 import anorm.Column
@@ -41,7 +42,10 @@ case class LocationRow(
   availability: BigDecimal,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(locationid: Defaulted[LocationId], costrate: Defaulted[BigDecimal] = Defaulted.Provided(this.costrate), availability: Defaulted[BigDecimal] = Defaulted.Provided(this.availability), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): LocationRowUnsaved =
+     LocationRowUnsaved(name, locationid, costrate, availability, modifieddate)
+ }
 
 object LocationRow {
   implicit lazy val reads: Reads[LocationRow] = Reads[LocationRow](json => JsResult.fromTry(

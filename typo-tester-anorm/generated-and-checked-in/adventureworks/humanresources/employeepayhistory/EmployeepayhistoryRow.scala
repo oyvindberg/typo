@@ -8,6 +8,7 @@ package humanresources
 package employeepayhistory
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
@@ -42,6 +43,8 @@ case class EmployeepayhistoryRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: EmployeepayhistoryId = EmployeepayhistoryId(businessentityid, ratechangedate)
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): EmployeepayhistoryRowUnsaved =
+     EmployeepayhistoryRowUnsaved(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
  }
 
 object EmployeepayhistoryRow {

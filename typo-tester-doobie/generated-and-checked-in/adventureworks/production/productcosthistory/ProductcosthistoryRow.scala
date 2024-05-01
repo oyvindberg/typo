@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productcosthistory
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
@@ -37,6 +38,8 @@ case class ProductcosthistoryRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductcosthistoryId = ProductcosthistoryId(productid, startdate)
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductcosthistoryRowUnsaved =
+     ProductcosthistoryRowUnsaved(productid, startdate, enddate, standardcost, modifieddate)
  }
 
 object ProductcosthistoryRow {

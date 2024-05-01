@@ -7,6 +7,7 @@ package adventureworks
 package production
 package billofmaterials
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
@@ -55,7 +56,10 @@ case class BillofmaterialsRow(
   perassemblyqty: BigDecimal,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(billofmaterialsid: Defaulted[Int], startdate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.startdate), perassemblyqty: Defaulted[BigDecimal] = Defaulted.Provided(this.perassemblyqty), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): BillofmaterialsRowUnsaved =
+     BillofmaterialsRowUnsaved(productassemblyid, componentid, enddate, unitmeasurecode, bomlevel, billofmaterialsid, startdate, perassemblyqty, modifieddate)
+ }
 
 object BillofmaterialsRow {
   implicit lazy val decoder: Decoder[BillofmaterialsRow] = Decoder.forProduct9[BillofmaterialsRow, Int, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, BigDecimal, TypoLocalDateTime]("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(BillofmaterialsRow.apply)(Decoder.decodeInt, Decoder.decodeOption(ProductId.decoder), ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), UnitmeasureId.decoder, TypoShort.decoder, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)

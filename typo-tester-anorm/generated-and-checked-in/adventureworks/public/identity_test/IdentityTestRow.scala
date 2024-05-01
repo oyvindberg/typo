@@ -8,6 +8,7 @@ package public
 package identity_test
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import anorm.Column
 import anorm.RowParser
 import anorm.Success
@@ -28,7 +29,10 @@ case class IdentityTestRow(
   /** Identity BY DEFAULT, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
   defaultGenerated: Int,
   name: IdentityTestId
-)
+){
+   def toUnsavedRow(defaultGenerated: Defaulted[Int] = Defaulted.Provided(this.defaultGenerated)): IdentityTestRowUnsaved =
+     IdentityTestRowUnsaved(name, defaultGenerated)
+ }
 
 object IdentityTestRow {
   implicit lazy val reads: Reads[IdentityTestRow] = Reads[IdentityTestRow](json => JsResult.fromTry(

@@ -8,6 +8,7 @@ package person
 package businessentity
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import anorm.RowParser
@@ -31,7 +32,10 @@ case class BusinessentityRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(businessentityid: Defaulted[BusinessentityId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): BusinessentityRowUnsaved =
+     BusinessentityRowUnsaved(businessentityid, rowguid, modifieddate)
+ }
 
 object BusinessentityRow {
   implicit lazy val reads: Reads[BusinessentityRow] = Reads[BusinessentityRow](json => JsResult.fromTry(

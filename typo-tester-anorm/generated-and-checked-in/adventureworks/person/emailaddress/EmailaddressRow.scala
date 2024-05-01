@@ -8,6 +8,7 @@ package person
 package emailaddress
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
@@ -41,6 +42,8 @@ case class EmailaddressRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: EmailaddressId = EmailaddressId(businessentityid, emailaddressid)
+   def toUnsavedRow(emailaddressid: Defaulted[Int], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): EmailaddressRowUnsaved =
+     EmailaddressRowUnsaved(businessentityid, emailaddress, emailaddressid, rowguid, modifieddate)
  }
 
 object EmailaddressRow {

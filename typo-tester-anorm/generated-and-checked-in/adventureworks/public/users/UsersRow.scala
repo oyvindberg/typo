@@ -8,6 +8,7 @@ package public
 package users
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
 import anorm.Column
@@ -33,7 +34,10 @@ case class UsersRow(
   /** Default: now() */
   createdAt: TypoInstant,
   verifiedOn: Option[TypoInstant]
-)
+){
+   def toUnsavedRow(createdAt: Defaulted[TypoInstant] = Defaulted.Provided(this.createdAt)): UsersRowUnsaved =
+     UsersRowUnsaved(userId, name, lastName, email, password, verifiedOn, createdAt)
+ }
 
 object UsersRow {
   implicit lazy val reads: Reads[UsersRow] = Reads[UsersRow](json => JsResult.fromTry(

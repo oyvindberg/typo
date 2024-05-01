@@ -7,6 +7,7 @@ package adventureworks
 package sales
 package salesorderdetail
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
@@ -55,6 +56,8 @@ case class SalesorderdetailRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SalesorderdetailId = SalesorderdetailId(salesorderid, salesorderdetailid)
+   def toUnsavedRow(salesorderdetailid: Defaulted[Int], unitpricediscount: Defaulted[BigDecimal] = Defaulted.Provided(this.unitpricediscount), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SalesorderdetailRowUnsaved =
+     SalesorderdetailRowUnsaved(salesorderid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, salesorderdetailid, unitpricediscount, rowguid, modifieddate)
  }
 
 object SalesorderdetailRow {

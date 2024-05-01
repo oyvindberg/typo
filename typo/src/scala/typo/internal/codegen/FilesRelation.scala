@@ -6,81 +6,98 @@ import play.api.libs.json.Json
 import typo.sc.Type
 
 case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option[NonEmptyList[ComputedColumn]], options: InternalOptions) {
-  def RowFile(rowType: DbLib.RowType, comment: Option[String]): Option[sc.File] = maybeCols.map { cols =>
-    val compositeId = names.maybeId match {
-      case Some(x: IdComputed.Composite) =>
-        code"""|{
-               |  val ${x.paramName}: ${x.tpe} = ${x.tpe}(${x.cols.map(x => x.name.code).mkCode(", ")})
-               |}""".stripMargin
-      case _ => code""
-    }
-
-    val formattedCols = cols.map { col =>
-      val commentPieces = List[Iterable[String]](
-        col.dbCol.comment,
-        col.dbCol.columnDefault.map(x => s"Default: $x"),
-        col.dbCol.identity.map(_.asString),
-        col.pointsTo.map { case (relationName, columnName) =>
-          val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, names.RowName.value.idents))
-          s"Points to [[${shortened.dotName}.${naming.field(columnName).value}]]"
+  def RowFile(rowType: DbLib.RowType, comment: Option[String], maybeUnsavedRow: Option[(ComputedRowUnsaved, ComputedDefault)]): Option[sc.File] =
+    maybeCols.map { cols =>
+      val members = List[Option[sc.Code]](
+        names.maybeId.collect { case x: IdComputed.Composite =>
+          code"""val ${x.paramName}: ${x.tpe} = ${x.tpe}(${x.cols.map(x => x.name.code).mkCode(", ")})"""
         },
-        col.dbCol.constraints.map(c => s"Constraint ${c.name} affecting columns ${c.columns.map(_.value).mkString(", ")}: ${c.checkClause}"),
-        if (options.debugTypes)
-          col.dbCol.jsonDescription.maybeJson.map(other => s"debug: ${Json.stringify(other)}")
-        else None
-      ).flatten
-
-      val comment = commentPieces match {
+        maybeUnsavedRow.map { case (unsaved, defaults) =>
+          val (partOfId, rest) = unsaved.defaultCols.toList.partition { case (col, _) => names.isIdColumn(col.dbName) }
+          val partOfIdParams = partOfId.map { case (col, tpe) =>
+            sc.Param(col.name, defaults.Defaulted.of(tpe), None)
+          }
+          val restParams = rest.map { case (col, tpe) =>
+            sc.Param(col.name, defaults.Defaulted.of(tpe), Some(code"${defaults.Defaulted}.${defaults.Provided}(this.${col.name})"))
+          }
+          val params = partOfIdParams ++ restParams
+          code"""|def toUnsavedRow(${params.map(_.code).mkCode(", ")}): ${unsaved.tpe} =
+                 |  ${unsaved.tpe}(${unsaved.allCols.map(col => col.name.code).mkCode(", ")})""".stripMargin
+        }
+      )
+      val formattedMembers = members.flatten match {
         case Nil => sc.Code.Empty
         case nonEmpty =>
-          val lines = nonEmpty.flatMap(_.linesIterator).map(_.code)
-          code"""|/** ${lines.mkCode("\n")} */
+          code"""|{
+                 |  ${nonEmpty.mkCode("\n")}
+                 |}""".stripMargin
+      }
+      val formattedCols = cols.map { col =>
+        val commentPieces = List[Iterable[String]](
+          col.dbCol.comment,
+          col.dbCol.columnDefault.map(x => s"Default: $x"),
+          col.dbCol.identity.map(_.asString),
+          col.pointsTo.map { case (relationName, columnName) =>
+            val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, names.RowName.value.idents))
+            s"Points to [[${shortened.dotName}.${naming.field(columnName).value}]]"
+          },
+          col.dbCol.constraints.map(c => s"Constraint ${c.name} affecting columns ${c.columns.map(_.value).mkString(", ")}: ${c.checkClause}"),
+          if (options.debugTypes)
+            col.dbCol.jsonDescription.maybeJson.map(other => s"debug: ${Json.stringify(other)}")
+          else None
+        ).flatten
+
+        val comment = commentPieces match {
+          case Nil => sc.Code.Empty
+          case nonEmpty =>
+            val lines = nonEmpty.flatMap(_.linesIterator).map(_.code)
+            code"""|/** ${lines.mkCode("\n")} */
                  |""".stripMargin
-      }
-
-      code"$comment${col.param.code}"
-    }
-    val instances =
-      options.jsonLibs.flatMap(_.instances(names.RowName, cols)) ++
-        options.dbLib.toList.flatMap(_.rowInstances(names.RowName, cols, rowType = rowType))
-
-    val classComment = {
-      val lines = List[Iterable[String]](
-        Some(names.source match {
-          case Source.Table(name)       => s"Table: ${name.value}"
-          case Source.View(name, true)  => s"Materialized View: ${name.value}"
-          case Source.View(name, false) => s"View: ${name.value}"
-          case Source.SqlFile(relPath)  => s"SQL file: ${relPath.asString}"
-        }),
-        comment,
-        names.maybeId.map {
-          case x: IdComputed.Unary     => s"Primary key: ${x.col.dbName.value}"
-          case x: IdComputed.Composite => s"Composite primary key: ${x.cols.map(_.dbName.value).mkString(", ")}"
         }
-      ).flatten
-      code"""|/** ${lines.mkString("\n")} */
-             |""".stripMargin
-    }
 
-    val maybeExtraApply: Option[sc.Code] =
-      names.maybeId.collect { case id: IdComputed.Composite =>
-        val nonKeyColumns = cols.toList.filter(col => !names.isIdColumn(col.dbCol.name))
-        val params = sc.Param(id.paramName, id.tpe, None) :: nonKeyColumns.map(col => sc.Param(col.name, col.tpe, None))
-        val args = cols.map { col => if (names.isIdColumn(col.dbCol.name)) code"${id.paramName}.${col.name}" else col.name.code }
-        code"""|def apply(${params.map(_.code).mkCode(", ")}) =
-               |  new ${names.RowName}(${args.map(_.code).mkCode(", ")})""".stripMargin
+        code"$comment${col.param.code}"
+      }
+      val instances =
+        options.jsonLibs.flatMap(_.instances(names.RowName, cols)) ++
+          options.dbLib.toList.flatMap(_.rowInstances(names.RowName, cols, rowType = rowType))
+
+      val classComment = {
+        val lines = List[Iterable[String]](
+          Some(names.source match {
+            case Source.Table(name)       => s"Table: ${name.value}"
+            case Source.View(name, true)  => s"Materialized View: ${name.value}"
+            case Source.View(name, false) => s"View: ${name.value}"
+            case Source.SqlFile(relPath)  => s"SQL file: ${relPath.asString}"
+          }),
+          comment,
+          names.maybeId.map {
+            case x: IdComputed.Unary     => s"Primary key: ${x.col.dbName.value}"
+            case x: IdComputed.Composite => s"Composite primary key: ${x.cols.map(_.dbName.value).mkString(", ")}"
+          }
+        ).flatten
+        code"""|/** ${lines.mkString("\n")} */
+             |""".stripMargin
       }
 
-    val str =
-      code"""${classComment}case class ${names.RowName.name}(
+      val maybeExtraApply: Option[sc.Code] =
+        names.maybeId.collect { case id: IdComputed.Composite =>
+          val nonKeyColumns = cols.toList.filter(col => !names.isIdColumn(col.dbCol.name))
+          val params = sc.Param(id.paramName, id.tpe, None) :: nonKeyColumns.map(col => sc.Param(col.name, col.tpe, None))
+          val args = cols.map { col => if (names.isIdColumn(col.dbCol.name)) code"${id.paramName}.${col.name}" else col.name.code }
+          code"""|def apply(${params.map(_.code).mkCode(", ")}) =
+               |  new ${names.RowName}(${args.map(_.code).mkCode(", ")})""".stripMargin
+        }
+
+      val str =
+        code"""${classComment}case class ${names.RowName.name}(
             |  ${formattedCols.mkCode(",\n")}
-            |)$compositeId
+            |)$formattedMembers
             |
             |${sc.Obj(names.RowName.value, instances, maybeExtraApply)}
             |""".stripMargin
 
-    sc.File(names.RowName, str, secondaryTypes = Nil)
-  }
+      sc.File(names.RowName, str, secondaryTypes = Nil)
+    }
 
   val FieldValueFile: Option[sc.File] =
     for {

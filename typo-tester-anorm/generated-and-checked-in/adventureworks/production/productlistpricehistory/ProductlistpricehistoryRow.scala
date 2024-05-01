@@ -8,6 +8,7 @@ package production
 package productlistpricehistory
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import anorm.Column
@@ -42,6 +43,8 @@ case class ProductlistpricehistoryRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductlistpricehistoryId = ProductlistpricehistoryId(productid, startdate)
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductlistpricehistoryRowUnsaved =
+     ProductlistpricehistoryRowUnsaved(productid, startdate, enddate, listprice, modifieddate)
  }
 
 object ProductlistpricehistoryRow {

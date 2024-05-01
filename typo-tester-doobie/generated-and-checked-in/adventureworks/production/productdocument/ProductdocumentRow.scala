@@ -7,6 +7,7 @@ package adventureworks
 package production
 package productdocument
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
@@ -32,6 +33,8 @@ case class ProductdocumentRow(
   documentnode: DocumentId
 ){
    val compositeId: ProductdocumentId = ProductdocumentId(productid, documentnode)
+   def toUnsavedRow(documentnode: Defaulted[DocumentId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductdocumentRowUnsaved =
+     ProductdocumentRowUnsaved(productid, modifieddate, documentnode)
  }
 
 object ProductdocumentRow {

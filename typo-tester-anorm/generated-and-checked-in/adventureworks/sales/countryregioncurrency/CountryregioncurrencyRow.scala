@@ -8,6 +8,7 @@ package sales
 package countryregioncurrency
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
@@ -35,6 +36,8 @@ case class CountryregioncurrencyRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: CountryregioncurrencyId = CountryregioncurrencyId(countryregioncode, currencycode)
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CountryregioncurrencyRowUnsaved =
+     CountryregioncurrencyRowUnsaved(countryregioncode, currencycode, modifieddate)
  }
 
 object CountryregioncurrencyRow {

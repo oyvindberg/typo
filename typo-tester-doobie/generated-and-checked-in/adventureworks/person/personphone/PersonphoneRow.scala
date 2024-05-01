@@ -7,6 +7,7 @@ package adventureworks
 package person
 package personphone
 
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
@@ -34,6 +35,8 @@ case class PersonphoneRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: PersonphoneId = PersonphoneId(businessentityid, phonenumber, phonenumbertypeid)
+   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PersonphoneRowUnsaved =
+     PersonphoneRowUnsaved(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
  }
 
 object PersonphoneRow {

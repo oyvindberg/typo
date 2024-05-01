@@ -8,6 +8,7 @@ package production
 package productreview
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
@@ -42,7 +43,10 @@ case class ProductreviewRow(
   comments: Option[/* max 3850 chars */ String],
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-)
+){
+   def toUnsavedRow(productreviewid: Defaulted[ProductreviewId], reviewdate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.reviewdate), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductreviewRowUnsaved =
+     ProductreviewRowUnsaved(productid, reviewername, emailaddress, rating, comments, productreviewid, reviewdate, modifieddate)
+ }
 
 object ProductreviewRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[ProductreviewRow] = new JdbcDecoder[ProductreviewRow] {

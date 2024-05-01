@@ -8,6 +8,7 @@ package purchasing
 package purchaseorderdetail
 
 import adventureworks.Text
+import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
@@ -50,6 +51,8 @@ case class PurchaseorderdetailRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: PurchaseorderdetailId = PurchaseorderdetailId(purchaseorderid, purchaseorderdetailid)
+   def toUnsavedRow(purchaseorderdetailid: Defaulted[Int], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PurchaseorderdetailRowUnsaved =
+     PurchaseorderdetailRowUnsaved(purchaseorderid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, purchaseorderdetailid, modifieddate)
  }
 
 object PurchaseorderdetailRow {
