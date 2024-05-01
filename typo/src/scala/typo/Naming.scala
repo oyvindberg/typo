@@ -59,6 +59,16 @@ class Naming(val pkg: sc.QIdent) {
   def field(name: db.ColName): sc.Ident =
     Naming.camelCaseIdent(name.value.split('_'))
 
+  def fk(baseTable: db.RelationName, fk: db.ForeignKey, includeCols: Boolean): sc.Ident = {
+    val parts = Array[Iterable[String]](
+      List("fk"),
+      fk.otherTable.schema.filterNot(baseTable.schema.contains),
+      List(fk.otherTable.name),
+      if (includeCols) fk.cols.toList.flatMap(_.value.split("_")) else Nil
+    )
+    Naming.camelCaseIdent(parts.flatten)
+  }
+
   // multiple field names together into one name
   def field(colNames: NonEmptyList[db.ColName]): sc.Ident =
     Naming.camelCaseIdent(colNames.map(field).map(_.value).toArray)

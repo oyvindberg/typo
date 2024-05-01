@@ -10,8 +10,13 @@ package store
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
+import adventureworks.person.businessentity.BusinessentityFields
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.businessentity.BusinessentityRow
 import adventureworks.public.Name
+import adventureworks.sales.salesperson.SalespersonFields
+import adventureworks.sales.salesperson.SalespersonRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -26,6 +31,12 @@ trait StoreFields {
   def demographics: OptField[TypoXml, StoreRow]
   def rowguid: Field[TypoUUID, StoreRow]
   def modifieddate: Field[TypoLocalDateTime, StoreRow]
+  def fkPersonBusinessentity: ForeignKey[BusinessentityFields, BusinessentityRow] =
+    ForeignKey[BusinessentityFields, BusinessentityRow]("sales.FK_Store_BusinessEntity_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
+  def fkSalesperson: ForeignKey[SalespersonFields, SalespersonRow] =
+    ForeignKey[SalespersonFields, SalespersonRow]("sales.FK_Store_SalesPerson_SalesPersonID", Nil)
+      .withColumnPair(salespersonid, _.businessentityid)
 }
 
 object StoreFields {

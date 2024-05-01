@@ -8,7 +8,10 @@ package sales
 package shoppingcartitem
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.production.product.ProductFields
 import adventureworks.production.product.ProductId
+import adventureworks.production.product.ProductRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -22,6 +25,9 @@ trait ShoppingcartitemFields {
   def productid: Field[ProductId, ShoppingcartitemRow]
   def datecreated: Field[TypoLocalDateTime, ShoppingcartitemRow]
   def modifieddate: Field[TypoLocalDateTime, ShoppingcartitemRow]
+  def fkProductionProduct: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("sales.FK_ShoppingCartItem_Product_ProductID", Nil)
+      .withColumnPair(productid, _.productid)
 }
 
 object ShoppingcartitemFields {

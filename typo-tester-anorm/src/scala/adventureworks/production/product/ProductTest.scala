@@ -119,6 +119,14 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(saved3.modifieddate == newModifiedDate): @nowarn
       assert(productRepo.update(saved3.copy(size = None))): @nowarn
 
+      val query0 = productRepo.select
+        .joinFk(_.fkProductmodel)(projectModelRepo.select)
+        .joinFk(_._1.fkProductsubcategory)(productsubcategoryRepo.select)
+        .joinFk(_._2.fkProductcategory)(productcategoryRepo.select)
+      query0.toList.foreach(println)
+      query0.sql.foreach(println)
+      println("foo")
+
       val query =
         productRepo.select
           .where(_.`class` === "H ")

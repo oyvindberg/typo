@@ -10,6 +10,9 @@ package emailaddress
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.person.PersonFields
+import adventureworks.person.person.PersonRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -23,6 +26,9 @@ trait EmailaddressFields {
   def emailaddress: OptField[/* max 50 chars */ String, EmailaddressRow]
   def rowguid: Field[TypoUUID, EmailaddressRow]
   def modifieddate: Field[TypoLocalDateTime, EmailaddressRow]
+  def fkPerson: ForeignKey[PersonFields, PersonRow] =
+    ForeignKey[PersonFields, PersonRow]("person.FK_EmailAddress_Person_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
 }
 
 object EmailaddressFields {

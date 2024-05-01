@@ -9,8 +9,15 @@ package businessentitycontact
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import adventureworks.person.businessentity.BusinessentityFields
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.businessentity.BusinessentityRow
+import adventureworks.person.contacttype.ContacttypeFields
 import adventureworks.person.contacttype.ContacttypeId
+import adventureworks.person.contacttype.ContacttypeRow
+import adventureworks.person.person.PersonFields
+import adventureworks.person.person.PersonRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -23,6 +30,15 @@ trait BusinessentitycontactFields {
   def contacttypeid: IdField[ContacttypeId, BusinessentitycontactRow]
   def rowguid: Field[TypoUUID, BusinessentitycontactRow]
   def modifieddate: Field[TypoLocalDateTime, BusinessentitycontactRow]
+  def fkPerson: ForeignKey[PersonFields, PersonRow] =
+    ForeignKey[PersonFields, PersonRow]("person.FK_BusinessEntityContact_Person_PersonID", Nil)
+      .withColumnPair(personid, _.businessentityid)
+  def fkContacttype: ForeignKey[ContacttypeFields, ContacttypeRow] =
+    ForeignKey[ContacttypeFields, ContacttypeRow]("person.FK_BusinessEntityContact_ContactType_ContactTypeID", Nil)
+      .withColumnPair(contacttypeid, _.contacttypeid)
+  def fkBusinessentity: ForeignKey[BusinessentityFields, BusinessentityRow] =
+    ForeignKey[BusinessentityFields, BusinessentityRow]("person.FK_BusinessEntityContact_BusinessEntity_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
 }
 
 object BusinessentitycontactFields {

@@ -10,8 +10,13 @@ package person
 
 import testdb.hardcoded.myschema.Number
 import testdb.hardcoded.myschema.Sector
+import testdb.hardcoded.myschema.football_club.FootballClubFields
 import testdb.hardcoded.myschema.football_club.FootballClubId
+import testdb.hardcoded.myschema.football_club.FootballClubRow
+import testdb.hardcoded.myschema.marital_status.MaritalStatusFields
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
+import testdb.hardcoded.myschema.marital_status.MaritalStatusRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -32,6 +37,12 @@ trait PersonFields {
   def workEmail: OptField[/* max 254 chars */ String, PersonRow]
   def sector: Field[Sector, PersonRow]
   def favoriteNumber: Field[Number, PersonRow]
+  def fkFootballClub: ForeignKey[FootballClubFields, FootballClubRow] =
+    ForeignKey[FootballClubFields, FootballClubRow]("myschema.person_favourite_football_club_id_fkey", Nil)
+      .withColumnPair(favouriteFootballClubId, _.id)
+  def fkMaritalStatus: ForeignKey[MaritalStatusFields, MaritalStatusRow] =
+    ForeignKey[MaritalStatusFields, MaritalStatusRow]("myschema.person_marital_status_id_fkey", Nil)
+      .withColumnPair(maritalStatusId, _.id)
 }
 
 object PersonFields {

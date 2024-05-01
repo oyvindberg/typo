@@ -9,8 +9,13 @@ package specialofferproduct
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import adventureworks.production.product.ProductFields
 import adventureworks.production.product.ProductId
+import adventureworks.production.product.ProductRow
+import adventureworks.sales.specialoffer.SpecialofferFields
 import adventureworks.sales.specialoffer.SpecialofferId
+import adventureworks.sales.specialoffer.SpecialofferRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -22,6 +27,12 @@ trait SpecialofferproductFields {
   def productid: IdField[ProductId, SpecialofferproductRow]
   def rowguid: Field[TypoUUID, SpecialofferproductRow]
   def modifieddate: Field[TypoLocalDateTime, SpecialofferproductRow]
+  def fkProductionProduct: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("sales.FK_SpecialOfferProduct_Product_ProductID", Nil)
+      .withColumnPair(productid, _.productid)
+  def fkSpecialoffer: ForeignKey[SpecialofferFields, SpecialofferRow] =
+    ForeignKey[SpecialofferFields, SpecialofferRow]("sales.FK_SpecialOfferProduct_SpecialOffer_SpecialOfferID", Nil)
+      .withColumnPair(specialofferid, _.specialofferid)
 }
 
 object SpecialofferproductFields {

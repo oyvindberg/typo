@@ -8,7 +8,10 @@ package sales
 package currencyrate
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.sales.currency.CurrencyFields
 import adventureworks.sales.currency.CurrencyId
+import adventureworks.sales.currency.CurrencyRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -23,6 +26,12 @@ trait CurrencyrateFields {
   def averagerate: Field[BigDecimal, CurrencyrateRow]
   def endofdayrate: Field[BigDecimal, CurrencyrateRow]
   def modifieddate: Field[TypoLocalDateTime, CurrencyrateRow]
+  def fkCurrencyFromcurrencycode: ForeignKey[CurrencyFields, CurrencyRow] =
+    ForeignKey[CurrencyFields, CurrencyRow]("sales.FK_CurrencyRate_Currency_FromCurrencyCode", Nil)
+      .withColumnPair(fromcurrencycode, _.currencycode)
+  def fkCurrencyTocurrencycode: ForeignKey[CurrencyFields, CurrencyRow] =
+    ForeignKey[CurrencyFields, CurrencyRow]("sales.FK_CurrencyRate_Currency_ToCurrencyCode", Nil)
+      .withColumnPair(tocurrencycode, _.currencycode)
 }
 
 object CurrencyrateFields {

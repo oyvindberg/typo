@@ -12,7 +12,10 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.person.PersonFields
+import adventureworks.person.person.PersonRow
 import adventureworks.public.Flag
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -36,6 +39,9 @@ trait EmployeeFields {
   def rowguid: Field[TypoUUID, EmployeeRow]
   def modifieddate: Field[TypoLocalDateTime, EmployeeRow]
   def organizationnode: OptField[String, EmployeeRow]
+  def fkPersonPerson: ForeignKey[PersonFields, PersonRow] =
+    ForeignKey[PersonFields, PersonRow]("humanresources.FK_Employee_Person_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
 }
 
 object EmployeeFields {

@@ -10,16 +10,31 @@ package salesorderheader
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
+import adventureworks.person.address.AddressFields
 import adventureworks.person.address.AddressId
+import adventureworks.person.address.AddressRow
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.OrderNumber
+import adventureworks.purchasing.shipmethod.ShipmethodFields
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import adventureworks.purchasing.shipmethod.ShipmethodRow
+import adventureworks.sales.creditcard.CreditcardFields
+import adventureworks.sales.creditcard.CreditcardRow
+import adventureworks.sales.currencyrate.CurrencyrateFields
 import adventureworks.sales.currencyrate.CurrencyrateId
+import adventureworks.sales.currencyrate.CurrencyrateRow
+import adventureworks.sales.customer.CustomerFields
 import adventureworks.sales.customer.CustomerId
+import adventureworks.sales.customer.CustomerRow
+import adventureworks.sales.salesperson.SalespersonFields
+import adventureworks.sales.salesperson.SalespersonRow
+import adventureworks.sales.salesterritory.SalesterritoryFields
 import adventureworks.sales.salesterritory.SalesterritoryId
+import adventureworks.sales.salesterritory.SalesterritoryRow
 import adventureworks.userdefined.CustomCreditcardId
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -53,6 +68,30 @@ trait SalesorderheaderFields {
   def comment: OptField[/* max 128 chars */ String, SalesorderheaderRow]
   def rowguid: Field[TypoUUID, SalesorderheaderRow]
   def modifieddate: Field[TypoLocalDateTime, SalesorderheaderRow]
+  def fkPersonAddressBilltoaddressid: ForeignKey[AddressFields, AddressRow] =
+    ForeignKey[AddressFields, AddressRow]("sales.FK_SalesOrderHeader_Address_BillToAddressID", Nil)
+      .withColumnPair(billtoaddressid, _.addressid)
+  def fkPersonAddressShiptoaddressid: ForeignKey[AddressFields, AddressRow] =
+    ForeignKey[AddressFields, AddressRow]("sales.FK_SalesOrderHeader_Address_ShipToAddressID", Nil)
+      .withColumnPair(shiptoaddressid, _.addressid)
+  def fkCreditcard: ForeignKey[CreditcardFields, CreditcardRow] =
+    ForeignKey[CreditcardFields, CreditcardRow]("sales.FK_SalesOrderHeader_CreditCard_CreditCardID", Nil)
+      .withColumnPair(creditcardid, _.creditcardid)
+  def fkCurrencyrate: ForeignKey[CurrencyrateFields, CurrencyrateRow] =
+    ForeignKey[CurrencyrateFields, CurrencyrateRow]("sales.FK_SalesOrderHeader_CurrencyRate_CurrencyRateID", Nil)
+      .withColumnPair(currencyrateid, _.currencyrateid)
+  def fkCustomer: ForeignKey[CustomerFields, CustomerRow] =
+    ForeignKey[CustomerFields, CustomerRow]("sales.FK_SalesOrderHeader_Customer_CustomerID", Nil)
+      .withColumnPair(customerid, _.customerid)
+  def fkSalesperson: ForeignKey[SalespersonFields, SalespersonRow] =
+    ForeignKey[SalespersonFields, SalespersonRow]("sales.FK_SalesOrderHeader_SalesPerson_SalesPersonID", Nil)
+      .withColumnPair(salespersonid, _.businessentityid)
+  def fkPurchasingShipmethod: ForeignKey[ShipmethodFields, ShipmethodRow] =
+    ForeignKey[ShipmethodFields, ShipmethodRow]("sales.FK_SalesOrderHeader_ShipMethod_ShipMethodID", Nil)
+      .withColumnPair(shipmethodid, _.shipmethodid)
+  def fkSalesterritory: ForeignKey[SalesterritoryFields, SalesterritoryRow] =
+    ForeignKey[SalesterritoryFields, SalesterritoryRow]("sales.FK_SalesOrderHeader_SalesTerritory_TerritoryID", Nil)
+      .withColumnPair(territoryid, _.territoryid)
 }
 
 object SalesorderheaderFields {

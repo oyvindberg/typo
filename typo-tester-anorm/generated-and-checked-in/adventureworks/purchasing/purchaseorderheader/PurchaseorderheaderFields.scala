@@ -9,8 +9,15 @@ package purchaseorderheader
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.humanresources.employee.EmployeeFields
+import adventureworks.humanresources.employee.EmployeeRow
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.purchasing.shipmethod.ShipmethodFields
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import adventureworks.purchasing.shipmethod.ShipmethodRow
+import adventureworks.purchasing.vendor.VendorFields
+import adventureworks.purchasing.vendor.VendorRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -31,6 +38,15 @@ trait PurchaseorderheaderFields {
   def taxamt: Field[BigDecimal, PurchaseorderheaderRow]
   def freight: Field[BigDecimal, PurchaseorderheaderRow]
   def modifieddate: Field[TypoLocalDateTime, PurchaseorderheaderRow]
+  def fkHumanresourcesEmployee: ForeignKey[EmployeeFields, EmployeeRow] =
+    ForeignKey[EmployeeFields, EmployeeRow]("purchasing.FK_PurchaseOrderHeader_Employee_EmployeeID", Nil)
+      .withColumnPair(employeeid, _.businessentityid)
+  def fkVendor: ForeignKey[VendorFields, VendorRow] =
+    ForeignKey[VendorFields, VendorRow]("purchasing.FK_PurchaseOrderHeader_Vendor_VendorID", Nil)
+      .withColumnPair(vendorid, _.businessentityid)
+  def fkShipmethod: ForeignKey[ShipmethodFields, ShipmethodRow] =
+    ForeignKey[ShipmethodFields, ShipmethodRow]("purchasing.FK_PurchaseOrderHeader_ShipMethod_ShipMethodID", Nil)
+      .withColumnPair(shipmethodid, _.shipmethodid)
 }
 
 object PurchaseorderheaderFields {

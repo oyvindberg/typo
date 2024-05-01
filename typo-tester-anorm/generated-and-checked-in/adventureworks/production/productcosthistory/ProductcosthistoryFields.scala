@@ -8,7 +8,10 @@ package production
 package productcosthistory
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.production.product.ProductFields
 import adventureworks.production.product.ProductId
+import adventureworks.production.product.ProductRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -22,6 +25,9 @@ trait ProductcosthistoryFields {
   def enddate: OptField[TypoLocalDateTime, ProductcosthistoryRow]
   def standardcost: Field[BigDecimal, ProductcosthistoryRow]
   def modifieddate: Field[TypoLocalDateTime, ProductcosthistoryRow]
+  def fkProduct: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("production.FK_ProductCostHistory_Product_ProductID", Nil)
+      .withColumnPair(productid, _.productid)
 }
 
 object ProductcosthistoryFields {

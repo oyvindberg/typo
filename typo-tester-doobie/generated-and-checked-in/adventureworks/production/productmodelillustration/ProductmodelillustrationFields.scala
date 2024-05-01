@@ -8,8 +8,13 @@ package production
 package productmodelillustration
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.production.illustration.IllustrationFields
 import adventureworks.production.illustration.IllustrationId
+import adventureworks.production.illustration.IllustrationRow
+import adventureworks.production.productmodel.ProductmodelFields
 import adventureworks.production.productmodel.ProductmodelId
+import adventureworks.production.productmodel.ProductmodelRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -20,6 +25,12 @@ trait ProductmodelillustrationFields {
   def productmodelid: IdField[ProductmodelId, ProductmodelillustrationRow]
   def illustrationid: IdField[IllustrationId, ProductmodelillustrationRow]
   def modifieddate: Field[TypoLocalDateTime, ProductmodelillustrationRow]
+  def fkProductmodel: ForeignKey[ProductmodelFields, ProductmodelRow] =
+    ForeignKey[ProductmodelFields, ProductmodelRow]("production.FK_ProductModelIllustration_ProductModel_ProductModelID", Nil)
+      .withColumnPair(productmodelid, _.productmodelid)
+  def fkIllustration: ForeignKey[IllustrationFields, IllustrationRow] =
+    ForeignKey[IllustrationFields, IllustrationRow]("production.FK_ProductModelIllustration_Illustration_IllustrationID", Nil)
+      .withColumnPair(illustrationid, _.illustrationid)
 }
 
 object ProductmodelillustrationFields {

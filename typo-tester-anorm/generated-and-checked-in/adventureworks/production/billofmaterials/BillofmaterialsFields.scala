@@ -9,8 +9,13 @@ package billofmaterials
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.production.product.ProductFields
 import adventureworks.production.product.ProductId
+import adventureworks.production.product.ProductRow
+import adventureworks.production.unitmeasure.UnitmeasureFields
 import adventureworks.production.unitmeasure.UnitmeasureId
+import adventureworks.production.unitmeasure.UnitmeasureRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -28,6 +33,15 @@ trait BillofmaterialsFields {
   def bomlevel: Field[TypoShort, BillofmaterialsRow]
   def perassemblyqty: Field[BigDecimal, BillofmaterialsRow]
   def modifieddate: Field[TypoLocalDateTime, BillofmaterialsRow]
+  def fkProductProductassemblyid: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("production.FK_BillOfMaterials_Product_ProductAssemblyID", Nil)
+      .withColumnPair(productassemblyid, _.productid)
+  def fkProductComponentid: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("production.FK_BillOfMaterials_Product_ComponentID", Nil)
+      .withColumnPair(componentid, _.productid)
+  def fkUnitmeasure: ForeignKey[UnitmeasureFields, UnitmeasureRow] =
+    ForeignKey[UnitmeasureFields, UnitmeasureRow]("production.FK_BillOfMaterials_UnitMeasure_UnitMeasureCode", Nil)
+      .withColumnPair(unitmeasurecode, _.unitmeasurecode)
 }
 
 object BillofmaterialsFields {

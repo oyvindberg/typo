@@ -136,10 +136,31 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
         code"def ${col.name}: ${cls.of(tpe, names.RowName)}"
       }
 
+      val fkMembers: List[sc.Code] =
+        names.source match {
+          case relation: Source.Relation =>
+            val byOtherTable = fks.groupBy(_.otherTable)
+            fks.map { fk =>
+              val otherTableSource = Source.Table(fk.otherTable)
+              val fkType = sc.Type.dsl.ForeignKey.of(
+                sc.Type.Qualified(naming.fieldsName(otherTableSource)),
+                sc.Type.Qualified(naming.rowName(otherTableSource))
+              )
+              val columnPairs = fk.cols.zip(fk.otherCols).map { case (col, otherCol) =>
+                code".withColumnPair(${naming.field(col)}, _.${naming.field(otherCol)})"
+              }
+              val fkName = naming.fk(relation.name, fk, includeCols = byOtherTable(fk.otherTable).size > 1)
+              code"""|def $fkName: $fkType =
+                     |  $fkType(${sc.StrLit(fk.constraintName.value)}, Nil)
+                     |    ${columnPairs.mkCode("\n")}""".stripMargin
+            }
+          case Source.SqlFile(_) => Nil
+        }
+
       val ImplName = sc.Ident("Impl")
       val str =
         code"""trait ${fieldsName.name} {
-            |  ${colMembers.mkCode("\n")}
+            |  ${(colMembers ++ fkMembers).mkCode("\n")}
             |}
             |
             |object ${fieldsName.name} {

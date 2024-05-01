@@ -9,7 +9,10 @@ package employeepayhistory
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.humanresources.employee.EmployeeFields
+import adventureworks.humanresources.employee.EmployeeRow
 import adventureworks.person.businessentity.BusinessentityId
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -22,6 +25,9 @@ trait EmployeepayhistoryFields {
   def rate: Field[BigDecimal, EmployeepayhistoryRow]
   def payfrequency: Field[TypoShort, EmployeepayhistoryRow]
   def modifieddate: Field[TypoLocalDateTime, EmployeepayhistoryRow]
+  def fkEmployee: ForeignKey[EmployeeFields, EmployeeRow] =
+    ForeignKey[EmployeeFields, EmployeeRow]("humanresources.FK_EmployeePayHistory_Employee_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
 }
 
 object EmployeepayhistoryFields {

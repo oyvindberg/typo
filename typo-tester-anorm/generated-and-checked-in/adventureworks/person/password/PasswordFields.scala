@@ -10,6 +10,9 @@ package password
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.person.PersonFields
+import adventureworks.person.person.PersonRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -22,6 +25,9 @@ trait PasswordFields {
   def passwordsalt: Field[/* max 10 chars */ String, PasswordRow]
   def rowguid: Field[TypoUUID, PasswordRow]
   def modifieddate: Field[TypoLocalDateTime, PasswordRow]
+  def fkPerson: ForeignKey[PersonFields, PersonRow] =
+    ForeignKey[PersonFields, PersonRow]("person.FK_Password_Person_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
 }
 
 object PasswordFields {

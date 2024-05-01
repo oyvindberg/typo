@@ -10,6 +10,9 @@ package salespersonquotahistory
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.sales.salesperson.SalespersonFields
+import adventureworks.sales.salesperson.SalespersonRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -22,6 +25,9 @@ trait SalespersonquotahistoryFields {
   def salesquota: Field[BigDecimal, SalespersonquotahistoryRow]
   def rowguid: Field[TypoUUID, SalespersonquotahistoryRow]
   def modifieddate: Field[TypoLocalDateTime, SalespersonquotahistoryRow]
+  def fkSalesperson: ForeignKey[SalespersonFields, SalespersonRow] =
+    ForeignKey[SalespersonFields, SalespersonRow]("sales.FK_SalesPersonQuotaHistory_SalesPerson_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
 }
 
 object SalespersonquotahistoryFields {

@@ -9,7 +9,12 @@ package personcreditcard
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.person.PersonFields
+import adventureworks.person.person.PersonRow
+import adventureworks.sales.creditcard.CreditcardFields
+import adventureworks.sales.creditcard.CreditcardRow
 import adventureworks.userdefined.CustomCreditcardId
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -20,6 +25,12 @@ trait PersoncreditcardFields {
   def businessentityid: IdField[BusinessentityId, PersoncreditcardRow]
   def creditcardid: IdField[/* user-picked */ CustomCreditcardId, PersoncreditcardRow]
   def modifieddate: Field[TypoLocalDateTime, PersoncreditcardRow]
+  def fkPersonPerson: ForeignKey[PersonFields, PersonRow] =
+    ForeignKey[PersonFields, PersonRow]("sales.FK_PersonCreditCard_Person_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
+  def fkCreditcard: ForeignKey[CreditcardFields, CreditcardRow] =
+    ForeignKey[CreditcardFields, CreditcardRow]("sales.FK_PersonCreditCard_CreditCard_CreditCardID", Nil)
+      .withColumnPair(creditcardid, _.creditcardid)
 }
 
 object PersoncreditcardFields {

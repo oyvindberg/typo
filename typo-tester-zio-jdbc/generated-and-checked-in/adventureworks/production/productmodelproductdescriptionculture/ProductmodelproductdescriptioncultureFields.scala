@@ -8,9 +8,16 @@ package production
 package productmodelproductdescriptionculture
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.production.culture.CultureFields
 import adventureworks.production.culture.CultureId
+import adventureworks.production.culture.CultureRow
+import adventureworks.production.productdescription.ProductdescriptionFields
 import adventureworks.production.productdescription.ProductdescriptionId
+import adventureworks.production.productdescription.ProductdescriptionRow
+import adventureworks.production.productmodel.ProductmodelFields
 import adventureworks.production.productmodel.ProductmodelId
+import adventureworks.production.productmodel.ProductmodelRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -22,6 +29,15 @@ trait ProductmodelproductdescriptioncultureFields {
   def productdescriptionid: IdField[ProductdescriptionId, ProductmodelproductdescriptioncultureRow]
   def cultureid: IdField[CultureId, ProductmodelproductdescriptioncultureRow]
   def modifieddate: Field[TypoLocalDateTime, ProductmodelproductdescriptioncultureRow]
+  def fkProductdescription: ForeignKey[ProductdescriptionFields, ProductdescriptionRow] =
+    ForeignKey[ProductdescriptionFields, ProductdescriptionRow]("production.FK_ProductModelProductDescriptionCulture_ProductDescription_Pro", Nil)
+      .withColumnPair(productdescriptionid, _.productdescriptionid)
+  def fkCulture: ForeignKey[CultureFields, CultureRow] =
+    ForeignKey[CultureFields, CultureRow]("production.FK_ProductModelProductDescriptionCulture_Culture_CultureID", Nil)
+      .withColumnPair(cultureid, _.cultureid)
+  def fkProductmodel: ForeignKey[ProductmodelFields, ProductmodelRow] =
+    ForeignKey[ProductmodelFields, ProductmodelRow]("production.FK_ProductModelProductDescriptionCulture_ProductModel_ProductMo", Nil)
+      .withColumnPair(productmodelid, _.productmodelid)
 }
 
 object ProductmodelproductdescriptioncultureFields {

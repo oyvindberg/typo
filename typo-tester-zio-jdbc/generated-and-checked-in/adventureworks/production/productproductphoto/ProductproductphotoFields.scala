@@ -8,9 +8,14 @@ package production
 package productproductphoto
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.production.product.ProductFields
 import adventureworks.production.product.ProductId
+import adventureworks.production.product.ProductRow
+import adventureworks.production.productphoto.ProductphotoFields
 import adventureworks.production.productphoto.ProductphotoId
+import adventureworks.production.productphoto.ProductphotoRow
 import adventureworks.public.Flag
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -22,6 +27,12 @@ trait ProductproductphotoFields {
   def productphotoid: IdField[ProductphotoId, ProductproductphotoRow]
   def primary: Field[Flag, ProductproductphotoRow]
   def modifieddate: Field[TypoLocalDateTime, ProductproductphotoRow]
+  def fkProduct: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("production.FK_ProductProductPhoto_Product_ProductID", Nil)
+      .withColumnPair(productid, _.productid)
+  def fkProductphoto: ForeignKey[ProductphotoFields, ProductphotoRow] =
+    ForeignKey[ProductphotoFields, ProductphotoRow]("production.FK_ProductProductPhoto_ProductPhoto_ProductPhotoID", Nil)
+      .withColumnPair(productphotoid, _.productphotoid)
 }
 
 object ProductproductphotoFields {

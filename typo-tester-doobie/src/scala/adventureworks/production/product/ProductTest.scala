@@ -90,6 +90,13 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         }
         _ <- delay(assert(saved3.modifieddate == newModifiedDate))
         _ <- productRepo.update(saved3.copy(size = None)).map(res => assert(res))
+        query0 = productRepo.select
+          .joinFk(_.fkProductmodel)(projectModelRepo.select)
+          .joinFk(_._1.fkProductsubcategory)(productsubcategoryRepo.select)
+          .joinFk(_._2.fkProductcategory)(productcategoryRepo.select)
+        _ <- query0.toList.map(println(_))
+        _ <- delay(query0.sql.foreach(f => println(f)))
+        _ <- delay(println("foo"))
 
         query = productRepo.select
           .where(_.`class` === "H ")

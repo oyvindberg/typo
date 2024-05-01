@@ -9,9 +9,16 @@ package employeedepartmenthistory
 
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.humanresources.department.DepartmentFields
 import adventureworks.humanresources.department.DepartmentId
+import adventureworks.humanresources.department.DepartmentRow
+import adventureworks.humanresources.employee.EmployeeFields
+import adventureworks.humanresources.employee.EmployeeRow
+import adventureworks.humanresources.shift.ShiftFields
 import adventureworks.humanresources.shift.ShiftId
+import adventureworks.humanresources.shift.ShiftRow
 import adventureworks.person.businessentity.BusinessentityId
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -26,6 +33,15 @@ trait EmployeedepartmenthistoryFields {
   def startdate: IdField[TypoLocalDate, EmployeedepartmenthistoryRow]
   def enddate: OptField[TypoLocalDate, EmployeedepartmenthistoryRow]
   def modifieddate: Field[TypoLocalDateTime, EmployeedepartmenthistoryRow]
+  def fkDepartment: ForeignKey[DepartmentFields, DepartmentRow] =
+    ForeignKey[DepartmentFields, DepartmentRow]("humanresources.FK_EmployeeDepartmentHistory_Department_DepartmentID", Nil)
+      .withColumnPair(departmentid, _.departmentid)
+  def fkEmployee: ForeignKey[EmployeeFields, EmployeeRow] =
+    ForeignKey[EmployeeFields, EmployeeRow]("humanresources.FK_EmployeeDepartmentHistory_Employee_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
+  def fkShift: ForeignKey[ShiftFields, ShiftRow] =
+    ForeignKey[ShiftFields, ShiftRow]("humanresources.FK_EmployeeDepartmentHistory_Shift_ShiftID", Nil)
+      .withColumnPair(shiftid, _.shiftid)
 }
 
 object EmployeedepartmenthistoryFields {

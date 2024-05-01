@@ -8,8 +8,13 @@ package sales
 package salesorderheadersalesreason
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.sales.salesorderheader.SalesorderheaderFields
 import adventureworks.sales.salesorderheader.SalesorderheaderId
+import adventureworks.sales.salesorderheader.SalesorderheaderRow
+import adventureworks.sales.salesreason.SalesreasonFields
 import adventureworks.sales.salesreason.SalesreasonId
+import adventureworks.sales.salesreason.SalesreasonRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -20,6 +25,12 @@ trait SalesorderheadersalesreasonFields {
   def salesorderid: IdField[SalesorderheaderId, SalesorderheadersalesreasonRow]
   def salesreasonid: IdField[SalesreasonId, SalesorderheadersalesreasonRow]
   def modifieddate: Field[TypoLocalDateTime, SalesorderheadersalesreasonRow]
+  def fkSalesreason: ForeignKey[SalesreasonFields, SalesreasonRow] =
+    ForeignKey[SalesreasonFields, SalesreasonRow]("sales.FK_SalesOrderHeaderSalesReason_SalesReason_SalesReasonID", Nil)
+      .withColumnPair(salesreasonid, _.salesreasonid)
+  def fkSalesorderheader: ForeignKey[SalesorderheaderFields, SalesorderheaderRow] =
+    ForeignKey[SalesorderheaderFields, SalesorderheaderRow]("sales.FK_SalesOrderHeaderSalesReason_SalesOrderHeader_SalesOrderID", Nil)
+      .withColumnPair(salesorderid, _.salesorderid)
 }
 
 object SalesorderheadersalesreasonFields {

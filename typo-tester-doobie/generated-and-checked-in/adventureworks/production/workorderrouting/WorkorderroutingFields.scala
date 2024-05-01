@@ -9,8 +9,13 @@ package workorderrouting
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.production.location.LocationFields
 import adventureworks.production.location.LocationId
+import adventureworks.production.location.LocationRow
+import adventureworks.production.workorder.WorkorderFields
 import adventureworks.production.workorder.WorkorderId
+import adventureworks.production.workorder.WorkorderRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -31,6 +36,12 @@ trait WorkorderroutingFields {
   def plannedcost: Field[BigDecimal, WorkorderroutingRow]
   def actualcost: OptField[BigDecimal, WorkorderroutingRow]
   def modifieddate: Field[TypoLocalDateTime, WorkorderroutingRow]
+  def fkLocation: ForeignKey[LocationFields, LocationRow] =
+    ForeignKey[LocationFields, LocationRow]("production.FK_WorkOrderRouting_Location_LocationID", Nil)
+      .withColumnPair(locationid, _.locationid)
+  def fkWorkorder: ForeignKey[WorkorderFields, WorkorderRow] =
+    ForeignKey[WorkorderFields, WorkorderRow]("production.FK_WorkOrderRouting_WorkOrder_WorkOrderID", Nil)
+      .withColumnPair(workorderid, _.workorderid)
 }
 
 object WorkorderroutingFields {

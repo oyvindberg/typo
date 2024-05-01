@@ -67,11 +67,27 @@ trait SelectBuilder[Fields, Row] {
   /** Return sql for debugging. [[None]] if backed by a mock repository */
   def sql: Option[Fragment]
 
+  final def joinFk[Fields2, Row2](f: Fields => ForeignKey[Fields2, Row2])(other: SelectBuilder[Fields2, Row2]): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)] =
+    joinOn[Fields2, Option, Row2](other) { case (thisFields, thatFields) =>
+      val fk: ForeignKey[Fields2, Row2] = f(thisFields)
+
+      fk.columnPairs
+        .map { case columnPair: ForeignKey.ColumnPair[t, Fields2] =>
+          implicit val ord: Ordering[t] = columnPair.ordering
+          val left: SqlExpr[t, Option] = columnPair.thisField
+          val right: SqlExpr[t, Option] = columnPair.thatField(thatFields)
+          left === right
+        }
+        .reduce(_.and(_))
+    }
+
   /** start constructing a join */
   final def join[F2, Row2](other: SelectBuilder[F2, Row2]): PartialJoin[F2, Row2] =
     new PartialJoin[F2, Row2](other)
 
   final class PartialJoin[Fields2, Row2](other: SelectBuilder[Fields2, Row2]) {
+    def onFk(f: Fields => ForeignKey[Fields2, Row2]): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)] =
+      joinFk(f)(other)
 
     /** inner join with the given predicate
       * {{{
