@@ -756,7 +756,16 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         List(sc.Param(T.value, ParameterMetaData.of(T), None)),
         ParameterMetaData.of(sc.Type.ArrayOf(T)),
         code"""|new ${ParameterMetaData.of(sc.Type.ArrayOf(T))} {
-               |  override def sqlType: ${TypesJava.String} = ${sc.StrLit("_")} + $T.sqlType
+               |  override def sqlType: ${TypesJava.String} =
+               |    $T.sqlType match {
+               |      case "INTEGER" => "int4[]"
+               |      case "FLOAT" => "float4[]"
+               |      case "DOUBLE PRECISION" => "float8[]"
+               |      case "DECIMAL" => "float8[]"
+               |      case "VARCHAR" => "text[]"
+               |      case other => s"$${other}[]"
+               |    }
+               |  
                |  override def jdbcType: ${TypesScala.Int} = ${TypesJava.SqlTypes}.ARRAY
                |}""".stripMargin
       )
