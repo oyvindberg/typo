@@ -83,10 +83,10 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
   override def selectByIds(contacttypeids: Array[ContacttypeId]): ZStream[ZConnection, Throwable, ContacttypeRow] = {
     sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype where "contacttypeid" = ANY(${Segment.paramSegment(contacttypeids)(ContacttypeId.arraySetter)})""".query(using ContacttypeRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(contacttypeids: Array[ContacttypeId]): ZIO[ZConnection, Throwable, Map[ContacttypeId, Option[ContacttypeRow]]] = {
+  override def selectByIdsTracked(contacttypeids: Array[ContacttypeId]): ZIO[ZConnection, Throwable, Map[ContacttypeId, ContacttypeRow]] = {
     selectByIds(contacttypeids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.contacttypeid, x)).toMap
-      contacttypeids.view.map(id => (id, byId.get(id))).toMap
+      contacttypeids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {

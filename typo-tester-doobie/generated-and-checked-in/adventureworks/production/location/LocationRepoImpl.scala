@@ -93,10 +93,10 @@ class LocationRepoImpl extends LocationRepo {
   override def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow] = {
     sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ANY(${locationids})""".query(using LocationRow.read).stream
   }
-  override def selectByIdsTracked(locationids: Array[LocationId]): ConnectionIO[Map[LocationId, Option[LocationRow]]] = {
+  override def selectByIdsTracked(locationids: Array[LocationId]): ConnectionIO[Map[LocationId, LocationRow]] = {
     selectByIds(locationids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.locationid, x)).toMap
-      locationids.view.map(id => (id, byId.get(id))).toMap
+      locationids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {

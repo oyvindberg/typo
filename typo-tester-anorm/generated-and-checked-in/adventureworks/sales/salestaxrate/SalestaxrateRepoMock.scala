@@ -67,9 +67,9 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
   override def selectByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow] = {
     salestaxrateids.flatMap(map.get).toList
   }
-  override def selectByIdsTracked(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): Map[SalestaxrateId, Option[SalestaxrateRow]] = {
+  override def selectByIdsTracked(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): Map[SalestaxrateId, SalestaxrateRow] = {
     val byId = selectByIds(salestaxrateids).view.map(x => (x.salestaxrateid, x)).toMap
-    salestaxrateids.view.map(id => (id, byId.get(id))).toMap
+    salestaxrateids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
     UpdateBuilderMock(UpdateParams.empty, SalestaxrateFields.structure.fields, map)

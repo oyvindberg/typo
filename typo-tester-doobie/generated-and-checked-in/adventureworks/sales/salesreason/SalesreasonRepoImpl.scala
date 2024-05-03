@@ -85,10 +85,10 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
   override def selectByIds(salesreasonids: Array[SalesreasonId]): Stream[ConnectionIO, SalesreasonRow] = {
     sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from sales.salesreason where "salesreasonid" = ANY(${salesreasonids})""".query(using SalesreasonRow.read).stream
   }
-  override def selectByIdsTracked(salesreasonids: Array[SalesreasonId]): ConnectionIO[Map[SalesreasonId, Option[SalesreasonRow]]] = {
+  override def selectByIdsTracked(salesreasonids: Array[SalesreasonId]): ConnectionIO[Map[SalesreasonId, SalesreasonRow]] = {
     selectByIds(salesreasonids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.salesreasonid, x)).toMap
-      salesreasonids.view.map(id => (id, byId.get(id))).toMap
+      salesreasonids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {

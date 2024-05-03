@@ -25,7 +25,7 @@ trait CountryregioncurrencyRepo {
   def selectAll(implicit c: Connection): List[CountryregioncurrencyRow]
   def selectById(compositeId: CountryregioncurrencyId)(implicit c: Connection): Option[CountryregioncurrencyRow]
   def selectByIds(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): List[CountryregioncurrencyRow]
-  def selectByIdsTracked(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): Map[CountryregioncurrencyId, Option[CountryregioncurrencyRow]]
+  def selectByIdsTracked(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): Map[CountryregioncurrencyId, CountryregioncurrencyRow]
   def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow

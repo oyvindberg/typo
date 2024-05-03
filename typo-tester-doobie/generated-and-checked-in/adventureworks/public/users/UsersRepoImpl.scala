@@ -86,10 +86,10 @@ class UsersRepoImpl extends UsersRepo {
   override def selectByIds(userIds: Array[UsersId]): Stream[ConnectionIO, UsersRow] = {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ANY(${userIds})""".query(using UsersRow.read).stream
   }
-  override def selectByIdsTracked(userIds: Array[UsersId]): ConnectionIO[Map[UsersId, Option[UsersRow]]] = {
+  override def selectByIdsTracked(userIds: Array[UsersId]): ConnectionIO[Map[UsersId, UsersRow]] = {
     selectByIds(userIds).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.userId, x)).toMap
-      userIds.view.map(id => (id, byId.get(id))).toMap
+      userIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def selectByUniqueEmail(email: TypoUnknownCitext): ConnectionIO[Option[UsersRow]] = {

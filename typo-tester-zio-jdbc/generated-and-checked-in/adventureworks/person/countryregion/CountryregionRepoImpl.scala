@@ -80,10 +80,10 @@ class CountryregionRepoImpl extends CountryregionRepo {
   override def selectByIds(countryregioncodes: Array[CountryregionId]): ZStream[ZConnection, Throwable, CountryregionRow] = {
     sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ANY(${Segment.paramSegment(countryregioncodes)(CountryregionId.arraySetter)})""".query(using CountryregionRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(countryregioncodes: Array[CountryregionId]): ZIO[ZConnection, Throwable, Map[CountryregionId, Option[CountryregionRow]]] = {
+  override def selectByIdsTracked(countryregioncodes: Array[CountryregionId]): ZIO[ZConnection, Throwable, Map[CountryregionId, CountryregionRow]] = {
     selectByIds(countryregioncodes).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.countryregioncode, x)).toMap
-      countryregioncodes.view.map(id => (id, byId.get(id))).toMap
+      countryregioncodes.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {

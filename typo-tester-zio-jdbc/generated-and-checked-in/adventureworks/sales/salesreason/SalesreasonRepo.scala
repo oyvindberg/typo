@@ -28,7 +28,7 @@ trait SalesreasonRepo {
   def selectAll: ZStream[ZConnection, Throwable, SalesreasonRow]
   def selectById(salesreasonid: SalesreasonId): ZIO[ZConnection, Throwable, Option[SalesreasonRow]]
   def selectByIds(salesreasonids: Array[SalesreasonId]): ZStream[ZConnection, Throwable, SalesreasonRow]
-  def selectByIdsTracked(salesreasonids: Array[SalesreasonId]): ZIO[ZConnection, Throwable, Map[SalesreasonId, Option[SalesreasonRow]]]
+  def selectByIdsTracked(salesreasonids: Array[SalesreasonId]): ZIO[ZConnection, Throwable, Map[SalesreasonId, SalesreasonRow]]
   def update: UpdateBuilder[SalesreasonFields, SalesreasonRow]
   def update(row: SalesreasonRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: SalesreasonRow): ZIO[ZConnection, Throwable, UpdateResult[SalesreasonRow]]

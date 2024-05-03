@@ -78,10 +78,10 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
   override def selectByIds(departmentids: Array[DepartmentId]): ZStream[ZConnection, Throwable, DepartmentRow] = {
     ZStream.fromIterable(departmentids.flatMap(map.get))
   }
-  override def selectByIdsTracked(departmentids: Array[DepartmentId]): ZIO[ZConnection, Throwable, Map[DepartmentId, Option[DepartmentRow]]] = {
+  override def selectByIdsTracked(departmentids: Array[DepartmentId]): ZIO[ZConnection, Throwable, Map[DepartmentId, DepartmentRow]] = {
     selectByIds(departmentids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.departmentid, x)).toMap
-      departmentids.view.map(id => (id, byId.get(id))).toMap
+      departmentids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {

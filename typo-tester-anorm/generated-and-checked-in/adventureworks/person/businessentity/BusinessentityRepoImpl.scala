@@ -104,9 +104,9 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
        """.as(BusinessentityRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(businessentityids: Array[BusinessentityId])(implicit c: Connection): Map[BusinessentityId, Option[BusinessentityRow]] = {
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId])(implicit c: Connection): Map[BusinessentityId, BusinessentityRow] = {
     val byId = selectByIds(businessentityids).view.map(x => (x.businessentityid, x)).toMap
-    businessentityids.view.map(id => (id, byId.get(id))).toMap
+    businessentityids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
     UpdateBuilder("person.businessentity", BusinessentityFields.structure, BusinessentityRow.rowParser)

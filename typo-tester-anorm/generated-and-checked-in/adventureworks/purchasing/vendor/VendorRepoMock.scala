@@ -68,9 +68,9 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[VendorRow] = {
     businessentityids.flatMap(map.get).toList
   }
-  override def selectByIdsTracked(businessentityids: Array[BusinessentityId])(implicit c: Connection): Map[BusinessentityId, Option[VendorRow]] = {
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId])(implicit c: Connection): Map[BusinessentityId, VendorRow] = {
     val byId = selectByIds(businessentityids).view.map(x => (x.businessentityid, x)).toMap
-    businessentityids.view.map(id => (id, byId.get(id))).toMap
+    businessentityids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
     UpdateBuilderMock(UpdateParams.empty, VendorFields.structure.fields, map)

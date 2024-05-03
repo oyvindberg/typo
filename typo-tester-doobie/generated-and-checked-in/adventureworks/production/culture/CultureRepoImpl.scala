@@ -81,10 +81,10 @@ class CultureRepoImpl extends CultureRepo {
   override def selectByIds(cultureids: Array[CultureId]): Stream[ConnectionIO, CultureRow] = {
     sql"""select "cultureid", "name", "modifieddate"::text from production.culture where "cultureid" = ANY(${cultureids})""".query(using CultureRow.read).stream
   }
-  override def selectByIdsTracked(cultureids: Array[CultureId]): ConnectionIO[Map[CultureId, Option[CultureRow]]] = {
+  override def selectByIdsTracked(cultureids: Array[CultureId]): ConnectionIO[Map[CultureId, CultureRow]] = {
     selectByIds(cultureids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.cultureid, x)).toMap
-      cultureids.view.map(id => (id, byId.get(id))).toMap
+      cultureids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {

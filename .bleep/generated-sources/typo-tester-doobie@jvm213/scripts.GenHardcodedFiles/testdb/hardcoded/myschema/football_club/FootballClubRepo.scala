@@ -25,7 +25,7 @@ trait FootballClubRepo {
   def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): Stream[ConnectionIO, FootballClubRow]
   def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]]
   def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow]
-  def selectByIdsTracked(ids: Array[FootballClubId]): ConnectionIO[Map[FootballClubId, Option[FootballClubRow]]]
+  def selectByIdsTracked(ids: Array[FootballClubId]): ConnectionIO[Map[FootballClubId, FootballClubRow]]
   def update: UpdateBuilder[FootballClubFields, FootballClubRow]
   def update(row: FootballClubRow): ConnectionIO[Boolean]
   def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ConnectionIO[Boolean]

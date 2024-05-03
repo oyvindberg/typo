@@ -67,9 +67,9 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
   override def selectByIds(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): List[EmployeepayhistoryRow] = {
     compositeIds.flatMap(map.get).toList
   }
-  override def selectByIdsTracked(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): Map[EmployeepayhistoryId, Option[EmployeepayhistoryRow]] = {
+  override def selectByIdsTracked(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): Map[EmployeepayhistoryId, EmployeepayhistoryRow] = {
     val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
-    compositeIds.view.map(id => (id, byId.get(id))).toMap
+    compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     UpdateBuilderMock(UpdateParams.empty, EmployeepayhistoryFields.structure.fields, map)

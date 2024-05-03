@@ -25,7 +25,7 @@ trait ShiftRepo {
   def selectAll(implicit c: Connection): List[ShiftRow]
   def selectById(shiftid: ShiftId)(implicit c: Connection): Option[ShiftRow]
   def selectByIds(shiftids: Array[ShiftId])(implicit c: Connection): List[ShiftRow]
-  def selectByIdsTracked(shiftids: Array[ShiftId])(implicit c: Connection): Map[ShiftId, Option[ShiftRow]]
+  def selectByIdsTracked(shiftids: Array[ShiftId])(implicit c: Connection): Map[ShiftId, ShiftRow]
   def update: UpdateBuilder[ShiftFields, ShiftRow]
   def update(row: ShiftRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow

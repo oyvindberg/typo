@@ -26,7 +26,7 @@ trait DepartmentRepo {
   def selectAll: Stream[ConnectionIO, DepartmentRow]
   def selectById(departmentid: DepartmentId): ConnectionIO[Option[DepartmentRow]]
   def selectByIds(departmentids: Array[DepartmentId]): Stream[ConnectionIO, DepartmentRow]
-  def selectByIdsTracked(departmentids: Array[DepartmentId]): ConnectionIO[Map[DepartmentId, Option[DepartmentRow]]]
+  def selectByIdsTracked(departmentids: Array[DepartmentId]): ConnectionIO[Map[DepartmentId, DepartmentRow]]
   def update: UpdateBuilder[DepartmentFields, DepartmentRow]
   def update(row: DepartmentRow): ConnectionIO[Boolean]
   def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow]

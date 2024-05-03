@@ -27,7 +27,7 @@ trait EmployeeRepo {
   def selectAll: Stream[ConnectionIO, EmployeeRow]
   def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[EmployeeRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, EmployeeRow]
-  def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, Option[EmployeeRow]]]
+  def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, EmployeeRow]]
   def update: UpdateBuilder[EmployeeFields, EmployeeRow]
   def update(row: EmployeeRow): ConnectionIO[Boolean]
   def upsert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow]

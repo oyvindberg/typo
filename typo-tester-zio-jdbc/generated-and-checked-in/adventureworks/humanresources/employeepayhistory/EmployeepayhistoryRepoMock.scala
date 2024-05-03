@@ -78,10 +78,10 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
   override def selectByIds(compositeIds: Array[EmployeepayhistoryId]): ZStream[ZConnection, Throwable, EmployeepayhistoryRow] = {
     ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
-  override def selectByIdsTracked(compositeIds: Array[EmployeepayhistoryId]): ZIO[ZConnection, Throwable, Map[EmployeepayhistoryId, Option[EmployeepayhistoryRow]]] = {
+  override def selectByIdsTracked(compositeIds: Array[EmployeepayhistoryId]): ZIO[ZConnection, Throwable, Map[EmployeepayhistoryId, EmployeepayhistoryRow]] = {
     selectByIds(compositeIds).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
-      compositeIds.view.map(id => (id, byId.get(id))).toMap
+      compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {

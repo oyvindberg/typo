@@ -93,10 +93,10 @@ class WorkorderRepoImpl extends WorkorderRepo {
   override def selectByIds(workorderids: Array[WorkorderId]): Stream[ConnectionIO, WorkorderRow] = {
     sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from production.workorder where "workorderid" = ANY(${workorderids})""".query(using WorkorderRow.read).stream
   }
-  override def selectByIdsTracked(workorderids: Array[WorkorderId]): ConnectionIO[Map[WorkorderId, Option[WorkorderRow]]] = {
+  override def selectByIdsTracked(workorderids: Array[WorkorderId]): ConnectionIO[Map[WorkorderId, WorkorderRow]] = {
     selectByIds(workorderids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.workorderid, x)).toMap
-      workorderids.view.map(id => (id, byId.get(id))).toMap
+      workorderids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {

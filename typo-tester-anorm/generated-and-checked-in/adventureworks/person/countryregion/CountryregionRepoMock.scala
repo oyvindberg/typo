@@ -67,9 +67,9 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
   override def selectByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): List[CountryregionRow] = {
     countryregioncodes.flatMap(map.get).toList
   }
-  override def selectByIdsTracked(countryregioncodes: Array[CountryregionId])(implicit c: Connection): Map[CountryregionId, Option[CountryregionRow]] = {
+  override def selectByIdsTracked(countryregioncodes: Array[CountryregionId])(implicit c: Connection): Map[CountryregionId, CountryregionRow] = {
     val byId = selectByIds(countryregioncodes).view.map(x => (x.countryregioncode, x)).toMap
-    countryregioncodes.view.map(id => (id, byId.get(id))).toMap
+    countryregioncodes.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
     UpdateBuilderMock(UpdateParams.empty, CountryregionFields.structure.fields, map)

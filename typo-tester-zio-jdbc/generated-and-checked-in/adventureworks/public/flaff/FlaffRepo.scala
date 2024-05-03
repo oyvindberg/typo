@@ -25,7 +25,7 @@ trait FlaffRepo {
   def selectAll: ZStream[ZConnection, Throwable, FlaffRow]
   def selectById(compositeId: FlaffId): ZIO[ZConnection, Throwable, Option[FlaffRow]]
   def selectByIds(compositeIds: Array[FlaffId]): ZStream[ZConnection, Throwable, FlaffRow]
-  def selectByIdsTracked(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Map[FlaffId, Option[FlaffRow]]]
+  def selectByIdsTracked(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Map[FlaffId, FlaffRow]]
   def update: UpdateBuilder[FlaffFields, FlaffRow]
   def update(row: FlaffRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, UpdateResult[FlaffRow]]

@@ -28,7 +28,7 @@ trait JobcandidateRepo {
   def selectAll: ZStream[ZConnection, Throwable, JobcandidateRow]
   def selectById(jobcandidateid: JobcandidateId): ZIO[ZConnection, Throwable, Option[JobcandidateRow]]
   def selectByIds(jobcandidateids: Array[JobcandidateId]): ZStream[ZConnection, Throwable, JobcandidateRow]
-  def selectByIdsTracked(jobcandidateids: Array[JobcandidateId]): ZIO[ZConnection, Throwable, Map[JobcandidateId, Option[JobcandidateRow]]]
+  def selectByIdsTracked(jobcandidateids: Array[JobcandidateId]): ZIO[ZConnection, Throwable, Map[JobcandidateId, JobcandidateRow]]
   def update: UpdateBuilder[JobcandidateFields, JobcandidateRow]
   def update(row: JobcandidateRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: JobcandidateRow): ZIO[ZConnection, Throwable, UpdateResult[JobcandidateRow]]

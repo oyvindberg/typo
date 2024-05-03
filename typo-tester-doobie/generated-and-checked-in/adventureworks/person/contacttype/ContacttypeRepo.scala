@@ -26,7 +26,7 @@ trait ContacttypeRepo {
   def selectAll: Stream[ConnectionIO, ContacttypeRow]
   def selectById(contacttypeid: ContacttypeId): ConnectionIO[Option[ContacttypeRow]]
   def selectByIds(contacttypeids: Array[ContacttypeId]): Stream[ConnectionIO, ContacttypeRow]
-  def selectByIdsTracked(contacttypeids: Array[ContacttypeId]): ConnectionIO[Map[ContacttypeId, Option[ContacttypeRow]]]
+  def selectByIdsTracked(contacttypeids: Array[ContacttypeId]): ConnectionIO[Map[ContacttypeId, ContacttypeRow]]
   def update: UpdateBuilder[ContacttypeFields, ContacttypeRow]
   def update(row: ContacttypeRow): ConnectionIO[Boolean]
   def upsert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow]

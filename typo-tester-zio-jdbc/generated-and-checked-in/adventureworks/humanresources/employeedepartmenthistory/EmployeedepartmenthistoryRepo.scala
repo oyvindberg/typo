@@ -28,7 +28,7 @@ trait EmployeedepartmenthistoryRepo {
   def selectAll: ZStream[ZConnection, Throwable, EmployeedepartmenthistoryRow]
   def selectById(compositeId: EmployeedepartmenthistoryId): ZIO[ZConnection, Throwable, Option[EmployeedepartmenthistoryRow]]
   def selectByIds(compositeIds: Array[EmployeedepartmenthistoryId]): ZStream[ZConnection, Throwable, EmployeedepartmenthistoryRow]
-  def selectByIdsTracked(compositeIds: Array[EmployeedepartmenthistoryId]): ZIO[ZConnection, Throwable, Map[EmployeedepartmenthistoryId, Option[EmployeedepartmenthistoryRow]]]
+  def selectByIdsTracked(compositeIds: Array[EmployeedepartmenthistoryId]): ZIO[ZConnection, Throwable, Map[EmployeedepartmenthistoryId, EmployeedepartmenthistoryRow]]
   def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow]
   def update(row: EmployeedepartmenthistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: EmployeedepartmenthistoryRow): ZIO[ZConnection, Throwable, UpdateResult[EmployeedepartmenthistoryRow]]

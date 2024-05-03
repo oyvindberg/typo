@@ -92,10 +92,10 @@ class CustomerRepoImpl extends CustomerRepo {
   override def selectByIds(customerids: Array[CustomerId]): ZStream[ZConnection, Throwable, CustomerRow] = {
     sql"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text from sales.customer where "customerid" = ANY(${Segment.paramSegment(customerids)(CustomerId.arraySetter)})""".query(using CustomerRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(customerids: Array[CustomerId]): ZIO[ZConnection, Throwable, Map[CustomerId, Option[CustomerRow]]] = {
+  override def selectByIdsTracked(customerids: Array[CustomerId]): ZIO[ZConnection, Throwable, Map[CustomerId, CustomerRow]] = {
     selectByIds(customerids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.customerid, x)).toMap
-      customerids.view.map(id => (id, byId.get(id))).toMap
+      customerids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[CustomerFields, CustomerRow] = {

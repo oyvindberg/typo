@@ -26,7 +26,7 @@ trait TransactionhistoryarchiveRepo {
   def selectAll: Stream[ConnectionIO, TransactionhistoryarchiveRow]
   def selectById(transactionid: TransactionhistoryarchiveId): ConnectionIO[Option[TransactionhistoryarchiveRow]]
   def selectByIds(transactionids: Array[TransactionhistoryarchiveId]): Stream[ConnectionIO, TransactionhistoryarchiveRow]
-  def selectByIdsTracked(transactionids: Array[TransactionhistoryarchiveId]): ConnectionIO[Map[TransactionhistoryarchiveId, Option[TransactionhistoryarchiveRow]]]
+  def selectByIdsTracked(transactionids: Array[TransactionhistoryarchiveId]): ConnectionIO[Map[TransactionhistoryarchiveId, TransactionhistoryarchiveRow]]
   def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow]
   def update(row: TransactionhistoryarchiveRow): ConnectionIO[Boolean]
   def upsert(unsaved: TransactionhistoryarchiveRow): ConnectionIO[TransactionhistoryarchiveRow]

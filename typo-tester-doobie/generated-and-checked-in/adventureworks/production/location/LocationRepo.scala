@@ -26,7 +26,7 @@ trait LocationRepo {
   def selectAll: Stream[ConnectionIO, LocationRow]
   def selectById(locationid: LocationId): ConnectionIO[Option[LocationRow]]
   def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow]
-  def selectByIdsTracked(locationids: Array[LocationId]): ConnectionIO[Map[LocationId, Option[LocationRow]]]
+  def selectByIdsTracked(locationids: Array[LocationId]): ConnectionIO[Map[LocationId, LocationRow]]
   def update: UpdateBuilder[LocationFields, LocationRow]
   def update(row: LocationRow): ConnectionIO[Boolean]
   def upsert(unsaved: LocationRow): ConnectionIO[LocationRow]

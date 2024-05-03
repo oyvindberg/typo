@@ -78,10 +78,10 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): ZStream[ZConnection, Throwable, JobcandidateRow] = {
     ZStream.fromIterable(jobcandidateids.flatMap(map.get))
   }
-  override def selectByIdsTracked(jobcandidateids: Array[JobcandidateId]): ZIO[ZConnection, Throwable, Map[JobcandidateId, Option[JobcandidateRow]]] = {
+  override def selectByIdsTracked(jobcandidateids: Array[JobcandidateId]): ZIO[ZConnection, Throwable, Map[JobcandidateId, JobcandidateRow]] = {
     selectByIds(jobcandidateids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.jobcandidateid, x)).toMap
-      jobcandidateids.view.map(id => (id, byId.get(id))).toMap
+      jobcandidateids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {

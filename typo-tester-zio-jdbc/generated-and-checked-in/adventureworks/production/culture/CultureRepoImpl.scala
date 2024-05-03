@@ -80,10 +80,10 @@ class CultureRepoImpl extends CultureRepo {
   override def selectByIds(cultureids: Array[CultureId]): ZStream[ZConnection, Throwable, CultureRow] = {
     sql"""select "cultureid", "name", "modifieddate"::text from production.culture where "cultureid" = ANY(${Segment.paramSegment(cultureids)(CultureId.arraySetter)})""".query(using CultureRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(cultureids: Array[CultureId]): ZIO[ZConnection, Throwable, Map[CultureId, Option[CultureRow]]] = {
+  override def selectByIdsTracked(cultureids: Array[CultureId]): ZIO[ZConnection, Throwable, Map[CultureId, CultureRow]] = {
     selectByIds(cultureids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.cultureid, x)).toMap
-      cultureids.view.map(id => (id, byId.get(id))).toMap
+      cultureids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {

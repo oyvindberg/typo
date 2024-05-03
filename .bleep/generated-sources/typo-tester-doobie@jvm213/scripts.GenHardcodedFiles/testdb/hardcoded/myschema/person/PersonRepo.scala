@@ -28,7 +28,7 @@ trait PersonRepo {
   def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): Stream[ConnectionIO, PersonRow]
   def selectById(id: PersonId): ConnectionIO[Option[PersonRow]]
   def selectByIds(ids: Array[PersonId]): Stream[ConnectionIO, PersonRow]
-  def selectByIdsTracked(ids: Array[PersonId]): ConnectionIO[Map[PersonId, Option[PersonRow]]]
+  def selectByIdsTracked(ids: Array[PersonId]): ConnectionIO[Map[PersonId, PersonRow]]
   def update: UpdateBuilder[PersonFields, PersonRow]
   def update(row: PersonRow): ConnectionIO[Boolean]
   def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]]): ConnectionIO[Boolean]

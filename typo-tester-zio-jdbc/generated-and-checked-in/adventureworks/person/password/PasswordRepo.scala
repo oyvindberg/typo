@@ -29,7 +29,7 @@ trait PasswordRepo {
   def selectAll: ZStream[ZConnection, Throwable, PasswordRow]
   def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[PasswordRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, PasswordRow]
-  def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, Option[PasswordRow]]]
+  def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, PasswordRow]]
   def update: UpdateBuilder[PasswordFields, PasswordRow]
   def update(row: PasswordRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: PasswordRow): ZIO[ZConnection, Throwable, UpdateResult[PasswordRow]]

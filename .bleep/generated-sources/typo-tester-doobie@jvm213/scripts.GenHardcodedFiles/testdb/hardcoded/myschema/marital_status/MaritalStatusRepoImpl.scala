@@ -59,10 +59,10 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow] = {
     sql"""select "id" from myschema.marital_status where "id" = ANY(${ids})""".query(using MaritalStatusRow.read).stream
   }
-  override def selectByIdsTracked(ids: Array[MaritalStatusId]): ConnectionIO[Map[MaritalStatusId, Option[MaritalStatusRow]]] = {
+  override def selectByIdsTracked(ids: Array[MaritalStatusId]): ConnectionIO[Map[MaritalStatusId, MaritalStatusRow]] = {
     selectByIds(ids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.id, x)).toMap
-      ids.view.map(id => (id, byId.get(id))).toMap
+      ids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {

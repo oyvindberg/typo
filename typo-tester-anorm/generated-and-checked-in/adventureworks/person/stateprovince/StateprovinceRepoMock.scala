@@ -67,9 +67,9 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
   override def selectByIds(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): List[StateprovinceRow] = {
     stateprovinceids.flatMap(map.get).toList
   }
-  override def selectByIdsTracked(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): Map[StateprovinceId, Option[StateprovinceRow]] = {
+  override def selectByIdsTracked(stateprovinceids: Array[StateprovinceId])(implicit c: Connection): Map[StateprovinceId, StateprovinceRow] = {
     val byId = selectByIds(stateprovinceids).view.map(x => (x.stateprovinceid, x)).toMap
-    stateprovinceids.view.map(id => (id, byId.get(id))).toMap
+    stateprovinceids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
     UpdateBuilderMock(UpdateParams.empty, StateprovinceFields.structure.fields, map)

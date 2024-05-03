@@ -25,7 +25,7 @@ trait DepartmentRepo {
   def selectAll(implicit c: Connection): List[DepartmentRow]
   def selectById(departmentid: DepartmentId)(implicit c: Connection): Option[DepartmentRow]
   def selectByIds(departmentids: Array[DepartmentId])(implicit c: Connection): List[DepartmentRow]
-  def selectByIdsTracked(departmentids: Array[DepartmentId])(implicit c: Connection): Map[DepartmentId, Option[DepartmentRow]]
+  def selectByIdsTracked(departmentids: Array[DepartmentId])(implicit c: Connection): Map[DepartmentId, DepartmentRow]
   def update: UpdateBuilder[DepartmentFields, DepartmentRow]
   def update(row: DepartmentRow)(implicit c: Connection): Boolean
   def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow

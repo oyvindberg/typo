@@ -67,9 +67,9 @@ class SalesorderheadersalesreasonRepoMock(toRow: Function1[Salesorderheadersales
   override def selectByIds(compositeIds: Array[SalesorderheadersalesreasonId])(implicit c: Connection): List[SalesorderheadersalesreasonRow] = {
     compositeIds.flatMap(map.get).toList
   }
-  override def selectByIdsTracked(compositeIds: Array[SalesorderheadersalesreasonId])(implicit c: Connection): Map[SalesorderheadersalesreasonId, Option[SalesorderheadersalesreasonRow]] = {
+  override def selectByIdsTracked(compositeIds: Array[SalesorderheadersalesreasonId])(implicit c: Connection): Map[SalesorderheadersalesreasonId, SalesorderheadersalesreasonRow] = {
     val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
-    compositeIds.view.map(id => (id, byId.get(id))).toMap
+    compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
     UpdateBuilderMock(UpdateParams.empty, SalesorderheadersalesreasonFields.structure.fields, map)

@@ -89,10 +89,10 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def selectByIds(productdescriptionids: Array[ProductdescriptionId]): Stream[ConnectionIO, ProductdescriptionRow] = {
     sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from production.productdescription where "productdescriptionid" = ANY(${productdescriptionids})""".query(using ProductdescriptionRow.read).stream
   }
-  override def selectByIdsTracked(productdescriptionids: Array[ProductdescriptionId]): ConnectionIO[Map[ProductdescriptionId, Option[ProductdescriptionRow]]] = {
+  override def selectByIdsTracked(productdescriptionids: Array[ProductdescriptionId]): ConnectionIO[Map[ProductdescriptionId, ProductdescriptionRow]] = {
     selectByIds(productdescriptionids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.productdescriptionid, x)).toMap
-      productdescriptionids.view.map(id => (id, byId.get(id))).toMap
+      productdescriptionids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow] = {

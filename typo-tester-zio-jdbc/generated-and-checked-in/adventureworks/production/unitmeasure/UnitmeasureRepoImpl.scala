@@ -80,10 +80,10 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): ZStream[ZConnection, Throwable, UnitmeasureRow] = {
     sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure where "unitmeasurecode" = ANY(${Segment.paramSegment(unitmeasurecodes)(UnitmeasureId.arraySetter)})""".query(using UnitmeasureRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(unitmeasurecodes: Array[UnitmeasureId]): ZIO[ZConnection, Throwable, Map[UnitmeasureId, Option[UnitmeasureRow]]] = {
+  override def selectByIdsTracked(unitmeasurecodes: Array[UnitmeasureId]): ZIO[ZConnection, Throwable, Map[UnitmeasureId, UnitmeasureRow]] = {
     selectByIds(unitmeasurecodes).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.unitmeasurecode, x)).toMap
-      unitmeasurecodes.view.map(id => (id, byId.get(id))).toMap
+      unitmeasurecodes.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {

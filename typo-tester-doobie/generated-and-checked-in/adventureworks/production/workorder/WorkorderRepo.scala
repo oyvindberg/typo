@@ -26,7 +26,7 @@ trait WorkorderRepo {
   def selectAll: Stream[ConnectionIO, WorkorderRow]
   def selectById(workorderid: WorkorderId): ConnectionIO[Option[WorkorderRow]]
   def selectByIds(workorderids: Array[WorkorderId]): Stream[ConnectionIO, WorkorderRow]
-  def selectByIdsTracked(workorderids: Array[WorkorderId]): ConnectionIO[Map[WorkorderId, Option[WorkorderRow]]]
+  def selectByIdsTracked(workorderids: Array[WorkorderId]): ConnectionIO[Map[WorkorderId, WorkorderRow]]
   def update: UpdateBuilder[WorkorderFields, WorkorderRow]
   def update(row: WorkorderRow): ConnectionIO[Boolean]
   def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow]

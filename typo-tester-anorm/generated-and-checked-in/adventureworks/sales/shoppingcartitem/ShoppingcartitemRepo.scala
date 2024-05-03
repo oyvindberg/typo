@@ -25,7 +25,7 @@ trait ShoppingcartitemRepo {
   def selectAll(implicit c: Connection): List[ShoppingcartitemRow]
   def selectById(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Option[ShoppingcartitemRow]
   def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow]
-  def selectByIdsTracked(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): Map[ShoppingcartitemId, Option[ShoppingcartitemRow]]
+  def selectByIdsTracked(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): Map[ShoppingcartitemId, ShoppingcartitemRow]
   def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
   def update(row: ShoppingcartitemRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow

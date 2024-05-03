@@ -28,7 +28,7 @@ trait LocationRepo {
   def selectAll: ZStream[ZConnection, Throwable, LocationRow]
   def selectById(locationid: LocationId): ZIO[ZConnection, Throwable, Option[LocationRow]]
   def selectByIds(locationids: Array[LocationId]): ZStream[ZConnection, Throwable, LocationRow]
-  def selectByIdsTracked(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Map[LocationId, Option[LocationRow]]]
+  def selectByIdsTracked(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Map[LocationId, LocationRow]]
   def update: UpdateBuilder[LocationFields, LocationRow]
   def update(row: LocationRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: LocationRow): ZIO[ZConnection, Throwable, UpdateResult[LocationRow]]

@@ -28,7 +28,7 @@ trait BillofmaterialsRepo {
   def selectAll: ZStream[ZConnection, Throwable, BillofmaterialsRow]
   def selectById(billofmaterialsid: Int): ZIO[ZConnection, Throwable, Option[BillofmaterialsRow]]
   def selectByIds(billofmaterialsids: Array[Int]): ZStream[ZConnection, Throwable, BillofmaterialsRow]
-  def selectByIdsTracked(billofmaterialsids: Array[Int]): ZIO[ZConnection, Throwable, Map[Int, Option[BillofmaterialsRow]]]
+  def selectByIdsTracked(billofmaterialsids: Array[Int]): ZIO[ZConnection, Throwable, Map[Int, BillofmaterialsRow]]
   def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def update(row: BillofmaterialsRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: BillofmaterialsRow): ZIO[ZConnection, Throwable, UpdateResult[BillofmaterialsRow]]

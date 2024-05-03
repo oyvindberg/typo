@@ -25,7 +25,7 @@ trait CultureRepo {
   def selectAll(implicit c: Connection): List[CultureRow]
   def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow]
   def selectByIds(cultureids: Array[CultureId])(implicit c: Connection): List[CultureRow]
-  def selectByIdsTracked(cultureids: Array[CultureId])(implicit c: Connection): Map[CultureId, Option[CultureRow]]
+  def selectByIdsTracked(cultureids: Array[CultureId])(implicit c: Connection): Map[CultureId, CultureRow]
   def update: UpdateBuilder[CultureFields, CultureRow]
   def update(row: CultureRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow

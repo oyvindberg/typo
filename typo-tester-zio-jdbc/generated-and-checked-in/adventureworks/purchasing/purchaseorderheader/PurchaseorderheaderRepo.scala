@@ -28,7 +28,7 @@ trait PurchaseorderheaderRepo {
   def selectAll: ZStream[ZConnection, Throwable, PurchaseorderheaderRow]
   def selectById(purchaseorderid: PurchaseorderheaderId): ZIO[ZConnection, Throwable, Option[PurchaseorderheaderRow]]
   def selectByIds(purchaseorderids: Array[PurchaseorderheaderId]): ZStream[ZConnection, Throwable, PurchaseorderheaderRow]
-  def selectByIdsTracked(purchaseorderids: Array[PurchaseorderheaderId]): ZIO[ZConnection, Throwable, Map[PurchaseorderheaderId, Option[PurchaseorderheaderRow]]]
+  def selectByIdsTracked(purchaseorderids: Array[PurchaseorderheaderId]): ZIO[ZConnection, Throwable, Map[PurchaseorderheaderId, PurchaseorderheaderRow]]
   def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
   def update(row: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, UpdateResult[PurchaseorderheaderRow]]

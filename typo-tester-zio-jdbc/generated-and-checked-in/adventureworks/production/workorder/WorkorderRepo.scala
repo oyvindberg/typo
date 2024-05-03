@@ -28,7 +28,7 @@ trait WorkorderRepo {
   def selectAll: ZStream[ZConnection, Throwable, WorkorderRow]
   def selectById(workorderid: WorkorderId): ZIO[ZConnection, Throwable, Option[WorkorderRow]]
   def selectByIds(workorderids: Array[WorkorderId]): ZStream[ZConnection, Throwable, WorkorderRow]
-  def selectByIdsTracked(workorderids: Array[WorkorderId]): ZIO[ZConnection, Throwable, Map[WorkorderId, Option[WorkorderRow]]]
+  def selectByIdsTracked(workorderids: Array[WorkorderId]): ZIO[ZConnection, Throwable, Map[WorkorderId, WorkorderRow]]
   def update: UpdateBuilder[WorkorderFields, WorkorderRow]
   def update(row: WorkorderRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: WorkorderRow): ZIO[ZConnection, Throwable, UpdateResult[WorkorderRow]]

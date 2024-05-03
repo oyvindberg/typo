@@ -106,9 +106,9 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
        """.as(AddresstypeRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(addresstypeids: Array[AddresstypeId])(implicit c: Connection): Map[AddresstypeId, Option[AddresstypeRow]] = {
+  override def selectByIdsTracked(addresstypeids: Array[AddresstypeId])(implicit c: Connection): Map[AddresstypeId, AddresstypeRow] = {
     val byId = selectByIds(addresstypeids).view.map(x => (x.addresstypeid, x)).toMap
-    addresstypeids.view.map(id => (id, byId.get(id))).toMap
+    addresstypeids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
     UpdateBuilder("person.addresstype", AddresstypeFields.structure, AddresstypeRow.rowParser)

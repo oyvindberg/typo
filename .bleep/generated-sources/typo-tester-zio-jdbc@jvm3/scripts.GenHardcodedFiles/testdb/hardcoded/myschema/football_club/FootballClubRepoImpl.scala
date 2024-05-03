@@ -67,10 +67,10 @@ class FootballClubRepoImpl extends FootballClubRepo {
   override def selectByIds(ids: Array[FootballClubId]): ZStream[ZConnection, Throwable, FootballClubRow] = {
     sql"""select "id", "name" from myschema.football_club where "id" = ANY(${Segment.paramSegment(ids)(FootballClubId.arraySetter)})""".query(using FootballClubRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Map[FootballClubId, Option[FootballClubRow]]] = {
+  override def selectByIdsTracked(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Map[FootballClubId, FootballClubRow]] = {
     selectByIds(ids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.id, x)).toMap
-      ids.view.map(id => (id, byId.get(id))).toMap
+      ids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {

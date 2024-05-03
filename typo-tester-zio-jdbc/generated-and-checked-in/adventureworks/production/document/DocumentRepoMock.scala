@@ -79,10 +79,10 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   override def selectByIds(documentnodes: Array[DocumentId]): ZStream[ZConnection, Throwable, DocumentRow] = {
     ZStream.fromIterable(documentnodes.flatMap(map.get))
   }
-  override def selectByIdsTracked(documentnodes: Array[DocumentId]): ZIO[ZConnection, Throwable, Map[DocumentId, Option[DocumentRow]]] = {
+  override def selectByIdsTracked(documentnodes: Array[DocumentId]): ZIO[ZConnection, Throwable, Map[DocumentId, DocumentRow]] = {
     selectByIds(documentnodes).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.documentnode, x)).toMap
-      documentnodes.view.map(id => (id, byId.get(id))).toMap
+      documentnodes.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def selectByUniqueRowguid(rowguid: TypoUUID): ZIO[ZConnection, Throwable, Option[DocumentRow]] = {

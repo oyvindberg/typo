@@ -28,7 +28,7 @@ trait PersoncreditcardRepo {
   def selectAll: Stream[ConnectionIO, PersoncreditcardRow]
   def selectById(compositeId: PersoncreditcardId): ConnectionIO[Option[PersoncreditcardRow]]
   def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): Stream[ConnectionIO, PersoncreditcardRow]
-  def selectByIdsTracked(compositeIds: Array[PersoncreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Map[PersoncreditcardId, Option[PersoncreditcardRow]]]
+  def selectByIdsTracked(compositeIds: Array[PersoncreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Map[PersoncreditcardId, PersoncreditcardRow]]
   def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow]
   def update(row: PersoncreditcardRow): ConnectionIO[Boolean]
   def upsert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow]

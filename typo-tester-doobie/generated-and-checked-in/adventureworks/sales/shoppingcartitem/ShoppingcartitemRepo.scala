@@ -26,7 +26,7 @@ trait ShoppingcartitemRepo {
   def selectAll: Stream[ConnectionIO, ShoppingcartitemRow]
   def selectById(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Option[ShoppingcartitemRow]]
   def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): Stream[ConnectionIO, ShoppingcartitemRow]
-  def selectByIdsTracked(shoppingcartitemids: Array[ShoppingcartitemId]): ConnectionIO[Map[ShoppingcartitemId, Option[ShoppingcartitemRow]]]
+  def selectByIdsTracked(shoppingcartitemids: Array[ShoppingcartitemId]): ConnectionIO[Map[ShoppingcartitemId, ShoppingcartitemRow]]
   def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
   def update(row: ShoppingcartitemRow): ConnectionIO[Boolean]
   def upsert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow]

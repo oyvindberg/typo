@@ -93,10 +93,10 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   override def selectByIds(transactionids: Array[TransactionhistoryarchiveId]): Stream[ConnectionIO, TransactionhistoryarchiveRow] = {
     sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistoryarchive where "transactionid" = ANY(${transactionids})""".query(using TransactionhistoryarchiveRow.read).stream
   }
-  override def selectByIdsTracked(transactionids: Array[TransactionhistoryarchiveId]): ConnectionIO[Map[TransactionhistoryarchiveId, Option[TransactionhistoryarchiveRow]]] = {
+  override def selectByIdsTracked(transactionids: Array[TransactionhistoryarchiveId]): ConnectionIO[Map[TransactionhistoryarchiveId, TransactionhistoryarchiveRow]] = {
     selectByIds(transactionids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.transactionid, x)).toMap
-      transactionids.view.map(id => (id, byId.get(id))).toMap
+      transactionids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {

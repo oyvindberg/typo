@@ -96,10 +96,10 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def selectByIds(transactionids: Array[TransactionhistoryId]): ZStream[ZConnection, Throwable, TransactionhistoryRow] = {
     sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ANY(${Segment.paramSegment(transactionids)(TransactionhistoryId.arraySetter)})""".query(using TransactionhistoryRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(transactionids: Array[TransactionhistoryId]): ZIO[ZConnection, Throwable, Map[TransactionhistoryId, Option[TransactionhistoryRow]]] = {
+  override def selectByIdsTracked(transactionids: Array[TransactionhistoryId]): ZIO[ZConnection, Throwable, Map[TransactionhistoryId, TransactionhistoryRow]] = {
     selectByIds(transactionids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.transactionid, x)).toMap
-      transactionids.view.map(id => (id, byId.get(id))).toMap
+      transactionids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {

@@ -25,7 +25,7 @@ trait ProductcosthistoryRepo {
   def selectAll(implicit c: Connection): List[ProductcosthistoryRow]
   def selectById(compositeId: ProductcosthistoryId)(implicit c: Connection): Option[ProductcosthistoryRow]
   def selectByIds(compositeIds: Array[ProductcosthistoryId])(implicit c: Connection): List[ProductcosthistoryRow]
-  def selectByIdsTracked(compositeIds: Array[ProductcosthistoryId])(implicit c: Connection): Map[ProductcosthistoryId, Option[ProductcosthistoryRow]]
+  def selectByIdsTracked(compositeIds: Array[ProductcosthistoryId])(implicit c: Connection): Map[ProductcosthistoryId, ProductcosthistoryRow]
   def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def update(row: ProductcosthistoryRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow

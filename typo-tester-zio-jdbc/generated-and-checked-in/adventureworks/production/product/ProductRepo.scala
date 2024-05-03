@@ -28,7 +28,7 @@ trait ProductRepo {
   def selectAll: ZStream[ZConnection, Throwable, ProductRow]
   def selectById(productid: ProductId): ZIO[ZConnection, Throwable, Option[ProductRow]]
   def selectByIds(productids: Array[ProductId]): ZStream[ZConnection, Throwable, ProductRow]
-  def selectByIdsTracked(productids: Array[ProductId]): ZIO[ZConnection, Throwable, Map[ProductId, Option[ProductRow]]]
+  def selectByIdsTracked(productids: Array[ProductId]): ZIO[ZConnection, Throwable, Map[ProductId, ProductRow]]
   def update: UpdateBuilder[ProductFields, ProductRow]
   def update(row: ProductRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ProductRow): ZIO[ZConnection, Throwable, UpdateResult[ProductRow]]

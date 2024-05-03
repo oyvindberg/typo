@@ -25,7 +25,7 @@ trait MaritalStatusRepo {
   def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): Stream[ConnectionIO, MaritalStatusRow]
   def selectById(id: MaritalStatusId): ConnectionIO[Option[MaritalStatusRow]]
   def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow]
-  def selectByIdsTracked(ids: Array[MaritalStatusId]): ConnectionIO[Map[MaritalStatusId, Option[MaritalStatusRow]]]
+  def selectByIdsTracked(ids: Array[MaritalStatusId]): ConnectionIO[Map[MaritalStatusId, MaritalStatusRow]]
   def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow]
   def upsert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow]
 }

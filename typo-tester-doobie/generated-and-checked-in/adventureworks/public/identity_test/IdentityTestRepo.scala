@@ -26,7 +26,7 @@ trait IdentityTestRepo {
   def selectAll: Stream[ConnectionIO, IdentityTestRow]
   def selectById(name: IdentityTestId): ConnectionIO[Option[IdentityTestRow]]
   def selectByIds(names: Array[IdentityTestId]): Stream[ConnectionIO, IdentityTestRow]
-  def selectByIdsTracked(names: Array[IdentityTestId]): ConnectionIO[Map[IdentityTestId, Option[IdentityTestRow]]]
+  def selectByIdsTracked(names: Array[IdentityTestId]): ConnectionIO[Map[IdentityTestId, IdentityTestRow]]
   def update: UpdateBuilder[IdentityTestFields, IdentityTestRow]
   def update(row: IdentityTestRow): ConnectionIO[Boolean]
   def upsert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow]

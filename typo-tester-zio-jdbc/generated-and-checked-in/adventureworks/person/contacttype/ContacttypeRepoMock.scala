@@ -78,10 +78,10 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
   override def selectByIds(contacttypeids: Array[ContacttypeId]): ZStream[ZConnection, Throwable, ContacttypeRow] = {
     ZStream.fromIterable(contacttypeids.flatMap(map.get))
   }
-  override def selectByIdsTracked(contacttypeids: Array[ContacttypeId]): ZIO[ZConnection, Throwable, Map[ContacttypeId, Option[ContacttypeRow]]] = {
+  override def selectByIdsTracked(contacttypeids: Array[ContacttypeId]): ZIO[ZConnection, Throwable, Map[ContacttypeId, ContacttypeRow]] = {
     selectByIds(contacttypeids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.contacttypeid, x)).toMap
-      contacttypeids.view.map(id => (id, byId.get(id))).toMap
+      contacttypeids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {

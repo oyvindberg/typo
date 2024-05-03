@@ -79,10 +79,10 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId]): Stream[ConnectionIO, PurchaseorderheaderRow] = {
     Stream.emits(purchaseorderids.flatMap(map.get).toList)
   }
-  override def selectByIdsTracked(purchaseorderids: Array[PurchaseorderheaderId]): ConnectionIO[Map[PurchaseorderheaderId, Option[PurchaseorderheaderRow]]] = {
+  override def selectByIdsTracked(purchaseorderids: Array[PurchaseorderheaderId]): ConnectionIO[Map[PurchaseorderheaderId, PurchaseorderheaderRow]] = {
     selectByIds(purchaseorderids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.purchaseorderid, x)).toMap
-      purchaseorderids.view.map(id => (id, byId.get(id))).toMap
+      purchaseorderids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {

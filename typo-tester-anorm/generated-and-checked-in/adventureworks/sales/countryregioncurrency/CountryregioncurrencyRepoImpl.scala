@@ -105,9 +105,9 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
        """.as(CountryregioncurrencyRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): Map[CountryregioncurrencyId, Option[CountryregioncurrencyRow]] = {
+  override def selectByIdsTracked(compositeIds: Array[CountryregioncurrencyId])(implicit c: Connection): Map[CountryregioncurrencyId, CountryregioncurrencyRow] = {
     val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
-    compositeIds.view.map(id => (id, byId.get(id))).toMap
+    compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     UpdateBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.rowParser)

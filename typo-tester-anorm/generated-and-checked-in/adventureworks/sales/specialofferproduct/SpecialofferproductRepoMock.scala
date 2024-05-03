@@ -67,9 +67,9 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
   override def selectByIds(compositeIds: Array[SpecialofferproductId])(implicit c: Connection): List[SpecialofferproductRow] = {
     compositeIds.flatMap(map.get).toList
   }
-  override def selectByIdsTracked(compositeIds: Array[SpecialofferproductId])(implicit c: Connection): Map[SpecialofferproductId, Option[SpecialofferproductRow]] = {
+  override def selectByIdsTracked(compositeIds: Array[SpecialofferproductId])(implicit c: Connection): Map[SpecialofferproductId, SpecialofferproductRow] = {
     val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
-    compositeIds.view.map(id => (id, byId.get(id))).toMap
+    compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
     UpdateBuilderMock(UpdateParams.empty, SpecialofferproductFields.structure.fields, map)

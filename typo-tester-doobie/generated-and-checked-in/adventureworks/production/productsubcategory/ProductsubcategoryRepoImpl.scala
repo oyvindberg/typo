@@ -91,10 +91,10 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def selectByIds(productsubcategoryids: Array[ProductsubcategoryId]): Stream[ConnectionIO, ProductsubcategoryRow] = {
     sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory where "productsubcategoryid" = ANY(${productsubcategoryids})""".query(using ProductsubcategoryRow.read).stream
   }
-  override def selectByIdsTracked(productsubcategoryids: Array[ProductsubcategoryId]): ConnectionIO[Map[ProductsubcategoryId, Option[ProductsubcategoryRow]]] = {
+  override def selectByIdsTracked(productsubcategoryids: Array[ProductsubcategoryId]): ConnectionIO[Map[ProductsubcategoryId, ProductsubcategoryRow]] = {
     selectByIds(productsubcategoryids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.productsubcategoryid, x)).toMap
-      productsubcategoryids.view.map(id => (id, byId.get(id))).toMap
+      productsubcategoryids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {

@@ -102,9 +102,9 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
        """.as(SalesreasonRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(salesreasonids: Array[SalesreasonId])(implicit c: Connection): Map[SalesreasonId, Option[SalesreasonRow]] = {
+  override def selectByIdsTracked(salesreasonids: Array[SalesreasonId])(implicit c: Connection): Map[SalesreasonId, SalesreasonRow] = {
     val byId = selectByIds(salesreasonids).view.map(x => (x.salesreasonid, x)).toMap
-    salesreasonids.view.map(id => (id, byId.get(id))).toMap
+    salesreasonids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
     UpdateBuilder("sales.salesreason", SalesreasonFields.structure, SalesreasonRow.rowParser)

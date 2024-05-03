@@ -78,10 +78,10 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
   override def selectByIds(territoryids: Array[SalesterritoryId]): ZStream[ZConnection, Throwable, SalesterritoryRow] = {
     ZStream.fromIterable(territoryids.flatMap(map.get))
   }
-  override def selectByIdsTracked(territoryids: Array[SalesterritoryId]): ZIO[ZConnection, Throwable, Map[SalesterritoryId, Option[SalesterritoryRow]]] = {
+  override def selectByIdsTracked(territoryids: Array[SalesterritoryId]): ZIO[ZConnection, Throwable, Map[SalesterritoryId, SalesterritoryRow]] = {
     selectByIds(territoryids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.territoryid, x)).toMap
-      territoryids.view.map(id => (id, byId.get(id))).toMap
+      territoryids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {

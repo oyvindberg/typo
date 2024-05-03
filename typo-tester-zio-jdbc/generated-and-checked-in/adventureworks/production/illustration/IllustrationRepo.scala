@@ -28,7 +28,7 @@ trait IllustrationRepo {
   def selectAll: ZStream[ZConnection, Throwable, IllustrationRow]
   def selectById(illustrationid: IllustrationId): ZIO[ZConnection, Throwable, Option[IllustrationRow]]
   def selectByIds(illustrationids: Array[IllustrationId]): ZStream[ZConnection, Throwable, IllustrationRow]
-  def selectByIdsTracked(illustrationids: Array[IllustrationId]): ZIO[ZConnection, Throwable, Map[IllustrationId, Option[IllustrationRow]]]
+  def selectByIdsTracked(illustrationids: Array[IllustrationId]): ZIO[ZConnection, Throwable, Map[IllustrationId, IllustrationRow]]
   def update: UpdateBuilder[IllustrationFields, IllustrationRow]
   def update(row: IllustrationRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: IllustrationRow): ZIO[ZConnection, Throwable, UpdateResult[IllustrationRow]]

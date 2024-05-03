@@ -73,10 +73,10 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
   override def selectByIds(ids: Array[FootballClubId]): ZStream[ZConnection, Throwable, FootballClubRow] = {
     ZStream.fromIterable(ids.flatMap(map.get))
   }
-  override def selectByIdsTracked(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Map[FootballClubId, Option[FootballClubRow]]] = {
+  override def selectByIdsTracked(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Map[FootballClubId, FootballClubRow]] = {
     selectByIds(ids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.id, x)).toMap
-      ids.view.map(id => (id, byId.get(id))).toMap
+      ids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {

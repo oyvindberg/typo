@@ -64,10 +64,10 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def selectByIds(ids: Array[MaritalStatusId]): ZStream[ZConnection, Throwable, MaritalStatusRow] = {
     sql"""select "id" from myschema.marital_status where "id" = ANY(${Segment.paramSegment(ids)(MaritalStatusId.arraySetter)})""".query(using MaritalStatusRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Map[MaritalStatusId, Option[MaritalStatusRow]]] = {
+  override def selectByIdsTracked(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Map[MaritalStatusId, MaritalStatusRow]] = {
     selectByIds(ids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.id, x)).toMap
-      ids.view.map(id => (id, byId.get(id))).toMap
+      ids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {

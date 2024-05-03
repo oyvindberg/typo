@@ -126,9 +126,9 @@ class DocumentRepoImpl extends DocumentRepo {
        """.as(DocumentRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(documentnodes: Array[DocumentId])(implicit c: Connection): Map[DocumentId, Option[DocumentRow]] = {
+  override def selectByIdsTracked(documentnodes: Array[DocumentId])(implicit c: Connection): Map[DocumentId, DocumentRow] = {
     val byId = selectByIds(documentnodes).view.map(x => (x.documentnode, x)).toMap
-    documentnodes.view.map(id => (id, byId.get(id))).toMap
+    documentnodes.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def selectByUniqueRowguid(rowguid: TypoUUID)(implicit c: Connection): Option[DocumentRow] = {
     SQL"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"

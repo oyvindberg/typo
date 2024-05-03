@@ -78,10 +78,10 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
   override def selectByIds(currencyrateids: Array[CurrencyrateId]): ZStream[ZConnection, Throwable, CurrencyrateRow] = {
     ZStream.fromIterable(currencyrateids.flatMap(map.get))
   }
-  override def selectByIdsTracked(currencyrateids: Array[CurrencyrateId]): ZIO[ZConnection, Throwable, Map[CurrencyrateId, Option[CurrencyrateRow]]] = {
+  override def selectByIdsTracked(currencyrateids: Array[CurrencyrateId]): ZIO[ZConnection, Throwable, Map[CurrencyrateId, CurrencyrateRow]] = {
     selectByIds(currencyrateids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.currencyrateid, x)).toMap
-      currencyrateids.view.map(id => (id, byId.get(id))).toMap
+      currencyrateids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {

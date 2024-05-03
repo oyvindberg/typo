@@ -87,10 +87,10 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, BusinessentityRow] = {
     sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity where "businessentityid" = ANY(${businessentityids})""".query(using BusinessentityRow.read).stream
   }
-  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, Option[BusinessentityRow]]] = {
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, BusinessentityRow]] = {
     selectByIds(businessentityids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.businessentityid, x)).toMap
-      businessentityids.view.map(id => (id, byId.get(id))).toMap
+      businessentityids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {

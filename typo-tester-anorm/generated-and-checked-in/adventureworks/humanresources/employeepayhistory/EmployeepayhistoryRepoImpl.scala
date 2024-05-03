@@ -108,9 +108,9 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
        """.as(EmployeepayhistoryRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): Map[EmployeepayhistoryId, Option[EmployeepayhistoryRow]] = {
+  override def selectByIdsTracked(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): Map[EmployeepayhistoryId, EmployeepayhistoryRow] = {
     val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
-    compositeIds.view.map(id => (id, byId.get(id))).toMap
+    compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     UpdateBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.rowParser)

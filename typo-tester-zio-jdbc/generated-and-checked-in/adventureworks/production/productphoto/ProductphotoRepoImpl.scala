@@ -87,10 +87,10 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
   override def selectByIds(productphotoids: Array[ProductphotoId]): ZStream[ZConnection, Throwable, ProductphotoRow] = {
     sql"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text from production.productphoto where "productphotoid" = ANY(${Segment.paramSegment(productphotoids)(ProductphotoId.arraySetter)})""".query(using ProductphotoRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(productphotoids: Array[ProductphotoId]): ZIO[ZConnection, Throwable, Map[ProductphotoId, Option[ProductphotoRow]]] = {
+  override def selectByIdsTracked(productphotoids: Array[ProductphotoId]): ZIO[ZConnection, Throwable, Map[ProductphotoId, ProductphotoRow]] = {
     selectByIds(productphotoids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.productphotoid, x)).toMap
-      productphotoids.view.map(id => (id, byId.get(id))).toMap
+      productphotoids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {

@@ -28,7 +28,7 @@ trait ShoppingcartitemRepo {
   def selectAll: ZStream[ZConnection, Throwable, ShoppingcartitemRow]
   def selectById(shoppingcartitemid: ShoppingcartitemId): ZIO[ZConnection, Throwable, Option[ShoppingcartitemRow]]
   def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): ZStream[ZConnection, Throwable, ShoppingcartitemRow]
-  def selectByIdsTracked(shoppingcartitemids: Array[ShoppingcartitemId]): ZIO[ZConnection, Throwable, Map[ShoppingcartitemId, Option[ShoppingcartitemRow]]]
+  def selectByIdsTracked(shoppingcartitemids: Array[ShoppingcartitemId]): ZIO[ZConnection, Throwable, Map[ShoppingcartitemId, ShoppingcartitemRow]]
   def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
   def update(row: ShoppingcartitemRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ShoppingcartitemRow): ZIO[ZConnection, Throwable, UpdateResult[ShoppingcartitemRow]]

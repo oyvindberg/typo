@@ -84,10 +84,10 @@ class IllustrationRepoImpl extends IllustrationRepo {
   override def selectByIds(illustrationids: Array[IllustrationId]): ZStream[ZConnection, Throwable, IllustrationRow] = {
     sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ANY(${Segment.paramSegment(illustrationids)(IllustrationId.arraySetter)})""".query(using IllustrationRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(illustrationids: Array[IllustrationId]): ZIO[ZConnection, Throwable, Map[IllustrationId, Option[IllustrationRow]]] = {
+  override def selectByIdsTracked(illustrationids: Array[IllustrationId]): ZIO[ZConnection, Throwable, Map[IllustrationId, IllustrationRow]] = {
     selectByIds(illustrationids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.illustrationid, x)).toMap
-      illustrationids.view.map(id => (id, byId.get(id))).toMap
+      illustrationids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {

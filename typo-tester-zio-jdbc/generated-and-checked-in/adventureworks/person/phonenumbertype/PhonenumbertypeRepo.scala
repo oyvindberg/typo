@@ -28,7 +28,7 @@ trait PhonenumbertypeRepo {
   def selectAll: ZStream[ZConnection, Throwable, PhonenumbertypeRow]
   def selectById(phonenumbertypeid: PhonenumbertypeId): ZIO[ZConnection, Throwable, Option[PhonenumbertypeRow]]
   def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId]): ZStream[ZConnection, Throwable, PhonenumbertypeRow]
-  def selectByIdsTracked(phonenumbertypeids: Array[PhonenumbertypeId]): ZIO[ZConnection, Throwable, Map[PhonenumbertypeId, Option[PhonenumbertypeRow]]]
+  def selectByIdsTracked(phonenumbertypeids: Array[PhonenumbertypeId]): ZIO[ZConnection, Throwable, Map[PhonenumbertypeId, PhonenumbertypeRow]]
   def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
   def update(row: PhonenumbertypeRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: PhonenumbertypeRow): ZIO[ZConnection, Throwable, UpdateResult[PhonenumbertypeRow]]

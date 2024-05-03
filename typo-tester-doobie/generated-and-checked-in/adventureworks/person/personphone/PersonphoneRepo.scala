@@ -26,7 +26,7 @@ trait PersonphoneRepo {
   def selectAll: Stream[ConnectionIO, PersonphoneRow]
   def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]]
   def selectByIds(compositeIds: Array[PersonphoneId]): Stream[ConnectionIO, PersonphoneRow]
-  def selectByIdsTracked(compositeIds: Array[PersonphoneId]): ConnectionIO[Map[PersonphoneId, Option[PersonphoneRow]]]
+  def selectByIdsTracked(compositeIds: Array[PersonphoneId]): ConnectionIO[Map[PersonphoneId, PersonphoneRow]]
   def update: UpdateBuilder[PersonphoneFields, PersonphoneRow]
   def update(row: PersonphoneRow): ConnectionIO[Boolean]
   def upsert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow]

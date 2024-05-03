@@ -90,10 +90,10 @@ class StoreRepoImpl extends StoreRepo {
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, StoreRow] = {
     sql"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text from sales.store where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(using StoreRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, Option[StoreRow]]] = {
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, StoreRow]] = {
     selectByIds(businessentityids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.businessentityid, x)).toMap
-      businessentityids.view.map(id => (id, byId.get(id))).toMap
+      businessentityids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[StoreFields, StoreRow] = {

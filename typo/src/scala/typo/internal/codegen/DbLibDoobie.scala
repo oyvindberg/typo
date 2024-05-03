@@ -80,7 +80,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         }
       case RepoMethod.SelectByIdsTracked(x) =>
         val usedDefineds = x.idComputed.userDefinedCols.zipWithIndex.map { case (col, i) => sc.Param(sc.Ident(s"puts$i"), Put.of(sc.Type.ArrayOf(col.tpe)), None) }
-        val returnType = ConnectionIO.of(TypesScala.Map.of(x.idComputed.tpe, TypesScala.Option.of(x.rowType)))
+        val returnType = ConnectionIO.of(TypesScala.Map.of(x.idComputed.tpe, x.rowType))
         usedDefineds match {
           case Nil =>
             code"def $name(${x.idsParam}): $returnType"
@@ -179,7 +179,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       case RepoMethod.SelectByIdsTracked(x) =>
         code"""|${x.methodName}(${x.idsParam.name}).compile.toList.map { rows =>
                |  val byId = rows.view.map(x => (x.${x.idComputed.paramName}, x)).toMap
-               |  ${x.idsParam.name}.view.map(id => (id, byId.get(id))).toMap
+               |  ${x.idsParam.name}.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
                |}""".stripMargin
 
       case RepoMethod.SelectByUnique(relName, keyColumns, allColumns, rowType) =>
@@ -404,7 +404,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       case RepoMethod.SelectByIdsTracked(x) =>
         code"""|${x.methodName}(${x.idsParam.name}).compile.toList.map { rows =>
                |  val byId = rows.view.map(x => (x.${x.idComputed.paramName}, x)).toMap
-               |  ${x.idsParam.name}.view.map(id => (id, byId.get(id))).toMap
+               |  ${x.idsParam.name}.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
                |}""".stripMargin
       case RepoMethod.SelectByUnique(_, keyColumns, _, _) =>
         code"${delayCIO}(map.values.find(v => ${keyColumns.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")}))"

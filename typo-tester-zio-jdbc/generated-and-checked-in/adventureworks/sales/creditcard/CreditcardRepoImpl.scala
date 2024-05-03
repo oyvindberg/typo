@@ -89,10 +89,10 @@ class CreditcardRepoImpl extends CreditcardRepo {
   override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZStream[ZConnection, Throwable, CreditcardRow] = {
     sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ANY(${Segment.paramSegment(creditcardids)(CustomCreditcardId.arraySetter)})""".query(using CreditcardRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZIO[ZConnection, Throwable, Map[/* user-picked */ CustomCreditcardId, Option[CreditcardRow]]] = {
+  override def selectByIdsTracked(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZIO[ZConnection, Throwable, Map[/* user-picked */ CustomCreditcardId, CreditcardRow]] = {
     selectByIds(creditcardids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.creditcardid, x)).toMap
-      creditcardids.view.map(id => (id, byId.get(id))).toMap
+      creditcardids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {

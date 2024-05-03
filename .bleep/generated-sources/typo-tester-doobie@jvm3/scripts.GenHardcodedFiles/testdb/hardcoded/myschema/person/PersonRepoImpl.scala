@@ -125,10 +125,10 @@ class PersonRepoImpl extends PersonRepo {
   override def selectByIds(ids: Array[PersonId]): Stream[ConnectionIO, PersonRow] = {
     sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where "id" = ANY(${ids})""".query(using PersonRow.read).stream
   }
-  override def selectByIdsTracked(ids: Array[PersonId]): ConnectionIO[Map[PersonId, Option[PersonRow]]] = {
+  override def selectByIdsTracked(ids: Array[PersonId]): ConnectionIO[Map[PersonId, PersonRow]] = {
     selectByIds(ids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.id, x)).toMap
-      ids.view.map(id => (id, byId.get(id))).toMap
+      ids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {

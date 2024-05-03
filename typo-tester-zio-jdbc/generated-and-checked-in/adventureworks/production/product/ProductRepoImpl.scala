@@ -121,10 +121,10 @@ class ProductRepoImpl extends ProductRepo {
   override def selectByIds(productids: Array[ProductId]): ZStream[ZConnection, Throwable, ProductRow] = {
     sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product where "productid" = ANY(${Segment.paramSegment(productids)(ProductId.arraySetter)})""".query(using ProductRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(productids: Array[ProductId]): ZIO[ZConnection, Throwable, Map[ProductId, Option[ProductRow]]] = {
+  override def selectByIdsTracked(productids: Array[ProductId]): ZIO[ZConnection, Throwable, Map[ProductId, ProductRow]] = {
     selectByIds(productids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.productid, x)).toMap
-      productids.view.map(id => (id, byId.get(id))).toMap
+      productids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ProductFields, ProductRow] = {

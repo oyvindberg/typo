@@ -114,10 +114,10 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId]): Stream[ConnectionIO, PurchaseorderheaderRow] = {
     sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader where "purchaseorderid" = ANY(${purchaseorderids})""".query(using PurchaseorderheaderRow.read).stream
   }
-  override def selectByIdsTracked(purchaseorderids: Array[PurchaseorderheaderId]): ConnectionIO[Map[PurchaseorderheaderId, Option[PurchaseorderheaderRow]]] = {
+  override def selectByIdsTracked(purchaseorderids: Array[PurchaseorderheaderId]): ConnectionIO[Map[PurchaseorderheaderId, PurchaseorderheaderRow]] = {
     selectByIds(purchaseorderids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.purchaseorderid, x)).toMap
-      purchaseorderids.view.map(id => (id, byId.get(id))).toMap
+      purchaseorderids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {

@@ -104,9 +104,9 @@ class ShiftRepoImpl extends ShiftRepo {
        """.as(ShiftRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(shiftids: Array[ShiftId])(implicit c: Connection): Map[ShiftId, Option[ShiftRow]] = {
+  override def selectByIdsTracked(shiftids: Array[ShiftId])(implicit c: Connection): Map[ShiftId, ShiftRow] = {
     val byId = selectByIds(shiftids).view.map(x => (x.shiftid, x)).toMap
-    shiftids.view.map(id => (id, byId.get(id))).toMap
+    shiftids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
     UpdateBuilder("humanresources.shift", ShiftFields.structure, ShiftRow.rowParser)

@@ -101,9 +101,9 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
        """.as(ScrapreasonRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): Map[ScrapreasonId, Option[ScrapreasonRow]] = {
+  override def selectByIdsTracked(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): Map[ScrapreasonId, ScrapreasonRow] = {
     val byId = selectByIds(scrapreasonids).view.map(x => (x.scrapreasonid, x)).toMap
-    scrapreasonids.view.map(id => (id, byId.get(id))).toMap
+    scrapreasonids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
     UpdateBuilder("production.scrapreason", ScrapreasonFields.structure, ScrapreasonRow.rowParser)

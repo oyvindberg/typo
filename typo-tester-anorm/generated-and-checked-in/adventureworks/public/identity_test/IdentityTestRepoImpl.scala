@@ -96,9 +96,9 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
        """.as(IdentityTestRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(names: Array[IdentityTestId])(implicit c: Connection): Map[IdentityTestId, Option[IdentityTestRow]] = {
+  override def selectByIdsTracked(names: Array[IdentityTestId])(implicit c: Connection): Map[IdentityTestId, IdentityTestRow] = {
     val byId = selectByIds(names).view.map(x => (x.name, x)).toMap
-    names.view.map(id => (id, byId.get(id))).toMap
+    names.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
     UpdateBuilder("public.identity-test", IdentityTestFields.structure, IdentityTestRow.rowParser)

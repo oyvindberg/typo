@@ -26,7 +26,7 @@ trait ShipmethodRepo {
   def selectAll: Stream[ConnectionIO, ShipmethodRow]
   def selectById(shipmethodid: ShipmethodId): ConnectionIO[Option[ShipmethodRow]]
   def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow]
-  def selectByIdsTracked(shipmethodids: Array[ShipmethodId]): ConnectionIO[Map[ShipmethodId, Option[ShipmethodRow]]]
+  def selectByIdsTracked(shipmethodids: Array[ShipmethodId]): ConnectionIO[Map[ShipmethodId, ShipmethodRow]]
   def update: UpdateBuilder[ShipmethodFields, ShipmethodRow]
   def update(row: ShipmethodRow): ConnectionIO[Boolean]
   def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow]

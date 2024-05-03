@@ -79,10 +79,10 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): Stream[ConnectionIO, UnitmeasureRow] = {
     Stream.emits(unitmeasurecodes.flatMap(map.get).toList)
   }
-  override def selectByIdsTracked(unitmeasurecodes: Array[UnitmeasureId]): ConnectionIO[Map[UnitmeasureId, Option[UnitmeasureRow]]] = {
+  override def selectByIdsTracked(unitmeasurecodes: Array[UnitmeasureId]): ConnectionIO[Map[UnitmeasureId, UnitmeasureRow]] = {
     selectByIds(unitmeasurecodes).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.unitmeasurecode, x)).toMap
-      unitmeasurecodes.view.map(id => (id, byId.get(id))).toMap
+      unitmeasurecodes.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {

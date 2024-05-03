@@ -86,10 +86,10 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, BusinessentityRow] = {
     sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(using BusinessentityRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, Option[BusinessentityRow]]] = {
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, BusinessentityRow]] = {
     selectByIds(businessentityids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.businessentityid, x)).toMap
-      businessentityids.view.map(id => (id, byId.get(id))).toMap
+      businessentityids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {

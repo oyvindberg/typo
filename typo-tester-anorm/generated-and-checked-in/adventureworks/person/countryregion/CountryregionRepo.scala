@@ -25,7 +25,7 @@ trait CountryregionRepo {
   def selectAll(implicit c: Connection): List[CountryregionRow]
   def selectById(countryregioncode: CountryregionId)(implicit c: Connection): Option[CountryregionRow]
   def selectByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): List[CountryregionRow]
-  def selectByIdsTracked(countryregioncodes: Array[CountryregionId])(implicit c: Connection): Map[CountryregionId, Option[CountryregionRow]]
+  def selectByIdsTracked(countryregioncodes: Array[CountryregionId])(implicit c: Connection): Map[CountryregionId, CountryregionRow]
   def update: UpdateBuilder[CountryregionFields, CountryregionRow]
   def update(row: CountryregionRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow

@@ -67,9 +67,9 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
   override def selectByIds(compositeIds: Array[PersonphoneId])(implicit c: Connection): List[PersonphoneRow] = {
     compositeIds.flatMap(map.get).toList
   }
-  override def selectByIdsTracked(compositeIds: Array[PersonphoneId])(implicit c: Connection): Map[PersonphoneId, Option[PersonphoneRow]] = {
+  override def selectByIdsTracked(compositeIds: Array[PersonphoneId])(implicit c: Connection): Map[PersonphoneId, PersonphoneRow] = {
     val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
-    compositeIds.view.map(id => (id, byId.get(id))).toMap
+    compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
     UpdateBuilderMock(UpdateParams.empty, PersonphoneFields.structure.fields, map)

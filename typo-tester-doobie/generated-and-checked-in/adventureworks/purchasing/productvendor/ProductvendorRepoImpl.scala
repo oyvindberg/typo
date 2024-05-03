@@ -106,10 +106,10 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
        """.query(using ProductvendorRow.read).stream
     
   }
-  override def selectByIdsTracked(compositeIds: Array[ProductvendorId]): ConnectionIO[Map[ProductvendorId, Option[ProductvendorRow]]] = {
+  override def selectByIdsTracked(compositeIds: Array[ProductvendorId]): ConnectionIO[Map[ProductvendorId, ProductvendorRow]] = {
     selectByIds(compositeIds).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
-      compositeIds.view.map(id => (id, byId.get(id))).toMap
+      compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {

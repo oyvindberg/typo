@@ -78,10 +78,10 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
   override def selectByIds(shipmethodids: Array[ShipmethodId]): ZStream[ZConnection, Throwable, ShipmethodRow] = {
     ZStream.fromIterable(shipmethodids.flatMap(map.get))
   }
-  override def selectByIdsTracked(shipmethodids: Array[ShipmethodId]): ZIO[ZConnection, Throwable, Map[ShipmethodId, Option[ShipmethodRow]]] = {
+  override def selectByIdsTracked(shipmethodids: Array[ShipmethodId]): ZIO[ZConnection, Throwable, Map[ShipmethodId, ShipmethodRow]] = {
     selectByIds(shipmethodids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.shipmethodid, x)).toMap
-      shipmethodids.view.map(id => (id, byId.get(id))).toMap
+      shipmethodids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {

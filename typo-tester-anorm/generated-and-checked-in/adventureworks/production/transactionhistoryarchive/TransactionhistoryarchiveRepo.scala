@@ -25,7 +25,7 @@ trait TransactionhistoryarchiveRepo {
   def selectAll(implicit c: Connection): List[TransactionhistoryarchiveRow]
   def selectById(transactionid: TransactionhistoryarchiveId)(implicit c: Connection): Option[TransactionhistoryarchiveRow]
   def selectByIds(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): List[TransactionhistoryarchiveRow]
-  def selectByIdsTracked(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): Map[TransactionhistoryarchiveId, Option[TransactionhistoryarchiveRow]]
+  def selectByIdsTracked(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): Map[TransactionhistoryarchiveId, TransactionhistoryarchiveRow]
   def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow]
   def update(row: TransactionhistoryarchiveRow)(implicit c: Connection): Boolean
   def upsert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow

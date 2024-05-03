@@ -28,7 +28,7 @@ trait EmailaddressRepo {
   def selectAll: ZStream[ZConnection, Throwable, EmailaddressRow]
   def selectById(compositeId: EmailaddressId): ZIO[ZConnection, Throwable, Option[EmailaddressRow]]
   def selectByIds(compositeIds: Array[EmailaddressId]): ZStream[ZConnection, Throwable, EmailaddressRow]
-  def selectByIdsTracked(compositeIds: Array[EmailaddressId]): ZIO[ZConnection, Throwable, Map[EmailaddressId, Option[EmailaddressRow]]]
+  def selectByIdsTracked(compositeIds: Array[EmailaddressId]): ZIO[ZConnection, Throwable, Map[EmailaddressId, EmailaddressRow]]
   def update: UpdateBuilder[EmailaddressFields, EmailaddressRow]
   def update(row: EmailaddressRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: EmailaddressRow): ZIO[ZConnection, Throwable, UpdateResult[EmailaddressRow]]

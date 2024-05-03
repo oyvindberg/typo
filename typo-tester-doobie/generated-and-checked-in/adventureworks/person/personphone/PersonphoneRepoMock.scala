@@ -79,10 +79,10 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
   override def selectByIds(compositeIds: Array[PersonphoneId]): Stream[ConnectionIO, PersonphoneRow] = {
     Stream.emits(compositeIds.flatMap(map.get).toList)
   }
-  override def selectByIdsTracked(compositeIds: Array[PersonphoneId]): ConnectionIO[Map[PersonphoneId, Option[PersonphoneRow]]] = {
+  override def selectByIdsTracked(compositeIds: Array[PersonphoneId]): ConnectionIO[Map[PersonphoneId, PersonphoneRow]] = {
     selectByIds(compositeIds).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
-      compositeIds.view.map(id => (id, byId.get(id))).toMap
+      compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {

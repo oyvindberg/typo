@@ -22,7 +22,7 @@ trait FlaffRepo {
   def selectAll(implicit c: Connection): List[FlaffRow]
   def selectById(compositeId: FlaffId)(implicit c: Connection): Option[FlaffRow]
   def selectByIds(compositeIds: Array[FlaffId])(implicit c: Connection): List[FlaffRow]
-  def selectByIdsTracked(compositeIds: Array[FlaffId])(implicit c: Connection): Map[FlaffId, Option[FlaffRow]]
+  def selectByIdsTracked(compositeIds: Array[FlaffId])(implicit c: Connection): Map[FlaffId, FlaffRow]
   def update: UpdateBuilder[FlaffFields, FlaffRow]
   def update(row: FlaffRow)(implicit c: Connection): Boolean
   def upsert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow

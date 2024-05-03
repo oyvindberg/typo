@@ -78,10 +78,10 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
   override def selectByIds(addresstypeids: Array[AddresstypeId]): ZStream[ZConnection, Throwable, AddresstypeRow] = {
     ZStream.fromIterable(addresstypeids.flatMap(map.get))
   }
-  override def selectByIdsTracked(addresstypeids: Array[AddresstypeId]): ZIO[ZConnection, Throwable, Map[AddresstypeId, Option[AddresstypeRow]]] = {
+  override def selectByIdsTracked(addresstypeids: Array[AddresstypeId]): ZIO[ZConnection, Throwable, Map[AddresstypeId, AddresstypeRow]] = {
     selectByIds(addresstypeids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.addresstypeid, x)).toMap
-      addresstypeids.view.map(id => (id, byId.get(id))).toMap
+      addresstypeids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {

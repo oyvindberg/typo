@@ -98,9 +98,9 @@ class CurrencyRepoImpl extends CurrencyRepo {
        """.as(CurrencyRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(currencycodes: Array[CurrencyId])(implicit c: Connection): Map[CurrencyId, Option[CurrencyRow]] = {
+  override def selectByIdsTracked(currencycodes: Array[CurrencyId])(implicit c: Connection): Map[CurrencyId, CurrencyRow] = {
     val byId = selectByIds(currencycodes).view.map(x => (x.currencycode, x)).toMap
-    currencycodes.view.map(id => (id, byId.get(id))).toMap
+    currencycodes.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
     UpdateBuilder("sales.currency", CurrencyFields.structure, CurrencyRow.rowParser)

@@ -78,10 +78,10 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
   override def selectByIds(specialofferids: Array[SpecialofferId]): ZStream[ZConnection, Throwable, SpecialofferRow] = {
     ZStream.fromIterable(specialofferids.flatMap(map.get))
   }
-  override def selectByIdsTracked(specialofferids: Array[SpecialofferId]): ZIO[ZConnection, Throwable, Map[SpecialofferId, Option[SpecialofferRow]]] = {
+  override def selectByIdsTracked(specialofferids: Array[SpecialofferId]): ZIO[ZConnection, Throwable, Map[SpecialofferId, SpecialofferRow]] = {
     selectByIds(specialofferids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.specialofferid, x)).toMap
-      specialofferids.view.map(id => (id, byId.get(id))).toMap
+      specialofferids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {

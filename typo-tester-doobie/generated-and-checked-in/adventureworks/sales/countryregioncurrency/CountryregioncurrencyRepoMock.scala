@@ -79,10 +79,10 @@ class CountryregioncurrencyRepoMock(toRow: Function1[CountryregioncurrencyRowUns
   override def selectByIds(compositeIds: Array[CountryregioncurrencyId]): Stream[ConnectionIO, CountryregioncurrencyRow] = {
     Stream.emits(compositeIds.flatMap(map.get).toList)
   }
-  override def selectByIdsTracked(compositeIds: Array[CountryregioncurrencyId]): ConnectionIO[Map[CountryregioncurrencyId, Option[CountryregioncurrencyRow]]] = {
+  override def selectByIdsTracked(compositeIds: Array[CountryregioncurrencyId]): ConnectionIO[Map[CountryregioncurrencyId, CountryregioncurrencyRow]] = {
     selectByIds(compositeIds).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
-      compositeIds.view.map(id => (id, byId.get(id))).toMap
+      compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {

@@ -87,10 +87,10 @@ class ShiftRepoImpl extends ShiftRepo {
   override def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow] = {
     sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ANY(${shiftids})""".query(using ShiftRow.read).stream
   }
-  override def selectByIdsTracked(shiftids: Array[ShiftId]): ConnectionIO[Map[ShiftId, Option[ShiftRow]]] = {
+  override def selectByIdsTracked(shiftids: Array[ShiftId]): ConnectionIO[Map[ShiftId, ShiftRow]] = {
     selectByIds(shiftids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.shiftid, x)).toMap
-      shiftids.view.map(id => (id, byId.get(id))).toMap
+      shiftids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {

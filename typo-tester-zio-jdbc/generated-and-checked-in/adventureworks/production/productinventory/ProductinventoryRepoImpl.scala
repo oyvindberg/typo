@@ -108,10 +108,10 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
        """.query(using ProductinventoryRow.jdbcDecoder).selectStream()
     
   }
-  override def selectByIdsTracked(compositeIds: Array[ProductinventoryId]): ZIO[ZConnection, Throwable, Map[ProductinventoryId, Option[ProductinventoryRow]]] = {
+  override def selectByIdsTracked(compositeIds: Array[ProductinventoryId]): ZIO[ZConnection, Throwable, Map[ProductinventoryId, ProductinventoryRow]] = {
     selectByIds(compositeIds).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
-      compositeIds.view.map(id => (id, byId.get(id))).toMap
+      compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {

@@ -79,10 +79,10 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
   override def selectByIds(addressids: Array[AddressId]): Stream[ConnectionIO, AddressRow] = {
     Stream.emits(addressids.flatMap(map.get).toList)
   }
-  override def selectByIdsTracked(addressids: Array[AddressId]): ConnectionIO[Map[AddressId, Option[AddressRow]]] = {
+  override def selectByIdsTracked(addressids: Array[AddressId]): ConnectionIO[Map[AddressId, AddressRow]] = {
     selectByIds(addressids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.addressid, x)).toMap
-      addressids.view.map(id => (id, byId.get(id))).toMap
+      addressids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[AddressFields, AddressRow] = {

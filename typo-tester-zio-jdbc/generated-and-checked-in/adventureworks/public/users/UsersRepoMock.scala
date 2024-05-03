@@ -79,10 +79,10 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
   override def selectByIds(userIds: Array[UsersId]): ZStream[ZConnection, Throwable, UsersRow] = {
     ZStream.fromIterable(userIds.flatMap(map.get))
   }
-  override def selectByIdsTracked(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Map[UsersId, Option[UsersRow]]] = {
+  override def selectByIdsTracked(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Map[UsersId, UsersRow]] = {
     selectByIds(userIds).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.userId, x)).toMap
-      userIds.view.map(id => (id, byId.get(id))).toMap
+      userIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def selectByUniqueEmail(email: TypoUnknownCitext): ZIO[ZConnection, Throwable, Option[UsersRow]] = {

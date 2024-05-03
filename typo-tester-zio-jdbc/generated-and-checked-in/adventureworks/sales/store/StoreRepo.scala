@@ -29,7 +29,7 @@ trait StoreRepo {
   def selectAll: ZStream[ZConnection, Throwable, StoreRow]
   def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[StoreRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, StoreRow]
-  def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, Option[StoreRow]]]
+  def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, StoreRow]]
   def update: UpdateBuilder[StoreFields, StoreRow]
   def update(row: StoreRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: StoreRow): ZIO[ZConnection, Throwable, UpdateResult[StoreRow]]

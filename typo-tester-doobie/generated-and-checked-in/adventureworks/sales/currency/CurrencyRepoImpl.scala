@@ -81,10 +81,10 @@ class CurrencyRepoImpl extends CurrencyRepo {
   override def selectByIds(currencycodes: Array[CurrencyId]): Stream[ConnectionIO, CurrencyRow] = {
     sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ANY(${currencycodes})""".query(using CurrencyRow.read).stream
   }
-  override def selectByIdsTracked(currencycodes: Array[CurrencyId]): ConnectionIO[Map[CurrencyId, Option[CurrencyRow]]] = {
+  override def selectByIdsTracked(currencycodes: Array[CurrencyId]): ConnectionIO[Map[CurrencyId, CurrencyRow]] = {
     selectByIds(currencycodes).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.currencycode, x)).toMap
-      currencycodes.view.map(id => (id, byId.get(id))).toMap
+      currencycodes.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {

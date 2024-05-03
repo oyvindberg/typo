@@ -79,10 +79,10 @@ class SalespersonquotahistoryRepoMock(toRow: Function1[SalespersonquotahistoryRo
   override def selectByIds(compositeIds: Array[SalespersonquotahistoryId]): Stream[ConnectionIO, SalespersonquotahistoryRow] = {
     Stream.emits(compositeIds.flatMap(map.get).toList)
   }
-  override def selectByIdsTracked(compositeIds: Array[SalespersonquotahistoryId]): ConnectionIO[Map[SalespersonquotahistoryId, Option[SalespersonquotahistoryRow]]] = {
+  override def selectByIdsTracked(compositeIds: Array[SalespersonquotahistoryId]): ConnectionIO[Map[SalespersonquotahistoryId, SalespersonquotahistoryRow]] = {
     selectByIds(compositeIds).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
-      compositeIds.view.map(id => (id, byId.get(id))).toMap
+      compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {

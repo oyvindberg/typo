@@ -29,7 +29,7 @@ trait PersonRepo {
   def selectAll: ZStream[ZConnection, Throwable, PersonRow]
   def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[PersonRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, PersonRow]
-  def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, Option[PersonRow]]]
+  def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, PersonRow]]
   def update: UpdateBuilder[PersonFields, PersonRow]
   def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: PersonRow): ZIO[ZConnection, Throwable, UpdateResult[PersonRow]]

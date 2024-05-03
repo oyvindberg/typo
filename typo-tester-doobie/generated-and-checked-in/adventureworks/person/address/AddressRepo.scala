@@ -26,7 +26,7 @@ trait AddressRepo {
   def selectAll: Stream[ConnectionIO, AddressRow]
   def selectById(addressid: AddressId): ConnectionIO[Option[AddressRow]]
   def selectByIds(addressids: Array[AddressId]): Stream[ConnectionIO, AddressRow]
-  def selectByIdsTracked(addressids: Array[AddressId]): ConnectionIO[Map[AddressId, Option[AddressRow]]]
+  def selectByIdsTracked(addressids: Array[AddressId]): ConnectionIO[Map[AddressId, AddressRow]]
   def update: UpdateBuilder[AddressFields, AddressRow]
   def update(row: AddressRow): ConnectionIO[Boolean]
   def upsert(unsaved: AddressRow): ConnectionIO[AddressRow]

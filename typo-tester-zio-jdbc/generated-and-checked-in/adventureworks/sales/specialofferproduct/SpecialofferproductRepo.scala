@@ -28,7 +28,7 @@ trait SpecialofferproductRepo {
   def selectAll: ZStream[ZConnection, Throwable, SpecialofferproductRow]
   def selectById(compositeId: SpecialofferproductId): ZIO[ZConnection, Throwable, Option[SpecialofferproductRow]]
   def selectByIds(compositeIds: Array[SpecialofferproductId]): ZStream[ZConnection, Throwable, SpecialofferproductRow]
-  def selectByIdsTracked(compositeIds: Array[SpecialofferproductId]): ZIO[ZConnection, Throwable, Map[SpecialofferproductId, Option[SpecialofferproductRow]]]
+  def selectByIdsTracked(compositeIds: Array[SpecialofferproductId]): ZIO[ZConnection, Throwable, Map[SpecialofferproductId, SpecialofferproductRow]]
   def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow]
   def update(row: SpecialofferproductRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: SpecialofferproductRow): ZIO[ZConnection, Throwable, UpdateResult[SpecialofferproductRow]]

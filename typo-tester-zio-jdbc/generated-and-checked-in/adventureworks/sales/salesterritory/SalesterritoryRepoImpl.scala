@@ -108,10 +108,10 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def selectByIds(territoryids: Array[SalesterritoryId]): ZStream[ZConnection, Throwable, SalesterritoryRow] = {
     sql"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sales.salesterritory where "territoryid" = ANY(${Segment.paramSegment(territoryids)(SalesterritoryId.arraySetter)})""".query(using SalesterritoryRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(territoryids: Array[SalesterritoryId]): ZIO[ZConnection, Throwable, Map[SalesterritoryId, Option[SalesterritoryRow]]] = {
+  override def selectByIdsTracked(territoryids: Array[SalesterritoryId]): ZIO[ZConnection, Throwable, Map[SalesterritoryId, SalesterritoryRow]] = {
     selectByIds(territoryids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.territoryid, x)).toMap
-      territoryids.view.map(id => (id, byId.get(id))).toMap
+      territoryids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {

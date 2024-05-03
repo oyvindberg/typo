@@ -25,7 +25,7 @@ trait IdentityTestRepo {
   def selectAll(implicit c: Connection): List[IdentityTestRow]
   def selectById(name: IdentityTestId)(implicit c: Connection): Option[IdentityTestRow]
   def selectByIds(names: Array[IdentityTestId])(implicit c: Connection): List[IdentityTestRow]
-  def selectByIdsTracked(names: Array[IdentityTestId])(implicit c: Connection): Map[IdentityTestId, Option[IdentityTestRow]]
+  def selectByIdsTracked(names: Array[IdentityTestId])(implicit c: Connection): Map[IdentityTestId, IdentityTestRow]
   def update: UpdateBuilder[IdentityTestFields, IdentityTestRow]
   def update(row: IdentityTestRow)(implicit c: Connection): Boolean
   def upsert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow

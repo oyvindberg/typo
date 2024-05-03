@@ -25,7 +25,7 @@ trait SalesreasonRepo {
   def selectAll(implicit c: Connection): List[SalesreasonRow]
   def selectById(salesreasonid: SalesreasonId)(implicit c: Connection): Option[SalesreasonRow]
   def selectByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): List[SalesreasonRow]
-  def selectByIdsTracked(salesreasonids: Array[SalesreasonId])(implicit c: Connection): Map[SalesreasonId, Option[SalesreasonRow]]
+  def selectByIdsTracked(salesreasonids: Array[SalesreasonId])(implicit c: Connection): Map[SalesreasonId, SalesreasonRow]
   def update: UpdateBuilder[SalesreasonFields, SalesreasonRow]
   def update(row: SalesreasonRow)(implicit c: Connection): Boolean
   def upsert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow

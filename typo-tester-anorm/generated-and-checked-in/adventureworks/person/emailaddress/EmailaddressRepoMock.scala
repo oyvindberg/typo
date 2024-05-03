@@ -67,9 +67,9 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
   override def selectByIds(compositeIds: Array[EmailaddressId])(implicit c: Connection): List[EmailaddressRow] = {
     compositeIds.flatMap(map.get).toList
   }
-  override def selectByIdsTracked(compositeIds: Array[EmailaddressId])(implicit c: Connection): Map[EmailaddressId, Option[EmailaddressRow]] = {
+  override def selectByIdsTracked(compositeIds: Array[EmailaddressId])(implicit c: Connection): Map[EmailaddressId, EmailaddressRow] = {
     val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
-    compositeIds.view.map(id => (id, byId.get(id))).toMap
+    compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
     UpdateBuilderMock(UpdateParams.empty, EmailaddressFields.structure.fields, map)

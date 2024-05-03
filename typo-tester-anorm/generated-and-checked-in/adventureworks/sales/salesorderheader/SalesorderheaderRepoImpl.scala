@@ -160,9 +160,9 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
        """.as(SalesorderheaderRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(salesorderids: Array[SalesorderheaderId])(implicit c: Connection): Map[SalesorderheaderId, Option[SalesorderheaderRow]] = {
+  override def selectByIdsTracked(salesorderids: Array[SalesorderheaderId])(implicit c: Connection): Map[SalesorderheaderId, SalesorderheaderRow] = {
     val byId = selectByIds(salesorderids).view.map(x => (x.salesorderid, x)).toMap
-    salesorderids.view.map(id => (id, byId.get(id))).toMap
+    salesorderids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     UpdateBuilder("sales.salesorderheader", SalesorderheaderFields.structure, SalesorderheaderRow.rowParser)

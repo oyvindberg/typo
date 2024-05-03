@@ -25,7 +25,7 @@ trait IllustrationRepo {
   def selectAll(implicit c: Connection): List[IllustrationRow]
   def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow]
   def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow]
-  def selectByIdsTracked(illustrationids: Array[IllustrationId])(implicit c: Connection): Map[IllustrationId, Option[IllustrationRow]]
+  def selectByIdsTracked(illustrationids: Array[IllustrationId])(implicit c: Connection): Map[IllustrationId, IllustrationRow]
   def update: UpdateBuilder[IllustrationFields, IllustrationRow]
   def update(row: IllustrationRow)(implicit c: Connection): Boolean
   def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow

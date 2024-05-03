@@ -67,9 +67,9 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
   override def selectByIds(jobcandidateids: Array[JobcandidateId])(implicit c: Connection): List[JobcandidateRow] = {
     jobcandidateids.flatMap(map.get).toList
   }
-  override def selectByIdsTracked(jobcandidateids: Array[JobcandidateId])(implicit c: Connection): Map[JobcandidateId, Option[JobcandidateRow]] = {
+  override def selectByIdsTracked(jobcandidateids: Array[JobcandidateId])(implicit c: Connection): Map[JobcandidateId, JobcandidateRow] = {
     val byId = selectByIds(jobcandidateids).view.map(x => (x.jobcandidateid, x)).toMap
-    jobcandidateids.view.map(id => (id, byId.get(id))).toMap
+    jobcandidateids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
     UpdateBuilderMock(UpdateParams.empty, JobcandidateFields.structure.fields, map)

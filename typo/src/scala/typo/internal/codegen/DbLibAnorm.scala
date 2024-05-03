@@ -174,7 +174,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       case RepoMethod.SelectByIdsTracked(x) =>
         val usedDefineds = x.idComputed.userDefinedCols.zipWithIndex.map { case (col, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(col.tpe)), None) }
         val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
-        code"def $name(${x.idsParam})(implicit ${params.map(_.code).mkCode(", ")}): ${TypesScala.Map.of(x.idComputed.tpe, TypesScala.Option.of(x.rowType))}"
+        code"def $name(${x.idsParam})(implicit ${params.map(_.code).mkCode(", ")}): ${TypesScala.Map.of(x.idComputed.tpe, x.rowType)}"
       case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
         code"def $name(${keyColumns.map(_.param.code).mkCode(", ")})(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}"
       case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
@@ -263,7 +263,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         }
       case RepoMethod.SelectByIdsTracked(x) =>
         code"""|val byId = ${x.methodName}(${x.idsParam.name}).view.map(x => (x.${x.idComputed.paramName}, x)).toMap
-               |${x.idsParam.name}.view.map(id => (id, byId.get(id))).toMap""".stripMargin
+               |${x.idsParam.name}.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap""".stripMargin
 
       case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
         code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType.structure, $rowType.rowParser)"
@@ -523,7 +523,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         code"${idsParam.name}.flatMap(map.get).toList"
       case RepoMethod.SelectByIdsTracked(x) =>
         code"""|val byId = ${x.methodName}(${x.idsParam.name}).view.map(x => (x.${x.idComputed.paramName}, x)).toMap
-               |${x.idsParam.name}.view.map(id => (id, byId.get(id))).toMap""".stripMargin
+               |${x.idsParam.name}.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap""".stripMargin
       case RepoMethod.SelectByUnique(_, keyColumns, _, _) =>
         code"map.values.find(v => ${keyColumns.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")})"
 

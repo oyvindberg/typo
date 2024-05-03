@@ -26,7 +26,7 @@ trait SalespersonquotahistoryRepo {
   def selectAll: Stream[ConnectionIO, SalespersonquotahistoryRow]
   def selectById(compositeId: SalespersonquotahistoryId): ConnectionIO[Option[SalespersonquotahistoryRow]]
   def selectByIds(compositeIds: Array[SalespersonquotahistoryId]): Stream[ConnectionIO, SalespersonquotahistoryRow]
-  def selectByIdsTracked(compositeIds: Array[SalespersonquotahistoryId]): ConnectionIO[Map[SalespersonquotahistoryId, Option[SalespersonquotahistoryRow]]]
+  def selectByIdsTracked(compositeIds: Array[SalespersonquotahistoryId]): ConnectionIO[Map[SalespersonquotahistoryId, SalespersonquotahistoryRow]]
   def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def update(row: SalespersonquotahistoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow]

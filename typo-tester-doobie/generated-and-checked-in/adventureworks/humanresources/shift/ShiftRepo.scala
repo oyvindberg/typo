@@ -26,7 +26,7 @@ trait ShiftRepo {
   def selectAll: Stream[ConnectionIO, ShiftRow]
   def selectById(shiftid: ShiftId): ConnectionIO[Option[ShiftRow]]
   def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow]
-  def selectByIdsTracked(shiftids: Array[ShiftId]): ConnectionIO[Map[ShiftId, Option[ShiftRow]]]
+  def selectByIdsTracked(shiftids: Array[ShiftId]): ConnectionIO[Map[ShiftId, ShiftRow]]
   def update: UpdateBuilder[ShiftFields, ShiftRow]
   def update(row: ShiftRow): ConnectionIO[Boolean]
   def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow]

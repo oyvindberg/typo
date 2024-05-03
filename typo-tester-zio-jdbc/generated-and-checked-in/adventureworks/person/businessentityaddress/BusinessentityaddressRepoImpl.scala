@@ -104,10 +104,10 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
        """.query(using BusinessentityaddressRow.jdbcDecoder).selectStream()
     
   }
-  override def selectByIdsTracked(compositeIds: Array[BusinessentityaddressId]): ZIO[ZConnection, Throwable, Map[BusinessentityaddressId, Option[BusinessentityaddressRow]]] = {
+  override def selectByIdsTracked(compositeIds: Array[BusinessentityaddressId]): ZIO[ZConnection, Throwable, Map[BusinessentityaddressId, BusinessentityaddressRow]] = {
     selectByIds(compositeIds).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
-      compositeIds.view.map(id => (id, byId.get(id))).toMap
+      compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {

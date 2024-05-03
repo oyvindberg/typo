@@ -96,10 +96,10 @@ class VendorRepoImpl extends VendorRepo {
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, VendorRow] = {
     sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(using VendorRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, Option[VendorRow]]] = {
+  override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, VendorRow]] = {
     selectByIds(businessentityids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.businessentityid, x)).toMap
-      businessentityids.view.map(id => (id, byId.get(id))).toMap
+      businessentityids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[VendorFields, VendorRow] = {

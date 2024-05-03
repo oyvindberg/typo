@@ -98,10 +98,10 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
   override def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow] = {
     sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from purchasing.shipmethod where "shipmethodid" = ANY(${shipmethodids})""".query(using ShipmethodRow.read).stream
   }
-  override def selectByIdsTracked(shipmethodids: Array[ShipmethodId]): ConnectionIO[Map[ShipmethodId, Option[ShipmethodRow]]] = {
+  override def selectByIdsTracked(shipmethodids: Array[ShipmethodId]): ConnectionIO[Map[ShipmethodId, ShipmethodRow]] = {
     selectByIds(shipmethodids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.shipmethodid, x)).toMap
-      shipmethodids.view.map(id => (id, byId.get(id))).toMap
+      shipmethodids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {

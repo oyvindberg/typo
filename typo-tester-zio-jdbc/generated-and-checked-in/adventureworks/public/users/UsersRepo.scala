@@ -29,7 +29,7 @@ trait UsersRepo {
   def selectAll: ZStream[ZConnection, Throwable, UsersRow]
   def selectById(userId: UsersId): ZIO[ZConnection, Throwable, Option[UsersRow]]
   def selectByIds(userIds: Array[UsersId]): ZStream[ZConnection, Throwable, UsersRow]
-  def selectByIdsTracked(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Map[UsersId, Option[UsersRow]]]
+  def selectByIdsTracked(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Map[UsersId, UsersRow]]
   def selectByUniqueEmail(email: TypoUnknownCitext): ZIO[ZConnection, Throwable, Option[UsersRow]]
   def update: UpdateBuilder[UsersFields, UsersRow]
   def update(row: UsersRow): ZIO[ZConnection, Throwable, Boolean]

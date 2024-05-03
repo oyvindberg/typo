@@ -16,5 +16,5 @@ trait PurchaseorderdetailRepo {
   def selectAll: Stream[ConnectionIO, PurchaseorderdetailRow]
   def selectById(compositeId: PurchaseorderdetailId): ConnectionIO[Option[PurchaseorderdetailRow]]
   def selectByIds(compositeIds: Array[PurchaseorderdetailId]): Stream[ConnectionIO, PurchaseorderdetailRow]
-  def selectByIdsTracked(compositeIds: Array[PurchaseorderdetailId]): ConnectionIO[Map[PurchaseorderdetailId, Option[PurchaseorderdetailRow]]]
+  def selectByIdsTracked(compositeIds: Array[PurchaseorderdetailId]): ConnectionIO[Map[PurchaseorderdetailId, PurchaseorderdetailRow]]
 }

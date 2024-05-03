@@ -97,10 +97,10 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
   override def selectByIds(ids: Array[PersonId]): ZStream[ZConnection, Throwable, PersonRow] = {
     ZStream.fromIterable(ids.flatMap(map.get))
   }
-  override def selectByIdsTracked(ids: Array[PersonId]): ZIO[ZConnection, Throwable, Map[PersonId, Option[PersonRow]]] = {
+  override def selectByIdsTracked(ids: Array[PersonId]): ZIO[ZConnection, Throwable, Map[PersonId, PersonRow]] = {
     selectByIds(ids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.id, x)).toMap
-      ids.view.map(id => (id, byId.get(id))).toMap
+      ids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {

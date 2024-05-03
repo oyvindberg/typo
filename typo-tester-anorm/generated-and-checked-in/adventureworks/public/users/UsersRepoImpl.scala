@@ -104,9 +104,9 @@ class UsersRepoImpl extends UsersRepo {
        """.as(UsersRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(userIds: Array[UsersId])(implicit c: Connection): Map[UsersId, Option[UsersRow]] = {
+  override def selectByIdsTracked(userIds: Array[UsersId])(implicit c: Connection): Map[UsersId, UsersRow] = {
     val byId = selectByIds(userIds).view.map(x => (x.userId, x)).toMap
-    userIds.view.map(id => (id, byId.get(id))).toMap
+    userIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def selectByUniqueEmail(email: TypoUnknownCitext)(implicit c: Connection): Option[UsersRow] = {
     SQL"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text

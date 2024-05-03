@@ -25,7 +25,7 @@ trait ContacttypeRepo {
   def selectAll(implicit c: Connection): List[ContacttypeRow]
   def selectById(contacttypeid: ContacttypeId)(implicit c: Connection): Option[ContacttypeRow]
   def selectByIds(contacttypeids: Array[ContacttypeId])(implicit c: Connection): List[ContacttypeRow]
-  def selectByIdsTracked(contacttypeids: Array[ContacttypeId])(implicit c: Connection): Map[ContacttypeId, Option[ContacttypeRow]]
+  def selectByIdsTracked(contacttypeids: Array[ContacttypeId])(implicit c: Connection): Map[ContacttypeId, ContacttypeRow]
   def update: UpdateBuilder[ContacttypeFields, ContacttypeRow]
   def update(row: ContacttypeRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow

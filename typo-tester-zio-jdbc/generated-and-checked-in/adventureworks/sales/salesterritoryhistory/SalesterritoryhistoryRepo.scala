@@ -28,7 +28,7 @@ trait SalesterritoryhistoryRepo {
   def selectAll: ZStream[ZConnection, Throwable, SalesterritoryhistoryRow]
   def selectById(compositeId: SalesterritoryhistoryId): ZIO[ZConnection, Throwable, Option[SalesterritoryhistoryRow]]
   def selectByIds(compositeIds: Array[SalesterritoryhistoryId]): ZStream[ZConnection, Throwable, SalesterritoryhistoryRow]
-  def selectByIdsTracked(compositeIds: Array[SalesterritoryhistoryId]): ZIO[ZConnection, Throwable, Map[SalesterritoryhistoryId, Option[SalesterritoryhistoryRow]]]
+  def selectByIdsTracked(compositeIds: Array[SalesterritoryhistoryId]): ZIO[ZConnection, Throwable, Map[SalesterritoryhistoryId, SalesterritoryhistoryRow]]
   def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def update(row: SalesterritoryhistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: SalesterritoryhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[SalesterritoryhistoryRow]]

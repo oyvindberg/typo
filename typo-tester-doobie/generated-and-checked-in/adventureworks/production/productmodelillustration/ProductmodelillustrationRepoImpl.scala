@@ -96,10 +96,10 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
        """.query(using ProductmodelillustrationRow.read).stream
     
   }
-  override def selectByIdsTracked(compositeIds: Array[ProductmodelillustrationId]): ConnectionIO[Map[ProductmodelillustrationId, Option[ProductmodelillustrationRow]]] = {
+  override def selectByIdsTracked(compositeIds: Array[ProductmodelillustrationId]): ConnectionIO[Map[ProductmodelillustrationId, ProductmodelillustrationRow]] = {
     selectByIds(compositeIds).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
-      compositeIds.view.map(id => (id, byId.get(id))).toMap
+      compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {

@@ -64,10 +64,10 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
   override def selectByIds(compositeIds: Array[FlaffId]): ZStream[ZConnection, Throwable, FlaffRow] = {
     ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
-  override def selectByIdsTracked(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Map[FlaffId, Option[FlaffRow]]] = {
+  override def selectByIdsTracked(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Map[FlaffId, FlaffRow]] = {
     selectByIds(compositeIds).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
-      compositeIds.view.map(id => (id, byId.get(id))).toMap
+      compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[FlaffFields, FlaffRow] = {

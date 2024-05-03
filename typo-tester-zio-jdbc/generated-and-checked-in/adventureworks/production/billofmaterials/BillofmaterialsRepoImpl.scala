@@ -98,10 +98,10 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def selectByIds(billofmaterialsids: Array[Int]): ZStream[ZConnection, Throwable, BillofmaterialsRow] = {
     sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from production.billofmaterials where "billofmaterialsid" = ANY(${Segment.paramSegment(billofmaterialsids)(adventureworks.IntArraySetter)})""".query(using BillofmaterialsRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(billofmaterialsids: Array[Int]): ZIO[ZConnection, Throwable, Map[Int, Option[BillofmaterialsRow]]] = {
+  override def selectByIdsTracked(billofmaterialsids: Array[Int]): ZIO[ZConnection, Throwable, Map[Int, BillofmaterialsRow]] = {
     selectByIds(billofmaterialsids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.billofmaterialsid, x)).toMap
-      billofmaterialsids.view.map(id => (id, byId.get(id))).toMap
+      billofmaterialsids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {

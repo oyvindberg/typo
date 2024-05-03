@@ -79,10 +79,10 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
   override def selectByIds(names: Array[IdentityTestId]): Stream[ConnectionIO, IdentityTestRow] = {
     sql"""select "always_generated", "default_generated", "name" from public.identity-test where "name" = ANY(${names})""".query(using IdentityTestRow.read).stream
   }
-  override def selectByIdsTracked(names: Array[IdentityTestId]): ConnectionIO[Map[IdentityTestId, Option[IdentityTestRow]]] = {
+  override def selectByIdsTracked(names: Array[IdentityTestId]): ConnectionIO[Map[IdentityTestId, IdentityTestRow]] = {
     selectByIds(names).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.name, x)).toMap
-      names.view.map(id => (id, byId.get(id))).toMap
+      names.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {

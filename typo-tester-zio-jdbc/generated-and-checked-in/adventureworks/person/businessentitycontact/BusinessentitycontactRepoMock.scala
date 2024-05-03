@@ -78,10 +78,10 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
   override def selectByIds(compositeIds: Array[BusinessentitycontactId]): ZStream[ZConnection, Throwable, BusinessentitycontactRow] = {
     ZStream.fromIterable(compositeIds.flatMap(map.get))
   }
-  override def selectByIdsTracked(compositeIds: Array[BusinessentitycontactId]): ZIO[ZConnection, Throwable, Map[BusinessentitycontactId, Option[BusinessentitycontactRow]]] = {
+  override def selectByIdsTracked(compositeIds: Array[BusinessentitycontactId]): ZIO[ZConnection, Throwable, Map[BusinessentitycontactId, BusinessentitycontactRow]] = {
     selectByIds(compositeIds).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
-      compositeIds.view.map(id => (id, byId.get(id))).toMap
+      compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {

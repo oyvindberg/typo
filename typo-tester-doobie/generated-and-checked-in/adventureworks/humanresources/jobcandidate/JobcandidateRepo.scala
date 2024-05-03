@@ -26,7 +26,7 @@ trait JobcandidateRepo {
   def selectAll: Stream[ConnectionIO, JobcandidateRow]
   def selectById(jobcandidateid: JobcandidateId): ConnectionIO[Option[JobcandidateRow]]
   def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow]
-  def selectByIdsTracked(jobcandidateids: Array[JobcandidateId]): ConnectionIO[Map[JobcandidateId, Option[JobcandidateRow]]]
+  def selectByIdsTracked(jobcandidateids: Array[JobcandidateId]): ConnectionIO[Map[JobcandidateId, JobcandidateRow]]
   def update: UpdateBuilder[JobcandidateFields, JobcandidateRow]
   def update(row: JobcandidateRow): ConnectionIO[Boolean]
   def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow]

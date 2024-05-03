@@ -30,7 +30,7 @@ trait CreditcardRepo {
   def selectAll: ZStream[ZConnection, Throwable, CreditcardRow]
   def selectById(creditcardid: /* user-picked */ CustomCreditcardId): ZIO[ZConnection, Throwable, Option[CreditcardRow]]
   def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZStream[ZConnection, Throwable, CreditcardRow]
-  def selectByIdsTracked(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZIO[ZConnection, Throwable, Map[/* user-picked */ CustomCreditcardId, Option[CreditcardRow]]]
+  def selectByIdsTracked(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZIO[ZConnection, Throwable, Map[/* user-picked */ CustomCreditcardId, CreditcardRow]]
   def update: UpdateBuilder[CreditcardFields, CreditcardRow]
   def update(row: CreditcardRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CreditcardRow): ZIO[ZConnection, Throwable, UpdateResult[CreditcardRow]]

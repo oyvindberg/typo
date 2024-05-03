@@ -79,10 +79,10 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   override def selectByIds(billofmaterialsids: Array[Int]): Stream[ConnectionIO, BillofmaterialsRow] = {
     Stream.emits(billofmaterialsids.flatMap(map.get).toList)
   }
-  override def selectByIdsTracked(billofmaterialsids: Array[Int]): ConnectionIO[Map[Int, Option[BillofmaterialsRow]]] = {
+  override def selectByIdsTracked(billofmaterialsids: Array[Int]): ConnectionIO[Map[Int, BillofmaterialsRow]] = {
     selectByIds(billofmaterialsids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.billofmaterialsid, x)).toMap
-      billofmaterialsids.view.map(id => (id, byId.get(id))).toMap
+      billofmaterialsids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {

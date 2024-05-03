@@ -107,10 +107,10 @@ class DocumentRepoImpl extends DocumentRepo {
   override def selectByIds(documentnodes: Array[DocumentId]): ZStream[ZConnection, Throwable, DocumentRow] = {
     sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document where "documentnode" = ANY(${Segment.paramSegment(documentnodes)(DocumentId.arraySetter)})""".query(using DocumentRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(documentnodes: Array[DocumentId]): ZIO[ZConnection, Throwable, Map[DocumentId, Option[DocumentRow]]] = {
+  override def selectByIdsTracked(documentnodes: Array[DocumentId]): ZIO[ZConnection, Throwable, Map[DocumentId, DocumentRow]] = {
     selectByIds(documentnodes).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.documentnode, x)).toMap
-      documentnodes.view.map(id => (id, byId.get(id))).toMap
+      documentnodes.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def selectByUniqueRowguid(rowguid: TypoUUID): ZIO[ZConnection, Throwable, Option[DocumentRow]] = {

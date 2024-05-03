@@ -93,10 +93,10 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): ZStream[ZConnection, Throwable, ShoppingcartitemRow] = {
     sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem where "shoppingcartitemid" = ANY(${Segment.paramSegment(shoppingcartitemids)(ShoppingcartitemId.arraySetter)})""".query(using ShoppingcartitemRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(shoppingcartitemids: Array[ShoppingcartitemId]): ZIO[ZConnection, Throwable, Map[ShoppingcartitemId, Option[ShoppingcartitemRow]]] = {
+  override def selectByIdsTracked(shoppingcartitemids: Array[ShoppingcartitemId]): ZIO[ZConnection, Throwable, Map[ShoppingcartitemId, ShoppingcartitemRow]] = {
     selectByIds(shoppingcartitemids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.shoppingcartitemid, x)).toMap
-      shoppingcartitemids.view.map(id => (id, byId.get(id))).toMap
+      shoppingcartitemids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {

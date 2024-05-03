@@ -113,10 +113,10 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId]): ZStream[ZConnection, Throwable, PurchaseorderheaderRow] = {
     sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader where "purchaseorderid" = ANY(${Segment.paramSegment(purchaseorderids)(PurchaseorderheaderId.arraySetter)})""".query(using PurchaseorderheaderRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(purchaseorderids: Array[PurchaseorderheaderId]): ZIO[ZConnection, Throwable, Map[PurchaseorderheaderId, Option[PurchaseorderheaderRow]]] = {
+  override def selectByIdsTracked(purchaseorderids: Array[PurchaseorderheaderId]): ZIO[ZConnection, Throwable, Map[PurchaseorderheaderId, PurchaseorderheaderRow]] = {
     selectByIds(purchaseorderids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.purchaseorderid, x)).toMap
-      purchaseorderids.view.map(id => (id, byId.get(id))).toMap
+      purchaseorderids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {

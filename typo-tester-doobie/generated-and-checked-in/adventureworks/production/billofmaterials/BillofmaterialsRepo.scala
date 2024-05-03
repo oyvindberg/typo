@@ -26,7 +26,7 @@ trait BillofmaterialsRepo {
   def selectAll: Stream[ConnectionIO, BillofmaterialsRow]
   def selectById(billofmaterialsid: Int): ConnectionIO[Option[BillofmaterialsRow]]
   def selectByIds(billofmaterialsids: Array[Int]): Stream[ConnectionIO, BillofmaterialsRow]
-  def selectByIdsTracked(billofmaterialsids: Array[Int]): ConnectionIO[Map[Int, Option[BillofmaterialsRow]]]
+  def selectByIdsTracked(billofmaterialsids: Array[Int]): ConnectionIO[Map[Int, BillofmaterialsRow]]
   def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def update(row: BillofmaterialsRow): ConnectionIO[Boolean]
   def upsert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow]

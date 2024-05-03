@@ -86,9 +86,9 @@ class FootballClubRepoImpl extends FootballClubRepo {
        """.as(FootballClubRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(ids: Array[FootballClubId])(implicit c: Connection): Map[FootballClubId, Option[FootballClubRow]] = {
+  override def selectByIdsTracked(ids: Array[FootballClubId])(implicit c: Connection): Map[FootballClubId, FootballClubRow] = {
     val byId = selectByIds(ids).view.map(x => (x.id, x)).toMap
-    ids.view.map(id => (id, byId.get(id))).toMap
+    ids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
     UpdateBuilder("myschema.football_club", FootballClubFields.structure, FootballClubRow.rowParser)

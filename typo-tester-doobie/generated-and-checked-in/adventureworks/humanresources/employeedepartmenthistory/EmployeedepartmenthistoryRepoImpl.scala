@@ -105,10 +105,10 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
        """.query(using EmployeedepartmenthistoryRow.read).stream
     
   }
-  override def selectByIdsTracked(compositeIds: Array[EmployeedepartmenthistoryId]): ConnectionIO[Map[EmployeedepartmenthistoryId, Option[EmployeedepartmenthistoryRow]]] = {
+  override def selectByIdsTracked(compositeIds: Array[EmployeedepartmenthistoryId]): ConnectionIO[Map[EmployeedepartmenthistoryId, EmployeedepartmenthistoryRow]] = {
     selectByIds(compositeIds).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
-      compositeIds.view.map(id => (id, byId.get(id))).toMap
+      compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {

@@ -81,10 +81,10 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
   override def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): Stream[ConnectionIO, PersoncreditcardRow] = {
     Stream.emits(compositeIds.flatMap(map.get).toList)
   }
-  override def selectByIdsTracked(compositeIds: Array[PersoncreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Map[PersoncreditcardId, Option[PersoncreditcardRow]]] = {
+  override def selectByIdsTracked(compositeIds: Array[PersoncreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Map[PersoncreditcardId, PersoncreditcardRow]] = {
     selectByIds(compositeIds).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
-      compositeIds.view.map(id => (id, byId.get(id))).toMap
+      compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {

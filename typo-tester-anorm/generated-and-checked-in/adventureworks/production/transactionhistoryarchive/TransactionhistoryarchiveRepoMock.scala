@@ -67,9 +67,9 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
   override def selectByIds(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
     transactionids.flatMap(map.get).toList
   }
-  override def selectByIdsTracked(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): Map[TransactionhistoryarchiveId, Option[TransactionhistoryarchiveRow]] = {
+  override def selectByIdsTracked(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): Map[TransactionhistoryarchiveId, TransactionhistoryarchiveRow] = {
     val byId = selectByIds(transactionids).view.map(x => (x.transactionid, x)).toMap
-    transactionids.view.map(id => (id, byId.get(id))).toMap
+    transactionids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
     UpdateBuilderMock(UpdateParams.empty, TransactionhistoryarchiveFields.structure.fields, map)

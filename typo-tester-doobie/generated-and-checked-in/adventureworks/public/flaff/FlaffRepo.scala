@@ -23,7 +23,7 @@ trait FlaffRepo {
   def selectAll: Stream[ConnectionIO, FlaffRow]
   def selectById(compositeId: FlaffId): ConnectionIO[Option[FlaffRow]]
   def selectByIds(compositeIds: Array[FlaffId]): Stream[ConnectionIO, FlaffRow]
-  def selectByIdsTracked(compositeIds: Array[FlaffId]): ConnectionIO[Map[FlaffId, Option[FlaffRow]]]
+  def selectByIdsTracked(compositeIds: Array[FlaffId]): ConnectionIO[Map[FlaffId, FlaffRow]]
   def update: UpdateBuilder[FlaffFields, FlaffRow]
   def update(row: FlaffRow): ConnectionIO[Boolean]
   def upsert(unsaved: FlaffRow): ConnectionIO[FlaffRow]

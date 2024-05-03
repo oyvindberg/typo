@@ -26,7 +26,7 @@ trait IllustrationRepo {
   def selectAll: Stream[ConnectionIO, IllustrationRow]
   def selectById(illustrationid: IllustrationId): ConnectionIO[Option[IllustrationRow]]
   def selectByIds(illustrationids: Array[IllustrationId]): Stream[ConnectionIO, IllustrationRow]
-  def selectByIdsTracked(illustrationids: Array[IllustrationId]): ConnectionIO[Map[IllustrationId, Option[IllustrationRow]]]
+  def selectByIdsTracked(illustrationids: Array[IllustrationId]): ConnectionIO[Map[IllustrationId, IllustrationRow]]
   def update: UpdateBuilder[IllustrationFields, IllustrationRow]
   def update(row: IllustrationRow): ConnectionIO[Boolean]
   def upsert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow]

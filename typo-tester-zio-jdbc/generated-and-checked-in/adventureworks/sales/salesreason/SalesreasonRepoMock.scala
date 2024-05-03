@@ -78,10 +78,10 @@ class SalesreasonRepoMock(toRow: Function1[SalesreasonRowUnsaved, SalesreasonRow
   override def selectByIds(salesreasonids: Array[SalesreasonId]): ZStream[ZConnection, Throwable, SalesreasonRow] = {
     ZStream.fromIterable(salesreasonids.flatMap(map.get))
   }
-  override def selectByIdsTracked(salesreasonids: Array[SalesreasonId]): ZIO[ZConnection, Throwable, Map[SalesreasonId, Option[SalesreasonRow]]] = {
+  override def selectByIdsTracked(salesreasonids: Array[SalesreasonId]): ZIO[ZConnection, Throwable, Map[SalesreasonId, SalesreasonRow]] = {
     selectByIds(salesreasonids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.salesreasonid, x)).toMap
-      salesreasonids.view.map(id => (id, byId.get(id))).toMap
+      salesreasonids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {

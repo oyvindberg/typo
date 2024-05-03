@@ -26,7 +26,7 @@ trait UsersRepo {
   def selectAll(implicit c: Connection): List[UsersRow]
   def selectById(userId: UsersId)(implicit c: Connection): Option[UsersRow]
   def selectByIds(userIds: Array[UsersId])(implicit c: Connection): List[UsersRow]
-  def selectByIdsTracked(userIds: Array[UsersId])(implicit c: Connection): Map[UsersId, Option[UsersRow]]
+  def selectByIdsTracked(userIds: Array[UsersId])(implicit c: Connection): Map[UsersId, UsersRow]
   def selectByUniqueEmail(email: TypoUnknownCitext)(implicit c: Connection): Option[UsersRow]
   def update: UpdateBuilder[UsersFields, UsersRow]
   def update(row: UsersRow)(implicit c: Connection): Boolean

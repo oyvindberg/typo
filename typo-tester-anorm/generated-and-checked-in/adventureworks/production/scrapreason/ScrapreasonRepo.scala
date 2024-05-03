@@ -25,7 +25,7 @@ trait ScrapreasonRepo {
   def selectAll(implicit c: Connection): List[ScrapreasonRow]
   def selectById(scrapreasonid: ScrapreasonId)(implicit c: Connection): Option[ScrapreasonRow]
   def selectByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow]
-  def selectByIdsTracked(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): Map[ScrapreasonId, Option[ScrapreasonRow]]
+  def selectByIdsTracked(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): Map[ScrapreasonId, ScrapreasonRow]
   def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow]
   def update(row: ScrapreasonRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow

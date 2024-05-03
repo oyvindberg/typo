@@ -25,7 +25,7 @@ trait SalesterritoryRepo {
   def selectAll(implicit c: Connection): List[SalesterritoryRow]
   def selectById(territoryid: SalesterritoryId)(implicit c: Connection): Option[SalesterritoryRow]
   def selectByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow]
-  def selectByIdsTracked(territoryids: Array[SalesterritoryId])(implicit c: Connection): Map[SalesterritoryId, Option[SalesterritoryRow]]
+  def selectByIdsTracked(territoryids: Array[SalesterritoryId])(implicit c: Connection): Map[SalesterritoryId, SalesterritoryRow]
   def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow]
   def update(row: SalesterritoryRow)(implicit c: Connection): Boolean
   def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow

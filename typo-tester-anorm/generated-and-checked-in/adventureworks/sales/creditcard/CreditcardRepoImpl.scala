@@ -106,9 +106,9 @@ class CreditcardRepoImpl extends CreditcardRepo {
        """.as(CreditcardRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): Map[/* user-picked */ CustomCreditcardId, Option[CreditcardRow]] = {
+  override def selectByIdsTracked(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): Map[/* user-picked */ CustomCreditcardId, CreditcardRow] = {
     val byId = selectByIds(creditcardids).view.map(x => (x.creditcardid, x)).toMap
-    creditcardids.view.map(id => (id, byId.get(id))).toMap
+    creditcardids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
     UpdateBuilder("sales.creditcard", CreditcardFields.structure, CreditcardRow.rowParser)

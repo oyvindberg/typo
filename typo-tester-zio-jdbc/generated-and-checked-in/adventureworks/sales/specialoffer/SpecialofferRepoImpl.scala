@@ -101,10 +101,10 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
   override def selectByIds(specialofferids: Array[SpecialofferId]): ZStream[ZConnection, Throwable, SpecialofferRow] = {
     sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sales.specialoffer where "specialofferid" = ANY(${Segment.paramSegment(specialofferids)(SpecialofferId.arraySetter)})""".query(using SpecialofferRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(specialofferids: Array[SpecialofferId]): ZIO[ZConnection, Throwable, Map[SpecialofferId, Option[SpecialofferRow]]] = {
+  override def selectByIdsTracked(specialofferids: Array[SpecialofferId]): ZIO[ZConnection, Throwable, Map[SpecialofferId, SpecialofferRow]] = {
     selectByIds(specialofferids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.specialofferid, x)).toMap
-      specialofferids.view.map(id => (id, byId.get(id))).toMap
+      specialofferids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {

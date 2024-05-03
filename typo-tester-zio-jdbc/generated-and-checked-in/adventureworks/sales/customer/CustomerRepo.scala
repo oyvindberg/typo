@@ -28,7 +28,7 @@ trait CustomerRepo {
   def selectAll: ZStream[ZConnection, Throwable, CustomerRow]
   def selectById(customerid: CustomerId): ZIO[ZConnection, Throwable, Option[CustomerRow]]
   def selectByIds(customerids: Array[CustomerId]): ZStream[ZConnection, Throwable, CustomerRow]
-  def selectByIdsTracked(customerids: Array[CustomerId]): ZIO[ZConnection, Throwable, Map[CustomerId, Option[CustomerRow]]]
+  def selectByIdsTracked(customerids: Array[CustomerId]): ZIO[ZConnection, Throwable, Map[CustomerId, CustomerRow]]
   def update: UpdateBuilder[CustomerFields, CustomerRow]
   def update(row: CustomerRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CustomerRow): ZIO[ZConnection, Throwable, UpdateResult[CustomerRow]]

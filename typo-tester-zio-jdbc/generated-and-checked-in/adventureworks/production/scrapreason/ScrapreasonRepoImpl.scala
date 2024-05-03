@@ -83,10 +83,10 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def selectByIds(scrapreasonids: Array[ScrapreasonId]): ZStream[ZConnection, Throwable, ScrapreasonRow] = {
     sql"""select "scrapreasonid", "name", "modifieddate"::text from production.scrapreason where "scrapreasonid" = ANY(${Segment.paramSegment(scrapreasonids)(ScrapreasonId.arraySetter)})""".query(using ScrapreasonRow.jdbcDecoder).selectStream()
   }
-  override def selectByIdsTracked(scrapreasonids: Array[ScrapreasonId]): ZIO[ZConnection, Throwable, Map[ScrapreasonId, Option[ScrapreasonRow]]] = {
+  override def selectByIdsTracked(scrapreasonids: Array[ScrapreasonId]): ZIO[ZConnection, Throwable, Map[ScrapreasonId, ScrapreasonRow]] = {
     selectByIds(scrapreasonids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.scrapreasonid, x)).toMap
-      scrapreasonids.view.map(id => (id, byId.get(id))).toMap
+      scrapreasonids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {

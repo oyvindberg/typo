@@ -72,10 +72,10 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
   override def selectByIds(ids: Array[MaritalStatusId]): ZStream[ZConnection, Throwable, MaritalStatusRow] = {
     ZStream.fromIterable(ids.flatMap(map.get))
   }
-  override def selectByIdsTracked(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Map[MaritalStatusId, Option[MaritalStatusRow]]] = {
+  override def selectByIdsTracked(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Map[MaritalStatusId, MaritalStatusRow]] = {
     selectByIds(ids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.id, x)).toMap
-      ids.view.map(id => (id, byId.get(id))).toMap
+      ids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {

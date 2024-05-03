@@ -26,7 +26,7 @@ trait PasswordRepo {
   def selectAll(implicit c: Connection): List[PasswordRow]
   def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PasswordRow]
   def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PasswordRow]
-  def selectByIdsTracked(businessentityids: Array[BusinessentityId])(implicit c: Connection): Map[BusinessentityId, Option[PasswordRow]]
+  def selectByIdsTracked(businessentityids: Array[BusinessentityId])(implicit c: Connection): Map[BusinessentityId, PasswordRow]
   def update: UpdateBuilder[PasswordFields, PasswordRow]
   def update(row: PasswordRow)(implicit c: Connection): Boolean
   def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow

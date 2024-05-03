@@ -29,7 +29,7 @@ trait EmployeeRepo {
   def selectAll: ZStream[ZConnection, Throwable, EmployeeRow]
   def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[EmployeeRow]]
   def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, EmployeeRow]
-  def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, Option[EmployeeRow]]]
+  def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, EmployeeRow]]
   def update: UpdateBuilder[EmployeeFields, EmployeeRow]
   def update(row: EmployeeRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: EmployeeRow): ZIO[ZConnection, Throwable, UpdateResult[EmployeeRow]]

@@ -81,10 +81,10 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId]): Stream[ConnectionIO, UnitmeasureRow] = {
     sql"""select "unitmeasurecode", "name", "modifieddate"::text from production.unitmeasure where "unitmeasurecode" = ANY(${unitmeasurecodes})""".query(using UnitmeasureRow.read).stream
   }
-  override def selectByIdsTracked(unitmeasurecodes: Array[UnitmeasureId]): ConnectionIO[Map[UnitmeasureId, Option[UnitmeasureRow]]] = {
+  override def selectByIdsTracked(unitmeasurecodes: Array[UnitmeasureId]): ConnectionIO[Map[UnitmeasureId, UnitmeasureRow]] = {
     selectByIds(unitmeasurecodes).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.unitmeasurecode, x)).toMap
-      unitmeasurecodes.view.map(id => (id, byId.get(id))).toMap
+      unitmeasurecodes.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {

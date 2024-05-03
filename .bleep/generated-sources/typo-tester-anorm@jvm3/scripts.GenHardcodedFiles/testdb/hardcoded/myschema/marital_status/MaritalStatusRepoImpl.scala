@@ -84,9 +84,9 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
        """.as(MaritalStatusRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(ids: Array[MaritalStatusId])(implicit c: Connection): Map[MaritalStatusId, Option[MaritalStatusRow]] = {
+  override def selectByIdsTracked(ids: Array[MaritalStatusId])(implicit c: Connection): Map[MaritalStatusId, MaritalStatusRow] = {
     val byId = selectByIds(ids).view.map(x => (x.id, x)).toMap
-    ids.view.map(id => (id, byId.get(id))).toMap
+    ids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
     UpdateBuilder("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.rowParser)

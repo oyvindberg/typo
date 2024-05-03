@@ -102,9 +102,9 @@ class IllustrationRepoImpl extends IllustrationRepo {
        """.as(IllustrationRow.rowParser(1).*)
     
   }
-  override def selectByIdsTracked(illustrationids: Array[IllustrationId])(implicit c: Connection): Map[IllustrationId, Option[IllustrationRow]] = {
+  override def selectByIdsTracked(illustrationids: Array[IllustrationId])(implicit c: Connection): Map[IllustrationId, IllustrationRow] = {
     val byId = selectByIds(illustrationids).view.map(x => (x.illustrationid, x)).toMap
-    illustrationids.view.map(id => (id, byId.get(id))).toMap
+    illustrationids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
     UpdateBuilder("production.illustration", IllustrationFields.structure, IllustrationRow.rowParser)
