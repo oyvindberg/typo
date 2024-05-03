@@ -18,9 +18,9 @@ trait SelectBuilder[Fields[_], Row] {
   final def where[N[_]: Nullability](v: Fields[Hidden] => SqlExpr[Boolean, N, Hidden]): SelectBuilder[Fields, Row] =
     withParams(params.where(fields => v(fields.asInstanceOf[Fields[Hidden]]).asInstanceOf[SqlExpr[Boolean, N, Row]].?))
 
-  final def maybeWhere[N[_]: Nullability, T](ot: Option[T])(v: (T, Fields[Hidden]) => SqlExpr[Boolean, N, Hidden]): SelectBuilder[Fields, Row] =
+  final def maybeWhere[N[_]: Nullability, T](ot: Option[T])(v: (Fields[Hidden], T) => SqlExpr[Boolean, N, Hidden]): SelectBuilder[Fields, Row] =
     ot match {
-      case Some(t) => where(fields => v(t, fields))
+      case Some(t) => where(fields => v(fields, t))
       case None    => this
     }
 
