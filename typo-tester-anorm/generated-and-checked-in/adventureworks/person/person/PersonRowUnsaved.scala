@@ -31,7 +31,7 @@ case class PersonRowUnsaved(
       Points to [[businessentity.BusinessentityRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Primary type of person: SC = Store Contact, IN = Individual (retail) customer, SP = Sales person, EM = Employee (non-sales), VC = Vendor contact, GC = General contact
-      Constraint CK_Person_PersonType affecting columns p, e, r, s, o, n, t, y, p, e:  (((persontype IS NULL) OR (upper((persontype)::text) = ANY (ARRAY['SC'::text, 'VC'::text, 'IN'::text, 'EM'::text, 'SP'::text, 'GC'::text])))) */
+      Constraint CK_Person_PersonType affecting columns persontype:  (((persontype IS NULL) OR (upper((persontype)::text) = ANY (ARRAY['SC'::text, 'VC'::text, 'IN'::text, 'EM'::text, 'SP'::text, 'GC'::text])))) */
   persontype: /* bpchar, max 2 chars */ String,
   /** A courtesy title. For example, Mr. or Ms. */
   title: Option[/* max 8 chars */ String],
@@ -52,7 +52,7 @@ case class PersonRowUnsaved(
   namestyle: Defaulted[NameStyle] = Defaulted.UseDefault,
   /** Default: 0
       0 = Contact does not wish to receive e-mail promotions, 1 = Contact does wish to receive e-mail promotions from AdventureWorks, 2 = Contact does wish to receive e-mail promotions from AdventureWorks and selected partners.
-      Constraint CK_Person_EmailPromotion affecting columns e, m, a, i, l, p, r, o, m, o, t, i, o, n:  (((emailpromotion >= 0) AND (emailpromotion <= 2))) */
+      Constraint CK_Person_EmailPromotion affecting columns emailpromotion:  (((emailpromotion >= 0) AND (emailpromotion <= 2))) */
   emailpromotion: Defaulted[Int] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,

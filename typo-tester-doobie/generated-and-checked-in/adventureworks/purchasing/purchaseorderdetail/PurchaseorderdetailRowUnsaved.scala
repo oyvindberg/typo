@@ -24,19 +24,19 @@ case class PurchaseorderdetailRowUnsaved(
   /** Date the product is expected to be received. */
   duedate: TypoLocalDateTime,
   /** Quantity ordered.
-      Constraint CK_PurchaseOrderDetail_OrderQty affecting columns o, r, d, e, r, q, t, y:  ((orderqty > 0)) */
+      Constraint CK_PurchaseOrderDetail_OrderQty affecting columns orderqty:  ((orderqty > 0)) */
   orderqty: TypoShort,
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[production.product.ProductRow.productid]] */
   productid: ProductId,
   /** Vendor's selling price of a single product.
-      Constraint CK_PurchaseOrderDetail_UnitPrice affecting columns u, n, i, t, p, r, i, c, e:  ((unitprice >= 0.00)) */
+      Constraint CK_PurchaseOrderDetail_UnitPrice affecting columns unitprice:  ((unitprice >= 0.00)) */
   unitprice: BigDecimal,
   /** Quantity actually received from the vendor.
-      Constraint CK_PurchaseOrderDetail_ReceivedQty affecting columns r, e, c, e, i, v, e, d, q, t, y:  ((receivedqty >= 0.00)) */
+      Constraint CK_PurchaseOrderDetail_ReceivedQty affecting columns receivedqty:  ((receivedqty >= 0.00)) */
   receivedqty: BigDecimal,
   /** Quantity rejected during inspection.
-      Constraint CK_PurchaseOrderDetail_RejectedQty affecting columns r, e, j, e, c, t, e, d, q, t, y:  ((rejectedqty >= 0.00)) */
+      Constraint CK_PurchaseOrderDetail_RejectedQty affecting columns rejectedqty:  ((rejectedqty >= 0.00)) */
   rejectedqty: BigDecimal,
   /** Default: nextval('purchasing.purchaseorderdetail_purchaseorderdetailid_seq'::regclass)
       Primary key. One line number per purchased product. */

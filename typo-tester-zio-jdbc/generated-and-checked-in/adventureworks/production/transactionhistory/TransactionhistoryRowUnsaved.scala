@@ -24,7 +24,7 @@ case class TransactionhistoryRowUnsaved(
   /** Purchase order, sales order, or work order identification number. */
   referenceorderid: Int,
   /** W = WorkOrder, S = SalesOrder, P = PurchaseOrder
-      Constraint CK_TransactionHistory_TransactionType affecting columns t, r, a, n, s, a, c, t, i, o, n, t, y, p, e:  ((upper((transactiontype)::text) = ANY (ARRAY['W'::text, 'S'::text, 'P'::text]))) */
+      Constraint CK_TransactionHistory_TransactionType affecting columns transactiontype:  ((upper((transactiontype)::text) = ANY (ARRAY['W'::text, 'S'::text, 'P'::text]))) */
   transactiontype: /* bpchar, max 1 chars */ String,
   /** Product quantity. */
   quantity: Int,

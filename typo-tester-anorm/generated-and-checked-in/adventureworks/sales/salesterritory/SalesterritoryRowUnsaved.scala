@@ -36,19 +36,19 @@ case class SalesterritoryRowUnsaved(
   territoryid: Defaulted[SalesterritoryId] = Defaulted.UseDefault,
   /** Default: 0.00
       Sales in the territory year to date.
-      Constraint CK_SalesTerritory_SalesYTD affecting columns s, a, l, e, s, y, t, d:  ((salesytd >= 0.00)) */
+      Constraint CK_SalesTerritory_SalesYTD affecting columns salesytd:  ((salesytd >= 0.00)) */
   salesytd: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Sales in the territory the previous year.
-      Constraint CK_SalesTerritory_SalesLastYear affecting columns s, a, l, e, s, l, a, s, t, y, e, a, r:  ((saleslastyear >= 0.00)) */
+      Constraint CK_SalesTerritory_SalesLastYear affecting columns saleslastyear:  ((saleslastyear >= 0.00)) */
   saleslastyear: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Business costs in the territory year to date.
-      Constraint CK_SalesTerritory_CostYTD affecting columns c, o, s, t, y, t, d:  ((costytd >= 0.00)) */
+      Constraint CK_SalesTerritory_CostYTD affecting columns costytd:  ((costytd >= 0.00)) */
   costytd: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: 0.00
       Business costs in the territory the previous year.
-      Constraint CK_SalesTerritory_CostLastYear affecting columns c, o, s, t, l, a, s, t, y, e, a, r:  ((costlastyear >= 0.00)) */
+      Constraint CK_SalesTerritory_CostLastYear affecting columns costlastyear:  ((costlastyear >= 0.00)) */
   costlastyear: Defaulted[BigDecimal] = Defaulted.UseDefault,
   /** Default: uuid_generate_v1() */
   rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,

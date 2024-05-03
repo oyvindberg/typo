@@ -20,13 +20,13 @@ case class ProductcosthistoryRowUnsaved(
       Points to [[product.ProductRow.productid]] */
   productid: ProductId,
   /** Product cost start date.
-      Constraint CK_ProductCostHistory_EndDate affecting columns e, n, d, d, a, t, e, ,,  , s, t, a, r, t, d, a, t, e:  (((enddate >= startdate) OR (enddate IS NULL))) */
+      Constraint CK_ProductCostHistory_EndDate affecting columns enddate, startdate:  (((enddate >= startdate) OR (enddate IS NULL))) */
   startdate: TypoLocalDateTime,
   /** Product cost end date.
-      Constraint CK_ProductCostHistory_EndDate affecting columns e, n, d, d, a, t, e, ,,  , s, t, a, r, t, d, a, t, e:  (((enddate >= startdate) OR (enddate IS NULL))) */
+      Constraint CK_ProductCostHistory_EndDate affecting columns enddate, startdate:  (((enddate >= startdate) OR (enddate IS NULL))) */
   enddate: Option[TypoLocalDateTime],
   /** Standard cost of the product.
-      Constraint CK_ProductCostHistory_StandardCost affecting columns s, t, a, n, d, a, r, d, c, o, s, t:  ((standardcost >= 0.00)) */
+      Constraint CK_ProductCostHistory_StandardCost affecting columns standardcost:  ((standardcost >= 0.00)) */
   standardcost: BigDecimal,
   /** Default: now() */
   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
