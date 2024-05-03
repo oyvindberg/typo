@@ -8,7 +8,7 @@ trait DbLib {
   def repoImpl(repoMethod: RepoMethod): sc.Code
   def mockRepoImpl(id: IdComputed, repoMethod: RepoMethod, maybeToRow: Option[sc.Param]): sc.Code
   def testInsertMethod(x: ComputedTestInserts.InsertMethod): sc.Value
-  def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.ClassMember]
+  def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, enm: db.StringEnum): List[sc.ClassMember]
   def wrapperTypeInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.ClassMember]
   def missingInstances: List[sc.ClassMember]
   def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn], rowType: DbLib.RowType): List[sc.ClassMember]

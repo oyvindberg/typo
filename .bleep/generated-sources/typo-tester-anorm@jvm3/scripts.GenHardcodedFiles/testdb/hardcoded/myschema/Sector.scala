@@ -11,6 +11,7 @@ import anorm.Column
 import anorm.ParameterMetaData
 import anorm.SqlMappingError
 import anorm.ToStatement
+import java.sql.Types
 import play.api.libs.json.JsError
 import play.api.libs.json.JsSuccess
 import play.api.libs.json.JsValue
@@ -41,12 +42,12 @@ object Sector {
   val ByName: Map[String, Sector] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayColumn: Column[Array[Sector]] = Column.columnToArray(column, implicitly)
-  implicit lazy val arrayToStatement: ToStatement[Array[Sector]] = ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData).contramap(_.map(_.value))
+  implicit lazy val arrayToStatement: ToStatement[Array[Sector]] = ToStatement[Array[Sector]]((ps, i, arr) => ps.setArray(i, ps.getConnection.createArrayOf("myschema.sector", arr.map[AnyRef](_.value))))
   implicit lazy val column: Column[Sector] = Column.columnToString.mapResult(str => Sector(str).left.map(SqlMappingError.apply))
   implicit lazy val ordering: Ordering[Sector] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[Sector] = new ParameterMetaData[Sector] {
-    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
+    override def sqlType: String = "myschema.sector"
+    override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[Sector] = Reads[Sector]{(value: JsValue) => value.validate(Reads.StringReads).flatMap(str => Sector(str).fold(JsError.apply, JsSuccess(_)))}
   implicit lazy val text: Text[Sector] = new Text[Sector] {

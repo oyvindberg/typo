@@ -7,6 +7,8 @@ package testdb
 package hardcoded
 package myschema
 
+import cats.data.NonEmptyList
+import doobie.enumerated.JdbcType
 import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
@@ -39,12 +41,12 @@ object Sector {
   val ByName: Map[String, Sector] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayGet: Get[Array[Sector]] = testdb.hardcoded.StringArrayMeta.get.map(_.map(force))
-  implicit lazy val arrayPut: Put[Array[Sector]] = testdb.hardcoded.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val arrayPut: Put[Array[Sector]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_myschema.sector"), "myschema.sector").contramap(_.map(_.value))
   implicit lazy val decoder: Decoder[Sector] = Decoder.decodeString.emap(Sector.apply)
   implicit lazy val encoder: Encoder[Sector] = Encoder.encodeString.contramap(_.value)
   implicit lazy val get: Get[Sector] = Meta.StringMeta.get.temap(Sector.apply)
   implicit lazy val ordering: Ordering[Sector] = Ordering.by(_.value)
-  implicit lazy val put: Put[Sector] = Meta.StringMeta.put.contramap(_.value)
+  implicit lazy val put: Put[Sector] = Put.Advanced.one[Sector](JdbcType.Other, NonEmptyList.one("myschema.sector"), (ps, i, a) => ps.setString(i, a.value), (rs, i, a) => rs.updateString(i, a.value))
   implicit lazy val read: Read[Sector] = Read.fromGet(get)
   implicit lazy val text: Text[Sector] = new Text[Sector] {
     override def unsafeEncode(v: Sector, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)

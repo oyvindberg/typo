@@ -13,7 +13,7 @@ object FileStringEnum {
     val str = sc.Ident("str")
 
     val instances = List(
-      options.dbLib.toList.flatMap(_.stringEnumInstances(enm.tpe, TypesJava.String)),
+      options.dbLib.toList.flatMap(_.stringEnumInstances(enm.tpe, TypesJava.String, enm.dbEnum)),
       options.jsonLibs.flatMap(_.stringEnumInstances(enm.tpe, TypesJava.String)),
       List(
         genOrdering.ordering(enm.tpe, NonEmptyList(sc.Param(sc.Ident("value"), TypesJava.String, None)))

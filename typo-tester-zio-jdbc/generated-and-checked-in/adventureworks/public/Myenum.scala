@@ -8,6 +8,7 @@ package public
 
 import adventureworks.Text
 import java.sql.ResultSet
+import java.sql.Types
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcDecoderError
@@ -40,7 +41,10 @@ object Myenum {
               
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[Myenum]] = adventureworks.StringArrayDecoder.map(a => if (a == null) null else a.map(force))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[Myenum]] = JdbcEncoder.singleParamEncoder(using arraySetter)
-  implicit lazy val arraySetter: Setter[Array[Myenum]] = adventureworks.StringArraySetter.contramap(_.map(_.value))
+  implicit lazy val arraySetter: Setter[Array[Myenum]] = Setter.forSqlType[Array[Myenum]](
+      (ps, i, v) => ps.setArray(i, ps.getConnection.createArrayOf("public.myenum", v.map(x => x.value))),
+      java.sql.Types.ARRAY
+    )
   implicit lazy val jdbcDecoder: JdbcDecoder[Myenum] = JdbcDecoder.stringDecoder.flatMap { s =>
     new JdbcDecoder[Myenum] {
       override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, Myenum) = {
@@ -60,7 +64,7 @@ object Myenum {
   implicit lazy val jsonDecoder: JsonDecoder[Myenum] = JsonDecoder.string.mapOrFail(Myenum.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Myenum] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[Myenum] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[Myenum] = ParameterMetaData.instance[Myenum](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
+  implicit lazy val parameterMetadata: ParameterMetaData[Myenum] = ParameterMetaData.instance[Myenum]("public.myenum", Types.OTHER)
   implicit lazy val setter: Setter[Myenum] = Setter.stringSetter.contramap(_.value)
   implicit lazy val text: Text[Myenum] = new Text[Myenum] {
     override def unsafeEncode(v: Myenum, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)

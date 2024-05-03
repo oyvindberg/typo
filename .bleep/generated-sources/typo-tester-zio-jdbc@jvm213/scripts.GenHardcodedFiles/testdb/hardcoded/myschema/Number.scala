@@ -8,6 +8,7 @@ package hardcoded
 package myschema
 
 import java.sql.ResultSet
+import java.sql.Types
 import testdb.hardcoded.Text
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder
@@ -41,7 +42,10 @@ object Number {
               
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[Number]] = testdb.hardcoded.StringArrayDecoder.map(a => if (a == null) null else a.map(force))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[Number]] = JdbcEncoder.singleParamEncoder(using arraySetter)
-  implicit lazy val arraySetter: Setter[Array[Number]] = testdb.hardcoded.StringArraySetter.contramap(_.map(_.value))
+  implicit lazy val arraySetter: Setter[Array[Number]] = Setter.forSqlType[Array[Number]](
+      (ps, i, v) => ps.setArray(i, ps.getConnection.createArrayOf("myschema.number", v.map(x => x.value))),
+      java.sql.Types.ARRAY
+    )
   implicit lazy val jdbcDecoder: JdbcDecoder[Number] = JdbcDecoder.stringDecoder.flatMap { s =>
     new JdbcDecoder[Number] {
       override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, Number) = {
@@ -61,7 +65,7 @@ object Number {
   implicit lazy val jsonDecoder: JsonDecoder[Number] = JsonDecoder.string.mapOrFail(Number.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Number] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[Number] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[Number] = ParameterMetaData.instance[Number](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
+  implicit lazy val parameterMetadata: ParameterMetaData[Number] = ParameterMetaData.instance[Number]("myschema.number", Types.OTHER)
   implicit lazy val setter: Setter[Number] = Setter.stringSetter.contramap(_.value)
   implicit lazy val text: Text[Number] = new Text[Number] {
     override def unsafeEncode(v: Number, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)

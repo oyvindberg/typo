@@ -11,6 +11,7 @@ import anorm.Column
 import anorm.ParameterMetaData
 import anorm.SqlMappingError
 import anorm.ToStatement
+import java.sql.Types
 import play.api.libs.json.JsError
 import play.api.libs.json.JsSuccess
 import play.api.libs.json.JsValue
@@ -41,12 +42,12 @@ object Number {
   val ByName: Map[String, Number] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayColumn: Column[Array[Number]] = Column.columnToArray(column, implicitly)
-  implicit lazy val arrayToStatement: ToStatement[Array[Number]] = ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData).contramap(_.map(_.value))
+  implicit lazy val arrayToStatement: ToStatement[Array[Number]] = ToStatement[Array[Number]]((ps, i, arr) => ps.setArray(i, ps.getConnection.createArrayOf("myschema.number", arr.map[AnyRef](_.value))))
   implicit lazy val column: Column[Number] = Column.columnToString.mapResult(str => Number(str).left.map(SqlMappingError.apply))
   implicit lazy val ordering: Ordering[Number] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[Number] = new ParameterMetaData[Number] {
-    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
+    override def sqlType: String = "myschema.number"
+    override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[Number] = Reads[Number]{(value: JsValue) => value.validate(Reads.StringReads).flatMap(str => Number(str).fold(JsError.apply, JsSuccess(_)))}
   implicit lazy val text: Text[Number] = new Text[Number] {

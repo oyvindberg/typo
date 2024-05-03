@@ -26,6 +26,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
   val NonEmptyList = sc.Type.Qualified("cats.data.NonEmptyList")
   val fromWrite = sc.Type.Qualified("doobie.syntax.SqlInterpolator.SingleFragment.fromWrite")
   val FragmentOps = sc.Type.Qualified("doobie.postgres.syntax.FragmentOps")
+  val JdbcType = sc.Type.Qualified("doobie.enumerated.JdbcType")
 
   val arrayGetName: sc.Ident = sc.Ident("arrayGet")
   val arrayPutName: sc.Ident = sc.Ident("arrayPut")
@@ -510,7 +511,9 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
   override val defaultedInstance: List[sc.Given] =
     textSupport.map(_.defaultedInstance).toList
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.Given] =
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, enm: db.StringEnum): List[sc.Given] = {
+    val sqlTypeLit = sc.StrLit(enm.name.value)
+    val sqlArrayTypeLit = sc.StrLit("_" + enm.name.value)
     List(
       Some(
         sc.Given(
@@ -518,7 +521,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = putName,
           implicitParams = Nil,
           tpe = Put.of(wrapperType),
-          body = code"""${lookupPutFor(underlying)}.contramap(_.value)"""
+          body = code"$Put.Advanced.one[$wrapperType]($JdbcType.Other, $NonEmptyList.one($sqlTypeLit), (ps, i, a) => ps.setString(i, a.value), (rs, i, a) => rs.updateString(i, a.value))"
         )
       ),
       Some(
@@ -527,7 +530,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = arrayPutName,
           implicitParams = Nil,
           tpe = Put.of(sc.Type.ArrayOf(wrapperType)),
-          body = code"""${lookupPutFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"""
+          body = code"$Put.Advanced.array[${TypesScala.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit), $sqlTypeLit).contramap(_.map(_.value))"
         )
       ),
       Some(
@@ -545,7 +548,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = arrayGetName,
           implicitParams = Nil,
           tpe = Get.of(sc.Type.ArrayOf(wrapperType)),
-          body = code"""${lookupGetFor(sc.Type.ArrayOf(underlying))}.map(_.map(force))"""
+          body = code"${lookupGetFor(sc.Type.ArrayOf(underlying))}.map(_.map(force))"
         )
       ),
       Some(
@@ -554,7 +557,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = writeName,
           implicitParams = Nil,
           tpe = Write.of(wrapperType),
-          body = code"""$Write.fromPut($putName)"""
+          body = code"$Write.fromPut($putName)"
         )
       ),
       Some(
@@ -563,11 +566,12 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = readName,
           implicitParams = Nil,
           tpe = Read.of(wrapperType),
-          body = code"""$Read.fromGet($getName)"""
+          body = code"$Read.fromGet($getName)"
         )
       ),
       textSupport.map(_.anyValInstance(wrapperType, underlying))
     ).flatten
+  }
 
   override def wrapperTypeInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Given] =
     List(
@@ -762,7 +766,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
             implicitParams = Nil,
             tpe = Get.of(arrayType),
             body = code"""|$Get.Advanced.array[${TypesScala.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit))
-                        |  .map(_.map($v => ${toTypo.toTypo(code"$v.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)}))""".stripMargin
+                          |  .map(_.map($v => ${toTypo.toTypo(code"$v.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)}))""".stripMargin
           ),
           sc.Given(
             tparams = Nil,
@@ -770,7 +774,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
             implicitParams = Nil,
             tpe = Put.of(arrayType),
             body = code"""|$Put.Advanced.array[${TypesScala.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit), $sqlTypeLit)
-                        |  .contramap(_.map($v => ${fromTypo.fromTypo0(v)}))""".stripMargin
+                          |  .contramap(_.map($v => ${fromTypo.fromTypo0(v)}))""".stripMargin
           )
         )
       }

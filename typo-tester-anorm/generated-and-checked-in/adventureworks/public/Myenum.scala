@@ -11,6 +11,7 @@ import anorm.Column
 import anorm.ParameterMetaData
 import anorm.SqlMappingError
 import anorm.ToStatement
+import java.sql.Types
 import play.api.libs.json.JsError
 import play.api.libs.json.JsSuccess
 import play.api.libs.json.JsValue
@@ -40,12 +41,12 @@ object Myenum {
   val ByName: Map[String, Myenum] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayColumn: Column[Array[Myenum]] = Column.columnToArray(column, implicitly)
-  implicit lazy val arrayToStatement: ToStatement[Array[Myenum]] = ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData).contramap(_.map(_.value))
+  implicit lazy val arrayToStatement: ToStatement[Array[Myenum]] = ToStatement[Array[Myenum]]((ps, i, arr) => ps.setArray(i, ps.getConnection.createArrayOf("public.myenum", arr.map[AnyRef](_.value))))
   implicit lazy val column: Column[Myenum] = Column.columnToString.mapResult(str => Myenum(str).left.map(SqlMappingError.apply))
   implicit lazy val ordering: Ordering[Myenum] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[Myenum] = new ParameterMetaData[Myenum] {
-    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
+    override def sqlType: String = "public.myenum"
+    override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[Myenum] = Reads[Myenum]{(value: JsValue) => value.validate(Reads.StringReads).flatMap(str => Myenum(str).fold(JsError.apply, JsSuccess(_)))}
   implicit lazy val text: Text[Myenum] = new Text[Myenum] {

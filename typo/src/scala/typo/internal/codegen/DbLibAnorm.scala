@@ -609,14 +609,16 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
   override val defaultedInstance: List[sc.Given] =
     textSupport.map(_.defaultedInstance).toList
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.Given] =
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, enm: db.StringEnum): List[sc.Given] = {
+    val sqlTypeLit = sc.StrLit(enm.name.value)
+    val arrayWrapper = sc.Type.ArrayOf(wrapperType)
     List(
       Some(
         sc.Given(
           tparams = Nil,
           name = arrayColumnName,
           implicitParams = Nil,
-          tpe = Column.of(sc.Type.ArrayOf(wrapperType)),
+          tpe = Column.of(arrayWrapper),
           body = code"""$Column.columnToArray($columnName, implicitly)"""
         )
       ),
@@ -643,8 +645,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           tparams = Nil,
           name = arrayToStatementName,
           implicitParams = Nil,
-          tpe = ToStatement.of(sc.Type.ArrayOf(wrapperType)),
-          body = code"${lookupToStatementFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"
+          tpe = ToStatement.of(arrayWrapper),
+          body = code"$ToStatement[$arrayWrapper]((ps, i, arr) => ps.setArray(i, ps.getConnection.createArrayOf($sqlTypeLit, arr.map[AnyRef](_.value))))"
         )
       ),
       Some(
@@ -654,13 +656,14 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           implicitParams = Nil,
           tpe = ParameterMetaData.of(wrapperType),
           body = code"""|new $ParameterMetaData[$wrapperType] {
-                 |  override def sqlType: ${TypesJava.String} = ${lookupParameterMetaDataFor(underlying)}.sqlType
-                 |  override def jdbcType: ${TypesScala.Int} = ${lookupParameterMetaDataFor(underlying)}.jdbcType
-                 |}""".stripMargin
+                        |  override def sqlType: ${TypesJava.String} = $sqlTypeLit
+                        |  override def jdbcType: ${TypesScala.Int} = ${TypesJava.SqlTypes}.OTHER
+                        |}""".stripMargin
         )
       ),
       textSupport.map(_.anyValInstance(wrapperType, underlying))
     ).flatten
+  }
 
   override def wrapperTypeInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Given] =
     List(

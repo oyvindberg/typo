@@ -623,26 +623,31 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
   override val defaultedInstance: List[sc.Given] =
     textSupport.map(_.defaultedInstance).toList
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.ClassMember] = {
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, enm: db.StringEnum): List[sc.ClassMember] = {
+    val sqlTypeLit = sc.StrLit(enm.name.value)
+    val arrayWrapper = sc.Type.ArrayOf(wrapperType)
     val arraySetter = sc.Given(
       tparams = Nil,
       name = arraySetterName,
       implicitParams = Nil,
-      tpe = Setter.of(sc.Type.ArrayOf(wrapperType)),
-      body = code"""${lookupSetter(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"""
+      tpe = Setter.of(arrayWrapper),
+      body = code"""|$Setter.forSqlType[$arrayWrapper](
+                    |    (ps, i, v) => ps.setArray(i, ps.getConnection.createArrayOf($sqlTypeLit, v.map(x => x.value))),
+                    |    java.sql.Types.ARRAY
+                    |  )""".stripMargin
     )
     val arrayJdbcDecoder = sc.Given(
       tparams = Nil,
       name = arrayJdbcDecoderName,
       implicitParams = Nil,
-      tpe = JdbcDecoder.of(sc.Type.ArrayOf(wrapperType)),
+      tpe = JdbcDecoder.of(arrayWrapper),
       body = code"""${lookupJdbcDecoder(sc.Type.ArrayOf(underlying))}.map(a => if (a == null) null else a.map(force))"""
     )
     val arrayJdbcEncoder = sc.Given(
       tparams = Nil,
       name = arrayJdbcEncoderName,
       implicitParams = Nil,
-      tpe = JdbcEncoder.of(sc.Type.ArrayOf(wrapperType)),
+      tpe = JdbcEncoder.of(arrayWrapper),
       // JdbcEncoder for unary types defined in terms of `Setter`
       body = code"""$JdbcEncoder.singleParamEncoder(using ${arraySetterName})"""
     )
@@ -682,8 +687,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     )
 
     val parameterMetadata = {
-      val body =
-        code"$ParameterMetaData.instance[$wrapperType](${lookupParameterMetaDataFor(underlying)}.sqlType, ${lookupParameterMetaDataFor(underlying)}.jdbcType)"
+      val body = code"$ParameterMetaData.instance[$wrapperType](${sqlTypeLit}, ${TypesJava.SqlTypes}.OTHER)"
       sc.Given(tparams = Nil, name = parameterMetadataName, implicitParams = Nil, tpe = ParameterMetaData.of(wrapperType), body = body)
     }
 

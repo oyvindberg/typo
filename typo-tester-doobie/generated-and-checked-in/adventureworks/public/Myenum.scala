@@ -6,6 +6,8 @@
 package adventureworks
 package public
 
+import cats.data.NonEmptyList
+import doobie.enumerated.JdbcType
 import doobie.postgres.Text
 import doobie.util.Get
 import doobie.util.Put
@@ -38,12 +40,12 @@ object Myenum {
   val ByName: Map[String, Myenum] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayGet: Get[Array[Myenum]] = adventureworks.StringArrayMeta.get.map(_.map(force))
-  implicit lazy val arrayPut: Put[Array[Myenum]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
+  implicit lazy val arrayPut: Put[Array[Myenum]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_public.myenum"), "public.myenum").contramap(_.map(_.value))
   implicit lazy val decoder: Decoder[Myenum] = Decoder.decodeString.emap(Myenum.apply)
   implicit lazy val encoder: Encoder[Myenum] = Encoder.encodeString.contramap(_.value)
   implicit lazy val get: Get[Myenum] = Meta.StringMeta.get.temap(Myenum.apply)
   implicit lazy val ordering: Ordering[Myenum] = Ordering.by(_.value)
-  implicit lazy val put: Put[Myenum] = Meta.StringMeta.put.contramap(_.value)
+  implicit lazy val put: Put[Myenum] = Put.Advanced.one[Myenum](JdbcType.Other, NonEmptyList.one("public.myenum"), (ps, i, a) => ps.setString(i, a.value), (rs, i, a) => rs.updateString(i, a.value))
   implicit lazy val read: Read[Myenum] = Read.fromGet(get)
   implicit lazy val text: Text[Myenum] = new Text[Myenum] {
     override def unsafeEncode(v: Myenum, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
