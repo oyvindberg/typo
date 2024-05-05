@@ -35,7 +35,7 @@ object EmployeedepartmenthistoryId {
 
 ## I don't want these
 
-if you have some tables where you don't want the type-safety this brings, you can [customize](customization/overview.md)
+if you have some tables where you don't want the type-safety this brings, you can [customize](../customization/overview.md)
 code generation by tweaking `Options#enablePrimaryKeyType`:
 
 ```scala mdoc:silent

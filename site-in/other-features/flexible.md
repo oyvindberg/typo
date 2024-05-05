@@ -21,4 +21,4 @@ For now you have the option of `doobie`, `anorm` or `zio-jdbc`, with `skunk` to 
 
 ## Bring your own JSON library
 
-In the same manner, you can generate JSON codecs for the library you already use, see [json](other-features/json.md)
+In the same manner, you can generate JSON codecs for the library you already use, see [json](../other-features/json.md)

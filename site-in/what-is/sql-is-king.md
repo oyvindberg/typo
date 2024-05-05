@@ -36,7 +36,7 @@ src="https://github.com/oyvindberg/typo/assets/247937/df7c4f2d-b118-4081-81c6-dd
 
 This video shows how you can use parameters. 
 
-It also shows the syntax to [override inferred nullability and types](customization/customize-sql-files.md).
+It also shows the syntax to [override inferred nullability and types](../customization/customize-sql-files.md).
 While PostgreSQL is pretty good at both, it's not always exactly what you want. 
 In particular, parameters are optional by default. 
 

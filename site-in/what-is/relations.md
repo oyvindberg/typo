@@ -45,7 +45,7 @@ comment on column address.spatiallocation is 'Latitude and longitude of this add
 
 ### Primary Key Types
 
-Typo generates strongly typed [primary key types](type-safety/id-types.md), ensuring correct usage and enforcement of data integrity. 
+Typo generates strongly typed [primary key types](../type-safety/id-types.md), ensuring correct usage and enforcement of data integrity. 
 You also get types for composite primary keys.
 
 ```scala
@@ -59,7 +59,7 @@ object AddressId {
 ### Row Class
 
 You'll receive a meticulously crafted row case class that precisely mirrors your table structure. 
-The field names are beautified (see [Customize naming](customization/customize-naming.md) for how to tweak naming), 
+The field names are beautified (see [Customize naming](../customization/customize-naming.md) for how to tweak naming), 
 and the corresponding types are correct.
 
 Relevant column comments, check constraints and foreign keys are clearly marked, 
@@ -166,7 +166,7 @@ case class AddressRowUnsaved(
 
 ### Readonly repositories
 
-If you have a bunch of tables you just want to read, you can [customize](customization/overview.md) 
+If you have a bunch of tables you just want to read, you can [customize](../customization/overview.md) 
 the repositories to only expose read methods.
 
 ## Views

@@ -3,11 +3,11 @@ title: Customize column types
 ---
 
 Note that use of this feature is in general **discouraged**, 
-see warning in [user-selected type](type-safety/user-selected-types.md).
+see warning in [user-selected type](../type-safety/user-selected-types.md).
 
 If you're not happy with the types PostgreSQL and Typo has ended up with for a given column, you can override it.
 
-This is referred to within Typo as a [user-selected type](type-safety/user-selected-types.md).
+This is referred to within Typo as a [user-selected type](../type-safety/user-selected-types.md).
 
 
 

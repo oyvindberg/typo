@@ -2,7 +2,7 @@
 title: "Patterns: Dynamic queries"
 ---
 
-If you use [sql files](what-is/sql-is-king.md), there is a very high chance you'll want some queries to
+If you use [sql files](../what-is/sql-is-king.md), there is a very high chance you'll want some queries to
 a bit dynamic. The way forward here is to move the dynamism into the sql itself. 
 
 A frequently used pattern is a query with an optional filter that selects all rows by default. This can be achieved using a IS NULL construct. 

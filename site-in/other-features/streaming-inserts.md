@@ -2,7 +2,7 @@
 title: Streaming inserts with COPY API
 ---
 
-If you [customize](customization/overview.md) Typo with `enableStreamingInserts = true`,
+If you [customize](../customization/overview.md) Typo with `enableStreamingInserts = true`,
 you can use the `insertStreaming` and `insertStreamingUnsaved` method on your repositories to insert a stream of data
 into the database.
 

@@ -2,7 +2,7 @@
 title: "Patterns: The multi-repo"
 ---
 
-There has been some comments about how [the generated repositories](what-is/relations.md) do not match with peoples preferences of what a repository should be.
+There has been some comments about how [the generated repositories](../what-is/relations.md) do not match with peoples preferences of what a repository should be.
 For instance you may prefer that your repositories coordinate multiple tables.
 
 And that's more than fair - Often you need to coordinate multiple tables in a transaction.
@@ -18,9 +18,9 @@ You still get huge benefits from using Typo in this case:
 
 - All of this is typesafe
 - You get perfect auto-complete from your IDE
-- Strongly typed [Id types](type-safety/id-types.md) and [type flow](type-safety/type-flow.md) ensure that you have to follow foreign keys correctly  
+- Strongly typed [Id types](../type-safety/id-types.md) and [type flow](../type-safety/type-flow.md) ensure that you have to follow foreign keys correctly  
 - It's fairly readable. 
-- It's testable! You can even wire in [stub repositories](other-features/testing-with-stubs.md) and test it all without a running database.
+- It's testable! You can even wire in [stub repositories](../other-features/testing-with-stubs.md) and test it all without a running database.
 
 Just have a look at the example and think how long it would take you to write this without Typo.
 
@@ -121,7 +121,7 @@ c.setAutoCommit(false)
 
 Here is example usage:
 
-Note that we can easily create a deep dependency graph with random data due to [testInsert](other-features/testing-with-random-values.md).
+Note that we can easily create a deep dependency graph with random data due to [testInsert](../other-features/testing-with-random-values.md).
 ```scala mdoc:silent
 import adventureworks.{TestInsert, withConnection}
 import adventureworks.userdefined.FirstName

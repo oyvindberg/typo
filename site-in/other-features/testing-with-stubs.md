@@ -18,7 +18,7 @@ interfaces backed by a mutable `Map`. This can be generated for all tables with 
 
 ## DSL
 
-Notable, these mocks work with the [dsl](what-is/dsl.md), which lets you describe semi-complex joins, updates, where predicates,
+Notable, these mocks work with the [dsl](../what-is/dsl.md), which lets you describe semi-complex joins, updates, where predicates,
 string operations and so on in your code, and test it in-memory!
 
 ### *Note

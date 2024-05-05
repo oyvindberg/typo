@@ -9,7 +9,7 @@ And it's all full of implicit type class instances.
 
 The main thing you can affect is to ask for less code to be generated. 
 
-This is done by [customizing selected relations](customization/customize-selected-relations.md).
+This is done by [customizing selected relations](../customization/customize-selected-relations.md).
 
 ## The following measures have been taken to compile code fast 
 
