@@ -6,7 +6,7 @@ import doobie.ConnectionIO
 import doobie.free.connection.delay
 import doobie.implicits.toSqlInterpolator
 import doobie.util.fragment.Fragment
-import doobie.util.{Put, Read, fragments}
+import doobie.util.{Put, Read, Write, fragments}
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -20,8 +20,8 @@ trait UpdateBuilder[Fields[_], Row] {
   final def where[N[_]: Nullability](v: Fields[Row] => SqlExpr[Boolean, N, Row]): UpdateBuilder[Fields, Row] =
     withParams(params.where(f => v(f).?.coalesce(false)))
 
-  final def setValue[N[_], T](col: Fields[Row] => SqlExpr.FieldLikeNotId[T, N, Row])(value: N[T])(implicit P: Put[N[T]]): UpdateBuilder[Fields, Row] =
-    withParams(params.set(col, _ => SqlExpr.Const[T, N, Row](value, P)))
+  final def setValue[N[_], T](col: Fields[Row] => SqlExpr.FieldLikeNotId[T, N, Row])(value: N[T])(implicit P: Put[T], W: Write[N[T]]): UpdateBuilder[Fields, Row] =
+    withParams(params.set(col, _ => SqlExpr.Const[T, N, Row](value, P, W)))
 
   final def setComputedValue[T, N[_]](col: Fields[Row] => SqlExpr.FieldLikeNotId[T, N, Row])(value: SqlExpr.FieldLikeNotId[T, N, Row] => SqlExpr[T, N, Row]): UpdateBuilder[Fields, Row] =
     withParams(params.set(col, fields => value(col(fields))))
