@@ -2,12 +2,11 @@ package adventureworks
 
 import adventureworks.customtypes.{TypoLocalDateTime, TypoUUID}
 import adventureworks.person.businessentity.*
-import adventureworks.withConnection
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
-import zio.{Chunk, ZIO}
 import zio.stream.ZStream
+import zio.{Chunk, ZIO}
 
 import java.time.LocalDateTime
 
