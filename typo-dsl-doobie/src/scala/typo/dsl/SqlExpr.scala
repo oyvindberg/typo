@@ -1,5 +1,6 @@
 package typo.dsl
 
+import cats.implicits.toFoldableOps
 import doobie.Fragment
 import doobie.implicits.toSqlInterpolator
 import doobie.util.{Put, Write}
@@ -138,7 +139,7 @@ object SqlExpr {
       extends FieldLike[T, Option, R](prefix, name, sqlReadCast, sqlWriteCast)(get, set)
       with FieldLikeNotId[T, Option, R]
 
-  case class Const[T, N[_], R](value: N[T], P: Put[N[T]]) extends SqlExpr[T, N, R] {
+  case class Const[T, N[_], R](value: N[T], P: Put[T], W: Write[N[T]]) extends SqlExpr[T, N, R] {
     override def eval(row: R): N[T] =
       value
 
@@ -147,7 +148,7 @@ object SqlExpr {
         case _: Put.Basic[_]    => Fragment.empty
         case p: Put.Advanced[_] => Fragment.const(s"::${p.schemaTypes.head}")
       }
-      fr"${Write.fromPut(P).toFragment(value)}$cast"
+      fr"${W.toFragment(value)}$cast"
     }
   }
 
@@ -194,7 +195,7 @@ object SqlExpr {
     override def eval(row: R): N[O] =
       N.mapN(left.eval(row), right.eval(row))(op.eval)
     override def render(counter: AtomicInteger): Fragment =
-      fr"${left.render(counter)} ${Fragment.const(op.name)} ${right.render(counter)}"
+      fr"(${left.render(counter)} ${Fragment.const(op.name)} ${right.render(counter)})"
   }
 
   case class Underlying[T, TT, N[_], R](expr: SqlExpr[T, N, R], bijection: Bijection[T, TT], N: Nullability[N]) extends SqlExpr[TT, N, R] {
@@ -242,16 +243,21 @@ object SqlExpr {
   }
 
   // automatically put values in a constant expression
-  implicit def asConstOpt[T, R](t: Option[T])(implicit x: Put[Option[T]]): SqlExpr[T, Option, R] =
-    Const(t, x)
+  implicit def asConstOpt[T, R](t: Option[T])(implicit P: Put[T]): SqlExpr.Const[T, Option, R] =
+    Const(t, P, Write.fromPutOption(using P))
 
-  implicit def asConstRequired[T: Put, R](t: T): SqlExpr[T, Required, R] =
-    Const[T, Required, R](t, implicitly)
+  implicit def asConstRequired[T, R](t: T)(implicit P: Put[T]): SqlExpr.Const[T, Required, R] =
+    Const[T, Required, R](t, P, Write.fromPut(using P))
 
   // some syntax to construct field sort order
-  implicit class SqlExprSortSyntax[NT, R](private val expr: SqlExprNoHkt[NT, R]) extends AnyVal {
-    def asc(implicit O: Ordering[NT]): SortOrder[NT, R] = SortOrder(expr, ascending = true, nullsFirst = false)
-    def desc(implicit O: Ordering[NT]): SortOrder[NT, R] = SortOrder(expr, ascending = false, nullsFirst = false)
+  implicit class SqlExprSortSyntax[T, N[_], R](private val expr: SqlExpr[T, N, R]) extends AnyVal {
+    def asc(implicit O: Ordering[T], N: Nullability[N]): SortOrder[T, N, R] = SortOrder(expr, ascending = true, nullsFirst = false)
+    def desc(implicit O: Ordering[T], N: Nullability[N]): SortOrder[T, N, R] = SortOrder(expr, ascending = false, nullsFirst = false)
+  }
+
+  final case class RowExpr[R](exprs: List[SqlExpr.SqlExprNoHkt[?, R]]) extends SqlExpr[List[?], Required, R] {
+    override def eval(row: R): List[?] = exprs.map(_.eval(row))
+    override def render(counter: AtomicInteger): Fragment = fr"(${exprs.map(_.render(counter)).intercalate(fr",")})"
   }
 
   implicit class SqlExprArraySyntax[T, N[_], R](private val expr: SqlExpr[Array[T], N, R]) extends AnyVal {

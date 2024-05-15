@@ -1,6 +1,8 @@
 package typo.dsl
 
 import java.sql.Connection
+import typo.dsl.internal.seeks
+import typo.dsl.internal.mocks.RowOrdering
 
 case class SelectBuilderMock[Fields[_], Row](
     structure: Structure[Fields, Row],
@@ -11,7 +13,7 @@ case class SelectBuilderMock[Fields[_], Row](
     copy(params = sqlParams)
 
   override def toList(implicit c: Connection): List[Row] =
-    SelectParams.applyParams(structure.fields, all(), params)
+    SelectBuilderMock.applyParams(structure.fields, all(), params)
 
   override def joinOn[Fields2[_], N[_]: Nullability, Row2](
       other: SelectBuilder[Fields2, Row2]
@@ -54,4 +56,16 @@ case class SelectBuilderMock[Fields[_], Row](
   }
 
   override def sql: Option[Fragment] = None
+}
+
+object SelectBuilderMock {
+  def applyParams[Fields[_], Row](fields: Fields[Row], rows: List[Row], params: SelectParams[Fields, Row]): List[Row] = {
+    val (filters, orderBys) = seeks.expand(fields, params)
+    implicit val rowOrdering: Ordering[Row] = new RowOrdering(orderBys)
+    rows
+      .filter(row => filters.forall(_.eval(row).getOrElse(false)))
+      .sorted
+      .drop(params.offset.getOrElse(0))
+      .take(params.limit.getOrElse(Int.MaxValue))
+  }
 }

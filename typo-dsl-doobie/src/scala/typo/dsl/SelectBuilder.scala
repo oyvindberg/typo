@@ -43,8 +43,17 @@ trait SelectBuilder[Fields[_], Row] {
     *        .orderBy { case ((_, _), productModel) => productModel(_.name).desc.withNullsFirst }
     * }}}
     */
-  final def orderBy(v: Fields[Hidden] => SortOrder[?, Hidden]): SelectBuilder[Fields, Row] =
-    withParams(params.orderBy(v.asInstanceOf[Fields[Row] => SortOrder[?, Row]]))
+  final def orderBy[T, N[_]](v: Fields[Hidden] => SortOrder[T, N, Hidden]): SelectBuilder[Fields, Row] =
+    withParams(params.orderBy(v.asInstanceOf[Fields[Row] => SortOrderNoHkt[?, Row]]))
+
+  final def seek[T, N[_]](v: Fields[Row] => SortOrder[T, N, Row])(value: SqlExpr.Const[T, N, Row]): SelectBuilder[Fields, Row] =
+    withParams(params.seek(SelectParams.Seek[Fields, Row, T, N](v, value)))
+
+  final def maybeSeek[T, N[_]](v: Fields[Row] => SortOrder[T, N, Row])(maybeValue: Option[SqlExpr.Const[T, N, Row]]): SelectBuilder[Fields, Row] =
+    maybeValue match {
+      case Some(value) => seek(v)(value)
+      case None        => orderBy(v.asInstanceOf[Fields[Hidden] => SortOrder[T, N, Hidden]])
+    }
   final def offset(v: Int): SelectBuilder[Fields, Row] =
     withParams(params.offset(v))
   final def limit(v: Int): SelectBuilder[Fields, Row] =

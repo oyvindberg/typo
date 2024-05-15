@@ -185,7 +185,7 @@ object SqlExpr {
     override def eval(row: R): N[O] =
       N.mapN(left.eval(row), right.eval(row))(op.eval)
     override def render(counter: AtomicInteger): SqlFragment =
-      sql"${left.render(counter)} ${SqlFragment(op.name)} ${right.render(counter)}"
+      sql"(${left.render(counter)} ${SqlFragment(op.name)} ${right.render(counter)})"
   }
 
   final case class Underlying[T, TT, N[_], R](expr: SqlExpr[T, N, R], bijection: Bijection[T, TT], N: Nullability[N]) extends SqlExpr[TT, N, R] {
@@ -233,16 +233,21 @@ object SqlExpr {
   }
 
   // automatically put values in a constant expression
-  implicit def asConstOpt[T, R](t: Option[T])(implicit E: JdbcEncoder[Option[T]], P: ParameterMetaData[T]): SqlExpr[T, Option, R] =
+  implicit def asConstOpt[T, R](t: Option[T])(implicit E: JdbcEncoder[Option[T]], P: ParameterMetaData[T]): SqlExpr.Const[T, Option, R] =
     Const(t, E, P)
 
-  implicit def asConstRequired[T: JdbcEncoder: ParameterMetaData, R](t: T): SqlExpr[T, Required, R] =
+  implicit def asConstRequired[T: JdbcEncoder: ParameterMetaData, R](t: T): SqlExpr.Const[T, Required, R] =
     Const[T, Required, R](t, implicitly, implicitly)
 
   // some syntax to construct field sort order
-  implicit class SqlExprSortSyntax[NT, R](private val expr: SqlExprNoHkt[NT, R]) extends AnyVal {
-    def asc(implicit O: Ordering[NT]): SortOrder[NT, R] = SortOrder(expr, ascending = true, nullsFirst = false)
-    def desc(implicit O: Ordering[NT]): SortOrder[NT, R] = SortOrder(expr, ascending = false, nullsFirst = false)
+  implicit class SqlExprSortSyntax[T, N[_], R](private val expr: SqlExpr[T, N, R]) extends AnyVal {
+    def asc(implicit O: Ordering[T], N: Nullability[N]): SortOrder[T, N, R] = SortOrder(expr, ascending = true, nullsFirst = false)
+    def desc(implicit O: Ordering[T], N: Nullability[N]): SortOrder[T, N, R] = SortOrder(expr, ascending = false, nullsFirst = false)
+  }
+
+  final case class RowExpr[R](exprs: List[SqlExpr.SqlExprNoHkt[?, R]]) extends SqlExpr[List[?], Required, R] {
+    override def eval(row: R): List[?] = exprs.map(_.eval(row))
+    override def render(counter: AtomicInteger): SqlFragment = exprs.map(_.render(counter)).mkFragment(sql"(", sql",", sql")")
   }
 
   implicit class SqlExprArraySyntax[T, N[_], R](private val expr: SqlExpr[Array[T], N, R]) extends AnyVal {

@@ -1,5 +1,7 @@
 package typo.dsl
 
+import typo.dsl.internal.seeks
+import typo.dsl.internal.mocks.RowOrdering
 import zio.{Chunk, ZIO}
 import zio.jdbc.*
 
@@ -12,7 +14,7 @@ final case class SelectBuilderMock[Fields[_], Row](
     copy(params = sqlParams)
 
   override def toChunk: ZIO[ZConnection, Throwable, Chunk[Row]] =
-    all.map(all => SelectParams.applyParams(structure.fields, all, params))
+    all.map(all => SelectBuilderMock.applyParams(structure.fields, all, params))
 
   override def joinOn[Fields2[_], N[_]: Nullability, Row2](
       other: SelectBuilder[Fields2, Row2]
@@ -62,4 +64,16 @@ final case class SelectBuilderMock[Fields[_], Row](
   }
 
   override def sql: Option[SqlFragment] = None
+}
+
+object SelectBuilderMock {
+  def applyParams[Fields[_], Row](fields: Fields[Row], rows: Chunk[Row], params: SelectParams[Fields, Row]): Chunk[Row] = {
+    val (filters, orderBys) = seeks.expand(fields, params)
+    implicit val rowOrdering: Ordering[Row] = new RowOrdering(orderBys)
+    rows
+      .filter(row => filters.forall(_.eval(row).getOrElse(false)))
+      .sorted
+      .drop(params.offset.getOrElse(0))
+      .take(params.limit.getOrElse(Int.MaxValue))
+  }
 }

@@ -1,35 +1,48 @@
 package typo.dsl
 
 import typo.dsl.Fragment.FragmentStringInterpolator
+import typo.dsl.internal.seeks
 
 import java.util.concurrent.atomic.AtomicInteger
 
-case class SelectParams[Fields[_], Row](
+final case class SelectParams[Fields[_], Row](
     where: List[Fields[Row] => SqlExpr[Boolean, Option, Row]],
-    orderBy: List[Fields[Row] => SortOrder[?, Row]],
+    orderBy: List[Fields[Row] => SortOrderNoHkt[?, Row]],
+    seeks: List[SelectParams.SeekNoHkt[Fields, Row, ?]],
     offset: Option[Int],
     limit: Option[Int]
 ) {
   def where(v: Fields[Row] => SqlExpr[Boolean, Option, Row]): SelectParams[Fields, Row] = copy(where = where :+ v)
-  def orderBy(v: Fields[Row] => SortOrder[?, Row]): SelectParams[Fields, Row] = copy(orderBy = orderBy :+ v)
+  def orderBy(v: Fields[Row] => SortOrderNoHkt[?, Row]): SelectParams[Fields, Row] = copy(orderBy = orderBy :+ v)
+  def seek(v: SelectParams.SeekNoHkt[Fields, Row, ?]): SelectParams[Fields, Row] = copy(seeks = seeks :+ v)
   def offset(v: Int): SelectParams[Fields, Row] = copy(offset = Some(v))
   def limit(v: Int): SelectParams[Fields, Row] = copy(limit = Some(v))
 }
 
 object SelectParams {
+  sealed trait SeekNoHkt[Fields[_], Row, NT] {
+    val f: Fields[Row] => SortOrderNoHkt[NT, Row]
+  }
+
+  case class Seek[Fields[_], Row, T, N[_]](
+      f: Fields[Row] => SortOrder[T, N, Row],
+      value: SqlExpr.Const[T, N, Row]
+  ) extends SeekNoHkt[Fields, Row, N[T]]
+
   def empty[Fields[_], Row]: SelectParams[Fields, Row] =
-    SelectParams[Fields, Row](List.empty, List.empty, None, None)
+    SelectParams[Fields, Row](List.empty, List.empty, List.empty, None, None)
 
   def render[Row, Fields[_]](fields: Fields[Row], baseSql: Fragment, counter: AtomicInteger, params: SelectParams[Fields, Row]): Fragment = {
+    val (filters, orderBys) = seeks.expand(fields, params)
 
     val maybeEnd: Option[Fragment] =
       List[Option[Fragment]](
-        params.where.map(w => w(fields)).reduceLeftOption(_.and(_)).map { where =>
+        filters.reduceLeftOption(_.and(_)).map { where =>
           Fragment(" where ") ++ where.render(counter)
         },
-        params.orderBy match {
+        orderBys match {
           case Nil      => None
-          case nonEmpty => Some(frag" order by ${nonEmpty.map(x => x(fields).render(counter)).mkFragment(", ")}")
+          case nonEmpty => Some(frag" order by ${nonEmpty.map(x => x.render(counter)).mkFragment(", ")}")
         },
         params.offset.map(value => Fragment(" offset " + value)),
         params.limit.map { value => Fragment(" limit " + value) }
@@ -43,28 +56,5 @@ object SelectParams {
     }
 
     completeSql
-  }
-
-  def applyParams[Fields[_], Row](fields: Fields[Row], rows: List[Row], params: SelectParams[Fields, Row]): List[Row] = {
-    // precompute filters and order bys for this row structure
-    val filters: List[SqlExpr[Boolean, Option, Row]] =
-      params.where.map(f => f(fields))
-    val orderBys: List[SortOrder[?, Row]] =
-      params.orderBy.map(f => f(fields))
-
-    rows
-      .filter(row => filters.forall(_.eval(row).getOrElse(false)))
-      .sorted((row1: Row, row2: Row) =>
-        orderBys.foldLeft(0) {
-          case (acc, so: SortOrder[t, Row]) if acc == 0 =>
-            val t1: t = so.expr.eval(row1)
-            val t2: t = so.expr.eval(row2)
-            val ordering: Ordering[t] = if (so.ascending) so.ordering else so.ordering.reverse
-            ordering.compare(t1, t2)
-          case (acc, _) => acc
-        }
-      )
-      .drop(params.offset.getOrElse(0))
-      .take(params.limit.getOrElse(Int.MaxValue))
   }
 }
