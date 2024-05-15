@@ -39,8 +39,8 @@ object UpdateBuilder {
       decoder: JdbcDecoder[Row],
       params: UpdateParams[Fields, Row]
   ) extends UpdateBuilder[Fields, Row] {
-    override def withParams(params: UpdateParams[Fields, Row]): UpdateBuilder[Fields, Row] =
-      copy(params = params)
+    override def withParams(sqlParams: UpdateParams[Fields, Row]): UpdateBuilder[Fields, Row] =
+      copy(params = sqlParams)
 
     def mkSql(counter: AtomicInteger, returning: Boolean): SqlFragment = {
       Chunk[Option[SqlFragment]](
@@ -88,8 +88,8 @@ object UpdateBuilder {
       fields: Fields[Row],
       map: scala.collection.mutable.Map[Id, Row]
   ) extends UpdateBuilder[Fields, Row] {
-    override def withParams(params: UpdateParams[Fields, Row]): UpdateBuilder[Fields, Row] =
-      copy(params = params)
+    override def withParams(sqlParams: UpdateParams[Fields, Row]): UpdateBuilder[Fields, Row] =
+      copy(params = sqlParams)
 
     override def sql(returning: Boolean): Option[SqlFragment] = None
 

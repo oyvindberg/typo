@@ -9,7 +9,7 @@ case class SelectBuilderMock[Fields[_], Row](
     params: SelectParams[Fields, Row]
 ) extends SelectBuilder[Fields, Row] {
   override def withParams(sqlParams: SelectParams[Fields, Row]): SelectBuilder[Fields, Row] =
-    copy(params = params)
+    copy(params = sqlParams)
 
   override def toList: ConnectionIO[List[Row]] =
     all.map(all => SelectParams.applyParams(structure.fields, all, params))

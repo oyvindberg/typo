@@ -29,8 +29,8 @@ object DeleteBuilder {
       structure: Structure.Relation[Fields, ?, Row],
       params: DeleteParams[Fields, Row]
   ) extends DeleteBuilder[Fields, Row] {
-    override def withParams(params: DeleteParams[Fields, Row]): DeleteBuilder[Fields, Row] =
-      copy(params = params)
+    override def withParams(sqlParams: DeleteParams[Fields, Row]): DeleteBuilder[Fields, Row] =
+      copy(params = sqlParams)
 
     def mkSql(counter: AtomicInteger): SqlFragment = {
       List[Iterable[SqlFragment]](
@@ -54,8 +54,8 @@ object DeleteBuilder {
       fields: Fields[Row],
       map: scala.collection.mutable.Map[Id, Row]
   ) extends DeleteBuilder[Fields, Row] {
-    override def withParams(params: DeleteParams[Fields, Row]): DeleteBuilder[Fields, Row] =
-      copy(params = params)
+    override def withParams(sqlParams: DeleteParams[Fields, Row]): DeleteBuilder[Fields, Row] =
+      copy(params = sqlParams)
 
     override def sql: Option[SqlFragment] = None
 
