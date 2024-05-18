@@ -122,7 +122,7 @@ object SqlExpr {
   ) extends SqlExpr[T, N, R]
       with FieldLikeNoHkt[N[T], R] {
     override def eval(row: R): N[T] = get(row)
-    override def render(counter: AtomicInteger): Fragment = Fragment.const(value)
+    override def render(counter: AtomicInteger): Fragment = Fragment.const0(value)
   }
 
   sealed trait FieldLikeNotId[T, N[_], R] extends FieldLike[T, N, R] with FieldLikeNotIdNoHkt[N[T], R]
@@ -146,7 +146,7 @@ object SqlExpr {
     override def render(counter: AtomicInteger): Fragment = {
       val cast = P match {
         case _: Put.Basic[_]    => Fragment.empty
-        case p: Put.Advanced[_] => Fragment.const(s"::${p.schemaTypes.head}")
+        case p: Put.Advanced[_] => Fragment.const0(s"::${p.schemaTypes.head}")
       }
       fr"${W.toFragment(value)}$cast"
     }
@@ -168,14 +168,14 @@ object SqlExpr {
     override def eval(row: R): N[O] =
       N.mapN(arg1.eval(row))(f.eval)
     override def render(counter: AtomicInteger): Fragment =
-      fr"${Fragment.const(f.name)}(${arg1.render(counter)})"
+      fr"${Fragment.const0(f.name)}(${arg1.render(counter)})"
   }
 
   case class Apply2[T1, T2, O, N1[_], N2[_], N[_], R](f: SqlFunction2[T1, T2, O], arg1: SqlExpr[T1, N1, R], arg2: SqlExpr[T2, N2, R], N: Nullability2[N1, N2, N]) extends SqlExpr[O, N, R] {
     override def eval(row: R): N[O] =
       N.mapN(arg1.eval(row), arg2.eval(row))(f.eval)
     override def render(counter: AtomicInteger): Fragment =
-      fr"${Fragment.const(f.name)}(${arg1.render(counter)}, ${arg2.render(counter)})"
+      fr"${Fragment.const0(f.name)}(${arg1.render(counter)}, ${arg2.render(counter)})"
   }
 
   case class Apply3[T1, T2, T3, N1[_], N2[_], N3[_], N[_], O, R](
@@ -188,14 +188,14 @@ object SqlExpr {
     override def eval(row: R): N[O] =
       N.mapN(arg1.eval(row), arg2.eval(row), arg3.eval(row))(f.eval)
     override def render(counter: AtomicInteger): Fragment =
-      fr"${Fragment.const(f.name)}(${arg1.render(counter)}, ${arg2.render(counter)}, ${arg3.render(counter)})"
+      fr"${Fragment.const0(f.name)}(${arg1.render(counter)}, ${arg2.render(counter)}, ${arg3.render(counter)})"
   }
 
   case class Binary[T1, T2, O, N1[_], N2[_], N[_], R](left: SqlExpr[T1, N1, R], op: SqlOperator[T1, T2, O], right: SqlExpr[T2, N2, R], N: Nullability2[N1, N2, N]) extends SqlExpr[O, N, R] {
     override def eval(row: R): N[O] =
       N.mapN(left.eval(row), right.eval(row))(op.eval)
     override def render(counter: AtomicInteger): Fragment =
-      fr"(${left.render(counter)} ${Fragment.const(op.name)} ${right.render(counter)})"
+      fr"(${left.render(counter)} ${Fragment.const0(op.name)} ${right.render(counter)})"
   }
 
   case class Underlying[T, TT, N[_], R](expr: SqlExpr[T, N, R], bijection: Bijection[T, TT], N: Nullability[N]) extends SqlExpr[TT, N, R] {

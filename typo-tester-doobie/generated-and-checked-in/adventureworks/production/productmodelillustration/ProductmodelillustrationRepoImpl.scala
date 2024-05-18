@@ -48,11 +48,11 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   }
   override def insert(unsaved: ProductmodelillustrationRowUnsaved): ConnectionIO[ProductmodelillustrationRow] = {
     val fs = List(
-      Some((Fragment.const(s""""productmodelid""""), fr"${fromWrite(unsaved.productmodelid)(Write.fromPut(ProductmodelId.put))}::int4")),
-      Some((Fragment.const(s""""illustrationid""""), fr"${fromWrite(unsaved.illustrationid)(Write.fromPut(IllustrationId.put))}::int4")),
+      Some((Fragment.const0(s""""productmodelid""""), fr"${fromWrite(unsaved.productmodelid)(Write.fromPut(ProductmodelId.put))}::int4")),
+      Some((Fragment.const0(s""""illustrationid""""), fr"${fromWrite(unsaved.illustrationid)(Write.fromPut(IllustrationId.put))}::int4")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

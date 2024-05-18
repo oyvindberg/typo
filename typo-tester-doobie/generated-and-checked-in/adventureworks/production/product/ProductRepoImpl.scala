@@ -47,45 +47,45 @@ class ProductRepoImpl extends ProductRepo {
   }
   override def insert(unsaved: ProductRowUnsaved): ConnectionIO[ProductRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
-      Some((Fragment.const(s""""productnumber""""), fr"${fromWrite(unsaved.productnumber)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""color""""), fr"${fromWrite(unsaved.color)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""safetystocklevel""""), fr"${fromWrite(unsaved.safetystocklevel)(Write.fromPut(TypoShort.put))}::int2")),
-      Some((Fragment.const(s""""reorderpoint""""), fr"${fromWrite(unsaved.reorderpoint)(Write.fromPut(TypoShort.put))}::int2")),
-      Some((Fragment.const(s""""standardcost""""), fr"${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
-      Some((Fragment.const(s""""listprice""""), fr"${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
-      Some((Fragment.const(s""""size""""), fr"${fromWrite(unsaved.size)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""sizeunitmeasurecode""""), fr"${fromWrite(unsaved.sizeunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar")),
-      Some((Fragment.const(s""""weightunitmeasurecode""""), fr"${fromWrite(unsaved.weightunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar")),
-      Some((Fragment.const(s""""weight""""), fr"${fromWrite(unsaved.weight)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric")),
-      Some((Fragment.const(s""""daystomanufacture""""), fr"${fromWrite(unsaved.daystomanufacture)(Write.fromPut(Meta.IntMeta.put))}::int4")),
-      Some((Fragment.const(s""""productline""""), fr"${fromWrite(unsaved.productline)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar")),
-      Some((Fragment.const(s""""class""""), fr"${fromWrite(unsaved.`class`)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar")),
-      Some((Fragment.const(s""""style""""), fr"${fromWrite(unsaved.style)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar")),
-      Some((Fragment.const(s""""productsubcategoryid""""), fr"${fromWrite(unsaved.productsubcategoryid)(Write.fromPutOption(ProductsubcategoryId.put))}::int4")),
-      Some((Fragment.const(s""""productmodelid""""), fr"${fromWrite(unsaved.productmodelid)(Write.fromPutOption(ProductmodelId.put))}::int4")),
-      Some((Fragment.const(s""""sellstartdate""""), fr"${fromWrite(unsaved.sellstartdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const(s""""sellenddate""""), fr"${fromWrite(unsaved.sellenddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const(s""""discontinueddate""""), fr"${fromWrite(unsaved.discontinueddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""productnumber""""), fr"${fromWrite(unsaved.productnumber)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""color""""), fr"${fromWrite(unsaved.color)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""safetystocklevel""""), fr"${fromWrite(unsaved.safetystocklevel)(Write.fromPut(TypoShort.put))}::int2")),
+      Some((Fragment.const0(s""""reorderpoint""""), fr"${fromWrite(unsaved.reorderpoint)(Write.fromPut(TypoShort.put))}::int2")),
+      Some((Fragment.const0(s""""standardcost""""), fr"${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const0(s""""listprice""""), fr"${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const0(s""""size""""), fr"${fromWrite(unsaved.size)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""sizeunitmeasurecode""""), fr"${fromWrite(unsaved.sizeunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar")),
+      Some((Fragment.const0(s""""weightunitmeasurecode""""), fr"${fromWrite(unsaved.weightunitmeasurecode)(Write.fromPutOption(UnitmeasureId.put))}::bpchar")),
+      Some((Fragment.const0(s""""weight""""), fr"${fromWrite(unsaved.weight)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const0(s""""daystomanufacture""""), fr"${fromWrite(unsaved.daystomanufacture)(Write.fromPut(Meta.IntMeta.put))}::int4")),
+      Some((Fragment.const0(s""""productline""""), fr"${fromWrite(unsaved.productline)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const0(s""""class""""), fr"${fromWrite(unsaved.`class`)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const0(s""""style""""), fr"${fromWrite(unsaved.style)(Write.fromPutOption(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const0(s""""productsubcategoryid""""), fr"${fromWrite(unsaved.productsubcategoryid)(Write.fromPutOption(ProductsubcategoryId.put))}::int4")),
+      Some((Fragment.const0(s""""productmodelid""""), fr"${fromWrite(unsaved.productmodelid)(Write.fromPutOption(ProductmodelId.put))}::int4")),
+      Some((Fragment.const0(s""""sellstartdate""""), fr"${fromWrite(unsaved.sellstartdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""sellenddate""""), fr"${fromWrite(unsaved.sellenddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""discontinueddate""""), fr"${fromWrite(unsaved.discontinueddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
       unsaved.productid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""productid""""), fr"${fromWrite(value: ProductId)(Write.fromPut(ProductId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""productid""""), fr"${fromWrite(value: ProductId)(Write.fromPut(ProductId.put))}::int4"))
       },
       unsaved.makeflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""makeflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""makeflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
       },
       unsaved.finishedgoodsflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""finishedgoodsflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""finishedgoodsflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

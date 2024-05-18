@@ -43,23 +43,23 @@ class AddressRepoImpl extends AddressRepo {
   }
   override def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow] = {
     val fs = List(
-      Some((Fragment.const(s""""addressline1""""), fr"${fromWrite(unsaved.addressline1)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""addressline2""""), fr"${fromWrite(unsaved.addressline2)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""city""""), fr"${fromWrite(unsaved.city)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""stateprovinceid""""), fr"${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4")),
-      Some((Fragment.const(s""""postalcode""""), fr"${fromWrite(unsaved.postalcode)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""spatiallocation""""), fr"${fromWrite(unsaved.spatiallocation)(Write.fromPutOption(TypoBytea.put))}::bytea")),
+      Some((Fragment.const0(s""""addressline1""""), fr"${fromWrite(unsaved.addressline1)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""addressline2""""), fr"${fromWrite(unsaved.addressline2)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""city""""), fr"${fromWrite(unsaved.city)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""stateprovinceid""""), fr"${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4")),
+      Some((Fragment.const0(s""""postalcode""""), fr"${fromWrite(unsaved.postalcode)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""spatiallocation""""), fr"${fromWrite(unsaved.spatiallocation)(Write.fromPutOption(TypoBytea.put))}::bytea")),
       unsaved.addressid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""addressid""""), fr"${fromWrite(value: AddressId)(Write.fromPut(AddressId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""addressid""""), fr"${fromWrite(value: AddressId)(Write.fromPut(AddressId.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

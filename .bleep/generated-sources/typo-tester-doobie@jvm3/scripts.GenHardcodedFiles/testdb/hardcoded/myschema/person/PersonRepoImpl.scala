@@ -47,29 +47,29 @@ class PersonRepoImpl extends PersonRepo {
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
-      Some((Fragment.const(s""""favourite_football_club_id""""), fr"${fromWrite(unsaved.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))}")),
-      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""nick_name""""), fr"${fromWrite(unsaved.nickName)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""blog_url""""), fr"${fromWrite(unsaved.blogUrl)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""email""""), fr"${fromWrite(unsaved.email)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""phone""""), fr"${fromWrite(unsaved.phone)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""likes_pizza""""), fr"${fromWrite(unsaved.likesPizza)(Write.fromPut(Meta.BooleanMeta.put))}")),
-      Some((Fragment.const(s""""work_email""""), fr"${fromWrite(unsaved.workEmail)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""favourite_football_club_id""""), fr"${fromWrite(unsaved.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))}")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""nick_name""""), fr"${fromWrite(unsaved.nickName)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""blog_url""""), fr"${fromWrite(unsaved.blogUrl)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""email""""), fr"${fromWrite(unsaved.email)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""phone""""), fr"${fromWrite(unsaved.phone)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""likes_pizza""""), fr"${fromWrite(unsaved.likesPizza)(Write.fromPut(Meta.BooleanMeta.put))}")),
+      Some((Fragment.const0(s""""work_email""""), fr"${fromWrite(unsaved.workEmail)(Write.fromPutOption(Meta.StringMeta.put))}")),
       unsaved.id match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""id""""), fr"${fromWrite(value: PersonId)(Write.fromPut(PersonId.put))}::int8"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""id""""), fr"${fromWrite(value: PersonId)(Write.fromPut(PersonId.put))}::int8"))
       },
       unsaved.maritalStatusId match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""marital_status_id""""), fr"${fromWrite(value: MaritalStatusId)(Write.fromPut(MaritalStatusId.put))}"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""marital_status_id""""), fr"${fromWrite(value: MaritalStatusId)(Write.fromPut(MaritalStatusId.put))}"))
       },
       unsaved.sector match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""sector""""), fr"${fromWrite(value: Sector)(Write.fromPut(Sector.put))}::myschema.sector"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""sector""""), fr"${fromWrite(value: Sector)(Write.fromPut(Sector.put))}::myschema.sector"))
       },
       unsaved.favoriteNumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""favorite_number""""), fr"${fromWrite(value: Number)(Write.fromPut(Number.put))}::myschema.number"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""favorite_number""""), fr"${fromWrite(value: Number)(Write.fromPut(Number.put))}::myschema.number"))
       }
     ).flatten
     

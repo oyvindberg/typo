@@ -45,33 +45,33 @@ class DocumentRepoImpl extends DocumentRepo {
   }
   override def insert(unsaved: DocumentRowUnsaved): ConnectionIO[DocumentRow] = {
     val fs = List(
-      Some((Fragment.const(s""""title""""), fr"${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""owner""""), fr"${fromWrite(unsaved.owner)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const(s""""filename""""), fr"${fromWrite(unsaved.filename)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""fileextension""""), fr"${fromWrite(unsaved.fileextension)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""revision""""), fr"${fromWrite(unsaved.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
-      Some((Fragment.const(s""""status""""), fr"${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2")),
-      Some((Fragment.const(s""""documentsummary""""), fr"${fromWrite(unsaved.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""document""""), fr"${fromWrite(unsaved.document)(Write.fromPutOption(TypoBytea.put))}::bytea")),
+      Some((Fragment.const0(s""""title""""), fr"${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""owner""""), fr"${fromWrite(unsaved.owner)(Write.fromPut(BusinessentityId.put))}::int4")),
+      Some((Fragment.const0(s""""filename""""), fr"${fromWrite(unsaved.filename)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""fileextension""""), fr"${fromWrite(unsaved.fileextension)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""revision""""), fr"${fromWrite(unsaved.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const0(s""""status""""), fr"${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2")),
+      Some((Fragment.const0(s""""documentsummary""""), fr"${fromWrite(unsaved.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""document""""), fr"${fromWrite(unsaved.document)(Write.fromPutOption(TypoBytea.put))}::bytea")),
       unsaved.folderflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""folderflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""folderflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
       },
       unsaved.changenumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""changenumber""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""changenumber""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       },
       unsaved.documentnode match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""documentnode""""), fr"${fromWrite(value: DocumentId)(Write.fromPut(DocumentId.put))}"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""documentnode""""), fr"${fromWrite(value: DocumentId)(Write.fromPut(DocumentId.put))}"))
       }
     ).flatten
     

@@ -7,9 +7,6 @@ import org.scalatest.funsuite.AnyFunSuite
 class SeekTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val productRepo = new ProductRepoImpl
 
-  val base =
-    """select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product"""
-
   test("uniform ascending") {
     val query = productRepo.select
       .seek(_.name.asc)(Name("foo"))

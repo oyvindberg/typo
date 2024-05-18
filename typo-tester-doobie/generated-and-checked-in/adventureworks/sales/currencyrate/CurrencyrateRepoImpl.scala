@@ -41,18 +41,18 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
   }
   override def insert(unsaved: CurrencyrateRowUnsaved): ConnectionIO[CurrencyrateRow] = {
     val fs = List(
-      Some((Fragment.const(s""""currencyratedate""""), fr"${fromWrite(unsaved.currencyratedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const(s""""fromcurrencycode""""), fr"${fromWrite(unsaved.fromcurrencycode)(Write.fromPut(CurrencyId.put))}::bpchar")),
-      Some((Fragment.const(s""""tocurrencycode""""), fr"${fromWrite(unsaved.tocurrencycode)(Write.fromPut(CurrencyId.put))}::bpchar")),
-      Some((Fragment.const(s""""averagerate""""), fr"${fromWrite(unsaved.averagerate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
-      Some((Fragment.const(s""""endofdayrate""""), fr"${fromWrite(unsaved.endofdayrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const0(s""""currencyratedate""""), fr"${fromWrite(unsaved.currencyratedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""fromcurrencycode""""), fr"${fromWrite(unsaved.fromcurrencycode)(Write.fromPut(CurrencyId.put))}::bpchar")),
+      Some((Fragment.const0(s""""tocurrencycode""""), fr"${fromWrite(unsaved.tocurrencycode)(Write.fromPut(CurrencyId.put))}::bpchar")),
+      Some((Fragment.const0(s""""averagerate""""), fr"${fromWrite(unsaved.averagerate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const0(s""""endofdayrate""""), fr"${fromWrite(unsaved.endofdayrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
       unsaved.currencyrateid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""currencyrateid""""), fr"${fromWrite(value: CurrencyrateId)(Write.fromPut(CurrencyrateId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""currencyrateid""""), fr"${fromWrite(value: CurrencyrateId)(Write.fromPut(CurrencyrateId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

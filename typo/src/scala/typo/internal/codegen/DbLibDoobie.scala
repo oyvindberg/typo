@@ -248,13 +248,13 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
         val cases0 = unsaved.restCols.map { col =>
           val set = frInterpolate(code"${runtimeInterpolateValue(code"${unsavedParam.name}.${col.name}", col.tpe)}${SqlCast.toPgCode(col)}")
-          code"""Some(($Fragment.const(${sc.s(col.dbName.code)}), $set))"""
+          code"""Some(($Fragment.const0(${sc.s(col.dbName.code)}), $set))"""
         }
         val cases1 = unsaved.defaultCols.map { case (col @ ComputedColumn(_, ident, _, _), origType) =>
           val setValue = frInterpolate(code"${runtimeInterpolateValue(code"value: $origType", origType)}${SqlCast.toPgCode(col)}")
           code"""|${unsavedParam.name}.$ident match {
                  |  case ${default.Defaulted}.${default.UseDefault} => None
-                 |  case ${default.Defaulted}.${default.Provided}(value) => Some(($Fragment.const(${sc.s(col.dbName.code)}), $setValue))
+                 |  case ${default.Defaulted}.${default.Provided}(value) => Some(($Fragment.const0(${sc.s(col.dbName.code)}), $setValue))
                  |}"""
         }
 

@@ -39,10 +39,10 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
   }
   override def insert(unsaved: IdentityTestRowUnsaved): ConnectionIO[IdentityTestRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(IdentityTestId.put))}")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(IdentityTestId.put))}")),
       unsaved.defaultGenerated match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""default_generated""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""default_generated""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
       }
     ).flatten
     

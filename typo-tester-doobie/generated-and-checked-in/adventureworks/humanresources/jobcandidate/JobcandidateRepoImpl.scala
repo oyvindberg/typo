@@ -41,15 +41,15 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
   }
   override def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow] = {
     val fs = List(
-      Some((Fragment.const(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
-      Some((Fragment.const(s""""resume""""), fr"${fromWrite(unsaved.resume)(Write.fromPutOption(TypoXml.put))}::xml")),
+      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
+      Some((Fragment.const0(s""""resume""""), fr"${fromWrite(unsaved.resume)(Write.fromPutOption(TypoXml.put))}::xml")),
       unsaved.jobcandidateid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""jobcandidateid""""), fr"${fromWrite(value: JobcandidateId)(Write.fromPut(JobcandidateId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""jobcandidateid""""), fr"${fromWrite(value: JobcandidateId)(Write.fromPut(JobcandidateId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

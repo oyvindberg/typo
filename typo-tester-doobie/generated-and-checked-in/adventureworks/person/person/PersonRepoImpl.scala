@@ -46,30 +46,30 @@ class PersonRepoImpl extends PersonRepo {
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
-      Some((Fragment.const(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const(s""""persontype""""), fr"${fromWrite(unsaved.persontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
-      Some((Fragment.const(s""""title""""), fr"${fromWrite(unsaved.title)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""firstname""""), fr"${fromWrite(unsaved.firstname)(Write.fromPut(/* user-picked */ FirstName.put))}::varchar")),
-      Some((Fragment.const(s""""middlename""""), fr"${fromWrite(unsaved.middlename)(Write.fromPutOption(Name.put))}::varchar")),
-      Some((Fragment.const(s""""lastname""""), fr"${fromWrite(unsaved.lastname)(Write.fromPut(Name.put))}::varchar")),
-      Some((Fragment.const(s""""suffix""""), fr"${fromWrite(unsaved.suffix)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""additionalcontactinfo""""), fr"${fromWrite(unsaved.additionalcontactinfo)(Write.fromPutOption(TypoXml.put))}::xml")),
-      Some((Fragment.const(s""""demographics""""), fr"${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml")),
+      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
+      Some((Fragment.const0(s""""persontype""""), fr"${fromWrite(unsaved.persontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const0(s""""title""""), fr"${fromWrite(unsaved.title)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""firstname""""), fr"${fromWrite(unsaved.firstname)(Write.fromPut(/* user-picked */ FirstName.put))}::varchar")),
+      Some((Fragment.const0(s""""middlename""""), fr"${fromWrite(unsaved.middlename)(Write.fromPutOption(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""lastname""""), fr"${fromWrite(unsaved.lastname)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""suffix""""), fr"${fromWrite(unsaved.suffix)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""additionalcontactinfo""""), fr"${fromWrite(unsaved.additionalcontactinfo)(Write.fromPutOption(TypoXml.put))}::xml")),
+      Some((Fragment.const0(s""""demographics""""), fr"${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml")),
       unsaved.namestyle match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""namestyle""""), fr"${fromWrite(value: NameStyle)(Write.fromPut(NameStyle.put))}::bool"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""namestyle""""), fr"${fromWrite(value: NameStyle)(Write.fromPut(NameStyle.put))}::bool"))
       },
       unsaved.emailpromotion match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""emailpromotion""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""emailpromotion""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

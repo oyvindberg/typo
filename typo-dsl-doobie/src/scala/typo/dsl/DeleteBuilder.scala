@@ -36,7 +36,7 @@ object DeleteBuilder {
 
     def mkSql(counter: AtomicInteger): Fragment = {
       List[Iterable[Fragment]](
-        Some(fr"delete from ${Fragment.const(name)}"),
+        Some(fr"delete from ${Fragment.const0(name)}"),
         params.where
           .map(w => w(structure.fields))
           .reduceLeftOption(_.and(_))

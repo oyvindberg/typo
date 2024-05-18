@@ -61,9 +61,9 @@ object SelectBuilderSql {
 
     private def sql(counter: AtomicInteger): Fragment = {
       val cols = structure.columns
-        .map(x => Fragment.const(x.sqlReadCast.foldLeft("\"" + x.value + "\"") { case (acc, cast) => s"$acc::$cast" }))
-        .intercalate(Fragment.const(", "))
-      val baseSql = fr"select $cols from ${Fragment.const(name)}"
+        .map(x => Fragment.const0(x.sqlReadCast.foldLeft("\"" + x.value + "\"") { case (acc, cast) => s"$acc::$cast" }))
+        .intercalate(Fragment.const0(", "))
+      val baseSql = fr"select $cols from ${Fragment.const0(name)}"
       SelectParams.render(structure.fields, baseSql, counter, params)
     }
 
@@ -108,16 +108,16 @@ object SelectBuilderSql {
         case NonEmptyList(one, Nil) => one.sqlFrag
         case NonEmptyList(first, rest) =>
           val prelude =
-            fr"""|select ${instance.columns.map(c => Fragment.const(c.value)).intercalate(Fragment.const(", "))}
+            fr"""|select ${instance.columns.map(c => Fragment.const0(c.value)).intercalate(Fragment.const0(", "))}
                    |from (
                    |${first.sqlFrag}
-                   |) ${Fragment.const(first.alias)}
+                   |) ${Fragment.const0(first.alias)}
                    |""".stripMargin
 
           val joins = rest.map { case SelectBuilderSql.InstantiatedPart(alias, _, sqlFrag, joinFrag) =>
             fr"""|join (
                    |$sqlFrag
-                   |) ${Fragment.const(alias)} on $joinFrag
+                   |) ${Fragment.const0(alias)} on $joinFrag
                    |""".stripMargin
           }
           prelude ++ joins.reduce(_ ++ _)
@@ -167,16 +167,16 @@ object SelectBuilderSql {
         case NonEmptyList(one, Nil) => one.sqlFrag
         case NonEmptyList(first, rest) =>
           val prelude =
-            fr"""|select ${fragments.comma(instance.columns.map(c => Fragment.const(c.value)))}
+            fr"""|select ${fragments.comma(instance.columns.map(c => Fragment.const0(c.value)))}
                    |from (
                    |  ${first.sqlFrag}
-                   |) ${Fragment.const(first.alias)}
+                   |) ${Fragment.const0(first.alias)}
                    |""".stripMargin
 
           val joins = rest.map { case SelectBuilderSql.InstantiatedPart(alias, _, sqlFrag, joinFrag) =>
             fr"""|left join (
                    |${sqlFrag}
-                   |) ${Fragment.const(alias)} on $joinFrag
+                   |) ${Fragment.const0(alias)} on $joinFrag
                    |""".stripMargin
           }
           prelude ++ joins.reduce(_ ++ _)

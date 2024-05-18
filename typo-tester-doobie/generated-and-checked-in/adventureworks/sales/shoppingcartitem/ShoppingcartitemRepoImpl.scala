@@ -41,23 +41,23 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved): ConnectionIO[ShoppingcartitemRow] = {
     val fs = List(
-      Some((Fragment.const(s""""shoppingcartid""""), fr"${fromWrite(unsaved.shoppingcartid)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
+      Some((Fragment.const0(s""""shoppingcartid""""), fr"${fromWrite(unsaved.shoppingcartid)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
       unsaved.shoppingcartitemid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""shoppingcartitemid""""), fr"${fromWrite(value: ShoppingcartitemId)(Write.fromPut(ShoppingcartitemId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""shoppingcartitemid""""), fr"${fromWrite(value: ShoppingcartitemId)(Write.fromPut(ShoppingcartitemId.put))}::int4"))
       },
       unsaved.quantity match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""quantity""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""quantity""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
       },
       unsaved.datecreated match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""datecreated""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""datecreated""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

@@ -41,15 +41,15 @@ class UsersRepoImpl extends UsersRepo {
   }
   override def insert(unsaved: UsersRowUnsaved): ConnectionIO[UsersRow] = {
     val fs = List(
-      Some((Fragment.const(s""""user_id""""), fr"${fromWrite(unsaved.userId)(Write.fromPut(UsersId.put))}::uuid")),
-      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""last_name""""), fr"${fromWrite(unsaved.lastName)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""email""""), fr"${fromWrite(unsaved.email)(Write.fromPut(TypoUnknownCitext.put))}::citext")),
-      Some((Fragment.const(s""""password""""), fr"${fromWrite(unsaved.password)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""verified_on""""), fr"${fromWrite(unsaved.verifiedOn)(Write.fromPutOption(TypoInstant.put))}::timestamptz")),
+      Some((Fragment.const0(s""""user_id""""), fr"${fromWrite(unsaved.userId)(Write.fromPut(UsersId.put))}::uuid")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""last_name""""), fr"${fromWrite(unsaved.lastName)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""email""""), fr"${fromWrite(unsaved.email)(Write.fromPut(TypoUnknownCitext.put))}::citext")),
+      Some((Fragment.const0(s""""password""""), fr"${fromWrite(unsaved.password)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""verified_on""""), fr"${fromWrite(unsaved.verifiedOn)(Write.fromPutOption(TypoInstant.put))}::timestamptz")),
       unsaved.createdAt match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""created_at""""), fr"${fromWrite(value: TypoInstant)(Write.fromPut(TypoInstant.put))}::timestamptz"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""created_at""""), fr"${fromWrite(value: TypoInstant)(Write.fromPut(TypoInstant.put))}::timestamptz"))
       }
     ).flatten
     

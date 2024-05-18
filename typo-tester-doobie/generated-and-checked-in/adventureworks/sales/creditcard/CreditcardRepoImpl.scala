@@ -43,17 +43,17 @@ class CreditcardRepoImpl extends CreditcardRepo {
   }
   override def insert(unsaved: CreditcardRowUnsaved): ConnectionIO[CreditcardRow] = {
     val fs = List(
-      Some((Fragment.const(s""""cardtype""""), fr"${fromWrite(unsaved.cardtype)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""cardnumber""""), fr"${fromWrite(unsaved.cardnumber)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""expmonth""""), fr"${fromWrite(unsaved.expmonth)(Write.fromPut(TypoShort.put))}::int2")),
-      Some((Fragment.const(s""""expyear""""), fr"${fromWrite(unsaved.expyear)(Write.fromPut(TypoShort.put))}::int2")),
+      Some((Fragment.const0(s""""cardtype""""), fr"${fromWrite(unsaved.cardtype)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""cardnumber""""), fr"${fromWrite(unsaved.cardnumber)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""expmonth""""), fr"${fromWrite(unsaved.expmonth)(Write.fromPut(TypoShort.put))}::int2")),
+      Some((Fragment.const0(s""""expyear""""), fr"${fromWrite(unsaved.expyear)(Write.fromPut(TypoShort.put))}::int2")),
       unsaved.creditcardid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""creditcardid""""), fr"${fromWrite(value: /* user-picked */ CustomCreditcardId)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""creditcardid""""), fr"${fromWrite(value: /* user-picked */ CustomCreditcardId)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

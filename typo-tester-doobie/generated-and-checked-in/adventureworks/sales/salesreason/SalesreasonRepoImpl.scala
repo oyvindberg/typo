@@ -40,15 +40,15 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
   }
   override def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
-      Some((Fragment.const(s""""reasontype""""), fr"${fromWrite(unsaved.reasontype)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""reasontype""""), fr"${fromWrite(unsaved.reasontype)(Write.fromPut(Name.put))}::varchar")),
       unsaved.salesreasonid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""salesreasonid""""), fr"${fromWrite(value: SalesreasonId)(Write.fromPut(SalesreasonId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""salesreasonid""""), fr"${fromWrite(value: SalesreasonId)(Write.fromPut(SalesreasonId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

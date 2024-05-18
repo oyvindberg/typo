@@ -41,31 +41,31 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
   }
   override def insert(unsaved: SpecialofferRowUnsaved): ConnectionIO[SpecialofferRow] = {
     val fs = List(
-      Some((Fragment.const(s""""description""""), fr"${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""type""""), fr"${fromWrite(unsaved.`type`)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""category""""), fr"${fromWrite(unsaved.category)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const(s""""maxqty""""), fr"${fromWrite(unsaved.maxqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4")),
+      Some((Fragment.const0(s""""description""""), fr"${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""type""""), fr"${fromWrite(unsaved.`type`)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""category""""), fr"${fromWrite(unsaved.category)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""maxqty""""), fr"${fromWrite(unsaved.maxqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4")),
       unsaved.specialofferid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""specialofferid""""), fr"${fromWrite(value: SpecialofferId)(Write.fromPut(SpecialofferId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""specialofferid""""), fr"${fromWrite(value: SpecialofferId)(Write.fromPut(SpecialofferId.put))}::int4"))
       },
       unsaved.discountpct match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""discountpct""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""discountpct""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.minqty match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""minqty""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""minqty""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

@@ -42,22 +42,22 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
   }
   override def insert(unsaved: ProductreviewRowUnsaved): ConnectionIO[ProductreviewRow] = {
     val fs = List(
-      Some((Fragment.const(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
-      Some((Fragment.const(s""""reviewername""""), fr"${fromWrite(unsaved.reviewername)(Write.fromPut(Name.put))}::varchar")),
-      Some((Fragment.const(s""""emailaddress""""), fr"${fromWrite(unsaved.emailaddress)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""rating""""), fr"${fromWrite(unsaved.rating)(Write.fromPut(Meta.IntMeta.put))}::int4")),
-      Some((Fragment.const(s""""comments""""), fr"${fromWrite(unsaved.comments)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
+      Some((Fragment.const0(s""""reviewername""""), fr"${fromWrite(unsaved.reviewername)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""emailaddress""""), fr"${fromWrite(unsaved.emailaddress)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""rating""""), fr"${fromWrite(unsaved.rating)(Write.fromPut(Meta.IntMeta.put))}::int4")),
+      Some((Fragment.const0(s""""comments""""), fr"${fromWrite(unsaved.comments)(Write.fromPutOption(Meta.StringMeta.put))}")),
       unsaved.productreviewid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""productreviewid""""), fr"${fromWrite(value: ProductreviewId)(Write.fromPut(ProductreviewId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""productreviewid""""), fr"${fromWrite(value: ProductreviewId)(Write.fromPut(ProductreviewId.put))}::int4"))
       },
       unsaved.reviewdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""reviewdate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""reviewdate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

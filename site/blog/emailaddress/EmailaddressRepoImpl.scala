@@ -34,19 +34,19 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
   }
   override def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow] = {
     val fs = List(
-      Some((Fragment.const(s""""businessentityid""""), fr"${unsaved.businessentityid}::int4")),
-      Some((Fragment.const(s""""emailaddress""""), fr"${unsaved.emailaddress}")),
+      Some((Fragment.const0(s""""businessentityid""""), fr"${unsaved.businessentityid}::int4")),
+      Some((Fragment.const0(s""""emailaddress""""), fr"${unsaved.emailaddress}")),
       unsaved.emailaddressid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""emailaddressid""""), fr"${value: Int}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""emailaddressid""""), fr"${value: Int}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""rowguid""""), fr"${value: TypoUUID}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${value: TypoUUID}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${value: TypoLocalDateTime}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${value: TypoLocalDateTime}::timestamp"))
       }
     ).flatten
     

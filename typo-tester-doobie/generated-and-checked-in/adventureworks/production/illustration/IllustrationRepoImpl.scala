@@ -40,14 +40,14 @@ class IllustrationRepoImpl extends IllustrationRepo {
   }
   override def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow] = {
     val fs = List(
-      Some((Fragment.const(s""""diagram""""), fr"${fromWrite(unsaved.diagram)(Write.fromPutOption(TypoXml.put))}::xml")),
+      Some((Fragment.const0(s""""diagram""""), fr"${fromWrite(unsaved.diagram)(Write.fromPutOption(TypoXml.put))}::xml")),
       unsaved.illustrationid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""illustrationid""""), fr"${fromWrite(value: IllustrationId)(Write.fromPut(IllustrationId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""illustrationid""""), fr"${fromWrite(value: IllustrationId)(Write.fromPut(IllustrationId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

@@ -45,41 +45,41 @@ class EmployeeRepoImpl extends EmployeeRepo {
   }
   override def insert(unsaved: EmployeeRowUnsaved): ConnectionIO[EmployeeRow] = {
     val fs = List(
-      Some((Fragment.const(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const(s""""nationalidnumber""""), fr"${fromWrite(unsaved.nationalidnumber)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""loginid""""), fr"${fromWrite(unsaved.loginid)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""jobtitle""""), fr"${fromWrite(unsaved.jobtitle)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""birthdate""""), fr"${fromWrite(unsaved.birthdate)(Write.fromPut(TypoLocalDate.put))}::date")),
-      Some((Fragment.const(s""""maritalstatus""""), fr"${fromWrite(unsaved.maritalstatus)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
-      Some((Fragment.const(s""""gender""""), fr"${fromWrite(unsaved.gender)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
-      Some((Fragment.const(s""""hiredate""""), fr"${fromWrite(unsaved.hiredate)(Write.fromPut(TypoLocalDate.put))}::date")),
+      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
+      Some((Fragment.const0(s""""nationalidnumber""""), fr"${fromWrite(unsaved.nationalidnumber)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""loginid""""), fr"${fromWrite(unsaved.loginid)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""jobtitle""""), fr"${fromWrite(unsaved.jobtitle)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""birthdate""""), fr"${fromWrite(unsaved.birthdate)(Write.fromPut(TypoLocalDate.put))}::date")),
+      Some((Fragment.const0(s""""maritalstatus""""), fr"${fromWrite(unsaved.maritalstatus)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const0(s""""gender""""), fr"${fromWrite(unsaved.gender)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const0(s""""hiredate""""), fr"${fromWrite(unsaved.hiredate)(Write.fromPut(TypoLocalDate.put))}::date")),
       unsaved.salariedflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""salariedflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""salariedflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
       },
       unsaved.vacationhours match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""vacationhours""""), fr"${fromWrite(value: TypoShort)(Write.fromPut(TypoShort.put))}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""vacationhours""""), fr"${fromWrite(value: TypoShort)(Write.fromPut(TypoShort.put))}::int2"))
       },
       unsaved.sickleavehours match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""sickleavehours""""), fr"${fromWrite(value: TypoShort)(Write.fromPut(TypoShort.put))}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""sickleavehours""""), fr"${fromWrite(value: TypoShort)(Write.fromPut(TypoShort.put))}::int2"))
       },
       unsaved.currentflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""currentflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""currentflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       },
       unsaved.organizationnode match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""organizationnode""""), fr"${fromWrite(value: Option[String])(Write.fromPutOption(Meta.StringMeta.put))}"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""organizationnode""""), fr"${fromWrite(value: Option[String])(Write.fromPutOption(Meta.StringMeta.put))}"))
       }
     ).flatten
     

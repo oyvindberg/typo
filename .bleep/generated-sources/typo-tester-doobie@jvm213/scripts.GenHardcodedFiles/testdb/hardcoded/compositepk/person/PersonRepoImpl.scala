@@ -40,14 +40,14 @@ class PersonRepoImpl extends PersonRepo {
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPutOption(Meta.StringMeta.put))}")),
       unsaved.one match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""one""""), fr"${fromWrite(value: Long)(Write.fromPut(Meta.LongMeta.put))}::int8"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""one""""), fr"${fromWrite(value: Long)(Write.fromPut(Meta.LongMeta.put))}::int8"))
       },
       unsaved.two match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""two""""), fr"${fromWrite(value: Option[String])(Write.fromPutOption(Meta.StringMeta.put))}"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""two""""), fr"${fromWrite(value: Option[String])(Write.fromPutOption(Meta.StringMeta.put))}"))
       }
     ).flatten
     

@@ -41,17 +41,17 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
   }
   override def insert(unsaved: ProductphotoRowUnsaved): ConnectionIO[ProductphotoRow] = {
     val fs = List(
-      Some((Fragment.const(s""""thumbnailphoto""""), fr"${fromWrite(unsaved.thumbnailphoto)(Write.fromPutOption(TypoBytea.put))}::bytea")),
-      Some((Fragment.const(s""""thumbnailphotofilename""""), fr"${fromWrite(unsaved.thumbnailphotofilename)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""largephoto""""), fr"${fromWrite(unsaved.largephoto)(Write.fromPutOption(TypoBytea.put))}::bytea")),
-      Some((Fragment.const(s""""largephotofilename""""), fr"${fromWrite(unsaved.largephotofilename)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""thumbnailphoto""""), fr"${fromWrite(unsaved.thumbnailphoto)(Write.fromPutOption(TypoBytea.put))}::bytea")),
+      Some((Fragment.const0(s""""thumbnailphotofilename""""), fr"${fromWrite(unsaved.thumbnailphotofilename)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""largephoto""""), fr"${fromWrite(unsaved.largephoto)(Write.fromPutOption(TypoBytea.put))}::bytea")),
+      Some((Fragment.const0(s""""largephotofilename""""), fr"${fromWrite(unsaved.largephotofilename)(Write.fromPutOption(Meta.StringMeta.put))}")),
       unsaved.productphotoid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""productphotoid""""), fr"${fromWrite(value: ProductphotoId)(Write.fromPut(ProductphotoId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""productphotoid""""), fr"${fromWrite(value: ProductphotoId)(Write.fromPut(ProductphotoId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

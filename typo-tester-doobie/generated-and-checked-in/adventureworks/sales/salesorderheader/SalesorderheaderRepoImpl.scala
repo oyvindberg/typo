@@ -52,60 +52,60 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   }
   override def insert(unsaved: SalesorderheaderRowUnsaved): ConnectionIO[SalesorderheaderRow] = {
     val fs = List(
-      Some((Fragment.const(s""""duedate""""), fr"${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const(s""""shipdate""""), fr"${fromWrite(unsaved.shipdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const(s""""purchaseordernumber""""), fr"${fromWrite(unsaved.purchaseordernumber)(Write.fromPutOption(OrderNumber.put))}::varchar")),
-      Some((Fragment.const(s""""accountnumber""""), fr"${fromWrite(unsaved.accountnumber)(Write.fromPutOption(AccountNumber.put))}::varchar")),
-      Some((Fragment.const(s""""customerid""""), fr"${fromWrite(unsaved.customerid)(Write.fromPut(CustomerId.put))}::int4")),
-      Some((Fragment.const(s""""salespersonid""""), fr"${fromWrite(unsaved.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
-      Some((Fragment.const(s""""territoryid""""), fr"${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4")),
-      Some((Fragment.const(s""""billtoaddressid""""), fr"${fromWrite(unsaved.billtoaddressid)(Write.fromPut(AddressId.put))}::int4")),
-      Some((Fragment.const(s""""shiptoaddressid""""), fr"${fromWrite(unsaved.shiptoaddressid)(Write.fromPut(AddressId.put))}::int4")),
-      Some((Fragment.const(s""""shipmethodid""""), fr"${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4")),
-      Some((Fragment.const(s""""creditcardid""""), fr"${fromWrite(unsaved.creditcardid)(Write.fromPutOption(/* user-picked */ CustomCreditcardId.put))}::int4")),
-      Some((Fragment.const(s""""creditcardapprovalcode""""), fr"${fromWrite(unsaved.creditcardapprovalcode)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const(s""""currencyrateid""""), fr"${fromWrite(unsaved.currencyrateid)(Write.fromPutOption(CurrencyrateId.put))}::int4")),
-      Some((Fragment.const(s""""totaldue""""), fr"${fromWrite(unsaved.totaldue)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric")),
-      Some((Fragment.const(s""""comment""""), fr"${fromWrite(unsaved.comment)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""duedate""""), fr"${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""shipdate""""), fr"${fromWrite(unsaved.shipdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""purchaseordernumber""""), fr"${fromWrite(unsaved.purchaseordernumber)(Write.fromPutOption(OrderNumber.put))}::varchar")),
+      Some((Fragment.const0(s""""accountnumber""""), fr"${fromWrite(unsaved.accountnumber)(Write.fromPutOption(AccountNumber.put))}::varchar")),
+      Some((Fragment.const0(s""""customerid""""), fr"${fromWrite(unsaved.customerid)(Write.fromPut(CustomerId.put))}::int4")),
+      Some((Fragment.const0(s""""salespersonid""""), fr"${fromWrite(unsaved.salespersonid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
+      Some((Fragment.const0(s""""territoryid""""), fr"${fromWrite(unsaved.territoryid)(Write.fromPutOption(SalesterritoryId.put))}::int4")),
+      Some((Fragment.const0(s""""billtoaddressid""""), fr"${fromWrite(unsaved.billtoaddressid)(Write.fromPut(AddressId.put))}::int4")),
+      Some((Fragment.const0(s""""shiptoaddressid""""), fr"${fromWrite(unsaved.shiptoaddressid)(Write.fromPut(AddressId.put))}::int4")),
+      Some((Fragment.const0(s""""shipmethodid""""), fr"${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4")),
+      Some((Fragment.const0(s""""creditcardid""""), fr"${fromWrite(unsaved.creditcardid)(Write.fromPutOption(/* user-picked */ CustomCreditcardId.put))}::int4")),
+      Some((Fragment.const0(s""""creditcardapprovalcode""""), fr"${fromWrite(unsaved.creditcardapprovalcode)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""currencyrateid""""), fr"${fromWrite(unsaved.currencyrateid)(Write.fromPutOption(CurrencyrateId.put))}::int4")),
+      Some((Fragment.const0(s""""totaldue""""), fr"${fromWrite(unsaved.totaldue)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const0(s""""comment""""), fr"${fromWrite(unsaved.comment)(Write.fromPutOption(Meta.StringMeta.put))}")),
       unsaved.salesorderid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""salesorderid""""), fr"${fromWrite(value: SalesorderheaderId)(Write.fromPut(SalesorderheaderId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""salesorderid""""), fr"${fromWrite(value: SalesorderheaderId)(Write.fromPut(SalesorderheaderId.put))}::int4"))
       },
       unsaved.revisionnumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""revisionnumber""""), fr"${fromWrite(value: TypoShort)(Write.fromPut(TypoShort.put))}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""revisionnumber""""), fr"${fromWrite(value: TypoShort)(Write.fromPut(TypoShort.put))}::int2"))
       },
       unsaved.orderdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""orderdate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""orderdate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       },
       unsaved.status match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""status""""), fr"${fromWrite(value: TypoShort)(Write.fromPut(TypoShort.put))}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""status""""), fr"${fromWrite(value: TypoShort)(Write.fromPut(TypoShort.put))}::int2"))
       },
       unsaved.onlineorderflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""onlineorderflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""onlineorderflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
       },
       unsaved.subtotal match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""subtotal""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""subtotal""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.taxamt match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""taxamt""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""taxamt""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.freight match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""freight""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""freight""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     

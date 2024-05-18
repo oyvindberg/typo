@@ -49,7 +49,7 @@ object UpdateBuilder {
 
     def mkSql(counter: AtomicInteger, returning: Boolean): Fragment = {
       List[Option[Fragment]](
-        Some(fr"update ${Fragment.const(name)}"),
+        Some(fr"update ${Fragment.const0(name)}"),
         NonEmptyList.fromList(params.setters) match {
           case None =>
             sys.error("you must specify a columns to set. use `set` method")
@@ -57,7 +57,7 @@ object UpdateBuilder {
             val setFragments = setters.map { setter =>
               val fieldExpr = setter.col(structure.fields)
               val valueExpr = setter.value(structure.fields)
-              fr"${fieldExpr.render(counter)} = ${valueExpr.render(counter)}${fieldExpr.sqlWriteCast.fold(Fragment.empty)(cast => Fragment.const(s"::$cast"))}"
+              fr"${fieldExpr.render(counter)} = ${valueExpr.render(counter)}${fieldExpr.sqlWriteCast.fold(Fragment.empty)(cast => Fragment.const0(s"::$cast"))}"
             }
             Some(fragments.set(setFragments))
         },
@@ -71,7 +71,7 @@ object UpdateBuilder {
         if (returning) {
           val colFragments = fragments.comma(
             NonEmptyList.fromListUnsafe(structure.columns).map { col =>
-              Fragment.const(col.sqlReadCast.foldLeft("\"" + col.value + "\"") { case (acc, cast) => s"$acc::$cast" })
+              Fragment.const0(col.sqlReadCast.foldLeft("\"" + col.value + "\"") { case (acc, cast) => s"$acc::$cast" })
             }
           )
           Some(fr"returning $colFragments")

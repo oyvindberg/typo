@@ -41,16 +41,16 @@ class ShiftRepoImpl extends ShiftRepo {
   }
   override def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = {
     val fs = List(
-      Some((Fragment.const(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
-      Some((Fragment.const(s""""starttime""""), fr"${fromWrite(unsaved.starttime)(Write.fromPut(TypoLocalTime.put))}::time")),
-      Some((Fragment.const(s""""endtime""""), fr"${fromWrite(unsaved.endtime)(Write.fromPut(TypoLocalTime.put))}::time")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""starttime""""), fr"${fromWrite(unsaved.starttime)(Write.fromPut(TypoLocalTime.put))}::time")),
+      Some((Fragment.const0(s""""endtime""""), fr"${fromWrite(unsaved.endtime)(Write.fromPut(TypoLocalTime.put))}::time")),
       unsaved.shiftid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""shiftid""""), fr"${fromWrite(value: ShiftId)(Write.fromPut(ShiftId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""shiftid""""), fr"${fromWrite(value: ShiftId)(Write.fromPut(ShiftId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
