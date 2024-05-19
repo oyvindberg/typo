@@ -9,7 +9,7 @@ package transactionhistoryarchive
 
 import adventureworks.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -26,7 +26,7 @@ object TransactionhistoryarchiveId {
   implicit lazy val jsonDecoder: JsonDecoder[TransactionhistoryarchiveId] = JsonDecoder.int.map(TransactionhistoryarchiveId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TransactionhistoryarchiveId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[TransactionhistoryarchiveId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TransactionhistoryarchiveId] = ParameterMetaData.instance[TransactionhistoryarchiveId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[TransactionhistoryarchiveId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[TransactionhistoryarchiveId] = Setter.intSetter.contramap(_.value)
   implicit lazy val text: Text[TransactionhistoryarchiveId] = new Text[TransactionhistoryarchiveId] {
     override def unsafeEncode(v: TransactionhistoryarchiveId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)

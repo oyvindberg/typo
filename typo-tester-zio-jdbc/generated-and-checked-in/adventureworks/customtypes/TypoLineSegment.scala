@@ -11,7 +11,7 @@ import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGlseg
 import org.postgresql.geometric.PGpoint
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -71,7 +71,7 @@ object TypoLineSegment {
     }
   }
   implicit def ordering(implicit O0: Ordering[TypoPoint]): Ordering[TypoLineSegment] = Ordering.by(x => (x.p1, x.p2))
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoLineSegment] = ParameterMetaData.instance[TypoLineSegment]("lseg", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoLineSegment] = PGType.instance[TypoLineSegment]("lseg", Types.OTHER)
   implicit lazy val setter: Setter[TypoLineSegment] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

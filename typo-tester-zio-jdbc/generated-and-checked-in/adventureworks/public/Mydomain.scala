@@ -8,7 +8,7 @@ package public
 
 import adventureworks.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -27,7 +27,7 @@ object Mydomain {
   implicit lazy val jsonDecoder: JsonDecoder[Mydomain] = JsonDecoder.string.map(Mydomain.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Mydomain] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[Mydomain] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[Mydomain] = ParameterMetaData.instance[Mydomain](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[Mydomain] = PGType.PGTypeString.as
   implicit lazy val setter: Setter[Mydomain] = Setter.stringSetter.contramap(_.value)
   implicit lazy val text: Text[Mydomain] = new Text[Mydomain] {
     override def unsafeEncode(v: Mydomain, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)

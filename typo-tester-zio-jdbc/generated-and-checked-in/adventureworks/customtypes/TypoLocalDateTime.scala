@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -62,7 +62,7 @@ object TypoLocalDateTime {
   implicit lazy val jsonDecoder: JsonDecoder[TypoLocalDateTime] = JsonDecoder.localDateTime.map(TypoLocalDateTime.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoLocalDateTime] = JsonEncoder.localDateTime.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoLocalDateTime] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoLocalDateTime] = ParameterMetaData.instance[TypoLocalDateTime]("timestamp", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoLocalDateTime] = PGType.instance[TypoLocalDateTime]("timestamp", Types.OTHER)
   implicit lazy val setter: Setter[TypoLocalDateTime] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

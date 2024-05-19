@@ -11,7 +11,7 @@ import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -59,7 +59,7 @@ object TypoInet {
   implicit lazy val jsonDecoder: JsonDecoder[TypoInet] = JsonDecoder.string.map(TypoInet.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoInet] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoInet] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoInet] = ParameterMetaData.instance[TypoInet]("inet", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoInet] = PGType.instance[TypoInet]("inet", Types.OTHER)
   implicit lazy val setter: Setter[TypoInet] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

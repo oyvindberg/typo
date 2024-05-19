@@ -9,7 +9,7 @@ package jobcandidate
 
 import adventureworks.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -26,7 +26,7 @@ object JobcandidateId {
   implicit lazy val jsonDecoder: JsonDecoder[JobcandidateId] = JsonDecoder.int.map(JobcandidateId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[JobcandidateId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[JobcandidateId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[JobcandidateId] = ParameterMetaData.instance[JobcandidateId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[JobcandidateId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[JobcandidateId] = Setter.intSetter.contramap(_.value)
   implicit lazy val text: Text[JobcandidateId] = new Text[JobcandidateId] {
     override def unsafeEncode(v: JobcandidateId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)

@@ -10,7 +10,7 @@ package myschema
 import java.sql.ResultSet
 import java.sql.Types
 import testdb.hardcoded.Text
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcDecoderError
 import zio.jdbc.JdbcEncoder
@@ -65,7 +65,7 @@ object Sector {
   implicit lazy val jsonDecoder: JsonDecoder[Sector] = JsonDecoder.string.mapOrFail(Sector.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Sector] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[Sector] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[Sector] = ParameterMetaData.instance[Sector]("myschema.sector", Types.OTHER)
+  implicit lazy val pgType: PGType[Sector] = PGType.instance[Sector]("myschema.sector", Types.OTHER)
   implicit lazy val setter: Setter[Sector] = Setter.stringSetter.contramap(_.value)
   implicit lazy val text: Text[Sector] = new Text[Sector] {
     override def unsafeEncode(v: Sector, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)

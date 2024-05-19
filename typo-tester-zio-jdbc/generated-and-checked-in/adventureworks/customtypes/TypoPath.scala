@@ -11,7 +11,7 @@ import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGpath
 import org.postgresql.geometric.PGpoint
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -71,7 +71,7 @@ object TypoPath {
     }
   }
   implicit def ordering(implicit O0: Ordering[List[TypoPoint]]): Ordering[TypoPath] = Ordering.by(x => (x.open, x.points))
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoPath] = ParameterMetaData.instance[TypoPath]("path", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoPath] = PGType.instance[TypoPath]("path", Types.OTHER)
   implicit lazy val setter: Setter[TypoPath] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

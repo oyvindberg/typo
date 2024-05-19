@@ -10,7 +10,7 @@ package myschema
 import java.sql.ResultSet
 import java.sql.Types
 import testdb.hardcoded.Text
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcDecoderError
 import zio.jdbc.JdbcEncoder
@@ -65,7 +65,7 @@ object Number {
   implicit lazy val jsonDecoder: JsonDecoder[Number] = JsonDecoder.string.mapOrFail(Number.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Number] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[Number] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[Number] = ParameterMetaData.instance[Number]("myschema.number", Types.OTHER)
+  implicit lazy val pgType: PGType[Number] = PGType.instance[Number]("myschema.number", Types.OTHER)
   implicit lazy val setter: Setter[Number] = Setter.stringSetter.contramap(_.value)
   implicit lazy val text: Text[Number] = new Text[Number] {
     override def unsafeEncode(v: Number, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)

@@ -11,7 +11,7 @@ import java.sql.ResultSet
 import java.sql.Types
 import java.util.HashMap
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -38,7 +38,7 @@ object TypoHStore {
   implicit lazy val jsonDecoder: JsonDecoder[TypoHStore] = JsonDecoder[Map[String, String]].map(TypoHStore.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoHStore] = JsonEncoder[Map[String, String]].contramap(_.value)
   implicit def ordering(implicit O0: Ordering[Map[String, String]]): Ordering[TypoHStore] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoHStore] = ParameterMetaData.instance[TypoHStore]("hstore", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoHStore] = PGType.instance[TypoHStore]("hstore", Types.OTHER)
   implicit lazy val setter: Setter[TypoHStore] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

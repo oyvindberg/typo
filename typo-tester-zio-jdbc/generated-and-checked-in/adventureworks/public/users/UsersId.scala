@@ -10,7 +10,7 @@ package users
 import adventureworks.Text
 import adventureworks.customtypes.TypoUUID
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -27,7 +27,7 @@ object UsersId {
   implicit lazy val jsonDecoder: JsonDecoder[UsersId] = TypoUUID.jsonDecoder.map(UsersId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[UsersId] = TypoUUID.jsonEncoder.contramap(_.value)
   implicit def ordering(implicit O0: Ordering[TypoUUID]): Ordering[UsersId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[UsersId] = ParameterMetaData.instance[UsersId](TypoUUID.parameterMetadata.sqlType, TypoUUID.parameterMetadata.jdbcType)
+  implicit lazy val pgType: PGType[UsersId] = TypoUUID.pgType.as
   implicit lazy val setter: Setter[UsersId] = TypoUUID.setter.contramap(_.value)
   implicit lazy val text: Text[UsersId] = new Text[UsersId] {
     override def unsafeEncode(v: UsersId, sb: StringBuilder) = TypoUUID.text.unsafeEncode(v.value, sb)

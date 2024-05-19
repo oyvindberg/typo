@@ -10,7 +10,7 @@ import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGbox
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -78,7 +78,7 @@ object TypoBox {
     }
   }
   implicit lazy val ordering: Ordering[TypoBox] = Ordering.by(x => (x.x1, x.y1, x.x2, x.y2))
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoBox] = ParameterMetaData.instance[TypoBox]("box", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoBox] = PGType.instance[TypoBox]("box", Types.OTHER)
   implicit lazy val setter: Setter[TypoBox] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

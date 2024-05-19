@@ -12,7 +12,7 @@ import java.sql.Types
 import org.postgresql.geometric.PGpoint
 import org.postgresql.geometric.PGpolygon
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -55,7 +55,7 @@ object TypoPolygon {
   implicit lazy val jsonDecoder: JsonDecoder[TypoPolygon] = JsonDecoder[List[TypoPoint]].map(TypoPolygon.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoPolygon] = JsonEncoder[List[TypoPoint]].contramap(_.points)
   implicit def ordering(implicit O0: Ordering[List[TypoPoint]]): Ordering[TypoPolygon] = Ordering.by(_.points)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoPolygon] = ParameterMetaData.instance[TypoPolygon]("polygon", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoPolygon] = PGType.instance[TypoPolygon]("polygon", Types.OTHER)
   implicit lazy val setter: Setter[TypoPolygon] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

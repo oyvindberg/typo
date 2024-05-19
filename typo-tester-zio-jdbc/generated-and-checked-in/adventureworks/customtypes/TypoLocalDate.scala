@@ -11,7 +11,7 @@ import java.sql.ResultSet
 import java.sql.Types
 import java.time.LocalDate
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -56,7 +56,7 @@ object TypoLocalDate {
   implicit lazy val jsonDecoder: JsonDecoder[TypoLocalDate] = JsonDecoder.localDate.map(TypoLocalDate.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoLocalDate] = JsonEncoder.localDate.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoLocalDate] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoLocalDate] = ParameterMetaData.instance[TypoLocalDate]("date", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoLocalDate] = PGType.instance[TypoLocalDate]("date", Types.OTHER)
   implicit lazy val setter: Setter[TypoLocalDate] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

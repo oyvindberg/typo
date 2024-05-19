@@ -38,7 +38,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     *
     * A bit unfortunate maybe, but it's not the end of the world to provide it ourselves.
     */
-  private val ParameterMetaData = sc.Type.Qualified("typo.dsl.ParameterMetaData")
+  private val PGType = sc.Type.Qualified("typo.dsl.PGType")
 
   def ifDsl(g: sc.Given): Option[sc.Given] =
     if (dslEnabled) Some(g) else None
@@ -51,7 +51,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
   private val jdbcDecoderName: sc.Ident = sc.Ident("jdbcDecoder")
   private val jdbcEncoderName: sc.Ident = sc.Ident("jdbcEncoder")
   private val setterName: sc.Ident = sc.Ident("setter")
-  private val parameterMetadataName: sc.Ident = sc.Ident("parameterMetadata")
+  private val pgTypeName: sc.Ident = sc.Ident("pgType")
 
   private def dbNames(cols: NonEmptyList[ComputedColumn], isRead: Boolean): sc.Code =
     cols
@@ -139,30 +139,29 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       }
 
   /** Resolve known implicits at generation-time instead of at compile-time */
-  def lookupParameterMetaDataFor(tpe: sc.Type): sc.Code =
-    if (!inlineImplicits) sc.Summon(ParameterMetaData.of(tpe)).code
+  def lookupPgTypeFor(tpe: sc.Type): sc.Code =
+    if (!inlineImplicits) sc.Summon(PGType.of(tpe)).code
     else
       sc.Type.base(tpe) match {
-        case TypesScala.BigDecimal => code"$ParameterMetaData.BigDecimalParameterMetaData"
-        case TypesScala.Boolean    => code"$ParameterMetaData.BooleanParameterMetaData"
-        case TypesScala.Byte       => code"$ParameterMetaData.ByteParameterMetaData"
-        case TypesScala.Double     => code"$ParameterMetaData.DoubleParameterMetaData"
-        case TypesScala.Float      => code"$ParameterMetaData.FloatParameterMetaData"
-        case TypesScala.Int        => code"$ParameterMetaData.IntParameterMetaData"
-        case TypesScala.Long       => code"$ParameterMetaData.LongParameterMetaData"
-        case TypesJava.String      => code"$ParameterMetaData.StringParameterMetaData"
-        case TypesJava.UUID        => code"$ParameterMetaData.UUIDParameterMetaData"
+        case TypesScala.BigDecimal => code"$PGType.PGTypeBigDecimal"
+        case TypesScala.Boolean    => code"$PGType.PGTypeBoolean"
+        case TypesScala.Double     => code"$PGType.PGTypeDouble"
+        case TypesScala.Float      => code"$PGType.PGTypeFloat"
+        case TypesScala.Int        => code"$PGType.PGTypeInt"
+        case TypesScala.Long       => code"$PGType.PGTypeLong"
+        case TypesJava.String      => code"$PGType.PGTypeString"
+        case TypesJava.UUID        => code"$PGType.PGTypeUUID"
         //        case ScalaTypes.Optional(targ) => lookupParameterMetaDataFor(targ)
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
-          code"$tpe.$parameterMetadataName"
+          code"$tpe.$pgTypeName"
         // customized type mapping
-        case x if missingInstancesByType.contains(ParameterMetaData.of(x)) =>
-          code"${missingInstancesByType(ParameterMetaData.of(x))}"
-        case sc.Type.ArrayOf(TypesScala.Byte) => code"$ParameterMetaData.ByteArrayParameterMetaData"
+        case x if missingInstancesByType.contains(PGType.of(x)) =>
+          code"${missingInstancesByType(PGType.of(x))}"
+        case sc.Type.ArrayOf(TypesScala.Byte) => code"$PGType.PGTypeByteArray"
         // fallback array case.
-        case sc.Type.ArrayOf(targ) => code"$ParameterMetaData.arrayParameterMetaData(${lookupParameterMetaDataFor(targ)})"
-        case other                 => sc.Summon(ParameterMetaData.of(other)).code
+        case sc.Type.ArrayOf(targ) => code"$PGType.forArray(${lookupPgTypeFor(targ)})"
+        case other                 => sc.Summon(PGType.of(other)).code
       }
 
   private def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type, forbidInline: Boolean = false): sc.Code = {
@@ -687,8 +686,8 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     )
 
     val parameterMetadata = {
-      val body = code"$ParameterMetaData.instance[$wrapperType](${sqlTypeLit}, ${TypesJava.SqlTypes}.OTHER)"
-      sc.Given(tparams = Nil, name = parameterMetadataName, implicitParams = Nil, tpe = ParameterMetaData.of(wrapperType), body = body)
+      val body = code"$PGType.instance[$wrapperType](${sqlTypeLit}, ${TypesJava.SqlTypes}.OTHER)"
+      sc.Given(tparams = Nil, name = pgTypeName, implicitParams = Nil, tpe = PGType.of(wrapperType), body = body)
     }
 
     val text = textSupport.map(_.anyValInstance(wrapperType, underlying))
@@ -746,10 +745,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       ifDsl(
         sc.Given(
           tparams = Nil,
-          name = parameterMetadataName,
+          name = pgTypeName,
           implicitParams = Nil,
-          tpe = ParameterMetaData.of(wrapperType),
-          body = code"$ParameterMetaData.instance[$wrapperType](${lookupParameterMetaDataFor(underlying)}.sqlType, ${lookupParameterMetaDataFor(underlying)}.jdbcType)"
+          tpe = PGType.of(wrapperType),
+          body = code"${lookupPgTypeFor(underlying)}.as"
         )
       ),
       textSupport.map(_.anyValInstance(wrapperType, underlying))
@@ -923,13 +922,13 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       sc.Given(tparams = Nil, name = setterName, implicitParams = Nil, tpe = Setter.of(ct.typoType), body = body)
     }
 
-    val parameterMetadata = {
-      val body = code"$ParameterMetaData.instance[${ct.typoType}](${sc.StrLit(ct.sqlType)}, ${TypesJava.SqlTypes}.OTHER)"
-      sc.Given(Nil, parameterMetadataName, Nil, ParameterMetaData.of(ct.typoType), body)
+    val pgType = {
+      val body = code"$PGType.instance[${ct.typoType}](${sc.StrLit(ct.sqlType)}, ${TypesJava.SqlTypes}.OTHER)"
+      sc.Given(Nil, pgTypeName, Nil, PGType.of(ct.typoType), body)
     }
     val text = textSupport.map(_.customTypeInstance(ct))
 
-    List(Option(jdbcEncoder), Option(jdbcDecoder), Option(setter), ifDsl(parameterMetadata), text).flatten
+    List(Option(jdbcEncoder), Option(jdbcDecoder), Option(setter), ifDsl(pgType), text).flatten
   }
 
   def customTypeArray(ct: CustomType): List[sc.Given] = {

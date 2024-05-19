@@ -10,7 +10,7 @@ import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -66,7 +66,7 @@ object TypoShort {
   implicit lazy val jsonDecoder: JsonDecoder[TypoShort] = JsonDecoder[Short].map(TypoShort.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoShort] = JsonEncoder[Short].contramap(_.value)
   implicit lazy val ordering: Ordering[TypoShort] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoShort] = ParameterMetaData.instance[TypoShort]("int2", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoShort] = PGType.instance[TypoShort]("int2", Types.OTHER)
   implicit lazy val setter: Setter[TypoShort] = Setter.other(
     (ps, i, v) => {
       ps.setObject(
