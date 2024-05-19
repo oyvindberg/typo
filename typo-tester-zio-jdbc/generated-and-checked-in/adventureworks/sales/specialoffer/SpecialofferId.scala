@@ -9,7 +9,7 @@ package specialoffer
 
 import adventureworks.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -26,7 +26,7 @@ object SpecialofferId {
   implicit lazy val jsonDecoder: JsonDecoder[SpecialofferId] = JsonDecoder.int.map(SpecialofferId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[SpecialofferId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[SpecialofferId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[SpecialofferId] = ParameterMetaData.instance[SpecialofferId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[SpecialofferId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[SpecialofferId] = Setter.intSetter.contramap(_.value)
   implicit lazy val text: Text[SpecialofferId] = new Text[SpecialofferId] {
     override def unsafeEncode(v: SpecialofferId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)

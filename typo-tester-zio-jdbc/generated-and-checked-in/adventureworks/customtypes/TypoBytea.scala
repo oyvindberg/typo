@@ -10,7 +10,7 @@ import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -33,7 +33,7 @@ object TypoBytea {
   implicit lazy val jsonDecoder: JsonDecoder[TypoBytea] = JsonDecoder.array[Byte](using JsonDecoder.byte, implicitly).map(TypoBytea.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoBytea] = JsonEncoder.array[Byte](using JsonEncoder.byte, implicitly).contramap(_.value)
   implicit def ordering(implicit O0: Ordering[Array[Byte]]): Ordering[TypoBytea] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoBytea] = ParameterMetaData.instance[TypoBytea]("bytea", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoBytea] = PGType.instance[TypoBytea]("bytea", Types.OTHER)
   implicit lazy val setter: Setter[TypoBytea] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

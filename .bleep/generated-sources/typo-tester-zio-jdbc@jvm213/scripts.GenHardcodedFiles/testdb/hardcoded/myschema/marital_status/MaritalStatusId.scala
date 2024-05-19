@@ -10,7 +10,7 @@ package marital_status
 
 import testdb.hardcoded.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -27,7 +27,7 @@ object MaritalStatusId {
   implicit lazy val jsonDecoder: JsonDecoder[MaritalStatusId] = JsonDecoder.long.map(MaritalStatusId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[MaritalStatusId] = JsonEncoder.long.contramap(_.value)
   implicit lazy val ordering: Ordering[MaritalStatusId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[MaritalStatusId] = ParameterMetaData.instance[MaritalStatusId](ParameterMetaData.LongParameterMetaData.sqlType, ParameterMetaData.LongParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[MaritalStatusId] = PGType.PGTypeLong.as
   implicit lazy val setter: Setter[MaritalStatusId] = Setter.longSetter.contramap(_.value)
   implicit lazy val text: Text[MaritalStatusId] = new Text[MaritalStatusId] {
     override def unsafeEncode(v: MaritalStatusId, sb: StringBuilder) = Text.longInstance.unsafeEncode(v.value, sb)

@@ -9,7 +9,7 @@ package public
 import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcDecoderError
 import zio.jdbc.JdbcEncoder
@@ -64,7 +64,7 @@ object Myenum {
   implicit lazy val jsonDecoder: JsonDecoder[Myenum] = JsonDecoder.string.mapOrFail(Myenum.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Myenum] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[Myenum] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[Myenum] = ParameterMetaData.instance[Myenum]("public.myenum", Types.OTHER)
+  implicit lazy val pgType: PGType[Myenum] = PGType.instance[Myenum]("public.myenum", Types.OTHER)
   implicit lazy val setter: Setter[Myenum] = Setter.stringSetter.contramap(_.value)
   implicit lazy val text: Text[Myenum] = new Text[Myenum] {
     override def unsafeEncode(v: Myenum, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)

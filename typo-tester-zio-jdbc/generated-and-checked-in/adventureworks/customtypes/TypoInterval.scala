@@ -10,7 +10,7 @@ import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGInterval
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -86,7 +86,7 @@ object TypoInterval {
     }
   }
   implicit lazy val ordering: Ordering[TypoInterval] = Ordering.by(x => (x.years, x.months, x.days, x.hours, x.minutes, x.seconds))
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoInterval] = ParameterMetaData.instance[TypoInterval]("interval", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoInterval] = PGType.instance[TypoInterval]("interval", Types.OTHER)
   implicit lazy val setter: Setter[TypoInterval] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

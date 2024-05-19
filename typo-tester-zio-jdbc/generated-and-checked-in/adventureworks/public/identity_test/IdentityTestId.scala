@@ -9,7 +9,7 @@ package identity_test
 
 import adventureworks.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -26,7 +26,7 @@ object IdentityTestId {
   implicit lazy val jsonDecoder: JsonDecoder[IdentityTestId] = JsonDecoder.string.map(IdentityTestId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[IdentityTestId] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[IdentityTestId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[IdentityTestId] = ParameterMetaData.instance[IdentityTestId](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[IdentityTestId] = PGType.PGTypeString.as
   implicit lazy val setter: Setter[IdentityTestId] = Setter.stringSetter.contramap(_.value)
   implicit lazy val text: Text[IdentityTestId] = new Text[IdentityTestId] {
     override def unsafeEncode(v: IdentityTestId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)

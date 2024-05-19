@@ -9,7 +9,7 @@ package productdescription
 
 import adventureworks.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -26,7 +26,7 @@ object ProductdescriptionId {
   implicit lazy val jsonDecoder: JsonDecoder[ProductdescriptionId] = JsonDecoder.int.map(ProductdescriptionId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[ProductdescriptionId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[ProductdescriptionId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[ProductdescriptionId] = ParameterMetaData.instance[ProductdescriptionId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[ProductdescriptionId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[ProductdescriptionId] = Setter.intSetter.contramap(_.value)
   implicit lazy val text: Text[ProductdescriptionId] = new Text[ProductdescriptionId] {
     override def unsafeEncode(v: ProductdescriptionId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)

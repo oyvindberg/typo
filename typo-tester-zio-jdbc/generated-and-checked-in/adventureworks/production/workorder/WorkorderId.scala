@@ -9,7 +9,7 @@ package workorder
 
 import adventureworks.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -26,7 +26,7 @@ object WorkorderId {
   implicit lazy val jsonDecoder: JsonDecoder[WorkorderId] = JsonDecoder.int.map(WorkorderId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[WorkorderId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[WorkorderId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[WorkorderId] = ParameterMetaData.instance[WorkorderId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[WorkorderId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[WorkorderId] = Setter.intSetter.contramap(_.value)
   implicit lazy val text: Text[WorkorderId] = new Text[WorkorderId] {
     override def unsafeEncode(v: WorkorderId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)

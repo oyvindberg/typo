@@ -10,7 +10,7 @@ import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGline
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -74,7 +74,7 @@ object TypoLine {
     }
   }
   implicit lazy val ordering: Ordering[TypoLine] = Ordering.by(x => (x.a, x.b, x.c))
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoLine] = ParameterMetaData.instance[TypoLine]("line", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoLine] = PGType.instance[TypoLine]("line", Types.OTHER)
   implicit lazy val setter: Setter[TypoLine] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

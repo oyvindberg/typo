@@ -9,7 +9,7 @@ package department
 
 import adventureworks.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -26,7 +26,7 @@ object DepartmentId {
   implicit lazy val jsonDecoder: JsonDecoder[DepartmentId] = JsonDecoder.int.map(DepartmentId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[DepartmentId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[DepartmentId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[DepartmentId] = ParameterMetaData.instance[DepartmentId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[DepartmentId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[DepartmentId] = Setter.intSetter.contramap(_.value)
   implicit lazy val text: Text[DepartmentId] = new Text[DepartmentId] {
     override def unsafeEncode(v: DepartmentId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)

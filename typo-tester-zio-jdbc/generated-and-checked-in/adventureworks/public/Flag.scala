@@ -8,7 +8,7 @@ package public
 
 import adventureworks.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -27,7 +27,7 @@ object Flag {
   implicit lazy val jsonDecoder: JsonDecoder[Flag] = JsonDecoder.boolean.map(Flag.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Flag] = JsonEncoder.boolean.contramap(_.value)
   implicit lazy val ordering: Ordering[Flag] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[Flag] = ParameterMetaData.instance[Flag](ParameterMetaData.BooleanParameterMetaData.sqlType, ParameterMetaData.BooleanParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[Flag] = PGType.PGTypeBoolean.as
   implicit lazy val setter: Setter[Flag] = Setter.booleanSetter.contramap(_.value)
   implicit lazy val text: Text[Flag] = new Text[Flag] {
     override def unsafeEncode(v: Flag, sb: StringBuilder) = Text.booleanInstance.unsafeEncode(v.value, sb)

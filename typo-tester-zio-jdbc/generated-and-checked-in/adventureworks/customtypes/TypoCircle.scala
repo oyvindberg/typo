@@ -10,7 +10,7 @@ import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.geometric.PGcircle
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -70,7 +70,7 @@ object TypoCircle {
     }
   }
   implicit def ordering(implicit O0: Ordering[TypoPoint]): Ordering[TypoCircle] = Ordering.by(x => (x.center, x.radius))
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoCircle] = ParameterMetaData.instance[TypoCircle]("circle", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoCircle] = PGType.instance[TypoCircle]("circle", Types.OTHER)
   implicit lazy val setter: Setter[TypoCircle] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

@@ -10,7 +10,7 @@ import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -53,7 +53,7 @@ object TypoUnknownCitext {
   implicit lazy val jsonDecoder: JsonDecoder[TypoUnknownCitext] = JsonDecoder.string.map(TypoUnknownCitext.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoUnknownCitext] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoUnknownCitext] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoUnknownCitext] = ParameterMetaData.instance[TypoUnknownCitext]("citext", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoUnknownCitext] = PGType.instance[TypoUnknownCitext]("citext", Types.OTHER)
   implicit lazy val setter: Setter[TypoUnknownCitext] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

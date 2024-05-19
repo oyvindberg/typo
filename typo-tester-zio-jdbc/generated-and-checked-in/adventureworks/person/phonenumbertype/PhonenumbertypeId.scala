@@ -9,7 +9,7 @@ package phonenumbertype
 
 import adventureworks.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -26,7 +26,7 @@ object PhonenumbertypeId {
   implicit lazy val jsonDecoder: JsonDecoder[PhonenumbertypeId] = JsonDecoder.int.map(PhonenumbertypeId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[PhonenumbertypeId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[PhonenumbertypeId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[PhonenumbertypeId] = ParameterMetaData.instance[PhonenumbertypeId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[PhonenumbertypeId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[PhonenumbertypeId] = Setter.intSetter.contramap(_.value)
   implicit lazy val text: Text[PhonenumbertypeId] = new Text[PhonenumbertypeId] {
     override def unsafeEncode(v: PhonenumbertypeId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)

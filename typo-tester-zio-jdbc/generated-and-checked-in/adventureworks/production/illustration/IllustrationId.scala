@@ -9,7 +9,7 @@ package illustration
 
 import adventureworks.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -26,7 +26,7 @@ object IllustrationId {
   implicit lazy val jsonDecoder: JsonDecoder[IllustrationId] = JsonDecoder.int.map(IllustrationId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[IllustrationId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val ordering: Ordering[IllustrationId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[IllustrationId] = ParameterMetaData.instance[IllustrationId](ParameterMetaData.IntParameterMetaData.sqlType, ParameterMetaData.IntParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[IllustrationId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[IllustrationId] = Setter.intSetter.contramap(_.value)
   implicit lazy val text: Text[IllustrationId] = new Text[IllustrationId] {
     override def unsafeEncode(v: IllustrationId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)

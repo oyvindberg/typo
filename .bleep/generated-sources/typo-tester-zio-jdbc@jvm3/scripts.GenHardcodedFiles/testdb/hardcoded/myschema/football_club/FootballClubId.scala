@@ -10,7 +10,7 @@ package football_club
 
 import testdb.hardcoded.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -27,7 +27,7 @@ object FootballClubId {
   implicit lazy val jsonDecoder: JsonDecoder[FootballClubId] = JsonDecoder.long.map(FootballClubId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[FootballClubId] = JsonEncoder.long.contramap(_.value)
   implicit lazy val ordering: Ordering[FootballClubId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[FootballClubId] = ParameterMetaData.instance[FootballClubId](ParameterMetaData.LongParameterMetaData.sqlType, ParameterMetaData.LongParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[FootballClubId] = PGType.PGTypeLong.as
   implicit lazy val setter: Setter[FootballClubId] = Setter.longSetter.contramap(_.value)
   implicit lazy val text: Text[FootballClubId] = new Text[FootballClubId] {
     override def unsafeEncode(v: FootballClubId, sb: StringBuilder) = Text.longInstance.unsafeEncode(v.value, sb)

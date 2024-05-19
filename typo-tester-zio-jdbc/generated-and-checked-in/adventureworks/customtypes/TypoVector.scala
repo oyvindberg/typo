@@ -11,7 +11,7 @@ import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.jdbc.PgArray
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -34,7 +34,7 @@ object TypoVector {
   implicit lazy val jsonDecoder: JsonDecoder[TypoVector] = JsonDecoder.array[Float](using JsonDecoder.float, implicitly).map(TypoVector.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoVector] = JsonEncoder.array[Float](using JsonEncoder.float, implicitly).contramap(_.value)
   implicit def ordering(implicit O0: Ordering[Array[Float]]): Ordering[TypoVector] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoVector] = ParameterMetaData.instance[TypoVector]("vector", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoVector] = PGType.instance[TypoVector]("vector", Types.OTHER)
   implicit lazy val setter: Setter[TypoVector] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

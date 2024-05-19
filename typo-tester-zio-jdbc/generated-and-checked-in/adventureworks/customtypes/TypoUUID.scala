@@ -11,7 +11,7 @@ import java.sql.ResultSet
 import java.sql.Types
 import java.util.UUID
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -56,7 +56,7 @@ object TypoUUID {
   implicit lazy val jsonDecoder: JsonDecoder[TypoUUID] = JsonDecoder.uuid.map(TypoUUID.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoUUID] = JsonEncoder.uuid.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoUUID] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoUUID] = ParameterMetaData.instance[TypoUUID]("uuid", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoUUID] = PGType.instance[TypoUUID]("uuid", Types.OTHER)
   implicit lazy val setter: Setter[TypoUUID] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

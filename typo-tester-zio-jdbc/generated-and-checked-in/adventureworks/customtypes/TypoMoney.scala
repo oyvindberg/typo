@@ -10,7 +10,7 @@ import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -53,7 +53,7 @@ object TypoMoney {
   implicit lazy val jsonDecoder: JsonDecoder[TypoMoney] = JsonDecoder.scalaBigDecimal.map(TypoMoney.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoMoney] = JsonEncoder.scalaBigDecimal.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoMoney] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoMoney] = ParameterMetaData.instance[TypoMoney]("money", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoMoney] = PGType.instance[TypoMoney]("money", Types.OTHER)
   implicit lazy val setter: Setter[TypoMoney] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

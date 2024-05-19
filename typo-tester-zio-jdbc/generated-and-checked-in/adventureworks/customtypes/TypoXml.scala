@@ -12,7 +12,7 @@ import java.sql.Types
 import org.postgresql.jdbc.PgSQLXML
 import org.postgresql.util.PGobject
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -60,7 +60,7 @@ object TypoXml {
   implicit lazy val jsonDecoder: JsonDecoder[TypoXml] = JsonDecoder.string.map(TypoXml.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoXml] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoXml] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoXml] = ParameterMetaData.instance[TypoXml]("xml", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoXml] = PGType.instance[TypoXml]("xml", Types.OTHER)
   implicit lazy val setter: Setter[TypoXml] = Setter.other(
     (ps, i, v) => {
       ps.setObject(

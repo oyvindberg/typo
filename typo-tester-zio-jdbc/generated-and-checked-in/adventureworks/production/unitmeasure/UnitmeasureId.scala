@@ -9,7 +9,7 @@ package unitmeasure
 
 import adventureworks.Text
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -26,7 +26,7 @@ object UnitmeasureId {
   implicit lazy val jsonDecoder: JsonDecoder[UnitmeasureId] = JsonDecoder.string.map(UnitmeasureId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[UnitmeasureId] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[UnitmeasureId] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[UnitmeasureId] = ParameterMetaData.instance[UnitmeasureId](ParameterMetaData.StringParameterMetaData.sqlType, ParameterMetaData.StringParameterMetaData.jdbcType)
+  implicit lazy val pgType: PGType[UnitmeasureId] = PGType.PGTypeString.as
   implicit lazy val setter: Setter[UnitmeasureId] = Setter.stringSetter.contramap(_.value)
   implicit lazy val text: Text[UnitmeasureId] = new Text[UnitmeasureId] {
     override def unsafeEncode(v: UnitmeasureId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)

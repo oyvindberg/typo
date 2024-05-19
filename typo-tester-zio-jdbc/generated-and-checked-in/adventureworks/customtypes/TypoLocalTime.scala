@@ -12,7 +12,7 @@ import java.sql.Types
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import typo.dsl.Bijection
-import typo.dsl.ParameterMetaData
+import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcEncoder
 import zio.jdbc.SqlFragment.Setter
@@ -58,7 +58,7 @@ object TypoLocalTime {
   implicit lazy val jsonDecoder: JsonDecoder[TypoLocalTime] = JsonDecoder.localTime.map(TypoLocalTime.apply)
   implicit lazy val jsonEncoder: JsonEncoder[TypoLocalTime] = JsonEncoder.localTime.contramap(_.value)
   implicit lazy val ordering: Ordering[TypoLocalTime] = Ordering.by(_.value)
-  implicit lazy val parameterMetadata: ParameterMetaData[TypoLocalTime] = ParameterMetaData.instance[TypoLocalTime]("time", Types.OTHER)
+  implicit lazy val pgType: PGType[TypoLocalTime] = PGType.instance[TypoLocalTime]("time", Types.OTHER)
   implicit lazy val setter: Setter[TypoLocalTime] = Setter.other(
     (ps, i, v) => {
       ps.setObject(
