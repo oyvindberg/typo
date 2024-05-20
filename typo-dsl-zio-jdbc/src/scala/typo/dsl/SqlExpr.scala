@@ -142,6 +142,17 @@ object SqlExpr {
     override def render(counter: AtomicInteger): SqlFragment = sql"${E.encode(value)}" ++ s"::${P.sqlType}"
   }
 
+  object Const {
+    trait As[T, N[_], R] {
+      def apply(value: N[T]): SqlExpr.Const[T, N, R]
+    }
+
+    object As {
+      implicit def as[T, N[_], R](implicit E: JdbcEncoder[N[T]], P: ParameterMetaData[T]): As[T, N, R] =
+        (value: N[T]) => SqlExpr.Const(value, E, P)
+    }
+  }
+
   final case class ArrayIndex[T, N1[_], N2[_], R](arr: SqlExpr[Array[T], N1, R], idx: SqlExpr[Int, N2, R], N: Nullability2[N1, N2, Option]) extends SqlExpr[T, Option, R] {
     override def eval(row: R): Option[T] = {
       N.mapN(arr.eval(row), idx.eval(row)) { (arr, idx) =>
