@@ -18,9 +18,9 @@ import org.postgresql.geometric.PGpoint
 case class TypoPoint(x: Double, y: Double)
 
 object TypoPoint {
-  implicit lazy val arrayGet: Get[Array[TypoPoint]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_point"))
+  implicit lazy val arrayGet: Get[Array[TypoPoint]] = Get.Advanced.array[AnyRef](NonEmptyList.one("point[]"))
     .map(_.map(v => TypoPoint(v.asInstanceOf[PGpoint].x, v.asInstanceOf[PGpoint].y)))
-  implicit lazy val arrayPut: Put[Array[TypoPoint]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_point"), "point")
+  implicit lazy val arrayPut: Put[Array[TypoPoint]] = Put.Advanced.array[AnyRef](NonEmptyList.one("point[]"), "point")
     .contramap(_.map(v => new PGpoint(v.x, v.y)))
   implicit lazy val decoder: Decoder[TypoPoint] = Decoder.forProduct2[TypoPoint, Double, Double]("x", "y")(TypoPoint.apply)(Decoder.decodeDouble, Decoder.decodeDouble)
   implicit lazy val encoder: Encoder[TypoPoint] = Encoder.forProduct2[TypoPoint, Double, Double]("x", "y")(x => (x.x, x.y))(Encoder.encodeDouble, Encoder.encodeDouble)

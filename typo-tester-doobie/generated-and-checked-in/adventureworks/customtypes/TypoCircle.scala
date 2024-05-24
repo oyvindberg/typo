@@ -18,9 +18,9 @@ import org.postgresql.geometric.PGcircle
 case class TypoCircle(center: TypoPoint, radius: Double)
 
 object TypoCircle {
-  implicit lazy val arrayGet: Get[Array[TypoCircle]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_circle"))
+  implicit lazy val arrayGet: Get[Array[TypoCircle]] = Get.Advanced.array[AnyRef](NonEmptyList.one("circle[]"))
     .map(_.map(v => TypoCircle(TypoPoint(v.asInstanceOf[PGcircle].center.x, v.asInstanceOf[PGcircle].center.y), v.asInstanceOf[PGcircle].radius)))
-  implicit lazy val arrayPut: Put[Array[TypoCircle]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_circle"), "circle")
+  implicit lazy val arrayPut: Put[Array[TypoCircle]] = Put.Advanced.array[AnyRef](NonEmptyList.one("circle[]"), "circle")
     .contramap(_.map(v => new PGcircle(v.center.x, v.center.y, v.radius)))
   implicit lazy val decoder: Decoder[TypoCircle] = Decoder.forProduct2[TypoCircle, TypoPoint, Double]("center", "radius")(TypoCircle.apply)(TypoPoint.decoder, Decoder.decodeDouble)
   implicit lazy val encoder: Encoder[TypoCircle] = Encoder.forProduct2[TypoCircle, TypoPoint, Double]("center", "radius")(x => (x.center, x.radius))(TypoPoint.encoder, Encoder.encodeDouble)

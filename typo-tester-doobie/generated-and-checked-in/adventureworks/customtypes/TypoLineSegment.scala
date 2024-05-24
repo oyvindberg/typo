@@ -19,9 +19,9 @@ import org.postgresql.geometric.PGpoint
 case class TypoLineSegment(p1: TypoPoint, p2: TypoPoint)
 
 object TypoLineSegment {
-  implicit lazy val arrayGet: Get[Array[TypoLineSegment]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_lseg"))
+  implicit lazy val arrayGet: Get[Array[TypoLineSegment]] = Get.Advanced.array[AnyRef](NonEmptyList.one("lseg[]"))
     .map(_.map(v => TypoLineSegment(TypoPoint(v.asInstanceOf[PGlseg].point(0).x, v.asInstanceOf[PGlseg].point(0).y), TypoPoint(v.asInstanceOf[PGlseg].point(1).x, v.asInstanceOf[PGlseg].point(1).y))))
-  implicit lazy val arrayPut: Put[Array[TypoLineSegment]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_lseg"), "lseg")
+  implicit lazy val arrayPut: Put[Array[TypoLineSegment]] = Put.Advanced.array[AnyRef](NonEmptyList.one("lseg[]"), "lseg")
     .contramap(_.map(v => new PGlseg(new PGpoint(v.p1.x, v.p1.y), new PGpoint(v.p2.x, v.p2.y))))
   implicit lazy val decoder: Decoder[TypoLineSegment] = Decoder.forProduct2[TypoLineSegment, TypoPoint, TypoPoint]("p1", "p2")(TypoLineSegment.apply)(TypoPoint.decoder, TypoPoint.decoder)
   implicit lazy val encoder: Encoder[TypoLineSegment] = Encoder.forProduct2[TypoLineSegment, TypoPoint, TypoPoint]("p1", "p2")(x => (x.p1, x.p2))(TypoPoint.encoder, TypoPoint.encoder)
