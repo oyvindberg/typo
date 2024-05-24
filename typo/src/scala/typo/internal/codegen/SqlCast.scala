@@ -26,7 +26,11 @@ object SqlCast {
       case db.Type.Unknown(sqlType)                            => Some(SqlCast(sqlType))
       case db.Type.EnumRef(name)                               => Some(SqlCast(name.value))
       case db.Type.Boolean | db.Type.Text | db.Type.VarChar(_) => None
-      case _                                                   => udtName.map(SqlCast.apply)
+      case _ =>
+        udtName.map {
+          case ArrayName(x) => SqlCast(x + "[]")
+          case other        => SqlCast(other)
+        }
     }
 
   def toPgCode(c: ComputedColumn): sc.Code =
