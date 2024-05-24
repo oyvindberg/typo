@@ -212,7 +212,7 @@ object SqlExpr {
   }
 
   final case class RowExpr[R](exprs: List[SqlExpr.SqlExprNoHkt[?]]) extends SqlExpr[List[?], Required] {
-    override def render(counter: AtomicInteger): SqlFragment = exprs.map(_.render(counter)).mkFragment(sql"(", sql",", sql")")
+    override def render(ctx: RenderCtx): SqlFragment = exprs.map(_.render(ctx)).mkFragment(sql"(", sql",", sql")")
   }
 
   implicit class SqlExprArraySyntax[T, N[_]](private val expr: SqlExpr[Array[T], N]) extends AnyVal {

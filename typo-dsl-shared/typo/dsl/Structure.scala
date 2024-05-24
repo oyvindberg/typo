@@ -53,8 +53,6 @@ trait Structure[Fields, Row] {
         x.N.mapN(untypedEval(x.expr, row))(t => x.B.map(t)(b => !b))
       case x: SqlExpr.ToNullable[t, n] =>
         x.N.toOpt(untypedEval(x.expr, row))
-      case x: SqlExpr.RowExpr =>
-        x.exprs.map(expr => untypedEval(expr, row))
     }
 
   final def join[Fields2, Row2](other: Structure[Fields2, Row2]): Structure[Joined[Fields, Fields2], (Row, Row2)] =
