@@ -16,7 +16,7 @@ object db {
     case object Bytea extends Type
     case object Char extends Type
     case object Date extends Type
-    case class DomainRef(name: RelationName) extends Type
+    case class DomainRef(name: RelationName, underlying: Type) extends Type
     case object Float4 extends Type
     case object Float8 extends Type
     case object Hstore extends Type

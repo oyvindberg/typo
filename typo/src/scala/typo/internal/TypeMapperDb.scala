@@ -6,9 +6,14 @@ import typo.generated.information_schema.columns.ColumnsViewRow
 case class TypeMapperDb(enums: List[db.StringEnum], domains: List[db.Domain]) {
   val domainsByName: Map[String, db.Domain] = domains.flatMap(e => List((e.name.name, e), (e.name.value, e))).toMap
   val enumsByName = enums.flatMap(e => List((e.name.name, e), (e.name.value, e))).toMap
+  
   def col(c: ColumnsViewRow)(logWarning: () => Unit): db.Type = {
     val fromDomain: Option[db.Type.DomainRef] =
-      c.domainName.map(domainName => db.Type.DomainRef(db.RelationName(c.domainSchema, domainName)))
+      c.domainName.map { domainName =>
+        val domainRelationName = db.RelationName(c.domainSchema, domainName)
+        val d = domainsByName(domainRelationName.value)
+        db.Type.DomainRef(d.name, d.tpe)
+      }
 
     fromDomain.getOrElse(dbTypeFrom(c.udtName.get, c.characterMaximumLength)(logWarning))
   }
@@ -83,7 +88,7 @@ case class TypeMapperDb(enums: List[db.StringEnum], domains: List[db.Domain]) {
         enumsByName
           .get(typeName)
           .map(`enum` => db.Type.EnumRef(`enum`.name))
-          .orElse(domainsByName.get(typeName).map(domain => db.Type.DomainRef(domain.name)))
+          .orElse(domainsByName.get(typeName).map(domain => db.Type.DomainRef(domain.name, domain.tpe)))
           .getOrElse {
             logWarning()
             db.Type.Unknown(udtName)
