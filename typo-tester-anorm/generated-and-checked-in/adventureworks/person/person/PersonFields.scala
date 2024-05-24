@@ -10,10 +10,13 @@ package person
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
+import adventureworks.person.businessentity.BusinessentityFields
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.businessentity.BusinessentityRow
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import adventureworks.userdefined.FirstName
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -35,6 +38,9 @@ trait PersonFields {
   def demographics: OptField[TypoXml, PersonRow]
   def rowguid: Field[TypoUUID, PersonRow]
   def modifieddate: Field[TypoLocalDateTime, PersonRow]
+  def fkBusinessentity: ForeignKey[BusinessentityFields, BusinessentityRow] =
+    ForeignKey[BusinessentityFields, BusinessentityRow]("person.FK_Person_BusinessEntity_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
 }
 
 object PersonFields {

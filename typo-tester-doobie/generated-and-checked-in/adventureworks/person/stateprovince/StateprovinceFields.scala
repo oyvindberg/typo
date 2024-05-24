@@ -9,10 +9,15 @@ package stateprovince
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import adventureworks.person.countryregion.CountryregionFields
 import adventureworks.person.countryregion.CountryregionId
+import adventureworks.person.countryregion.CountryregionRow
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import adventureworks.sales.salesterritory.SalesterritoryFields
 import adventureworks.sales.salesterritory.SalesterritoryId
+import adventureworks.sales.salesterritory.SalesterritoryRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -28,6 +33,12 @@ trait StateprovinceFields {
   def territoryid: Field[SalesterritoryId, StateprovinceRow]
   def rowguid: Field[TypoUUID, StateprovinceRow]
   def modifieddate: Field[TypoLocalDateTime, StateprovinceRow]
+  def fkCountryregion: ForeignKey[CountryregionFields, CountryregionRow] =
+    ForeignKey[CountryregionFields, CountryregionRow]("person.FK_StateProvince_CountryRegion_CountryRegionCode", Nil)
+      .withColumnPair(countryregioncode, _.countryregioncode)
+  def fkSalesSalesterritory: ForeignKey[SalesterritoryFields, SalesterritoryRow] =
+    ForeignKey[SalesterritoryFields, SalesterritoryRow]("person.FK_StateProvince_SalesTerritory_TerritoryID", Nil)
+      .withColumnPair(territoryid, _.territoryid)
 }
 
 object StateprovinceFields {

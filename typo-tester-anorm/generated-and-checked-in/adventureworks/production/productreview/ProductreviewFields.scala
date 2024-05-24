@@ -8,8 +8,11 @@ package production
 package productreview
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.production.product.ProductFields
 import adventureworks.production.product.ProductId
+import adventureworks.production.product.ProductRow
 import adventureworks.public.Name
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -26,6 +29,9 @@ trait ProductreviewFields {
   def rating: Field[Int, ProductreviewRow]
   def comments: OptField[/* max 3850 chars */ String, ProductreviewRow]
   def modifieddate: Field[TypoLocalDateTime, ProductreviewRow]
+  def fkProduct: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("production.FK_ProductReview_Product_ProductID", Nil)
+      .withColumnPair(productid, _.productid)
 }
 
 object ProductreviewFields {

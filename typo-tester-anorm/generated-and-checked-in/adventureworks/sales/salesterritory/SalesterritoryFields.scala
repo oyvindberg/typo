@@ -9,8 +9,11 @@ package salesterritory
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import adventureworks.person.countryregion.CountryregionFields
 import adventureworks.person.countryregion.CountryregionId
+import adventureworks.person.countryregion.CountryregionRow
 import adventureworks.public.Name
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -28,6 +31,9 @@ trait SalesterritoryFields {
   def costlastyear: Field[BigDecimal, SalesterritoryRow]
   def rowguid: Field[TypoUUID, SalesterritoryRow]
   def modifieddate: Field[TypoLocalDateTime, SalesterritoryRow]
+  def fkPersonCountryregion: ForeignKey[CountryregionFields, CountryregionRow] =
+    ForeignKey[CountryregionFields, CountryregionRow]("sales.FK_SalesTerritory_CountryRegion_CountryRegionCode", Nil)
+      .withColumnPair(countryregioncode, _.countryregioncode)
 }
 
 object SalesterritoryFields {

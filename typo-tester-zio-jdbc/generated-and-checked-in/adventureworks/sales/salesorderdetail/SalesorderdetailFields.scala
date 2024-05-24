@@ -11,8 +11,13 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
+import adventureworks.sales.salesorderheader.SalesorderheaderFields
 import adventureworks.sales.salesorderheader.SalesorderheaderId
+import adventureworks.sales.salesorderheader.SalesorderheaderRow
 import adventureworks.sales.specialoffer.SpecialofferId
+import adventureworks.sales.specialofferproduct.SpecialofferproductFields
+import adventureworks.sales.specialofferproduct.SpecialofferproductRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -31,6 +36,13 @@ trait SalesorderdetailFields {
   def unitpricediscount: Field[BigDecimal, SalesorderdetailRow]
   def rowguid: Field[TypoUUID, SalesorderdetailRow]
   def modifieddate: Field[TypoLocalDateTime, SalesorderdetailRow]
+  def fkSalesorderheader: ForeignKey[SalesorderheaderFields, SalesorderheaderRow] =
+    ForeignKey[SalesorderheaderFields, SalesorderheaderRow]("sales.FK_SalesOrderDetail_SalesOrderHeader_SalesOrderID", Nil)
+      .withColumnPair(salesorderid, _.salesorderid)
+  def fkSpecialofferproduct: ForeignKey[SpecialofferproductFields, SpecialofferproductRow] =
+    ForeignKey[SpecialofferproductFields, SpecialofferproductRow]("sales.FK_SalesOrderDetail_SpecialOfferProduct_SpecialOfferIDProductID", Nil)
+      .withColumnPair(specialofferid, _.specialofferid)
+      .withColumnPair(productid, _.productid)
 }
 
 object SalesorderdetailFields {

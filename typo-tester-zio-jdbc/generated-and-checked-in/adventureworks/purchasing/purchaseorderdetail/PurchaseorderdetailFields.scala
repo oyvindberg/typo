@@ -9,8 +9,13 @@ package purchaseorderdetail
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.production.product.ProductFields
 import adventureworks.production.product.ProductId
+import adventureworks.production.product.ProductRow
+import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderFields
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
+import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -27,6 +32,12 @@ trait PurchaseorderdetailFields {
   def receivedqty: Field[BigDecimal, PurchaseorderdetailRow]
   def rejectedqty: Field[BigDecimal, PurchaseorderdetailRow]
   def modifieddate: Field[TypoLocalDateTime, PurchaseorderdetailRow]
+  def fkProductionProduct: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("purchasing.FK_PurchaseOrderDetail_Product_ProductID", Nil)
+      .withColumnPair(productid, _.productid)
+  def fkPurchaseorderheader: ForeignKey[PurchaseorderheaderFields, PurchaseorderheaderRow] =
+    ForeignKey[PurchaseorderheaderFields, PurchaseorderheaderRow]("purchasing.FK_PurchaseOrderDetail_PurchaseOrderHeader_PurchaseOrderID", Nil)
+      .withColumnPair(purchaseorderid, _.purchaseorderid)
 }
 
 object PurchaseorderdetailFields {

@@ -9,8 +9,13 @@ package personphone
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.person.PersonFields
+import adventureworks.person.person.PersonRow
+import adventureworks.person.phonenumbertype.PhonenumbertypeFields
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
+import adventureworks.person.phonenumbertype.PhonenumbertypeRow
 import adventureworks.public.Phone
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -22,6 +27,12 @@ trait PersonphoneFields {
   def phonenumber: IdField[Phone, PersonphoneRow]
   def phonenumbertypeid: IdField[PhonenumbertypeId, PersonphoneRow]
   def modifieddate: Field[TypoLocalDateTime, PersonphoneRow]
+  def fkPerson: ForeignKey[PersonFields, PersonRow] =
+    ForeignKey[PersonFields, PersonRow]("person.FK_PersonPhone_Person_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
+  def fkPhonenumbertype: ForeignKey[PhonenumbertypeFields, PhonenumbertypeRow] =
+    ForeignKey[PhonenumbertypeFields, PhonenumbertypeRow]("person.FK_PersonPhone_PhoneNumberType_PhoneNumberTypeID", Nil)
+      .withColumnPair(phonenumbertypeid, _.phonenumbertypeid)
 }
 
 object PersonphoneFields {

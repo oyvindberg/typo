@@ -9,8 +9,13 @@ package workorder
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.production.product.ProductFields
 import adventureworks.production.product.ProductId
+import adventureworks.production.product.ProductRow
+import adventureworks.production.scrapreason.ScrapreasonFields
 import adventureworks.production.scrapreason.ScrapreasonId
+import adventureworks.production.scrapreason.ScrapreasonRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -28,6 +33,12 @@ trait WorkorderFields {
   def duedate: Field[TypoLocalDateTime, WorkorderRow]
   def scrapreasonid: OptField[ScrapreasonId, WorkorderRow]
   def modifieddate: Field[TypoLocalDateTime, WorkorderRow]
+  def fkProduct: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("production.FK_WorkOrder_Product_ProductID", Nil)
+      .withColumnPair(productid, _.productid)
+  def fkScrapreason: ForeignKey[ScrapreasonFields, ScrapreasonRow] =
+    ForeignKey[ScrapreasonFields, ScrapreasonRow]("production.FK_WorkOrder_ScrapReason_ScrapReasonID", Nil)
+      .withColumnPair(scrapreasonid, _.scrapreasonid)
 }
 
 object WorkorderFields {

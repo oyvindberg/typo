@@ -10,7 +10,12 @@ package salesterritoryhistory
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.sales.salesperson.SalespersonFields
+import adventureworks.sales.salesperson.SalespersonRow
+import adventureworks.sales.salesterritory.SalesterritoryFields
 import adventureworks.sales.salesterritory.SalesterritoryId
+import adventureworks.sales.salesterritory.SalesterritoryRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -25,6 +30,12 @@ trait SalesterritoryhistoryFields {
   def enddate: OptField[TypoLocalDateTime, SalesterritoryhistoryRow]
   def rowguid: Field[TypoUUID, SalesterritoryhistoryRow]
   def modifieddate: Field[TypoLocalDateTime, SalesterritoryhistoryRow]
+  def fkSalesperson: ForeignKey[SalespersonFields, SalespersonRow] =
+    ForeignKey[SalespersonFields, SalespersonRow]("sales.FK_SalesTerritoryHistory_SalesPerson_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
+  def fkSalesterritory: ForeignKey[SalesterritoryFields, SalesterritoryRow] =
+    ForeignKey[SalesterritoryFields, SalesterritoryRow]("sales.FK_SalesTerritoryHistory_SalesTerritory_TerritoryID", Nil)
+      .withColumnPair(territoryid, _.territoryid)
 }
 
 object SalesterritoryhistoryFields {

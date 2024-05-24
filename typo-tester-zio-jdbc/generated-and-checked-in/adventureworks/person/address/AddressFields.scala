@@ -10,7 +10,10 @@ package address
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import adventureworks.person.stateprovince.StateprovinceFields
 import adventureworks.person.stateprovince.StateprovinceId
+import adventureworks.person.stateprovince.StateprovinceRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -28,6 +31,9 @@ trait AddressFields {
   def spatiallocation: OptField[TypoBytea, AddressRow]
   def rowguid: Field[TypoUUID, AddressRow]
   def modifieddate: Field[TypoLocalDateTime, AddressRow]
+  def fkStateprovince: ForeignKey[StateprovinceFields, StateprovinceRow] =
+    ForeignKey[StateprovinceFields, StateprovinceRow]("person.FK_Address_StateProvince_StateProvinceID", Nil)
+      .withColumnPair(stateprovinceid, _.stateprovinceid)
 }
 
 object AddressFields {

@@ -8,8 +8,13 @@ package production
 package productdocument
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.production.document.DocumentFields
 import adventureworks.production.document.DocumentId
+import adventureworks.production.document.DocumentRow
+import adventureworks.production.product.ProductFields
 import adventureworks.production.product.ProductId
+import adventureworks.production.product.ProductRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -20,6 +25,12 @@ trait ProductdocumentFields {
   def productid: IdField[ProductId, ProductdocumentRow]
   def modifieddate: Field[TypoLocalDateTime, ProductdocumentRow]
   def documentnode: IdField[DocumentId, ProductdocumentRow]
+  def fkProduct: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("production.FK_ProductDocument_Product_ProductID", Nil)
+      .withColumnPair(productid, _.productid)
+  def fkDocument: ForeignKey[DocumentFields, DocumentRow] =
+    ForeignKey[DocumentFields, DocumentRow]("production.FK_ProductDocument_Document_DocumentNode", Nil)
+      .withColumnPair(documentnode, _.documentnode)
 }
 
 object ProductdocumentFields {

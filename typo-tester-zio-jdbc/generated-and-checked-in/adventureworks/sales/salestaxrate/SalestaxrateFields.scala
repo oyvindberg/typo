@@ -10,8 +10,11 @@ package salestaxrate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
+import adventureworks.person.stateprovince.StateprovinceFields
 import adventureworks.person.stateprovince.StateprovinceId
+import adventureworks.person.stateprovince.StateprovinceRow
 import adventureworks.public.Name
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -26,6 +29,9 @@ trait SalestaxrateFields {
   def name: Field[Name, SalestaxrateRow]
   def rowguid: Field[TypoUUID, SalestaxrateRow]
   def modifieddate: Field[TypoLocalDateTime, SalestaxrateRow]
+  def fkPersonStateprovince: ForeignKey[StateprovinceFields, StateprovinceRow] =
+    ForeignKey[StateprovinceFields, StateprovinceRow]("sales.FK_SalesTaxRate_StateProvince_StateProvinceID", Nil)
+      .withColumnPair(stateprovinceid, _.stateprovinceid)
 }
 
 object SalestaxrateFields {

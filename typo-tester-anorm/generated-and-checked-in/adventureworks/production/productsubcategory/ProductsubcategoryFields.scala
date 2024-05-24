@@ -9,8 +9,11 @@ package productsubcategory
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import adventureworks.production.productcategory.ProductcategoryFields
 import adventureworks.production.productcategory.ProductcategoryId
+import adventureworks.production.productcategory.ProductcategoryRow
 import adventureworks.public.Name
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -23,6 +26,9 @@ trait ProductsubcategoryFields {
   def name: Field[Name, ProductsubcategoryRow]
   def rowguid: Field[TypoUUID, ProductsubcategoryRow]
   def modifieddate: Field[TypoLocalDateTime, ProductsubcategoryRow]
+  def fkProductcategory: ForeignKey[ProductcategoryFields, ProductcategoryRow] =
+    ForeignKey[ProductcategoryFields, ProductcategoryRow]("production.FK_ProductSubcategory_ProductCategory_ProductCategoryID", Nil)
+      .withColumnPair(productcategoryid, _.productcategoryid)
 }
 
 object ProductsubcategoryFields {

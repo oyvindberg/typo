@@ -113,7 +113,7 @@ object SqlExpr {
 
   sealed trait FieldLikeNotIdNoHkt[NT, R] extends FieldLikeNoHkt[NT, R]
 
-  sealed trait FieldLike[T, N[_], R] extends SqlExpr[T, N] with FieldLikeNoHkt[N[T], R] with Product {
+  sealed trait FieldLike[T, N[_], R] extends SqlExpr[T, N] with FieldLikeNoHkt[N[T], R] {
     val path: List[Path]
     val name: String
     val sqlReadCast: Option[String]

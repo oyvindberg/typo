@@ -8,6 +8,7 @@ package public
 package flaff
 
 import adventureworks.public.ShortText
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -20,6 +21,12 @@ trait FlaffFields {
   def someNumber: IdField[Int, FlaffRow]
   def specifier: IdField[ShortText, FlaffRow]
   def parentspecifier: OptField[ShortText, FlaffRow]
+  def fkFlaff: ForeignKey[FlaffFields, FlaffRow] =
+    ForeignKey[FlaffFields, FlaffRow]("public.flaff_parent_fk", Nil)
+      .withColumnPair(code, _.code)
+      .withColumnPair(anotherCode, _.anotherCode)
+      .withColumnPair(someNumber, _.someNumber)
+      .withColumnPair(parentspecifier, _.specifier)
 }
 
 object FlaffFields {

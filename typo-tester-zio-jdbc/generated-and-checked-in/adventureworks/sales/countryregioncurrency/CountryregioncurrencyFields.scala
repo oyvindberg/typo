@@ -8,8 +8,13 @@ package sales
 package countryregioncurrency
 
 import adventureworks.customtypes.TypoLocalDateTime
+import adventureworks.person.countryregion.CountryregionFields
 import adventureworks.person.countryregion.CountryregionId
+import adventureworks.person.countryregion.CountryregionRow
+import adventureworks.sales.currency.CurrencyFields
 import adventureworks.sales.currency.CurrencyId
+import adventureworks.sales.currency.CurrencyRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -20,6 +25,12 @@ trait CountryregioncurrencyFields {
   def countryregioncode: IdField[CountryregionId, CountryregioncurrencyRow]
   def currencycode: IdField[CurrencyId, CountryregioncurrencyRow]
   def modifieddate: Field[TypoLocalDateTime, CountryregioncurrencyRow]
+  def fkPersonCountryregion: ForeignKey[CountryregionFields, CountryregionRow] =
+    ForeignKey[CountryregionFields, CountryregionRow]("sales.FK_CountryRegionCurrency_CountryRegion_CountryRegionCode", Nil)
+      .withColumnPair(countryregioncode, _.countryregioncode)
+  def fkCurrency: ForeignKey[CurrencyFields, CurrencyRow] =
+    ForeignKey[CurrencyFields, CurrencyRow]("sales.FK_CountryRegionCurrency_Currency_CurrencyCode", Nil)
+      .withColumnPair(currencycode, _.currencycode)
 }
 
 object CountryregioncurrencyFields {

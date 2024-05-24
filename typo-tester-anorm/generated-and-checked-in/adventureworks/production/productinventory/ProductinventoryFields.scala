@@ -10,8 +10,13 @@ package productinventory
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
+import adventureworks.production.location.LocationFields
 import adventureworks.production.location.LocationId
+import adventureworks.production.location.LocationRow
+import adventureworks.production.product.ProductFields
 import adventureworks.production.product.ProductId
+import adventureworks.production.product.ProductRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -26,6 +31,12 @@ trait ProductinventoryFields {
   def quantity: Field[TypoShort, ProductinventoryRow]
   def rowguid: Field[TypoUUID, ProductinventoryRow]
   def modifieddate: Field[TypoLocalDateTime, ProductinventoryRow]
+  def fkLocation: ForeignKey[LocationFields, LocationRow] =
+    ForeignKey[LocationFields, LocationRow]("production.FK_ProductInventory_Location_LocationID", Nil)
+      .withColumnPair(locationid, _.locationid)
+  def fkProduct: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("production.FK_ProductInventory_Product_ProductID", Nil)
+      .withColumnPair(productid, _.productid)
 }
 
 object ProductinventoryFields {

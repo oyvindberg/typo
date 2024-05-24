@@ -9,7 +9,10 @@ package jobcandidate
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
+import adventureworks.humanresources.employee.EmployeeFields
+import adventureworks.humanresources.employee.EmployeeRow
 import adventureworks.person.businessentity.BusinessentityId
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -22,6 +25,9 @@ trait JobcandidateFields {
   def businessentityid: OptField[BusinessentityId, JobcandidateRow]
   def resume: OptField[TypoXml, JobcandidateRow]
   def modifieddate: Field[TypoLocalDateTime, JobcandidateRow]
+  def fkEmployee: ForeignKey[EmployeeFields, EmployeeRow] =
+    ForeignKey[EmployeeFields, EmployeeRow]("humanresources.FK_JobCandidate_Employee_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
 }
 
 object JobcandidateFields {

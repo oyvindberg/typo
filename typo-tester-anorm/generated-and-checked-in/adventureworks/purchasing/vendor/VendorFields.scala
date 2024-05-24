@@ -9,10 +9,13 @@ package vendor
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
+import adventureworks.person.businessentity.BusinessentityFields
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.businessentity.BusinessentityRow
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -29,6 +32,9 @@ trait VendorFields {
   def activeflag: Field[Flag, VendorRow]
   def purchasingwebserviceurl: OptField[/* max 1024 chars */ String, VendorRow]
   def modifieddate: Field[TypoLocalDateTime, VendorRow]
+  def fkPersonBusinessentity: ForeignKey[BusinessentityFields, BusinessentityRow] =
+    ForeignKey[BusinessentityFields, BusinessentityRow]("purchasing.FK_Vendor_BusinessEntity_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
 }
 
 object VendorFields {

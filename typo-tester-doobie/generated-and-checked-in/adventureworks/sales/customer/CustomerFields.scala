@@ -10,7 +10,14 @@ package customer
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import adventureworks.person.person.PersonFields
+import adventureworks.person.person.PersonRow
+import adventureworks.sales.salesterritory.SalesterritoryFields
 import adventureworks.sales.salesterritory.SalesterritoryId
+import adventureworks.sales.salesterritory.SalesterritoryRow
+import adventureworks.sales.store.StoreFields
+import adventureworks.sales.store.StoreRow
+import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
@@ -25,6 +32,15 @@ trait CustomerFields {
   def territoryid: OptField[SalesterritoryId, CustomerRow]
   def rowguid: Field[TypoUUID, CustomerRow]
   def modifieddate: Field[TypoLocalDateTime, CustomerRow]
+  def fkPersonPerson: ForeignKey[PersonFields, PersonRow] =
+    ForeignKey[PersonFields, PersonRow]("sales.FK_Customer_Person_PersonID", Nil)
+      .withColumnPair(personid, _.businessentityid)
+  def fkStore: ForeignKey[StoreFields, StoreRow] =
+    ForeignKey[StoreFields, StoreRow]("sales.FK_Customer_Store_StoreID", Nil)
+      .withColumnPair(storeid, _.businessentityid)
+  def fkSalesterritory: ForeignKey[SalesterritoryFields, SalesterritoryRow] =
+    ForeignKey[SalesterritoryFields, SalesterritoryRow]("sales.FK_Customer_SalesTerritory_TerritoryID", Nil)
+      .withColumnPair(territoryid, _.territoryid)
 }
 
 object CustomerFields {
