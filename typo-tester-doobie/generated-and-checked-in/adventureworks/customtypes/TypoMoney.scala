@@ -18,9 +18,9 @@ import typo.dsl.Bijection
 case class TypoMoney(value: BigDecimal)
 
 object TypoMoney {
-  implicit lazy val arrayGet: Get[Array[TypoMoney]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_money"))
+  implicit lazy val arrayGet: Get[Array[TypoMoney]] = Get.Advanced.array[AnyRef](NonEmptyList.one("money[]"))
     .map(_.map(v => TypoMoney(BigDecimal(v.asInstanceOf[java.math.BigDecimal]))))
-  implicit lazy val arrayPut: Put[Array[TypoMoney]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_money"), "money")
+  implicit lazy val arrayPut: Put[Array[TypoMoney]] = Put.Advanced.array[AnyRef](NonEmptyList.one("money[]"), "money")
     .contramap(_.map(v => v.value.bigDecimal))
   implicit lazy val bijection: Bijection[TypoMoney, BigDecimal] = Bijection[TypoMoney, BigDecimal](_.value)(TypoMoney.apply)
   implicit lazy val decoder: Decoder[TypoMoney] = Decoder.decodeBigDecimal.map(TypoMoney.apply)

@@ -18,9 +18,9 @@ import typo.dsl.Bijection
 case class TypoUnknownCitext(value: String)
 
 object TypoUnknownCitext {
-  implicit lazy val arrayGet: Get[Array[TypoUnknownCitext]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_citext"))
+  implicit lazy val arrayGet: Get[Array[TypoUnknownCitext]] = Get.Advanced.array[AnyRef](NonEmptyList.one("citext[]"))
     .map(_.map(v => TypoUnknownCitext(v.asInstanceOf[String])))
-  implicit lazy val arrayPut: Put[Array[TypoUnknownCitext]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_citext"), "citext")
+  implicit lazy val arrayPut: Put[Array[TypoUnknownCitext]] = Put.Advanced.array[AnyRef](NonEmptyList.one("citext[]"), "citext")
     .contramap(_.map(v => v.value))
   implicit lazy val bijection: Bijection[TypoUnknownCitext, String] = Bijection[TypoUnknownCitext, String](_.value)(TypoUnknownCitext.apply)
   implicit lazy val decoder: Decoder[TypoUnknownCitext] = Decoder.decodeString.map(TypoUnknownCitext.apply)

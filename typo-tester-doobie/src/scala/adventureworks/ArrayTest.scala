@@ -81,6 +81,163 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
       transaction.transact(withConnection.testXa)
     }
   }
+  test("can query pgtestnull with DSL") {
+    withConnection {
+      implicit def ordering[T]: Ordering[T] = null
+
+      for {
+        row <- pgtestnullRepo.insert(ArrayTestData.pgtestnullRowWithValues)
+        _ <- pgtestnullRepo.select.where(_.bool === row.bool).toList.map(x => assertJsonEquals(row.bool, x.head.bool))
+        _ <- pgtestnullRepo.select.where(_.box === row.box).toList.map(x => assertJsonEquals(row.box, x.head.box))
+        _ <- pgtestnullRepo.select.where(_.bpchar === row.bpchar).toList.map(x => assertJsonEquals(row.bpchar, x.head.bpchar))
+        _ <- pgtestnullRepo.select.where(_.bytea === row.bytea).toList.map(x => assertJsonEquals(row.bytea, x.head.bytea))
+        _ <- pgtestnullRepo.select.where(_.char === row.char).toList.map(x => assertJsonEquals(row.char, x.head.char))
+        _ <- pgtestnullRepo.select.where(_.circle === row.circle).toList.map(x => assertJsonEquals(row.circle, x.head.circle))
+        _ <- pgtestnullRepo.select.where(_.date === row.date).toList.map(x => assertJsonEquals(row.date, x.head.date))
+        _ <- pgtestnullRepo.select.where(_.float4 === row.float4).toList.map(x => assertJsonEquals(row.float4, x.head.float4))
+        _ <- pgtestnullRepo.select.where(_.float8 === row.float8).toList.map(x => assertJsonEquals(row.float8, x.head.float8))
+        _ <- pgtestnullRepo.select.where(_.hstore === row.hstore).toList.map(x => assertJsonEquals(row.hstore, x.head.hstore))
+        _ <- pgtestnullRepo.select.where(_.inet === row.inet).toList.map(x => assertJsonEquals(row.inet, x.head.inet))
+        _ <- pgtestnullRepo.select.where(_.int2 === row.int2).toList.map(x => assertJsonEquals(row.int2, x.head.int2))
+        _ <- pgtestnullRepo.select.where(_.int2vector === row.int2vector).toList.map(x => assertJsonEquals(row.int2vector, x.head.int2vector))
+        _ <- pgtestnullRepo.select.where(_.int4 === row.int4).toList.map(x => assertJsonEquals(row.int4, x.head.int4))
+        _ <- pgtestnullRepo.select.where(_.int8 === row.int8).toList.map(x => assertJsonEquals(row.int8, x.head.int8))
+        _ <- pgtestnullRepo.select.where(_.interval === row.interval).toList.map(x => assertJsonEquals(row.interval, x.head.interval))
+        //        _ <- pgtestnullRepo.select.where(_.json === row.json).toList.map(x => assertJsonEquals(row.json, x.head.json))
+        _ <- pgtestnullRepo.select.where(_.jsonb === row.jsonb).toList.map(x => assertJsonEquals(row.jsonb, x.head.jsonb))
+        _ <- pgtestnullRepo.select.where(_.line === row.line).toList.map(x => assertJsonEquals(row.line, x.head.line))
+        _ <- pgtestnullRepo.select.where(_.lseg === row.lseg).toList.map(x => assertJsonEquals(row.lseg, x.head.lseg))
+        _ <- pgtestnullRepo.select.where(_.money === row.money).toList.map(x => assertJsonEquals(row.money, x.head.money))
+        _ <- pgtestnullRepo.select.where(_.mydomain === row.mydomain).toList.map(x => assertJsonEquals(row.mydomain, x.head.mydomain))
+        _ <- pgtestnullRepo.select.where(_.myenum === row.myenum).toList.map(x => assertJsonEquals(row.myenum, x.head.myenum))
+        _ <- pgtestnullRepo.select.where(_.name === row.name).toList.map(x => assertJsonEquals(row.name, x.head.name))
+        _ <- pgtestnullRepo.select.where(_.numeric === row.numeric).toList.map(x => assertJsonEquals(row.numeric, x.head.numeric)) // only doobie
+        _ <- pgtestnullRepo.select.where(_.path === row.path).toList.map(x => assertJsonEquals(row.path, x.head.path))
+//        _ <- pgtestnullRepo.select.where(_.point === row.point).toList.map(x => assertJsonEquals(row.point, x.head.point))
+        //        _ <- pgtestnullRepo.select.where(_.polygon === row.polygon).toList.map(x => assertJsonEquals(row.polygon, x.head.polygon))
+        //        _ <- pgtestnullRepo.select.where(_.text === row.text).toList.map(x => assertJsonEquals(row.text, x.head.text)) // only doobie
+        _ <- pgtestnullRepo.select.where(_.time === row.time).toList.map(x => assertJsonEquals(row.time, x.head.time))
+        _ <- pgtestnullRepo.select.where(_.timestamp === row.timestamp).toList.map(x => assertJsonEquals(row.timestamp, x.head.timestamp))
+        _ <- pgtestnullRepo.select.where(_.timestampz === row.timestampz).toList.map(x => assertJsonEquals(row.timestampz, x.head.timestampz))
+        _ <- pgtestnullRepo.select.where(_.timez === row.timez).toList.map(x => assertJsonEquals(row.timez, x.head.timez))
+        _ <- pgtestnullRepo.select.where(_.uuid === row.uuid).toList.map(x => assertJsonEquals(row.uuid, x.head.uuid))
+        _ <- pgtestnullRepo.select.where(_.varchar === row.varchar).toList.map(x => assertJsonEquals(row.varchar, x.head.varchar))
+        _ <- pgtestnullRepo.select.where(_.vector === row.vector).toList.map(x => assertJsonEquals(row.vector, x.head.vector))
+        //        _ <- pgtestnullRepo.select.where(_.xml === row.xml).toList.map(x => assertJsonEquals(row.xml, x.head.xml))
+        //        _ <- pgtestnullRepo.select.where(_.boxes === row.boxes).toList.map(x => assertJsonEquals(row.boxes, x.head.boxes))
+        //        _ <- pgtestnullRepo.select.where(_.bpchares === row.bpchares).toList.map(x => assertJsonEquals(row.bpchares, x.head.bpchares))
+        //        _ <- pgtestnullRepo.select.where(_.chares === row.chares).toList.map(x => assertJsonEquals(row.chares, x.head.chares))
+        //        _ <- pgtestnullRepo.select.where(_.circlees === row.circlees).toList.map(x => assertJsonEquals(row.circlees, x.head.circlees))
+        _ <- pgtestnullRepo.select.where(_.datees === row.datees).toList.map(x => assertJsonEquals(row.datees, x.head.datees))
+        _ <- pgtestnullRepo.select.where(_.float4es === row.float4es).toList.map(x => assertJsonEquals(row.float4es, x.head.float4es))
+        _ <- pgtestnullRepo.select.where(_.float8es === row.float8es).toList.map(x => assertJsonEquals(row.float8es, x.head.float8es))
+        _ <- pgtestnullRepo.select.where(_.inetes === row.inetes).toList.map(x => assertJsonEquals(row.inetes, x.head.inetes))
+        _ <- pgtestnullRepo.select.where(_.int2es === row.int2es).toList.map(x => assertJsonEquals(row.int2es, x.head.int2es))
+        _ <- pgtestnullRepo.select.where(_.int2vectores === row.int2vectores).toList.map(x => assertJsonEquals(row.int2vectores, x.head.int2vectores))
+        _ <- pgtestnullRepo.select.where(_.int4es === row.int4es).toList.map(x => assertJsonEquals(row.int4es, x.head.int4es))
+        _ <- pgtestnullRepo.select.where(_.int8es === row.int8es).toList.map(x => assertJsonEquals(row.int8es, x.head.int8es))
+        _ <- pgtestnullRepo.select.where(_.intervales === row.intervales).toList.map(x => assertJsonEquals(row.intervales, x.head.intervales))
+        //        _ <- pgtestnullRepo.select.where(_.jsones === row.jsones).toList.map(x => assertJsonEquals(row.jsones, x.head.jsones))
+        _ <- pgtestnullRepo.select.where(_.jsonbes === row.jsonbes).toList.map(x => assertJsonEquals(row.jsonbes, x.head.jsonbes))
+        //        _ <- pgtestnullRepo.select.where(_.linees === row.linees).toList.map(x => assertJsonEquals(row.linees, x.head.linees))
+        //        _ <- pgtestnullRepo.select.where(_.lseges === row.lseges).toList.map(x => assertJsonEquals(row.lseges, x.head.lseges))
+        _ <- pgtestnullRepo.select.where(_.moneyes === row.moneyes).toList.map(x => assertJsonEquals(row.moneyes, x.head.moneyes))
+        _ <- pgtestnullRepo.select.where(_.myenumes === row.myenumes).toList.map(x => assertJsonEquals(row.myenumes, x.head.myenumes))
+        //        _ <- pgtestnullRepo.select.where(_.namees === row.namees).toList.map(x => assertJsonEquals(row.namees, x.head.namees))
+//        _ <- pgtestnullRepo.select.where(_.numerices === row.numerices).toList.map(x => assertJsonEquals(row.numerices, x.head.numerices)) // only doobie
+        //        _ <- pgtestnullRepo.select.where(_.pathes === row.pathes).toList.map(x => assertJsonEquals(row.pathes, x.head.pathes))
+        //        _ <- pgtestnullRepo.select.where(_.pointes === row.pointes).toList.map(x => assertJsonEquals(row.pointes, x.head.pointes))
+        //        _ <- pgtestnullRepo.select.where(_.polygones === row.polygones).toList.map(x => assertJsonEquals(row.polygones, x.head.polygones))
+//        _ <- pgtestnullRepo.select.where(_.textes === row.textes).toList.map(x => assertJsonEquals(row.textes, x.head.textes)) // only doobie
+        _ <- pgtestnullRepo.select.where(_.timees === row.timees).toList.map(x => assertJsonEquals(row.timees, x.head.timees))
+        _ <- pgtestnullRepo.select.where(_.timestampes === row.timestampes).toList.map(x => assertJsonEquals(row.timestampes, x.head.timestampes))
+        _ <- pgtestnullRepo.select.where(_.timestampzes === row.timestampzes).toList.map(x => assertJsonEquals(row.timestampzes, x.head.timestampzes))
+        _ <- pgtestnullRepo.select.where(_.timezes === row.timezes).toList.map(x => assertJsonEquals(row.timezes, x.head.timezes))
+        _ <- pgtestnullRepo.select.where(_.uuides === row.uuides).toList.map(x => assertJsonEquals(row.uuides, x.head.uuides))
+        _ <- pgtestnullRepo.select.where(_.varchares === row.varchares).toList.map(x => assertJsonEquals(row.varchares, x.head.varchares))
+        //        _ <- pgtestnullRepo.select.where(_.xmles === row.xmles).toList.map(x => assertJsonEquals(row.xmles, x.head.xmles))
+      } yield ()
+    }
+  }
+
+  test("can update pgtest with DSL") {
+    withConnection {
+      implicit def ordering[T]: Ordering[T] = null
+
+      for {
+        row <- pgtestRepo.insert(ArrayTestData.pgTestRow)
+        _ <- pgtestRepo.update.setValue(_.bool)(row.bool).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.box)(row.box).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.bpchar)(row.bpchar).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.bytea)(row.bytea).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.char)(row.char).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.circle)(row.circle).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.date)(row.date).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.float4)(row.float4).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.float8)(row.float8).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.hstore)(row.hstore).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.inet)(row.inet).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.int2)(row.int2).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.int2vector)(row.int2vector).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.int4)(row.int4).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.int8)(row.int8).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.interval)(row.interval).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.json)(row.json).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.jsonb)(row.jsonb).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.line)(row.line).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.lseg)(row.lseg).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.money)(row.money).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.mydomain)(row.mydomain).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.myenum)(row.myenum).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.name)(row.name).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.numeric)(row.numeric).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.path)(row.path).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.point)(row.point).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.polygon)(row.polygon).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.text)(row.text).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.time)(row.time).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.timestamp)(row.timestamp).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.timestampz)(row.timestampz).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.timez)(row.timez).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.uuid)(row.uuid).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.varchar)(row.varchar).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.vector)(row.vector).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.xml)(row.xml).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.boxes)(row.boxes).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.bpchares)(row.bpchares).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.chares)(row.chares).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.circlees)(row.circlees).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.datees)(row.datees).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.float4es)(row.float4es).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.float8es)(row.float8es).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.inetes)(row.inetes).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.int2es)(row.int2es).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.int2vectores)(row.int2vectores).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.int4es)(row.int4es).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.int8es)(row.int8es).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.intervales)(row.intervales).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.jsones)(row.jsones).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.jsonbes)(row.jsonbes).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.linees)(row.linees).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.lseges)(row.lseges).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.moneyes)(row.moneyes).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.myenumes)(row.myenumes).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.namees)(row.namees).where(_.uuid === row.uuid).execute
+//        _ <- pgtestRepo.update.setValue(_.numerices)(row.numerices).where(_.uuid === row.uuid).execute // only doobie
+        _ <- pgtestRepo.update.setValue(_.pathes)(row.pathes).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.pointes)(row.pointes).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.polygones)(row.polygones).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.textes)(row.textes).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.timees)(row.timees).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.timestampes)(row.timestampes).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.timestampzes)(row.timestampzes).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.timezes)(row.timezes).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.uuides)(row.uuides).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.varchares)(row.varchares).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.xmles)(row.xmles).where(_.uuid === row.uuid).execute
+      } yield ()
+    }
+  }
 }
 
 object ArrayTestData {

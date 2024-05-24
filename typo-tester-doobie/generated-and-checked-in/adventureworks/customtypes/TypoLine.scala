@@ -18,9 +18,9 @@ import org.postgresql.geometric.PGline
 case class TypoLine(a: Double, b: Double, c: Double)
 
 object TypoLine {
-  implicit lazy val arrayGet: Get[Array[TypoLine]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_line"))
+  implicit lazy val arrayGet: Get[Array[TypoLine]] = Get.Advanced.array[AnyRef](NonEmptyList.one("line[]"))
     .map(_.map(v => TypoLine(v.asInstanceOf[PGline].a, v.asInstanceOf[PGline].b, v.asInstanceOf[PGline].c)))
-  implicit lazy val arrayPut: Put[Array[TypoLine]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_line"), "line")
+  implicit lazy val arrayPut: Put[Array[TypoLine]] = Put.Advanced.array[AnyRef](NonEmptyList.one("line[]"), "line")
     .contramap(_.map(v => new PGline(v.a, v.b, v.c)))
   implicit lazy val decoder: Decoder[TypoLine] = Decoder.forProduct3[TypoLine, Double, Double, Double]("a", "b", "c")(TypoLine.apply)(Decoder.decodeDouble, Decoder.decodeDouble, Decoder.decodeDouble)
   implicit lazy val encoder: Encoder[TypoLine] = Encoder.forProduct3[TypoLine, Double, Double, Double]("a", "b", "c")(x => (x.a, x.b, x.c))(Encoder.encodeDouble, Encoder.encodeDouble, Encoder.encodeDouble)

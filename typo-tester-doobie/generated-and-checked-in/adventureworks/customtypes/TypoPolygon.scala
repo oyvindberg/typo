@@ -20,9 +20,9 @@ import typo.dsl.Bijection
 case class TypoPolygon(points: List[TypoPoint])
 
 object TypoPolygon {
-  implicit lazy val arrayGet: Get[Array[TypoPolygon]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_polygon"))
+  implicit lazy val arrayGet: Get[Array[TypoPolygon]] = Get.Advanced.array[AnyRef](NonEmptyList.one("polygon[]"))
     .map(_.map(v => TypoPolygon(v.asInstanceOf[PGpolygon].points.map(p => TypoPoint(p.x, p.y)).toList)))
-  implicit lazy val arrayPut: Put[Array[TypoPolygon]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_polygon"), "polygon")
+  implicit lazy val arrayPut: Put[Array[TypoPolygon]] = Put.Advanced.array[AnyRef](NonEmptyList.one("polygon[]"), "polygon")
     .contramap(_.map(v => new PGpolygon(v.points.map(p => new PGpoint(p.x, p.y)).toArray)))
   implicit lazy val bijection: Bijection[TypoPolygon, List[TypoPoint]] = Bijection[TypoPolygon, List[TypoPoint]](_.points)(TypoPolygon.apply)
   implicit lazy val decoder: Decoder[TypoPolygon] = Decoder[List[TypoPoint]].map(TypoPolygon.apply)

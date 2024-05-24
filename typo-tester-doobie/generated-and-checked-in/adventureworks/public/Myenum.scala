@@ -40,7 +40,7 @@ object Myenum {
   val ByName: Map[String, Myenum] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayGet: Get[Array[Myenum]] = adventureworks.StringArrayMeta.get.map(_.map(force))
-  implicit lazy val arrayPut: Put[Array[Myenum]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_public.myenum"), "public.myenum").contramap(_.map(_.value))
+  implicit lazy val arrayPut: Put[Array[Myenum]] = Put.Advanced.array[AnyRef](NonEmptyList.one("public.myenum[]"), "public.myenum").contramap(_.map(_.value))
   implicit lazy val decoder: Decoder[Myenum] = Decoder.decodeString.emap(Myenum.apply)
   implicit lazy val encoder: Encoder[Myenum] = Encoder.encodeString.contramap(_.value)
   implicit lazy val get: Get[Myenum] = Meta.StringMeta.get.temap(Myenum.apply)

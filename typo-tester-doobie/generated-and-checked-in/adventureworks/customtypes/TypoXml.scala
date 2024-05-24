@@ -20,9 +20,9 @@ import typo.dsl.Bijection
 case class TypoXml(value: String)
 
 object TypoXml {
-  implicit lazy val arrayGet: Get[Array[TypoXml]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_xml"))
+  implicit lazy val arrayGet: Get[Array[TypoXml]] = Get.Advanced.array[AnyRef](NonEmptyList.one("xml[]"))
     .map(_.map(v => TypoXml(v.asInstanceOf[PGobject].getValue)))
-  implicit lazy val arrayPut: Put[Array[TypoXml]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_xml"), "xml")
+  implicit lazy val arrayPut: Put[Array[TypoXml]] = Put.Advanced.array[AnyRef](NonEmptyList.one("xml[]"), "xml")
     .contramap(_.map(v => {
                             val obj = new PGobject
                             obj.setType("xml")

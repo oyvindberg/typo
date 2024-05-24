@@ -19,9 +19,9 @@ import org.postgresql.geometric.PGpoint
 case class TypoPath(open: Boolean, points: List[TypoPoint])
 
 object TypoPath {
-  implicit lazy val arrayGet: Get[Array[TypoPath]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_path"))
+  implicit lazy val arrayGet: Get[Array[TypoPath]] = Get.Advanced.array[AnyRef](NonEmptyList.one("path[]"))
     .map(_.map(v => TypoPath(v.asInstanceOf[PGpath].isOpen, v.asInstanceOf[PGpath].points.map(p => TypoPoint(p.x, p.y)).toList)))
-  implicit lazy val arrayPut: Put[Array[TypoPath]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_path"), "path")
+  implicit lazy val arrayPut: Put[Array[TypoPath]] = Put.Advanced.array[AnyRef](NonEmptyList.one("path[]"), "path")
     .contramap(_.map(v => new PGpath(v.points.map(p => new PGpoint(p.x, p.y)).toArray, v.open)))
   implicit lazy val decoder: Decoder[TypoPath] = Decoder.forProduct2[TypoPath, Boolean, List[TypoPoint]]("open", "points")(TypoPath.apply)(Decoder.decodeBoolean, Decoder[List[TypoPoint]])
   implicit lazy val encoder: Encoder[TypoPath] = Encoder.forProduct2[TypoPath, Boolean, List[TypoPoint]]("open", "points")(x => (x.open, x.points))(Encoder.encodeBoolean, Encoder[List[TypoPoint]])

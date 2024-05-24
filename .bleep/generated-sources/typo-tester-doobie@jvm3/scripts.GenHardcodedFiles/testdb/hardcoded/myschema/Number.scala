@@ -41,7 +41,7 @@ object Number {
   val ByName: Map[String, Number] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayGet: Get[Array[Number]] = testdb.hardcoded.StringArrayMeta.get.map(_.map(force))
-  implicit lazy val arrayPut: Put[Array[Number]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_myschema.number"), "myschema.number").contramap(_.map(_.value))
+  implicit lazy val arrayPut: Put[Array[Number]] = Put.Advanced.array[AnyRef](NonEmptyList.one("myschema.number[]"), "myschema.number").contramap(_.map(_.value))
   implicit lazy val decoder: Decoder[Number] = Decoder.decodeString.emap(Number.apply)
   implicit lazy val encoder: Encoder[Number] = Encoder.encodeString.contramap(_.value)
   implicit lazy val get: Get[Number] = Meta.StringMeta.get.temap(Number.apply)

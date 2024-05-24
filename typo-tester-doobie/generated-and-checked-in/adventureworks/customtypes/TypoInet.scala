@@ -19,9 +19,9 @@ import typo.dsl.Bijection
 case class TypoInet(value: String)
 
 object TypoInet {
-  implicit lazy val arrayGet: Get[Array[TypoInet]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_inet"))
+  implicit lazy val arrayGet: Get[Array[TypoInet]] = Get.Advanced.array[AnyRef](NonEmptyList.one("inet[]"))
     .map(_.map(v => TypoInet(v.asInstanceOf[PGobject].getValue)))
-  implicit lazy val arrayPut: Put[Array[TypoInet]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_inet"), "inet")
+  implicit lazy val arrayPut: Put[Array[TypoInet]] = Put.Advanced.array[AnyRef](NonEmptyList.one("inet[]"), "inet")
     .contramap(_.map(v => {
                             val obj = new PGobject
                             obj.setType("inet")

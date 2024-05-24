@@ -41,7 +41,7 @@ object Sector {
   val ByName: Map[String, Sector] = All.map(x => (x.value, x)).toMap
               
   implicit lazy val arrayGet: Get[Array[Sector]] = testdb.hardcoded.StringArrayMeta.get.map(_.map(force))
-  implicit lazy val arrayPut: Put[Array[Sector]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_myschema.sector"), "myschema.sector").contramap(_.map(_.value))
+  implicit lazy val arrayPut: Put[Array[Sector]] = Put.Advanced.array[AnyRef](NonEmptyList.one("myschema.sector[]"), "myschema.sector").contramap(_.map(_.value))
   implicit lazy val decoder: Decoder[Sector] = Decoder.decodeString.emap(Sector.apply)
   implicit lazy val encoder: Encoder[Sector] = Encoder.encodeString.contramap(_.value)
   implicit lazy val get: Get[Sector] = Meta.StringMeta.get.temap(Sector.apply)

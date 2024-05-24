@@ -31,9 +31,9 @@ object TypoShort {
       override def toDouble(x: TypoShort): Double = x.value.toDouble
       def parseString(str: String): Option[TypoShort] = str.toShortOption.map(TypoShort.apply)
     }
-  implicit lazy val arrayGet: Get[Array[TypoShort]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_int2"))
+  implicit lazy val arrayGet: Get[Array[TypoShort]] = Get.Advanced.array[AnyRef](NonEmptyList.one("int2[]"))
     .map(_.map(v => TypoShort(v.asInstanceOf[java.lang.Short])))
-  implicit lazy val arrayPut: Put[Array[TypoShort]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_int2"), "int2")
+  implicit lazy val arrayPut: Put[Array[TypoShort]] = Put.Advanced.array[AnyRef](NonEmptyList.one("int2[]"), "int2")
     .contramap(_.map(v => v.value: java.lang.Short))
   implicit lazy val bijection: Bijection[TypoShort, Short] = Bijection[TypoShort, Short](_.value)(TypoShort.apply)
   implicit lazy val decoder: Decoder[TypoShort] = Decoder[Short].map(TypoShort.apply)

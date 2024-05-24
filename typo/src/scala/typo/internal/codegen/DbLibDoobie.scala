@@ -513,7 +513,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
 
   override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, enm: db.StringEnum): List[sc.Given] = {
     val sqlTypeLit = sc.StrLit(enm.name.value)
-    val sqlArrayTypeLit = sc.StrLit("_" + enm.name.value)
+    val sqlArrayTypeLit = sc.StrLit(enm.name.value + "[]")
     List(
       Some(
         sc.Given(
@@ -757,7 +757,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       else {
         val fromTypo = ct.fromTypoInArray.getOrElse(ct.fromTypo)
         val toTypo = ct.toTypoInArray.getOrElse(ct.toTypo)
-        val sqlArrayTypeLit = sc.StrLit("_" + ct.sqlType)
+        val sqlArrayTypeLit = sc.StrLit(ct.sqlType + "[]")
         val arrayType = sc.Type.ArrayOf(ct.typoType)
         List(
           sc.Given(

@@ -19,9 +19,9 @@ import typo.dsl.Bijection
 case class TypoJson(value: String)
 
 object TypoJson {
-  implicit lazy val arrayGet: Get[Array[TypoJson]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_json"))
+  implicit lazy val arrayGet: Get[Array[TypoJson]] = Get.Advanced.array[AnyRef](NonEmptyList.one("json[]"))
     .map(_.map(v => TypoJson(v.asInstanceOf[String])))
-  implicit lazy val arrayPut: Put[Array[TypoJson]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_json"), "json")
+  implicit lazy val arrayPut: Put[Array[TypoJson]] = Put.Advanced.array[AnyRef](NonEmptyList.one("json[]"), "json")
     .contramap(_.map(v => {
                             val obj = new PGobject
                             obj.setType("json")

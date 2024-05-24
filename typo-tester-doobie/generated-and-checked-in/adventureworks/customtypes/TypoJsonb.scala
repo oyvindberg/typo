@@ -19,9 +19,9 @@ import typo.dsl.Bijection
 case class TypoJsonb(value: String)
 
 object TypoJsonb {
-  implicit lazy val arrayGet: Get[Array[TypoJsonb]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_jsonb"))
+  implicit lazy val arrayGet: Get[Array[TypoJsonb]] = Get.Advanced.array[AnyRef](NonEmptyList.one("jsonb[]"))
     .map(_.map(v => TypoJsonb(v.asInstanceOf[String])))
-  implicit lazy val arrayPut: Put[Array[TypoJsonb]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_jsonb"), "jsonb")
+  implicit lazy val arrayPut: Put[Array[TypoJsonb]] = Put.Advanced.array[AnyRef](NonEmptyList.one("jsonb[]"), "jsonb")
     .contramap(_.map(v => {
                             val obj = new PGobject
                             obj.setType("jsonb")

@@ -19,9 +19,9 @@ import typo.dsl.Bijection
 case class TypoRecord(value: String)
 
 object TypoRecord {
-  implicit lazy val arrayGet: Get[Array[TypoRecord]] = Get.Advanced.array[AnyRef](NonEmptyList.one("_record"))
+  implicit lazy val arrayGet: Get[Array[TypoRecord]] = Get.Advanced.array[AnyRef](NonEmptyList.one("record[]"))
     .map(_.map(v => TypoRecord(v.asInstanceOf[PGobject].getValue)))
-  implicit lazy val arrayPut: Put[Array[TypoRecord]] = Put.Advanced.array[AnyRef](NonEmptyList.one("_record"), "record")
+  implicit lazy val arrayPut: Put[Array[TypoRecord]] = Put.Advanced.array[AnyRef](NonEmptyList.one("record[]"), "record")
     .contramap(_.map(v => {
                             val obj = new PGobject
                             obj.setType("record")
