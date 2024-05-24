@@ -10,38 +10,39 @@ package vproductanddescription
 import adventureworks.production.culture.CultureId
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait VproductanddescriptionMVFields[Row] {
-  val productid: Field[ProductId, Row]
-  val name: Field[Name, Row]
-  val productmodel: Field[Name, Row]
-  val cultureid: Field[CultureId, Row]
-  val description: Field[/* max 400 chars */ String, Row]
+trait VproductanddescriptionMVFields {
+  def productid: Field[ProductId, VproductanddescriptionMVRow]
+  def name: Field[Name, VproductanddescriptionMVRow]
+  def productmodel: Field[Name, VproductanddescriptionMVRow]
+  def cultureid: Field[CultureId, VproductanddescriptionMVRow]
+  def description: Field[/* max 400 chars */ String, VproductanddescriptionMVRow]
 }
 
 object VproductanddescriptionMVFields {
-  val structure: Relation[VproductanddescriptionMVFields, VproductanddescriptionMVRow, VproductanddescriptionMVRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[VproductanddescriptionMVFields, VproductanddescriptionMVRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => VproductanddescriptionMVRow, val merge: (Row, VproductanddescriptionMVRow) => Row)
-    extends Relation[VproductanddescriptionMVFields, VproductanddescriptionMVRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[VproductanddescriptionMVFields, VproductanddescriptionMVRow] {
   
-    override val fields: VproductanddescriptionMVFields[Row] = new VproductanddescriptionMVFields[Row] {
-      override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val productmodel = new Field[Name, Row](prefix, "productmodel", None, None)(x => extract(x).productmodel, (row, value) => merge(row, extract(row).copy(productmodel = value)))
-      override val cultureid = new Field[CultureId, Row](prefix, "cultureid", None, None)(x => extract(x).cultureid, (row, value) => merge(row, extract(row).copy(cultureid = value)))
-      override val description = new Field[/* max 400 chars */ String, Row](prefix, "description", None, None)(x => extract(x).description, (row, value) => merge(row, extract(row).copy(description = value)))
+    override lazy val fields: VproductanddescriptionMVFields = new VproductanddescriptionMVFields {
+      override def productid = Field[ProductId, VproductanddescriptionMVRow](_path, "productid", None, None, x => x.productid, (row, value) => row.copy(productid = value))
+      override def name = Field[Name, VproductanddescriptionMVRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def productmodel = Field[Name, VproductanddescriptionMVRow](_path, "productmodel", None, None, x => x.productmodel, (row, value) => row.copy(productmodel = value))
+      override def cultureid = Field[CultureId, VproductanddescriptionMVRow](_path, "cultureid", None, None, x => x.cultureid, (row, value) => row.copy(cultureid = value))
+      override def description = Field[/* max 400 chars */ String, VproductanddescriptionMVRow](_path, "description", None, None, x => x.description, (row, value) => row.copy(description = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.productid, fields.name, fields.productmodel, fields.cultureid, fields.description)
+    override lazy val columns: List[FieldLikeNoHkt[?, VproductanddescriptionMVRow]] =
+      List[FieldLikeNoHkt[?, VproductanddescriptionMVRow]](fields.productid, fields.name, fields.productmodel, fields.cultureid, fields.description)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => VproductanddescriptionMVRow, merge: (NewRow, VproductanddescriptionMVRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

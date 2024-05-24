@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, StateprovinceRow],
                             map: scala.collection.mutable.Map[StateprovinceId, StateprovinceRow] = scala.collection.mutable.Map.empty) extends StateprovinceRepo {
   override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
-    DeleteBuilderMock(DeleteParams.empty, StateprovinceFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, StateprovinceFields.structure, map)
   }
   override def deleteById(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(stateprovinceid).isDefined)
@@ -85,7 +85,7 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
     }
   }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
-    UpdateBuilderMock(UpdateParams.empty, StateprovinceFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, StateprovinceFields.structure, map)
   }
   override def update(row: StateprovinceRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

@@ -11,47 +11,48 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait PurchaseorderdetailFields[Row] {
-  val purchaseorderid: IdField[PurchaseorderheaderId, Row]
-  val purchaseorderdetailid: IdField[Int, Row]
-  val duedate: Field[TypoLocalDateTime, Row]
-  val orderqty: Field[TypoShort, Row]
-  val productid: Field[ProductId, Row]
-  val unitprice: Field[BigDecimal, Row]
-  val receivedqty: Field[BigDecimal, Row]
-  val rejectedqty: Field[BigDecimal, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait PurchaseorderdetailFields {
+  def purchaseorderid: IdField[PurchaseorderheaderId, PurchaseorderdetailRow]
+  def purchaseorderdetailid: IdField[Int, PurchaseorderdetailRow]
+  def duedate: Field[TypoLocalDateTime, PurchaseorderdetailRow]
+  def orderqty: Field[TypoShort, PurchaseorderdetailRow]
+  def productid: Field[ProductId, PurchaseorderdetailRow]
+  def unitprice: Field[BigDecimal, PurchaseorderdetailRow]
+  def receivedqty: Field[BigDecimal, PurchaseorderdetailRow]
+  def rejectedqty: Field[BigDecimal, PurchaseorderdetailRow]
+  def modifieddate: Field[TypoLocalDateTime, PurchaseorderdetailRow]
 }
 
 object PurchaseorderdetailFields {
-  val structure: Relation[PurchaseorderdetailFields, PurchaseorderdetailRow, PurchaseorderdetailRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PurchaseorderdetailFields, PurchaseorderdetailRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PurchaseorderdetailRow, val merge: (Row, PurchaseorderdetailRow) => Row)
-    extends Relation[PurchaseorderdetailFields, PurchaseorderdetailRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PurchaseorderdetailFields, PurchaseorderdetailRow] {
   
-    override val fields: PurchaseorderdetailFields[Row] = new PurchaseorderdetailFields[Row] {
-      override val purchaseorderid = new IdField[PurchaseorderheaderId, Row](prefix, "purchaseorderid", None, Some("int4"))(x => extract(x).purchaseorderid, (row, value) => merge(row, extract(row).copy(purchaseorderid = value)))
-      override val purchaseorderdetailid = new IdField[Int, Row](prefix, "purchaseorderdetailid", None, Some("int4"))(x => extract(x).purchaseorderdetailid, (row, value) => merge(row, extract(row).copy(purchaseorderdetailid = value)))
-      override val duedate = new Field[TypoLocalDateTime, Row](prefix, "duedate", Some("text"), Some("timestamp"))(x => extract(x).duedate, (row, value) => merge(row, extract(row).copy(duedate = value)))
-      override val orderqty = new Field[TypoShort, Row](prefix, "orderqty", None, Some("int2"))(x => extract(x).orderqty, (row, value) => merge(row, extract(row).copy(orderqty = value)))
-      override val productid = new Field[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val unitprice = new Field[BigDecimal, Row](prefix, "unitprice", None, Some("numeric"))(x => extract(x).unitprice, (row, value) => merge(row, extract(row).copy(unitprice = value)))
-      override val receivedqty = new Field[BigDecimal, Row](prefix, "receivedqty", None, Some("numeric"))(x => extract(x).receivedqty, (row, value) => merge(row, extract(row).copy(receivedqty = value)))
-      override val rejectedqty = new Field[BigDecimal, Row](prefix, "rejectedqty", None, Some("numeric"))(x => extract(x).rejectedqty, (row, value) => merge(row, extract(row).copy(rejectedqty = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: PurchaseorderdetailFields = new PurchaseorderdetailFields {
+      override def purchaseorderid = IdField[PurchaseorderheaderId, PurchaseorderdetailRow](_path, "purchaseorderid", None, Some("int4"), x => x.purchaseorderid, (row, value) => row.copy(purchaseorderid = value))
+      override def purchaseorderdetailid = IdField[Int, PurchaseorderdetailRow](_path, "purchaseorderdetailid", None, Some("int4"), x => x.purchaseorderdetailid, (row, value) => row.copy(purchaseorderdetailid = value))
+      override def duedate = Field[TypoLocalDateTime, PurchaseorderdetailRow](_path, "duedate", Some("text"), Some("timestamp"), x => x.duedate, (row, value) => row.copy(duedate = value))
+      override def orderqty = Field[TypoShort, PurchaseorderdetailRow](_path, "orderqty", None, Some("int2"), x => x.orderqty, (row, value) => row.copy(orderqty = value))
+      override def productid = Field[ProductId, PurchaseorderdetailRow](_path, "productid", None, Some("int4"), x => x.productid, (row, value) => row.copy(productid = value))
+      override def unitprice = Field[BigDecimal, PurchaseorderdetailRow](_path, "unitprice", None, Some("numeric"), x => x.unitprice, (row, value) => row.copy(unitprice = value))
+      override def receivedqty = Field[BigDecimal, PurchaseorderdetailRow](_path, "receivedqty", None, Some("numeric"), x => x.receivedqty, (row, value) => row.copy(receivedqty = value))
+      override def rejectedqty = Field[BigDecimal, PurchaseorderdetailRow](_path, "rejectedqty", None, Some("numeric"), x => x.rejectedqty, (row, value) => row.copy(rejectedqty = value))
+      override def modifieddate = Field[TypoLocalDateTime, PurchaseorderdetailRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.purchaseorderid, fields.purchaseorderdetailid, fields.duedate, fields.orderqty, fields.productid, fields.unitprice, fields.receivedqty, fields.rejectedqty, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, PurchaseorderdetailRow]] =
+      List[FieldLikeNoHkt[?, PurchaseorderdetailRow]](fields.purchaseorderid, fields.purchaseorderdetailid, fields.duedate, fields.orderqty, fields.productid, fields.unitprice, fields.receivedqty, fields.rejectedqty, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PurchaseorderdetailRow, merge: (NewRow, PurchaseorderdetailRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

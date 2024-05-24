@@ -24,7 +24,7 @@ import typo.dsl.UpdateParams
 class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, SpecialofferRow],
                            map: scala.collection.mutable.Map[SpecialofferId, SpecialofferRow] = scala.collection.mutable.Map.empty) extends SpecialofferRepo {
   override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SpecialofferFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, SpecialofferFields.structure, map)
   }
   override def deleteById(specialofferid: SpecialofferId): ConnectionIO[Boolean] = {
     delay(map.remove(specialofferid).isDefined)
@@ -86,7 +86,7 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
     }
   }
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SpecialofferFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, SpecialofferFields.structure, map)
   }
   override def update(row: SpecialofferRow): ConnectionIO[Boolean] = {
     delay {

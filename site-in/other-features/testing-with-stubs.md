@@ -42,7 +42,7 @@ import scala.annotation.nowarn
 class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
                       map: scala.collection.mutable.Map[AddressId, AddressRow] = scala.collection.mutable.Map.empty) extends AddressRepo {
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
-    DeleteBuilderMock(DeleteParams.empty, AddressFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, AddressFields.structure, map)
   }
   override def deleteById(addressid: AddressId)(implicit c: Connection): Boolean = {
     map.remove(addressid).isDefined
@@ -61,14 +61,14 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
   override def insert(unsaved: AddressRowUnsaved)(implicit c: Connection): AddressRow = {
     insert(toRow(unsaved))
   }
-  override def insertStreaming(unsaved: Iterator[AddressRow], batchSize: Int)(implicit c: Connection): Long = {
+  override def insertStreaming(unsaved: Iterator[AddressRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.addressid -> row)
     }
     unsaved.size.toLong
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Iterator[AddressRowUnsaved], batchSize: Int)(implicit c: Connection): Long = {
+  override def insertUnsavedStreaming(unsaved: Iterator[AddressRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { unsavedRow =>
       val row = toRow(unsavedRow)
       map += (row.addressid -> row)
@@ -92,7 +92,7 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     addressids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
-    UpdateBuilderMock(UpdateParams.empty, AddressFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, AddressFields.structure, map)
   }
   override def update(row: AddressRow)(implicit c: Connection): Boolean = {
     map.get(row.addressid) match {
@@ -108,6 +108,5 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     unsaved
   }
 }
-
 ```
 

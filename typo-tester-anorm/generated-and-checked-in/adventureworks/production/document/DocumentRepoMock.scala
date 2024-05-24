@@ -23,7 +23,7 @@ import typo.dsl.UpdateParams
 class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
                        map: scala.collection.mutable.Map[DocumentId, DocumentRow] = scala.collection.mutable.Map.empty) extends DocumentRepo {
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
-    DeleteBuilderMock(DeleteParams.empty, DocumentFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, DocumentFields.structure, map)
   }
   override def deleteById(documentnode: DocumentId)(implicit c: Connection): Boolean = {
     map.remove(documentnode).isDefined
@@ -76,7 +76,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     map.values.find(v => rowguid == v.rowguid)
   }
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
-    UpdateBuilderMock(UpdateParams.empty, DocumentFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, DocumentFields.structure, map)
   }
   override def update(row: DocumentRow)(implicit c: Connection): Boolean = {
     map.get(row.documentnode) match {

@@ -12,54 +12,55 @@ import testdb.hardcoded.myschema.Number
 import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait PersonFields[Row] {
-  val id: IdField[PersonId, Row]
-  val favouriteFootballClubId: Field[FootballClubId, Row]
-  val name: Field[/* max 100 chars */ String, Row]
-  val nickName: OptField[/* max 30 chars */ String, Row]
-  val blogUrl: OptField[/* max 100 chars */ String, Row]
-  val email: Field[/* max 254 chars */ String, Row]
-  val phone: Field[/* max 8 chars */ String, Row]
-  val likesPizza: Field[Boolean, Row]
-  val maritalStatusId: Field[MaritalStatusId, Row]
-  val workEmail: OptField[/* max 254 chars */ String, Row]
-  val sector: Field[Sector, Row]
-  val favoriteNumber: Field[Number, Row]
+trait PersonFields {
+  def id: IdField[PersonId, PersonRow]
+  def favouriteFootballClubId: Field[FootballClubId, PersonRow]
+  def name: Field[/* max 100 chars */ String, PersonRow]
+  def nickName: OptField[/* max 30 chars */ String, PersonRow]
+  def blogUrl: OptField[/* max 100 chars */ String, PersonRow]
+  def email: Field[/* max 254 chars */ String, PersonRow]
+  def phone: Field[/* max 8 chars */ String, PersonRow]
+  def likesPizza: Field[Boolean, PersonRow]
+  def maritalStatusId: Field[MaritalStatusId, PersonRow]
+  def workEmail: OptField[/* max 254 chars */ String, PersonRow]
+  def sector: Field[Sector, PersonRow]
+  def favoriteNumber: Field[Number, PersonRow]
 }
 
 object PersonFields {
-  val structure: Relation[PersonFields, PersonRow, PersonRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PersonFields, PersonRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PersonRow, val merge: (Row, PersonRow) => Row)
-    extends Relation[PersonFields, PersonRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PersonFields, PersonRow] {
   
-    override val fields: PersonFields[Row] = new PersonFields[Row] {
-      override val id = new IdField[PersonId, Row](prefix, "id", None, Some("int8"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val favouriteFootballClubId = new Field[FootballClubId, Row](prefix, "favourite_football_club_id", None, None)(x => extract(x).favouriteFootballClubId, (row, value) => merge(row, extract(row).copy(favouriteFootballClubId = value)))
-      override val name = new Field[/* max 100 chars */ String, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val nickName = new OptField[/* max 30 chars */ String, Row](prefix, "nick_name", None, None)(x => extract(x).nickName, (row, value) => merge(row, extract(row).copy(nickName = value)))
-      override val blogUrl = new OptField[/* max 100 chars */ String, Row](prefix, "blog_url", None, None)(x => extract(x).blogUrl, (row, value) => merge(row, extract(row).copy(blogUrl = value)))
-      override val email = new Field[/* max 254 chars */ String, Row](prefix, "email", None, None)(x => extract(x).email, (row, value) => merge(row, extract(row).copy(email = value)))
-      override val phone = new Field[/* max 8 chars */ String, Row](prefix, "phone", None, None)(x => extract(x).phone, (row, value) => merge(row, extract(row).copy(phone = value)))
-      override val likesPizza = new Field[Boolean, Row](prefix, "likes_pizza", None, None)(x => extract(x).likesPizza, (row, value) => merge(row, extract(row).copy(likesPizza = value)))
-      override val maritalStatusId = new Field[MaritalStatusId, Row](prefix, "marital_status_id", None, None)(x => extract(x).maritalStatusId, (row, value) => merge(row, extract(row).copy(maritalStatusId = value)))
-      override val workEmail = new OptField[/* max 254 chars */ String, Row](prefix, "work_email", None, None)(x => extract(x).workEmail, (row, value) => merge(row, extract(row).copy(workEmail = value)))
-      override val sector = new Field[Sector, Row](prefix, "sector", None, Some("myschema.sector"))(x => extract(x).sector, (row, value) => merge(row, extract(row).copy(sector = value)))
-      override val favoriteNumber = new Field[Number, Row](prefix, "favorite_number", None, Some("myschema.number"))(x => extract(x).favoriteNumber, (row, value) => merge(row, extract(row).copy(favoriteNumber = value)))
+    override lazy val fields: PersonFields = new PersonFields {
+      override def id = IdField[PersonId, PersonRow](_path, "id", None, Some("int8"), x => x.id, (row, value) => row.copy(id = value))
+      override def favouriteFootballClubId = Field[FootballClubId, PersonRow](_path, "favourite_football_club_id", None, None, x => x.favouriteFootballClubId, (row, value) => row.copy(favouriteFootballClubId = value))
+      override def name = Field[/* max 100 chars */ String, PersonRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def nickName = OptField[/* max 30 chars */ String, PersonRow](_path, "nick_name", None, None, x => x.nickName, (row, value) => row.copy(nickName = value))
+      override def blogUrl = OptField[/* max 100 chars */ String, PersonRow](_path, "blog_url", None, None, x => x.blogUrl, (row, value) => row.copy(blogUrl = value))
+      override def email = Field[/* max 254 chars */ String, PersonRow](_path, "email", None, None, x => x.email, (row, value) => row.copy(email = value))
+      override def phone = Field[/* max 8 chars */ String, PersonRow](_path, "phone", None, None, x => x.phone, (row, value) => row.copy(phone = value))
+      override def likesPizza = Field[Boolean, PersonRow](_path, "likes_pizza", None, None, x => x.likesPizza, (row, value) => row.copy(likesPizza = value))
+      override def maritalStatusId = Field[MaritalStatusId, PersonRow](_path, "marital_status_id", None, None, x => x.maritalStatusId, (row, value) => row.copy(maritalStatusId = value))
+      override def workEmail = OptField[/* max 254 chars */ String, PersonRow](_path, "work_email", None, None, x => x.workEmail, (row, value) => row.copy(workEmail = value))
+      override def sector = Field[Sector, PersonRow](_path, "sector", None, Some("myschema.sector"), x => x.sector, (row, value) => row.copy(sector = value))
+      override def favoriteNumber = Field[Number, PersonRow](_path, "favorite_number", None, Some("myschema.number"), x => x.favoriteNumber, (row, value) => row.copy(favoriteNumber = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.favouriteFootballClubId, fields.name, fields.nickName, fields.blogUrl, fields.email, fields.phone, fields.likesPizza, fields.maritalStatusId, fields.workEmail, fields.sector, fields.favoriteNumber)
+    override lazy val columns: List[FieldLikeNoHkt[?, PersonRow]] =
+      List[FieldLikeNoHkt[?, PersonRow]](fields.id, fields.favouriteFootballClubId, fields.name, fields.nickName, fields.blogUrl, fields.email, fields.phone, fields.likesPizza, fields.maritalStatusId, fields.workEmail, fields.sector, fields.favoriteNumber)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PersonRow, merge: (NewRow, PersonRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

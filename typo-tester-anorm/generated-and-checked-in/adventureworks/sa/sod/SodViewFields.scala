@@ -13,51 +13,52 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait SodViewFields[Row] {
-  val id: Field[Int, Row]
-  val salesorderid: Field[SalesorderheaderId, Row]
-  val salesorderdetailid: Field[Int, Row]
-  val carriertrackingnumber: OptField[/* max 25 chars */ String, Row]
-  val orderqty: Field[TypoShort, Row]
-  val productid: Field[ProductId, Row]
-  val specialofferid: Field[SpecialofferId, Row]
-  val unitprice: Field[BigDecimal, Row]
-  val unitpricediscount: Field[BigDecimal, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SodViewFields {
+  def id: Field[Int, SodViewRow]
+  def salesorderid: Field[SalesorderheaderId, SodViewRow]
+  def salesorderdetailid: Field[Int, SodViewRow]
+  def carriertrackingnumber: OptField[/* max 25 chars */ String, SodViewRow]
+  def orderqty: Field[TypoShort, SodViewRow]
+  def productid: Field[ProductId, SodViewRow]
+  def specialofferid: Field[SpecialofferId, SodViewRow]
+  def unitprice: Field[BigDecimal, SodViewRow]
+  def unitpricediscount: Field[BigDecimal, SodViewRow]
+  def rowguid: Field[TypoUUID, SodViewRow]
+  def modifieddate: Field[TypoLocalDateTime, SodViewRow]
 }
 
 object SodViewFields {
-  val structure: Relation[SodViewFields, SodViewRow, SodViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SodViewFields, SodViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SodViewRow, val merge: (Row, SodViewRow) => Row)
-    extends Relation[SodViewFields, SodViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SodViewFields, SodViewRow] {
   
-    override val fields: SodViewFields[Row] = new SodViewFields[Row] {
-      override val id = new Field[Int, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val salesorderid = new Field[SalesorderheaderId, Row](prefix, "salesorderid", None, None)(x => extract(x).salesorderid, (row, value) => merge(row, extract(row).copy(salesorderid = value)))
-      override val salesorderdetailid = new Field[Int, Row](prefix, "salesorderdetailid", None, None)(x => extract(x).salesorderdetailid, (row, value) => merge(row, extract(row).copy(salesorderdetailid = value)))
-      override val carriertrackingnumber = new OptField[/* max 25 chars */ String, Row](prefix, "carriertrackingnumber", None, None)(x => extract(x).carriertrackingnumber, (row, value) => merge(row, extract(row).copy(carriertrackingnumber = value)))
-      override val orderqty = new Field[TypoShort, Row](prefix, "orderqty", None, None)(x => extract(x).orderqty, (row, value) => merge(row, extract(row).copy(orderqty = value)))
-      override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val specialofferid = new Field[SpecialofferId, Row](prefix, "specialofferid", None, None)(x => extract(x).specialofferid, (row, value) => merge(row, extract(row).copy(specialofferid = value)))
-      override val unitprice = new Field[BigDecimal, Row](prefix, "unitprice", None, None)(x => extract(x).unitprice, (row, value) => merge(row, extract(row).copy(unitprice = value)))
-      override val unitpricediscount = new Field[BigDecimal, Row](prefix, "unitpricediscount", None, None)(x => extract(x).unitpricediscount, (row, value) => merge(row, extract(row).copy(unitpricediscount = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SodViewFields = new SodViewFields {
+      override def id = Field[Int, SodViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def salesorderid = Field[SalesorderheaderId, SodViewRow](_path, "salesorderid", None, None, x => x.salesorderid, (row, value) => row.copy(salesorderid = value))
+      override def salesorderdetailid = Field[Int, SodViewRow](_path, "salesorderdetailid", None, None, x => x.salesorderdetailid, (row, value) => row.copy(salesorderdetailid = value))
+      override def carriertrackingnumber = OptField[/* max 25 chars */ String, SodViewRow](_path, "carriertrackingnumber", None, None, x => x.carriertrackingnumber, (row, value) => row.copy(carriertrackingnumber = value))
+      override def orderqty = Field[TypoShort, SodViewRow](_path, "orderqty", None, None, x => x.orderqty, (row, value) => row.copy(orderqty = value))
+      override def productid = Field[ProductId, SodViewRow](_path, "productid", None, None, x => x.productid, (row, value) => row.copy(productid = value))
+      override def specialofferid = Field[SpecialofferId, SodViewRow](_path, "specialofferid", None, None, x => x.specialofferid, (row, value) => row.copy(specialofferid = value))
+      override def unitprice = Field[BigDecimal, SodViewRow](_path, "unitprice", None, None, x => x.unitprice, (row, value) => row.copy(unitprice = value))
+      override def unitpricediscount = Field[BigDecimal, SodViewRow](_path, "unitpricediscount", None, None, x => x.unitpricediscount, (row, value) => row.copy(unitpricediscount = value))
+      override def rowguid = Field[TypoUUID, SodViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, SodViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.salesorderid, fields.salesorderdetailid, fields.carriertrackingnumber, fields.orderqty, fields.productid, fields.specialofferid, fields.unitprice, fields.unitpricediscount, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SodViewRow]] =
+      List[FieldLikeNoHkt[?, SodViewRow]](fields.id, fields.salesorderid, fields.salesorderdetailid, fields.carriertrackingnumber, fields.orderqty, fields.productid, fields.specialofferid, fields.unitprice, fields.unitpricediscount, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SodViewRow, merge: (NewRow, SodViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

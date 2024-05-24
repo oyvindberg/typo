@@ -22,7 +22,7 @@ import typo.dsl.UpdateParams
 class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, CurrencyrateRow],
                            map: scala.collection.mutable.Map[CurrencyrateId, CurrencyrateRow] = scala.collection.mutable.Map.empty) extends CurrencyrateRepo {
   override def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CurrencyrateFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, CurrencyrateFields.structure, map)
   }
   override def deleteById(currencyrateid: CurrencyrateId)(implicit c: Connection): Boolean = {
     map.remove(currencyrateid).isDefined
@@ -72,7 +72,7 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
     currencyrateids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CurrencyrateFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, CurrencyrateFields.structure, map)
   }
   override def update(row: CurrencyrateRow)(implicit c: Connection): Boolean = {
     map.get(row.currencyrateid) match {

@@ -20,23 +20,14 @@ projects:
       mainClass: com.foo.App
     sources: ./generated-and-checked-in
   typo-dsl-anorm:
-    cross:
-      jvm213:
-        extends: template-kind-projector
     dependencies: org.playframework.anorm::anorm:2.7.0
     extends: template-cross
     sources: ../typo-dsl-shared
   typo-dsl-doobie:
-    cross:
-      jvm213:
-        extends: template-kind-projector
     dependencies: org.tpolecat::doobie-postgres:1.0.0-RC5
     extends: template-cross
     sources: ../typo-dsl-shared
   typo-dsl-zio-jdbc:
-    cross:
-      jvm213:
-        extends: template-kind-projector
     dependencies: dev.zio::zio-jdbc:0.1.2
     extends: template-cross
     sources: ../typo-dsl-shared
@@ -130,11 +121,8 @@ templates:
       jvm3:
         extends: template-nocross
     extends: template-common
-  template-kind-projector:
-    scala:
-      compilerPlugins: org.typelevel:::kind-projector:0.13.2
   template-nocross:
     extends: template-common
     scala:
-      version: 3.4.0
+      version: 3.4.1
       options: -source 3.4

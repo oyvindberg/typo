@@ -22,7 +22,7 @@ import typo.dsl.UpdateParams
 class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow],
                           map: scala.collection.mutable.Map[PersonphoneId, PersonphoneRow] = scala.collection.mutable.Map.empty) extends PersonphoneRepo {
   override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PersonphoneFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, PersonphoneFields.structure, map)
   }
   override def deleteById(compositeId: PersonphoneId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
@@ -72,7 +72,7 @@ class PersonphoneRepoMock(toRow: Function1[PersonphoneRowUnsaved, PersonphoneRow
     compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PersonphoneFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, PersonphoneFields.structure, map)
   }
   override def update(row: PersonphoneRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {

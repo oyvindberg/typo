@@ -22,7 +22,7 @@ import typo.dsl.UpdateParams
 class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
                         map: scala.collection.mutable.Map[WorkorderId, WorkorderRow] = scala.collection.mutable.Map.empty) extends WorkorderRepo {
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
-    DeleteBuilderMock(DeleteParams.empty, WorkorderFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, WorkorderFields.structure, map)
   }
   override def deleteById(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
     map.remove(workorderid).isDefined
@@ -72,7 +72,7 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     workorderids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
-    UpdateBuilderMock(UpdateParams.empty, WorkorderFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, WorkorderFields.structure, map)
   }
   override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
     map.get(row.workorderid) match {

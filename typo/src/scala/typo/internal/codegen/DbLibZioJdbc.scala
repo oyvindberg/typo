@@ -535,7 +535,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
               |  }
               |}""".stripMargin
       case RepoMethod.UpdateBuilder(_, fieldsType, _) =>
-        code"${sc.Type.dsl.UpdateBuilderMock}(${sc.Type.dsl.UpdateParams}.empty, $fieldsType.structure.fields, map)"
+        code"${sc.Type.dsl.UpdateBuilderMock}(${sc.Type.dsl.UpdateParams}.empty, $fieldsType.structure, map)"
       case RepoMethod.UpdateFieldValues(_, id, varargs, fieldValue, cases0, _) =>
         val cases = cases0.map { col =>
           code"case (acc, $fieldValue.${col.name}(value)) => acc.copy(${col.name} = value)"
@@ -585,7 +585,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         code"insert(${maybeToRow.get.name}(${unsavedParam.name}))"
 
       case RepoMethod.DeleteBuilder(_, fieldsType, _) =>
-        code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType.structure.fields, map)"
+        code"${sc.Type.dsl.DeleteBuilderMock}(${sc.Type.dsl.DeleteParams}.empty, $fieldsType.structure, map)"
       case RepoMethod.Delete(_, id) =>
         code"$ZIO.succeed(map.remove(${id.paramName}).isDefined)"
       case RepoMethod.DeleteByIds(_, _, idsParam) =>

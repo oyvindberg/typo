@@ -12,43 +12,44 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait ProductinventoryFields[Row] {
-  val productid: IdField[ProductId, Row]
-  val locationid: IdField[LocationId, Row]
-  val shelf: Field[/* max 10 chars */ String, Row]
-  val bin: Field[TypoShort, Row]
-  val quantity: Field[TypoShort, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait ProductinventoryFields {
+  def productid: IdField[ProductId, ProductinventoryRow]
+  def locationid: IdField[LocationId, ProductinventoryRow]
+  def shelf: Field[/* max 10 chars */ String, ProductinventoryRow]
+  def bin: Field[TypoShort, ProductinventoryRow]
+  def quantity: Field[TypoShort, ProductinventoryRow]
+  def rowguid: Field[TypoUUID, ProductinventoryRow]
+  def modifieddate: Field[TypoLocalDateTime, ProductinventoryRow]
 }
 
 object ProductinventoryFields {
-  val structure: Relation[ProductinventoryFields, ProductinventoryRow, ProductinventoryRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[ProductinventoryFields, ProductinventoryRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => ProductinventoryRow, val merge: (Row, ProductinventoryRow) => Row)
-    extends Relation[ProductinventoryFields, ProductinventoryRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[ProductinventoryFields, ProductinventoryRow] {
   
-    override val fields: ProductinventoryFields[Row] = new ProductinventoryFields[Row] {
-      override val productid = new IdField[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val locationid = new IdField[LocationId, Row](prefix, "locationid", None, Some("int2"))(x => extract(x).locationid, (row, value) => merge(row, extract(row).copy(locationid = value)))
-      override val shelf = new Field[/* max 10 chars */ String, Row](prefix, "shelf", None, None)(x => extract(x).shelf, (row, value) => merge(row, extract(row).copy(shelf = value)))
-      override val bin = new Field[TypoShort, Row](prefix, "bin", None, Some("int2"))(x => extract(x).bin, (row, value) => merge(row, extract(row).copy(bin = value)))
-      override val quantity = new Field[TypoShort, Row](prefix, "quantity", None, Some("int2"))(x => extract(x).quantity, (row, value) => merge(row, extract(row).copy(quantity = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: ProductinventoryFields = new ProductinventoryFields {
+      override def productid = IdField[ProductId, ProductinventoryRow](_path, "productid", None, Some("int4"), x => x.productid, (row, value) => row.copy(productid = value))
+      override def locationid = IdField[LocationId, ProductinventoryRow](_path, "locationid", None, Some("int2"), x => x.locationid, (row, value) => row.copy(locationid = value))
+      override def shelf = Field[/* max 10 chars */ String, ProductinventoryRow](_path, "shelf", None, None, x => x.shelf, (row, value) => row.copy(shelf = value))
+      override def bin = Field[TypoShort, ProductinventoryRow](_path, "bin", None, Some("int2"), x => x.bin, (row, value) => row.copy(bin = value))
+      override def quantity = Field[TypoShort, ProductinventoryRow](_path, "quantity", None, Some("int2"), x => x.quantity, (row, value) => row.copy(quantity = value))
+      override def rowguid = Field[TypoUUID, ProductinventoryRow](_path, "rowguid", None, Some("uuid"), x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, ProductinventoryRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.productid, fields.locationid, fields.shelf, fields.bin, fields.quantity, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, ProductinventoryRow]] =
+      List[FieldLikeNoHkt[?, ProductinventoryRow]](fields.productid, fields.locationid, fields.shelf, fields.bin, fields.quantity, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => ProductinventoryRow, merge: (NewRow, ProductinventoryRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

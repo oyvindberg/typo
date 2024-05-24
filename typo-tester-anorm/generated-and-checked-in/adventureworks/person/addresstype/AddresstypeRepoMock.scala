@@ -22,7 +22,7 @@ import typo.dsl.UpdateParams
 class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow],
                           map: scala.collection.mutable.Map[AddresstypeId, AddresstypeRow] = scala.collection.mutable.Map.empty) extends AddresstypeRepo {
   override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
-    DeleteBuilderMock(DeleteParams.empty, AddresstypeFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, AddresstypeFields.structure, map)
   }
   override def deleteById(addresstypeid: AddresstypeId)(implicit c: Connection): Boolean = {
     map.remove(addresstypeid).isDefined
@@ -72,7 +72,7 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
     addresstypeids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
-    UpdateBuilderMock(UpdateParams.empty, AddresstypeFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, AddresstypeFields.structure, map)
   }
   override def update(row: AddresstypeRow)(implicit c: Connection): Boolean = {
     map.get(row.addresstypeid) match {

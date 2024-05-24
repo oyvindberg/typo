@@ -9,35 +9,36 @@ package culture
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait CultureFields[Row] {
-  val cultureid: IdField[CultureId, Row]
-  val name: Field[Name, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait CultureFields {
+  def cultureid: IdField[CultureId, CultureRow]
+  def name: Field[Name, CultureRow]
+  def modifieddate: Field[TypoLocalDateTime, CultureRow]
 }
 
 object CultureFields {
-  val structure: Relation[CultureFields, CultureRow, CultureRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[CultureFields, CultureRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => CultureRow, val merge: (Row, CultureRow) => Row)
-    extends Relation[CultureFields, CultureRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[CultureFields, CultureRow] {
   
-    override val fields: CultureFields[Row] = new CultureFields[Row] {
-      override val cultureid = new IdField[CultureId, Row](prefix, "cultureid", None, Some("bpchar"))(x => extract(x).cultureid, (row, value) => merge(row, extract(row).copy(cultureid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: CultureFields = new CultureFields {
+      override def cultureid = IdField[CultureId, CultureRow](_path, "cultureid", None, Some("bpchar"), x => x.cultureid, (row, value) => row.copy(cultureid = value))
+      override def name = Field[Name, CultureRow](_path, "name", None, Some("varchar"), x => x.name, (row, value) => row.copy(name = value))
+      override def modifieddate = Field[TypoLocalDateTime, CultureRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.cultureid, fields.name, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, CultureRow]] =
+      List[FieldLikeNoHkt[?, CultureRow]](fields.cultureid, fields.name, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => CultureRow, merge: (NewRow, CultureRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

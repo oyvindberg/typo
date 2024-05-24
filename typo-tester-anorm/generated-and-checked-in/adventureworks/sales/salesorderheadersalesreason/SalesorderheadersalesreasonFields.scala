@@ -10,35 +10,36 @@ package salesorderheadersalesreason
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait SalesorderheadersalesreasonFields[Row] {
-  val salesorderid: IdField[SalesorderheaderId, Row]
-  val salesreasonid: IdField[SalesreasonId, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SalesorderheadersalesreasonFields {
+  def salesorderid: IdField[SalesorderheaderId, SalesorderheadersalesreasonRow]
+  def salesreasonid: IdField[SalesreasonId, SalesorderheadersalesreasonRow]
+  def modifieddate: Field[TypoLocalDateTime, SalesorderheadersalesreasonRow]
 }
 
 object SalesorderheadersalesreasonFields {
-  val structure: Relation[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow, SalesorderheadersalesreasonRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SalesorderheadersalesreasonRow, val merge: (Row, SalesorderheadersalesreasonRow) => Row)
-    extends Relation[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] {
   
-    override val fields: SalesorderheadersalesreasonFields[Row] = new SalesorderheadersalesreasonFields[Row] {
-      override val salesorderid = new IdField[SalesorderheaderId, Row](prefix, "salesorderid", None, Some("int4"))(x => extract(x).salesorderid, (row, value) => merge(row, extract(row).copy(salesorderid = value)))
-      override val salesreasonid = new IdField[SalesreasonId, Row](prefix, "salesreasonid", None, Some("int4"))(x => extract(x).salesreasonid, (row, value) => merge(row, extract(row).copy(salesreasonid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SalesorderheadersalesreasonFields = new SalesorderheadersalesreasonFields {
+      override def salesorderid = IdField[SalesorderheaderId, SalesorderheadersalesreasonRow](_path, "salesorderid", None, Some("int4"), x => x.salesorderid, (row, value) => row.copy(salesorderid = value))
+      override def salesreasonid = IdField[SalesreasonId, SalesorderheadersalesreasonRow](_path, "salesreasonid", None, Some("int4"), x => x.salesreasonid, (row, value) => row.copy(salesreasonid = value))
+      override def modifieddate = Field[TypoLocalDateTime, SalesorderheadersalesreasonRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.salesorderid, fields.salesreasonid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SalesorderheadersalesreasonRow]] =
+      List[FieldLikeNoHkt[?, SalesorderheadersalesreasonRow]](fields.salesorderid, fields.salesreasonid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SalesorderheadersalesreasonRow, merge: (NewRow, SalesorderheadersalesreasonRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

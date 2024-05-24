@@ -9,35 +9,36 @@ package countryregion
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait CountryregionFields[Row] {
-  val countryregioncode: IdField[CountryregionId, Row]
-  val name: Field[Name, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait CountryregionFields {
+  def countryregioncode: IdField[CountryregionId, CountryregionRow]
+  def name: Field[Name, CountryregionRow]
+  def modifieddate: Field[TypoLocalDateTime, CountryregionRow]
 }
 
 object CountryregionFields {
-  val structure: Relation[CountryregionFields, CountryregionRow, CountryregionRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[CountryregionFields, CountryregionRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => CountryregionRow, val merge: (Row, CountryregionRow) => Row)
-    extends Relation[CountryregionFields, CountryregionRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[CountryregionFields, CountryregionRow] {
   
-    override val fields: CountryregionFields[Row] = new CountryregionFields[Row] {
-      override val countryregioncode = new IdField[CountryregionId, Row](prefix, "countryregioncode", None, None)(x => extract(x).countryregioncode, (row, value) => merge(row, extract(row).copy(countryregioncode = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: CountryregionFields = new CountryregionFields {
+      override def countryregioncode = IdField[CountryregionId, CountryregionRow](_path, "countryregioncode", None, None, x => x.countryregioncode, (row, value) => row.copy(countryregioncode = value))
+      override def name = Field[Name, CountryregionRow](_path, "name", None, Some("varchar"), x => x.name, (row, value) => row.copy(name = value))
+      override def modifieddate = Field[TypoLocalDateTime, CountryregionRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.countryregioncode, fields.name, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, CountryregionRow]] =
+      List[FieldLikeNoHkt[?, CountryregionRow]](fields.countryregioncode, fields.name, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => CountryregionRow, merge: (NewRow, CountryregionRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

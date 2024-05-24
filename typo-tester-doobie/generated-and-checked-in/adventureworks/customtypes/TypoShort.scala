@@ -12,7 +12,6 @@ import doobie.util.Get
 import doobie.util.Put
 import io.circe.Decoder
 import io.circe.Encoder
-import scala.math.Numeric
 import typo.dsl.Bijection
 
 /** Short primitive */

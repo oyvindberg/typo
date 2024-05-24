@@ -1,8 +1,6 @@
 package typo.dsl.pagination
 
-import typo.dsl.SortOrderNoHkt
-
-import java.util.concurrent.atomic.AtomicInteger
+import typo.dsl.{RenderCtx, SortOrderNoHkt}
 
 /** A client cursor is inherently tied to a set of sort orderings.
   *
@@ -11,8 +9,8 @@ import java.util.concurrent.atomic.AtomicInteger
 case class SortOrderRepr(expr: String) extends AnyVal
 
 object SortOrderRepr {
-  def from[NT, R](x: SortOrderNoHkt[NT, R]): SortOrderRepr = {
-    val internals = x.expr.render(new AtomicInteger(0)).internals
+  def from[NT](x: SortOrderNoHkt[NT], ctx: RenderCtx): SortOrderRepr = {
+    val internals = x.expr.render(ctx).internals
     // todo: deconstructing the sql string and replacing `?` with the value would yield a more readable result
     val sql = internals.elements match {
       case Nil      => internals.sql

@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
                     map: scala.collection.mutable.Map[ShiftId, ShiftRow] = scala.collection.mutable.Map.empty) extends ShiftRepo {
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShiftFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, ShiftFields.structure, map)
   }
   override def deleteById(shiftid: ShiftId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(shiftid).isDefined)
@@ -85,7 +85,7 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
     }
   }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure, map)
   }
   override def update(row: ShiftRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

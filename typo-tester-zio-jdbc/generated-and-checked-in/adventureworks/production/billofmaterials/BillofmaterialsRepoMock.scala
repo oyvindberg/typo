@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, BillofmaterialsRow],
                               map: scala.collection.mutable.Map[Int, BillofmaterialsRow] = scala.collection.mutable.Map.empty) extends BillofmaterialsRepo {
   override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields.structure, map)
   }
   override def deleteById(billofmaterialsid: Int): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(billofmaterialsid).isDefined)
@@ -85,7 +85,7 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     }
   }
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields.structure, map)
   }
   override def update(row: BillofmaterialsRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

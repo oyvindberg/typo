@@ -11,38 +11,39 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait AtViewFields[Row] {
-  val id: Field[AddresstypeId, Row]
-  val addresstypeid: Field[AddresstypeId, Row]
-  val name: Field[Name, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait AtViewFields {
+  def id: Field[AddresstypeId, AtViewRow]
+  def addresstypeid: Field[AddresstypeId, AtViewRow]
+  def name: Field[Name, AtViewRow]
+  def rowguid: Field[TypoUUID, AtViewRow]
+  def modifieddate: Field[TypoLocalDateTime, AtViewRow]
 }
 
 object AtViewFields {
-  val structure: Relation[AtViewFields, AtViewRow, AtViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[AtViewFields, AtViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => AtViewRow, val merge: (Row, AtViewRow) => Row)
-    extends Relation[AtViewFields, AtViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[AtViewFields, AtViewRow] {
   
-    override val fields: AtViewFields[Row] = new AtViewFields[Row] {
-      override val id = new Field[AddresstypeId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val addresstypeid = new Field[AddresstypeId, Row](prefix, "addresstypeid", None, None)(x => extract(x).addresstypeid, (row, value) => merge(row, extract(row).copy(addresstypeid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: AtViewFields = new AtViewFields {
+      override def id = Field[AddresstypeId, AtViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def addresstypeid = Field[AddresstypeId, AtViewRow](_path, "addresstypeid", None, None, x => x.addresstypeid, (row, value) => row.copy(addresstypeid = value))
+      override def name = Field[Name, AtViewRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def rowguid = Field[TypoUUID, AtViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, AtViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.addresstypeid, fields.name, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, AtViewRow]] =
+      List[FieldLikeNoHkt[?, AtViewRow]](fields.id, fields.addresstypeid, fields.name, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => AtViewRow, merge: (NewRow, AtViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

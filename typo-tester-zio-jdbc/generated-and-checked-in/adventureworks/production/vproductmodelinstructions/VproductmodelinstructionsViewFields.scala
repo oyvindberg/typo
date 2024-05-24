@@ -11,51 +11,52 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait VproductmodelinstructionsViewFields[Row] {
-  val productmodelid: Field[ProductmodelId, Row]
-  val name: Field[Name, Row]
-  val instructions: OptField[String, Row]
-  val LocationID: OptField[Int, Row]
-  val SetupHours: OptField[BigDecimal, Row]
-  val MachineHours: OptField[BigDecimal, Row]
-  val LaborHours: OptField[BigDecimal, Row]
-  val LotSize: OptField[Int, Row]
-  val Step: OptField[/* max 1024 chars */ String, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait VproductmodelinstructionsViewFields {
+  def productmodelid: Field[ProductmodelId, VproductmodelinstructionsViewRow]
+  def name: Field[Name, VproductmodelinstructionsViewRow]
+  def instructions: OptField[String, VproductmodelinstructionsViewRow]
+  def LocationID: OptField[Int, VproductmodelinstructionsViewRow]
+  def SetupHours: OptField[BigDecimal, VproductmodelinstructionsViewRow]
+  def MachineHours: OptField[BigDecimal, VproductmodelinstructionsViewRow]
+  def LaborHours: OptField[BigDecimal, VproductmodelinstructionsViewRow]
+  def LotSize: OptField[Int, VproductmodelinstructionsViewRow]
+  def Step: OptField[/* max 1024 chars */ String, VproductmodelinstructionsViewRow]
+  def rowguid: Field[TypoUUID, VproductmodelinstructionsViewRow]
+  def modifieddate: Field[TypoLocalDateTime, VproductmodelinstructionsViewRow]
 }
 
 object VproductmodelinstructionsViewFields {
-  val structure: Relation[VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow, VproductmodelinstructionsViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => VproductmodelinstructionsViewRow, val merge: (Row, VproductmodelinstructionsViewRow) => Row)
-    extends Relation[VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow] {
   
-    override val fields: VproductmodelinstructionsViewFields[Row] = new VproductmodelinstructionsViewFields[Row] {
-      override val productmodelid = new Field[ProductmodelId, Row](prefix, "productmodelid", None, None)(x => extract(x).productmodelid, (row, value) => merge(row, extract(row).copy(productmodelid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val instructions = new OptField[String, Row](prefix, "instructions", None, None)(x => extract(x).instructions, (row, value) => merge(row, extract(row).copy(instructions = value)))
-      override val LocationID = new OptField[Int, Row](prefix, "LocationID", None, None)(x => extract(x).LocationID, (row, value) => merge(row, extract(row).copy(LocationID = value)))
-      override val SetupHours = new OptField[BigDecimal, Row](prefix, "SetupHours", None, None)(x => extract(x).SetupHours, (row, value) => merge(row, extract(row).copy(SetupHours = value)))
-      override val MachineHours = new OptField[BigDecimal, Row](prefix, "MachineHours", None, None)(x => extract(x).MachineHours, (row, value) => merge(row, extract(row).copy(MachineHours = value)))
-      override val LaborHours = new OptField[BigDecimal, Row](prefix, "LaborHours", None, None)(x => extract(x).LaborHours, (row, value) => merge(row, extract(row).copy(LaborHours = value)))
-      override val LotSize = new OptField[Int, Row](prefix, "LotSize", None, None)(x => extract(x).LotSize, (row, value) => merge(row, extract(row).copy(LotSize = value)))
-      override val Step = new OptField[/* max 1024 chars */ String, Row](prefix, "Step", None, None)(x => extract(x).Step, (row, value) => merge(row, extract(row).copy(Step = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: VproductmodelinstructionsViewFields = new VproductmodelinstructionsViewFields {
+      override def productmodelid = Field[ProductmodelId, VproductmodelinstructionsViewRow](_path, "productmodelid", None, None, x => x.productmodelid, (row, value) => row.copy(productmodelid = value))
+      override def name = Field[Name, VproductmodelinstructionsViewRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def instructions = OptField[String, VproductmodelinstructionsViewRow](_path, "instructions", None, None, x => x.instructions, (row, value) => row.copy(instructions = value))
+      override def LocationID = OptField[Int, VproductmodelinstructionsViewRow](_path, "LocationID", None, None, x => x.LocationID, (row, value) => row.copy(LocationID = value))
+      override def SetupHours = OptField[BigDecimal, VproductmodelinstructionsViewRow](_path, "SetupHours", None, None, x => x.SetupHours, (row, value) => row.copy(SetupHours = value))
+      override def MachineHours = OptField[BigDecimal, VproductmodelinstructionsViewRow](_path, "MachineHours", None, None, x => x.MachineHours, (row, value) => row.copy(MachineHours = value))
+      override def LaborHours = OptField[BigDecimal, VproductmodelinstructionsViewRow](_path, "LaborHours", None, None, x => x.LaborHours, (row, value) => row.copy(LaborHours = value))
+      override def LotSize = OptField[Int, VproductmodelinstructionsViewRow](_path, "LotSize", None, None, x => x.LotSize, (row, value) => row.copy(LotSize = value))
+      override def Step = OptField[/* max 1024 chars */ String, VproductmodelinstructionsViewRow](_path, "Step", None, None, x => x.Step, (row, value) => row.copy(Step = value))
+      override def rowguid = Field[TypoUUID, VproductmodelinstructionsViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, VproductmodelinstructionsViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.productmodelid, fields.name, fields.instructions, fields.LocationID, fields.SetupHours, fields.MachineHours, fields.LaborHours, fields.LotSize, fields.Step, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, VproductmodelinstructionsViewRow]] =
+      List[FieldLikeNoHkt[?, VproductmodelinstructionsViewRow]](fields.productmodelid, fields.name, fields.instructions, fields.LocationID, fields.SetupHours, fields.MachineHours, fields.LaborHours, fields.LotSize, fields.Step, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => VproductmodelinstructionsViewRow, merge: (NewRow, VproductmodelinstructionsViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

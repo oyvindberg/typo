@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, SalesorderheaderRow],
                                map: scala.collection.mutable.Map[SalesorderheaderId, SalesorderheaderRow] = scala.collection.mutable.Map.empty) extends SalesorderheaderRepo {
   override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesorderheaderFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalesorderheaderFields.structure, map)
   }
   override def deleteById(salesorderid: SalesorderheaderId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(salesorderid).isDefined)
@@ -85,7 +85,7 @@ class SalesorderheaderRepoMock(toRow: Function1[SalesorderheaderRowUnsaved, Sale
     }
   }
   override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesorderheaderFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalesorderheaderFields.structure, map)
   }
   override def update(row: SalesorderheaderRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

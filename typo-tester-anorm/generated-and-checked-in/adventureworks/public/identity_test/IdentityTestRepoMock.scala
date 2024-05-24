@@ -22,7 +22,7 @@ import typo.dsl.UpdateParams
 class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTestRow],
                            map: scala.collection.mutable.Map[IdentityTestId, IdentityTestRow] = scala.collection.mutable.Map.empty) extends IdentityTestRepo {
   override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
-    DeleteBuilderMock(DeleteParams.empty, IdentityTestFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, IdentityTestFields.structure, map)
   }
   override def deleteById(name: IdentityTestId)(implicit c: Connection): Boolean = {
     map.remove(name).isDefined
@@ -72,7 +72,7 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
     names.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
-    UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure, map)
   }
   override def update(row: IdentityTestRow)(implicit c: Connection): Boolean = {
     map.get(row.name) match {

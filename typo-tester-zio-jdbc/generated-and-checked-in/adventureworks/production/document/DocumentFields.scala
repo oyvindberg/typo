@@ -13,56 +13,57 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait DocumentFields[Row] {
-  val title: Field[/* max 50 chars */ String, Row]
-  val owner: Field[BusinessentityId, Row]
-  val folderflag: Field[Flag, Row]
-  val filename: Field[/* max 400 chars */ String, Row]
-  val fileextension: OptField[/* max 8 chars */ String, Row]
-  val revision: Field[/* bpchar, max 5 chars */ String, Row]
-  val changenumber: Field[Int, Row]
-  val status: Field[TypoShort, Row]
-  val documentsummary: OptField[String, Row]
-  val document: OptField[TypoBytea, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
-  val documentnode: IdField[DocumentId, Row]
+trait DocumentFields {
+  def title: Field[/* max 50 chars */ String, DocumentRow]
+  def owner: Field[BusinessentityId, DocumentRow]
+  def folderflag: Field[Flag, DocumentRow]
+  def filename: Field[/* max 400 chars */ String, DocumentRow]
+  def fileextension: OptField[/* max 8 chars */ String, DocumentRow]
+  def revision: Field[/* bpchar, max 5 chars */ String, DocumentRow]
+  def changenumber: Field[Int, DocumentRow]
+  def status: Field[TypoShort, DocumentRow]
+  def documentsummary: OptField[String, DocumentRow]
+  def document: OptField[TypoBytea, DocumentRow]
+  def rowguid: Field[TypoUUID, DocumentRow]
+  def modifieddate: Field[TypoLocalDateTime, DocumentRow]
+  def documentnode: IdField[DocumentId, DocumentRow]
 }
 
 object DocumentFields {
-  val structure: Relation[DocumentFields, DocumentRow, DocumentRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[DocumentFields, DocumentRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => DocumentRow, val merge: (Row, DocumentRow) => Row)
-    extends Relation[DocumentFields, DocumentRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[DocumentFields, DocumentRow] {
   
-    override val fields: DocumentFields[Row] = new DocumentFields[Row] {
-      override val title = new Field[/* max 50 chars */ String, Row](prefix, "title", None, None)(x => extract(x).title, (row, value) => merge(row, extract(row).copy(title = value)))
-      override val owner = new Field[BusinessentityId, Row](prefix, "owner", None, Some("int4"))(x => extract(x).owner, (row, value) => merge(row, extract(row).copy(owner = value)))
-      override val folderflag = new Field[Flag, Row](prefix, "folderflag", None, Some("bool"))(x => extract(x).folderflag, (row, value) => merge(row, extract(row).copy(folderflag = value)))
-      override val filename = new Field[/* max 400 chars */ String, Row](prefix, "filename", None, None)(x => extract(x).filename, (row, value) => merge(row, extract(row).copy(filename = value)))
-      override val fileextension = new OptField[/* max 8 chars */ String, Row](prefix, "fileextension", None, None)(x => extract(x).fileextension, (row, value) => merge(row, extract(row).copy(fileextension = value)))
-      override val revision = new Field[/* bpchar, max 5 chars */ String, Row](prefix, "revision", None, Some("bpchar"))(x => extract(x).revision, (row, value) => merge(row, extract(row).copy(revision = value)))
-      override val changenumber = new Field[Int, Row](prefix, "changenumber", None, Some("int4"))(x => extract(x).changenumber, (row, value) => merge(row, extract(row).copy(changenumber = value)))
-      override val status = new Field[TypoShort, Row](prefix, "status", None, Some("int2"))(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
-      override val documentsummary = new OptField[String, Row](prefix, "documentsummary", None, None)(x => extract(x).documentsummary, (row, value) => merge(row, extract(row).copy(documentsummary = value)))
-      override val document = new OptField[TypoBytea, Row](prefix, "document", None, Some("bytea"))(x => extract(x).document, (row, value) => merge(row, extract(row).copy(document = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
-      override val documentnode = new IdField[DocumentId, Row](prefix, "documentnode", None, None)(x => extract(x).documentnode, (row, value) => merge(row, extract(row).copy(documentnode = value)))
+    override lazy val fields: DocumentFields = new DocumentFields {
+      override def title = Field[/* max 50 chars */ String, DocumentRow](_path, "title", None, None, x => x.title, (row, value) => row.copy(title = value))
+      override def owner = Field[BusinessentityId, DocumentRow](_path, "owner", None, Some("int4"), x => x.owner, (row, value) => row.copy(owner = value))
+      override def folderflag = Field[Flag, DocumentRow](_path, "folderflag", None, Some("bool"), x => x.folderflag, (row, value) => row.copy(folderflag = value))
+      override def filename = Field[/* max 400 chars */ String, DocumentRow](_path, "filename", None, None, x => x.filename, (row, value) => row.copy(filename = value))
+      override def fileextension = OptField[/* max 8 chars */ String, DocumentRow](_path, "fileextension", None, None, x => x.fileextension, (row, value) => row.copy(fileextension = value))
+      override def revision = Field[/* bpchar, max 5 chars */ String, DocumentRow](_path, "revision", None, Some("bpchar"), x => x.revision, (row, value) => row.copy(revision = value))
+      override def changenumber = Field[Int, DocumentRow](_path, "changenumber", None, Some("int4"), x => x.changenumber, (row, value) => row.copy(changenumber = value))
+      override def status = Field[TypoShort, DocumentRow](_path, "status", None, Some("int2"), x => x.status, (row, value) => row.copy(status = value))
+      override def documentsummary = OptField[String, DocumentRow](_path, "documentsummary", None, None, x => x.documentsummary, (row, value) => row.copy(documentsummary = value))
+      override def document = OptField[TypoBytea, DocumentRow](_path, "document", None, Some("bytea"), x => x.document, (row, value) => row.copy(document = value))
+      override def rowguid = Field[TypoUUID, DocumentRow](_path, "rowguid", None, Some("uuid"), x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, DocumentRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
+      override def documentnode = IdField[DocumentId, DocumentRow](_path, "documentnode", None, None, x => x.documentnode, (row, value) => row.copy(documentnode = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.title, fields.owner, fields.folderflag, fields.filename, fields.fileextension, fields.revision, fields.changenumber, fields.status, fields.documentsummary, fields.document, fields.rowguid, fields.modifieddate, fields.documentnode)
+    override lazy val columns: List[FieldLikeNoHkt[?, DocumentRow]] =
+      List[FieldLikeNoHkt[?, DocumentRow]](fields.title, fields.owner, fields.folderflag, fields.filename, fields.fileextension, fields.revision, fields.changenumber, fields.status, fields.documentsummary, fields.document, fields.rowguid, fields.modifieddate, fields.documentnode)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => DocumentRow, merge: (NewRow, DocumentRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

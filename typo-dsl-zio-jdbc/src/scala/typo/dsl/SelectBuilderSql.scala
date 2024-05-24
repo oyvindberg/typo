@@ -3,92 +3,101 @@ package typo.dsl
 import zio.jdbc.*
 import zio.{Chunk, NonEmptyChunk, ZIO}
 
-import java.util.concurrent.atomic.AtomicInteger
+sealed trait SelectBuilderSql[Fields, Row] extends SelectBuilder[Fields, Row] {
+  def withPath(path: Path): SelectBuilderSql[Fields, Row]
+  def instantiate(ctx: RenderCtx): SelectBuilderSql.Instantiated[Fields, Row]
+  def sqlFor(ctx: RenderCtx): Query[Row]
 
-sealed trait SelectBuilderSql[Fields[_], Row] extends SelectBuilder[Fields, Row] {
-  def instantiate(counter: AtomicInteger): SelectBuilderSql.Instantiated[Fields, Row]
-  def sqlFor(counter: AtomicInteger): Query[Row]
+  override lazy val renderCtx: RenderCtx = RenderCtx.from(this)
+  override def sql: Option[SqlFragment] = Some(sqlFor(renderCtx).sql)
 
-  override def sql: Option[SqlFragment] = Some(sqlFor(new AtomicInteger(0)).sql)
-
-  final override def joinOn[Fields2[_], N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(
-      pred: Joined[Fields, Fields2, (Row, Row2)] => SqlExpr[Boolean, N, (Row, Row2)]
-  ): SelectBuilder[Joined[Fields, Fields2, *], (Row, Row2)] =
+  final override def joinOn[Fields2, N[_]: Nullability, Row2](
+      other: SelectBuilder[Fields2, Row2]
+  )(pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)] =
     other match {
       case otherSql: SelectBuilderSql[Fields2, Row2] =>
-        new SelectBuilderSql.TableJoin[Fields, Fields2, N, Row, Row2](this, otherSql, pred, SelectParams.empty)
-      case _ =>
-        sys.error("you cannot mix mock and sql repos")
+        new SelectBuilderSql.TableJoin[Fields, Fields2, N, Row, Row2](this.withPath(Path.LeftInJoin), otherSql.withPath(Path.RightInJoin), pred, SelectParams.empty)
+      case _ => sys.error("you cannot mix mock and sql repos")
     }
 
-  final override def leftJoinOn[Fields2[_], N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(
-      pred: Joined[Fields, Fields2, (Row, Row2)] => SqlExpr[Boolean, N, (Row, Row2)]
-  ): SelectBuilder[LeftJoined[Fields, Fields2, *], (Row, Option[Row2])] =
+  final override def leftJoinOn[Fields2, N[_]: Nullability, Row2](
+      other: SelectBuilder[Fields2, Row2]
+  )(pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]): SelectBuilder[LeftJoined[Fields, Fields2], (Row, Option[Row2])] =
     other match {
       case otherSql: SelectBuilderSql[Fields2, Row2] =>
-        SelectBuilderSql.TableLeftJoin(this, otherSql, pred, SelectParams.empty)
-      case _ =>
-        sys.error("you cannot mix mock and sql repos")
+        SelectBuilderSql.TableLeftJoin(this.withPath(Path.LeftInJoin), otherSql.withPath(Path.RightInJoin), pred, SelectParams.empty)
+      case _ => sys.error("you cannot mix mock and sql repos")
     }
 
   final override def toChunk: ZIO[ZConnection, Throwable, Chunk[Row]] =
-    sqlFor(new AtomicInteger(0)).selectAll
+    sqlFor(renderCtx).selectAll
 }
 
 object SelectBuilderSql {
-  def apply[Fields[_], OriginalRow, Row](
+  def apply[Fields, Row](
       name: String,
-      structure: Structure.Relation[Fields, OriginalRow, Row],
+      structure: Structure.Relation[Fields, Row],
       read: JdbcDecoder[Row]
   ): SelectBuilderSql[Fields, Row] =
     Relation(name, structure, read, SelectParams.empty)
 
-  private final case class Relation[Fields[_], OriginalRow, Row](
+  final case class Relation[Fields, Row](
       name: String,
-      structure: Structure.Relation[Fields, OriginalRow, Row],
+      structure: Structure.Relation[Fields, Row],
       read: JdbcDecoder[Row],
       params: SelectParams[Fields, Row]
   ) extends SelectBuilderSql[Fields, Row] {
+    override def withPath(path: Path): SelectBuilderSql[Fields, Row] =
+      copy(structure = structure.withPath(path))
+
     override def withParams(sqlParams: SelectParams[Fields, Row]): SelectBuilder[Fields, Row] =
       copy(params = sqlParams)
 
-    private def sql(counter: AtomicInteger): SqlFragment = {
+    private def sql(ctx: RenderCtx): SqlFragment = {
       val cols = structure.columns
-        .map(x => SqlFragment(x.sqlReadCast.foldLeft("\"" + x.value + "\"") { case (acc, cast) => s"$acc::$cast" }))
+        .map(x => SqlFragment(x.sqlReadCast.foldLeft("\"" + x.name + "\"") { case (acc, cast) => s"$acc::$cast" }))
         .mkFragment(", ")
-
-      val baseSql = sql"select $cols from ${SqlFragment(name)}"
-      SelectParams.render(structure.fields, baseSql, counter, params)
+      val alias = ctx.alias(structure._path)
+      val baseSql = sql"select $cols from ${SqlFragment(name)} ${SqlFragment(alias)}"
+      SelectParams.render(structure.fields, baseSql, ctx, params)
     }
 
-    override def sqlFor(counter: AtomicInteger): Query[Row] =
-      sql(counter).query[Row](using read)
+    override def sqlFor(ctx: RenderCtx): Query[Row] =
+      sql(ctx).query[Row](using read)
 
-    override def instantiate(counter: AtomicInteger): SelectBuilderSql.Instantiated[Fields, Row] = {
-      val completeSql = sql(counter)
-      val alias = s"${name.split("\\.").last}${counter.incrementAndGet()}"
-      val prefixed = structure.withPrefix(alias)
-      val subquery = SelectBuilderSql.InstantiatedPart(alias, NonEmptyChunk.fromIterableOption(prefixed.columns).get, completeSql, joinFrag = SqlFragment.empty)
-      SelectBuilderSql.Instantiated(prefixed, NonEmptyChunk.single(subquery), read)
+    override def instantiate(ctx: RenderCtx): SelectBuilderSql.Instantiated[Fields, Row] = {
+      val part = SelectBuilderSql.InstantiatedPart(
+        alias = ctx.alias(structure._path),
+        columns = NonEmptyChunk.fromIterableOption(structure.columns).get,
+        sqlFrag = sql(ctx),
+        joinFrag = SqlFragment.empty
+      )
+      SelectBuilderSql.Instantiated(structure, NonEmptyChunk.single(part), read)
     }
   }
 
-  private final case class TableJoin[Fields1[_], Fields2[_], N[_]: Nullability, Row1, Row2](
+  final case class TableJoin[Fields1, Fields2, N[_]: Nullability, Row1, Row2](
       left: SelectBuilderSql[Fields1, Row1],
       right: SelectBuilderSql[Fields2, Row2],
-      pred: Joined[Fields1, Fields2, (Row1, Row2)] => SqlExpr[Boolean, N, (Row1, Row2)],
-      params: SelectParams[Joined[Fields1, Fields2, *], (Row1, Row2)]
-  ) extends SelectBuilderSql[Joined[Fields1, Fields2, *], (Row1, Row2)] {
+      pred: Joined[Fields1, Fields2] => SqlExpr[Boolean, N],
+      params: SelectParams[Joined[Fields1, Fields2], (Row1, Row2)]
+  ) extends SelectBuilderSql[Joined[Fields1, Fields2], (Row1, Row2)] {
+    override lazy val structure: Structure[(Fields1, Fields2), (Row1, Row2)] =
+      left.structure.join(right.structure)
 
-    override def withParams(sqlParams: SelectParams[Joined[Fields1, Fields2, *], (Row1, Row2)]): SelectBuilder[Joined[Fields1, Fields2, *], (Row1, Row2)] =
+    override def withPath(path: Path): SelectBuilderSql[Joined[Fields1, Fields2], (Row1, Row2)] =
+      copy(left = left.withPath(path), right = right.withPath(path))
+
+    override def withParams(sqlParams: SelectParams[Joined[Fields1, Fields2], (Row1, Row2)]): SelectBuilder[Joined[Fields1, Fields2], (Row1, Row2)] =
       copy(params = sqlParams)
 
-    override def instantiate(counter: AtomicInteger): Instantiated[Joined[Fields1, Fields2, *], (Row1, Row2)] = {
-      val leftInstantiated = left.instantiate(counter)
-      val rightInstantiated = right.instantiate(counter)
+    override def instantiate(ctx: RenderCtx): Instantiated[Joined[Fields1, Fields2], (Row1, Row2)] = {
+      val leftInstantiated: Instantiated[Fields1, Row1] = left.instantiate(ctx)
+      val rightInstantiated: Instantiated[Fields2, Row2] = right.instantiate(ctx)
+
       val newStructure = leftInstantiated.structure.join(rightInstantiated.structure)
       val newRightInstantiatedParts = rightInstantiated.parts
-        .mapLast(_.copy(joinFrag = pred(newStructure.fields).render(counter)))
+        .mapLast(_.copy(joinFrag = pred(newStructure.fields).render(ctx)))
 
       SelectBuilderSql.Instantiated(
         structure = newStructure,
@@ -96,8 +105,8 @@ object SelectBuilderSql {
         decoder = JdbcDecoder.tuple2Decoder(leftInstantiated.decoder, rightInstantiated.decoder)
       )
     }
-    override def sqlFor(paramCounter: AtomicInteger): Query[(Row1, Row2)] = {
-      val instance = instantiate(paramCounter)
+    override def sqlFor(ctx: RenderCtx): Query[(Row1, Row2)] = {
+      val instance = instantiate(ctx)
       val combinedFrag = {
         val size = instance.parts.size
         if (size == 1) instance.parts.head.sqlFrag
@@ -106,7 +115,7 @@ object SelectBuilderSql {
           val rest = instance.parts.tail
 
           val prelude =
-            sql"""select ${instance.columns.map(c => SqlFragment(c.value)).mkFragment(", ")}
+            sql"""select ${instance.columns.map(c => c.render(ctx)).mkFragment(", ")}
                  from (
                  ${first.sqlFrag}
                  ) ${SqlFragment(first.alias)}
@@ -122,30 +131,36 @@ object SelectBuilderSql {
           prelude ++ joins.reduce(_ ++ _)
         }
       }
-      val newCombinedFrag = SelectParams.render[(Row1, Row2), Joined[Fields1, Fields2, *]](instance.structure.fields, combinedFrag, paramCounter, params)
+      val newCombinedFrag = SelectParams.render[Joined[Fields1, Fields2], (Row1, Row2)](instance.structure.fields, combinedFrag, ctx, params)
 
       newCombinedFrag.query(using instance.decoder)
     }
   }
 
-  private final case class TableLeftJoin[Fields1[_], Fields2[_], N[_]: Nullability, Row1, Row2](
+  final case class TableLeftJoin[Fields1, Fields2, N[_]: Nullability, Row1, Row2](
       left: SelectBuilderSql[Fields1, Row1],
       right: SelectBuilderSql[Fields2, Row2],
-      pred: Joined[Fields1, Fields2, (Row1, Row2)] => SqlExpr[Boolean, N, (Row1, Row2)],
-      params: SelectParams[LeftJoined[Fields1, Fields2, *], (Row1, Option[Row2])]
-  ) extends SelectBuilderSql[LeftJoined[Fields1, Fields2, *], (Row1, Option[Row2])] {
+      pred: Joined[Fields1, Fields2] => SqlExpr[Boolean, N],
+      params: SelectParams[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])]
+  ) extends SelectBuilderSql[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])] {
+    override lazy val structure: Structure[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])] =
+      left.structure.leftJoin(right.structure)
+
+    override def withPath(path: Path): SelectBuilderSql[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])] =
+      copy(left = left.withPath(path), right = right.withPath(path))
 
     override def withParams(
-        sqlParams: SelectParams[LeftJoined[Fields1, Fields2, *], (Row1, Option[Row2])]
-    ): SelectBuilder[LeftJoined[Fields1, Fields2, *], (Row1, Option[Row2])] =
+        sqlParams: SelectParams[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])]
+    ): SelectBuilder[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])] =
       copy(params = sqlParams)
 
-    override def instantiate(counter: AtomicInteger): Instantiated[LeftJoined[Fields1, Fields2, *], (Row1, Option[Row2])] = {
-      val leftInstantiated = left.instantiate(counter)
-      val rightInstantiated = right.instantiate(counter)
+    override def instantiate(ctx: RenderCtx): Instantiated[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])] = {
+      val leftInstantiated = left.instantiate(ctx)
+      val rightInstantiated = right.instantiate(ctx)
+
       val newStructure = leftInstantiated.structure.leftJoin(rightInstantiated.structure)
       val newRightInstantiatedParts = rightInstantiated.parts
-        .mapLast(_.copy(joinFrag = pred(leftInstantiated.structure.join(rightInstantiated.structure).fields).render(counter)))
+        .mapLast(_.copy(joinFrag = pred(leftInstantiated.structure.join(rightInstantiated.structure).fields).render(ctx)))
 
       SelectBuilderSql.Instantiated(
         structure = newStructure,
@@ -154,8 +169,8 @@ object SelectBuilderSql {
       )
     }
 
-    override def sqlFor(paramCounter: AtomicInteger): Query[(Row1, Option[Row2])] = {
-      val instance = instantiate(paramCounter)
+    override def sqlFor(ctx: RenderCtx): Query[(Row1, Option[Row2])] = {
+      val instance = instantiate(ctx)
       val combinedFrag = {
         val size = instance.parts.size
         if (size == 1) instance.parts.head.sqlFrag
@@ -164,7 +179,7 @@ object SelectBuilderSql {
           val rest = instance.parts.tail
 
           val prelude =
-            sql"""select ${instance.columns.map(c => SqlFragment(c.value)).mkFragment(", ")}
+            sql"""select ${instance.columns.map(c => c.render(ctx)).mkFragment(", ")}
                   from (
                     ${first.sqlFrag}
                   ) ${SqlFragment(first.alias)}
@@ -180,7 +195,7 @@ object SelectBuilderSql {
         }
       }
       val newCombinedFrag =
-        SelectParams.render[(Row1, Option[Row2]), LeftJoined[Fields1, Fields2, *]](instance.structure.fields, combinedFrag, paramCounter, params)
+        SelectParams.render[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])](instance.structure.fields, combinedFrag, ctx, params)
 
       newCombinedFrag.query(using instance.decoder)
     }
@@ -193,7 +208,7 @@ object SelectBuilderSql {
   /** Need this intermediate data structure to generate aliases for tables (and prefixes for column selections) when we have a tree of joined tables. Need to start from the root after the user has
     * constructed the tree
     */
-  final case class Instantiated[Fields[_], Row](
+  final case class Instantiated[Fields, Row](
       structure: Structure[Fields, Row],
       parts: NonEmptyChunk[SelectBuilderSql.InstantiatedPart],
       decoder: JdbcDecoder[Row]

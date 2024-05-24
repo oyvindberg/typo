@@ -9,39 +9,40 @@ package location
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait LocationFields[Row] {
-  val locationid: IdField[LocationId, Row]
-  val name: Field[Name, Row]
-  val costrate: Field[BigDecimal, Row]
-  val availability: Field[BigDecimal, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait LocationFields {
+  def locationid: IdField[LocationId, LocationRow]
+  def name: Field[Name, LocationRow]
+  def costrate: Field[BigDecimal, LocationRow]
+  def availability: Field[BigDecimal, LocationRow]
+  def modifieddate: Field[TypoLocalDateTime, LocationRow]
 }
 
 object LocationFields {
-  val structure: Relation[LocationFields, LocationRow, LocationRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[LocationFields, LocationRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => LocationRow, val merge: (Row, LocationRow) => Row)
-    extends Relation[LocationFields, LocationRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[LocationFields, LocationRow] {
   
-    override val fields: LocationFields[Row] = new LocationFields[Row] {
-      override val locationid = new IdField[LocationId, Row](prefix, "locationid", None, Some("int4"))(x => extract(x).locationid, (row, value) => merge(row, extract(row).copy(locationid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val costrate = new Field[BigDecimal, Row](prefix, "costrate", None, Some("numeric"))(x => extract(x).costrate, (row, value) => merge(row, extract(row).copy(costrate = value)))
-      override val availability = new Field[BigDecimal, Row](prefix, "availability", None, Some("numeric"))(x => extract(x).availability, (row, value) => merge(row, extract(row).copy(availability = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: LocationFields = new LocationFields {
+      override def locationid = IdField[LocationId, LocationRow](_path, "locationid", None, Some("int4"), x => x.locationid, (row, value) => row.copy(locationid = value))
+      override def name = Field[Name, LocationRow](_path, "name", None, Some("varchar"), x => x.name, (row, value) => row.copy(name = value))
+      override def costrate = Field[BigDecimal, LocationRow](_path, "costrate", None, Some("numeric"), x => x.costrate, (row, value) => row.copy(costrate = value))
+      override def availability = Field[BigDecimal, LocationRow](_path, "availability", None, Some("numeric"), x => x.availability, (row, value) => row.copy(availability = value))
+      override def modifieddate = Field[TypoLocalDateTime, LocationRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.locationid, fields.name, fields.costrate, fields.availability, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, LocationRow]] =
+      List[FieldLikeNoHkt[?, LocationRow]](fields.locationid, fields.name, fields.costrate, fields.availability, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => LocationRow, merge: (NewRow, LocationRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

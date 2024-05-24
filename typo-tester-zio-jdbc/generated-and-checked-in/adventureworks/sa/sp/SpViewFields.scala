@@ -11,49 +11,50 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait SpViewFields[Row] {
-  val id: Field[BusinessentityId, Row]
-  val businessentityid: Field[BusinessentityId, Row]
-  val territoryid: OptField[SalesterritoryId, Row]
-  val salesquota: OptField[BigDecimal, Row]
-  val bonus: Field[BigDecimal, Row]
-  val commissionpct: Field[BigDecimal, Row]
-  val salesytd: Field[BigDecimal, Row]
-  val saleslastyear: Field[BigDecimal, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SpViewFields {
+  def id: Field[BusinessentityId, SpViewRow]
+  def businessentityid: Field[BusinessentityId, SpViewRow]
+  def territoryid: OptField[SalesterritoryId, SpViewRow]
+  def salesquota: OptField[BigDecimal, SpViewRow]
+  def bonus: Field[BigDecimal, SpViewRow]
+  def commissionpct: Field[BigDecimal, SpViewRow]
+  def salesytd: Field[BigDecimal, SpViewRow]
+  def saleslastyear: Field[BigDecimal, SpViewRow]
+  def rowguid: Field[TypoUUID, SpViewRow]
+  def modifieddate: Field[TypoLocalDateTime, SpViewRow]
 }
 
 object SpViewFields {
-  val structure: Relation[SpViewFields, SpViewRow, SpViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SpViewFields, SpViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SpViewRow, val merge: (Row, SpViewRow) => Row)
-    extends Relation[SpViewFields, SpViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SpViewFields, SpViewRow] {
   
-    override val fields: SpViewFields[Row] = new SpViewFields[Row] {
-      override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val territoryid = new OptField[SalesterritoryId, Row](prefix, "territoryid", None, None)(x => extract(x).territoryid, (row, value) => merge(row, extract(row).copy(territoryid = value)))
-      override val salesquota = new OptField[BigDecimal, Row](prefix, "salesquota", None, None)(x => extract(x).salesquota, (row, value) => merge(row, extract(row).copy(salesquota = value)))
-      override val bonus = new Field[BigDecimal, Row](prefix, "bonus", None, None)(x => extract(x).bonus, (row, value) => merge(row, extract(row).copy(bonus = value)))
-      override val commissionpct = new Field[BigDecimal, Row](prefix, "commissionpct", None, None)(x => extract(x).commissionpct, (row, value) => merge(row, extract(row).copy(commissionpct = value)))
-      override val salesytd = new Field[BigDecimal, Row](prefix, "salesytd", None, None)(x => extract(x).salesytd, (row, value) => merge(row, extract(row).copy(salesytd = value)))
-      override val saleslastyear = new Field[BigDecimal, Row](prefix, "saleslastyear", None, None)(x => extract(x).saleslastyear, (row, value) => merge(row, extract(row).copy(saleslastyear = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SpViewFields = new SpViewFields {
+      override def id = Field[BusinessentityId, SpViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def businessentityid = Field[BusinessentityId, SpViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def territoryid = OptField[SalesterritoryId, SpViewRow](_path, "territoryid", None, None, x => x.territoryid, (row, value) => row.copy(territoryid = value))
+      override def salesquota = OptField[BigDecimal, SpViewRow](_path, "salesquota", None, None, x => x.salesquota, (row, value) => row.copy(salesquota = value))
+      override def bonus = Field[BigDecimal, SpViewRow](_path, "bonus", None, None, x => x.bonus, (row, value) => row.copy(bonus = value))
+      override def commissionpct = Field[BigDecimal, SpViewRow](_path, "commissionpct", None, None, x => x.commissionpct, (row, value) => row.copy(commissionpct = value))
+      override def salesytd = Field[BigDecimal, SpViewRow](_path, "salesytd", None, None, x => x.salesytd, (row, value) => row.copy(salesytd = value))
+      override def saleslastyear = Field[BigDecimal, SpViewRow](_path, "saleslastyear", None, None, x => x.saleslastyear, (row, value) => row.copy(saleslastyear = value))
+      override def rowguid = Field[TypoUUID, SpViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, SpViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.businessentityid, fields.territoryid, fields.salesquota, fields.bonus, fields.commissionpct, fields.salesytd, fields.saleslastyear, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SpViewRow]] =
+      List[FieldLikeNoHkt[?, SpViewRow]](fields.id, fields.businessentityid, fields.territoryid, fields.salesquota, fields.bonus, fields.commissionpct, fields.salesytd, fields.saleslastyear, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SpViewRow, merge: (NewRow, SpViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

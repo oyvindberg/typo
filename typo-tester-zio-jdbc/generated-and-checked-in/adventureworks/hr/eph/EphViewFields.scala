@@ -10,40 +10,41 @@ package eph
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait EphViewFields[Row] {
-  val id: Field[BusinessentityId, Row]
-  val businessentityid: Field[BusinessentityId, Row]
-  val ratechangedate: Field[TypoLocalDateTime, Row]
-  val rate: Field[BigDecimal, Row]
-  val payfrequency: Field[TypoShort, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait EphViewFields {
+  def id: Field[BusinessentityId, EphViewRow]
+  def businessentityid: Field[BusinessentityId, EphViewRow]
+  def ratechangedate: Field[TypoLocalDateTime, EphViewRow]
+  def rate: Field[BigDecimal, EphViewRow]
+  def payfrequency: Field[TypoShort, EphViewRow]
+  def modifieddate: Field[TypoLocalDateTime, EphViewRow]
 }
 
 object EphViewFields {
-  val structure: Relation[EphViewFields, EphViewRow, EphViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[EphViewFields, EphViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => EphViewRow, val merge: (Row, EphViewRow) => Row)
-    extends Relation[EphViewFields, EphViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[EphViewFields, EphViewRow] {
   
-    override val fields: EphViewFields[Row] = new EphViewFields[Row] {
-      override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val ratechangedate = new Field[TypoLocalDateTime, Row](prefix, "ratechangedate", Some("text"), None)(x => extract(x).ratechangedate, (row, value) => merge(row, extract(row).copy(ratechangedate = value)))
-      override val rate = new Field[BigDecimal, Row](prefix, "rate", None, None)(x => extract(x).rate, (row, value) => merge(row, extract(row).copy(rate = value)))
-      override val payfrequency = new Field[TypoShort, Row](prefix, "payfrequency", None, None)(x => extract(x).payfrequency, (row, value) => merge(row, extract(row).copy(payfrequency = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: EphViewFields = new EphViewFields {
+      override def id = Field[BusinessentityId, EphViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def businessentityid = Field[BusinessentityId, EphViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def ratechangedate = Field[TypoLocalDateTime, EphViewRow](_path, "ratechangedate", Some("text"), None, x => x.ratechangedate, (row, value) => row.copy(ratechangedate = value))
+      override def rate = Field[BigDecimal, EphViewRow](_path, "rate", None, None, x => x.rate, (row, value) => row.copy(rate = value))
+      override def payfrequency = Field[TypoShort, EphViewRow](_path, "payfrequency", None, None, x => x.payfrequency, (row, value) => row.copy(payfrequency = value))
+      override def modifieddate = Field[TypoLocalDateTime, EphViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.businessentityid, fields.ratechangedate, fields.rate, fields.payfrequency, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, EphViewRow]] =
+      List[FieldLikeNoHkt[?, EphViewRow]](fields.id, fields.businessentityid, fields.ratechangedate, fields.rate, fields.payfrequency, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => EphViewRow, merge: (NewRow, EphViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

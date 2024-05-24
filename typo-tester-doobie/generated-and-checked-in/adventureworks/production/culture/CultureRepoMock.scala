@@ -24,7 +24,7 @@ import typo.dsl.UpdateParams
 class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
                       map: scala.collection.mutable.Map[CultureId, CultureRow] = scala.collection.mutable.Map.empty) extends CultureRepo {
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CultureFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, CultureFields.structure, map)
   }
   override def deleteById(cultureid: CultureId): ConnectionIO[Boolean] = {
     delay(map.remove(cultureid).isDefined)
@@ -86,7 +86,7 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
     }
   }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CultureFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, CultureFields.structure, map)
   }
   override def update(row: CultureRow): ConnectionIO[Boolean] = {
     delay {

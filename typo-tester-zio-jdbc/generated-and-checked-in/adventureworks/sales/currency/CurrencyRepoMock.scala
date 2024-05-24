@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
                        map: scala.collection.mutable.Map[CurrencyId, CurrencyRow] = scala.collection.mutable.Map.empty) extends CurrencyRepo {
   override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
-    DeleteBuilderMock(DeleteParams.empty, CurrencyFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, CurrencyFields.structure, map)
   }
   override def deleteById(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(currencycode).isDefined)
@@ -85,7 +85,7 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
     }
   }
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
-    UpdateBuilderMock(UpdateParams.empty, CurrencyFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, CurrencyFields.structure, map)
   }
   override def update(row: CurrencyRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

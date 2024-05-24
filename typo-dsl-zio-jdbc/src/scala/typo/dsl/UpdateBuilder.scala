@@ -3,25 +3,23 @@ package typo.dsl
 import zio.jdbc.*
 import zio.{Chunk, NonEmptyChunk, ZIO}
 
-import java.util.concurrent.atomic.AtomicInteger
-
-trait UpdateBuilder[Fields[_], Row] {
+trait UpdateBuilder[Fields, Row] {
   protected def params: UpdateParams[Fields, Row]
   protected def withParams(sqlParams: UpdateParams[Fields, Row]): UpdateBuilder[Fields, Row]
 
-  final def whereStrict(v: Fields[Row] => SqlExpr[Boolean, Required, Row]): UpdateBuilder[Fields, Row] =
+  final def whereStrict(v: Fields => SqlExpr[Boolean, Required]): UpdateBuilder[Fields, Row] =
     withParams(params.where(v))
 
-  final def where[N[_]: Nullability](v: Fields[Row] => SqlExpr[Boolean, N, Row]): UpdateBuilder[Fields, Row] =
+  final def where[N[_]: Nullability](v: Fields => SqlExpr[Boolean, N]): UpdateBuilder[Fields, Row] =
     withParams(params.where(f => v(f).?.coalesce(false)))
 
-  final def setValue[N[_], T](col: Fields[Row] => SqlExpr.FieldLikeNotId[T, N, Row])(value: N[T])(implicit E: JdbcEncoder[N[T]], P: ParameterMetaData[T]): UpdateBuilder[Fields, Row] =
-    withParams(params.set(col, _ => SqlExpr.Const[T, N, Row](value, E, P)))
+  final def setValue[N[_], T](col: Fields => SqlExpr.FieldLikeNotId[T, N, Row])(value: N[T])(implicit E: JdbcEncoder[N[T]], P: ParameterMetaData[T]): UpdateBuilder[Fields, Row] =
+    withParams(params.set(col, _ => SqlExpr.Const[T, N](value, E, P)))
 
-  final def setComputedValue[T, N[_]](col: Fields[Row] => SqlExpr.FieldLikeNotId[T, N, Row])(value: SqlExpr.FieldLikeNotId[T, N, Row] => SqlExpr[T, N, Row]): UpdateBuilder[Fields, Row] =
+  final def setComputedValue[T, N[_]](col: Fields => SqlExpr.FieldLikeNotId[T, N, Row])(value: SqlExpr.FieldLikeNotId[T, N, Row] => SqlExpr[T, N]): UpdateBuilder[Fields, Row] =
     withParams(params.set(col, fields => value(col(fields))))
 
-  final def setComputedValueFromRow[T, N[_]](col: Fields[Row] => SqlExpr.FieldLikeNotId[T, N, Row])(value: Fields[Row] => SqlExpr[T, N, Row]): UpdateBuilder[Fields, Row] =
+  final def setComputedValueFromRow[T, N[_]](col: Fields => SqlExpr.FieldLikeNotId[T, N, Row])(value: Fields => SqlExpr[T, N]): UpdateBuilder[Fields, Row] =
     withParams(params.set(col, value))
 
   def sql(returning: Boolean): Option[SqlFragment]
@@ -30,19 +28,19 @@ trait UpdateBuilder[Fields[_], Row] {
 }
 
 object UpdateBuilder {
-  def apply[Fields[_], Row](name: String, structure: Structure.Relation[Fields, ?, Row], rowParser: JdbcDecoder[Row]): UpdateBuilderSql[Fields, Row] =
+  def apply[Fields, Row](name: String, structure: Structure.Relation[Fields, Row], rowParser: JdbcDecoder[Row]): UpdateBuilderSql[Fields, Row] =
     UpdateBuilderSql(name, structure, rowParser, UpdateParams.empty)
 
-  final case class UpdateBuilderSql[Fields[_], Row](
+  final case class UpdateBuilderSql[Fields, Row](
       name: String,
-      structure: Structure.Relation[Fields, ?, Row],
+      structure: Structure.Relation[Fields, Row],
       decoder: JdbcDecoder[Row],
       params: UpdateParams[Fields, Row]
   ) extends UpdateBuilder[Fields, Row] {
     override def withParams(sqlParams: UpdateParams[Fields, Row]): UpdateBuilder[Fields, Row] =
       copy(params = sqlParams)
 
-    def mkSql(counter: AtomicInteger, returning: Boolean): SqlFragment = {
+    def mkSql(ctx: RenderCtx, returning: Boolean): SqlFragment = {
       Chunk[Option[SqlFragment]](
         Some(SqlFragment.update(name)),
         NonEmptyChunk.fromIterableOption(params.setters) match {
@@ -53,18 +51,18 @@ object UpdateBuilder {
               .map { setter =>
                 val fieldExpr = setter.col(structure.fields)
                 val valueExpr = setter.value(structure.fields)
-                sql"${fieldExpr.render(counter)} = ${valueExpr.render(counter)}${fieldExpr.sqlWriteCast.fold(SqlFragment.empty)(cast => SqlFragment(s"::$cast"))}"
+                sql"${fieldExpr.render(ctx)} = ${valueExpr.render(ctx)}${fieldExpr.sqlWriteCast.fold(SqlFragment.empty)(cast => SqlFragment(s"::$cast"))}"
               }
               .mkFragment(", ")
             Some(sql"SET $setFragments")
         },
         NonEmptyChunk.fromIterableOption(params.where).map { wheres =>
-          sql"WHERE ${wheres.toChunk.map { where => where(structure.fields).render(counter) }.mkFragment(" AND ")} "
+          sql"WHERE ${wheres.toChunk.map { where => where(structure.fields).render(ctx) }.mkFragment(" AND ")} "
         },
         if (returning) {
           val colFragments =
             structure.columns
-              .map { col => SqlFragment(col.sqlReadCast.foldLeft("\"" + col.value + "\"") { case (acc, cast) => s"$acc::$cast" }) }
+              .map { col => SqlFragment(col.sqlReadCast.foldLeft("\"" + col.value(ctx) + "\"") { case (acc, cast) => s"$acc::$cast" }) }
               .mkFragment(", ")
 
           Some(sql"returning $colFragments")
@@ -73,19 +71,20 @@ object UpdateBuilder {
     }
 
     override def sql(returning: Boolean): Option[SqlFragment] = {
-      Some(mkSql(new AtomicInteger(1), returning))
+      Some(mkSql(RenderCtx.Empty, returning))
     }
 
     override def execute: ZIO[ZConnection, Throwable, Long] =
-      mkSql(new AtomicInteger(0), returning = false).update
+      mkSql(RenderCtx.Empty, returning = false).update
 
     override def executeReturnChanged: ZIO[ZConnection, Throwable, Chunk[Row]] = {
-      mkSql(new AtomicInteger(0), returning = true).query[Row](using decoder).selectAll
+      mkSql(RenderCtx.Empty, returning = true).query[Row](using decoder).selectAll
     }
   }
-  final case class UpdateBuilderMock[Id, Fields[_], Row](
+
+  final case class UpdateBuilderMock[Id, Fields, Row](
       params: UpdateParams[Fields, Row],
-      fields: Fields[Row],
+      structure: Structure[Fields, Row],
       map: scala.collection.mutable.Map[Id, Row]
   ) extends UpdateBuilder[Fields, Row] {
     override def withParams(sqlParams: UpdateParams[Fields, Row]): UpdateBuilder[Fields, Row] =
@@ -99,8 +98,12 @@ object UpdateBuilder {
     override def executeReturnChanged: ZIO[ZConnection, Throwable, Chunk[Row]] = ZIO.succeed {
       val changed = Chunk.newBuilder[Row]
       map.foreach { case (id, row) =>
-        if (params.where.forall(w => w(fields).eval(row))) {
-          val newRow = params.setters.foldLeft(row) { case (row, set) => set.transform(fields, row) }
+        if (params.where.forall(w => structure.untypedEval(w(structure.fields), row))) {
+          val newRow = params.setters.foldLeft(row) { case (row, set: UpdateParams.Setter[Fields, nt, Row]) =>
+            val field: SqlExpr.FieldLikeNotIdNoHkt[nt, Row] = set.col(structure.fields)
+            val newValue: nt = structure.untypedEval(set.value(structure.fields), row)
+            field.set(row, newValue)
+          }
           map.update(id, newRow)
           changed += newRow
         }

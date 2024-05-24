@@ -9,42 +9,43 @@ package productphoto
 
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait ProductphotoFields[Row] {
-  val productphotoid: IdField[ProductphotoId, Row]
-  val thumbnailphoto: OptField[TypoBytea, Row]
-  val thumbnailphotofilename: OptField[/* max 50 chars */ String, Row]
-  val largephoto: OptField[TypoBytea, Row]
-  val largephotofilename: OptField[/* max 50 chars */ String, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait ProductphotoFields {
+  def productphotoid: IdField[ProductphotoId, ProductphotoRow]
+  def thumbnailphoto: OptField[TypoBytea, ProductphotoRow]
+  def thumbnailphotofilename: OptField[/* max 50 chars */ String, ProductphotoRow]
+  def largephoto: OptField[TypoBytea, ProductphotoRow]
+  def largephotofilename: OptField[/* max 50 chars */ String, ProductphotoRow]
+  def modifieddate: Field[TypoLocalDateTime, ProductphotoRow]
 }
 
 object ProductphotoFields {
-  val structure: Relation[ProductphotoFields, ProductphotoRow, ProductphotoRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[ProductphotoFields, ProductphotoRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => ProductphotoRow, val merge: (Row, ProductphotoRow) => Row)
-    extends Relation[ProductphotoFields, ProductphotoRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[ProductphotoFields, ProductphotoRow] {
   
-    override val fields: ProductphotoFields[Row] = new ProductphotoFields[Row] {
-      override val productphotoid = new IdField[ProductphotoId, Row](prefix, "productphotoid", None, Some("int4"))(x => extract(x).productphotoid, (row, value) => merge(row, extract(row).copy(productphotoid = value)))
-      override val thumbnailphoto = new OptField[TypoBytea, Row](prefix, "thumbnailphoto", None, Some("bytea"))(x => extract(x).thumbnailphoto, (row, value) => merge(row, extract(row).copy(thumbnailphoto = value)))
-      override val thumbnailphotofilename = new OptField[/* max 50 chars */ String, Row](prefix, "thumbnailphotofilename", None, None)(x => extract(x).thumbnailphotofilename, (row, value) => merge(row, extract(row).copy(thumbnailphotofilename = value)))
-      override val largephoto = new OptField[TypoBytea, Row](prefix, "largephoto", None, Some("bytea"))(x => extract(x).largephoto, (row, value) => merge(row, extract(row).copy(largephoto = value)))
-      override val largephotofilename = new OptField[/* max 50 chars */ String, Row](prefix, "largephotofilename", None, None)(x => extract(x).largephotofilename, (row, value) => merge(row, extract(row).copy(largephotofilename = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: ProductphotoFields = new ProductphotoFields {
+      override def productphotoid = IdField[ProductphotoId, ProductphotoRow](_path, "productphotoid", None, Some("int4"), x => x.productphotoid, (row, value) => row.copy(productphotoid = value))
+      override def thumbnailphoto = OptField[TypoBytea, ProductphotoRow](_path, "thumbnailphoto", None, Some("bytea"), x => x.thumbnailphoto, (row, value) => row.copy(thumbnailphoto = value))
+      override def thumbnailphotofilename = OptField[/* max 50 chars */ String, ProductphotoRow](_path, "thumbnailphotofilename", None, None, x => x.thumbnailphotofilename, (row, value) => row.copy(thumbnailphotofilename = value))
+      override def largephoto = OptField[TypoBytea, ProductphotoRow](_path, "largephoto", None, Some("bytea"), x => x.largephoto, (row, value) => row.copy(largephoto = value))
+      override def largephotofilename = OptField[/* max 50 chars */ String, ProductphotoRow](_path, "largephotofilename", None, None, x => x.largephotofilename, (row, value) => row.copy(largephotofilename = value))
+      override def modifieddate = Field[TypoLocalDateTime, ProductphotoRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.productphotoid, fields.thumbnailphoto, fields.thumbnailphotofilename, fields.largephoto, fields.largephotofilename, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, ProductphotoRow]] =
+      List[FieldLikeNoHkt[?, ProductphotoRow]](fields.productphotoid, fields.thumbnailphoto, fields.thumbnailphotofilename, fields.largephoto, fields.largephotofilename, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => ProductphotoRow, merge: (NewRow, ProductphotoRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

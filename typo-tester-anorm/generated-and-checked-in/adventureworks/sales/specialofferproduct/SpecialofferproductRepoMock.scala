@@ -22,7 +22,7 @@ import typo.dsl.UpdateParams
 class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved, SpecialofferproductRow],
                                   map: scala.collection.mutable.Map[SpecialofferproductId, SpecialofferproductRow] = scala.collection.mutable.Map.empty) extends SpecialofferproductRepo {
   override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SpecialofferproductFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, SpecialofferproductFields.structure, map)
   }
   override def deleteById(compositeId: SpecialofferproductId)(implicit c: Connection): Boolean = {
     map.remove(compositeId).isDefined
@@ -72,7 +72,7 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
     compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SpecialofferproductFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, SpecialofferproductFields.structure, map)
   }
   override def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {

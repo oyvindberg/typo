@@ -20,6 +20,7 @@ object TypesScala {
   val ListMap = sc.Type.Qualified("scala.collection.immutable.ListMap")
   val Long = sc.Type.Qualified("scala.Long")
   val Map = sc.Type.Qualified("scala.collection.immutable.Map")
+  val Nil = sc.Type.Qualified("scala.collection.immutable.Nil")
   val None = sc.Type.Qualified("scala.None")
   val Numeric = sc.Type.Qualified("scala.math.Numeric")
   val Option = sc.Type.Qualified("scala.Option")

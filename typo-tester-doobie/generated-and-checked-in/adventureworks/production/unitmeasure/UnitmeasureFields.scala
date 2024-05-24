@@ -9,35 +9,36 @@ package unitmeasure
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait UnitmeasureFields[Row] {
-  val unitmeasurecode: IdField[UnitmeasureId, Row]
-  val name: Field[Name, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait UnitmeasureFields {
+  def unitmeasurecode: IdField[UnitmeasureId, UnitmeasureRow]
+  def name: Field[Name, UnitmeasureRow]
+  def modifieddate: Field[TypoLocalDateTime, UnitmeasureRow]
 }
 
 object UnitmeasureFields {
-  val structure: Relation[UnitmeasureFields, UnitmeasureRow, UnitmeasureRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[UnitmeasureFields, UnitmeasureRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => UnitmeasureRow, val merge: (Row, UnitmeasureRow) => Row)
-    extends Relation[UnitmeasureFields, UnitmeasureRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[UnitmeasureFields, UnitmeasureRow] {
   
-    override val fields: UnitmeasureFields[Row] = new UnitmeasureFields[Row] {
-      override val unitmeasurecode = new IdField[UnitmeasureId, Row](prefix, "unitmeasurecode", None, Some("bpchar"))(x => extract(x).unitmeasurecode, (row, value) => merge(row, extract(row).copy(unitmeasurecode = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: UnitmeasureFields = new UnitmeasureFields {
+      override def unitmeasurecode = IdField[UnitmeasureId, UnitmeasureRow](_path, "unitmeasurecode", None, Some("bpchar"), x => x.unitmeasurecode, (row, value) => row.copy(unitmeasurecode = value))
+      override def name = Field[Name, UnitmeasureRow](_path, "name", None, Some("varchar"), x => x.name, (row, value) => row.copy(name = value))
+      override def modifieddate = Field[TypoLocalDateTime, UnitmeasureRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.unitmeasurecode, fields.name, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, UnitmeasureRow]] =
+      List[FieldLikeNoHkt[?, UnitmeasureRow]](fields.unitmeasurecode, fields.name, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => UnitmeasureRow, merge: (NewRow, UnitmeasureRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

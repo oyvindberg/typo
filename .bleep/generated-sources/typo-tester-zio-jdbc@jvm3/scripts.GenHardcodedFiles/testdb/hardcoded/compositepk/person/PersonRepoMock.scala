@@ -27,7 +27,7 @@ import zio.stream.ZStream
 class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
                      map: scala.collection.mutable.Map[PersonId, PersonRow] = scala.collection.mutable.Map.empty) extends PersonRepo {
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PersonFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, PersonFields.structure, map)
   }
   override def deleteById(compositeId: PersonId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
@@ -83,7 +83,7 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
     ZIO.succeed(map.get(compositeId))
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PersonFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, PersonFields.structure, map)
   }
   override def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

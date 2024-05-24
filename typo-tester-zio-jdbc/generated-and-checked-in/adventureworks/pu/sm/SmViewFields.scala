@@ -11,42 +11,43 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait SmViewFields[Row] {
-  val id: Field[ShipmethodId, Row]
-  val shipmethodid: Field[ShipmethodId, Row]
-  val name: Field[Name, Row]
-  val shipbase: Field[BigDecimal, Row]
-  val shiprate: Field[BigDecimal, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SmViewFields {
+  def id: Field[ShipmethodId, SmViewRow]
+  def shipmethodid: Field[ShipmethodId, SmViewRow]
+  def name: Field[Name, SmViewRow]
+  def shipbase: Field[BigDecimal, SmViewRow]
+  def shiprate: Field[BigDecimal, SmViewRow]
+  def rowguid: Field[TypoUUID, SmViewRow]
+  def modifieddate: Field[TypoLocalDateTime, SmViewRow]
 }
 
 object SmViewFields {
-  val structure: Relation[SmViewFields, SmViewRow, SmViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SmViewFields, SmViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SmViewRow, val merge: (Row, SmViewRow) => Row)
-    extends Relation[SmViewFields, SmViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SmViewFields, SmViewRow] {
   
-    override val fields: SmViewFields[Row] = new SmViewFields[Row] {
-      override val id = new Field[ShipmethodId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val shipmethodid = new Field[ShipmethodId, Row](prefix, "shipmethodid", None, None)(x => extract(x).shipmethodid, (row, value) => merge(row, extract(row).copy(shipmethodid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val shipbase = new Field[BigDecimal, Row](prefix, "shipbase", None, None)(x => extract(x).shipbase, (row, value) => merge(row, extract(row).copy(shipbase = value)))
-      override val shiprate = new Field[BigDecimal, Row](prefix, "shiprate", None, None)(x => extract(x).shiprate, (row, value) => merge(row, extract(row).copy(shiprate = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SmViewFields = new SmViewFields {
+      override def id = Field[ShipmethodId, SmViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def shipmethodid = Field[ShipmethodId, SmViewRow](_path, "shipmethodid", None, None, x => x.shipmethodid, (row, value) => row.copy(shipmethodid = value))
+      override def name = Field[Name, SmViewRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def shipbase = Field[BigDecimal, SmViewRow](_path, "shipbase", None, None, x => x.shipbase, (row, value) => row.copy(shipbase = value))
+      override def shiprate = Field[BigDecimal, SmViewRow](_path, "shiprate", None, None, x => x.shiprate, (row, value) => row.copy(shiprate = value))
+      override def rowguid = Field[TypoUUID, SmViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, SmViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.shipmethodid, fields.name, fields.shipbase, fields.shiprate, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SmViewRow]] =
+      List[FieldLikeNoHkt[?, SmViewRow]](fields.id, fields.shipmethodid, fields.name, fields.shipbase, fields.shiprate, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SmViewRow, merge: (NewRow, SmViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

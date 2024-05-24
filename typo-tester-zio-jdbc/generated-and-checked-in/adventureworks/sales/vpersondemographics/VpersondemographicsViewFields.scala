@@ -10,55 +10,56 @@ package vpersondemographics
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoMoney
 import adventureworks.person.businessentity.BusinessentityId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait VpersondemographicsViewFields[Row] {
-  val businessentityid: Field[BusinessentityId, Row]
-  val totalpurchaseytd: OptField[TypoMoney, Row]
-  val datefirstpurchase: OptField[TypoLocalDate, Row]
-  val birthdate: OptField[TypoLocalDate, Row]
-  val maritalstatus: OptField[/* max 1 chars */ String, Row]
-  val yearlyincome: OptField[/* max 30 chars */ String, Row]
-  val gender: OptField[/* max 1 chars */ String, Row]
-  val totalchildren: OptField[Int, Row]
-  val numberchildrenathome: OptField[Int, Row]
-  val education: OptField[/* max 30 chars */ String, Row]
-  val occupation: OptField[/* max 30 chars */ String, Row]
-  val homeownerflag: OptField[Boolean, Row]
-  val numbercarsowned: OptField[Int, Row]
+trait VpersondemographicsViewFields {
+  def businessentityid: Field[BusinessentityId, VpersondemographicsViewRow]
+  def totalpurchaseytd: OptField[TypoMoney, VpersondemographicsViewRow]
+  def datefirstpurchase: OptField[TypoLocalDate, VpersondemographicsViewRow]
+  def birthdate: OptField[TypoLocalDate, VpersondemographicsViewRow]
+  def maritalstatus: OptField[/* max 1 chars */ String, VpersondemographicsViewRow]
+  def yearlyincome: OptField[/* max 30 chars */ String, VpersondemographicsViewRow]
+  def gender: OptField[/* max 1 chars */ String, VpersondemographicsViewRow]
+  def totalchildren: OptField[Int, VpersondemographicsViewRow]
+  def numberchildrenathome: OptField[Int, VpersondemographicsViewRow]
+  def education: OptField[/* max 30 chars */ String, VpersondemographicsViewRow]
+  def occupation: OptField[/* max 30 chars */ String, VpersondemographicsViewRow]
+  def homeownerflag: OptField[Boolean, VpersondemographicsViewRow]
+  def numbercarsowned: OptField[Int, VpersondemographicsViewRow]
 }
 
 object VpersondemographicsViewFields {
-  val structure: Relation[VpersondemographicsViewFields, VpersondemographicsViewRow, VpersondemographicsViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[VpersondemographicsViewFields, VpersondemographicsViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => VpersondemographicsViewRow, val merge: (Row, VpersondemographicsViewRow) => Row)
-    extends Relation[VpersondemographicsViewFields, VpersondemographicsViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[VpersondemographicsViewFields, VpersondemographicsViewRow] {
   
-    override val fields: VpersondemographicsViewFields[Row] = new VpersondemographicsViewFields[Row] {
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val totalpurchaseytd = new OptField[TypoMoney, Row](prefix, "totalpurchaseytd", Some("numeric"), None)(x => extract(x).totalpurchaseytd, (row, value) => merge(row, extract(row).copy(totalpurchaseytd = value)))
-      override val datefirstpurchase = new OptField[TypoLocalDate, Row](prefix, "datefirstpurchase", Some("text"), None)(x => extract(x).datefirstpurchase, (row, value) => merge(row, extract(row).copy(datefirstpurchase = value)))
-      override val birthdate = new OptField[TypoLocalDate, Row](prefix, "birthdate", Some("text"), None)(x => extract(x).birthdate, (row, value) => merge(row, extract(row).copy(birthdate = value)))
-      override val maritalstatus = new OptField[/* max 1 chars */ String, Row](prefix, "maritalstatus", None, None)(x => extract(x).maritalstatus, (row, value) => merge(row, extract(row).copy(maritalstatus = value)))
-      override val yearlyincome = new OptField[/* max 30 chars */ String, Row](prefix, "yearlyincome", None, None)(x => extract(x).yearlyincome, (row, value) => merge(row, extract(row).copy(yearlyincome = value)))
-      override val gender = new OptField[/* max 1 chars */ String, Row](prefix, "gender", None, None)(x => extract(x).gender, (row, value) => merge(row, extract(row).copy(gender = value)))
-      override val totalchildren = new OptField[Int, Row](prefix, "totalchildren", None, None)(x => extract(x).totalchildren, (row, value) => merge(row, extract(row).copy(totalchildren = value)))
-      override val numberchildrenathome = new OptField[Int, Row](prefix, "numberchildrenathome", None, None)(x => extract(x).numberchildrenathome, (row, value) => merge(row, extract(row).copy(numberchildrenathome = value)))
-      override val education = new OptField[/* max 30 chars */ String, Row](prefix, "education", None, None)(x => extract(x).education, (row, value) => merge(row, extract(row).copy(education = value)))
-      override val occupation = new OptField[/* max 30 chars */ String, Row](prefix, "occupation", None, None)(x => extract(x).occupation, (row, value) => merge(row, extract(row).copy(occupation = value)))
-      override val homeownerflag = new OptField[Boolean, Row](prefix, "homeownerflag", None, None)(x => extract(x).homeownerflag, (row, value) => merge(row, extract(row).copy(homeownerflag = value)))
-      override val numbercarsowned = new OptField[Int, Row](prefix, "numbercarsowned", None, None)(x => extract(x).numbercarsowned, (row, value) => merge(row, extract(row).copy(numbercarsowned = value)))
+    override lazy val fields: VpersondemographicsViewFields = new VpersondemographicsViewFields {
+      override def businessentityid = Field[BusinessentityId, VpersondemographicsViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def totalpurchaseytd = OptField[TypoMoney, VpersondemographicsViewRow](_path, "totalpurchaseytd", Some("numeric"), None, x => x.totalpurchaseytd, (row, value) => row.copy(totalpurchaseytd = value))
+      override def datefirstpurchase = OptField[TypoLocalDate, VpersondemographicsViewRow](_path, "datefirstpurchase", Some("text"), None, x => x.datefirstpurchase, (row, value) => row.copy(datefirstpurchase = value))
+      override def birthdate = OptField[TypoLocalDate, VpersondemographicsViewRow](_path, "birthdate", Some("text"), None, x => x.birthdate, (row, value) => row.copy(birthdate = value))
+      override def maritalstatus = OptField[/* max 1 chars */ String, VpersondemographicsViewRow](_path, "maritalstatus", None, None, x => x.maritalstatus, (row, value) => row.copy(maritalstatus = value))
+      override def yearlyincome = OptField[/* max 30 chars */ String, VpersondemographicsViewRow](_path, "yearlyincome", None, None, x => x.yearlyincome, (row, value) => row.copy(yearlyincome = value))
+      override def gender = OptField[/* max 1 chars */ String, VpersondemographicsViewRow](_path, "gender", None, None, x => x.gender, (row, value) => row.copy(gender = value))
+      override def totalchildren = OptField[Int, VpersondemographicsViewRow](_path, "totalchildren", None, None, x => x.totalchildren, (row, value) => row.copy(totalchildren = value))
+      override def numberchildrenathome = OptField[Int, VpersondemographicsViewRow](_path, "numberchildrenathome", None, None, x => x.numberchildrenathome, (row, value) => row.copy(numberchildrenathome = value))
+      override def education = OptField[/* max 30 chars */ String, VpersondemographicsViewRow](_path, "education", None, None, x => x.education, (row, value) => row.copy(education = value))
+      override def occupation = OptField[/* max 30 chars */ String, VpersondemographicsViewRow](_path, "occupation", None, None, x => x.occupation, (row, value) => row.copy(occupation = value))
+      override def homeownerflag = OptField[Boolean, VpersondemographicsViewRow](_path, "homeownerflag", None, None, x => x.homeownerflag, (row, value) => row.copy(homeownerflag = value))
+      override def numbercarsowned = OptField[Int, VpersondemographicsViewRow](_path, "numbercarsowned", None, None, x => x.numbercarsowned, (row, value) => row.copy(numbercarsowned = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.businessentityid, fields.totalpurchaseytd, fields.datefirstpurchase, fields.birthdate, fields.maritalstatus, fields.yearlyincome, fields.gender, fields.totalchildren, fields.numberchildrenathome, fields.education, fields.occupation, fields.homeownerflag, fields.numbercarsowned)
+    override lazy val columns: List[FieldLikeNoHkt[?, VpersondemographicsViewRow]] =
+      List[FieldLikeNoHkt[?, VpersondemographicsViewRow]](fields.businessentityid, fields.totalpurchaseytd, fields.datefirstpurchase, fields.birthdate, fields.maritalstatus, fields.yearlyincome, fields.gender, fields.totalchildren, fields.numberchildrenathome, fields.education, fields.occupation, fields.homeownerflag, fields.numbercarsowned)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => VpersondemographicsViewRow, merge: (NewRow, VpersondemographicsViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

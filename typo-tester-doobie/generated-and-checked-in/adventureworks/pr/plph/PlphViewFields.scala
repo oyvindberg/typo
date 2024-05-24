@@ -9,41 +9,42 @@ package plph
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait PlphViewFields[Row] {
-  val id: Field[ProductId, Row]
-  val productid: Field[ProductId, Row]
-  val startdate: Field[TypoLocalDateTime, Row]
-  val enddate: OptField[TypoLocalDateTime, Row]
-  val listprice: Field[BigDecimal, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait PlphViewFields {
+  def id: Field[ProductId, PlphViewRow]
+  def productid: Field[ProductId, PlphViewRow]
+  def startdate: Field[TypoLocalDateTime, PlphViewRow]
+  def enddate: OptField[TypoLocalDateTime, PlphViewRow]
+  def listprice: Field[BigDecimal, PlphViewRow]
+  def modifieddate: Field[TypoLocalDateTime, PlphViewRow]
 }
 
 object PlphViewFields {
-  val structure: Relation[PlphViewFields, PlphViewRow, PlphViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PlphViewFields, PlphViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PlphViewRow, val merge: (Row, PlphViewRow) => Row)
-    extends Relation[PlphViewFields, PlphViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PlphViewFields, PlphViewRow] {
   
-    override val fields: PlphViewFields[Row] = new PlphViewFields[Row] {
-      override val id = new Field[ProductId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val startdate = new Field[TypoLocalDateTime, Row](prefix, "startdate", Some("text"), None)(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
-      override val enddate = new OptField[TypoLocalDateTime, Row](prefix, "enddate", Some("text"), None)(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
-      override val listprice = new Field[BigDecimal, Row](prefix, "listprice", None, None)(x => extract(x).listprice, (row, value) => merge(row, extract(row).copy(listprice = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: PlphViewFields = new PlphViewFields {
+      override def id = Field[ProductId, PlphViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def productid = Field[ProductId, PlphViewRow](_path, "productid", None, None, x => x.productid, (row, value) => row.copy(productid = value))
+      override def startdate = Field[TypoLocalDateTime, PlphViewRow](_path, "startdate", Some("text"), None, x => x.startdate, (row, value) => row.copy(startdate = value))
+      override def enddate = OptField[TypoLocalDateTime, PlphViewRow](_path, "enddate", Some("text"), None, x => x.enddate, (row, value) => row.copy(enddate = value))
+      override def listprice = Field[BigDecimal, PlphViewRow](_path, "listprice", None, None, x => x.listprice, (row, value) => row.copy(listprice = value))
+      override def modifieddate = Field[TypoLocalDateTime, PlphViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.productid, fields.startdate, fields.enddate, fields.listprice, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, PlphViewRow]] =
+      List[FieldLikeNoHkt[?, PlphViewRow]](fields.id, fields.productid, fields.startdate, fields.enddate, fields.listprice, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PlphViewRow, merge: (NewRow, PlphViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

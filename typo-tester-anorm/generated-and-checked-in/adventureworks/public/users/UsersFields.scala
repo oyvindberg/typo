@@ -9,44 +9,45 @@ package users
 
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait UsersFields[Row] {
-  val userId: IdField[UsersId, Row]
-  val name: Field[String, Row]
-  val lastName: OptField[String, Row]
-  val email: Field[TypoUnknownCitext, Row]
-  val password: Field[String, Row]
-  val createdAt: Field[TypoInstant, Row]
-  val verifiedOn: OptField[TypoInstant, Row]
+trait UsersFields {
+  def userId: IdField[UsersId, UsersRow]
+  def name: Field[String, UsersRow]
+  def lastName: OptField[String, UsersRow]
+  def email: Field[TypoUnknownCitext, UsersRow]
+  def password: Field[String, UsersRow]
+  def createdAt: Field[TypoInstant, UsersRow]
+  def verifiedOn: OptField[TypoInstant, UsersRow]
 }
 
 object UsersFields {
-  val structure: Relation[UsersFields, UsersRow, UsersRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[UsersFields, UsersRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => UsersRow, val merge: (Row, UsersRow) => Row)
-    extends Relation[UsersFields, UsersRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[UsersFields, UsersRow] {
   
-    override val fields: UsersFields[Row] = new UsersFields[Row] {
-      override val userId = new IdField[UsersId, Row](prefix, "user_id", None, Some("uuid"))(x => extract(x).userId, (row, value) => merge(row, extract(row).copy(userId = value)))
-      override val name = new Field[String, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val lastName = new OptField[String, Row](prefix, "last_name", None, None)(x => extract(x).lastName, (row, value) => merge(row, extract(row).copy(lastName = value)))
-      override val email = new Field[TypoUnknownCitext, Row](prefix, "email", Some("text"), Some("citext"))(x => extract(x).email, (row, value) => merge(row, extract(row).copy(email = value)))
-      override val password = new Field[String, Row](prefix, "password", None, None)(x => extract(x).password, (row, value) => merge(row, extract(row).copy(password = value)))
-      override val createdAt = new Field[TypoInstant, Row](prefix, "created_at", Some("text"), Some("timestamptz"))(x => extract(x).createdAt, (row, value) => merge(row, extract(row).copy(createdAt = value)))
-      override val verifiedOn = new OptField[TypoInstant, Row](prefix, "verified_on", Some("text"), Some("timestamptz"))(x => extract(x).verifiedOn, (row, value) => merge(row, extract(row).copy(verifiedOn = value)))
+    override lazy val fields: UsersFields = new UsersFields {
+      override def userId = IdField[UsersId, UsersRow](_path, "user_id", None, Some("uuid"), x => x.userId, (row, value) => row.copy(userId = value))
+      override def name = Field[String, UsersRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def lastName = OptField[String, UsersRow](_path, "last_name", None, None, x => x.lastName, (row, value) => row.copy(lastName = value))
+      override def email = Field[TypoUnknownCitext, UsersRow](_path, "email", Some("text"), Some("citext"), x => x.email, (row, value) => row.copy(email = value))
+      override def password = Field[String, UsersRow](_path, "password", None, None, x => x.password, (row, value) => row.copy(password = value))
+      override def createdAt = Field[TypoInstant, UsersRow](_path, "created_at", Some("text"), Some("timestamptz"), x => x.createdAt, (row, value) => row.copy(createdAt = value))
+      override def verifiedOn = OptField[TypoInstant, UsersRow](_path, "verified_on", Some("text"), Some("timestamptz"), x => x.verifiedOn, (row, value) => row.copy(verifiedOn = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.userId, fields.name, fields.lastName, fields.email, fields.password, fields.createdAt, fields.verifiedOn)
+    override lazy val columns: List[FieldLikeNoHkt[?, UsersRow]] =
+      List[FieldLikeNoHkt[?, UsersRow]](fields.userId, fields.name, fields.lastName, fields.email, fields.password, fields.createdAt, fields.verifiedOn)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => UsersRow, merge: (NewRow, UsersRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

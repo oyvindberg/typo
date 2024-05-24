@@ -24,7 +24,7 @@ import typo.dsl.UpdateParams
 class ProductRepoMock(toRow: Function1[ProductRowUnsaved, ProductRow],
                       map: scala.collection.mutable.Map[ProductId, ProductRow] = scala.collection.mutable.Map.empty) extends ProductRepo {
   override def delete: DeleteBuilder[ProductFields, ProductRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ProductFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, ProductFields.structure, map)
   }
   override def deleteById(productid: ProductId): ConnectionIO[Boolean] = {
     delay(map.remove(productid).isDefined)
@@ -86,7 +86,7 @@ class ProductRepoMock(toRow: Function1[ProductRowUnsaved, ProductRow],
     }
   }
   override def update: UpdateBuilder[ProductFields, ProductRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ProductFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, ProductFields.structure, map)
   }
   override def update(row: ProductRow): ConnectionIO[Boolean] = {
     delay {

@@ -11,48 +11,49 @@ import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait AddressFields[Row] {
-  val addressid: IdField[AddressId, Row]
-  val addressline1: Field[/* max 60 chars */ String, Row]
-  val addressline2: OptField[/* max 60 chars */ String, Row]
-  val city: Field[/* max 30 chars */ String, Row]
-  val stateprovinceid: Field[StateprovinceId, Row]
-  val postalcode: Field[/* max 15 chars */ String, Row]
-  val spatiallocation: OptField[TypoBytea, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait AddressFields {
+  def addressid: IdField[AddressId, AddressRow]
+  def addressline1: Field[/* max 60 chars */ String, AddressRow]
+  def addressline2: OptField[/* max 60 chars */ String, AddressRow]
+  def city: Field[/* max 30 chars */ String, AddressRow]
+  def stateprovinceid: Field[StateprovinceId, AddressRow]
+  def postalcode: Field[/* max 15 chars */ String, AddressRow]
+  def spatiallocation: OptField[TypoBytea, AddressRow]
+  def rowguid: Field[TypoUUID, AddressRow]
+  def modifieddate: Field[TypoLocalDateTime, AddressRow]
 }
 
 object AddressFields {
-  val structure: Relation[AddressFields, AddressRow, AddressRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[AddressFields, AddressRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => AddressRow, val merge: (Row, AddressRow) => Row)
-    extends Relation[AddressFields, AddressRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[AddressFields, AddressRow] {
   
-    override val fields: AddressFields[Row] = new AddressFields[Row] {
-      override val addressid = new IdField[AddressId, Row](prefix, "addressid", None, Some("int4"))(x => extract(x).addressid, (row, value) => merge(row, extract(row).copy(addressid = value)))
-      override val addressline1 = new Field[/* max 60 chars */ String, Row](prefix, "addressline1", None, None)(x => extract(x).addressline1, (row, value) => merge(row, extract(row).copy(addressline1 = value)))
-      override val addressline2 = new OptField[/* max 60 chars */ String, Row](prefix, "addressline2", None, None)(x => extract(x).addressline2, (row, value) => merge(row, extract(row).copy(addressline2 = value)))
-      override val city = new Field[/* max 30 chars */ String, Row](prefix, "city", None, None)(x => extract(x).city, (row, value) => merge(row, extract(row).copy(city = value)))
-      override val stateprovinceid = new Field[StateprovinceId, Row](prefix, "stateprovinceid", None, Some("int4"))(x => extract(x).stateprovinceid, (row, value) => merge(row, extract(row).copy(stateprovinceid = value)))
-      override val postalcode = new Field[/* max 15 chars */ String, Row](prefix, "postalcode", None, None)(x => extract(x).postalcode, (row, value) => merge(row, extract(row).copy(postalcode = value)))
-      override val spatiallocation = new OptField[TypoBytea, Row](prefix, "spatiallocation", None, Some("bytea"))(x => extract(x).spatiallocation, (row, value) => merge(row, extract(row).copy(spatiallocation = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: AddressFields = new AddressFields {
+      override def addressid = IdField[AddressId, AddressRow](_path, "addressid", None, Some("int4"), x => x.addressid, (row, value) => row.copy(addressid = value))
+      override def addressline1 = Field[/* max 60 chars */ String, AddressRow](_path, "addressline1", None, None, x => x.addressline1, (row, value) => row.copy(addressline1 = value))
+      override def addressline2 = OptField[/* max 60 chars */ String, AddressRow](_path, "addressline2", None, None, x => x.addressline2, (row, value) => row.copy(addressline2 = value))
+      override def city = Field[/* max 30 chars */ String, AddressRow](_path, "city", None, None, x => x.city, (row, value) => row.copy(city = value))
+      override def stateprovinceid = Field[StateprovinceId, AddressRow](_path, "stateprovinceid", None, Some("int4"), x => x.stateprovinceid, (row, value) => row.copy(stateprovinceid = value))
+      override def postalcode = Field[/* max 15 chars */ String, AddressRow](_path, "postalcode", None, None, x => x.postalcode, (row, value) => row.copy(postalcode = value))
+      override def spatiallocation = OptField[TypoBytea, AddressRow](_path, "spatiallocation", None, Some("bytea"), x => x.spatiallocation, (row, value) => row.copy(spatiallocation = value))
+      override def rowguid = Field[TypoUUID, AddressRow](_path, "rowguid", None, Some("uuid"), x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, AddressRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.addressid, fields.addressline1, fields.addressline2, fields.city, fields.stateprovinceid, fields.postalcode, fields.spatiallocation, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, AddressRow]] =
+      List[FieldLikeNoHkt[?, AddressRow]](fields.addressid, fields.addressline1, fields.addressline2, fields.city, fields.stateprovinceid, fields.postalcode, fields.spatiallocation, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => AddressRow, merge: (NewRow, AddressRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

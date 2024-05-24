@@ -9,37 +9,38 @@ package department
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait DepartmentFields[Row] {
-  val departmentid: IdField[DepartmentId, Row]
-  val name: Field[Name, Row]
-  val groupname: Field[Name, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait DepartmentFields {
+  def departmentid: IdField[DepartmentId, DepartmentRow]
+  def name: Field[Name, DepartmentRow]
+  def groupname: Field[Name, DepartmentRow]
+  def modifieddate: Field[TypoLocalDateTime, DepartmentRow]
 }
 
 object DepartmentFields {
-  val structure: Relation[DepartmentFields, DepartmentRow, DepartmentRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[DepartmentFields, DepartmentRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => DepartmentRow, val merge: (Row, DepartmentRow) => Row)
-    extends Relation[DepartmentFields, DepartmentRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[DepartmentFields, DepartmentRow] {
   
-    override val fields: DepartmentFields[Row] = new DepartmentFields[Row] {
-      override val departmentid = new IdField[DepartmentId, Row](prefix, "departmentid", None, Some("int4"))(x => extract(x).departmentid, (row, value) => merge(row, extract(row).copy(departmentid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val groupname = new Field[Name, Row](prefix, "groupname", None, Some("varchar"))(x => extract(x).groupname, (row, value) => merge(row, extract(row).copy(groupname = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: DepartmentFields = new DepartmentFields {
+      override def departmentid = IdField[DepartmentId, DepartmentRow](_path, "departmentid", None, Some("int4"), x => x.departmentid, (row, value) => row.copy(departmentid = value))
+      override def name = Field[Name, DepartmentRow](_path, "name", None, Some("varchar"), x => x.name, (row, value) => row.copy(name = value))
+      override def groupname = Field[Name, DepartmentRow](_path, "groupname", None, Some("varchar"), x => x.groupname, (row, value) => row.copy(groupname = value))
+      override def modifieddate = Field[TypoLocalDateTime, DepartmentRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.departmentid, fields.name, fields.groupname, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, DepartmentRow]] =
+      List[FieldLikeNoHkt[?, DepartmentRow]](fields.departmentid, fields.name, fields.groupname, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => DepartmentRow, merge: (NewRow, DepartmentRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

@@ -13,46 +13,47 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait VendorFields[Row] {
-  val businessentityid: IdField[BusinessentityId, Row]
-  val accountnumber: Field[AccountNumber, Row]
-  val name: Field[Name, Row]
-  val creditrating: Field[TypoShort, Row]
-  val preferredvendorstatus: Field[Flag, Row]
-  val activeflag: Field[Flag, Row]
-  val purchasingwebserviceurl: OptField[/* max 1024 chars */ String, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait VendorFields {
+  def businessentityid: IdField[BusinessentityId, VendorRow]
+  def accountnumber: Field[AccountNumber, VendorRow]
+  def name: Field[Name, VendorRow]
+  def creditrating: Field[TypoShort, VendorRow]
+  def preferredvendorstatus: Field[Flag, VendorRow]
+  def activeflag: Field[Flag, VendorRow]
+  def purchasingwebserviceurl: OptField[/* max 1024 chars */ String, VendorRow]
+  def modifieddate: Field[TypoLocalDateTime, VendorRow]
 }
 
 object VendorFields {
-  val structure: Relation[VendorFields, VendorRow, VendorRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[VendorFields, VendorRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => VendorRow, val merge: (Row, VendorRow) => Row)
-    extends Relation[VendorFields, VendorRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[VendorFields, VendorRow] {
   
-    override val fields: VendorFields[Row] = new VendorFields[Row] {
-      override val businessentityid = new IdField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val accountnumber = new Field[AccountNumber, Row](prefix, "accountnumber", None, Some("varchar"))(x => extract(x).accountnumber, (row, value) => merge(row, extract(row).copy(accountnumber = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val creditrating = new Field[TypoShort, Row](prefix, "creditrating", None, Some("int2"))(x => extract(x).creditrating, (row, value) => merge(row, extract(row).copy(creditrating = value)))
-      override val preferredvendorstatus = new Field[Flag, Row](prefix, "preferredvendorstatus", None, Some("bool"))(x => extract(x).preferredvendorstatus, (row, value) => merge(row, extract(row).copy(preferredvendorstatus = value)))
-      override val activeflag = new Field[Flag, Row](prefix, "activeflag", None, Some("bool"))(x => extract(x).activeflag, (row, value) => merge(row, extract(row).copy(activeflag = value)))
-      override val purchasingwebserviceurl = new OptField[/* max 1024 chars */ String, Row](prefix, "purchasingwebserviceurl", None, None)(x => extract(x).purchasingwebserviceurl, (row, value) => merge(row, extract(row).copy(purchasingwebserviceurl = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: VendorFields = new VendorFields {
+      override def businessentityid = IdField[BusinessentityId, VendorRow](_path, "businessentityid", None, Some("int4"), x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def accountnumber = Field[AccountNumber, VendorRow](_path, "accountnumber", None, Some("varchar"), x => x.accountnumber, (row, value) => row.copy(accountnumber = value))
+      override def name = Field[Name, VendorRow](_path, "name", None, Some("varchar"), x => x.name, (row, value) => row.copy(name = value))
+      override def creditrating = Field[TypoShort, VendorRow](_path, "creditrating", None, Some("int2"), x => x.creditrating, (row, value) => row.copy(creditrating = value))
+      override def preferredvendorstatus = Field[Flag, VendorRow](_path, "preferredvendorstatus", None, Some("bool"), x => x.preferredvendorstatus, (row, value) => row.copy(preferredvendorstatus = value))
+      override def activeflag = Field[Flag, VendorRow](_path, "activeflag", None, Some("bool"), x => x.activeflag, (row, value) => row.copy(activeflag = value))
+      override def purchasingwebserviceurl = OptField[/* max 1024 chars */ String, VendorRow](_path, "purchasingwebserviceurl", None, None, x => x.purchasingwebserviceurl, (row, value) => row.copy(purchasingwebserviceurl = value))
+      override def modifieddate = Field[TypoLocalDateTime, VendorRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.businessentityid, fields.accountnumber, fields.name, fields.creditrating, fields.preferredvendorstatus, fields.activeflag, fields.purchasingwebserviceurl, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, VendorRow]] =
+      List[FieldLikeNoHkt[?, VendorRow]](fields.businessentityid, fields.accountnumber, fields.name, fields.creditrating, fields.preferredvendorstatus, fields.activeflag, fields.purchasingwebserviceurl, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => VendorRow, merge: (NewRow, VendorRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

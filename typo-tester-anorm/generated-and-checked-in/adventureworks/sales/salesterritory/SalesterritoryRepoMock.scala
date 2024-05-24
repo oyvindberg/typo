@@ -22,7 +22,7 @@ import typo.dsl.UpdateParams
 class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, SalesterritoryRow],
                              map: scala.collection.mutable.Map[SalesterritoryId, SalesterritoryRow] = scala.collection.mutable.Map.empty) extends SalesterritoryRepo {
   override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields.structure, map)
   }
   override def deleteById(territoryid: SalesterritoryId)(implicit c: Connection): Boolean = {
     map.remove(territoryid).isDefined
@@ -72,7 +72,7 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     territoryids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields.structure, map)
   }
   override def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
     map.get(row.territoryid) match {

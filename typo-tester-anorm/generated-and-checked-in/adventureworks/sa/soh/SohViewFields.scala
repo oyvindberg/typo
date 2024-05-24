@@ -21,81 +21,82 @@ import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import adventureworks.userdefined.CustomCreditcardId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait SohViewFields[Row] {
-  val id: Field[SalesorderheaderId, Row]
-  val salesorderid: Field[SalesorderheaderId, Row]
-  val revisionnumber: Field[TypoShort, Row]
-  val orderdate: Field[TypoLocalDateTime, Row]
-  val duedate: Field[TypoLocalDateTime, Row]
-  val shipdate: OptField[TypoLocalDateTime, Row]
-  val status: Field[TypoShort, Row]
-  val onlineorderflag: Field[Flag, Row]
-  val purchaseordernumber: OptField[OrderNumber, Row]
-  val accountnumber: OptField[AccountNumber, Row]
-  val customerid: Field[CustomerId, Row]
-  val salespersonid: OptField[BusinessentityId, Row]
-  val territoryid: OptField[SalesterritoryId, Row]
-  val billtoaddressid: Field[AddressId, Row]
-  val shiptoaddressid: Field[AddressId, Row]
-  val shipmethodid: Field[ShipmethodId, Row]
-  val creditcardid: OptField[/* user-picked */ CustomCreditcardId, Row]
-  val creditcardapprovalcode: OptField[/* max 15 chars */ String, Row]
-  val currencyrateid: OptField[CurrencyrateId, Row]
-  val subtotal: Field[BigDecimal, Row]
-  val taxamt: Field[BigDecimal, Row]
-  val freight: Field[BigDecimal, Row]
-  val totaldue: OptField[BigDecimal, Row]
-  val comment: OptField[/* max 128 chars */ String, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SohViewFields {
+  def id: Field[SalesorderheaderId, SohViewRow]
+  def salesorderid: Field[SalesorderheaderId, SohViewRow]
+  def revisionnumber: Field[TypoShort, SohViewRow]
+  def orderdate: Field[TypoLocalDateTime, SohViewRow]
+  def duedate: Field[TypoLocalDateTime, SohViewRow]
+  def shipdate: OptField[TypoLocalDateTime, SohViewRow]
+  def status: Field[TypoShort, SohViewRow]
+  def onlineorderflag: Field[Flag, SohViewRow]
+  def purchaseordernumber: OptField[OrderNumber, SohViewRow]
+  def accountnumber: OptField[AccountNumber, SohViewRow]
+  def customerid: Field[CustomerId, SohViewRow]
+  def salespersonid: OptField[BusinessentityId, SohViewRow]
+  def territoryid: OptField[SalesterritoryId, SohViewRow]
+  def billtoaddressid: Field[AddressId, SohViewRow]
+  def shiptoaddressid: Field[AddressId, SohViewRow]
+  def shipmethodid: Field[ShipmethodId, SohViewRow]
+  def creditcardid: OptField[/* user-picked */ CustomCreditcardId, SohViewRow]
+  def creditcardapprovalcode: OptField[/* max 15 chars */ String, SohViewRow]
+  def currencyrateid: OptField[CurrencyrateId, SohViewRow]
+  def subtotal: Field[BigDecimal, SohViewRow]
+  def taxamt: Field[BigDecimal, SohViewRow]
+  def freight: Field[BigDecimal, SohViewRow]
+  def totaldue: OptField[BigDecimal, SohViewRow]
+  def comment: OptField[/* max 128 chars */ String, SohViewRow]
+  def rowguid: Field[TypoUUID, SohViewRow]
+  def modifieddate: Field[TypoLocalDateTime, SohViewRow]
 }
 
 object SohViewFields {
-  val structure: Relation[SohViewFields, SohViewRow, SohViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SohViewFields, SohViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SohViewRow, val merge: (Row, SohViewRow) => Row)
-    extends Relation[SohViewFields, SohViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SohViewFields, SohViewRow] {
   
-    override val fields: SohViewFields[Row] = new SohViewFields[Row] {
-      override val id = new Field[SalesorderheaderId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val salesorderid = new Field[SalesorderheaderId, Row](prefix, "salesorderid", None, None)(x => extract(x).salesorderid, (row, value) => merge(row, extract(row).copy(salesorderid = value)))
-      override val revisionnumber = new Field[TypoShort, Row](prefix, "revisionnumber", None, None)(x => extract(x).revisionnumber, (row, value) => merge(row, extract(row).copy(revisionnumber = value)))
-      override val orderdate = new Field[TypoLocalDateTime, Row](prefix, "orderdate", Some("text"), None)(x => extract(x).orderdate, (row, value) => merge(row, extract(row).copy(orderdate = value)))
-      override val duedate = new Field[TypoLocalDateTime, Row](prefix, "duedate", Some("text"), None)(x => extract(x).duedate, (row, value) => merge(row, extract(row).copy(duedate = value)))
-      override val shipdate = new OptField[TypoLocalDateTime, Row](prefix, "shipdate", Some("text"), None)(x => extract(x).shipdate, (row, value) => merge(row, extract(row).copy(shipdate = value)))
-      override val status = new Field[TypoShort, Row](prefix, "status", None, None)(x => extract(x).status, (row, value) => merge(row, extract(row).copy(status = value)))
-      override val onlineorderflag = new Field[Flag, Row](prefix, "onlineorderflag", None, None)(x => extract(x).onlineorderflag, (row, value) => merge(row, extract(row).copy(onlineorderflag = value)))
-      override val purchaseordernumber = new OptField[OrderNumber, Row](prefix, "purchaseordernumber", None, None)(x => extract(x).purchaseordernumber, (row, value) => merge(row, extract(row).copy(purchaseordernumber = value)))
-      override val accountnumber = new OptField[AccountNumber, Row](prefix, "accountnumber", None, None)(x => extract(x).accountnumber, (row, value) => merge(row, extract(row).copy(accountnumber = value)))
-      override val customerid = new Field[CustomerId, Row](prefix, "customerid", None, None)(x => extract(x).customerid, (row, value) => merge(row, extract(row).copy(customerid = value)))
-      override val salespersonid = new OptField[BusinessentityId, Row](prefix, "salespersonid", None, None)(x => extract(x).salespersonid, (row, value) => merge(row, extract(row).copy(salespersonid = value)))
-      override val territoryid = new OptField[SalesterritoryId, Row](prefix, "territoryid", None, None)(x => extract(x).territoryid, (row, value) => merge(row, extract(row).copy(territoryid = value)))
-      override val billtoaddressid = new Field[AddressId, Row](prefix, "billtoaddressid", None, None)(x => extract(x).billtoaddressid, (row, value) => merge(row, extract(row).copy(billtoaddressid = value)))
-      override val shiptoaddressid = new Field[AddressId, Row](prefix, "shiptoaddressid", None, None)(x => extract(x).shiptoaddressid, (row, value) => merge(row, extract(row).copy(shiptoaddressid = value)))
-      override val shipmethodid = new Field[ShipmethodId, Row](prefix, "shipmethodid", None, None)(x => extract(x).shipmethodid, (row, value) => merge(row, extract(row).copy(shipmethodid = value)))
-      override val creditcardid = new OptField[/* user-picked */ CustomCreditcardId, Row](prefix, "creditcardid", None, None)(x => extract(x).creditcardid, (row, value) => merge(row, extract(row).copy(creditcardid = value)))
-      override val creditcardapprovalcode = new OptField[/* max 15 chars */ String, Row](prefix, "creditcardapprovalcode", None, None)(x => extract(x).creditcardapprovalcode, (row, value) => merge(row, extract(row).copy(creditcardapprovalcode = value)))
-      override val currencyrateid = new OptField[CurrencyrateId, Row](prefix, "currencyrateid", None, None)(x => extract(x).currencyrateid, (row, value) => merge(row, extract(row).copy(currencyrateid = value)))
-      override val subtotal = new Field[BigDecimal, Row](prefix, "subtotal", None, None)(x => extract(x).subtotal, (row, value) => merge(row, extract(row).copy(subtotal = value)))
-      override val taxamt = new Field[BigDecimal, Row](prefix, "taxamt", None, None)(x => extract(x).taxamt, (row, value) => merge(row, extract(row).copy(taxamt = value)))
-      override val freight = new Field[BigDecimal, Row](prefix, "freight", None, None)(x => extract(x).freight, (row, value) => merge(row, extract(row).copy(freight = value)))
-      override val totaldue = new OptField[BigDecimal, Row](prefix, "totaldue", None, None)(x => extract(x).totaldue, (row, value) => merge(row, extract(row).copy(totaldue = value)))
-      override val comment = new OptField[/* max 128 chars */ String, Row](prefix, "comment", None, None)(x => extract(x).comment, (row, value) => merge(row, extract(row).copy(comment = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SohViewFields = new SohViewFields {
+      override def id = Field[SalesorderheaderId, SohViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def salesorderid = Field[SalesorderheaderId, SohViewRow](_path, "salesorderid", None, None, x => x.salesorderid, (row, value) => row.copy(salesorderid = value))
+      override def revisionnumber = Field[TypoShort, SohViewRow](_path, "revisionnumber", None, None, x => x.revisionnumber, (row, value) => row.copy(revisionnumber = value))
+      override def orderdate = Field[TypoLocalDateTime, SohViewRow](_path, "orderdate", Some("text"), None, x => x.orderdate, (row, value) => row.copy(orderdate = value))
+      override def duedate = Field[TypoLocalDateTime, SohViewRow](_path, "duedate", Some("text"), None, x => x.duedate, (row, value) => row.copy(duedate = value))
+      override def shipdate = OptField[TypoLocalDateTime, SohViewRow](_path, "shipdate", Some("text"), None, x => x.shipdate, (row, value) => row.copy(shipdate = value))
+      override def status = Field[TypoShort, SohViewRow](_path, "status", None, None, x => x.status, (row, value) => row.copy(status = value))
+      override def onlineorderflag = Field[Flag, SohViewRow](_path, "onlineorderflag", None, None, x => x.onlineorderflag, (row, value) => row.copy(onlineorderflag = value))
+      override def purchaseordernumber = OptField[OrderNumber, SohViewRow](_path, "purchaseordernumber", None, None, x => x.purchaseordernumber, (row, value) => row.copy(purchaseordernumber = value))
+      override def accountnumber = OptField[AccountNumber, SohViewRow](_path, "accountnumber", None, None, x => x.accountnumber, (row, value) => row.copy(accountnumber = value))
+      override def customerid = Field[CustomerId, SohViewRow](_path, "customerid", None, None, x => x.customerid, (row, value) => row.copy(customerid = value))
+      override def salespersonid = OptField[BusinessentityId, SohViewRow](_path, "salespersonid", None, None, x => x.salespersonid, (row, value) => row.copy(salespersonid = value))
+      override def territoryid = OptField[SalesterritoryId, SohViewRow](_path, "territoryid", None, None, x => x.territoryid, (row, value) => row.copy(territoryid = value))
+      override def billtoaddressid = Field[AddressId, SohViewRow](_path, "billtoaddressid", None, None, x => x.billtoaddressid, (row, value) => row.copy(billtoaddressid = value))
+      override def shiptoaddressid = Field[AddressId, SohViewRow](_path, "shiptoaddressid", None, None, x => x.shiptoaddressid, (row, value) => row.copy(shiptoaddressid = value))
+      override def shipmethodid = Field[ShipmethodId, SohViewRow](_path, "shipmethodid", None, None, x => x.shipmethodid, (row, value) => row.copy(shipmethodid = value))
+      override def creditcardid = OptField[/* user-picked */ CustomCreditcardId, SohViewRow](_path, "creditcardid", None, None, x => x.creditcardid, (row, value) => row.copy(creditcardid = value))
+      override def creditcardapprovalcode = OptField[/* max 15 chars */ String, SohViewRow](_path, "creditcardapprovalcode", None, None, x => x.creditcardapprovalcode, (row, value) => row.copy(creditcardapprovalcode = value))
+      override def currencyrateid = OptField[CurrencyrateId, SohViewRow](_path, "currencyrateid", None, None, x => x.currencyrateid, (row, value) => row.copy(currencyrateid = value))
+      override def subtotal = Field[BigDecimal, SohViewRow](_path, "subtotal", None, None, x => x.subtotal, (row, value) => row.copy(subtotal = value))
+      override def taxamt = Field[BigDecimal, SohViewRow](_path, "taxamt", None, None, x => x.taxamt, (row, value) => row.copy(taxamt = value))
+      override def freight = Field[BigDecimal, SohViewRow](_path, "freight", None, None, x => x.freight, (row, value) => row.copy(freight = value))
+      override def totaldue = OptField[BigDecimal, SohViewRow](_path, "totaldue", None, None, x => x.totaldue, (row, value) => row.copy(totaldue = value))
+      override def comment = OptField[/* max 128 chars */ String, SohViewRow](_path, "comment", None, None, x => x.comment, (row, value) => row.copy(comment = value))
+      override def rowguid = Field[TypoUUID, SohViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, SohViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.salesorderid, fields.revisionnumber, fields.orderdate, fields.duedate, fields.shipdate, fields.status, fields.onlineorderflag, fields.purchaseordernumber, fields.accountnumber, fields.customerid, fields.salespersonid, fields.territoryid, fields.billtoaddressid, fields.shiptoaddressid, fields.shipmethodid, fields.creditcardid, fields.creditcardapprovalcode, fields.currencyrateid, fields.subtotal, fields.taxamt, fields.freight, fields.totaldue, fields.comment, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SohViewRow]] =
+      List[FieldLikeNoHkt[?, SohViewRow]](fields.id, fields.salesorderid, fields.revisionnumber, fields.orderdate, fields.duedate, fields.shipdate, fields.status, fields.onlineorderflag, fields.purchaseordernumber, fields.accountnumber, fields.customerid, fields.salespersonid, fields.territoryid, fields.billtoaddressid, fields.shiptoaddressid, fields.shipmethodid, fields.creditcardid, fields.creditcardapprovalcode, fields.currencyrateid, fields.subtotal, fields.taxamt, fields.freight, fields.totaldue, fields.comment, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SohViewRow, merge: (NewRow, SohViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

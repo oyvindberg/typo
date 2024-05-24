@@ -11,40 +11,41 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.contacttype.ContacttypeId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait BecViewFields[Row] {
-  val id: Field[BusinessentityId, Row]
-  val businessentityid: Field[BusinessentityId, Row]
-  val personid: Field[BusinessentityId, Row]
-  val contacttypeid: Field[ContacttypeId, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait BecViewFields {
+  def id: Field[BusinessentityId, BecViewRow]
+  def businessentityid: Field[BusinessentityId, BecViewRow]
+  def personid: Field[BusinessentityId, BecViewRow]
+  def contacttypeid: Field[ContacttypeId, BecViewRow]
+  def rowguid: Field[TypoUUID, BecViewRow]
+  def modifieddate: Field[TypoLocalDateTime, BecViewRow]
 }
 
 object BecViewFields {
-  val structure: Relation[BecViewFields, BecViewRow, BecViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[BecViewFields, BecViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => BecViewRow, val merge: (Row, BecViewRow) => Row)
-    extends Relation[BecViewFields, BecViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[BecViewFields, BecViewRow] {
   
-    override val fields: BecViewFields[Row] = new BecViewFields[Row] {
-      override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val personid = new Field[BusinessentityId, Row](prefix, "personid", None, None)(x => extract(x).personid, (row, value) => merge(row, extract(row).copy(personid = value)))
-      override val contacttypeid = new Field[ContacttypeId, Row](prefix, "contacttypeid", None, None)(x => extract(x).contacttypeid, (row, value) => merge(row, extract(row).copy(contacttypeid = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: BecViewFields = new BecViewFields {
+      override def id = Field[BusinessentityId, BecViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def businessentityid = Field[BusinessentityId, BecViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def personid = Field[BusinessentityId, BecViewRow](_path, "personid", None, None, x => x.personid, (row, value) => row.copy(personid = value))
+      override def contacttypeid = Field[ContacttypeId, BecViewRow](_path, "contacttypeid", None, None, x => x.contacttypeid, (row, value) => row.copy(contacttypeid = value))
+      override def rowguid = Field[TypoUUID, BecViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, BecViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.businessentityid, fields.personid, fields.contacttypeid, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, BecViewRow]] =
+      List[FieldLikeNoHkt[?, BecViewRow]](fields.id, fields.businessentityid, fields.personid, fields.contacttypeid, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => BecViewRow, merge: (NewRow, BecViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

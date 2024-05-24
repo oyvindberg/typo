@@ -10,34 +10,35 @@ package pmi
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait PmiViewFields[Row] {
-  val productmodelid: Field[ProductmodelId, Row]
-  val illustrationid: Field[IllustrationId, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait PmiViewFields {
+  def productmodelid: Field[ProductmodelId, PmiViewRow]
+  def illustrationid: Field[IllustrationId, PmiViewRow]
+  def modifieddate: Field[TypoLocalDateTime, PmiViewRow]
 }
 
 object PmiViewFields {
-  val structure: Relation[PmiViewFields, PmiViewRow, PmiViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PmiViewFields, PmiViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PmiViewRow, val merge: (Row, PmiViewRow) => Row)
-    extends Relation[PmiViewFields, PmiViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PmiViewFields, PmiViewRow] {
   
-    override val fields: PmiViewFields[Row] = new PmiViewFields[Row] {
-      override val productmodelid = new Field[ProductmodelId, Row](prefix, "productmodelid", None, None)(x => extract(x).productmodelid, (row, value) => merge(row, extract(row).copy(productmodelid = value)))
-      override val illustrationid = new Field[IllustrationId, Row](prefix, "illustrationid", None, None)(x => extract(x).illustrationid, (row, value) => merge(row, extract(row).copy(illustrationid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: PmiViewFields = new PmiViewFields {
+      override def productmodelid = Field[ProductmodelId, PmiViewRow](_path, "productmodelid", None, None, x => x.productmodelid, (row, value) => row.copy(productmodelid = value))
+      override def illustrationid = Field[IllustrationId, PmiViewRow](_path, "illustrationid", None, None, x => x.illustrationid, (row, value) => row.copy(illustrationid = value))
+      override def modifieddate = Field[TypoLocalDateTime, PmiViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.productmodelid, fields.illustrationid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, PmiViewRow]] =
+      List[FieldLikeNoHkt[?, PmiViewRow]](fields.productmodelid, fields.illustrationid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PmiViewRow, merge: (NewRow, PmiViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

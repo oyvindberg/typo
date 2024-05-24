@@ -8,30 +8,31 @@ package hardcoded
 package myschema
 package marital_status
 
+import typo.dsl.Path
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait MaritalStatusFields[Row] {
-  val id: IdField[MaritalStatusId, Row]
+trait MaritalStatusFields {
+  def id: IdField[MaritalStatusId, MaritalStatusRow]
 }
 
 object MaritalStatusFields {
-  val structure: Relation[MaritalStatusFields, MaritalStatusRow, MaritalStatusRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[MaritalStatusFields, MaritalStatusRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => MaritalStatusRow, val merge: (Row, MaritalStatusRow) => Row)
-    extends Relation[MaritalStatusFields, MaritalStatusRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[MaritalStatusFields, MaritalStatusRow] {
   
-    override val fields: MaritalStatusFields[Row] = new MaritalStatusFields[Row] {
-      override val id = new IdField[MaritalStatusId, Row](prefix, "id", None, Some("int8"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
+    override lazy val fields: MaritalStatusFields = new MaritalStatusFields {
+      override def id = IdField[MaritalStatusId, MaritalStatusRow](_path, "id", None, Some("int8"), x => x.id, (row, value) => row.copy(id = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id)
+    override lazy val columns: List[FieldLikeNoHkt[?, MaritalStatusRow]] =
+      List[FieldLikeNoHkt[?, MaritalStatusRow]](fields.id)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => MaritalStatusRow, merge: (NewRow, MaritalStatusRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

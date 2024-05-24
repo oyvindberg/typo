@@ -6,11 +6,11 @@ import typo.dsl.{SelectBuilder, SortOrder, SqlExpr}
 
 import java.sql.Connection
 
-class PaginationQueryCirce[Fields[_], Row](underlying: PaginationQuery[Fields, Row, JsValue]) {
-  def andOn[T, N[_]](v: Fields[Row] => SortOrder[T, N, Row])(implicit
+class PaginationQueryCirce[Fields, Row](underlying: PaginationQuery[Fields, Row, JsValue]) {
+  def andOn[T, N[_]](v: Fields => SortOrder[T, N])(implicit
       e: Writes[N[T]],
       d: Reads[N[T]],
-      asConst: SqlExpr.Const.As[T, N, Row]
+      asConst: SqlExpr.Const.As[T, N]
   ): PaginationQueryCirce[Fields, Row] =
     new PaginationQueryCirce(underlying.andOn(v)(PaginationQueryCirce.abstractCodec)(asConst))
 
@@ -33,11 +33,11 @@ object PaginationQueryCirce {
   implicit val clientCursorDecoder: Reads[ClientCursor[JsValue]] =
     implicitly[Reads[Map[String, JsValue]]].map(parts => ClientCursor(parts.map { case (k, v) => (SortOrderRepr(k), v) }))
 
-  implicit class PaginationQuerySyntax[Fields[_], Row](private val query: SelectBuilder[Fields, Row]) extends AnyVal {
-    def seekPaginationOn[T, N[_]](v: Fields[Row] => SortOrder[T, N, Row])(implicit
+  implicit class PaginationQuerySyntax[Fields, Row](private val query: SelectBuilder[Fields, Row]) extends AnyVal {
+    def seekPaginationOn[T, N[_]](v: Fields => SortOrder[T, N])(implicit
         e: Writes[N[T]],
         d: Reads[N[T]],
-        asConst: SqlExpr.Const.As[T, N, Row]
+        asConst: SqlExpr.Const.As[T, N]
     ): PaginationQueryCirce[Fields, Row] =
       new PaginationQueryCirce(new PaginationQuery(query, Nil).andOn(v)(PaginationQueryCirce.abstractCodec))
   }

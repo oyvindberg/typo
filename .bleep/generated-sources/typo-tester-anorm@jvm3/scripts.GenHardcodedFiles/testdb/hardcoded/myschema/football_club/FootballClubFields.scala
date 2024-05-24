@@ -8,33 +8,34 @@ package hardcoded
 package myschema
 package football_club
 
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait FootballClubFields[Row] {
-  val id: IdField[FootballClubId, Row]
-  val name: Field[/* max 100 chars */ String, Row]
+trait FootballClubFields {
+  def id: IdField[FootballClubId, FootballClubRow]
+  def name: Field[/* max 100 chars */ String, FootballClubRow]
 }
 
 object FootballClubFields {
-  val structure: Relation[FootballClubFields, FootballClubRow, FootballClubRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[FootballClubFields, FootballClubRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => FootballClubRow, val merge: (Row, FootballClubRow) => Row)
-    extends Relation[FootballClubFields, FootballClubRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[FootballClubFields, FootballClubRow] {
   
-    override val fields: FootballClubFields[Row] = new FootballClubFields[Row] {
-      override val id = new IdField[FootballClubId, Row](prefix, "id", None, Some("int8"))(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val name = new Field[/* max 100 chars */ String, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+    override lazy val fields: FootballClubFields = new FootballClubFields {
+      override def id = IdField[FootballClubId, FootballClubRow](_path, "id", None, Some("int8"), x => x.id, (row, value) => row.copy(id = value))
+      override def name = Field[/* max 100 chars */ String, FootballClubRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.name)
+    override lazy val columns: List[FieldLikeNoHkt[?, FootballClubRow]] =
+      List[FieldLikeNoHkt[?, FootballClubRow]](fields.id, fields.name)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => FootballClubRow, merge: (NewRow, FootballClubRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

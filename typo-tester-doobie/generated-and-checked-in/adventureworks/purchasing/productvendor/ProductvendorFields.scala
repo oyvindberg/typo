@@ -11,52 +11,53 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait ProductvendorFields[Row] {
-  val productid: IdField[ProductId, Row]
-  val businessentityid: IdField[BusinessentityId, Row]
-  val averageleadtime: Field[Int, Row]
-  val standardprice: Field[BigDecimal, Row]
-  val lastreceiptcost: OptField[BigDecimal, Row]
-  val lastreceiptdate: OptField[TypoLocalDateTime, Row]
-  val minorderqty: Field[Int, Row]
-  val maxorderqty: Field[Int, Row]
-  val onorderqty: OptField[Int, Row]
-  val unitmeasurecode: Field[UnitmeasureId, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait ProductvendorFields {
+  def productid: IdField[ProductId, ProductvendorRow]
+  def businessentityid: IdField[BusinessentityId, ProductvendorRow]
+  def averageleadtime: Field[Int, ProductvendorRow]
+  def standardprice: Field[BigDecimal, ProductvendorRow]
+  def lastreceiptcost: OptField[BigDecimal, ProductvendorRow]
+  def lastreceiptdate: OptField[TypoLocalDateTime, ProductvendorRow]
+  def minorderqty: Field[Int, ProductvendorRow]
+  def maxorderqty: Field[Int, ProductvendorRow]
+  def onorderqty: OptField[Int, ProductvendorRow]
+  def unitmeasurecode: Field[UnitmeasureId, ProductvendorRow]
+  def modifieddate: Field[TypoLocalDateTime, ProductvendorRow]
 }
 
 object ProductvendorFields {
-  val structure: Relation[ProductvendorFields, ProductvendorRow, ProductvendorRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[ProductvendorFields, ProductvendorRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => ProductvendorRow, val merge: (Row, ProductvendorRow) => Row)
-    extends Relation[ProductvendorFields, ProductvendorRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[ProductvendorFields, ProductvendorRow] {
   
-    override val fields: ProductvendorFields[Row] = new ProductvendorFields[Row] {
-      override val productid = new IdField[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val businessentityid = new IdField[BusinessentityId, Row](prefix, "businessentityid", None, Some("int4"))(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val averageleadtime = new Field[Int, Row](prefix, "averageleadtime", None, Some("int4"))(x => extract(x).averageleadtime, (row, value) => merge(row, extract(row).copy(averageleadtime = value)))
-      override val standardprice = new Field[BigDecimal, Row](prefix, "standardprice", None, Some("numeric"))(x => extract(x).standardprice, (row, value) => merge(row, extract(row).copy(standardprice = value)))
-      override val lastreceiptcost = new OptField[BigDecimal, Row](prefix, "lastreceiptcost", None, Some("numeric"))(x => extract(x).lastreceiptcost, (row, value) => merge(row, extract(row).copy(lastreceiptcost = value)))
-      override val lastreceiptdate = new OptField[TypoLocalDateTime, Row](prefix, "lastreceiptdate", Some("text"), Some("timestamp"))(x => extract(x).lastreceiptdate, (row, value) => merge(row, extract(row).copy(lastreceiptdate = value)))
-      override val minorderqty = new Field[Int, Row](prefix, "minorderqty", None, Some("int4"))(x => extract(x).minorderqty, (row, value) => merge(row, extract(row).copy(minorderqty = value)))
-      override val maxorderqty = new Field[Int, Row](prefix, "maxorderqty", None, Some("int4"))(x => extract(x).maxorderqty, (row, value) => merge(row, extract(row).copy(maxorderqty = value)))
-      override val onorderqty = new OptField[Int, Row](prefix, "onorderqty", None, Some("int4"))(x => extract(x).onorderqty, (row, value) => merge(row, extract(row).copy(onorderqty = value)))
-      override val unitmeasurecode = new Field[UnitmeasureId, Row](prefix, "unitmeasurecode", None, Some("bpchar"))(x => extract(x).unitmeasurecode, (row, value) => merge(row, extract(row).copy(unitmeasurecode = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: ProductvendorFields = new ProductvendorFields {
+      override def productid = IdField[ProductId, ProductvendorRow](_path, "productid", None, Some("int4"), x => x.productid, (row, value) => row.copy(productid = value))
+      override def businessentityid = IdField[BusinessentityId, ProductvendorRow](_path, "businessentityid", None, Some("int4"), x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def averageleadtime = Field[Int, ProductvendorRow](_path, "averageleadtime", None, Some("int4"), x => x.averageleadtime, (row, value) => row.copy(averageleadtime = value))
+      override def standardprice = Field[BigDecimal, ProductvendorRow](_path, "standardprice", None, Some("numeric"), x => x.standardprice, (row, value) => row.copy(standardprice = value))
+      override def lastreceiptcost = OptField[BigDecimal, ProductvendorRow](_path, "lastreceiptcost", None, Some("numeric"), x => x.lastreceiptcost, (row, value) => row.copy(lastreceiptcost = value))
+      override def lastreceiptdate = OptField[TypoLocalDateTime, ProductvendorRow](_path, "lastreceiptdate", Some("text"), Some("timestamp"), x => x.lastreceiptdate, (row, value) => row.copy(lastreceiptdate = value))
+      override def minorderqty = Field[Int, ProductvendorRow](_path, "minorderqty", None, Some("int4"), x => x.minorderqty, (row, value) => row.copy(minorderqty = value))
+      override def maxorderqty = Field[Int, ProductvendorRow](_path, "maxorderqty", None, Some("int4"), x => x.maxorderqty, (row, value) => row.copy(maxorderqty = value))
+      override def onorderqty = OptField[Int, ProductvendorRow](_path, "onorderqty", None, Some("int4"), x => x.onorderqty, (row, value) => row.copy(onorderqty = value))
+      override def unitmeasurecode = Field[UnitmeasureId, ProductvendorRow](_path, "unitmeasurecode", None, Some("bpchar"), x => x.unitmeasurecode, (row, value) => row.copy(unitmeasurecode = value))
+      override def modifieddate = Field[TypoLocalDateTime, ProductvendorRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.productid, fields.businessentityid, fields.averageleadtime, fields.standardprice, fields.lastreceiptcost, fields.lastreceiptdate, fields.minorderqty, fields.maxorderqty, fields.onorderqty, fields.unitmeasurecode, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, ProductvendorRow]] =
+      List[FieldLikeNoHkt[?, ProductvendorRow]](fields.productid, fields.businessentityid, fields.averageleadtime, fields.standardprice, fields.lastreceiptcost, fields.lastreceiptdate, fields.minorderqty, fields.maxorderqty, fields.onorderqty, fields.unitmeasurecode, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => ProductvendorRow, merge: (NewRow, ProductvendorRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

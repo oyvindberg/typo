@@ -9,40 +9,41 @@ package productlistpricehistory
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait ProductlistpricehistoryFields[Row] {
-  val productid: IdField[ProductId, Row]
-  val startdate: IdField[TypoLocalDateTime, Row]
-  val enddate: OptField[TypoLocalDateTime, Row]
-  val listprice: Field[BigDecimal, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait ProductlistpricehistoryFields {
+  def productid: IdField[ProductId, ProductlistpricehistoryRow]
+  def startdate: IdField[TypoLocalDateTime, ProductlistpricehistoryRow]
+  def enddate: OptField[TypoLocalDateTime, ProductlistpricehistoryRow]
+  def listprice: Field[BigDecimal, ProductlistpricehistoryRow]
+  def modifieddate: Field[TypoLocalDateTime, ProductlistpricehistoryRow]
 }
 
 object ProductlistpricehistoryFields {
-  val structure: Relation[ProductlistpricehistoryFields, ProductlistpricehistoryRow, ProductlistpricehistoryRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[ProductlistpricehistoryFields, ProductlistpricehistoryRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => ProductlistpricehistoryRow, val merge: (Row, ProductlistpricehistoryRow) => Row)
-    extends Relation[ProductlistpricehistoryFields, ProductlistpricehistoryRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[ProductlistpricehistoryFields, ProductlistpricehistoryRow] {
   
-    override val fields: ProductlistpricehistoryFields[Row] = new ProductlistpricehistoryFields[Row] {
-      override val productid = new IdField[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val startdate = new IdField[TypoLocalDateTime, Row](prefix, "startdate", Some("text"), Some("timestamp"))(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
-      override val enddate = new OptField[TypoLocalDateTime, Row](prefix, "enddate", Some("text"), Some("timestamp"))(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
-      override val listprice = new Field[BigDecimal, Row](prefix, "listprice", None, Some("numeric"))(x => extract(x).listprice, (row, value) => merge(row, extract(row).copy(listprice = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: ProductlistpricehistoryFields = new ProductlistpricehistoryFields {
+      override def productid = IdField[ProductId, ProductlistpricehistoryRow](_path, "productid", None, Some("int4"), x => x.productid, (row, value) => row.copy(productid = value))
+      override def startdate = IdField[TypoLocalDateTime, ProductlistpricehistoryRow](_path, "startdate", Some("text"), Some("timestamp"), x => x.startdate, (row, value) => row.copy(startdate = value))
+      override def enddate = OptField[TypoLocalDateTime, ProductlistpricehistoryRow](_path, "enddate", Some("text"), Some("timestamp"), x => x.enddate, (row, value) => row.copy(enddate = value))
+      override def listprice = Field[BigDecimal, ProductlistpricehistoryRow](_path, "listprice", None, Some("numeric"), x => x.listprice, (row, value) => row.copy(listprice = value))
+      override def modifieddate = Field[TypoLocalDateTime, ProductlistpricehistoryRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.productid, fields.startdate, fields.enddate, fields.listprice, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, ProductlistpricehistoryRow]] =
+      List[FieldLikeNoHkt[?, ProductlistpricehistoryRow]](fields.productid, fields.startdate, fields.enddate, fields.listprice, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => ProductlistpricehistoryRow, merge: (NewRow, ProductlistpricehistoryRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

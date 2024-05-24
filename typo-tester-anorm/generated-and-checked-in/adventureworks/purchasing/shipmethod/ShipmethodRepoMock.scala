@@ -22,7 +22,7 @@ import typo.dsl.UpdateParams
 class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
                          map: scala.collection.mutable.Map[ShipmethodId, ShipmethodRow] = scala.collection.mutable.Map.empty) extends ShipmethodRepo {
   override def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShipmethodFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, ShipmethodFields.structure, map)
   }
   override def deleteById(shipmethodid: ShipmethodId)(implicit c: Connection): Boolean = {
     map.remove(shipmethodid).isDefined
@@ -72,7 +72,7 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
     shipmethodids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShipmethodFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, ShipmethodFields.structure, map)
   }
   override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
     map.get(row.shipmethodid) match {

@@ -10,35 +10,36 @@ package productdocument
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait ProductdocumentFields[Row] {
-  val productid: IdField[ProductId, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
-  val documentnode: IdField[DocumentId, Row]
+trait ProductdocumentFields {
+  def productid: IdField[ProductId, ProductdocumentRow]
+  def modifieddate: Field[TypoLocalDateTime, ProductdocumentRow]
+  def documentnode: IdField[DocumentId, ProductdocumentRow]
 }
 
 object ProductdocumentFields {
-  val structure: Relation[ProductdocumentFields, ProductdocumentRow, ProductdocumentRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[ProductdocumentFields, ProductdocumentRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => ProductdocumentRow, val merge: (Row, ProductdocumentRow) => Row)
-    extends Relation[ProductdocumentFields, ProductdocumentRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[ProductdocumentFields, ProductdocumentRow] {
   
-    override val fields: ProductdocumentFields[Row] = new ProductdocumentFields[Row] {
-      override val productid = new IdField[ProductId, Row](prefix, "productid", None, Some("int4"))(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
-      override val documentnode = new IdField[DocumentId, Row](prefix, "documentnode", None, None)(x => extract(x).documentnode, (row, value) => merge(row, extract(row).copy(documentnode = value)))
+    override lazy val fields: ProductdocumentFields = new ProductdocumentFields {
+      override def productid = IdField[ProductId, ProductdocumentRow](_path, "productid", None, Some("int4"), x => x.productid, (row, value) => row.copy(productid = value))
+      override def modifieddate = Field[TypoLocalDateTime, ProductdocumentRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
+      override def documentnode = IdField[DocumentId, ProductdocumentRow](_path, "documentnode", None, None, x => x.documentnode, (row, value) => row.copy(documentnode = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.productid, fields.modifieddate, fields.documentnode)
+    override lazy val columns: List[FieldLikeNoHkt[?, ProductdocumentRow]] =
+      List[FieldLikeNoHkt[?, ProductdocumentRow]](fields.productid, fields.modifieddate, fields.documentnode)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => ProductdocumentRow, merge: (NewRow, ProductdocumentRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

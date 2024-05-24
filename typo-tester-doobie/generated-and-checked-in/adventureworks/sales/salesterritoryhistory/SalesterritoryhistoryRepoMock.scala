@@ -24,7 +24,7 @@ import typo.dsl.UpdateParams
 class SalesterritoryhistoryRepoMock(toRow: Function1[SalesterritoryhistoryRowUnsaved, SalesterritoryhistoryRow],
                                     map: scala.collection.mutable.Map[SalesterritoryhistoryId, SalesterritoryhistoryRow] = scala.collection.mutable.Map.empty) extends SalesterritoryhistoryRepo {
   override def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesterritoryhistoryFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, SalesterritoryhistoryFields.structure, map)
   }
   override def deleteById(compositeId: SalesterritoryhistoryId): ConnectionIO[Boolean] = {
     delay(map.remove(compositeId).isDefined)
@@ -86,7 +86,7 @@ class SalesterritoryhistoryRepoMock(toRow: Function1[SalesterritoryhistoryRowUns
     }
   }
   override def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesterritoryhistoryFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, SalesterritoryhistoryFields.structure, map)
   }
   override def update(row: SalesterritoryhistoryRow): ConnectionIO[Boolean] = {
     delay {

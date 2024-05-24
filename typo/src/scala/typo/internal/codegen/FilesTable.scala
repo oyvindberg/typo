@@ -6,7 +6,7 @@ import play.api.libs.json.Json
 import typo.internal.codegen.DbLib.RowType
 
 case class FilesTable(table: ComputedTable, options: InternalOptions, genOrdering: GenOrdering) {
-  val relation = FilesRelation(table.naming, table.names, Some(table.cols), options)
+  val relation = FilesRelation(table.naming, table.names, Some(table.cols), options, table.dbTable.foreignKeys)
   val RowFile = relation.RowFile(RowType.ReadWriteable, table.dbTable.comment, maybeUnsavedRow = table.maybeUnsavedRow.map(u => (u, table.default)))
 
   val UnsavedRowFile: Option[sc.File] =

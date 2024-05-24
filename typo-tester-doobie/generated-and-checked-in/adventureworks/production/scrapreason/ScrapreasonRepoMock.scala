@@ -24,7 +24,7 @@ import typo.dsl.UpdateParams
 class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow],
                           map: scala.collection.mutable.Map[ScrapreasonId, ScrapreasonRow] = scala.collection.mutable.Map.empty) extends ScrapreasonRepo {
   override def delete: DeleteBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ScrapreasonFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, ScrapreasonFields.structure, map)
   }
   override def deleteById(scrapreasonid: ScrapreasonId): ConnectionIO[Boolean] = {
     delay(map.remove(scrapreasonid).isDefined)
@@ -86,7 +86,7 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
     }
   }
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ScrapreasonFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, ScrapreasonFields.structure, map)
   }
   override def update(row: ScrapreasonRow): ConnectionIO[Boolean] = {
     delay {

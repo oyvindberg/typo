@@ -33,166 +33,167 @@ import adventureworks.customtypes.TypoVector
 import adventureworks.customtypes.TypoXml
 import adventureworks.public.Mydomain
 import adventureworks.public.Myenum
+import typo.dsl.Path
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait PgtestnullFields[Row] {
-  val bool: OptField[Boolean, Row]
-  val box: OptField[TypoBox, Row]
-  val bpchar: OptField[/* bpchar, max 3 chars */ String, Row]
-  val bytea: OptField[TypoBytea, Row]
-  val char: OptField[/* bpchar, max 1 chars */ String, Row]
-  val circle: OptField[TypoCircle, Row]
-  val date: OptField[TypoLocalDate, Row]
-  val float4: OptField[Float, Row]
-  val float8: OptField[Double, Row]
-  val hstore: OptField[TypoHStore, Row]
-  val inet: OptField[TypoInet, Row]
-  val int2: OptField[TypoShort, Row]
-  val int2vector: OptField[TypoInt2Vector, Row]
-  val int4: OptField[Int, Row]
-  val int8: OptField[Long, Row]
-  val interval: OptField[TypoInterval, Row]
-  val json: OptField[TypoJson, Row]
-  val jsonb: OptField[TypoJsonb, Row]
-  val line: OptField[TypoLine, Row]
-  val lseg: OptField[TypoLineSegment, Row]
-  val money: OptField[TypoMoney, Row]
-  val mydomain: OptField[Mydomain, Row]
-  val myenum: OptField[Myenum, Row]
-  val name: OptField[String, Row]
-  val numeric: OptField[BigDecimal, Row]
-  val path: OptField[TypoPath, Row]
-  val point: OptField[TypoPoint, Row]
-  val polygon: OptField[TypoPolygon, Row]
-  val text: OptField[String, Row]
-  val time: OptField[TypoLocalTime, Row]
-  val timestamp: OptField[TypoLocalDateTime, Row]
-  val timestampz: OptField[TypoInstant, Row]
-  val timez: OptField[TypoOffsetTime, Row]
-  val uuid: OptField[TypoUUID, Row]
-  val varchar: OptField[String, Row]
-  val vector: OptField[TypoVector, Row]
-  val xml: OptField[TypoXml, Row]
-  val boxes: OptField[Array[TypoBox], Row]
-  val bpchares: OptField[Array[/* bpchar */ String], Row]
-  val chares: OptField[Array[/* bpchar */ String], Row]
-  val circlees: OptField[Array[TypoCircle], Row]
-  val datees: OptField[Array[TypoLocalDate], Row]
-  val float4es: OptField[Array[Float], Row]
-  val float8es: OptField[Array[Double], Row]
-  val inetes: OptField[Array[TypoInet], Row]
-  val int2es: OptField[Array[TypoShort], Row]
-  val int2vectores: OptField[Array[TypoInt2Vector], Row]
-  val int4es: OptField[Array[Int], Row]
-  val int8es: OptField[Array[Long], Row]
-  val intervales: OptField[Array[TypoInterval], Row]
-  val jsones: OptField[Array[TypoJson], Row]
-  val jsonbes: OptField[Array[TypoJsonb], Row]
-  val linees: OptField[Array[TypoLine], Row]
-  val lseges: OptField[Array[TypoLineSegment], Row]
-  val moneyes: OptField[Array[TypoMoney], Row]
-  val myenumes: OptField[Array[Myenum], Row]
-  val namees: OptField[Array[String], Row]
-  val numerices: OptField[Array[BigDecimal], Row]
-  val pathes: OptField[Array[TypoPath], Row]
-  val pointes: OptField[Array[TypoPoint], Row]
-  val polygones: OptField[Array[TypoPolygon], Row]
-  val textes: OptField[Array[String], Row]
-  val timees: OptField[Array[TypoLocalTime], Row]
-  val timestampes: OptField[Array[TypoLocalDateTime], Row]
-  val timestampzes: OptField[Array[TypoInstant], Row]
-  val timezes: OptField[Array[TypoOffsetTime], Row]
-  val uuides: OptField[Array[TypoUUID], Row]
-  val varchares: OptField[Array[String], Row]
-  val xmles: OptField[Array[TypoXml], Row]
+trait PgtestnullFields {
+  def bool: OptField[Boolean, PgtestnullRow]
+  def box: OptField[TypoBox, PgtestnullRow]
+  def bpchar: OptField[/* bpchar, max 3 chars */ String, PgtestnullRow]
+  def bytea: OptField[TypoBytea, PgtestnullRow]
+  def char: OptField[/* bpchar, max 1 chars */ String, PgtestnullRow]
+  def circle: OptField[TypoCircle, PgtestnullRow]
+  def date: OptField[TypoLocalDate, PgtestnullRow]
+  def float4: OptField[Float, PgtestnullRow]
+  def float8: OptField[Double, PgtestnullRow]
+  def hstore: OptField[TypoHStore, PgtestnullRow]
+  def inet: OptField[TypoInet, PgtestnullRow]
+  def int2: OptField[TypoShort, PgtestnullRow]
+  def int2vector: OptField[TypoInt2Vector, PgtestnullRow]
+  def int4: OptField[Int, PgtestnullRow]
+  def int8: OptField[Long, PgtestnullRow]
+  def interval: OptField[TypoInterval, PgtestnullRow]
+  def json: OptField[TypoJson, PgtestnullRow]
+  def jsonb: OptField[TypoJsonb, PgtestnullRow]
+  def line: OptField[TypoLine, PgtestnullRow]
+  def lseg: OptField[TypoLineSegment, PgtestnullRow]
+  def money: OptField[TypoMoney, PgtestnullRow]
+  def mydomain: OptField[Mydomain, PgtestnullRow]
+  def myenum: OptField[Myenum, PgtestnullRow]
+  def name: OptField[String, PgtestnullRow]
+  def numeric: OptField[BigDecimal, PgtestnullRow]
+  def path: OptField[TypoPath, PgtestnullRow]
+  def point: OptField[TypoPoint, PgtestnullRow]
+  def polygon: OptField[TypoPolygon, PgtestnullRow]
+  def text: OptField[String, PgtestnullRow]
+  def time: OptField[TypoLocalTime, PgtestnullRow]
+  def timestamp: OptField[TypoLocalDateTime, PgtestnullRow]
+  def timestampz: OptField[TypoInstant, PgtestnullRow]
+  def timez: OptField[TypoOffsetTime, PgtestnullRow]
+  def uuid: OptField[TypoUUID, PgtestnullRow]
+  def varchar: OptField[String, PgtestnullRow]
+  def vector: OptField[TypoVector, PgtestnullRow]
+  def xml: OptField[TypoXml, PgtestnullRow]
+  def boxes: OptField[Array[TypoBox], PgtestnullRow]
+  def bpchares: OptField[Array[/* bpchar */ String], PgtestnullRow]
+  def chares: OptField[Array[/* bpchar */ String], PgtestnullRow]
+  def circlees: OptField[Array[TypoCircle], PgtestnullRow]
+  def datees: OptField[Array[TypoLocalDate], PgtestnullRow]
+  def float4es: OptField[Array[Float], PgtestnullRow]
+  def float8es: OptField[Array[Double], PgtestnullRow]
+  def inetes: OptField[Array[TypoInet], PgtestnullRow]
+  def int2es: OptField[Array[TypoShort], PgtestnullRow]
+  def int2vectores: OptField[Array[TypoInt2Vector], PgtestnullRow]
+  def int4es: OptField[Array[Int], PgtestnullRow]
+  def int8es: OptField[Array[Long], PgtestnullRow]
+  def intervales: OptField[Array[TypoInterval], PgtestnullRow]
+  def jsones: OptField[Array[TypoJson], PgtestnullRow]
+  def jsonbes: OptField[Array[TypoJsonb], PgtestnullRow]
+  def linees: OptField[Array[TypoLine], PgtestnullRow]
+  def lseges: OptField[Array[TypoLineSegment], PgtestnullRow]
+  def moneyes: OptField[Array[TypoMoney], PgtestnullRow]
+  def myenumes: OptField[Array[Myenum], PgtestnullRow]
+  def namees: OptField[Array[String], PgtestnullRow]
+  def numerices: OptField[Array[BigDecimal], PgtestnullRow]
+  def pathes: OptField[Array[TypoPath], PgtestnullRow]
+  def pointes: OptField[Array[TypoPoint], PgtestnullRow]
+  def polygones: OptField[Array[TypoPolygon], PgtestnullRow]
+  def textes: OptField[Array[String], PgtestnullRow]
+  def timees: OptField[Array[TypoLocalTime], PgtestnullRow]
+  def timestampes: OptField[Array[TypoLocalDateTime], PgtestnullRow]
+  def timestampzes: OptField[Array[TypoInstant], PgtestnullRow]
+  def timezes: OptField[Array[TypoOffsetTime], PgtestnullRow]
+  def uuides: OptField[Array[TypoUUID], PgtestnullRow]
+  def varchares: OptField[Array[String], PgtestnullRow]
+  def xmles: OptField[Array[TypoXml], PgtestnullRow]
 }
 
 object PgtestnullFields {
-  val structure: Relation[PgtestnullFields, PgtestnullRow, PgtestnullRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PgtestnullFields, PgtestnullRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PgtestnullRow, val merge: (Row, PgtestnullRow) => Row)
-    extends Relation[PgtestnullFields, PgtestnullRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PgtestnullFields, PgtestnullRow] {
   
-    override val fields: PgtestnullFields[Row] = new PgtestnullFields[Row] {
-      override val bool = new OptField[Boolean, Row](prefix, "bool", None, None)(x => extract(x).bool, (row, value) => merge(row, extract(row).copy(bool = value)))
-      override val box = new OptField[TypoBox, Row](prefix, "box", None, Some("box"))(x => extract(x).box, (row, value) => merge(row, extract(row).copy(box = value)))
-      override val bpchar = new OptField[/* bpchar, max 3 chars */ String, Row](prefix, "bpchar", None, Some("bpchar"))(x => extract(x).bpchar, (row, value) => merge(row, extract(row).copy(bpchar = value)))
-      override val bytea = new OptField[TypoBytea, Row](prefix, "bytea", None, Some("bytea"))(x => extract(x).bytea, (row, value) => merge(row, extract(row).copy(bytea = value)))
-      override val char = new OptField[/* bpchar, max 1 chars */ String, Row](prefix, "char", None, Some("bpchar"))(x => extract(x).char, (row, value) => merge(row, extract(row).copy(char = value)))
-      override val circle = new OptField[TypoCircle, Row](prefix, "circle", None, Some("circle"))(x => extract(x).circle, (row, value) => merge(row, extract(row).copy(circle = value)))
-      override val date = new OptField[TypoLocalDate, Row](prefix, "date", Some("text"), Some("date"))(x => extract(x).date, (row, value) => merge(row, extract(row).copy(date = value)))
-      override val float4 = new OptField[Float, Row](prefix, "float4", None, Some("float4"))(x => extract(x).float4, (row, value) => merge(row, extract(row).copy(float4 = value)))
-      override val float8 = new OptField[Double, Row](prefix, "float8", None, Some("float8"))(x => extract(x).float8, (row, value) => merge(row, extract(row).copy(float8 = value)))
-      override val hstore = new OptField[TypoHStore, Row](prefix, "hstore", None, Some("hstore"))(x => extract(x).hstore, (row, value) => merge(row, extract(row).copy(hstore = value)))
-      override val inet = new OptField[TypoInet, Row](prefix, "inet", None, Some("inet"))(x => extract(x).inet, (row, value) => merge(row, extract(row).copy(inet = value)))
-      override val int2 = new OptField[TypoShort, Row](prefix, "int2", None, Some("int2"))(x => extract(x).int2, (row, value) => merge(row, extract(row).copy(int2 = value)))
-      override val int2vector = new OptField[TypoInt2Vector, Row](prefix, "int2vector", None, Some("int2vector"))(x => extract(x).int2vector, (row, value) => merge(row, extract(row).copy(int2vector = value)))
-      override val int4 = new OptField[Int, Row](prefix, "int4", None, Some("int4"))(x => extract(x).int4, (row, value) => merge(row, extract(row).copy(int4 = value)))
-      override val int8 = new OptField[Long, Row](prefix, "int8", None, Some("int8"))(x => extract(x).int8, (row, value) => merge(row, extract(row).copy(int8 = value)))
-      override val interval = new OptField[TypoInterval, Row](prefix, "interval", None, Some("interval"))(x => extract(x).interval, (row, value) => merge(row, extract(row).copy(interval = value)))
-      override val json = new OptField[TypoJson, Row](prefix, "json", None, Some("json"))(x => extract(x).json, (row, value) => merge(row, extract(row).copy(json = value)))
-      override val jsonb = new OptField[TypoJsonb, Row](prefix, "jsonb", None, Some("jsonb"))(x => extract(x).jsonb, (row, value) => merge(row, extract(row).copy(jsonb = value)))
-      override val line = new OptField[TypoLine, Row](prefix, "line", None, Some("line"))(x => extract(x).line, (row, value) => merge(row, extract(row).copy(line = value)))
-      override val lseg = new OptField[TypoLineSegment, Row](prefix, "lseg", None, Some("lseg"))(x => extract(x).lseg, (row, value) => merge(row, extract(row).copy(lseg = value)))
-      override val money = new OptField[TypoMoney, Row](prefix, "money", Some("numeric"), Some("money"))(x => extract(x).money, (row, value) => merge(row, extract(row).copy(money = value)))
-      override val mydomain = new OptField[Mydomain, Row](prefix, "mydomain", None, Some("text"))(x => extract(x).mydomain, (row, value) => merge(row, extract(row).copy(mydomain = value)))
-      override val myenum = new OptField[Myenum, Row](prefix, "myenum", None, Some("public.myenum"))(x => extract(x).myenum, (row, value) => merge(row, extract(row).copy(myenum = value)))
-      override val name = new OptField[String, Row](prefix, "name", None, Some("name"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val numeric = new OptField[BigDecimal, Row](prefix, "numeric", None, Some("numeric"))(x => extract(x).numeric, (row, value) => merge(row, extract(row).copy(numeric = value)))
-      override val path = new OptField[TypoPath, Row](prefix, "path", None, Some("path"))(x => extract(x).path, (row, value) => merge(row, extract(row).copy(path = value)))
-      override val point = new OptField[TypoPoint, Row](prefix, "point", None, Some("point"))(x => extract(x).point, (row, value) => merge(row, extract(row).copy(point = value)))
-      override val polygon = new OptField[TypoPolygon, Row](prefix, "polygon", None, Some("polygon"))(x => extract(x).polygon, (row, value) => merge(row, extract(row).copy(polygon = value)))
-      override val text = new OptField[String, Row](prefix, "text", None, None)(x => extract(x).text, (row, value) => merge(row, extract(row).copy(text = value)))
-      override val time = new OptField[TypoLocalTime, Row](prefix, "time", Some("text"), Some("time"))(x => extract(x).time, (row, value) => merge(row, extract(row).copy(time = value)))
-      override val timestamp = new OptField[TypoLocalDateTime, Row](prefix, "timestamp", Some("text"), Some("timestamp"))(x => extract(x).timestamp, (row, value) => merge(row, extract(row).copy(timestamp = value)))
-      override val timestampz = new OptField[TypoInstant, Row](prefix, "timestampz", Some("text"), Some("timestamptz"))(x => extract(x).timestampz, (row, value) => merge(row, extract(row).copy(timestampz = value)))
-      override val timez = new OptField[TypoOffsetTime, Row](prefix, "timez", Some("text"), Some("timetz"))(x => extract(x).timez, (row, value) => merge(row, extract(row).copy(timez = value)))
-      override val uuid = new OptField[TypoUUID, Row](prefix, "uuid", None, Some("uuid"))(x => extract(x).uuid, (row, value) => merge(row, extract(row).copy(uuid = value)))
-      override val varchar = new OptField[String, Row](prefix, "varchar", None, None)(x => extract(x).varchar, (row, value) => merge(row, extract(row).copy(varchar = value)))
-      override val vector = new OptField[TypoVector, Row](prefix, "vector", Some("float4[]"), Some("vector"))(x => extract(x).vector, (row, value) => merge(row, extract(row).copy(vector = value)))
-      override val xml = new OptField[TypoXml, Row](prefix, "xml", None, Some("xml"))(x => extract(x).xml, (row, value) => merge(row, extract(row).copy(xml = value)))
-      override val boxes = new OptField[Array[TypoBox], Row](prefix, "boxes", None, Some("_box"))(x => extract(x).boxes, (row, value) => merge(row, extract(row).copy(boxes = value)))
-      override val bpchares = new OptField[Array[/* bpchar */ String], Row](prefix, "bpchares", None, Some("_bpchar"))(x => extract(x).bpchares, (row, value) => merge(row, extract(row).copy(bpchares = value)))
-      override val chares = new OptField[Array[/* bpchar */ String], Row](prefix, "chares", None, Some("_bpchar"))(x => extract(x).chares, (row, value) => merge(row, extract(row).copy(chares = value)))
-      override val circlees = new OptField[Array[TypoCircle], Row](prefix, "circlees", None, Some("_circle"))(x => extract(x).circlees, (row, value) => merge(row, extract(row).copy(circlees = value)))
-      override val datees = new OptField[Array[TypoLocalDate], Row](prefix, "datees", Some("text[]"), Some("_date"))(x => extract(x).datees, (row, value) => merge(row, extract(row).copy(datees = value)))
-      override val float4es = new OptField[Array[Float], Row](prefix, "float4es", None, Some("_float4"))(x => extract(x).float4es, (row, value) => merge(row, extract(row).copy(float4es = value)))
-      override val float8es = new OptField[Array[Double], Row](prefix, "float8es", None, Some("_float8"))(x => extract(x).float8es, (row, value) => merge(row, extract(row).copy(float8es = value)))
-      override val inetes = new OptField[Array[TypoInet], Row](prefix, "inetes", None, Some("_inet"))(x => extract(x).inetes, (row, value) => merge(row, extract(row).copy(inetes = value)))
-      override val int2es = new OptField[Array[TypoShort], Row](prefix, "int2es", None, Some("_int2"))(x => extract(x).int2es, (row, value) => merge(row, extract(row).copy(int2es = value)))
-      override val int2vectores = new OptField[Array[TypoInt2Vector], Row](prefix, "int2vectores", None, Some("_int2vector"))(x => extract(x).int2vectores, (row, value) => merge(row, extract(row).copy(int2vectores = value)))
-      override val int4es = new OptField[Array[Int], Row](prefix, "int4es", None, Some("_int4"))(x => extract(x).int4es, (row, value) => merge(row, extract(row).copy(int4es = value)))
-      override val int8es = new OptField[Array[Long], Row](prefix, "int8es", None, Some("_int8"))(x => extract(x).int8es, (row, value) => merge(row, extract(row).copy(int8es = value)))
-      override val intervales = new OptField[Array[TypoInterval], Row](prefix, "intervales", None, Some("_interval"))(x => extract(x).intervales, (row, value) => merge(row, extract(row).copy(intervales = value)))
-      override val jsones = new OptField[Array[TypoJson], Row](prefix, "jsones", None, Some("_json"))(x => extract(x).jsones, (row, value) => merge(row, extract(row).copy(jsones = value)))
-      override val jsonbes = new OptField[Array[TypoJsonb], Row](prefix, "jsonbes", None, Some("_jsonb"))(x => extract(x).jsonbes, (row, value) => merge(row, extract(row).copy(jsonbes = value)))
-      override val linees = new OptField[Array[TypoLine], Row](prefix, "linees", None, Some("_line"))(x => extract(x).linees, (row, value) => merge(row, extract(row).copy(linees = value)))
-      override val lseges = new OptField[Array[TypoLineSegment], Row](prefix, "lseges", None, Some("_lseg"))(x => extract(x).lseges, (row, value) => merge(row, extract(row).copy(lseges = value)))
-      override val moneyes = new OptField[Array[TypoMoney], Row](prefix, "moneyes", Some("numeric[]"), Some("_money"))(x => extract(x).moneyes, (row, value) => merge(row, extract(row).copy(moneyes = value)))
-      override val myenumes = new OptField[Array[Myenum], Row](prefix, "myenumes", None, Some("_myenum"))(x => extract(x).myenumes, (row, value) => merge(row, extract(row).copy(myenumes = value)))
-      override val namees = new OptField[Array[String], Row](prefix, "namees", None, Some("_name"))(x => extract(x).namees, (row, value) => merge(row, extract(row).copy(namees = value)))
-      override val numerices = new OptField[Array[BigDecimal], Row](prefix, "numerices", None, Some("_numeric"))(x => extract(x).numerices, (row, value) => merge(row, extract(row).copy(numerices = value)))
-      override val pathes = new OptField[Array[TypoPath], Row](prefix, "pathes", None, Some("_path"))(x => extract(x).pathes, (row, value) => merge(row, extract(row).copy(pathes = value)))
-      override val pointes = new OptField[Array[TypoPoint], Row](prefix, "pointes", None, Some("_point"))(x => extract(x).pointes, (row, value) => merge(row, extract(row).copy(pointes = value)))
-      override val polygones = new OptField[Array[TypoPolygon], Row](prefix, "polygones", None, Some("_polygon"))(x => extract(x).polygones, (row, value) => merge(row, extract(row).copy(polygones = value)))
-      override val textes = new OptField[Array[String], Row](prefix, "textes", None, Some("_text"))(x => extract(x).textes, (row, value) => merge(row, extract(row).copy(textes = value)))
-      override val timees = new OptField[Array[TypoLocalTime], Row](prefix, "timees", Some("text[]"), Some("_time"))(x => extract(x).timees, (row, value) => merge(row, extract(row).copy(timees = value)))
-      override val timestampes = new OptField[Array[TypoLocalDateTime], Row](prefix, "timestampes", Some("text[]"), Some("_timestamp"))(x => extract(x).timestampes, (row, value) => merge(row, extract(row).copy(timestampes = value)))
-      override val timestampzes = new OptField[Array[TypoInstant], Row](prefix, "timestampzes", Some("text[]"), Some("_timestamptz"))(x => extract(x).timestampzes, (row, value) => merge(row, extract(row).copy(timestampzes = value)))
-      override val timezes = new OptField[Array[TypoOffsetTime], Row](prefix, "timezes", Some("text[]"), Some("_timetz"))(x => extract(x).timezes, (row, value) => merge(row, extract(row).copy(timezes = value)))
-      override val uuides = new OptField[Array[TypoUUID], Row](prefix, "uuides", None, Some("_uuid"))(x => extract(x).uuides, (row, value) => merge(row, extract(row).copy(uuides = value)))
-      override val varchares = new OptField[Array[String], Row](prefix, "varchares", None, Some("_varchar"))(x => extract(x).varchares, (row, value) => merge(row, extract(row).copy(varchares = value)))
-      override val xmles = new OptField[Array[TypoXml], Row](prefix, "xmles", None, Some("_xml"))(x => extract(x).xmles, (row, value) => merge(row, extract(row).copy(xmles = value)))
+    override lazy val fields: PgtestnullFields = new PgtestnullFields {
+      override def bool = OptField[Boolean, PgtestnullRow](_path, "bool", None, None, x => x.bool, (row, value) => row.copy(bool = value))
+      override def box = OptField[TypoBox, PgtestnullRow](_path, "box", None, Some("box"), x => x.box, (row, value) => row.copy(box = value))
+      override def bpchar = OptField[/* bpchar, max 3 chars */ String, PgtestnullRow](_path, "bpchar", None, Some("bpchar"), x => x.bpchar, (row, value) => row.copy(bpchar = value))
+      override def bytea = OptField[TypoBytea, PgtestnullRow](_path, "bytea", None, Some("bytea"), x => x.bytea, (row, value) => row.copy(bytea = value))
+      override def char = OptField[/* bpchar, max 1 chars */ String, PgtestnullRow](_path, "char", None, Some("bpchar"), x => x.char, (row, value) => row.copy(char = value))
+      override def circle = OptField[TypoCircle, PgtestnullRow](_path, "circle", None, Some("circle"), x => x.circle, (row, value) => row.copy(circle = value))
+      override def date = OptField[TypoLocalDate, PgtestnullRow](_path, "date", Some("text"), Some("date"), x => x.date, (row, value) => row.copy(date = value))
+      override def float4 = OptField[Float, PgtestnullRow](_path, "float4", None, Some("float4"), x => x.float4, (row, value) => row.copy(float4 = value))
+      override def float8 = OptField[Double, PgtestnullRow](_path, "float8", None, Some("float8"), x => x.float8, (row, value) => row.copy(float8 = value))
+      override def hstore = OptField[TypoHStore, PgtestnullRow](_path, "hstore", None, Some("hstore"), x => x.hstore, (row, value) => row.copy(hstore = value))
+      override def inet = OptField[TypoInet, PgtestnullRow](_path, "inet", None, Some("inet"), x => x.inet, (row, value) => row.copy(inet = value))
+      override def int2 = OptField[TypoShort, PgtestnullRow](_path, "int2", None, Some("int2"), x => x.int2, (row, value) => row.copy(int2 = value))
+      override def int2vector = OptField[TypoInt2Vector, PgtestnullRow](_path, "int2vector", None, Some("int2vector"), x => x.int2vector, (row, value) => row.copy(int2vector = value))
+      override def int4 = OptField[Int, PgtestnullRow](_path, "int4", None, Some("int4"), x => x.int4, (row, value) => row.copy(int4 = value))
+      override def int8 = OptField[Long, PgtestnullRow](_path, "int8", None, Some("int8"), x => x.int8, (row, value) => row.copy(int8 = value))
+      override def interval = OptField[TypoInterval, PgtestnullRow](_path, "interval", None, Some("interval"), x => x.interval, (row, value) => row.copy(interval = value))
+      override def json = OptField[TypoJson, PgtestnullRow](_path, "json", None, Some("json"), x => x.json, (row, value) => row.copy(json = value))
+      override def jsonb = OptField[TypoJsonb, PgtestnullRow](_path, "jsonb", None, Some("jsonb"), x => x.jsonb, (row, value) => row.copy(jsonb = value))
+      override def line = OptField[TypoLine, PgtestnullRow](_path, "line", None, Some("line"), x => x.line, (row, value) => row.copy(line = value))
+      override def lseg = OptField[TypoLineSegment, PgtestnullRow](_path, "lseg", None, Some("lseg"), x => x.lseg, (row, value) => row.copy(lseg = value))
+      override def money = OptField[TypoMoney, PgtestnullRow](_path, "money", Some("numeric"), Some("money"), x => x.money, (row, value) => row.copy(money = value))
+      override def mydomain = OptField[Mydomain, PgtestnullRow](_path, "mydomain", None, Some("text"), x => x.mydomain, (row, value) => row.copy(mydomain = value))
+      override def myenum = OptField[Myenum, PgtestnullRow](_path, "myenum", None, Some("public.myenum"), x => x.myenum, (row, value) => row.copy(myenum = value))
+      override def name = OptField[String, PgtestnullRow](_path, "name", None, Some("name"), x => x.name, (row, value) => row.copy(name = value))
+      override def numeric = OptField[BigDecimal, PgtestnullRow](_path, "numeric", None, Some("numeric"), x => x.numeric, (row, value) => row.copy(numeric = value))
+      override def path = OptField[TypoPath, PgtestnullRow](_path, "path", None, Some("path"), x => x.path, (row, value) => row.copy(path = value))
+      override def point = OptField[TypoPoint, PgtestnullRow](_path, "point", None, Some("point"), x => x.point, (row, value) => row.copy(point = value))
+      override def polygon = OptField[TypoPolygon, PgtestnullRow](_path, "polygon", None, Some("polygon"), x => x.polygon, (row, value) => row.copy(polygon = value))
+      override def text = OptField[String, PgtestnullRow](_path, "text", None, None, x => x.text, (row, value) => row.copy(text = value))
+      override def time = OptField[TypoLocalTime, PgtestnullRow](_path, "time", Some("text"), Some("time"), x => x.time, (row, value) => row.copy(time = value))
+      override def timestamp = OptField[TypoLocalDateTime, PgtestnullRow](_path, "timestamp", Some("text"), Some("timestamp"), x => x.timestamp, (row, value) => row.copy(timestamp = value))
+      override def timestampz = OptField[TypoInstant, PgtestnullRow](_path, "timestampz", Some("text"), Some("timestamptz"), x => x.timestampz, (row, value) => row.copy(timestampz = value))
+      override def timez = OptField[TypoOffsetTime, PgtestnullRow](_path, "timez", Some("text"), Some("timetz"), x => x.timez, (row, value) => row.copy(timez = value))
+      override def uuid = OptField[TypoUUID, PgtestnullRow](_path, "uuid", None, Some("uuid"), x => x.uuid, (row, value) => row.copy(uuid = value))
+      override def varchar = OptField[String, PgtestnullRow](_path, "varchar", None, None, x => x.varchar, (row, value) => row.copy(varchar = value))
+      override def vector = OptField[TypoVector, PgtestnullRow](_path, "vector", Some("float4[]"), Some("vector"), x => x.vector, (row, value) => row.copy(vector = value))
+      override def xml = OptField[TypoXml, PgtestnullRow](_path, "xml", None, Some("xml"), x => x.xml, (row, value) => row.copy(xml = value))
+      override def boxes = OptField[Array[TypoBox], PgtestnullRow](_path, "boxes", None, Some("_box"), x => x.boxes, (row, value) => row.copy(boxes = value))
+      override def bpchares = OptField[Array[/* bpchar */ String], PgtestnullRow](_path, "bpchares", None, Some("_bpchar"), x => x.bpchares, (row, value) => row.copy(bpchares = value))
+      override def chares = OptField[Array[/* bpchar */ String], PgtestnullRow](_path, "chares", None, Some("_bpchar"), x => x.chares, (row, value) => row.copy(chares = value))
+      override def circlees = OptField[Array[TypoCircle], PgtestnullRow](_path, "circlees", None, Some("_circle"), x => x.circlees, (row, value) => row.copy(circlees = value))
+      override def datees = OptField[Array[TypoLocalDate], PgtestnullRow](_path, "datees", Some("text[]"), Some("_date"), x => x.datees, (row, value) => row.copy(datees = value))
+      override def float4es = OptField[Array[Float], PgtestnullRow](_path, "float4es", None, Some("_float4"), x => x.float4es, (row, value) => row.copy(float4es = value))
+      override def float8es = OptField[Array[Double], PgtestnullRow](_path, "float8es", None, Some("_float8"), x => x.float8es, (row, value) => row.copy(float8es = value))
+      override def inetes = OptField[Array[TypoInet], PgtestnullRow](_path, "inetes", None, Some("_inet"), x => x.inetes, (row, value) => row.copy(inetes = value))
+      override def int2es = OptField[Array[TypoShort], PgtestnullRow](_path, "int2es", None, Some("_int2"), x => x.int2es, (row, value) => row.copy(int2es = value))
+      override def int2vectores = OptField[Array[TypoInt2Vector], PgtestnullRow](_path, "int2vectores", None, Some("_int2vector"), x => x.int2vectores, (row, value) => row.copy(int2vectores = value))
+      override def int4es = OptField[Array[Int], PgtestnullRow](_path, "int4es", None, Some("_int4"), x => x.int4es, (row, value) => row.copy(int4es = value))
+      override def int8es = OptField[Array[Long], PgtestnullRow](_path, "int8es", None, Some("_int8"), x => x.int8es, (row, value) => row.copy(int8es = value))
+      override def intervales = OptField[Array[TypoInterval], PgtestnullRow](_path, "intervales", None, Some("_interval"), x => x.intervales, (row, value) => row.copy(intervales = value))
+      override def jsones = OptField[Array[TypoJson], PgtestnullRow](_path, "jsones", None, Some("_json"), x => x.jsones, (row, value) => row.copy(jsones = value))
+      override def jsonbes = OptField[Array[TypoJsonb], PgtestnullRow](_path, "jsonbes", None, Some("_jsonb"), x => x.jsonbes, (row, value) => row.copy(jsonbes = value))
+      override def linees = OptField[Array[TypoLine], PgtestnullRow](_path, "linees", None, Some("_line"), x => x.linees, (row, value) => row.copy(linees = value))
+      override def lseges = OptField[Array[TypoLineSegment], PgtestnullRow](_path, "lseges", None, Some("_lseg"), x => x.lseges, (row, value) => row.copy(lseges = value))
+      override def moneyes = OptField[Array[TypoMoney], PgtestnullRow](_path, "moneyes", Some("numeric[]"), Some("_money"), x => x.moneyes, (row, value) => row.copy(moneyes = value))
+      override def myenumes = OptField[Array[Myenum], PgtestnullRow](_path, "myenumes", None, Some("_myenum"), x => x.myenumes, (row, value) => row.copy(myenumes = value))
+      override def namees = OptField[Array[String], PgtestnullRow](_path, "namees", None, Some("_name"), x => x.namees, (row, value) => row.copy(namees = value))
+      override def numerices = OptField[Array[BigDecimal], PgtestnullRow](_path, "numerices", None, Some("_numeric"), x => x.numerices, (row, value) => row.copy(numerices = value))
+      override def pathes = OptField[Array[TypoPath], PgtestnullRow](_path, "pathes", None, Some("_path"), x => x.pathes, (row, value) => row.copy(pathes = value))
+      override def pointes = OptField[Array[TypoPoint], PgtestnullRow](_path, "pointes", None, Some("_point"), x => x.pointes, (row, value) => row.copy(pointes = value))
+      override def polygones = OptField[Array[TypoPolygon], PgtestnullRow](_path, "polygones", None, Some("_polygon"), x => x.polygones, (row, value) => row.copy(polygones = value))
+      override def textes = OptField[Array[String], PgtestnullRow](_path, "textes", None, Some("_text"), x => x.textes, (row, value) => row.copy(textes = value))
+      override def timees = OptField[Array[TypoLocalTime], PgtestnullRow](_path, "timees", Some("text[]"), Some("_time"), x => x.timees, (row, value) => row.copy(timees = value))
+      override def timestampes = OptField[Array[TypoLocalDateTime], PgtestnullRow](_path, "timestampes", Some("text[]"), Some("_timestamp"), x => x.timestampes, (row, value) => row.copy(timestampes = value))
+      override def timestampzes = OptField[Array[TypoInstant], PgtestnullRow](_path, "timestampzes", Some("text[]"), Some("_timestamptz"), x => x.timestampzes, (row, value) => row.copy(timestampzes = value))
+      override def timezes = OptField[Array[TypoOffsetTime], PgtestnullRow](_path, "timezes", Some("text[]"), Some("_timetz"), x => x.timezes, (row, value) => row.copy(timezes = value))
+      override def uuides = OptField[Array[TypoUUID], PgtestnullRow](_path, "uuides", None, Some("_uuid"), x => x.uuides, (row, value) => row.copy(uuides = value))
+      override def varchares = OptField[Array[String], PgtestnullRow](_path, "varchares", None, Some("_varchar"), x => x.varchares, (row, value) => row.copy(varchares = value))
+      override def xmles = OptField[Array[TypoXml], PgtestnullRow](_path, "xmles", None, Some("_xml"), x => x.xmles, (row, value) => row.copy(xmles = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.bool, fields.box, fields.bpchar, fields.bytea, fields.char, fields.circle, fields.date, fields.float4, fields.float8, fields.hstore, fields.inet, fields.int2, fields.int2vector, fields.int4, fields.int8, fields.interval, fields.json, fields.jsonb, fields.line, fields.lseg, fields.money, fields.mydomain, fields.myenum, fields.name, fields.numeric, fields.path, fields.point, fields.polygon, fields.text, fields.time, fields.timestamp, fields.timestampz, fields.timez, fields.uuid, fields.varchar, fields.vector, fields.xml, fields.boxes, fields.bpchares, fields.chares, fields.circlees, fields.datees, fields.float4es, fields.float8es, fields.inetes, fields.int2es, fields.int2vectores, fields.int4es, fields.int8es, fields.intervales, fields.jsones, fields.jsonbes, fields.linees, fields.lseges, fields.moneyes, fields.myenumes, fields.namees, fields.numerices, fields.pathes, fields.pointes, fields.polygones, fields.textes, fields.timees, fields.timestampes, fields.timestampzes, fields.timezes, fields.uuides, fields.varchares, fields.xmles)
+    override lazy val columns: List[FieldLikeNoHkt[?, PgtestnullRow]] =
+      List[FieldLikeNoHkt[?, PgtestnullRow]](fields.bool, fields.box, fields.bpchar, fields.bytea, fields.char, fields.circle, fields.date, fields.float4, fields.float8, fields.hstore, fields.inet, fields.int2, fields.int2vector, fields.int4, fields.int8, fields.interval, fields.json, fields.jsonb, fields.line, fields.lseg, fields.money, fields.mydomain, fields.myenum, fields.name, fields.numeric, fields.path, fields.point, fields.polygon, fields.text, fields.time, fields.timestamp, fields.timestampz, fields.timez, fields.uuid, fields.varchar, fields.vector, fields.xml, fields.boxes, fields.bpchares, fields.chares, fields.circlees, fields.datees, fields.float4es, fields.float8es, fields.inetes, fields.int2es, fields.int2vectores, fields.int4es, fields.int8es, fields.intervales, fields.jsones, fields.jsonbes, fields.linees, fields.lseges, fields.moneyes, fields.myenumes, fields.namees, fields.numerices, fields.pathes, fields.pointes, fields.polygones, fields.textes, fields.timees, fields.timestampes, fields.timestampzes, fields.timezes, fields.uuides, fields.varchares, fields.xmles)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PgtestnullRow, merge: (NewRow, PgtestnullRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

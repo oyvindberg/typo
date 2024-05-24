@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, TransactionhistoryRow],
                                  map: scala.collection.mutable.Map[TransactionhistoryId, TransactionhistoryRow] = scala.collection.mutable.Map.empty) extends TransactionhistoryRepo {
   override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, TransactionhistoryFields.structure, map)
   }
   override def deleteById(transactionid: TransactionhistoryId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(transactionid).isDefined)
@@ -85,7 +85,7 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
     }
   }
   override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, TransactionhistoryFields.structure, map)
   }
   override def update(row: TransactionhistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

@@ -9,52 +9,53 @@ package specialoffer
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait SpecialofferFields[Row] {
-  val specialofferid: IdField[SpecialofferId, Row]
-  val description: Field[/* max 255 chars */ String, Row]
-  val discountpct: Field[BigDecimal, Row]
-  val `type`: Field[/* max 50 chars */ String, Row]
-  val category: Field[/* max 50 chars */ String, Row]
-  val startdate: Field[TypoLocalDateTime, Row]
-  val enddate: Field[TypoLocalDateTime, Row]
-  val minqty: Field[Int, Row]
-  val maxqty: OptField[Int, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SpecialofferFields {
+  def specialofferid: IdField[SpecialofferId, SpecialofferRow]
+  def description: Field[/* max 255 chars */ String, SpecialofferRow]
+  def discountpct: Field[BigDecimal, SpecialofferRow]
+  def `type`: Field[/* max 50 chars */ String, SpecialofferRow]
+  def category: Field[/* max 50 chars */ String, SpecialofferRow]
+  def startdate: Field[TypoLocalDateTime, SpecialofferRow]
+  def enddate: Field[TypoLocalDateTime, SpecialofferRow]
+  def minqty: Field[Int, SpecialofferRow]
+  def maxqty: OptField[Int, SpecialofferRow]
+  def rowguid: Field[TypoUUID, SpecialofferRow]
+  def modifieddate: Field[TypoLocalDateTime, SpecialofferRow]
 }
 
 object SpecialofferFields {
-  val structure: Relation[SpecialofferFields, SpecialofferRow, SpecialofferRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SpecialofferFields, SpecialofferRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SpecialofferRow, val merge: (Row, SpecialofferRow) => Row)
-    extends Relation[SpecialofferFields, SpecialofferRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SpecialofferFields, SpecialofferRow] {
   
-    override val fields: SpecialofferFields[Row] = new SpecialofferFields[Row] {
-      override val specialofferid = new IdField[SpecialofferId, Row](prefix, "specialofferid", None, Some("int4"))(x => extract(x).specialofferid, (row, value) => merge(row, extract(row).copy(specialofferid = value)))
-      override val description = new Field[/* max 255 chars */ String, Row](prefix, "description", None, None)(x => extract(x).description, (row, value) => merge(row, extract(row).copy(description = value)))
-      override val discountpct = new Field[BigDecimal, Row](prefix, "discountpct", None, Some("numeric"))(x => extract(x).discountpct, (row, value) => merge(row, extract(row).copy(discountpct = value)))
-      override val `type` = new Field[/* max 50 chars */ String, Row](prefix, "type", None, None)(x => extract(x).`type`, (row, value) => merge(row, extract(row).copy(`type` = value)))
-      override val category = new Field[/* max 50 chars */ String, Row](prefix, "category", None, None)(x => extract(x).category, (row, value) => merge(row, extract(row).copy(category = value)))
-      override val startdate = new Field[TypoLocalDateTime, Row](prefix, "startdate", Some("text"), Some("timestamp"))(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
-      override val enddate = new Field[TypoLocalDateTime, Row](prefix, "enddate", Some("text"), Some("timestamp"))(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
-      override val minqty = new Field[Int, Row](prefix, "minqty", None, Some("int4"))(x => extract(x).minqty, (row, value) => merge(row, extract(row).copy(minqty = value)))
-      override val maxqty = new OptField[Int, Row](prefix, "maxqty", None, Some("int4"))(x => extract(x).maxqty, (row, value) => merge(row, extract(row).copy(maxqty = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SpecialofferFields = new SpecialofferFields {
+      override def specialofferid = IdField[SpecialofferId, SpecialofferRow](_path, "specialofferid", None, Some("int4"), x => x.specialofferid, (row, value) => row.copy(specialofferid = value))
+      override def description = Field[/* max 255 chars */ String, SpecialofferRow](_path, "description", None, None, x => x.description, (row, value) => row.copy(description = value))
+      override def discountpct = Field[BigDecimal, SpecialofferRow](_path, "discountpct", None, Some("numeric"), x => x.discountpct, (row, value) => row.copy(discountpct = value))
+      override def `type` = Field[/* max 50 chars */ String, SpecialofferRow](_path, "type", None, None, x => x.`type`, (row, value) => row.copy(`type` = value))
+      override def category = Field[/* max 50 chars */ String, SpecialofferRow](_path, "category", None, None, x => x.category, (row, value) => row.copy(category = value))
+      override def startdate = Field[TypoLocalDateTime, SpecialofferRow](_path, "startdate", Some("text"), Some("timestamp"), x => x.startdate, (row, value) => row.copy(startdate = value))
+      override def enddate = Field[TypoLocalDateTime, SpecialofferRow](_path, "enddate", Some("text"), Some("timestamp"), x => x.enddate, (row, value) => row.copy(enddate = value))
+      override def minqty = Field[Int, SpecialofferRow](_path, "minqty", None, Some("int4"), x => x.minqty, (row, value) => row.copy(minqty = value))
+      override def maxqty = OptField[Int, SpecialofferRow](_path, "maxqty", None, Some("int4"), x => x.maxqty, (row, value) => row.copy(maxqty = value))
+      override def rowguid = Field[TypoUUID, SpecialofferRow](_path, "rowguid", None, Some("uuid"), x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, SpecialofferRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.specialofferid, fields.description, fields.discountpct, fields.`type`, fields.category, fields.startdate, fields.enddate, fields.minqty, fields.maxqty, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SpecialofferRow]] =
+      List[FieldLikeNoHkt[?, SpecialofferRow]](fields.specialofferid, fields.description, fields.discountpct, fields.`type`, fields.category, fields.startdate, fields.enddate, fields.minqty, fields.maxqty, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SpecialofferRow, merge: (NewRow, SpecialofferRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

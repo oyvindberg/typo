@@ -11,51 +11,52 @@ import adventureworks.customtypes.TypoLocalDate
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.userdefined.FirstName
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait VemployeedepartmenthistoryViewFields[Row] {
-  val businessentityid: Field[BusinessentityId, Row]
-  val title: OptField[/* max 8 chars */ String, Row]
-  val firstname: Field[/* user-picked */ FirstName, Row]
-  val middlename: OptField[Name, Row]
-  val lastname: Field[Name, Row]
-  val suffix: OptField[/* max 10 chars */ String, Row]
-  val shift: Field[Name, Row]
-  val department: Field[Name, Row]
-  val groupname: Field[Name, Row]
-  val startdate: Field[TypoLocalDate, Row]
-  val enddate: OptField[TypoLocalDate, Row]
+trait VemployeedepartmenthistoryViewFields {
+  def businessentityid: Field[BusinessentityId, VemployeedepartmenthistoryViewRow]
+  def title: OptField[/* max 8 chars */ String, VemployeedepartmenthistoryViewRow]
+  def firstname: Field[/* user-picked */ FirstName, VemployeedepartmenthistoryViewRow]
+  def middlename: OptField[Name, VemployeedepartmenthistoryViewRow]
+  def lastname: Field[Name, VemployeedepartmenthistoryViewRow]
+  def suffix: OptField[/* max 10 chars */ String, VemployeedepartmenthistoryViewRow]
+  def shift: Field[Name, VemployeedepartmenthistoryViewRow]
+  def department: Field[Name, VemployeedepartmenthistoryViewRow]
+  def groupname: Field[Name, VemployeedepartmenthistoryViewRow]
+  def startdate: Field[TypoLocalDate, VemployeedepartmenthistoryViewRow]
+  def enddate: OptField[TypoLocalDate, VemployeedepartmenthistoryViewRow]
 }
 
 object VemployeedepartmenthistoryViewFields {
-  val structure: Relation[VemployeedepartmenthistoryViewFields, VemployeedepartmenthistoryViewRow, VemployeedepartmenthistoryViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[VemployeedepartmenthistoryViewFields, VemployeedepartmenthistoryViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => VemployeedepartmenthistoryViewRow, val merge: (Row, VemployeedepartmenthistoryViewRow) => Row)
-    extends Relation[VemployeedepartmenthistoryViewFields, VemployeedepartmenthistoryViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[VemployeedepartmenthistoryViewFields, VemployeedepartmenthistoryViewRow] {
   
-    override val fields: VemployeedepartmenthistoryViewFields[Row] = new VemployeedepartmenthistoryViewFields[Row] {
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val title = new OptField[/* max 8 chars */ String, Row](prefix, "title", None, None)(x => extract(x).title, (row, value) => merge(row, extract(row).copy(title = value)))
-      override val firstname = new Field[/* user-picked */ FirstName, Row](prefix, "firstname", None, None)(x => extract(x).firstname, (row, value) => merge(row, extract(row).copy(firstname = value)))
-      override val middlename = new OptField[Name, Row](prefix, "middlename", None, None)(x => extract(x).middlename, (row, value) => merge(row, extract(row).copy(middlename = value)))
-      override val lastname = new Field[Name, Row](prefix, "lastname", None, None)(x => extract(x).lastname, (row, value) => merge(row, extract(row).copy(lastname = value)))
-      override val suffix = new OptField[/* max 10 chars */ String, Row](prefix, "suffix", None, None)(x => extract(x).suffix, (row, value) => merge(row, extract(row).copy(suffix = value)))
-      override val shift = new Field[Name, Row](prefix, "shift", None, None)(x => extract(x).shift, (row, value) => merge(row, extract(row).copy(shift = value)))
-      override val department = new Field[Name, Row](prefix, "department", None, None)(x => extract(x).department, (row, value) => merge(row, extract(row).copy(department = value)))
-      override val groupname = new Field[Name, Row](prefix, "groupname", None, None)(x => extract(x).groupname, (row, value) => merge(row, extract(row).copy(groupname = value)))
-      override val startdate = new Field[TypoLocalDate, Row](prefix, "startdate", Some("text"), None)(x => extract(x).startdate, (row, value) => merge(row, extract(row).copy(startdate = value)))
-      override val enddate = new OptField[TypoLocalDate, Row](prefix, "enddate", Some("text"), None)(x => extract(x).enddate, (row, value) => merge(row, extract(row).copy(enddate = value)))
+    override lazy val fields: VemployeedepartmenthistoryViewFields = new VemployeedepartmenthistoryViewFields {
+      override def businessentityid = Field[BusinessentityId, VemployeedepartmenthistoryViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def title = OptField[/* max 8 chars */ String, VemployeedepartmenthistoryViewRow](_path, "title", None, None, x => x.title, (row, value) => row.copy(title = value))
+      override def firstname = Field[/* user-picked */ FirstName, VemployeedepartmenthistoryViewRow](_path, "firstname", None, None, x => x.firstname, (row, value) => row.copy(firstname = value))
+      override def middlename = OptField[Name, VemployeedepartmenthistoryViewRow](_path, "middlename", None, None, x => x.middlename, (row, value) => row.copy(middlename = value))
+      override def lastname = Field[Name, VemployeedepartmenthistoryViewRow](_path, "lastname", None, None, x => x.lastname, (row, value) => row.copy(lastname = value))
+      override def suffix = OptField[/* max 10 chars */ String, VemployeedepartmenthistoryViewRow](_path, "suffix", None, None, x => x.suffix, (row, value) => row.copy(suffix = value))
+      override def shift = Field[Name, VemployeedepartmenthistoryViewRow](_path, "shift", None, None, x => x.shift, (row, value) => row.copy(shift = value))
+      override def department = Field[Name, VemployeedepartmenthistoryViewRow](_path, "department", None, None, x => x.department, (row, value) => row.copy(department = value))
+      override def groupname = Field[Name, VemployeedepartmenthistoryViewRow](_path, "groupname", None, None, x => x.groupname, (row, value) => row.copy(groupname = value))
+      override def startdate = Field[TypoLocalDate, VemployeedepartmenthistoryViewRow](_path, "startdate", Some("text"), None, x => x.startdate, (row, value) => row.copy(startdate = value))
+      override def enddate = OptField[TypoLocalDate, VemployeedepartmenthistoryViewRow](_path, "enddate", Some("text"), None, x => x.enddate, (row, value) => row.copy(enddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.businessentityid, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.shift, fields.department, fields.groupname, fields.startdate, fields.enddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, VemployeedepartmenthistoryViewRow]] =
+      List[FieldLikeNoHkt[?, VemployeedepartmenthistoryViewRow]](fields.businessentityid, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.shift, fields.department, fields.groupname, fields.startdate, fields.enddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => VemployeedepartmenthistoryViewRow, merge: (NewRow, VemployeedepartmenthistoryViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

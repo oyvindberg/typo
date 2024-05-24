@@ -10,37 +10,38 @@ package addresstype
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait AddresstypeFields[Row] {
-  val addresstypeid: IdField[AddresstypeId, Row]
-  val name: Field[Name, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait AddresstypeFields {
+  def addresstypeid: IdField[AddresstypeId, AddresstypeRow]
+  def name: Field[Name, AddresstypeRow]
+  def rowguid: Field[TypoUUID, AddresstypeRow]
+  def modifieddate: Field[TypoLocalDateTime, AddresstypeRow]
 }
 
 object AddresstypeFields {
-  val structure: Relation[AddresstypeFields, AddresstypeRow, AddresstypeRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[AddresstypeFields, AddresstypeRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => AddresstypeRow, val merge: (Row, AddresstypeRow) => Row)
-    extends Relation[AddresstypeFields, AddresstypeRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[AddresstypeFields, AddresstypeRow] {
   
-    override val fields: AddresstypeFields[Row] = new AddresstypeFields[Row] {
-      override val addresstypeid = new IdField[AddresstypeId, Row](prefix, "addresstypeid", None, Some("int4"))(x => extract(x).addresstypeid, (row, value) => merge(row, extract(row).copy(addresstypeid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: AddresstypeFields = new AddresstypeFields {
+      override def addresstypeid = IdField[AddresstypeId, AddresstypeRow](_path, "addresstypeid", None, Some("int4"), x => x.addresstypeid, (row, value) => row.copy(addresstypeid = value))
+      override def name = Field[Name, AddresstypeRow](_path, "name", None, Some("varchar"), x => x.name, (row, value) => row.copy(name = value))
+      override def rowguid = Field[TypoUUID, AddresstypeRow](_path, "rowguid", None, Some("uuid"), x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, AddresstypeRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.addresstypeid, fields.name, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, AddresstypeRow]] =
+      List[FieldLikeNoHkt[?, AddresstypeRow]](fields.addresstypeid, fields.name, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => AddresstypeRow, merge: (NewRow, AddresstypeRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

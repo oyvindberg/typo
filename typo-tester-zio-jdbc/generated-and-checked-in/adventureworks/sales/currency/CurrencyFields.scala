@@ -9,35 +9,36 @@ package currency
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait CurrencyFields[Row] {
-  val currencycode: IdField[CurrencyId, Row]
-  val name: Field[Name, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait CurrencyFields {
+  def currencycode: IdField[CurrencyId, CurrencyRow]
+  def name: Field[Name, CurrencyRow]
+  def modifieddate: Field[TypoLocalDateTime, CurrencyRow]
 }
 
 object CurrencyFields {
-  val structure: Relation[CurrencyFields, CurrencyRow, CurrencyRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[CurrencyFields, CurrencyRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => CurrencyRow, val merge: (Row, CurrencyRow) => Row)
-    extends Relation[CurrencyFields, CurrencyRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[CurrencyFields, CurrencyRow] {
   
-    override val fields: CurrencyFields[Row] = new CurrencyFields[Row] {
-      override val currencycode = new IdField[CurrencyId, Row](prefix, "currencycode", None, Some("bpchar"))(x => extract(x).currencycode, (row, value) => merge(row, extract(row).copy(currencycode = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: CurrencyFields = new CurrencyFields {
+      override def currencycode = IdField[CurrencyId, CurrencyRow](_path, "currencycode", None, Some("bpchar"), x => x.currencycode, (row, value) => row.copy(currencycode = value))
+      override def name = Field[Name, CurrencyRow](_path, "name", None, Some("varchar"), x => x.name, (row, value) => row.copy(name = value))
+      override def modifieddate = Field[TypoLocalDateTime, CurrencyRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.currencycode, fields.name, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, CurrencyRow]] =
+      List[FieldLikeNoHkt[?, CurrencyRow]](fields.currencycode, fields.name, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => CurrencyRow, merge: (NewRow, CurrencyRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

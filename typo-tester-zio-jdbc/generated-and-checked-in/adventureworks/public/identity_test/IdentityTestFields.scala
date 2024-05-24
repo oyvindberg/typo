@@ -7,35 +7,36 @@ package adventureworks
 package public
 package identity_test
 
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait IdentityTestFields[Row] {
-  val alwaysGenerated: Field[Int, Row]
-  val defaultGenerated: Field[Int, Row]
-  val name: IdField[IdentityTestId, Row]
+trait IdentityTestFields {
+  def alwaysGenerated: Field[Int, IdentityTestRow]
+  def defaultGenerated: Field[Int, IdentityTestRow]
+  def name: IdField[IdentityTestId, IdentityTestRow]
 }
 
 object IdentityTestFields {
-  val structure: Relation[IdentityTestFields, IdentityTestRow, IdentityTestRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[IdentityTestFields, IdentityTestRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => IdentityTestRow, val merge: (Row, IdentityTestRow) => Row)
-    extends Relation[IdentityTestFields, IdentityTestRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[IdentityTestFields, IdentityTestRow] {
   
-    override val fields: IdentityTestFields[Row] = new IdentityTestFields[Row] {
-      override val alwaysGenerated = new Field[Int, Row](prefix, "always_generated", None, Some("int4"))(x => extract(x).alwaysGenerated, (row, value) => merge(row, extract(row).copy(alwaysGenerated = value)))
-      override val defaultGenerated = new Field[Int, Row](prefix, "default_generated", None, Some("int4"))(x => extract(x).defaultGenerated, (row, value) => merge(row, extract(row).copy(defaultGenerated = value)))
-      override val name = new IdField[IdentityTestId, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
+    override lazy val fields: IdentityTestFields = new IdentityTestFields {
+      override def alwaysGenerated = Field[Int, IdentityTestRow](_path, "always_generated", None, Some("int4"), x => x.alwaysGenerated, (row, value) => row.copy(alwaysGenerated = value))
+      override def defaultGenerated = Field[Int, IdentityTestRow](_path, "default_generated", None, Some("int4"), x => x.defaultGenerated, (row, value) => row.copy(defaultGenerated = value))
+      override def name = IdField[IdentityTestId, IdentityTestRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.alwaysGenerated, fields.defaultGenerated, fields.name)
+    override lazy val columns: List[FieldLikeNoHkt[?, IdentityTestRow]] =
+      List[FieldLikeNoHkt[?, IdentityTestRow]](fields.alwaysGenerated, fields.defaultGenerated, fields.name)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => IdentityTestRow, merge: (NewRow, IdentityTestRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

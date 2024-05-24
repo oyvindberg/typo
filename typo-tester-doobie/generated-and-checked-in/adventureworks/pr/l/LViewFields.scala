@@ -10,40 +10,41 @@ package l
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.location.LocationId
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait LViewFields[Row] {
-  val id: Field[LocationId, Row]
-  val locationid: Field[LocationId, Row]
-  val name: Field[Name, Row]
-  val costrate: Field[BigDecimal, Row]
-  val availability: Field[BigDecimal, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait LViewFields {
+  def id: Field[LocationId, LViewRow]
+  def locationid: Field[LocationId, LViewRow]
+  def name: Field[Name, LViewRow]
+  def costrate: Field[BigDecimal, LViewRow]
+  def availability: Field[BigDecimal, LViewRow]
+  def modifieddate: Field[TypoLocalDateTime, LViewRow]
 }
 
 object LViewFields {
-  val structure: Relation[LViewFields, LViewRow, LViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[LViewFields, LViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => LViewRow, val merge: (Row, LViewRow) => Row)
-    extends Relation[LViewFields, LViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[LViewFields, LViewRow] {
   
-    override val fields: LViewFields[Row] = new LViewFields[Row] {
-      override val id = new Field[LocationId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val locationid = new Field[LocationId, Row](prefix, "locationid", None, None)(x => extract(x).locationid, (row, value) => merge(row, extract(row).copy(locationid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val costrate = new Field[BigDecimal, Row](prefix, "costrate", None, None)(x => extract(x).costrate, (row, value) => merge(row, extract(row).copy(costrate = value)))
-      override val availability = new Field[BigDecimal, Row](prefix, "availability", None, None)(x => extract(x).availability, (row, value) => merge(row, extract(row).copy(availability = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: LViewFields = new LViewFields {
+      override def id = Field[LocationId, LViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def locationid = Field[LocationId, LViewRow](_path, "locationid", None, None, x => x.locationid, (row, value) => row.copy(locationid = value))
+      override def name = Field[Name, LViewRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def costrate = Field[BigDecimal, LViewRow](_path, "costrate", None, None, x => x.costrate, (row, value) => row.copy(costrate = value))
+      override def availability = Field[BigDecimal, LViewRow](_path, "availability", None, None, x => x.availability, (row, value) => row.copy(availability = value))
+      override def modifieddate = Field[TypoLocalDateTime, LViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.locationid, fields.name, fields.costrate, fields.availability, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, LViewRow]] =
+      List[FieldLikeNoHkt[?, LViewRow]](fields.id, fields.locationid, fields.name, fields.costrate, fields.availability, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => LViewRow, merge: (NewRow, LViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

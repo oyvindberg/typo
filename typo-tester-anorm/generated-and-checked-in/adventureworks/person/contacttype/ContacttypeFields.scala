@@ -9,35 +9,36 @@ package contacttype
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait ContacttypeFields[Row] {
-  val contacttypeid: IdField[ContacttypeId, Row]
-  val name: Field[Name, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait ContacttypeFields {
+  def contacttypeid: IdField[ContacttypeId, ContacttypeRow]
+  def name: Field[Name, ContacttypeRow]
+  def modifieddate: Field[TypoLocalDateTime, ContacttypeRow]
 }
 
 object ContacttypeFields {
-  val structure: Relation[ContacttypeFields, ContacttypeRow, ContacttypeRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[ContacttypeFields, ContacttypeRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => ContacttypeRow, val merge: (Row, ContacttypeRow) => Row)
-    extends Relation[ContacttypeFields, ContacttypeRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[ContacttypeFields, ContacttypeRow] {
   
-    override val fields: ContacttypeFields[Row] = new ContacttypeFields[Row] {
-      override val contacttypeid = new IdField[ContacttypeId, Row](prefix, "contacttypeid", None, Some("int4"))(x => extract(x).contacttypeid, (row, value) => merge(row, extract(row).copy(contacttypeid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: ContacttypeFields = new ContacttypeFields {
+      override def contacttypeid = IdField[ContacttypeId, ContacttypeRow](_path, "contacttypeid", None, Some("int4"), x => x.contacttypeid, (row, value) => row.copy(contacttypeid = value))
+      override def name = Field[Name, ContacttypeRow](_path, "name", None, Some("varchar"), x => x.name, (row, value) => row.copy(name = value))
+      override def modifieddate = Field[TypoLocalDateTime, ContacttypeRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.contacttypeid, fields.name, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, ContacttypeRow]] =
+      List[FieldLikeNoHkt[?, ContacttypeRow]](fields.contacttypeid, fields.name, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => ContacttypeRow, merge: (NewRow, ContacttypeRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

@@ -1,9 +1,7 @@
 package typo.dsl.pagination
 
-import typo.dsl.SortOrderNoHkt
+import typo.dsl.{RenderCtx, SortOrderNoHkt}
 import zio.jdbc.SqlFragment
-
-import java.util.concurrent.atomic.AtomicInteger
 
 /** A client cursor is inherently tied to a set of sort orderings.
   *
@@ -12,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger
 case class SortOrderRepr(expr: String) extends AnyVal
 
 object SortOrderRepr {
-  def from[NT, R](x: SortOrderNoHkt[NT, R]): SortOrderRepr = {
+  def from[NT](x: SortOrderNoHkt[NT], ctx: RenderCtx): SortOrderRepr = {
     val sql = new StringBuilder()
 
     // no usable way to just get the sql without parameters in zio-jdbc :(
@@ -25,7 +23,7 @@ object SortOrderRepr {
       }
 
     // note `x.expr`! the value is independent of ascending/descending and nulls first/last
-    recAdd(x.expr.render(new AtomicInteger(0)))
+    recAdd(x.expr.render(ctx))
 
     SortOrderRepr(sql.result().trim)
   }

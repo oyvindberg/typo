@@ -10,36 +10,37 @@ package pcc
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.userdefined.CustomCreditcardId
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.Structure.Relation
 
-trait PccViewFields[Row] {
-  val id: Field[BusinessentityId, Row]
-  val businessentityid: Field[BusinessentityId, Row]
-  val creditcardid: Field[/* user-picked */ CustomCreditcardId, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait PccViewFields {
+  def id: Field[BusinessentityId, PccViewRow]
+  def businessentityid: Field[BusinessentityId, PccViewRow]
+  def creditcardid: Field[/* user-picked */ CustomCreditcardId, PccViewRow]
+  def modifieddate: Field[TypoLocalDateTime, PccViewRow]
 }
 
 object PccViewFields {
-  val structure: Relation[PccViewFields, PccViewRow, PccViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PccViewFields, PccViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PccViewRow, val merge: (Row, PccViewRow) => Row)
-    extends Relation[PccViewFields, PccViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PccViewFields, PccViewRow] {
   
-    override val fields: PccViewFields[Row] = new PccViewFields[Row] {
-      override val id = new Field[BusinessentityId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val businessentityid = new Field[BusinessentityId, Row](prefix, "businessentityid", None, None)(x => extract(x).businessentityid, (row, value) => merge(row, extract(row).copy(businessentityid = value)))
-      override val creditcardid = new Field[/* user-picked */ CustomCreditcardId, Row](prefix, "creditcardid", None, None)(x => extract(x).creditcardid, (row, value) => merge(row, extract(row).copy(creditcardid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: PccViewFields = new PccViewFields {
+      override def id = Field[BusinessentityId, PccViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def businessentityid = Field[BusinessentityId, PccViewRow](_path, "businessentityid", None, None, x => x.businessentityid, (row, value) => row.copy(businessentityid = value))
+      override def creditcardid = Field[/* user-picked */ CustomCreditcardId, PccViewRow](_path, "creditcardid", None, None, x => x.creditcardid, (row, value) => row.copy(creditcardid = value))
+      override def modifieddate = Field[TypoLocalDateTime, PccViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.businessentityid, fields.creditcardid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, PccViewRow]] =
+      List[FieldLikeNoHkt[?, PccViewRow]](fields.id, fields.businessentityid, fields.creditcardid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PccViewRow, merge: (NewRow, PccViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

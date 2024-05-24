@@ -16,81 +16,82 @@ import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
-trait PViewFields[Row] {
-  val id: Field[ProductId, Row]
-  val productid: Field[ProductId, Row]
-  val name: Field[Name, Row]
-  val productnumber: Field[/* max 25 chars */ String, Row]
-  val makeflag: Field[Flag, Row]
-  val finishedgoodsflag: Field[Flag, Row]
-  val color: OptField[/* max 15 chars */ String, Row]
-  val safetystocklevel: Field[TypoShort, Row]
-  val reorderpoint: Field[TypoShort, Row]
-  val standardcost: Field[BigDecimal, Row]
-  val listprice: Field[BigDecimal, Row]
-  val size: OptField[/* max 5 chars */ String, Row]
-  val sizeunitmeasurecode: OptField[UnitmeasureId, Row]
-  val weightunitmeasurecode: OptField[UnitmeasureId, Row]
-  val weight: OptField[BigDecimal, Row]
-  val daystomanufacture: Field[Int, Row]
-  val productline: OptField[/* bpchar, max 2 chars */ String, Row]
-  val `class`: OptField[/* bpchar, max 2 chars */ String, Row]
-  val style: OptField[/* bpchar, max 2 chars */ String, Row]
-  val productsubcategoryid: OptField[ProductsubcategoryId, Row]
-  val productmodelid: OptField[ProductmodelId, Row]
-  val sellstartdate: Field[TypoLocalDateTime, Row]
-  val sellenddate: OptField[TypoLocalDateTime, Row]
-  val discontinueddate: OptField[TypoLocalDateTime, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait PViewFields {
+  def id: Field[ProductId, PViewRow]
+  def productid: Field[ProductId, PViewRow]
+  def name: Field[Name, PViewRow]
+  def productnumber: Field[/* max 25 chars */ String, PViewRow]
+  def makeflag: Field[Flag, PViewRow]
+  def finishedgoodsflag: Field[Flag, PViewRow]
+  def color: OptField[/* max 15 chars */ String, PViewRow]
+  def safetystocklevel: Field[TypoShort, PViewRow]
+  def reorderpoint: Field[TypoShort, PViewRow]
+  def standardcost: Field[BigDecimal, PViewRow]
+  def listprice: Field[BigDecimal, PViewRow]
+  def size: OptField[/* max 5 chars */ String, PViewRow]
+  def sizeunitmeasurecode: OptField[UnitmeasureId, PViewRow]
+  def weightunitmeasurecode: OptField[UnitmeasureId, PViewRow]
+  def weight: OptField[BigDecimal, PViewRow]
+  def daystomanufacture: Field[Int, PViewRow]
+  def productline: OptField[/* bpchar, max 2 chars */ String, PViewRow]
+  def `class`: OptField[/* bpchar, max 2 chars */ String, PViewRow]
+  def style: OptField[/* bpchar, max 2 chars */ String, PViewRow]
+  def productsubcategoryid: OptField[ProductsubcategoryId, PViewRow]
+  def productmodelid: OptField[ProductmodelId, PViewRow]
+  def sellstartdate: Field[TypoLocalDateTime, PViewRow]
+  def sellenddate: OptField[TypoLocalDateTime, PViewRow]
+  def discontinueddate: OptField[TypoLocalDateTime, PViewRow]
+  def rowguid: Field[TypoUUID, PViewRow]
+  def modifieddate: Field[TypoLocalDateTime, PViewRow]
 }
 
 object PViewFields {
-  val structure: Relation[PViewFields, PViewRow, PViewRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[PViewFields, PViewRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => PViewRow, val merge: (Row, PViewRow) => Row)
-    extends Relation[PViewFields, PViewRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[PViewFields, PViewRow] {
   
-    override val fields: PViewFields[Row] = new PViewFields[Row] {
-      override val id = new Field[ProductId, Row](prefix, "id", None, None)(x => extract(x).id, (row, value) => merge(row, extract(row).copy(id = value)))
-      override val productid = new Field[ProductId, Row](prefix, "productid", None, None)(x => extract(x).productid, (row, value) => merge(row, extract(row).copy(productid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, None)(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val productnumber = new Field[/* max 25 chars */ String, Row](prefix, "productnumber", None, None)(x => extract(x).productnumber, (row, value) => merge(row, extract(row).copy(productnumber = value)))
-      override val makeflag = new Field[Flag, Row](prefix, "makeflag", None, None)(x => extract(x).makeflag, (row, value) => merge(row, extract(row).copy(makeflag = value)))
-      override val finishedgoodsflag = new Field[Flag, Row](prefix, "finishedgoodsflag", None, None)(x => extract(x).finishedgoodsflag, (row, value) => merge(row, extract(row).copy(finishedgoodsflag = value)))
-      override val color = new OptField[/* max 15 chars */ String, Row](prefix, "color", None, None)(x => extract(x).color, (row, value) => merge(row, extract(row).copy(color = value)))
-      override val safetystocklevel = new Field[TypoShort, Row](prefix, "safetystocklevel", None, None)(x => extract(x).safetystocklevel, (row, value) => merge(row, extract(row).copy(safetystocklevel = value)))
-      override val reorderpoint = new Field[TypoShort, Row](prefix, "reorderpoint", None, None)(x => extract(x).reorderpoint, (row, value) => merge(row, extract(row).copy(reorderpoint = value)))
-      override val standardcost = new Field[BigDecimal, Row](prefix, "standardcost", None, None)(x => extract(x).standardcost, (row, value) => merge(row, extract(row).copy(standardcost = value)))
-      override val listprice = new Field[BigDecimal, Row](prefix, "listprice", None, None)(x => extract(x).listprice, (row, value) => merge(row, extract(row).copy(listprice = value)))
-      override val size = new OptField[/* max 5 chars */ String, Row](prefix, "size", None, None)(x => extract(x).size, (row, value) => merge(row, extract(row).copy(size = value)))
-      override val sizeunitmeasurecode = new OptField[UnitmeasureId, Row](prefix, "sizeunitmeasurecode", None, None)(x => extract(x).sizeunitmeasurecode, (row, value) => merge(row, extract(row).copy(sizeunitmeasurecode = value)))
-      override val weightunitmeasurecode = new OptField[UnitmeasureId, Row](prefix, "weightunitmeasurecode", None, None)(x => extract(x).weightunitmeasurecode, (row, value) => merge(row, extract(row).copy(weightunitmeasurecode = value)))
-      override val weight = new OptField[BigDecimal, Row](prefix, "weight", None, None)(x => extract(x).weight, (row, value) => merge(row, extract(row).copy(weight = value)))
-      override val daystomanufacture = new Field[Int, Row](prefix, "daystomanufacture", None, None)(x => extract(x).daystomanufacture, (row, value) => merge(row, extract(row).copy(daystomanufacture = value)))
-      override val productline = new OptField[/* bpchar, max 2 chars */ String, Row](prefix, "productline", None, None)(x => extract(x).productline, (row, value) => merge(row, extract(row).copy(productline = value)))
-      override val `class` = new OptField[/* bpchar, max 2 chars */ String, Row](prefix, "class", None, None)(x => extract(x).`class`, (row, value) => merge(row, extract(row).copy(`class` = value)))
-      override val style = new OptField[/* bpchar, max 2 chars */ String, Row](prefix, "style", None, None)(x => extract(x).style, (row, value) => merge(row, extract(row).copy(style = value)))
-      override val productsubcategoryid = new OptField[ProductsubcategoryId, Row](prefix, "productsubcategoryid", None, None)(x => extract(x).productsubcategoryid, (row, value) => merge(row, extract(row).copy(productsubcategoryid = value)))
-      override val productmodelid = new OptField[ProductmodelId, Row](prefix, "productmodelid", None, None)(x => extract(x).productmodelid, (row, value) => merge(row, extract(row).copy(productmodelid = value)))
-      override val sellstartdate = new Field[TypoLocalDateTime, Row](prefix, "sellstartdate", Some("text"), None)(x => extract(x).sellstartdate, (row, value) => merge(row, extract(row).copy(sellstartdate = value)))
-      override val sellenddate = new OptField[TypoLocalDateTime, Row](prefix, "sellenddate", Some("text"), None)(x => extract(x).sellenddate, (row, value) => merge(row, extract(row).copy(sellenddate = value)))
-      override val discontinueddate = new OptField[TypoLocalDateTime, Row](prefix, "discontinueddate", Some("text"), None)(x => extract(x).discontinueddate, (row, value) => merge(row, extract(row).copy(discontinueddate = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, None)(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), None)(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: PViewFields = new PViewFields {
+      override def id = Field[ProductId, PViewRow](_path, "id", None, None, x => x.id, (row, value) => row.copy(id = value))
+      override def productid = Field[ProductId, PViewRow](_path, "productid", None, None, x => x.productid, (row, value) => row.copy(productid = value))
+      override def name = Field[Name, PViewRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
+      override def productnumber = Field[/* max 25 chars */ String, PViewRow](_path, "productnumber", None, None, x => x.productnumber, (row, value) => row.copy(productnumber = value))
+      override def makeflag = Field[Flag, PViewRow](_path, "makeflag", None, None, x => x.makeflag, (row, value) => row.copy(makeflag = value))
+      override def finishedgoodsflag = Field[Flag, PViewRow](_path, "finishedgoodsflag", None, None, x => x.finishedgoodsflag, (row, value) => row.copy(finishedgoodsflag = value))
+      override def color = OptField[/* max 15 chars */ String, PViewRow](_path, "color", None, None, x => x.color, (row, value) => row.copy(color = value))
+      override def safetystocklevel = Field[TypoShort, PViewRow](_path, "safetystocklevel", None, None, x => x.safetystocklevel, (row, value) => row.copy(safetystocklevel = value))
+      override def reorderpoint = Field[TypoShort, PViewRow](_path, "reorderpoint", None, None, x => x.reorderpoint, (row, value) => row.copy(reorderpoint = value))
+      override def standardcost = Field[BigDecimal, PViewRow](_path, "standardcost", None, None, x => x.standardcost, (row, value) => row.copy(standardcost = value))
+      override def listprice = Field[BigDecimal, PViewRow](_path, "listprice", None, None, x => x.listprice, (row, value) => row.copy(listprice = value))
+      override def size = OptField[/* max 5 chars */ String, PViewRow](_path, "size", None, None, x => x.size, (row, value) => row.copy(size = value))
+      override def sizeunitmeasurecode = OptField[UnitmeasureId, PViewRow](_path, "sizeunitmeasurecode", None, None, x => x.sizeunitmeasurecode, (row, value) => row.copy(sizeunitmeasurecode = value))
+      override def weightunitmeasurecode = OptField[UnitmeasureId, PViewRow](_path, "weightunitmeasurecode", None, None, x => x.weightunitmeasurecode, (row, value) => row.copy(weightunitmeasurecode = value))
+      override def weight = OptField[BigDecimal, PViewRow](_path, "weight", None, None, x => x.weight, (row, value) => row.copy(weight = value))
+      override def daystomanufacture = Field[Int, PViewRow](_path, "daystomanufacture", None, None, x => x.daystomanufacture, (row, value) => row.copy(daystomanufacture = value))
+      override def productline = OptField[/* bpchar, max 2 chars */ String, PViewRow](_path, "productline", None, None, x => x.productline, (row, value) => row.copy(productline = value))
+      override def `class` = OptField[/* bpchar, max 2 chars */ String, PViewRow](_path, "class", None, None, x => x.`class`, (row, value) => row.copy(`class` = value))
+      override def style = OptField[/* bpchar, max 2 chars */ String, PViewRow](_path, "style", None, None, x => x.style, (row, value) => row.copy(style = value))
+      override def productsubcategoryid = OptField[ProductsubcategoryId, PViewRow](_path, "productsubcategoryid", None, None, x => x.productsubcategoryid, (row, value) => row.copy(productsubcategoryid = value))
+      override def productmodelid = OptField[ProductmodelId, PViewRow](_path, "productmodelid", None, None, x => x.productmodelid, (row, value) => row.copy(productmodelid = value))
+      override def sellstartdate = Field[TypoLocalDateTime, PViewRow](_path, "sellstartdate", Some("text"), None, x => x.sellstartdate, (row, value) => row.copy(sellstartdate = value))
+      override def sellenddate = OptField[TypoLocalDateTime, PViewRow](_path, "sellenddate", Some("text"), None, x => x.sellenddate, (row, value) => row.copy(sellenddate = value))
+      override def discontinueddate = OptField[TypoLocalDateTime, PViewRow](_path, "discontinueddate", Some("text"), None, x => x.discontinueddate, (row, value) => row.copy(discontinueddate = value))
+      override def rowguid = Field[TypoUUID, PViewRow](_path, "rowguid", None, None, x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, PViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.id, fields.productid, fields.name, fields.productnumber, fields.makeflag, fields.finishedgoodsflag, fields.color, fields.safetystocklevel, fields.reorderpoint, fields.standardcost, fields.listprice, fields.size, fields.sizeunitmeasurecode, fields.weightunitmeasurecode, fields.weight, fields.daystomanufacture, fields.productline, fields.`class`, fields.style, fields.productsubcategoryid, fields.productmodelid, fields.sellstartdate, fields.sellenddate, fields.discontinueddate, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, PViewRow]] =
+      List[FieldLikeNoHkt[?, PViewRow]](fields.id, fields.productid, fields.name, fields.productnumber, fields.makeflag, fields.finishedgoodsflag, fields.color, fields.safetystocklevel, fields.reorderpoint, fields.standardcost, fields.listprice, fields.size, fields.sizeunitmeasurecode, fields.weightunitmeasurecode, fields.weight, fields.daystomanufacture, fields.productline, fields.`class`, fields.style, fields.productsubcategoryid, fields.productmodelid, fields.sellstartdate, fields.sellenddate, fields.discontinueddate, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => PViewRow, merge: (NewRow, PViewRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

@@ -3,9 +3,8 @@ package internal
 package codegen
 
 import play.api.libs.json.Json
-import typo.sc.Type
 
-case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option[NonEmptyList[ComputedColumn]], options: InternalOptions) {
+case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option[NonEmptyList[ComputedColumn]], options: InternalOptions, fks: List[db.ForeignKey]) {
   def RowFile(rowType: DbLib.RowType, comment: Option[String], maybeUnsavedRow: Option[(ComputedRowUnsaved, ComputedDefault)]): Option[sc.File] =
     maybeCols.map { cols =>
       val members = List[Option[sc.Code]](
@@ -126,31 +125,26 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
       fieldsName <- names.FieldsName
       cols <- maybeCols
     } yield {
-      val Row = sc.Type.Abstract(sc.Ident("Row"))
-
-      val members =
-        cols
-          .map { col =>
-            val (cls, tpe) =
-              if (names.isIdColumn(col.dbName)) (sc.Type.dsl.IdField, col.tpe)
-              else
-                col.tpe match {
-                  case TypesScala.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
-                  case _                               => (sc.Type.dsl.Field, col.tpe)
-                }
-            code"val ${col.name}: ${cls.of(tpe, Row)}"
-          }
-          .mkCode("\n")
+      val colMembers = cols.map { col =>
+        val (cls, tpe) =
+          if (names.isIdColumn(col.dbName)) (sc.Type.dsl.IdField, col.tpe)
+          else
+            col.tpe match {
+              case TypesScala.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
+              case _                               => (sc.Type.dsl.Field, col.tpe)
+            }
+        code"def ${col.name}: ${cls.of(tpe, names.RowName)}"
+      }
 
       val ImplName = sc.Ident("Impl")
       val str =
-        code"""trait ${fieldsName.name}[$Row] {
-            |  $members
+        code"""trait ${fieldsName.name} {
+            |  ${colMembers.mkCode("\n")}
             |}
             |
             |object ${fieldsName.name} {
-            |  val structure: ${sc.Type.dsl.StructureRelation}[$fieldsName, ${names.RowName}, ${names.RowName}] = 
-            |    new $ImplName(None, identity, (_, x) => x)
+            |  lazy val structure: ${sc.Type.dsl.StructureRelation}[$fieldsName, ${names.RowName}] =
+            |    new $ImplName(${TypesScala.Nil})
             |    
             |  ${structureFile(ImplName, fieldsName, cols)}
             |}
@@ -159,10 +153,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
       sc.File(fieldsName, str, Nil)
     }
 
-  def structureFile(implName: sc.Ident, fieldsName: Type.Qualified, cols: NonEmptyList[ComputedColumn]) = {
-    val Row = sc.Type.Abstract(sc.Ident("Row"))
-    val NewRow = sc.Type.Abstract(sc.Ident("NewRow"))
-
+  def structureFile(implName: sc.Ident, fieldsName: sc.Type.Qualified, cols: NonEmptyList[ComputedColumn]) = {
     val members =
       cols
         .map { col =>
@@ -182,26 +173,25 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
             case Some(sqlCast) => code"${TypesScala.Some}(${sc.StrLit(sqlCast.typeName)})"
             case None          => TypesScala.None.code
           }
-          code"override val ${col.name} = new ${cls.of(tpe, Row)}(prefix, ${sc
-              .StrLit(col.dbName.value)}, $readSqlCast, $writeSqlCast)(x => extract(x).${col.name}, (row, value) => merge(row, extract(row).copy(${col.name} = value)))"
+          code"override def ${col.name} = ${cls.of(tpe, names.RowName)}(_path, ${sc.StrLit(col.dbName.value)}, $readSqlCast, $writeSqlCast, x => x.${col.name}, (row, value) => row.copy(${col.name} = value))"
         }
         .mkCode("\n")
 
-    val optString = TypesScala.Option.of(TypesJava.String)
-    val generalizedColumn = sc.Type.dsl.FieldLikeNoHkt.of(sc.Type.Wildcard, Row)
+    val pathList = TypesScala.List.of(sc.Type.dsl.Path)
+    val generalizedColumn = sc.Type.dsl.FieldLikeNoHkt.of(sc.Type.Wildcard, names.RowName)
     val columnsList = TypesScala.List.of(generalizedColumn)
-    code"""private final class $implName[$Row](val prefix: $optString, val extract: $Row => ${names.RowName}, val merge: ($Row, ${names.RowName}) => $Row)
-          |  extends ${sc.Type.dsl.StructureRelation.of(fieldsName, names.RowName, Row)} { 
+    code"""private final class $implName(val _path: $pathList)
+          |  extends ${sc.Type.dsl.StructureRelation.of(fieldsName, names.RowName)} {
           |
-          |  override val fields: ${fieldsName.name}[$Row] = new ${fieldsName.name}[$Row] {
+          |  override lazy val fields: ${fieldsName.name} = new ${fieldsName.name} {
           |    $members
           |  }
           |
-          |  override val columns: $columnsList =
+          |  override lazy val columns: $columnsList =
           |    $columnsList(${cols.map(x => code"fields.${x.name}").mkCode(", ")})
           |
-          |  override def copy[$NewRow](prefix: $optString, extract: $NewRow => ${names.RowName}, merge: ($NewRow, ${names.RowName}) => $NewRow): $implName[$NewRow] =
-          |    new $implName(prefix, extract, merge)
+          |  override def copy(path: $pathList): $implName =
+          |    new $implName(path)
           |}
           |""".stripMargin
   }

@@ -11,49 +11,50 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait SalesterritoryFields[Row] {
-  val territoryid: IdField[SalesterritoryId, Row]
-  val name: Field[Name, Row]
-  val countryregioncode: Field[CountryregionId, Row]
-  val group: Field[/* max 50 chars */ String, Row]
-  val salesytd: Field[BigDecimal, Row]
-  val saleslastyear: Field[BigDecimal, Row]
-  val costytd: Field[BigDecimal, Row]
-  val costlastyear: Field[BigDecimal, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait SalesterritoryFields {
+  def territoryid: IdField[SalesterritoryId, SalesterritoryRow]
+  def name: Field[Name, SalesterritoryRow]
+  def countryregioncode: Field[CountryregionId, SalesterritoryRow]
+  def group: Field[/* max 50 chars */ String, SalesterritoryRow]
+  def salesytd: Field[BigDecimal, SalesterritoryRow]
+  def saleslastyear: Field[BigDecimal, SalesterritoryRow]
+  def costytd: Field[BigDecimal, SalesterritoryRow]
+  def costlastyear: Field[BigDecimal, SalesterritoryRow]
+  def rowguid: Field[TypoUUID, SalesterritoryRow]
+  def modifieddate: Field[TypoLocalDateTime, SalesterritoryRow]
 }
 
 object SalesterritoryFields {
-  val structure: Relation[SalesterritoryFields, SalesterritoryRow, SalesterritoryRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[SalesterritoryFields, SalesterritoryRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => SalesterritoryRow, val merge: (Row, SalesterritoryRow) => Row)
-    extends Relation[SalesterritoryFields, SalesterritoryRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[SalesterritoryFields, SalesterritoryRow] {
   
-    override val fields: SalesterritoryFields[Row] = new SalesterritoryFields[Row] {
-      override val territoryid = new IdField[SalesterritoryId, Row](prefix, "territoryid", None, Some("int4"))(x => extract(x).territoryid, (row, value) => merge(row, extract(row).copy(territoryid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val countryregioncode = new Field[CountryregionId, Row](prefix, "countryregioncode", None, None)(x => extract(x).countryregioncode, (row, value) => merge(row, extract(row).copy(countryregioncode = value)))
-      override val group = new Field[/* max 50 chars */ String, Row](prefix, "group", None, None)(x => extract(x).group, (row, value) => merge(row, extract(row).copy(group = value)))
-      override val salesytd = new Field[BigDecimal, Row](prefix, "salesytd", None, Some("numeric"))(x => extract(x).salesytd, (row, value) => merge(row, extract(row).copy(salesytd = value)))
-      override val saleslastyear = new Field[BigDecimal, Row](prefix, "saleslastyear", None, Some("numeric"))(x => extract(x).saleslastyear, (row, value) => merge(row, extract(row).copy(saleslastyear = value)))
-      override val costytd = new Field[BigDecimal, Row](prefix, "costytd", None, Some("numeric"))(x => extract(x).costytd, (row, value) => merge(row, extract(row).copy(costytd = value)))
-      override val costlastyear = new Field[BigDecimal, Row](prefix, "costlastyear", None, Some("numeric"))(x => extract(x).costlastyear, (row, value) => merge(row, extract(row).copy(costlastyear = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: SalesterritoryFields = new SalesterritoryFields {
+      override def territoryid = IdField[SalesterritoryId, SalesterritoryRow](_path, "territoryid", None, Some("int4"), x => x.territoryid, (row, value) => row.copy(territoryid = value))
+      override def name = Field[Name, SalesterritoryRow](_path, "name", None, Some("varchar"), x => x.name, (row, value) => row.copy(name = value))
+      override def countryregioncode = Field[CountryregionId, SalesterritoryRow](_path, "countryregioncode", None, None, x => x.countryregioncode, (row, value) => row.copy(countryregioncode = value))
+      override def group = Field[/* max 50 chars */ String, SalesterritoryRow](_path, "group", None, None, x => x.group, (row, value) => row.copy(group = value))
+      override def salesytd = Field[BigDecimal, SalesterritoryRow](_path, "salesytd", None, Some("numeric"), x => x.salesytd, (row, value) => row.copy(salesytd = value))
+      override def saleslastyear = Field[BigDecimal, SalesterritoryRow](_path, "saleslastyear", None, Some("numeric"), x => x.saleslastyear, (row, value) => row.copy(saleslastyear = value))
+      override def costytd = Field[BigDecimal, SalesterritoryRow](_path, "costytd", None, Some("numeric"), x => x.costytd, (row, value) => row.copy(costytd = value))
+      override def costlastyear = Field[BigDecimal, SalesterritoryRow](_path, "costlastyear", None, Some("numeric"), x => x.costlastyear, (row, value) => row.copy(costlastyear = value))
+      override def rowguid = Field[TypoUUID, SalesterritoryRow](_path, "rowguid", None, Some("uuid"), x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, SalesterritoryRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.territoryid, fields.name, fields.countryregioncode, fields.group, fields.salesytd, fields.saleslastyear, fields.costytd, fields.costlastyear, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, SalesterritoryRow]] =
+      List[FieldLikeNoHkt[?, SalesterritoryRow]](fields.territoryid, fields.name, fields.countryregioncode, fields.group, fields.salesytd, fields.saleslastyear, fields.costytd, fields.costlastyear, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => SalesterritoryRow, merge: (NewRow, SalesterritoryRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }

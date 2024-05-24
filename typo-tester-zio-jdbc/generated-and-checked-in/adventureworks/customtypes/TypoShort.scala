@@ -9,7 +9,6 @@ package customtypes
 import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
-import scala.math.Numeric
 import typo.dsl.Bijection
 import typo.dsl.ParameterMetaData
 import zio.jdbc.JdbcDecoder

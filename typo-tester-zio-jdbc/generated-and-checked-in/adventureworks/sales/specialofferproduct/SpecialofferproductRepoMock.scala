@@ -26,7 +26,7 @@ import zio.stream.ZStream
 class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved, SpecialofferproductRow],
                                   map: scala.collection.mutable.Map[SpecialofferproductId, SpecialofferproductRow] = scala.collection.mutable.Map.empty) extends SpecialofferproductRepo {
   override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SpecialofferproductFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, SpecialofferproductFields.structure, map)
   }
   override def deleteById(compositeId: SpecialofferproductId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(compositeId).isDefined)
@@ -85,7 +85,7 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
     }
   }
   override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SpecialofferproductFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, SpecialofferproductFields.structure, map)
   }
   override def update(row: SpecialofferproductRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

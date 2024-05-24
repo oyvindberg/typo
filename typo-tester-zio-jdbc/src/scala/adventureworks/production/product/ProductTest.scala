@@ -95,7 +95,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
           .where(x => (x.daystomanufacture > 25).or(x.daystomanufacture <= 0))
           .where(x => x.productline === "foo")
           .join(unitmeasureRepo.select.where(_.name.like("name%")))
-          .on { case (p, um) => p.sizeunitmeasurecode === um.unitmeasurecode }
+          .on { case (p, um) => p.sizeunitmeasurecode.isEqual(um.unitmeasurecode) }
           .join(projectModelRepo.select)
           .leftOn { case ((product, _), productModel) => product.productmodelid === productModel.productmodelid }
           .where { case ((product, _), productModel) => product.productmodelid === productModel(_.productmodelid) }

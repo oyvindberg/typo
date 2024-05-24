@@ -27,7 +27,7 @@ import zio.stream.ZStream
 class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
                        map: scala.collection.mutable.Map[DocumentId, DocumentRow] = scala.collection.mutable.Map.empty) extends DocumentRepo {
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
-    DeleteBuilderMock(DeleteParams.empty, DocumentFields.structure.fields, map)
+    DeleteBuilderMock(DeleteParams.empty, DocumentFields.structure, map)
   }
   override def deleteById(documentnode: DocumentId): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed(map.remove(documentnode).isDefined)
@@ -89,7 +89,7 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
     ZIO.succeed(map.values.find(v => rowguid == v.rowguid))
   }
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
-    UpdateBuilderMock(UpdateParams.empty, DocumentFields.structure.fields, map)
+    UpdateBuilderMock(UpdateParams.empty, DocumentFields.structure, map)
   }
   override def update(row: DocumentRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {

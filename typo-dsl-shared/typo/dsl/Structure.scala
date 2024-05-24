@@ -4,61 +4,122 @@ package typo.dsl
   *
   * This also serves as the type-level connection between `Fields` and `Row`.
   */
-trait Structure[Fields[_], Row] {
-  val fields: Fields[Row]
-  def imap[NewRow](extract: NewRow => Row)(merge: (NewRow, Row) => NewRow): Structure[Fields, NewRow]
-  val columns: List[SqlExpr.FieldLikeNoHkt[?, Row]]
+trait Structure[Fields, Row] {
+  def fields: Fields
+  def columns: List[SqlExpr.FieldLikeNoHkt[?, ?]]
 
-  final def join[Fields2[_], Row2](other: Structure[Fields2, Row2]): Structure[Joined[Fields, Fields2, *], (Row, Row2)] =
-    new Structure.Tupled(
-      left = this.imap[(Row, Row2)] { case (row1, _) => row1 } { case ((_, row2), updatedRow) => (updatedRow, row2) },
-      right = other.imap[(Row, Row2)] { case (_, row2) => row2 } { case ((row1, _), updatedRow) => (row1, updatedRow) }
-    )
+  def withPath(path: Path): Structure[Fields, Row]
 
-  final def leftJoin[Fields2[_], Row2](other: Structure[Fields2, Row2]): Structure[LeftJoined[Fields, Fields2, *], (Row, Option[Row2])] =
-    new Structure.LeftTupled(
-      left = this.imap[(Row, Option[Row2])] { case (row1, _) => row1 } { case ((_, row2), updatedRow) => (updatedRow, row2) },
-      right = other.imap[(Row, Option[Row2])] { case (_, row2) => row2.get } { case ((row1, _), updatedRow) => (row1, Some(updatedRow)) }
-    )
+  // It's up to you to ensure that the `Row` in `field` is the same type as `row`
+  def untypedGet[T, N[_]](field: SqlExpr.FieldLike[T, N, ?], row: Row): N[T]
+
+  // It's up to you to ensure that the `Row` in `field` is the same type as `row`
+  def untypedEval[TN](expr: SqlExpr.SqlExprNoHkt[TN], row: Row): TN =
+    expr match {
+      case expr: SqlExpr[t, n] => untypedEval[t, n](expr, row)
+    }
+
+  // It's up to you to ensure that the `Row` in `field` is the same type as `row`
+  def untypedEval[T, N[_]](expr: SqlExpr[T, N], row: Row): N[T] =
+    (expr: @unchecked) match {
+      case like: SqlExpr.FieldLike[T, N, row] =>
+        untypedGet(like, row)
+      case x: SqlExpr.Const[T, N] =>
+        x.value
+      case x: SqlExpr.ArrayIndex[t, n1, n2] =>
+        x.N
+          .mapN(untypedEval(x.arr, row), untypedEval(x.idx, row)) { (arr: Array[t], idx: Int) =>
+            if (idx < 0 || idx >= arr.length) None
+            else Some(arr(idx))
+          }
+          .flatten
+      case SqlExpr.Apply1(f, arg1, n) =>
+        n.mapN(untypedEval(arg1, row))(f.eval)
+      case SqlExpr.Apply2(f, arg1, arg2, n) =>
+        n.mapN(untypedEval(arg1, row), untypedEval(arg2, row))(f.eval)
+      case SqlExpr.Apply3(f, arg1, arg2, arg3, n) =>
+        n.mapN(untypedEval(arg1, row), untypedEval(arg2, row), untypedEval(arg3, row))(f.eval)
+      case SqlExpr.Binary(left, op, right, n) =>
+        n.mapN(untypedEval(left, row), untypedEval(right, row))(op.eval)
+      case SqlExpr.Underlying(expr, bijection, n) =>
+        n.mapN(untypedEval(expr, row))(bijection.underlying)
+      case x: SqlExpr.Coalesce[t] =>
+        untypedEval(x.expr, row).getOrElse(untypedEval(x.getOrElse, row))
+      case SqlExpr.In(expr, values, _, n) =>
+        n.mapN(untypedEval(expr, row))(values.contains)
+      case x: SqlExpr.IsNull[t] =>
+        untypedEval(x.expr, row).isEmpty
+      case x: SqlExpr.Not[T, N] =>
+        x.N.mapN(untypedEval(x.expr, row))(t => x.B.map(t)(b => !b))
+      case x: SqlExpr.ToNullable[t, n] =>
+        x.N.toOpt(untypedEval(x.expr, row))
+      case x: SqlExpr.RowExpr =>
+        x.exprs.map(expr => untypedEval(expr, row))
+    }
+
+  final def join[Fields2, Row2](other: Structure[Fields2, Row2]): Structure[Joined[Fields, Fields2], (Row, Row2)] =
+    new Structure.Tupled(left = this, right = other)
+
+  final def leftJoin[Fields2, Row2](other: Structure[Fields2, Row2]): Structure[LeftJoined[Fields, Fields2], (Row, Option[Row2])] =
+    new Structure.LeftTupled(left = this, right = other)
 }
 
 object Structure {
-  trait Relation[Fields[_], OriginalRow, Row] extends Structure[Fields, Row] { outer =>
-
-    val prefix: Option[String]
-    val extract: Row => OriginalRow
-    val merge: (Row, OriginalRow) => Row
-
-    def copy[NewRow](prefix: Option[String], extract: NewRow => OriginalRow, merge: (NewRow, OriginalRow) => NewRow): Relation[Fields, OriginalRow, NewRow]
-
-    override def imap[NewRow](extract: NewRow => Row)(merge: (NewRow, Row) => NewRow): Relation[Fields, OriginalRow, NewRow] =
-      copy[NewRow](
-        prefix,
-        newRow => outer.extract(extract(newRow)),
-        (newRow, originalRow) => merge(newRow, outer.merge(extract(newRow), originalRow))
-      )
-
-    def withPrefix(newPrefix: String): Relation[Fields, OriginalRow, Row] =
-      copy(Some(newPrefix), extract, merge)
+  // some of the row types are discarded, exchanging some type-safety for a cleaner API
+  implicit class FieldOps[T, N[_], R0](private val field: SqlExpr.FieldLike[T, N, R0]) extends AnyVal {
+    def castRow[R1]: SqlExpr.FieldLike[T, N, R1] = field.asInstanceOf[SqlExpr.FieldLike[T, N, R1]]
   }
 
-  private class Tupled[Fields1[_], Fields2[_], Row](val left: Structure[Fields1, Row], val right: Structure[Fields2, Row]) extends Structure[Joined[Fields1, Fields2, *], Row] {
-    override val fields: Joined[Fields1, Fields2, Row] = (left.fields, right.fields)
+  trait Relation[Fields, Row] extends Structure[Fields, Row] { outer =>
+    val _path: List[Path]
 
-    override def imap[NewRow](extract: NewRow => Row)(merge: (NewRow, Row) => NewRow): Tupled[Fields1, Fields2, NewRow] =
-      new Tupled(left.imap[NewRow](extract)(merge), right.imap[NewRow](extract)(merge))
+    def copy(path: List[Path]): Relation[Fields, Row]
 
-    override val columns: List[SqlExpr.FieldLikeNoHkt[?, Row]] =
-      left.columns ++ right.columns
+    override def withPath(newPath: Path): Relation[Fields, Row] =
+      copy(path = newPath :: _path)
+
+    override final def untypedGet[T, N[_]](field: SqlExpr.FieldLike[T, N, ?], row: Row): N[T] =
+      field.castRow[Row].get(row)
   }
 
-  private class LeftTupled[Fields1[_], Fields2[_], Row](val left: Structure[Fields1, Row], val right: Structure[Fields2, Row]) extends Structure[LeftJoined[Fields1, Fields2, *], Row] {
-    override val fields: LeftJoined[Fields1, Fields2, Row] = (left.fields, new OuterJoined(right.fields))
+  private class Tupled[Fields1, Fields2, Row1, Row2](val left: Structure[Fields1, Row1], val right: Structure[Fields2, Row2]) extends Structure[Joined[Fields1, Fields2], (Row1, Row2)] {
+    override val fields: Joined[Fields1, Fields2] =
+      (left.fields, right.fields)
 
-    override def imap[NewRow](extract: NewRow => Row)(merge: (NewRow, Row) => NewRow): LeftTupled[Fields1, Fields2, NewRow] =
-      new LeftTupled(left.imap[NewRow](extract)(merge), right.imap[NewRow](extract)(merge))
-
-    override val columns: List[SqlExpr.FieldLikeNoHkt[?, Row]] =
+    override val columns: List[SqlExpr.FieldLikeNoHkt[?, ?]] =
       left.columns ++ right.columns
+
+    override def untypedGet[T, N[_]](field: SqlExpr.FieldLike[T, N, ?], row: (Row1, Row2)): N[T] =
+      if (left.columns.contains(field)) left.untypedGet(field.castRow, row._1)
+      else right.untypedGet(field.castRow, row._2)
+
+    override def withPath(path: Path): Tupled[Fields1, Fields2, Row1, Row2] =
+      new Tupled(left.withPath(path), right.withPath(path))
+  }
+
+  private class LeftTupled[Fields1, Fields2, Row1, Row2](val left: Structure[Fields1, Row1], val right: Structure[Fields2, Row2])
+      extends Structure[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])] {
+
+    override val fields: LeftJoined[Fields1, Fields2] =
+      (left.fields, new OuterJoined(right.fields))
+
+    override val columns: List[SqlExpr.FieldLikeNoHkt[?, ?]] =
+      left.columns ++ right.columns
+
+    override def untypedGet[T, N[_]](field: SqlExpr.FieldLike[T, N, ?], row: (Row1, Option[Row2])): N[T] =
+      if (left.columns.contains(field)) left.untypedGet(field, row._1)
+      else {
+        val option: Option[N[T]] = row._2.map(v => right.untypedGet(field, v))
+        val flattened: Option[Any] = (option: Option[?]) match {
+          case Some(Some(t)) => Some(t)
+          case Some(None)    => None
+          case Some(t)       => Some(t)
+          case None          => None
+        }
+        flattened.asInstanceOf[N[T]]
+      }
+
+    override def withPath(path: Path): LeftTupled[Fields1, Fields2, Row1, Row2] =
+      new LeftTupled(left.withPath(path), right.withPath(path))
   }
 }

@@ -10,41 +10,42 @@ package shipmethod
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
+import typo.dsl.Path
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
 import typo.dsl.Structure.Relation
 
-trait ShipmethodFields[Row] {
-  val shipmethodid: IdField[ShipmethodId, Row]
-  val name: Field[Name, Row]
-  val shipbase: Field[BigDecimal, Row]
-  val shiprate: Field[BigDecimal, Row]
-  val rowguid: Field[TypoUUID, Row]
-  val modifieddate: Field[TypoLocalDateTime, Row]
+trait ShipmethodFields {
+  def shipmethodid: IdField[ShipmethodId, ShipmethodRow]
+  def name: Field[Name, ShipmethodRow]
+  def shipbase: Field[BigDecimal, ShipmethodRow]
+  def shiprate: Field[BigDecimal, ShipmethodRow]
+  def rowguid: Field[TypoUUID, ShipmethodRow]
+  def modifieddate: Field[TypoLocalDateTime, ShipmethodRow]
 }
 
 object ShipmethodFields {
-  val structure: Relation[ShipmethodFields, ShipmethodRow, ShipmethodRow] = 
-    new Impl(None, identity, (_, x) => x)
+  lazy val structure: Relation[ShipmethodFields, ShipmethodRow] =
+    new Impl(Nil)
     
-  private final class Impl[Row](val prefix: Option[String], val extract: Row => ShipmethodRow, val merge: (Row, ShipmethodRow) => Row)
-    extends Relation[ShipmethodFields, ShipmethodRow, Row] { 
+  private final class Impl(val _path: List[Path])
+    extends Relation[ShipmethodFields, ShipmethodRow] {
   
-    override val fields: ShipmethodFields[Row] = new ShipmethodFields[Row] {
-      override val shipmethodid = new IdField[ShipmethodId, Row](prefix, "shipmethodid", None, Some("int4"))(x => extract(x).shipmethodid, (row, value) => merge(row, extract(row).copy(shipmethodid = value)))
-      override val name = new Field[Name, Row](prefix, "name", None, Some("varchar"))(x => extract(x).name, (row, value) => merge(row, extract(row).copy(name = value)))
-      override val shipbase = new Field[BigDecimal, Row](prefix, "shipbase", None, Some("numeric"))(x => extract(x).shipbase, (row, value) => merge(row, extract(row).copy(shipbase = value)))
-      override val shiprate = new Field[BigDecimal, Row](prefix, "shiprate", None, Some("numeric"))(x => extract(x).shiprate, (row, value) => merge(row, extract(row).copy(shiprate = value)))
-      override val rowguid = new Field[TypoUUID, Row](prefix, "rowguid", None, Some("uuid"))(x => extract(x).rowguid, (row, value) => merge(row, extract(row).copy(rowguid = value)))
-      override val modifieddate = new Field[TypoLocalDateTime, Row](prefix, "modifieddate", Some("text"), Some("timestamp"))(x => extract(x).modifieddate, (row, value) => merge(row, extract(row).copy(modifieddate = value)))
+    override lazy val fields: ShipmethodFields = new ShipmethodFields {
+      override def shipmethodid = IdField[ShipmethodId, ShipmethodRow](_path, "shipmethodid", None, Some("int4"), x => x.shipmethodid, (row, value) => row.copy(shipmethodid = value))
+      override def name = Field[Name, ShipmethodRow](_path, "name", None, Some("varchar"), x => x.name, (row, value) => row.copy(name = value))
+      override def shipbase = Field[BigDecimal, ShipmethodRow](_path, "shipbase", None, Some("numeric"), x => x.shipbase, (row, value) => row.copy(shipbase = value))
+      override def shiprate = Field[BigDecimal, ShipmethodRow](_path, "shiprate", None, Some("numeric"), x => x.shiprate, (row, value) => row.copy(shiprate = value))
+      override def rowguid = Field[TypoUUID, ShipmethodRow](_path, "rowguid", None, Some("uuid"), x => x.rowguid, (row, value) => row.copy(rowguid = value))
+      override def modifieddate = Field[TypoLocalDateTime, ShipmethodRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override val columns: List[FieldLikeNoHkt[?, Row]] =
-      List[FieldLikeNoHkt[?, Row]](fields.shipmethodid, fields.name, fields.shipbase, fields.shiprate, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLikeNoHkt[?, ShipmethodRow]] =
+      List[FieldLikeNoHkt[?, ShipmethodRow]](fields.shipmethodid, fields.name, fields.shipbase, fields.shiprate, fields.rowguid, fields.modifieddate)
   
-    override def copy[NewRow](prefix: Option[String], extract: NewRow => ShipmethodRow, merge: (NewRow, ShipmethodRow) => NewRow): Impl[NewRow] =
-      new Impl(prefix, extract, merge)
+    override def copy(path: List[Path]): Impl =
+      new Impl(path)
   }
   
 }
