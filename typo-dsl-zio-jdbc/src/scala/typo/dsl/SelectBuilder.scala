@@ -123,11 +123,9 @@ trait SelectBuilder[Fields, Row] {
 
   protected def withParams(sqlParams: SelectParams[Fields, Row]): SelectBuilder[Fields, Row]
 
-  protected def joinOn[Fields2, N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(
-      pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]
-  ): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)]
+  def joinOn[Fields2, N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)]
 
-  protected def leftJoinOn[Fields2, N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(
+  def leftJoinOn[Fields2, N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(
       pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]
   ): SelectBuilder[LeftJoined[Fields, Fields2], (Row, Option[Row2])]
 }
