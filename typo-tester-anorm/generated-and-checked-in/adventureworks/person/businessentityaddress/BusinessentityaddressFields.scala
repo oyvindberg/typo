@@ -20,6 +20,10 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.businessentity.BusinessentityRow
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -40,6 +44,11 @@ trait BusinessentityaddressFields {
   def fkBusinessentity: ForeignKey[BusinessentityFields, BusinessentityRow] =
     ForeignKey[BusinessentityFields, BusinessentityRow]("person.FK_BusinessEntityAddress_BusinessEntity_BusinessEntityID", Nil)
       .withColumnPair(businessentityid, _.businessentityid)
+  def compositeIdIs(compositeId: BusinessentityaddressId): SqlExpr[Boolean, Required] =
+    businessentityid.isEqual(compositeId.businessentityid).and(addressid.isEqual(compositeId.addressid)).and(addresstypeid.isEqual(compositeId.addresstypeid))
+  def compositeIdIn(compositeIds: Array[BusinessentityaddressId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(businessentityid)(_.businessentityid), TuplePart(addressid)(_.addressid), TuplePart(addresstypeid)(_.addresstypeid))
+  
 }
 
 object BusinessentityaddressFields {

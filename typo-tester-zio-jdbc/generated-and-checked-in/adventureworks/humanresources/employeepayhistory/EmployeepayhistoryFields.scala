@@ -14,6 +14,10 @@ import adventureworks.humanresources.employee.EmployeeRow
 import adventureworks.person.businessentity.BusinessentityId
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -28,6 +32,11 @@ trait EmployeepayhistoryFields {
   def fkEmployee: ForeignKey[EmployeeFields, EmployeeRow] =
     ForeignKey[EmployeeFields, EmployeeRow]("humanresources.FK_EmployeePayHistory_Employee_BusinessEntityID", Nil)
       .withColumnPair(businessentityid, _.businessentityid)
+  def compositeIdIs(compositeId: EmployeepayhistoryId): SqlExpr[Boolean, Required] =
+    businessentityid.isEqual(compositeId.businessentityid).and(ratechangedate.isEqual(compositeId.ratechangedate))
+  def compositeIdIn(compositeIds: Array[EmployeepayhistoryId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(businessentityid)(_.businessentityid), TuplePart(ratechangedate)(_.ratechangedate))
+  
 }
 
 object EmployeepayhistoryFields {

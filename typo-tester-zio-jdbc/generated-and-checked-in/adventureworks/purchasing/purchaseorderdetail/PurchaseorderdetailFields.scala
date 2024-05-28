@@ -17,6 +17,10 @@ import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderRow
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -38,6 +42,11 @@ trait PurchaseorderdetailFields {
   def fkPurchaseorderheader: ForeignKey[PurchaseorderheaderFields, PurchaseorderheaderRow] =
     ForeignKey[PurchaseorderheaderFields, PurchaseorderheaderRow]("purchasing.FK_PurchaseOrderDetail_PurchaseOrderHeader_PurchaseOrderID", Nil)
       .withColumnPair(purchaseorderid, _.purchaseorderid)
+  def compositeIdIs(compositeId: PurchaseorderdetailId): SqlExpr[Boolean, Required] =
+    purchaseorderid.isEqual(compositeId.purchaseorderid).and(purchaseorderdetailid.isEqual(compositeId.purchaseorderdetailid))
+  def compositeIdIn(compositeIds: Array[PurchaseorderdetailId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(purchaseorderid)(_.purchaseorderid), TuplePart(purchaseorderdetailid)(_.purchaseorderdetailid))
+  
 }
 
 object PurchaseorderdetailFields {

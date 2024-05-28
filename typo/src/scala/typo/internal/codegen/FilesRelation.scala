@@ -157,10 +157,37 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
           case Source.SqlFile(_) => Nil
         }
 
+      val compositeIdMembers: List[sc.Code] =
+        names.maybeId
+          .collect {
+            case x: IdComputed.Composite if x.cols.forall(_.dbCol.nullability == Nullability.NoNulls) =>
+              val predicateType = sc.Type.dsl.SqlExpr.of(TypesScala.Boolean, sc.Type.dsl.Required)
+              val is = {
+                val id = x.paramName
+                val expr = x.cols
+                  .map(col => code"${col.name}.isEqual($id.${col.name})")
+                  .toList
+                  .reduceLeft[sc.Code] { case (acc, current) => code"$acc.and($current)" }
+                code"""|def compositeIdIs($id: ${x.tpe}): $predicateType =
+                       |  $expr""".stripMargin
+
+              }
+              val in = {
+                val ids = x.paramName.appended("s")
+                val parts = x.cols.map(col => code"${sc.Type.dsl.CompositeTuplePart}(${col.name})(_.${col.name})")
+                code"""|def compositeIdIn($ids: ${sc.Type.ArrayOf(x.tpe)}): $predicateType =
+                       |  new ${sc.Type.dsl.CompositeIn}($ids)(${parts.mkCode(", ")})
+                       |""".stripMargin
+              }
+
+              List(is, in)
+          }
+          .getOrElse(Nil)
+
       val ImplName = sc.Ident("Impl")
       val str =
         code"""trait ${fieldsName.name} {
-            |  ${(colMembers ++ fkMembers).mkCode("\n")}
+            |  ${(colMembers ++ fkMembers ++ compositeIdMembers).mkCode("\n")}
             |}
             |
             |object ${fieldsName.name} {

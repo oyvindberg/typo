@@ -16,6 +16,10 @@ import adventureworks.sales.creditcard.CreditcardRow
 import adventureworks.userdefined.CustomCreditcardId
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -31,6 +35,11 @@ trait PersoncreditcardFields {
   def fkCreditcard: ForeignKey[CreditcardFields, CreditcardRow] =
     ForeignKey[CreditcardFields, CreditcardRow]("sales.FK_PersonCreditCard_CreditCard_CreditCardID", Nil)
       .withColumnPair(creditcardid, _.creditcardid)
+  def compositeIdIs(compositeId: PersoncreditcardId): SqlExpr[Boolean, Required] =
+    businessentityid.isEqual(compositeId.businessentityid).and(creditcardid.isEqual(compositeId.creditcardid))
+  def compositeIdIn(compositeIds: Array[PersoncreditcardId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(businessentityid)(_.businessentityid), TuplePart(creditcardid)(_.creditcardid))
+  
 }
 
 object PersoncreditcardFields {

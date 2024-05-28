@@ -19,6 +19,10 @@ import adventureworks.purchasing.vendor.VendorFields
 import adventureworks.purchasing.vendor.VendorRow
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -46,6 +50,11 @@ trait ProductvendorFields {
   def fkVendor: ForeignKey[VendorFields, VendorRow] =
     ForeignKey[VendorFields, VendorRow]("purchasing.FK_ProductVendor_Vendor_BusinessEntityID", Nil)
       .withColumnPair(businessentityid, _.businessentityid)
+  def compositeIdIs(compositeId: ProductvendorId): SqlExpr[Boolean, Required] =
+    productid.isEqual(compositeId.productid).and(businessentityid.isEqual(compositeId.businessentityid))
+  def compositeIdIn(compositeIds: Array[ProductvendorId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(productid)(_.productid), TuplePart(businessentityid)(_.businessentityid))
+  
 }
 
 object ProductvendorFields {

@@ -16,6 +16,10 @@ import adventureworks.sales.currency.CurrencyId
 import adventureworks.sales.currency.CurrencyRow
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -31,6 +35,11 @@ trait CountryregioncurrencyFields {
   def fkCurrency: ForeignKey[CurrencyFields, CurrencyRow] =
     ForeignKey[CurrencyFields, CurrencyRow]("sales.FK_CountryRegionCurrency_Currency_CurrencyCode", Nil)
       .withColumnPair(currencycode, _.currencycode)
+  def compositeIdIs(compositeId: CountryregioncurrencyId): SqlExpr[Boolean, Required] =
+    countryregioncode.isEqual(compositeId.countryregioncode).and(currencycode.isEqual(compositeId.currencycode))
+  def compositeIdIn(compositeIds: Array[CountryregioncurrencyId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(countryregioncode)(_.countryregioncode), TuplePart(currencycode)(_.currencycode))
+  
 }
 
 object CountryregioncurrencyFields {

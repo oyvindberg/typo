@@ -17,6 +17,10 @@ import adventureworks.production.workorder.WorkorderId
 import adventureworks.production.workorder.WorkorderRow
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -42,6 +46,11 @@ trait WorkorderroutingFields {
   def fkWorkorder: ForeignKey[WorkorderFields, WorkorderRow] =
     ForeignKey[WorkorderFields, WorkorderRow]("production.FK_WorkOrderRouting_WorkOrder_WorkOrderID", Nil)
       .withColumnPair(workorderid, _.workorderid)
+  def compositeIdIs(compositeId: WorkorderroutingId): SqlExpr[Boolean, Required] =
+    workorderid.isEqual(compositeId.workorderid).and(productid.isEqual(compositeId.productid)).and(operationsequence.isEqual(compositeId.operationsequence))
+  def compositeIdIn(compositeIds: Array[WorkorderroutingId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(workorderid)(_.workorderid), TuplePart(productid)(_.productid), TuplePart(operationsequence)(_.operationsequence))
+  
 }
 
 object WorkorderroutingFields {

@@ -13,6 +13,10 @@ import adventureworks.production.product.ProductId
 import adventureworks.production.product.ProductRow
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -28,6 +32,11 @@ trait ProductlistpricehistoryFields {
   def fkProduct: ForeignKey[ProductFields, ProductRow] =
     ForeignKey[ProductFields, ProductRow]("production.FK_ProductListPriceHistory_Product_ProductID", Nil)
       .withColumnPair(productid, _.productid)
+  def compositeIdIs(compositeId: ProductlistpricehistoryId): SqlExpr[Boolean, Required] =
+    productid.isEqual(compositeId.productid).and(startdate.isEqual(compositeId.startdate))
+  def compositeIdIn(compositeIds: Array[ProductlistpricehistoryId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(productid)(_.productid), TuplePart(startdate)(_.startdate))
+  
 }
 
 object ProductlistpricehistoryFields {

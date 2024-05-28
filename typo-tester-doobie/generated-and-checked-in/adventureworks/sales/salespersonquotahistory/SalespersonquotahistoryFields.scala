@@ -14,6 +14,10 @@ import adventureworks.sales.salesperson.SalespersonFields
 import adventureworks.sales.salesperson.SalespersonRow
 import typo.dsl.ForeignKey
 import typo.dsl.Path
+import typo.dsl.Required
+import typo.dsl.SqlExpr
+import typo.dsl.SqlExpr.CompositeIn
+import typo.dsl.SqlExpr.CompositeIn.TuplePart
 import typo.dsl.SqlExpr.Field
 import typo.dsl.SqlExpr.FieldLikeNoHkt
 import typo.dsl.SqlExpr.IdField
@@ -28,6 +32,11 @@ trait SalespersonquotahistoryFields {
   def fkSalesperson: ForeignKey[SalespersonFields, SalespersonRow] =
     ForeignKey[SalespersonFields, SalespersonRow]("sales.FK_SalesPersonQuotaHistory_SalesPerson_BusinessEntityID", Nil)
       .withColumnPair(businessentityid, _.businessentityid)
+  def compositeIdIs(compositeId: SalespersonquotahistoryId): SqlExpr[Boolean, Required] =
+    businessentityid.isEqual(compositeId.businessentityid).and(quotadate.isEqual(compositeId.quotadate))
+  def compositeIdIn(compositeIds: Array[SalespersonquotahistoryId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(compositeIds)(TuplePart(businessentityid)(_.businessentityid), TuplePart(quotadate)(_.quotadate))
+  
 }
 
 object SalespersonquotahistoryFields {
