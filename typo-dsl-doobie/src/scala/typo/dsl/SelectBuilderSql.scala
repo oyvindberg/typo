@@ -78,7 +78,8 @@ object SelectBuilderSql {
         alias = ctx.alias(structure._path),
         columns = NonEmptyList.fromListUnsafe(structure.columns),
         sqlFrag = sql(ctx),
-        joinFrag = Fragment.empty
+        joinFrag = Fragment.empty,
+        joinType = JoinType.Inner
       )
       SelectBuilderSql.Instantiated(structure, NonEmptyList.of(part), read)
     }
@@ -105,7 +106,7 @@ object SelectBuilderSql {
 
       val newStructure = leftInstantiated.structure.join(rightInstantiated.structure)
       val newRightInstantiatedParts = rightInstantiated.parts
-        .mapLast(_.copy(joinFrag = pred(newStructure.fields).render(ctx)))
+        .mapLast(_.copy(joinFrag = pred(newStructure.fields).render(ctx), joinType = JoinType.Inner))
 
       SelectBuilderSql.Instantiated(
         structure = newStructure,
@@ -120,16 +121,16 @@ object SelectBuilderSql {
         case NonEmptyList(first, rest) =>
           val prelude =
             fr"""|select ${instance.columns.map(c => Fragment.const0(c.value(ctx))).intercalate(Fragment.const0(", "))}
-                   |from (
-                   |${first.sqlFrag}
-                   |) ${Fragment.const0(first.alias)}
-                   |""".stripMargin
+                 |from (
+                 |${first.sqlFrag}
+                 |) ${Fragment.const0(first.alias)}
+                 |""".stripMargin
 
-          val joins = rest.map { case SelectBuilderSql.InstantiatedPart(alias, _, sqlFrag, joinFrag) =>
-            fr"""|join (
-                   |$sqlFrag
-                   |) ${Fragment.const0(alias)} on $joinFrag
-                   |""".stripMargin
+          val joins = rest.map { case SelectBuilderSql.InstantiatedPart(alias, _, sqlFrag, joinFrag, joinType) =>
+            fr"""|${joinType.frag} (
+                 |$sqlFrag
+                 |) ${Fragment.const0(alias)} on $joinFrag
+                 |""".stripMargin
           }
 
           prelude ++ joins.reduce(_ ++ _)
@@ -171,7 +172,12 @@ object SelectBuilderSql {
 
       val newStructure = leftInstantiated.structure.leftJoin(rightInstantiated.structure)
       val newRightInstantiatedParts = rightInstantiated.parts
-        .mapLast(_.copy(joinFrag = pred(leftInstantiated.structure.join(rightInstantiated.structure).fields).render(ctx)))
+        .mapLast(
+          _.copy(
+            joinFrag = pred(leftInstantiated.structure.join(rightInstantiated.structure).fields).render(ctx),
+            joinType = JoinType.LeftJoin
+          )
+        )
 
       SelectBuilderSql.Instantiated(
         newStructure,
@@ -187,16 +193,16 @@ object SelectBuilderSql {
         case NonEmptyList(first, rest) =>
           val prelude =
             fr"""|select ${fragments.comma(instance.columns.map(c => Fragment.const0(c.value(ctx))))}
-                   |from (
-                   |  ${first.sqlFrag}
-                   |) ${Fragment.const0(first.alias)}
-                   |""".stripMargin
+                 |from (
+                 |  ${first.sqlFrag}
+                 |) ${Fragment.const0(first.alias)}
+                 |""".stripMargin
 
-          val joins = rest.map { case SelectBuilderSql.InstantiatedPart(alias, _, sqlFrag, joinFrag) =>
-            fr"""|left join (
-                   |${sqlFrag}
-                   |) ${Fragment.const0(alias)} on $joinFrag
-                   |""".stripMargin
+          val joins = rest.map { case SelectBuilderSql.InstantiatedPart(alias, _, sqlFrag, joinFrag, joinType) =>
+            fr"""|${joinType.frag} (
+                 |${sqlFrag}
+                 |) ${Fragment.const0(alias)} on $joinFrag
+                 |""".stripMargin
           }
           prelude ++ joins.reduce(_ ++ _)
       }
@@ -222,11 +228,21 @@ object SelectBuilderSql {
     val columns: NonEmptyList[SqlExpr.FieldLikeNoHkt[?, ?]] = parts.flatMap(_.columns)
   }
 
+  sealed abstract class JoinType(_frag: String) {
+    val frag = Fragment.const0(_frag)
+  }
+  object JoinType {
+    case object Inner extends JoinType("join")
+    case object LeftJoin extends JoinType("left join")
+    case object RightJoin extends JoinType("right join")
+  }
+
   /** This is needlessly awkward because the we start with a tree, but we need to make it linear to render it */
   final case class InstantiatedPart(
       alias: String,
       columns: NonEmptyList[SqlExpr.FieldLikeNoHkt[?, ?]],
       sqlFrag: Fragment,
-      joinFrag: Fragment
+      joinFrag: Fragment,
+      joinType: JoinType
   )
 }

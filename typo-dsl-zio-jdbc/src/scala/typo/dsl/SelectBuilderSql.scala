@@ -70,7 +70,8 @@ object SelectBuilderSql {
         alias = ctx.alias(structure._path),
         columns = NonEmptyChunk.fromIterableOption(structure.columns).get,
         sqlFrag = sql(ctx),
-        joinFrag = SqlFragment.empty
+        joinFrag = SqlFragment.empty,
+        joinType = JoinType.Inner
       )
       SelectBuilderSql.Instantiated(structure, NonEmptyChunk.single(part), read)
     }
@@ -97,7 +98,12 @@ object SelectBuilderSql {
 
       val newStructure = leftInstantiated.structure.join(rightInstantiated.structure)
       val newRightInstantiatedParts = rightInstantiated.parts
-        .mapLast(_.copy(joinFrag = pred(newStructure.fields).render(ctx)))
+        .mapLast(
+          _.copy(
+            joinFrag = pred(newStructure.fields).render(ctx),
+            joinType = JoinType.Inner
+          )
+        )
 
       SelectBuilderSql.Instantiated(
         structure = newStructure,
@@ -121,8 +127,8 @@ object SelectBuilderSql {
                  ) ${SqlFragment(first.alias)}
                  """
 
-          val joins = rest.map { case SelectBuilderSql.InstantiatedPart(alias, _, sqlFrag, joinFrag) =>
-            sql"""join (
+          val joins = rest.map { case SelectBuilderSql.InstantiatedPart(alias, _, sqlFrag, joinFrag, joinType) =>
+            sql"""${joinType.frag} (
                  $sqlFrag
                  ) ${SqlFragment(alias)} on $joinFrag
                  """
@@ -160,7 +166,12 @@ object SelectBuilderSql {
 
       val newStructure = leftInstantiated.structure.leftJoin(rightInstantiated.structure)
       val newRightInstantiatedParts = rightInstantiated.parts
-        .mapLast(_.copy(joinFrag = pred(leftInstantiated.structure.join(rightInstantiated.structure).fields).render(ctx)))
+        .mapLast(
+          _.copy(
+            joinFrag = pred(leftInstantiated.structure.join(rightInstantiated.structure).fields).render(ctx),
+            joinType = JoinType.LeftJoin
+          )
+        )
 
       SelectBuilderSql.Instantiated(
         structure = newStructure,
@@ -185,8 +196,8 @@ object SelectBuilderSql {
                   ) ${SqlFragment(first.alias)}
                   """
 
-          val joins = rest.map { case SelectBuilderSql.InstantiatedPart(alias, _, sqlFrag, joinFrag) =>
-            sql"""left join (
+          val joins = rest.map { case SelectBuilderSql.InstantiatedPart(alias, _, sqlFrag, joinFrag, joinType) =>
+            sql"""${joinType.frag} (
                   ${sqlFrag}
                   ) ${SqlFragment(alias)} on $joinFrag
                   """
@@ -215,12 +226,21 @@ object SelectBuilderSql {
   ) {
     val columns: NonEmptyChunk[SqlExpr.FieldLikeNoHkt[?, ?]] = parts.flatMap(_.columns)
   }
+  sealed abstract class JoinType(_frag: String) {
+    val frag = SqlFragment(_frag)
+  }
+  object JoinType {
+    case object Inner extends JoinType("join")
+    case object LeftJoin extends JoinType("left join")
+    case object RightJoin extends JoinType("right join")
+  }
 
   /** This is needlessly awkward because the we start with a tree, but we need to make it linear to render it */
   final case class InstantiatedPart(
       alias: String,
       columns: NonEmptyChunk[SqlExpr.FieldLikeNoHkt[?, ?]],
       sqlFrag: SqlFragment,
-      joinFrag: SqlFragment
+      joinFrag: SqlFragment,
+      joinType: JoinType
   )
 }
