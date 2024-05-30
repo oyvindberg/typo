@@ -31,12 +31,12 @@ trait ProductproductphotoFields {
   def productphotoid: IdField[ProductphotoId, ProductproductphotoRow]
   def primary: Field[Flag, ProductproductphotoRow]
   def modifieddate: Field[TypoLocalDateTime, ProductproductphotoRow]
-  def fkProduct: ForeignKey[ProductFields, ProductRow] =
-    ForeignKey[ProductFields, ProductRow]("production.FK_ProductProductPhoto_Product_ProductID", Nil)
-      .withColumnPair(productid, _.productid)
   def fkProductphoto: ForeignKey[ProductphotoFields, ProductphotoRow] =
     ForeignKey[ProductphotoFields, ProductphotoRow]("production.FK_ProductProductPhoto_ProductPhoto_ProductPhotoID", Nil)
       .withColumnPair(productphotoid, _.productphotoid)
+  def fkProduct: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("production.FK_ProductProductPhoto_Product_ProductID", Nil)
+      .withColumnPair(productid, _.productid)
   def compositeIdIs(compositeId: ProductproductphotoId): SqlExpr[Boolean, Required] =
     productid.isEqual(compositeId.productid).and(productphotoid.isEqual(compositeId.productphotoid))
   def compositeIdIn(compositeIds: Array[ProductproductphotoId]): SqlExpr[Boolean, Required] =

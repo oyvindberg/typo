@@ -33,12 +33,12 @@ trait BillofmaterialsFields {
   def bomlevel: Field[TypoShort, BillofmaterialsRow]
   def perassemblyqty: Field[BigDecimal, BillofmaterialsRow]
   def modifieddate: Field[TypoLocalDateTime, BillofmaterialsRow]
-  def fkProductProductassemblyid: ForeignKey[ProductFields, ProductRow] =
-    ForeignKey[ProductFields, ProductRow]("production.FK_BillOfMaterials_Product_ProductAssemblyID", Nil)
-      .withColumnPair(productassemblyid, _.productid)
   def fkProductComponentid: ForeignKey[ProductFields, ProductRow] =
     ForeignKey[ProductFields, ProductRow]("production.FK_BillOfMaterials_Product_ComponentID", Nil)
       .withColumnPair(componentid, _.productid)
+  def fkProductProductassemblyid: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("production.FK_BillOfMaterials_Product_ProductAssemblyID", Nil)
+      .withColumnPair(productassemblyid, _.productid)
   def fkUnitmeasure: ForeignKey[UnitmeasureFields, UnitmeasureRow] =
     ForeignKey[UnitmeasureFields, UnitmeasureRow]("production.FK_BillOfMaterials_UnitMeasure_UnitMeasureCode", Nil)
       .withColumnPair(unitmeasurecode, _.unitmeasurecode)

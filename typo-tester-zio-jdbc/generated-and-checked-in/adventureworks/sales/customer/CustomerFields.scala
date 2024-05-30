@@ -35,12 +35,12 @@ trait CustomerFields {
   def fkPersonPerson: ForeignKey[PersonFields, PersonRow] =
     ForeignKey[PersonFields, PersonRow]("sales.FK_Customer_Person_PersonID", Nil)
       .withColumnPair(personid, _.businessentityid)
-  def fkStore: ForeignKey[StoreFields, StoreRow] =
-    ForeignKey[StoreFields, StoreRow]("sales.FK_Customer_Store_StoreID", Nil)
-      .withColumnPair(storeid, _.businessentityid)
   def fkSalesterritory: ForeignKey[SalesterritoryFields, SalesterritoryRow] =
     ForeignKey[SalesterritoryFields, SalesterritoryRow]("sales.FK_Customer_SalesTerritory_TerritoryID", Nil)
       .withColumnPair(territoryid, _.territoryid)
+  def fkStore: ForeignKey[StoreFields, StoreRow] =
+    ForeignKey[StoreFields, StoreRow]("sales.FK_Customer_Store_StoreID", Nil)
+      .withColumnPair(storeid, _.businessentityid)
 }
 
 object CustomerFields {

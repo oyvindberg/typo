@@ -29,12 +29,12 @@ trait ProductdocumentFields {
   def productid: IdField[ProductId, ProductdocumentRow]
   def modifieddate: Field[TypoLocalDateTime, ProductdocumentRow]
   def documentnode: IdField[DocumentId, ProductdocumentRow]
-  def fkProduct: ForeignKey[ProductFields, ProductRow] =
-    ForeignKey[ProductFields, ProductRow]("production.FK_ProductDocument_Product_ProductID", Nil)
-      .withColumnPair(productid, _.productid)
   def fkDocument: ForeignKey[DocumentFields, DocumentRow] =
     ForeignKey[DocumentFields, DocumentRow]("production.FK_ProductDocument_Document_DocumentNode", Nil)
       .withColumnPair(documentnode, _.documentnode)
+  def fkProduct: ForeignKey[ProductFields, ProductRow] =
+    ForeignKey[ProductFields, ProductRow]("production.FK_ProductDocument_Product_ProductID", Nil)
+      .withColumnPair(productid, _.productid)
   def compositeIdIs(compositeId: ProductdocumentId): SqlExpr[Boolean, Required] =
     productid.isEqual(compositeId.productid).and(documentnode.isEqual(compositeId.documentnode))
   def compositeIdIn(compositeIds: Array[ProductdocumentId]): SqlExpr[Boolean, Required] =

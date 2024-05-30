@@ -140,7 +140,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
         names.source match {
           case relation: Source.Relation =>
             val byOtherTable = fks.groupBy(_.otherTable)
-            fks.map { fk =>
+            fks.sortBy(_.constraintName.value).map { fk =>
               val otherTableSource = Source.Table(fk.otherTable)
               val fkType = sc.Type.dsl.ForeignKey.of(
                 sc.Type.Qualified(naming.fieldsName(otherTableSource)),

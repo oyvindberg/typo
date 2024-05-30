@@ -34,15 +34,15 @@ trait BusinessentitycontactFields {
   def contacttypeid: IdField[ContacttypeId, BusinessentitycontactRow]
   def rowguid: Field[TypoUUID, BusinessentitycontactRow]
   def modifieddate: Field[TypoLocalDateTime, BusinessentitycontactRow]
-  def fkPerson: ForeignKey[PersonFields, PersonRow] =
-    ForeignKey[PersonFields, PersonRow]("person.FK_BusinessEntityContact_Person_PersonID", Nil)
-      .withColumnPair(personid, _.businessentityid)
-  def fkContacttype: ForeignKey[ContacttypeFields, ContacttypeRow] =
-    ForeignKey[ContacttypeFields, ContacttypeRow]("person.FK_BusinessEntityContact_ContactType_ContactTypeID", Nil)
-      .withColumnPair(contacttypeid, _.contacttypeid)
   def fkBusinessentity: ForeignKey[BusinessentityFields, BusinessentityRow] =
     ForeignKey[BusinessentityFields, BusinessentityRow]("person.FK_BusinessEntityContact_BusinessEntity_BusinessEntityID", Nil)
       .withColumnPair(businessentityid, _.businessentityid)
+  def fkContacttype: ForeignKey[ContacttypeFields, ContacttypeRow] =
+    ForeignKey[ContacttypeFields, ContacttypeRow]("person.FK_BusinessEntityContact_ContactType_ContactTypeID", Nil)
+      .withColumnPair(contacttypeid, _.contacttypeid)
+  def fkPerson: ForeignKey[PersonFields, PersonRow] =
+    ForeignKey[PersonFields, PersonRow]("person.FK_BusinessEntityContact_Person_PersonID", Nil)
+      .withColumnPair(personid, _.businessentityid)
   def compositeIdIs(compositeId: BusinessentitycontactId): SqlExpr[Boolean, Required] =
     businessentityid.isEqual(compositeId.businessentityid).and(personid.isEqual(compositeId.personid)).and(contacttypeid.isEqual(compositeId.contacttypeid))
   def compositeIdIn(compositeIds: Array[BusinessentitycontactId]): SqlExpr[Boolean, Required] =

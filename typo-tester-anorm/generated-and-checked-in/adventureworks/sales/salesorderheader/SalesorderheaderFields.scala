@@ -86,12 +86,12 @@ trait SalesorderheaderFields {
   def fkSalesperson: ForeignKey[SalespersonFields, SalespersonRow] =
     ForeignKey[SalespersonFields, SalespersonRow]("sales.FK_SalesOrderHeader_SalesPerson_SalesPersonID", Nil)
       .withColumnPair(salespersonid, _.businessentityid)
-  def fkPurchasingShipmethod: ForeignKey[ShipmethodFields, ShipmethodRow] =
-    ForeignKey[ShipmethodFields, ShipmethodRow]("sales.FK_SalesOrderHeader_ShipMethod_ShipMethodID", Nil)
-      .withColumnPair(shipmethodid, _.shipmethodid)
   def fkSalesterritory: ForeignKey[SalesterritoryFields, SalesterritoryRow] =
     ForeignKey[SalesterritoryFields, SalesterritoryRow]("sales.FK_SalesOrderHeader_SalesTerritory_TerritoryID", Nil)
       .withColumnPair(territoryid, _.territoryid)
+  def fkPurchasingShipmethod: ForeignKey[ShipmethodFields, ShipmethodRow] =
+    ForeignKey[ShipmethodFields, ShipmethodRow]("sales.FK_SalesOrderHeader_ShipMethod_ShipMethodID", Nil)
+      .withColumnPair(shipmethodid, _.shipmethodid)
 }
 
 object SalesorderheaderFields {
