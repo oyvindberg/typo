@@ -41,12 +41,12 @@ trait PurchaseorderheaderFields {
   def fkHumanresourcesEmployee: ForeignKey[EmployeeFields, EmployeeRow] =
     ForeignKey[EmployeeFields, EmployeeRow]("purchasing.FK_PurchaseOrderHeader_Employee_EmployeeID", Nil)
       .withColumnPair(employeeid, _.businessentityid)
-  def fkVendor: ForeignKey[VendorFields, VendorRow] =
-    ForeignKey[VendorFields, VendorRow]("purchasing.FK_PurchaseOrderHeader_Vendor_VendorID", Nil)
-      .withColumnPair(vendorid, _.businessentityid)
   def fkShipmethod: ForeignKey[ShipmethodFields, ShipmethodRow] =
     ForeignKey[ShipmethodFields, ShipmethodRow]("purchasing.FK_PurchaseOrderHeader_ShipMethod_ShipMethodID", Nil)
       .withColumnPair(shipmethodid, _.shipmethodid)
+  def fkVendor: ForeignKey[VendorFields, VendorRow] =
+    ForeignKey[VendorFields, VendorRow]("purchasing.FK_PurchaseOrderHeader_Vendor_VendorID", Nil)
+      .withColumnPair(vendorid, _.businessentityid)
 }
 
 object PurchaseorderheaderFields {

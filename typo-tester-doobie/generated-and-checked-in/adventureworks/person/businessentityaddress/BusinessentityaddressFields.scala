@@ -35,12 +35,12 @@ trait BusinessentityaddressFields {
   def addresstypeid: IdField[AddresstypeId, BusinessentityaddressRow]
   def rowguid: Field[TypoUUID, BusinessentityaddressRow]
   def modifieddate: Field[TypoLocalDateTime, BusinessentityaddressRow]
-  def fkAddress: ForeignKey[AddressFields, AddressRow] =
-    ForeignKey[AddressFields, AddressRow]("person.FK_BusinessEntityAddress_Address_AddressID", Nil)
-      .withColumnPair(addressid, _.addressid)
   def fkAddresstype: ForeignKey[AddresstypeFields, AddresstypeRow] =
     ForeignKey[AddresstypeFields, AddresstypeRow]("person.FK_BusinessEntityAddress_AddressType_AddressTypeID", Nil)
       .withColumnPair(addresstypeid, _.addresstypeid)
+  def fkAddress: ForeignKey[AddressFields, AddressRow] =
+    ForeignKey[AddressFields, AddressRow]("person.FK_BusinessEntityAddress_Address_AddressID", Nil)
+      .withColumnPair(addressid, _.addressid)
   def fkBusinessentity: ForeignKey[BusinessentityFields, BusinessentityRow] =
     ForeignKey[BusinessentityFields, BusinessentityRow]("person.FK_BusinessEntityAddress_BusinessEntity_BusinessEntityID", Nil)
       .withColumnPair(businessentityid, _.businessentityid)

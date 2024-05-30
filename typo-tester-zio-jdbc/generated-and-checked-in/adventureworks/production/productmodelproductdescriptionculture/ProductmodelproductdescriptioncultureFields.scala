@@ -33,12 +33,12 @@ trait ProductmodelproductdescriptioncultureFields {
   def productdescriptionid: IdField[ProductdescriptionId, ProductmodelproductdescriptioncultureRow]
   def cultureid: IdField[CultureId, ProductmodelproductdescriptioncultureRow]
   def modifieddate: Field[TypoLocalDateTime, ProductmodelproductdescriptioncultureRow]
-  def fkProductdescription: ForeignKey[ProductdescriptionFields, ProductdescriptionRow] =
-    ForeignKey[ProductdescriptionFields, ProductdescriptionRow]("production.FK_ProductModelProductDescriptionCulture_ProductDescription_Pro", Nil)
-      .withColumnPair(productdescriptionid, _.productdescriptionid)
   def fkCulture: ForeignKey[CultureFields, CultureRow] =
     ForeignKey[CultureFields, CultureRow]("production.FK_ProductModelProductDescriptionCulture_Culture_CultureID", Nil)
       .withColumnPair(cultureid, _.cultureid)
+  def fkProductdescription: ForeignKey[ProductdescriptionFields, ProductdescriptionRow] =
+    ForeignKey[ProductdescriptionFields, ProductdescriptionRow]("production.FK_ProductModelProductDescriptionCulture_ProductDescription_Pro", Nil)
+      .withColumnPair(productdescriptionid, _.productdescriptionid)
   def fkProductmodel: ForeignKey[ProductmodelFields, ProductmodelRow] =
     ForeignKey[ProductmodelFields, ProductmodelRow]("production.FK_ProductModelProductDescriptionCulture_ProductModel_ProductMo", Nil)
       .withColumnPair(productmodelid, _.productmodelid)

@@ -29,12 +29,12 @@ trait PersoncreditcardFields {
   def businessentityid: IdField[BusinessentityId, PersoncreditcardRow]
   def creditcardid: IdField[/* user-picked */ CustomCreditcardId, PersoncreditcardRow]
   def modifieddate: Field[TypoLocalDateTime, PersoncreditcardRow]
-  def fkPersonPerson: ForeignKey[PersonFields, PersonRow] =
-    ForeignKey[PersonFields, PersonRow]("sales.FK_PersonCreditCard_Person_BusinessEntityID", Nil)
-      .withColumnPair(businessentityid, _.businessentityid)
   def fkCreditcard: ForeignKey[CreditcardFields, CreditcardRow] =
     ForeignKey[CreditcardFields, CreditcardRow]("sales.FK_PersonCreditCard_CreditCard_CreditCardID", Nil)
       .withColumnPair(creditcardid, _.creditcardid)
+  def fkPersonPerson: ForeignKey[PersonFields, PersonRow] =
+    ForeignKey[PersonFields, PersonRow]("sales.FK_PersonCreditCard_Person_BusinessEntityID", Nil)
+      .withColumnPair(businessentityid, _.businessentityid)
   def compositeIdIs(compositeId: PersoncreditcardId): SqlExpr[Boolean, Required] =
     businessentityid.isEqual(compositeId.businessentityid).and(creditcardid.isEqual(compositeId.creditcardid))
   def compositeIdIn(compositeIds: Array[PersoncreditcardId]): SqlExpr[Boolean, Required] =

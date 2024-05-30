@@ -29,12 +29,12 @@ trait SalesorderheadersalesreasonFields {
   def salesorderid: IdField[SalesorderheaderId, SalesorderheadersalesreasonRow]
   def salesreasonid: IdField[SalesreasonId, SalesorderheadersalesreasonRow]
   def modifieddate: Field[TypoLocalDateTime, SalesorderheadersalesreasonRow]
-  def fkSalesreason: ForeignKey[SalesreasonFields, SalesreasonRow] =
-    ForeignKey[SalesreasonFields, SalesreasonRow]("sales.FK_SalesOrderHeaderSalesReason_SalesReason_SalesReasonID", Nil)
-      .withColumnPair(salesreasonid, _.salesreasonid)
   def fkSalesorderheader: ForeignKey[SalesorderheaderFields, SalesorderheaderRow] =
     ForeignKey[SalesorderheaderFields, SalesorderheaderRow]("sales.FK_SalesOrderHeaderSalesReason_SalesOrderHeader_SalesOrderID", Nil)
       .withColumnPair(salesorderid, _.salesorderid)
+  def fkSalesreason: ForeignKey[SalesreasonFields, SalesreasonRow] =
+    ForeignKey[SalesreasonFields, SalesreasonRow]("sales.FK_SalesOrderHeaderSalesReason_SalesReason_SalesReasonID", Nil)
+      .withColumnPair(salesreasonid, _.salesreasonid)
   def compositeIdIs(compositeId: SalesorderheadersalesreasonId): SqlExpr[Boolean, Required] =
     salesorderid.isEqual(compositeId.salesorderid).and(salesreasonid.isEqual(compositeId.salesreasonid))
   def compositeIdIn(compositeIds: Array[SalesorderheadersalesreasonId]): SqlExpr[Boolean, Required] =

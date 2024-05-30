@@ -55,18 +55,18 @@ trait ProductFields {
   def discontinueddate: OptField[TypoLocalDateTime, ProductRow]
   def rowguid: Field[TypoUUID, ProductRow]
   def modifieddate: Field[TypoLocalDateTime, ProductRow]
-  def fkUnitmeasureSizeunitmeasurecode: ForeignKey[UnitmeasureFields, UnitmeasureRow] =
-    ForeignKey[UnitmeasureFields, UnitmeasureRow]("production.FK_Product_UnitMeasure_SizeUnitMeasureCode", Nil)
-      .withColumnPair(sizeunitmeasurecode, _.unitmeasurecode)
-  def fkUnitmeasureWeightunitmeasurecode: ForeignKey[UnitmeasureFields, UnitmeasureRow] =
-    ForeignKey[UnitmeasureFields, UnitmeasureRow]("production.FK_Product_UnitMeasure_WeightUnitMeasureCode", Nil)
-      .withColumnPair(weightunitmeasurecode, _.unitmeasurecode)
   def fkProductmodel: ForeignKey[ProductmodelFields, ProductmodelRow] =
     ForeignKey[ProductmodelFields, ProductmodelRow]("production.FK_Product_ProductModel_ProductModelID", Nil)
       .withColumnPair(productmodelid, _.productmodelid)
   def fkProductsubcategory: ForeignKey[ProductsubcategoryFields, ProductsubcategoryRow] =
     ForeignKey[ProductsubcategoryFields, ProductsubcategoryRow]("production.FK_Product_ProductSubcategory_ProductSubcategoryID", Nil)
       .withColumnPair(productsubcategoryid, _.productsubcategoryid)
+  def fkUnitmeasureSizeunitmeasurecode: ForeignKey[UnitmeasureFields, UnitmeasureRow] =
+    ForeignKey[UnitmeasureFields, UnitmeasureRow]("production.FK_Product_UnitMeasure_SizeUnitMeasureCode", Nil)
+      .withColumnPair(sizeunitmeasurecode, _.unitmeasurecode)
+  def fkUnitmeasureWeightunitmeasurecode: ForeignKey[UnitmeasureFields, UnitmeasureRow] =
+    ForeignKey[UnitmeasureFields, UnitmeasureRow]("production.FK_Product_UnitMeasure_WeightUnitMeasureCode", Nil)
+      .withColumnPair(weightunitmeasurecode, _.unitmeasurecode)
 }
 
 object ProductFields {

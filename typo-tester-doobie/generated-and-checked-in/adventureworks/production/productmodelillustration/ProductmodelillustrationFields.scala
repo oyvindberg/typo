@@ -29,12 +29,12 @@ trait ProductmodelillustrationFields {
   def productmodelid: IdField[ProductmodelId, ProductmodelillustrationRow]
   def illustrationid: IdField[IllustrationId, ProductmodelillustrationRow]
   def modifieddate: Field[TypoLocalDateTime, ProductmodelillustrationRow]
-  def fkProductmodel: ForeignKey[ProductmodelFields, ProductmodelRow] =
-    ForeignKey[ProductmodelFields, ProductmodelRow]("production.FK_ProductModelIllustration_ProductModel_ProductModelID", Nil)
-      .withColumnPair(productmodelid, _.productmodelid)
   def fkIllustration: ForeignKey[IllustrationFields, IllustrationRow] =
     ForeignKey[IllustrationFields, IllustrationRow]("production.FK_ProductModelIllustration_Illustration_IllustrationID", Nil)
       .withColumnPair(illustrationid, _.illustrationid)
+  def fkProductmodel: ForeignKey[ProductmodelFields, ProductmodelRow] =
+    ForeignKey[ProductmodelFields, ProductmodelRow]("production.FK_ProductModelIllustration_ProductModel_ProductModelID", Nil)
+      .withColumnPair(productmodelid, _.productmodelid)
   def compositeIdIs(compositeId: ProductmodelillustrationId): SqlExpr[Boolean, Required] =
     productmodelid.isEqual(compositeId.productmodelid).and(illustrationid.isEqual(compositeId.illustrationid))
   def compositeIdIn(compositeIds: Array[ProductmodelillustrationId]): SqlExpr[Boolean, Required] =
