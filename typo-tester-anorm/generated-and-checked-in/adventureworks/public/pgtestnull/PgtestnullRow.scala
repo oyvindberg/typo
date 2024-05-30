@@ -103,6 +103,7 @@ case class PgtestnullRow(
   linees: Option[Array[TypoLine]],
   lseges: Option[Array[TypoLineSegment]],
   moneyes: Option[Array[TypoMoney]],
+  mydomaines: Option[Array[Mydomain]],
   myenumes: Option[Array[Myenum]],
   namees: Option[Array[String]],
   numerices: Option[Array[BigDecimal]],
@@ -178,6 +179,7 @@ object PgtestnullRow {
           linees = json.\("linees").toOption.map(_.as(Reads.ArrayReads[TypoLine](using TypoLine.reads, implicitly))),
           lseges = json.\("lseges").toOption.map(_.as(Reads.ArrayReads[TypoLineSegment](using TypoLineSegment.reads, implicitly))),
           moneyes = json.\("moneyes").toOption.map(_.as(Reads.ArrayReads[TypoMoney](using TypoMoney.reads, implicitly))),
+          mydomaines = json.\("mydomaines").toOption.map(_.as(Reads.ArrayReads[Mydomain](using Mydomain.reads, implicitly))),
           myenumes = json.\("myenumes").toOption.map(_.as(Reads.ArrayReads[Myenum](using Myenum.reads, implicitly))),
           namees = json.\("namees").toOption.map(_.as(Reads.ArrayReads[String](using Reads.StringReads, implicitly))),
           numerices = json.\("numerices").toOption.map(_.as(Reads.ArrayReads[BigDecimal](using Reads.bigDecReads, implicitly))),
@@ -254,20 +256,21 @@ object PgtestnullRow {
         linees = row(idx + 52)(Column.columnToOption(TypoLine.arrayColumn)),
         lseges = row(idx + 53)(Column.columnToOption(TypoLineSegment.arrayColumn)),
         moneyes = row(idx + 54)(Column.columnToOption(TypoMoney.arrayColumn)),
-        myenumes = row(idx + 55)(Column.columnToOption(Myenum.arrayColumn)),
-        namees = row(idx + 56)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
-        numerices = row(idx + 57)(Column.columnToOption(Column.columnToArray[BigDecimal](Column.columnToScalaBigDecimal, implicitly))),
-        pathes = row(idx + 58)(Column.columnToOption(TypoPath.arrayColumn)),
-        pointes = row(idx + 59)(Column.columnToOption(TypoPoint.arrayColumn)),
-        polygones = row(idx + 60)(Column.columnToOption(TypoPolygon.arrayColumn)),
-        textes = row(idx + 61)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
-        timees = row(idx + 62)(Column.columnToOption(TypoLocalTime.arrayColumn)),
-        timestampes = row(idx + 63)(Column.columnToOption(TypoLocalDateTime.arrayColumn)),
-        timestampzes = row(idx + 64)(Column.columnToOption(TypoInstant.arrayColumn)),
-        timezes = row(idx + 65)(Column.columnToOption(TypoOffsetTime.arrayColumn)),
-        uuides = row(idx + 66)(Column.columnToOption(TypoUUID.arrayColumn)),
-        varchares = row(idx + 67)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
-        xmles = row(idx + 68)(Column.columnToOption(TypoXml.arrayColumn))
+        mydomaines = row(idx + 55)(Column.columnToOption(Mydomain.arrayColumn)),
+        myenumes = row(idx + 56)(Column.columnToOption(Myenum.arrayColumn)),
+        namees = row(idx + 57)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        numerices = row(idx + 58)(Column.columnToOption(Column.columnToArray[BigDecimal](Column.columnToScalaBigDecimal, implicitly))),
+        pathes = row(idx + 59)(Column.columnToOption(TypoPath.arrayColumn)),
+        pointes = row(idx + 60)(Column.columnToOption(TypoPoint.arrayColumn)),
+        polygones = row(idx + 61)(Column.columnToOption(TypoPolygon.arrayColumn)),
+        textes = row(idx + 62)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        timees = row(idx + 63)(Column.columnToOption(TypoLocalTime.arrayColumn)),
+        timestampes = row(idx + 64)(Column.columnToOption(TypoLocalDateTime.arrayColumn)),
+        timestampzes = row(idx + 65)(Column.columnToOption(TypoInstant.arrayColumn)),
+        timezes = row(idx + 66)(Column.columnToOption(TypoOffsetTime.arrayColumn)),
+        uuides = row(idx + 67)(Column.columnToOption(TypoUUID.arrayColumn)),
+        varchares = row(idx + 68)(Column.columnToOption(Column.columnToArray[String](Column.columnToString, implicitly))),
+        xmles = row(idx + 69)(Column.columnToOption(TypoXml.arrayColumn))
       )
     )
   }
@@ -382,6 +385,8 @@ object PgtestnullRow {
     sb.append(Text.DELIMETER)
     Text.option(Text.iterableInstance[Array, TypoMoney](TypoMoney.text, implicitly)).unsafeEncode(row.moneyes, sb)
     sb.append(Text.DELIMETER)
+    Text.option(Text.iterableInstance[Array, Mydomain](Mydomain.text, implicitly)).unsafeEncode(row.mydomaines, sb)
+    sb.append(Text.DELIMETER)
     Text.option(Text.iterableInstance[Array, Myenum](Myenum.text, implicitly)).unsafeEncode(row.myenumes, sb)
     sb.append(Text.DELIMETER)
     Text.option(Text[Array[String]]).unsafeEncode(row.namees, sb)
@@ -467,6 +472,7 @@ object PgtestnullRow {
       "linees" -> Writes.OptionWrites(Writes.arrayWrites[TypoLine](using implicitly, TypoLine.writes)).writes(o.linees),
       "lseges" -> Writes.OptionWrites(Writes.arrayWrites[TypoLineSegment](using implicitly, TypoLineSegment.writes)).writes(o.lseges),
       "moneyes" -> Writes.OptionWrites(Writes.arrayWrites[TypoMoney](using implicitly, TypoMoney.writes)).writes(o.moneyes),
+      "mydomaines" -> Writes.OptionWrites(Writes.arrayWrites[Mydomain](using implicitly, Mydomain.writes)).writes(o.mydomaines),
       "myenumes" -> Writes.OptionWrites(Writes.arrayWrites[Myenum](using implicitly, Myenum.writes)).writes(o.myenumes),
       "namees" -> Writes.OptionWrites(Writes.arrayWrites[String](using implicitly, Writes.StringWrites)).writes(o.namees),
       "numerices" -> Writes.OptionWrites(Writes.arrayWrites[BigDecimal](using implicitly, Writes.BigDecimalWrites)).writes(o.numerices),

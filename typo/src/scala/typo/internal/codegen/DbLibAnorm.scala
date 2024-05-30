@@ -665,7 +665,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
     ).flatten
   }
 
-  override def wrapperTypeInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.Given] =
+  override def wrapperTypeInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type, overrideDbType: Option[String]): List[sc.Given] =
     List(
       Some(
         sc.Given(
@@ -709,10 +709,18 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           name = parameterMetadataName,
           implicitParams = Nil,
           tpe = ParameterMetaData.of(wrapperType),
-          body = code"""|new ${ParameterMetaData.of(wrapperType)} {
-                      |  override def sqlType: String = ${lookupParameterMetaDataFor(underlying)}.sqlType
-                      |  override def jdbcType: Int = ${lookupParameterMetaDataFor(underlying)}.jdbcType
-                      |}""".stripMargin
+          body = overrideDbType match {
+            case Some(dbType) =>
+              code"""|new ${ParameterMetaData.of(wrapperType)} {
+                       |  override def sqlType: String = ${sc.StrLit(dbType)}
+                       |  override def jdbcType: Int = ${TypesJava.SqlTypes}.OTHER
+                       |}""".stripMargin
+            case None =>
+              code"""|new ${ParameterMetaData.of(wrapperType)} {
+                     |  override def sqlType: String = ${lookupParameterMetaDataFor(underlying)}.sqlType
+                     |  override def jdbcType: Int = ${lookupParameterMetaDataFor(underlying)}.jdbcType
+                     |}""".stripMargin
+          }
         )
       ),
       textSupport.map(_.anyValInstance(wrapperType, underlying))

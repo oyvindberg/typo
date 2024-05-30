@@ -704,7 +704,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     ).flatten
   }
 
-  override def wrapperTypeInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type): List[sc.ClassMember] =
+  override def wrapperTypeInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type, overrideDbType: Option[String]): List[sc.ClassMember] =
     List(
       Option(
         sc.Given(
@@ -718,10 +718,28 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       Option(
         sc.Given(
           tparams = Nil,
+          name = arrayJdbcEncoderName,
+          implicitParams = Nil,
+          tpe = JdbcEncoder.of(sc.Type.ArrayOf(wrapperType)),
+          body = code"""${lookupJdbcEncoder(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"""
+        )
+      ),
+      Option(
+        sc.Given(
+          tparams = Nil,
           name = jdbcDecoderName,
           implicitParams = Nil,
           tpe = JdbcDecoder.of(wrapperType),
           body = code"""${lookupJdbcDecoder(underlying)}.map($wrapperType.apply)"""
+        )
+      ),
+      Option(
+        sc.Given(
+          tparams = Nil,
+          name = arrayJdbcDecoderName,
+          implicitParams = Nil,
+          tpe = JdbcDecoder.of(sc.Type.ArrayOf(wrapperType)),
+          body = code"""${lookupJdbcDecoder(sc.Type.ArrayOf(underlying))}.map(_.map($wrapperType.apply))"""
         )
       ),
       Option(
@@ -748,7 +766,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
           name = pgTypeName,
           implicitParams = Nil,
           tpe = PGType.of(wrapperType),
-          body = code"${lookupPgTypeFor(underlying)}.as"
+          body = overrideDbType match {
+            case Some(dbType) => code"PGType.instance(${sc.StrLit(dbType)}, ${TypesJava.SqlTypes}.OTHER)"
+            case None         => code"${lookupPgTypeFor(underlying)}.as"
+          }
         )
       ),
       textSupport.map(_.anyValInstance(wrapperType, underlying))

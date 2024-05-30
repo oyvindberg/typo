@@ -1,6 +1,6 @@
 package typo
 
-import typo.internal.DebugJson
+import typo.internal.{DebugJson, quote}
 import typo.internal.analysis.{DecomposedSql, ParsedName}
 
 import scala.collection.immutable.SortedSet
@@ -16,7 +16,7 @@ object db {
     case object Bytea extends Type
     case object Char extends Type
     case object Date extends Type
-    case class DomainRef(name: RelationName, underlying: Type) extends Type
+    case class DomainRef(name: RelationName, underlying: String) extends Type
     case object Float4 extends Type
     case object Float8 extends Type
     case object Hstore extends Type
@@ -69,7 +69,7 @@ object db {
     case object Vector extends Type
   }
 
-  case class Domain(name: RelationName, tpe: Type, isNotNull: Nullability, hasDefault: Boolean, constraintDefinition: Option[String])
+  case class Domain(name: RelationName, tpe: Type, originalType: String, isNotNull: Nullability, hasDefault: Boolean, constraintDefinition: Option[String])
   case class StringEnum(name: RelationName, values: List[String])
   case class ColName(value: String) extends AnyVal
   object ColName {
@@ -111,7 +111,10 @@ object db {
     def name = parsedName.name
   }
   case class RelationName(schema: Option[String], name: String) {
-    def value = s"${schema.map(_ + ".").getOrElse("")}$name"
+    def value: String =
+      schema.foldLeft(name)((acc, s) => s"$s.$acc")
+    def quotedValue: String =
+      schema.foldLeft(quote.double(name))((acc, s) => s"${quote.double(s)}.$acc")
   }
   object RelationName {
     implicit val ordering: Ordering[RelationName] = Ordering.by(_.value)

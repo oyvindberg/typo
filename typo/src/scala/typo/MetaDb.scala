@@ -84,6 +84,7 @@ object MetaDb {
       db.Domain(
         name = db.RelationName(Some(d.schema), d.name),
         tpe = tpe,
+        originalType = d.`type`,
         isNotNull = if (d.isNotNull) Nullability.NoNulls else Nullability.Nullable,
         hasDefault = d.default.isDefined,
         constraintDefinition = d.constraintDefinition

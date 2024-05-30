@@ -119,7 +119,7 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
           ),
           bijection.toList,
           options.jsonLibs.flatMap(_.wrapperTypeInstances(wrapperType = id.tpe, fieldName = value, underlying = id.underlying)),
-          options.dbLib.toList.flatMap(_.wrapperTypeInstances(wrapperType = id.tpe, underlying = id.underlying))
+          options.dbLib.toList.flatMap(_.wrapperTypeInstances(wrapperType = id.tpe, underlying = id.underlying, overrideDbType = None))
         ).flatten
         Some(
           sc.File(

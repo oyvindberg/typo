@@ -94,6 +94,7 @@ trait PgtestFields {
   def linees: Field[Array[TypoLine], PgtestRow]
   def lseges: Field[Array[TypoLineSegment], PgtestRow]
   def moneyes: Field[Array[TypoMoney], PgtestRow]
+  def mydomaines: Field[Array[Mydomain], PgtestRow]
   def myenumes: Field[Array[Myenum], PgtestRow]
   def namees: Field[Array[String], PgtestRow]
   def numerices: Field[Array[BigDecimal], PgtestRow]
@@ -173,6 +174,7 @@ object PgtestFields {
       override def linees = Field[Array[TypoLine], PgtestRow](_path, "linees", None, Some("line[]"), x => x.linees, (row, value) => row.copy(linees = value))
       override def lseges = Field[Array[TypoLineSegment], PgtestRow](_path, "lseges", None, Some("lseg[]"), x => x.lseges, (row, value) => row.copy(lseges = value))
       override def moneyes = Field[Array[TypoMoney], PgtestRow](_path, "moneyes", Some("numeric[]"), Some("money[]"), x => x.moneyes, (row, value) => row.copy(moneyes = value))
+      override def mydomaines = Field[Array[Mydomain], PgtestRow](_path, "mydomaines", Some("text[]"), Some("mydomain[]"), x => x.mydomaines, (row, value) => row.copy(mydomaines = value))
       override def myenumes = Field[Array[Myenum], PgtestRow](_path, "myenumes", None, Some("myenum[]"), x => x.myenumes, (row, value) => row.copy(myenumes = value))
       override def namees = Field[Array[String], PgtestRow](_path, "namees", None, Some("name[]"), x => x.namees, (row, value) => row.copy(namees = value))
       override def numerices = Field[Array[BigDecimal], PgtestRow](_path, "numerices", None, Some("numeric[]"), x => x.numerices, (row, value) => row.copy(numerices = value))
@@ -190,7 +192,7 @@ object PgtestFields {
     }
   
     override lazy val columns: List[FieldLikeNoHkt[?, PgtestRow]] =
-      List[FieldLikeNoHkt[?, PgtestRow]](fields.bool, fields.box, fields.bpchar, fields.bytea, fields.char, fields.circle, fields.date, fields.float4, fields.float8, fields.hstore, fields.inet, fields.int2, fields.int2vector, fields.int4, fields.int8, fields.interval, fields.json, fields.jsonb, fields.line, fields.lseg, fields.money, fields.mydomain, fields.myenum, fields.name, fields.numeric, fields.path, fields.point, fields.polygon, fields.text, fields.time, fields.timestamp, fields.timestampz, fields.timez, fields.uuid, fields.varchar, fields.vector, fields.xml, fields.boxes, fields.bpchares, fields.chares, fields.circlees, fields.datees, fields.float4es, fields.float8es, fields.inetes, fields.int2es, fields.int2vectores, fields.int4es, fields.int8es, fields.intervales, fields.jsones, fields.jsonbes, fields.linees, fields.lseges, fields.moneyes, fields.myenumes, fields.namees, fields.numerices, fields.pathes, fields.pointes, fields.polygones, fields.textes, fields.timees, fields.timestampes, fields.timestampzes, fields.timezes, fields.uuides, fields.varchares, fields.xmles)
+      List[FieldLikeNoHkt[?, PgtestRow]](fields.bool, fields.box, fields.bpchar, fields.bytea, fields.char, fields.circle, fields.date, fields.float4, fields.float8, fields.hstore, fields.inet, fields.int2, fields.int2vector, fields.int4, fields.int8, fields.interval, fields.json, fields.jsonb, fields.line, fields.lseg, fields.money, fields.mydomain, fields.myenum, fields.name, fields.numeric, fields.path, fields.point, fields.polygon, fields.text, fields.time, fields.timestamp, fields.timestampz, fields.timez, fields.uuid, fields.varchar, fields.vector, fields.xml, fields.boxes, fields.bpchares, fields.chares, fields.circlees, fields.datees, fields.float4es, fields.float8es, fields.inetes, fields.int2es, fields.int2vectores, fields.int4es, fields.int8es, fields.intervales, fields.jsones, fields.jsonbes, fields.linees, fields.lseges, fields.moneyes, fields.mydomaines, fields.myenumes, fields.namees, fields.numerices, fields.pathes, fields.pointes, fields.polygones, fields.textes, fields.timees, fields.timestampes, fields.timestampzes, fields.timezes, fields.uuides, fields.varchares, fields.xmles)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

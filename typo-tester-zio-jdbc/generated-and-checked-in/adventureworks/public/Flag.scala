@@ -7,6 +7,7 @@ package adventureworks
 package public
 
 import adventureworks.Text
+import java.sql.Types
 import typo.dsl.Bijection
 import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
@@ -20,6 +21,8 @@ import zio.json.JsonEncoder
   */
 case class Flag(value: Boolean)
 object Flag {
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[Flag]] = adventureworks.BooleanArrayDecoder.map(_.map(Flag.apply))
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[Flag]] = adventureworks.BooleanArrayEncoder.contramap(_.map(_.value))
   implicit lazy val arraySetter: Setter[Array[Flag]] = adventureworks.BooleanArraySetter.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[Flag, Boolean] = Bijection[Flag, Boolean](_.value)(Flag.apply)
   implicit lazy val jdbcDecoder: JdbcDecoder[Flag] = JdbcDecoder.booleanDecoder.map(Flag.apply)
@@ -27,7 +30,7 @@ object Flag {
   implicit lazy val jsonDecoder: JsonDecoder[Flag] = JsonDecoder.boolean.map(Flag.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Flag] = JsonEncoder.boolean.contramap(_.value)
   implicit lazy val ordering: Ordering[Flag] = Ordering.by(_.value)
-  implicit lazy val pgType: PGType[Flag] = PGType.PGTypeBoolean.as
+  implicit lazy val pgType: PGType[Flag] = PGType.instance(""""public"."Flag"""", Types.OTHER)
   implicit lazy val setter: Setter[Flag] = Setter.booleanSetter.contramap(_.value)
   implicit lazy val text: Text[Flag] = new Text[Flag] {
     override def unsafeEncode(v: Flag, sb: StringBuilder) = Text.booleanInstance.unsafeEncode(v.value, sb)

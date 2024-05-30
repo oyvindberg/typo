@@ -7,6 +7,7 @@ package adventureworks
 package public
 
 import adventureworks.Text
+import java.sql.Types
 import typo.dsl.Bijection
 import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
@@ -20,6 +21,8 @@ import zio.json.JsonEncoder
   */
 case class NameStyle(value: Boolean)
 object NameStyle {
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[NameStyle]] = adventureworks.BooleanArrayDecoder.map(_.map(NameStyle.apply))
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[NameStyle]] = adventureworks.BooleanArrayEncoder.contramap(_.map(_.value))
   implicit lazy val arraySetter: Setter[Array[NameStyle]] = adventureworks.BooleanArraySetter.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[NameStyle, Boolean] = Bijection[NameStyle, Boolean](_.value)(NameStyle.apply)
   implicit lazy val jdbcDecoder: JdbcDecoder[NameStyle] = JdbcDecoder.booleanDecoder.map(NameStyle.apply)
@@ -27,7 +30,7 @@ object NameStyle {
   implicit lazy val jsonDecoder: JsonDecoder[NameStyle] = JsonDecoder.boolean.map(NameStyle.apply)
   implicit lazy val jsonEncoder: JsonEncoder[NameStyle] = JsonEncoder.boolean.contramap(_.value)
   implicit lazy val ordering: Ordering[NameStyle] = Ordering.by(_.value)
-  implicit lazy val pgType: PGType[NameStyle] = PGType.PGTypeBoolean.as
+  implicit lazy val pgType: PGType[NameStyle] = PGType.instance(""""public"."NameStyle"""", Types.OTHER)
   implicit lazy val setter: Setter[NameStyle] = Setter.booleanSetter.contramap(_.value)
   implicit lazy val text: Text[NameStyle] = new Text[NameStyle] {
     override def unsafeEncode(v: NameStyle, sb: StringBuilder) = Text.booleanInstance.unsafeEncode(v.value, sb)

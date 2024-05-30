@@ -10,6 +10,7 @@ import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
+import java.sql.Types
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import typo.dsl.Bijection
@@ -25,8 +26,8 @@ object Flag {
   implicit lazy val column: Column[Flag] = Column.columnToBoolean.map(Flag.apply)
   implicit lazy val ordering: Ordering[Flag] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[Flag] = new ParameterMetaData[Flag] {
-    override def sqlType: String = ParameterMetaData.BooleanParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.BooleanParameterMetaData.jdbcType
+    override def sqlType: String = """"public"."Flag""""
+    override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[Flag] = Reads.BooleanReads.map(Flag.apply)
   implicit lazy val text: Text[Flag] = new Text[Flag] {

@@ -10,6 +10,7 @@ import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement
+import java.sql.Types
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import typo.dsl.Bijection
@@ -25,8 +26,8 @@ object Mydomain {
   implicit lazy val column: Column[Mydomain] = Column.columnToString.map(Mydomain.apply)
   implicit lazy val ordering: Ordering[Mydomain] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[Mydomain] = new ParameterMetaData[Mydomain] {
-    override def sqlType: String = ParameterMetaData.StringParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.StringParameterMetaData.jdbcType
+    override def sqlType: String = """"public"."mydomain""""
+    override def jdbcType: Int = Types.OTHER
   }
   implicit lazy val reads: Reads[Mydomain] = Reads.StringReads.map(Mydomain.apply)
   implicit lazy val text: Text[Mydomain] = new Text[Mydomain] {

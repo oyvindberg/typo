@@ -19,6 +19,8 @@ import zio.json.JsonEncoder
 /** Type for the primary key of table `humanresources.shift` */
 case class ShiftId(value: Int) extends AnyVal
 object ShiftId {
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[ShiftId]] = adventureworks.IntArrayDecoder.map(_.map(ShiftId.apply))
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[ShiftId]] = adventureworks.IntArrayEncoder.contramap(_.map(_.value))
   implicit lazy val arraySetter: Setter[Array[ShiftId]] = adventureworks.IntArraySetter.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[ShiftId, Int] = Bijection[ShiftId, Int](_.value)(ShiftId.apply)
   implicit lazy val jdbcDecoder: JdbcDecoder[ShiftId] = JdbcDecoder.intDecoder.map(ShiftId.apply)

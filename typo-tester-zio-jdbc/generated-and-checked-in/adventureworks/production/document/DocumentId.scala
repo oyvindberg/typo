@@ -19,6 +19,8 @@ import zio.json.JsonEncoder
 /** Type for the primary key of table `production.document` */
 case class DocumentId(value: String) extends AnyVal
 object DocumentId {
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[DocumentId]] = adventureworks.StringArrayDecoder.map(_.map(DocumentId.apply))
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[DocumentId]] = adventureworks.StringArrayEncoder.contramap(_.map(_.value))
   implicit lazy val arraySetter: Setter[Array[DocumentId]] = adventureworks.StringArraySetter.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[DocumentId, String] = Bijection[DocumentId, String](_.value)(DocumentId.apply)
   implicit lazy val jdbcDecoder: JdbcDecoder[DocumentId] = JdbcDecoder.stringDecoder.map(DocumentId.apply)
