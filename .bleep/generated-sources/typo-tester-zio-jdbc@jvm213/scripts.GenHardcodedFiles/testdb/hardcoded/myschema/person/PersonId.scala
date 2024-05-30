@@ -20,6 +20,8 @@ import zio.json.JsonEncoder
 /** Type for the primary key of table `myschema.person` */
 case class PersonId(value: Long) extends AnyVal
 object PersonId {
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[PersonId]] = testdb.hardcoded.LongArrayDecoder.map(_.map(PersonId.apply))
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[PersonId]] = testdb.hardcoded.LongArrayEncoder.contramap(_.map(_.value))
   implicit lazy val arraySetter: Setter[Array[PersonId]] = testdb.hardcoded.LongArraySetter.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[PersonId, Long] = Bijection[PersonId, Long](_.value)(PersonId.apply)
   implicit lazy val jdbcDecoder: JdbcDecoder[PersonId] = JdbcDecoder.longDecoder.map(PersonId.apply)

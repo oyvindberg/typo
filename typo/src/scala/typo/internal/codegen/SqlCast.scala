@@ -50,6 +50,8 @@ object SqlCast {
         Some(SqlCast("float4[]"))
       case db.Type.Array(db.Type.PGmoney) =>
         Some(SqlCast("numeric[]"))
+      case db.Type.Array(db.Type.DomainRef(_, underlying)) =>
+        Some(SqlCast(underlying + "[]"))
       case db.Type.TimestampTz | db.Type.Timestamp | db.Type.TimeTz | db.Type.Time | db.Type.Date =>
         Some(SqlCast("text"))
       case db.Type.Array(db.Type.TimestampTz | db.Type.Timestamp | db.Type.TimeTz | db.Type.Time | db.Type.Date) =>

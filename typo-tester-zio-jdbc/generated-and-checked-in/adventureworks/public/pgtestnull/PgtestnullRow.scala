@@ -98,6 +98,7 @@ case class PgtestnullRow(
   linees: Option[Array[TypoLine]],
   lseges: Option[Array[TypoLineSegment]],
   moneyes: Option[Array[TypoMoney]],
+  mydomaines: Option[Array[Mydomain]],
   myenumes: Option[Array[Myenum]],
   namees: Option[Array[String]],
   numerices: Option[Array[BigDecimal]],
@@ -117,7 +118,7 @@ case class PgtestnullRow(
 object PgtestnullRow {
   implicit lazy val jdbcDecoder: JdbcDecoder[PgtestnullRow] = new JdbcDecoder[PgtestnullRow] {
     override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, PgtestnullRow) =
-      columIndex + 68 ->
+      columIndex + 69 ->
         PgtestnullRow(
           bool = JdbcDecoder.optionDecoder(JdbcDecoder.booleanDecoder).unsafeDecode(columIndex + 0, rs)._2,
           box = JdbcDecoder.optionDecoder(TypoBox.jdbcDecoder).unsafeDecode(columIndex + 1, rs)._2,
@@ -174,20 +175,21 @@ object PgtestnullRow {
           linees = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoLine]]).unsafeDecode(columIndex + 52, rs)._2,
           lseges = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoLineSegment]]).unsafeDecode(columIndex + 53, rs)._2,
           moneyes = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoMoney]]).unsafeDecode(columIndex + 54, rs)._2,
-          myenumes = JdbcDecoder.optionDecoder(JdbcDecoder[Array[Myenum]]).unsafeDecode(columIndex + 55, rs)._2,
-          namees = JdbcDecoder.optionDecoder(adventureworks.StringArrayDecoder).unsafeDecode(columIndex + 56, rs)._2,
-          numerices = JdbcDecoder.optionDecoder(adventureworks.ScalaBigDecimalArrayDecoder).unsafeDecode(columIndex + 57, rs)._2,
-          pathes = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoPath]]).unsafeDecode(columIndex + 58, rs)._2,
-          pointes = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoPoint]]).unsafeDecode(columIndex + 59, rs)._2,
-          polygones = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoPolygon]]).unsafeDecode(columIndex + 60, rs)._2,
-          textes = JdbcDecoder.optionDecoder(adventureworks.StringArrayDecoder).unsafeDecode(columIndex + 61, rs)._2,
-          timees = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoLocalTime]]).unsafeDecode(columIndex + 62, rs)._2,
-          timestampes = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoLocalDateTime]]).unsafeDecode(columIndex + 63, rs)._2,
-          timestampzes = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoInstant]]).unsafeDecode(columIndex + 64, rs)._2,
-          timezes = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoOffsetTime]]).unsafeDecode(columIndex + 65, rs)._2,
-          uuides = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoUUID]]).unsafeDecode(columIndex + 66, rs)._2,
-          varchares = JdbcDecoder.optionDecoder(adventureworks.StringArrayDecoder).unsafeDecode(columIndex + 67, rs)._2,
-          xmles = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoXml]]).unsafeDecode(columIndex + 68, rs)._2
+          mydomaines = JdbcDecoder.optionDecoder(JdbcDecoder[Array[Mydomain]]).unsafeDecode(columIndex + 55, rs)._2,
+          myenumes = JdbcDecoder.optionDecoder(JdbcDecoder[Array[Myenum]]).unsafeDecode(columIndex + 56, rs)._2,
+          namees = JdbcDecoder.optionDecoder(adventureworks.StringArrayDecoder).unsafeDecode(columIndex + 57, rs)._2,
+          numerices = JdbcDecoder.optionDecoder(adventureworks.ScalaBigDecimalArrayDecoder).unsafeDecode(columIndex + 58, rs)._2,
+          pathes = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoPath]]).unsafeDecode(columIndex + 59, rs)._2,
+          pointes = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoPoint]]).unsafeDecode(columIndex + 60, rs)._2,
+          polygones = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoPolygon]]).unsafeDecode(columIndex + 61, rs)._2,
+          textes = JdbcDecoder.optionDecoder(adventureworks.StringArrayDecoder).unsafeDecode(columIndex + 62, rs)._2,
+          timees = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoLocalTime]]).unsafeDecode(columIndex + 63, rs)._2,
+          timestampes = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoLocalDateTime]]).unsafeDecode(columIndex + 64, rs)._2,
+          timestampzes = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoInstant]]).unsafeDecode(columIndex + 65, rs)._2,
+          timezes = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoOffsetTime]]).unsafeDecode(columIndex + 66, rs)._2,
+          uuides = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoUUID]]).unsafeDecode(columIndex + 67, rs)._2,
+          varchares = JdbcDecoder.optionDecoder(adventureworks.StringArrayDecoder).unsafeDecode(columIndex + 68, rs)._2,
+          xmles = JdbcDecoder.optionDecoder(JdbcDecoder[Array[TypoXml]]).unsafeDecode(columIndex + 69, rs)._2
         )
   }
   implicit lazy val jsonDecoder: JsonDecoder[PgtestnullRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
@@ -246,6 +248,7 @@ object PgtestnullRow {
     val linees = jsonObj.get("linees").fold[Either[String, Option[Array[TypoLine]]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.array[TypoLine](using TypoLine.jsonDecoder, implicitly))))
     val lseges = jsonObj.get("lseges").fold[Either[String, Option[Array[TypoLineSegment]]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.array[TypoLineSegment](using TypoLineSegment.jsonDecoder, implicitly))))
     val moneyes = jsonObj.get("moneyes").fold[Either[String, Option[Array[TypoMoney]]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.array[TypoMoney](using TypoMoney.jsonDecoder, implicitly))))
+    val mydomaines = jsonObj.get("mydomaines").fold[Either[String, Option[Array[Mydomain]]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.array[Mydomain](using Mydomain.jsonDecoder, implicitly))))
     val myenumes = jsonObj.get("myenumes").fold[Either[String, Option[Array[Myenum]]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.array[Myenum](using Myenum.jsonDecoder, implicitly))))
     val namees = jsonObj.get("namees").fold[Either[String, Option[Array[String]]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.array[String](using JsonDecoder.string, implicitly))))
     val numerices = jsonObj.get("numerices").fold[Either[String, Option[Array[BigDecimal]]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.array[BigDecimal](using JsonDecoder.scalaBigDecimal, implicitly))))
@@ -260,9 +263,9 @@ object PgtestnullRow {
     val uuides = jsonObj.get("uuides").fold[Either[String, Option[Array[TypoUUID]]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.array[TypoUUID](using TypoUUID.jsonDecoder, implicitly))))
     val varchares = jsonObj.get("varchares").fold[Either[String, Option[Array[String]]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.array[String](using JsonDecoder.string, implicitly))))
     val xmles = jsonObj.get("xmles").fold[Either[String, Option[Array[TypoXml]]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.array[TypoXml](using TypoXml.jsonDecoder, implicitly))))
-    if (bool.isRight && box.isRight && bpchar.isRight && bytea.isRight && char.isRight && circle.isRight && date.isRight && float4.isRight && float8.isRight && hstore.isRight && inet.isRight && int2.isRight && int2vector.isRight && int4.isRight && int8.isRight && interval.isRight && json.isRight && jsonb.isRight && line.isRight && lseg.isRight && money.isRight && mydomain.isRight && myenum.isRight && name.isRight && numeric.isRight && path.isRight && point.isRight && polygon.isRight && text.isRight && time.isRight && timestamp.isRight && timestampz.isRight && timez.isRight && uuid.isRight && varchar.isRight && vector.isRight && xml.isRight && boxes.isRight && bpchares.isRight && chares.isRight && circlees.isRight && datees.isRight && float4es.isRight && float8es.isRight && inetes.isRight && int2es.isRight && int2vectores.isRight && int4es.isRight && int8es.isRight && intervales.isRight && jsones.isRight && jsonbes.isRight && linees.isRight && lseges.isRight && moneyes.isRight && myenumes.isRight && namees.isRight && numerices.isRight && pathes.isRight && pointes.isRight && polygones.isRight && textes.isRight && timees.isRight && timestampes.isRight && timestampzes.isRight && timezes.isRight && uuides.isRight && varchares.isRight && xmles.isRight)
-      Right(PgtestnullRow(bool = bool.toOption.get, box = box.toOption.get, bpchar = bpchar.toOption.get, bytea = bytea.toOption.get, char = char.toOption.get, circle = circle.toOption.get, date = date.toOption.get, float4 = float4.toOption.get, float8 = float8.toOption.get, hstore = hstore.toOption.get, inet = inet.toOption.get, int2 = int2.toOption.get, int2vector = int2vector.toOption.get, int4 = int4.toOption.get, int8 = int8.toOption.get, interval = interval.toOption.get, json = json.toOption.get, jsonb = jsonb.toOption.get, line = line.toOption.get, lseg = lseg.toOption.get, money = money.toOption.get, mydomain = mydomain.toOption.get, myenum = myenum.toOption.get, name = name.toOption.get, numeric = numeric.toOption.get, path = path.toOption.get, point = point.toOption.get, polygon = polygon.toOption.get, text = text.toOption.get, time = time.toOption.get, timestamp = timestamp.toOption.get, timestampz = timestampz.toOption.get, timez = timez.toOption.get, uuid = uuid.toOption.get, varchar = varchar.toOption.get, vector = vector.toOption.get, xml = xml.toOption.get, boxes = boxes.toOption.get, bpchares = bpchares.toOption.get, chares = chares.toOption.get, circlees = circlees.toOption.get, datees = datees.toOption.get, float4es = float4es.toOption.get, float8es = float8es.toOption.get, inetes = inetes.toOption.get, int2es = int2es.toOption.get, int2vectores = int2vectores.toOption.get, int4es = int4es.toOption.get, int8es = int8es.toOption.get, intervales = intervales.toOption.get, jsones = jsones.toOption.get, jsonbes = jsonbes.toOption.get, linees = linees.toOption.get, lseges = lseges.toOption.get, moneyes = moneyes.toOption.get, myenumes = myenumes.toOption.get, namees = namees.toOption.get, numerices = numerices.toOption.get, pathes = pathes.toOption.get, pointes = pointes.toOption.get, polygones = polygones.toOption.get, textes = textes.toOption.get, timees = timees.toOption.get, timestampes = timestampes.toOption.get, timestampzes = timestampzes.toOption.get, timezes = timezes.toOption.get, uuides = uuides.toOption.get, varchares = varchares.toOption.get, xmles = xmles.toOption.get))
-    else Left(List[Either[String, Any]](bool, box, bpchar, bytea, char, circle, date, float4, float8, hstore, inet, int2, int2vector, int4, int8, interval, json, jsonb, line, lseg, money, mydomain, myenum, name, numeric, path, point, polygon, text, time, timestamp, timestampz, timez, uuid, varchar, vector, xml, boxes, bpchares, chares, circlees, datees, float4es, float8es, inetes, int2es, int2vectores, int4es, int8es, intervales, jsones, jsonbes, linees, lseges, moneyes, myenumes, namees, numerices, pathes, pointes, polygones, textes, timees, timestampes, timestampzes, timezes, uuides, varchares, xmles).flatMap(_.left.toOption).mkString(", "))
+    if (bool.isRight && box.isRight && bpchar.isRight && bytea.isRight && char.isRight && circle.isRight && date.isRight && float4.isRight && float8.isRight && hstore.isRight && inet.isRight && int2.isRight && int2vector.isRight && int4.isRight && int8.isRight && interval.isRight && json.isRight && jsonb.isRight && line.isRight && lseg.isRight && money.isRight && mydomain.isRight && myenum.isRight && name.isRight && numeric.isRight && path.isRight && point.isRight && polygon.isRight && text.isRight && time.isRight && timestamp.isRight && timestampz.isRight && timez.isRight && uuid.isRight && varchar.isRight && vector.isRight && xml.isRight && boxes.isRight && bpchares.isRight && chares.isRight && circlees.isRight && datees.isRight && float4es.isRight && float8es.isRight && inetes.isRight && int2es.isRight && int2vectores.isRight && int4es.isRight && int8es.isRight && intervales.isRight && jsones.isRight && jsonbes.isRight && linees.isRight && lseges.isRight && moneyes.isRight && mydomaines.isRight && myenumes.isRight && namees.isRight && numerices.isRight && pathes.isRight && pointes.isRight && polygones.isRight && textes.isRight && timees.isRight && timestampes.isRight && timestampzes.isRight && timezes.isRight && uuides.isRight && varchares.isRight && xmles.isRight)
+      Right(PgtestnullRow(bool = bool.toOption.get, box = box.toOption.get, bpchar = bpchar.toOption.get, bytea = bytea.toOption.get, char = char.toOption.get, circle = circle.toOption.get, date = date.toOption.get, float4 = float4.toOption.get, float8 = float8.toOption.get, hstore = hstore.toOption.get, inet = inet.toOption.get, int2 = int2.toOption.get, int2vector = int2vector.toOption.get, int4 = int4.toOption.get, int8 = int8.toOption.get, interval = interval.toOption.get, json = json.toOption.get, jsonb = jsonb.toOption.get, line = line.toOption.get, lseg = lseg.toOption.get, money = money.toOption.get, mydomain = mydomain.toOption.get, myenum = myenum.toOption.get, name = name.toOption.get, numeric = numeric.toOption.get, path = path.toOption.get, point = point.toOption.get, polygon = polygon.toOption.get, text = text.toOption.get, time = time.toOption.get, timestamp = timestamp.toOption.get, timestampz = timestampz.toOption.get, timez = timez.toOption.get, uuid = uuid.toOption.get, varchar = varchar.toOption.get, vector = vector.toOption.get, xml = xml.toOption.get, boxes = boxes.toOption.get, bpchares = bpchares.toOption.get, chares = chares.toOption.get, circlees = circlees.toOption.get, datees = datees.toOption.get, float4es = float4es.toOption.get, float8es = float8es.toOption.get, inetes = inetes.toOption.get, int2es = int2es.toOption.get, int2vectores = int2vectores.toOption.get, int4es = int4es.toOption.get, int8es = int8es.toOption.get, intervales = intervales.toOption.get, jsones = jsones.toOption.get, jsonbes = jsonbes.toOption.get, linees = linees.toOption.get, lseges = lseges.toOption.get, moneyes = moneyes.toOption.get, mydomaines = mydomaines.toOption.get, myenumes = myenumes.toOption.get, namees = namees.toOption.get, numerices = numerices.toOption.get, pathes = pathes.toOption.get, pointes = pointes.toOption.get, polygones = polygones.toOption.get, textes = textes.toOption.get, timees = timees.toOption.get, timestampes = timestampes.toOption.get, timestampzes = timestampzes.toOption.get, timezes = timezes.toOption.get, uuides = uuides.toOption.get, varchares = varchares.toOption.get, xmles = xmles.toOption.get))
+    else Left(List[Either[String, Any]](bool, box, bpchar, bytea, char, circle, date, float4, float8, hstore, inet, int2, int2vector, int4, int8, interval, json, jsonb, line, lseg, money, mydomain, myenum, name, numeric, path, point, polygon, text, time, timestamp, timestampz, timez, uuid, varchar, vector, xml, boxes, bpchares, chares, circlees, datees, float4es, float8es, inetes, int2es, int2vectores, int4es, int8es, intervales, jsones, jsonbes, linees, lseges, moneyes, mydomaines, myenumes, namees, numerices, pathes, pointes, polygones, textes, timees, timestampes, timestampzes, timezes, uuides, varchares, xmles).flatMap(_.left.toOption).mkString(", "))
   }
   implicit lazy val jsonEncoder: JsonEncoder[PgtestnullRow] = new JsonEncoder[PgtestnullRow] {
     override def unsafeEncode(a: PgtestnullRow, indent: Option[Int], out: Write): Unit = {
@@ -432,6 +435,9 @@ object PgtestnullRow {
       out.write(""""moneyes":""")
       JsonEncoder.option(using JsonEncoder.array[TypoMoney](using TypoMoney.jsonEncoder, implicitly)).unsafeEncode(a.moneyes, indent, out)
       out.write(",")
+      out.write(""""mydomaines":""")
+      JsonEncoder.option(using JsonEncoder.array[Mydomain](using Mydomain.jsonEncoder, implicitly)).unsafeEncode(a.mydomaines, indent, out)
+      out.write(",")
       out.write(""""myenumes":""")
       JsonEncoder.option(using JsonEncoder.array[Myenum](using Myenum.jsonEncoder, implicitly)).unsafeEncode(a.myenumes, indent, out)
       out.write(",")
@@ -586,6 +592,8 @@ object PgtestnullRow {
     Text.option(Text.iterableInstance[Array, TypoLineSegment](TypoLineSegment.text, implicitly)).unsafeEncode(row.lseges, sb)
     sb.append(Text.DELIMETER)
     Text.option(Text.iterableInstance[Array, TypoMoney](TypoMoney.text, implicitly)).unsafeEncode(row.moneyes, sb)
+    sb.append(Text.DELIMETER)
+    Text.option(Text.iterableInstance[Array, Mydomain](Mydomain.text, implicitly)).unsafeEncode(row.mydomaines, sb)
     sb.append(Text.DELIMETER)
     Text.option(Text.iterableInstance[Array, Myenum](Myenum.text, implicitly)).unsafeEncode(row.myenumes, sb)
     sb.append(Text.DELIMETER)

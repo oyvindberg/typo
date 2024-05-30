@@ -19,6 +19,8 @@ import zio.json.JsonEncoder
 /** Type for the primary key of table `production.unitmeasure` */
 case class UnitmeasureId(value: /* bpchar, max 3 chars */ String) extends AnyVal
 object UnitmeasureId {
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[UnitmeasureId]] = adventureworks.StringArrayDecoder.map(_.map(UnitmeasureId.apply))
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[UnitmeasureId]] = adventureworks.StringArrayEncoder.contramap(_.map(_.value))
   implicit lazy val arraySetter: Setter[Array[UnitmeasureId]] = adventureworks.StringArraySetter.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[UnitmeasureId, /* bpchar, max 3 chars */ String] = Bijection[UnitmeasureId, /* bpchar, max 3 chars */ String](_.value)(UnitmeasureId.apply)
   implicit lazy val jdbcDecoder: JdbcDecoder[UnitmeasureId] = JdbcDecoder.stringDecoder.map(UnitmeasureId.apply)

@@ -103,6 +103,7 @@ case class PgtestRow(
   linees: Array[TypoLine],
   lseges: Array[TypoLineSegment],
   moneyes: Array[TypoMoney],
+  mydomaines: Array[Mydomain],
   myenumes: Array[Myenum],
   namees: Array[String],
   numerices: Array[BigDecimal],
@@ -178,6 +179,7 @@ object PgtestRow {
           linees = json.\("linees").as(Reads.ArrayReads[TypoLine](using TypoLine.reads, implicitly)),
           lseges = json.\("lseges").as(Reads.ArrayReads[TypoLineSegment](using TypoLineSegment.reads, implicitly)),
           moneyes = json.\("moneyes").as(Reads.ArrayReads[TypoMoney](using TypoMoney.reads, implicitly)),
+          mydomaines = json.\("mydomaines").as(Reads.ArrayReads[Mydomain](using Mydomain.reads, implicitly)),
           myenumes = json.\("myenumes").as(Reads.ArrayReads[Myenum](using Myenum.reads, implicitly)),
           namees = json.\("namees").as(Reads.ArrayReads[String](using Reads.StringReads, implicitly)),
           numerices = json.\("numerices").as(Reads.ArrayReads[BigDecimal](using Reads.bigDecReads, implicitly)),
@@ -254,20 +256,21 @@ object PgtestRow {
         linees = row(idx + 52)(TypoLine.arrayColumn),
         lseges = row(idx + 53)(TypoLineSegment.arrayColumn),
         moneyes = row(idx + 54)(TypoMoney.arrayColumn),
-        myenumes = row(idx + 55)(Myenum.arrayColumn),
-        namees = row(idx + 56)(Column.columnToArray[String](Column.columnToString, implicitly)),
-        numerices = row(idx + 57)(Column.columnToArray[BigDecimal](Column.columnToScalaBigDecimal, implicitly)),
-        pathes = row(idx + 58)(TypoPath.arrayColumn),
-        pointes = row(idx + 59)(TypoPoint.arrayColumn),
-        polygones = row(idx + 60)(TypoPolygon.arrayColumn),
-        textes = row(idx + 61)(Column.columnToArray[String](Column.columnToString, implicitly)),
-        timees = row(idx + 62)(TypoLocalTime.arrayColumn),
-        timestampes = row(idx + 63)(TypoLocalDateTime.arrayColumn),
-        timestampzes = row(idx + 64)(TypoInstant.arrayColumn),
-        timezes = row(idx + 65)(TypoOffsetTime.arrayColumn),
-        uuides = row(idx + 66)(TypoUUID.arrayColumn),
-        varchares = row(idx + 67)(Column.columnToArray[String](Column.columnToString, implicitly)),
-        xmles = row(idx + 68)(TypoXml.arrayColumn)
+        mydomaines = row(idx + 55)(Mydomain.arrayColumn),
+        myenumes = row(idx + 56)(Myenum.arrayColumn),
+        namees = row(idx + 57)(Column.columnToArray[String](Column.columnToString, implicitly)),
+        numerices = row(idx + 58)(Column.columnToArray[BigDecimal](Column.columnToScalaBigDecimal, implicitly)),
+        pathes = row(idx + 59)(TypoPath.arrayColumn),
+        pointes = row(idx + 60)(TypoPoint.arrayColumn),
+        polygones = row(idx + 61)(TypoPolygon.arrayColumn),
+        textes = row(idx + 62)(Column.columnToArray[String](Column.columnToString, implicitly)),
+        timees = row(idx + 63)(TypoLocalTime.arrayColumn),
+        timestampes = row(idx + 64)(TypoLocalDateTime.arrayColumn),
+        timestampzes = row(idx + 65)(TypoInstant.arrayColumn),
+        timezes = row(idx + 66)(TypoOffsetTime.arrayColumn),
+        uuides = row(idx + 67)(TypoUUID.arrayColumn),
+        varchares = row(idx + 68)(Column.columnToArray[String](Column.columnToString, implicitly)),
+        xmles = row(idx + 69)(TypoXml.arrayColumn)
       )
     )
   }
@@ -382,6 +385,8 @@ object PgtestRow {
     sb.append(Text.DELIMETER)
     Text.iterableInstance[Array, TypoMoney](TypoMoney.text, implicitly).unsafeEncode(row.moneyes, sb)
     sb.append(Text.DELIMETER)
+    Text.iterableInstance[Array, Mydomain](Mydomain.text, implicitly).unsafeEncode(row.mydomaines, sb)
+    sb.append(Text.DELIMETER)
     Text.iterableInstance[Array, Myenum](Myenum.text, implicitly).unsafeEncode(row.myenumes, sb)
     sb.append(Text.DELIMETER)
     Text[Array[String]].unsafeEncode(row.namees, sb)
@@ -467,6 +472,7 @@ object PgtestRow {
       "linees" -> Writes.arrayWrites[TypoLine](using implicitly, TypoLine.writes).writes(o.linees),
       "lseges" -> Writes.arrayWrites[TypoLineSegment](using implicitly, TypoLineSegment.writes).writes(o.lseges),
       "moneyes" -> Writes.arrayWrites[TypoMoney](using implicitly, TypoMoney.writes).writes(o.moneyes),
+      "mydomaines" -> Writes.arrayWrites[Mydomain](using implicitly, Mydomain.writes).writes(o.mydomaines),
       "myenumes" -> Writes.arrayWrites[Myenum](using implicitly, Myenum.writes).writes(o.myenumes),
       "namees" -> Writes.arrayWrites[String](using implicitly, Writes.StringWrites).writes(o.namees),
       "numerices" -> Writes.arrayWrites[BigDecimal](using implicitly, Writes.BigDecimalWrites).writes(o.numerices),

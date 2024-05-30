@@ -7,6 +7,7 @@ package adventureworks
 package public
 
 import adventureworks.Text
+import java.sql.Types
 import typo.dsl.Bijection
 import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
@@ -20,6 +21,8 @@ import zio.json.JsonEncoder
   */
 case class OrderNumber(value: String)
 object OrderNumber {
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[OrderNumber]] = adventureworks.StringArrayDecoder.map(_.map(OrderNumber.apply))
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[OrderNumber]] = adventureworks.StringArrayEncoder.contramap(_.map(_.value))
   implicit lazy val arraySetter: Setter[Array[OrderNumber]] = adventureworks.StringArraySetter.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[OrderNumber, String] = Bijection[OrderNumber, String](_.value)(OrderNumber.apply)
   implicit lazy val jdbcDecoder: JdbcDecoder[OrderNumber] = JdbcDecoder.stringDecoder.map(OrderNumber.apply)
@@ -27,7 +30,7 @@ object OrderNumber {
   implicit lazy val jsonDecoder: JsonDecoder[OrderNumber] = JsonDecoder.string.map(OrderNumber.apply)
   implicit lazy val jsonEncoder: JsonEncoder[OrderNumber] = JsonEncoder.string.contramap(_.value)
   implicit lazy val ordering: Ordering[OrderNumber] = Ordering.by(_.value)
-  implicit lazy val pgType: PGType[OrderNumber] = PGType.PGTypeString.as
+  implicit lazy val pgType: PGType[OrderNumber] = PGType.instance(""""public"."OrderNumber"""", Types.OTHER)
   implicit lazy val setter: Setter[OrderNumber] = Setter.stringSetter.contramap(_.value)
   implicit lazy val text: Text[OrderNumber] = new Text[OrderNumber] {
     override def unsafeEncode(v: OrderNumber, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)

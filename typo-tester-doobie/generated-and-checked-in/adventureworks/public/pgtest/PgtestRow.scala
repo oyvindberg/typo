@@ -102,6 +102,7 @@ case class PgtestRow(
   linees: Array[TypoLine],
   lseges: Array[TypoLineSegment],
   moneyes: Array[TypoMoney],
+  mydomaines: Array[Mydomain],
   myenumes: Array[Myenum],
   namees: Array[String],
   numerices: Array[BigDecimal],
@@ -181,6 +182,7 @@ object PgtestRow {
         linees = orThrow(c.get("linees")(Decoder.decodeArray[TypoLine](TypoLine.decoder, implicitly))),
         lseges = orThrow(c.get("lseges")(Decoder.decodeArray[TypoLineSegment](TypoLineSegment.decoder, implicitly))),
         moneyes = orThrow(c.get("moneyes")(Decoder.decodeArray[TypoMoney](TypoMoney.decoder, implicitly))),
+        mydomaines = orThrow(c.get("mydomaines")(Decoder.decodeArray[Mydomain](Mydomain.decoder, implicitly))),
         myenumes = orThrow(c.get("myenumes")(Decoder.decodeArray[Myenum](Myenum.decoder, implicitly))),
         namees = orThrow(c.get("namees")(Decoder.decodeArray[String](Decoder.decodeString, implicitly))),
         numerices = orThrow(c.get("numerices")(Decoder.decodeArray[BigDecimal](Decoder.decodeBigDecimal, implicitly))),
@@ -255,6 +257,7 @@ object PgtestRow {
       "linees" -> Encoder.encodeIterable[TypoLine, Array](TypoLine.encoder, implicitly).apply(row.linees),
       "lseges" -> Encoder.encodeIterable[TypoLineSegment, Array](TypoLineSegment.encoder, implicitly).apply(row.lseges),
       "moneyes" -> Encoder.encodeIterable[TypoMoney, Array](TypoMoney.encoder, implicitly).apply(row.moneyes),
+      "mydomaines" -> Encoder.encodeIterable[Mydomain, Array](Mydomain.encoder, implicitly).apply(row.mydomaines),
       "myenumes" -> Encoder.encodeIterable[Myenum, Array](Myenum.encoder, implicitly).apply(row.myenumes),
       "namees" -> Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly).apply(row.namees),
       "numerices" -> Encoder.encodeIterable[BigDecimal, Array](Encoder.encodeBigDecimal, implicitly).apply(row.numerices),
@@ -328,6 +331,7 @@ object PgtestRow {
       (TypoLine.arrayGet, Nullability.NoNulls),
       (TypoLineSegment.arrayGet, Nullability.NoNulls),
       (TypoMoney.arrayGet, Nullability.NoNulls),
+      (Mydomain.arrayGet, Nullability.NoNulls),
       (Myenum.arrayGet, Nullability.NoNulls),
       (adventureworks.StringArrayMeta.get, Nullability.NoNulls),
       (adventureworks.BigDecimalMeta.get, Nullability.NoNulls),
@@ -399,20 +403,21 @@ object PgtestRow {
       linees = TypoLine.arrayGet.unsafeGetNonNullable(rs, i + 52),
       lseges = TypoLineSegment.arrayGet.unsafeGetNonNullable(rs, i + 53),
       moneyes = TypoMoney.arrayGet.unsafeGetNonNullable(rs, i + 54),
-      myenumes = Myenum.arrayGet.unsafeGetNonNullable(rs, i + 55),
-      namees = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 56),
-      numerices = adventureworks.BigDecimalMeta.get.unsafeGetNonNullable(rs, i + 57),
-      pathes = TypoPath.arrayGet.unsafeGetNonNullable(rs, i + 58),
-      pointes = TypoPoint.arrayGet.unsafeGetNonNullable(rs, i + 59),
-      polygones = TypoPolygon.arrayGet.unsafeGetNonNullable(rs, i + 60),
-      textes = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 61),
-      timees = TypoLocalTime.arrayGet.unsafeGetNonNullable(rs, i + 62),
-      timestampes = TypoLocalDateTime.arrayGet.unsafeGetNonNullable(rs, i + 63),
-      timestampzes = TypoInstant.arrayGet.unsafeGetNonNullable(rs, i + 64),
-      timezes = TypoOffsetTime.arrayGet.unsafeGetNonNullable(rs, i + 65),
-      uuides = TypoUUID.arrayGet.unsafeGetNonNullable(rs, i + 66),
-      varchares = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 67),
-      xmles = TypoXml.arrayGet.unsafeGetNonNullable(rs, i + 68)
+      mydomaines = Mydomain.arrayGet.unsafeGetNonNullable(rs, i + 55),
+      myenumes = Myenum.arrayGet.unsafeGetNonNullable(rs, i + 56),
+      namees = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 57),
+      numerices = adventureworks.BigDecimalMeta.get.unsafeGetNonNullable(rs, i + 58),
+      pathes = TypoPath.arrayGet.unsafeGetNonNullable(rs, i + 59),
+      pointes = TypoPoint.arrayGet.unsafeGetNonNullable(rs, i + 60),
+      polygones = TypoPolygon.arrayGet.unsafeGetNonNullable(rs, i + 61),
+      textes = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 62),
+      timees = TypoLocalTime.arrayGet.unsafeGetNonNullable(rs, i + 63),
+      timestampes = TypoLocalDateTime.arrayGet.unsafeGetNonNullable(rs, i + 64),
+      timestampzes = TypoInstant.arrayGet.unsafeGetNonNullable(rs, i + 65),
+      timezes = TypoOffsetTime.arrayGet.unsafeGetNonNullable(rs, i + 66),
+      uuides = TypoUUID.arrayGet.unsafeGetNonNullable(rs, i + 67),
+      varchares = adventureworks.StringArrayMeta.get.unsafeGetNonNullable(rs, i + 68),
+      xmles = TypoXml.arrayGet.unsafeGetNonNullable(rs, i + 69)
     )
   )
   implicit lazy val text: Text[PgtestRow] = Text.instance[PgtestRow]{ (row, sb) =>
@@ -525,6 +530,8 @@ object PgtestRow {
     Text.iterableInstance[Array, TypoLineSegment](TypoLineSegment.text, implicitly).unsafeEncode(row.lseges, sb)
     sb.append(Text.DELIMETER)
     Text.iterableInstance[Array, TypoMoney](TypoMoney.text, implicitly).unsafeEncode(row.moneyes, sb)
+    sb.append(Text.DELIMETER)
+    Text.iterableInstance[Array, Mydomain](Mydomain.text, implicitly).unsafeEncode(row.mydomaines, sb)
     sb.append(Text.DELIMETER)
     Text.iterableInstance[Array, Myenum](Myenum.text, implicitly).unsafeEncode(row.myenumes, sb)
     sb.append(Text.DELIMETER)

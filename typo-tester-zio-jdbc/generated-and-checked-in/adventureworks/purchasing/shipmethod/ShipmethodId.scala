@@ -19,6 +19,8 @@ import zio.json.JsonEncoder
 /** Type for the primary key of table `purchasing.shipmethod` */
 case class ShipmethodId(value: Int) extends AnyVal
 object ShipmethodId {
+  implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[ShipmethodId]] = adventureworks.IntArrayDecoder.map(_.map(ShipmethodId.apply))
+  implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[ShipmethodId]] = adventureworks.IntArrayEncoder.contramap(_.map(_.value))
   implicit lazy val arraySetter: Setter[Array[ShipmethodId]] = adventureworks.IntArraySetter.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[ShipmethodId, Int] = Bijection[ShipmethodId, Int](_.value)(ShipmethodId.apply)
   implicit lazy val jdbcDecoder: JdbcDecoder[ShipmethodId] = JdbcDecoder.intDecoder.map(ShipmethodId.apply)

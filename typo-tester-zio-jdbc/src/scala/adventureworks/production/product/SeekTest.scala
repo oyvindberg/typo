@@ -13,7 +13,7 @@ class SeekTest extends AnyFunSuite with TypeCheckedTripleEquals {
       .seek(_.weight.asc)(Some(BigDecimal(22.2)))
       .seek(_.listprice.asc)(BigDecimal(33.3))
     assertResult(query.sql.get.toString)(
-      s"""Sql(select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product product0 WHERE ((product0.name,product0.weight,product0.listprice) > (?::text,?::numeric,?::numeric)) ORDER BY product0.name ASC , product0.weight ASC , product0.listprice ASC , foo, Some(22.2), 33.3)"""
+      s"""Sql(select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product product0 WHERE ((product0.name,product0.weight,product0.listprice) > (?::"public"."Name",?::numeric,?::numeric)) ORDER BY product0.name ASC , product0.weight ASC , product0.listprice ASC , foo, Some(22.2), 33.3)"""
     )
   }
 
@@ -23,7 +23,7 @@ class SeekTest extends AnyFunSuite with TypeCheckedTripleEquals {
       .seek(_.weight.desc)(Some(BigDecimal(22.2)))
       .seek(_.listprice.desc)(BigDecimal(33.3))
     assertResult(query.sql.get.toString)(
-      s"""Sql(select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product product0 WHERE ((product0.name,product0.weight,product0.listprice) < (?::text,?::numeric,?::numeric)) ORDER BY product0.name DESC , product0.weight DESC , product0.listprice DESC , foo, Some(22.2), 33.3)"""
+      s"""Sql(select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product product0 WHERE ((product0.name,product0.weight,product0.listprice) < (?::"public"."Name",?::numeric,?::numeric)) ORDER BY product0.name DESC , product0.weight DESC , product0.listprice DESC , foo, Some(22.2), 33.3)"""
     )
   }
 
@@ -33,7 +33,7 @@ class SeekTest extends AnyFunSuite with TypeCheckedTripleEquals {
       .seek(_.weight.desc)(Some(BigDecimal(22.2)))
       .seek(_.listprice.desc)(BigDecimal(33.3))
     assertResult(query.sql.get.toString)(
-      s"""Sql(select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product product0 WHERE (((product0.name > ?::text) OR ((product0.name = ?::text) AND (product0.weight < ?::numeric))) OR (((product0.name = ?::text) AND (product0.weight = ?::numeric)) AND (product0.listprice < ?::numeric))) ORDER BY product0.name ASC , product0.weight DESC , product0.listprice DESC , foo, foo, Some(22.2), foo, Some(22.2), 33.3)"""
+      s"""Sql(select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product product0 WHERE (((product0.name > ?::"public"."Name") OR ((product0.name = ?::"public"."Name") AND (product0.weight < ?::numeric))) OR (((product0.name = ?::"public"."Name") AND (product0.weight = ?::numeric)) AND (product0.listprice < ?::numeric))) ORDER BY product0.name ASC , product0.weight DESC , product0.listprice DESC , foo, foo, Some(22.2), foo, Some(22.2), 33.3)"""
     )
   }
 }

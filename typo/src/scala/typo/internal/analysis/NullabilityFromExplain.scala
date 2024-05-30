@@ -3,6 +3,7 @@ package typo.internal.analysis
 import anorm.{Column, SqlParser, SqlStringInterpolation, TypeDoesNotMatch}
 import org.postgresql.util.PGobject
 import play.api.libs.json.{Json, Reads}
+import typo.internal.quote
 
 import java.sql.Connection
 
@@ -73,8 +74,6 @@ object NullabilityFromExplain {
       }
       s"$example::${param.parameterTypeName}"
     }
-
-  def quote(str: String) = s"'$str'"
 
   /** recursively inspect the query plan to find joins which cause nullable columns
     *

@@ -129,6 +129,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
 //        _ <- pgtestnullRepo.select.where(_.linees === row.linees).toChunk.map(x => assertJsonEquals(row.linees, x.head.linees))
 //        _ <- pgtestnullRepo.select.where(_.lseges === row.lseges).toChunk.map(x => assertJsonEquals(row.lseges, x.head.lseges))
         _ <- pgtestnullRepo.select.where(_.moneyes === row.moneyes).toChunk.map(x => assertJsonEquals(row.moneyes, x.head.moneyes))
+        _ <- pgtestnullRepo.select.where(_.mydomaines === row.mydomaines).toChunk.map(x => assertJsonEquals(row.mydomaines, x.head.mydomaines))
         _ <- pgtestnullRepo.select.where(_.myenumes === row.myenumes).toChunk.map(x => assertJsonEquals(row.myenumes, x.head.myenumes))
 //        _ <- pgtestnullRepo.select.where(_.namees === row.namees).toChunk.map(x => assertJsonEquals(row.namees, x.head.namees))
         _ <- pgtestnullRepo.select.where(_.numerices === row.numerices).toChunk.map(x => assertJsonEquals(row.numerices, x.head.numerices))
@@ -207,6 +208,7 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
         _ <- pgtestRepo.update.setValue(_.linees)(row.linees).where(_.uuid === row.uuid).execute
         _ <- pgtestRepo.update.setValue(_.lseges)(row.lseges).where(_.uuid === row.uuid).execute
         _ <- pgtestRepo.update.setValue(_.moneyes)(row.moneyes).where(_.uuid === row.uuid).execute
+        _ <- pgtestRepo.update.setValue(_.mydomaines)(row.mydomaines).where(_.uuid === row.uuid).execute
         _ <- pgtestRepo.update.setValue(_.myenumes)(row.myenumes).where(_.uuid === row.uuid).execute
         _ <- pgtestRepo.update.setValue(_.namees)(row.namees).where(_.uuid === row.uuid).execute
         _ <- pgtestRepo.update.setValue(_.numerices)(row.numerices).where(_.uuid === row.uuid).execute
@@ -284,6 +286,7 @@ object ArrayTestData {
     linees = Array(TypoLine(3.0, 4.5, 5.5)),
     lseges = Array(TypoLineSegment(TypoPoint(6.5, 4.3), TypoPoint(1.5, 2.3))),
     moneyes = Array(TypoMoney(BigDecimal("22.50"))),
+    mydomaines = Array(Mydomain("a")),
     myenumes = Array(Myenum.c),
     namees = Array("foo"),
     numerices = Array(BigDecimal("3.14159")),
@@ -356,6 +359,7 @@ object ArrayTestData {
     linees = None,
     lseges = None,
     moneyes = None,
+    mydomaines = None,
     myenumes = None,
     namees = None,
     numerices = None,
@@ -428,6 +432,7 @@ object ArrayTestData {
     linees = Some(Array(TypoLine(3.0, 4.5, 5.5))),
     lseges = Some(Array(TypoLineSegment(TypoPoint(6.5, 4.3), TypoPoint(1.5, 2.3)))),
     moneyes = Some(Array(TypoMoney(BigDecimal("22.50")))),
+    mydomaines = Some(Array(Mydomain("a"))),
     myenumes = Some(Array(Myenum.c)),
     namees = Some(Array("foo")),
     numerices = Some(Array(BigDecimal("3.14159"))),
