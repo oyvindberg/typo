@@ -12,24 +12,30 @@ case class ComputedTable(
     eval: Eval[db.RelationName, HasSource]
 ) extends HasSource {
   override val source: Source.Table = Source.Table(dbTable.name)
-  val pointsTo: Map[db.ColName, (Source.Relation, db.ColName)] = {
+
+  val deps: Map[db.ColName, List[(Source.Relation, db.ColName)]] = {
     val (fkSelf, fkOther) = dbTable.foreignKeys.partition { fk => fk.otherTable == dbTable.name }
 
-    val fromSelf = fkSelf.flatMap(fk => fk.cols.zip(fk.otherCols.map(cn => (source, cn))).toList).toMap
+    val fromSelf: List[(db.ColName, (Source.Relation, db.ColName))] =
+      fkSelf.flatMap(fk => fk.cols.zip(fk.otherCols.map(cn => (source, cn))).toList)
 
-    val fromOthers = fkOther.flatMap { fk =>
-      eval(fk.otherTable).get match {
-        case None =>
-          options.logger.warn(s"Circular: ${dbTable.name.value} => ${fk.otherTable.value}")
-          Nil
-        case Some(otherTable) =>
-          val value = fk.otherCols.map(cn => (otherTable.source, cn))
-          fk.cols.zip(value).toList
+    val fromOthers: List[(db.ColName, (Source.Relation, db.ColName))] =
+      fkOther.flatMap { fk =>
+        eval(fk.otherTable).get match {
+          case None =>
+            options.logger.warn(s"Circular: ${dbTable.name.value} => ${fk.otherTable.value}")
+            Nil
+          case Some(otherTable) =>
+            fk.cols.zip(fk.otherCols.map(cn => (otherTable.source, cn))).toList
+        }
       }
-    }.toMap
 
-    // prefer inferring types from outside the table
-    fromSelf ++ fromOthers
+    (fromSelf ++ fromOthers).groupBy(_._1).map { case (colName, tuples) =>
+      val sorted = tuples
+        .map { case (_, other) => other }
+        .sortBy { case (rel, colName) => (rel.name.value, colName.value) }
+      colName -> sorted
+    }
   }
 
   val dbColsByName: Map[db.ColName, db.Col] =
@@ -41,82 +47,60 @@ case class ComputedTable(
       pk.colNames match {
         case NonEmptyList(colName, Nil) =>
           val dbCol = dbColsByName(colName)
-          val underlying = scalaTypeMapper.col(dbTable.name, dbCol, None)
-          val col = ComputedColumn(
-            pointsTo = pointsTo.get(dbCol.name),
-            name = naming.field(dbCol.name),
-            tpe = underlying,
-            dbCol = dbCol
-          )
-          col.pointsTo match {
-            case Some((relationSource, colName)) =>
-              val cols = eval(relationSource.name).forceGet.cols
-              val tpe = cols.find(_.dbName == colName).get.tpe
+          val pointsTo = deps.getOrElse(dbCol.name, Nil)
+
+          findTypeFromFk(options.logger, source, dbCol.name, pointsTo, eval.asMaybe)(_ => None) match {
+            case Some(tpe) =>
+              val col = ComputedColumn(pointsTo = pointsTo, name = naming.field(dbCol.name), tpe = tpe, dbCol = dbCol)
               Some(IdComputed.UnaryInherited(col, tpe))
             case None =>
+              val underlying = scalaTypeMapper.col(dbTable.name, dbCol, None)
+              val col = ComputedColumn(pointsTo = pointsTo, name = naming.field(dbCol.name), tpe = underlying, dbCol = dbCol)
               if (sc.Type.containsUserDefined(underlying))
                 Some(IdComputed.UnaryUserSpecified(col, underlying))
               else if (!options.enablePrimaryKeyType.include(dbTable.name))
                 Some(IdComputed.UnaryNoIdType(col, underlying))
               else
                 Some(IdComputed.UnaryNormal(col, tpe))
-
           }
 
         case colNames =>
           val cols: NonEmptyList[ComputedColumn] =
             colNames.map { colName =>
-              val dbCol = dbColsByName(colName)
               ComputedColumn(
-                pointsTo = None,
+                pointsTo = Nil,
                 name = naming.field(colName),
-                tpe = deriveType(dbCol),
-                dbCol = dbCol
+                tpe = deriveType(colName),
+                dbCol = dbColsByName(colName)
               )
             }
           Some(IdComputed.Composite(cols, tpe, paramName = sc.Ident("compositeId")))
       }
     }
 
-  val cols: NonEmptyList[ComputedColumn] = {
+  val cols: NonEmptyList[ComputedColumn] =
     dbTable.cols.map { dbCol =>
-      val tpe = deriveType(dbCol)
-
       ComputedColumn(
-        pointsTo = pointsTo.get(dbCol.name),
+        pointsTo = deps.getOrElse(dbCol.name, Nil),
         name = naming.field(dbCol.name),
-        tpe = tpe,
+        tpe = deriveType(dbCol.name),
         dbCol = dbCol
       )
     }
-  }
 
-  def deriveType(dbCol: db.Col): sc.Type = {
+  def deriveType(colName: db.ColName): sc.Type = {
+    val dbCol = dbColsByName(colName)
     // we let types flow through constraints down to this column, the point is to reuse id types downstream
     val typeFromFk: Option[sc.Type] =
-      pointsTo.get(dbCol.name).flatMap { case (otherTableSource, otherColName) =>
-        if (otherTableSource.name == dbTable.name)
-          if (otherColName == dbCol.name) None
-          else Some(deriveType(dbColsByName(otherColName)))
-        else
-          eval(otherTableSource.name).get match {
-            case Some(otherTable) =>
-              otherTable.cols.find(_.dbName == otherColName).map(_.tpe)
-            case None =>
-              options.logger.warn(s"Unexpected circular dependency involving ${dbTable.name.value} => ${otherTableSource.name.value}")
-              None
-          }
-      }
+      findTypeFromFk(options.logger, source, colName, deps.getOrElse(colName, Nil), eval.asMaybe)(otherColName => Some(deriveType(otherColName)))
 
     val typeFromId: Option[sc.Type] =
       maybeId match {
-        case Some(id: IdComputed.Unary) if id.col.dbName == dbCol.name => Some(id.tpe)
-        case _                                                         => None
+        case Some(id: IdComputed.Unary) if id.col.dbName == colName => Some(id.tpe)
+        case _                                                      => None
       }
 
-    val tpe = scalaTypeMapper.col(dbTable.name, dbCol, typeFromFk.orElse(typeFromId))
-
-    tpe
+    scalaTypeMapper.col(dbTable.name, dbCol, typeFromFk.orElse(typeFromId))
   }
 
   val names = ComputedNames(naming, source, maybeId, options.enableFieldValue.include(dbTable.name), options.enableDsl)

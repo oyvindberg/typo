@@ -17,10 +17,10 @@ case class ComputedSqlFile(
 ) {
   val source: Source.SqlFile = Source.SqlFile(sqlFile.relPath)
 
-  val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
+  val deps: Map[db.ColName, List[(db.RelationName, db.ColName)]] =
     sqlFile.jdbcMetadata.columns match {
       case MaybeReturnsRows.Query(columns) =>
-        columns.toList.flatMap(col => col.baseRelationName.zip(col.baseColumnName).map(col.name -> _)).toMap
+        columns.toList.flatMap(col => col.baseRelationName.zip(col.baseColumnName).map(t => col.name -> List(t))).toMap
       case MaybeReturnsRows.Update =>
         Map.empty
     }
@@ -38,36 +38,28 @@ case class ComputedSqlFile(
           logger.warn(s"Couldn't translate type from file ${sqlFile.relPath} column ${col.name.value} with type ${col.columnTypeName}. Falling back to text")
         }
 
-        // we let types flow through constraints down to this column, the point is to reuse id types downstream
-        val typeFromFk: Option[sc.Type] =
-          deps.get(col.name) match {
-            case Some((otherTableName, otherColName)) =>
-              for {
-                existingTable <- eval(otherTableName)
-                nonCircular <- existingTable.get
-                col <- nonCircular.cols.find(_.dbName == otherColName)
-              } yield col.tpe
-            case _ => None
+        val pointsTo: List[(Source.Relation, db.ColName)] =
+          deps.getOrElse(col.name, Nil).flatMap { case (relName, colName) =>
+            eval(relName).flatMap(_.get).map(x => x.source -> colName)
           }
+
+        // we let types flow through constraints down to this column, the point is to reuse id types downstream
+        val typeFromFk: Option[sc.Type] = findTypeFromFk(logger, source, col.name, pointsTo, eval)(_ => None)
 
         val tpe = scalaTypeMapper.sqlFile(col.parsedColumnName.overriddenType.orElse(typeFromFk), dbType, nullability)
 
-        ComputedColumn(
-          pointsTo = deps.get(col.name).flatMap { case (relName, colName) => eval(relName).flatMap(_.get.map(foo => foo.source -> colName)) },
-          name = naming.field(col.name),
-          tpe = tpe,
-          dbCol = db.Col(
-            parsedName = col.parsedColumnName,
-            tpe = dbType,
-            udtName = None,
-            nullability = nullability,
-            columnDefault = None,
-            identity = None,
-            comment = None,
-            constraints = Nil,
-            jsonDescription = DebugJson(col)
-          )
+        val dbCol = db.Col(
+          parsedName = col.parsedColumnName,
+          tpe = dbType,
+          udtName = None,
+          nullability = nullability,
+          columnDefault = None,
+          identity = None,
+          comment = None,
+          constraints = Nil,
+          jsonDescription = DebugJson(col)
         )
+        ComputedColumn(pointsTo = pointsTo, name = naming.field(col.name), tpe = tpe, dbCol = dbCol)
       }
     }
 

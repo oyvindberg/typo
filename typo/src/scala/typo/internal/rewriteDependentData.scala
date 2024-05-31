@@ -7,8 +7,9 @@ import scala.collection.immutable.SortedMap
 //  where processing one thing requires having processed its dependencies first
 object rewriteDependentData {
   @FunctionalInterface
-  trait Eval[K, V] {
+  trait Eval[K, V] { self =>
     def apply(key: K): Lazy[V]
+    def asMaybe: EvalMaybe[K, V] = key => Some(apply(key))
   }
   @FunctionalInterface
   trait EvalMaybe[K, V] {

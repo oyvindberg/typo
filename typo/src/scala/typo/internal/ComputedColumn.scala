@@ -2,7 +2,7 @@ package typo
 package internal
 
 case class ComputedColumn(
-    pointsTo: Option[(Source.Relation, db.ColName)],
+    pointsTo: List[(Source.Relation, db.ColName)],
     name: sc.Ident,
     tpe: sc.Type,
     dbCol: db.Col
