@@ -65,7 +65,7 @@ object generate {
             case (_, dbTable: db.Table, eval) =>
               ComputedTable(options, default, dbTable, naming, scalaTypeMapper, eval)
             case (_, dbView: db.View, eval) =>
-              ComputedView(dbView, naming, metaDb.typeMapperDb, scalaTypeMapper, eval, options.enableFieldValue.include(dbView.name), options.enableDsl)
+              ComputedView(options.logger, dbView, naming, metaDb.typeMapperDb, scalaTypeMapper, eval, options.enableFieldValue.include(dbView.name), options.enableDsl)
           }
 
         // note, these statements will force the evaluation of some of the lazy values

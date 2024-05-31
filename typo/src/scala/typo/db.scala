@@ -144,7 +144,7 @@ object db {
       comment: Option[String],
       decomposedSql: DecomposedSql,
       cols: NonEmptyList[(db.Col, ParsedName)],
-      deps: Map[db.ColName, (db.RelationName, db.ColName)],
+      deps: Map[db.ColName, List[(db.RelationName, db.ColName)]],
       isMaterialized: Boolean
   ) extends Relation
 }

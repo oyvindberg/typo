@@ -122,10 +122,10 @@ object MetaDb {
             val decomposedSql = DecomposedSql.parse(sqlContent)
             val Right(jdbcMetadata) = JdbcMetadata.from(sqlContent): @unchecked
             val nullabilityInfo = NullabilityFromExplain.from(decomposedSql, Nil).nullableIndices
-            val deps: Map[db.ColName, (db.RelationName, db.ColName)] =
+            val deps: Map[db.ColName, List[(db.RelationName, db.ColName)]] =
               jdbcMetadata.columns match {
                 case MaybeReturnsRows.Query(columns) =>
-                  columns.toList.flatMap(col => col.baseRelationName.zip(col.baseColumnName).map(col.name -> _)).toMap
+                  columns.toList.flatMap(col => col.baseRelationName.zip(col.baseColumnName).map(t => col.name -> List(t))).toMap
                 case MaybeReturnsRows.Update =>
                   Map.empty
               }
