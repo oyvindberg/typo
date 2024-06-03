@@ -40,9 +40,9 @@ object SqlCast {
     */
   def fromPg(dbCol: db.Col): Option[SqlCast] =
     dbCol.tpe match {
-      case db.Type.Array(db.Type.Unknown(_)) =>
+      case db.Type.Array(db.Type.Unknown(_)) | db.Type.Array(db.Type.DomainRef(_, _, db.Type.Unknown(_))) =>
         Some(SqlCast("text[]"))
-      case db.Type.Unknown(_) =>
+      case db.Type.Unknown(_) | db.Type.DomainRef(_, _, db.Type.Unknown(_)) =>
         Some(SqlCast("text"))
       case db.Type.PGmoney =>
         Some(SqlCast("numeric"))
@@ -50,7 +50,7 @@ object SqlCast {
         Some(SqlCast("float4[]"))
       case db.Type.Array(db.Type.PGmoney) =>
         Some(SqlCast("numeric[]"))
-      case db.Type.Array(db.Type.DomainRef(_, underlying)) =>
+      case db.Type.Array(db.Type.DomainRef(_, underlying, _)) =>
         Some(SqlCast(underlying + "[]"))
       case db.Type.TimestampTz | db.Type.Timestamp | db.Type.TimeTz | db.Type.Time | db.Type.Date =>
         Some(SqlCast("text"))

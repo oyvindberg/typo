@@ -12,7 +12,7 @@ case class TypeMapperDb(enums: List[db.StringEnum], domains: List[db.Domain]) {
       c.domainName.map { domainName =>
         val domainRelationName = db.RelationName(c.domainSchema, domainName)
         val d = domainsByName(domainRelationName.value)
-        db.Type.DomainRef(d.name, d.originalType)
+        db.Type.DomainRef(d.name, d.originalType, dbTypeFrom(d.originalType, c.characterMaximumLength)(logWarning))
       }
 
     fromDomain.getOrElse(dbTypeFrom(c.udtName.get, c.characterMaximumLength)(logWarning))
@@ -79,7 +79,7 @@ case class TypeMapperDb(enums: List[db.StringEnum], domains: List[db.Domain]) {
         enumsByName
           .get(typeName)
           .map(`enum` => db.Type.EnumRef(`enum`.name))
-          .orElse(domainsByName.get(typeName).map(domain => db.Type.DomainRef(domain.name, domain.originalType)))
+          .orElse(domainsByName.get(typeName).map(domain => db.Type.DomainRef(domain.name, domain.originalType, domain.tpe)))
           .getOrElse {
             logWarning()
             db.Type.Unknown(udtName)
