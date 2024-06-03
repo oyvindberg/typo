@@ -6,7 +6,6 @@
 package adventureworks
 package customtypes
 
-import adventureworks.Text
 import scala.util.Success
 import scala.util.Try
 import zio.json.JsonDecoder

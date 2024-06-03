@@ -12,7 +12,6 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql

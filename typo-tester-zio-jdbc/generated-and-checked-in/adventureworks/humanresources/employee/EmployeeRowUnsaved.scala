@@ -7,7 +7,6 @@ package adventureworks
 package humanresources
 package employee
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDate
 import adventureworks.customtypes.TypoLocalDateTime

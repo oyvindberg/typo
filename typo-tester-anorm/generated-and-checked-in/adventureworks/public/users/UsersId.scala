@@ -7,7 +7,6 @@ package adventureworks
 package public
 package users
 
-import adventureworks.Text
 import adventureworks.customtypes.TypoUUID
 import anorm.Column
 import anorm.ParameterMetaData

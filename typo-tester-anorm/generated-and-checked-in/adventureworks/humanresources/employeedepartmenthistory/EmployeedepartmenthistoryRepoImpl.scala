@@ -13,7 +13,6 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser

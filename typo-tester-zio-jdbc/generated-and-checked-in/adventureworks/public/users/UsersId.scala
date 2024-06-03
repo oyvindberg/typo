@@ -7,7 +7,6 @@ package adventureworks
 package public
 package users
 
-import adventureworks.Text
 import adventureworks.customtypes.TypoUUID
 import typo.dsl.Bijection
 import typo.dsl.PGType

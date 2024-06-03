@@ -7,8 +7,6 @@ package adventureworks
 package public
 package flaff
 
-import adventureworks.Text
-import adventureworks.public.ShortText
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

@@ -11,7 +11,6 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
-import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser

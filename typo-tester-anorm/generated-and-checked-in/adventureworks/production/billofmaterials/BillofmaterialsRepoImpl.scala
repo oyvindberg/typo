@@ -12,7 +12,6 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser

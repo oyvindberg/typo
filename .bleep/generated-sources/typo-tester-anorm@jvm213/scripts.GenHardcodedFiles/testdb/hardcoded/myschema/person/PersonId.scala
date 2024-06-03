@@ -13,7 +13,6 @@ import anorm.ParameterMetaData
 import anorm.ToStatement
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import testdb.hardcoded.Text
 import typo.dsl.Bijection
 
 /** Type for the primary key of table `myschema.person` */

@@ -6,7 +6,6 @@
 package adventureworks
 package public
 
-import adventureworks.Text
 import java.sql.Types
 import typo.dsl.Bijection
 import typo.dsl.PGType

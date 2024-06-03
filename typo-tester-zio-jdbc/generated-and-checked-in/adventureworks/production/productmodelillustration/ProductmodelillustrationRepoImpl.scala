@@ -11,7 +11,6 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql

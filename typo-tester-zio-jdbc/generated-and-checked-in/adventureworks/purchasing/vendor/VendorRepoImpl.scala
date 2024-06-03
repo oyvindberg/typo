@@ -14,7 +14,6 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
-import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql

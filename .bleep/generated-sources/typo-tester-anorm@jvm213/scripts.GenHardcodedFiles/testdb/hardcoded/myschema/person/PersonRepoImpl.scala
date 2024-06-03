@@ -18,11 +18,8 @@ import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
 import testdb.hardcoded.customtypes.Defaulted
-import testdb.hardcoded.myschema.Number
-import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
-import testdb.hardcoded.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql

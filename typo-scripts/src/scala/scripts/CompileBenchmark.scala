@@ -9,6 +9,7 @@ import typo.internal.sqlfiles.readSqlFileDirectories
 
 import java.nio.file.Path
 import java.sql.{Connection, DriverManager}
+import scala.annotation.nowarn
 
 object CompileBenchmark extends BleepScript("CompileBenchmark") {
   val buildDir = Path.of(sys.props("user.dir"))
@@ -84,7 +85,7 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
             val times = 0.to(2).map { _ =>
               val crossProjectName = model.CrossProjectName(model.ProjectName(projectName), Some(crossId))
               commands.clean(List(crossProjectName))
-              SourceGen(false, Array(crossProjectName)).run(started)
+              SourceGen(false, Array(crossProjectName)).run(started): @nowarn
               time(commands.compile(List(crossProjectName)))
             }
             val avgtime = times.sum / times.length

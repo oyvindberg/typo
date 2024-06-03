@@ -7,7 +7,6 @@ package adventureworks
 package person
 package stateprovince
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID

@@ -7,7 +7,6 @@ package adventureworks
 package person
 package phonenumbertype
 
-import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement

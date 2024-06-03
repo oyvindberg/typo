@@ -5,7 +5,7 @@ import bleep.logging.Logger
 import typo.*
 import typo.internal.FileSync.SoftWrite
 import typo.internal.analysis.ParsedName
-import typo.internal.{DebugJson, Lazy, TypeMapperDb, generate}
+import typo.internal.{DebugJson, Lazy, generate}
 
 // this runs automatically at build time to instantly see results.
 // it does not need a running database

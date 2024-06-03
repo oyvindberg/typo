@@ -13,7 +13,6 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
-import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser

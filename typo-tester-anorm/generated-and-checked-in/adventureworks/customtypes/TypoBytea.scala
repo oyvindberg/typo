@@ -6,7 +6,6 @@
 package adventureworks
 package customtypes
 
-import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement

@@ -13,7 +13,6 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser

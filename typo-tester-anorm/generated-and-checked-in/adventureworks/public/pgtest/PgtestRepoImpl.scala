@@ -31,9 +31,6 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoVector
 import adventureworks.customtypes.TypoXml
-import adventureworks.public.Mydomain
-import adventureworks.public.Myenum
-import adventureworks.streamingInsert
 import anorm.ParameterMetaData
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation

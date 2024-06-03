@@ -12,8 +12,6 @@ import doobie.postgres.Text
 import io.circe.Decoder
 import io.circe.Encoder
 import testdb.hardcoded.customtypes.Defaulted
-import testdb.hardcoded.myschema.Number
-import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 

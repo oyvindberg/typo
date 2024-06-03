@@ -10,7 +10,6 @@ package creditcard
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
-import adventureworks.streamingInsert
 import adventureworks.userdefined.CustomCreditcardId
 import anorm.NamedParameter
 import anorm.ParameterValue

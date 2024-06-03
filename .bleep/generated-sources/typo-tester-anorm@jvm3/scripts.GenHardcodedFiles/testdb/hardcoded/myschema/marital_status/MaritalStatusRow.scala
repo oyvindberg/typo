@@ -17,7 +17,6 @@ import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
-import testdb.hardcoded.Text
 
 /** Table: myschema.marital_status
     Primary key: id */

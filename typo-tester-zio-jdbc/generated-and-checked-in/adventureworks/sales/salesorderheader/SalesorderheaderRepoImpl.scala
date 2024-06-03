@@ -20,7 +20,6 @@ import adventureworks.purchasing.shipmethod.ShipmethodId
 import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import adventureworks.streamingInsert
 import adventureworks.userdefined.CustomCreditcardId
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder

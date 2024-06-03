@@ -14,7 +14,6 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
-import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql

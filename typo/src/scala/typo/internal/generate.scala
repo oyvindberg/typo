@@ -4,6 +4,7 @@ package internal
 import typo.internal.codegen.*
 import typo.internal.sqlfiles.SqlFile
 
+import scala.annotation.nowarn
 import scala.collection.immutable
 import scala.collection.immutable.SortedMap
 
@@ -75,7 +76,10 @@ object generate {
           }
 
         computedLazyRelations.foreach { case (relName, lazyValue) =>
-          if (selector.include(relName)) lazyValue.get
+          if (selector.include(relName)) {
+            lazyValue.get: @nowarn
+            ()
+          }
         }
 
         // here we keep only the values which have been evaluated. this may very well be a bigger set than the sum of the
@@ -133,7 +137,22 @@ object generate {
             keptMostFiles.groupBy(_.pkg).map { case (pkg, files) =>
               (pkg, files.flatMap(f => (f.name, f.tpe) :: f.secondaryTypes.map(tpe => (tpe.value.name, tpe))).toMap)
             }
-          val withImports = (testInsertsDataFile.iterator ++ keptMostFiles).map(file => addPackageAndImports(knownNamesByPkg, file))
+
+          // pick up names from super packages as well
+          val knownNamesByPkgWithSuper: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]] =
+            knownNamesByPkg.map { case (pkg, known) =>
+              var currentPkg = pkg.parentOpt
+              var allKnown = known
+              while (currentPkg.isDefined) {
+                knownNamesByPkg.get(currentPkg.get) match {
+                  case Some(known2) => allKnown = known2 ++ allKnown
+                  case None         =>
+                }
+                currentPkg = currentPkg.get.parentOpt
+              }
+              (pkg, allKnown)
+            }
+          val withImports = (testInsertsDataFile.iterator ++ keptMostFiles).map(file => addPackageAndImports(knownNamesByPkgWithSuper, file))
           val all = withImports ++ pkgObject.iterator
           all.map(file => file.copy(contents = options.fileHeader.code ++ file.contents))
         }

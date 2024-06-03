@@ -7,7 +7,6 @@ package adventureworks
 package production
 package productphoto
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime

@@ -9,10 +9,7 @@ package myschema
 package person
 
 import java.sql.ResultSet
-import testdb.hardcoded.Text
 import testdb.hardcoded.customtypes.Defaulted
-import testdb.hardcoded.myschema.Number
-import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
 import zio.jdbc.JdbcDecoder

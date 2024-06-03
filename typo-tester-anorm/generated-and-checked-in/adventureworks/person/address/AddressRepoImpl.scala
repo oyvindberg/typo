@@ -12,7 +12,6 @@ import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
-import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue

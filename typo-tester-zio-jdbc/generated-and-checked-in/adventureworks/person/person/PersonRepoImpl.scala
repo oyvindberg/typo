@@ -14,7 +14,6 @@ import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
-import adventureworks.streamingInsert
 import adventureworks.userdefined.FirstName
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder

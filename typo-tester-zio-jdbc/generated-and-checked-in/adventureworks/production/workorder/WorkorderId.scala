@@ -7,7 +7,6 @@ package adventureworks
 package production
 package workorder
 
-import adventureworks.Text
 import typo.dsl.Bijection
 import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder

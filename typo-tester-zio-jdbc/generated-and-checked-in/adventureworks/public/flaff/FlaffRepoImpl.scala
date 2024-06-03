@@ -7,8 +7,6 @@ package adventureworks
 package public
 package flaff
 
-import adventureworks.public.ShortText
-import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql

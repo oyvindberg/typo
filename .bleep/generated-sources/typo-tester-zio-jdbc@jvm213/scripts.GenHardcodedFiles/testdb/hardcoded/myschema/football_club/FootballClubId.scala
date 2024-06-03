@@ -8,7 +8,6 @@ package hardcoded
 package myschema
 package football_club
 
-import testdb.hardcoded.Text
 import typo.dsl.Bijection
 import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder

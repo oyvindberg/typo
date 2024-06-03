@@ -7,7 +7,6 @@ package adventureworks
 package production
 package productsubcategory
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID

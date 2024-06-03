@@ -12,7 +12,6 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
-import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql

@@ -12,7 +12,6 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
-import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser

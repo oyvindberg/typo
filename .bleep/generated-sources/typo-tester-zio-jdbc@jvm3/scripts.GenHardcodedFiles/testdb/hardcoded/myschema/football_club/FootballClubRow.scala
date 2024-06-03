@@ -9,7 +9,6 @@ package myschema
 package football_club
 
 import java.sql.ResultSet
-import testdb.hardcoded.Text
 import zio.jdbc.JdbcDecoder
 import zio.json.JsonDecoder
 import zio.json.JsonEncoder

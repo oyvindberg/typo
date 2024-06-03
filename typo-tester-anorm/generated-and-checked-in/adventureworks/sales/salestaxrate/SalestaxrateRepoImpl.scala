@@ -13,7 +13,6 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
-import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser

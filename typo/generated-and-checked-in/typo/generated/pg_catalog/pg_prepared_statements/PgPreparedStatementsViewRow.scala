@@ -24,6 +24,7 @@ import scala.util.Try
 import typo.generated.customtypes.TypoInstant
 import typo.generated.customtypes.TypoRegtype
 
+/** View: pg_catalog.pg_prepared_statements */
 case class PgPreparedStatementsViewRow(
   /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"name","originalName":"name"},"columnName":"name","columnType":"VarChar","columnTypeName":"text","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
   name: /* nullability unknown */ Option[String],

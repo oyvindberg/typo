@@ -23,7 +23,6 @@ import java.time.temporal.ChronoUnit
 import org.postgresql.jdbc.PgArray
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import typo.generated.Text
 
 /** This is `java.time.TypoInstant`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken */
 case class TypoInstant(value: Instant)
@@ -51,7 +50,7 @@ object TypoInstant {
       case other => Left(TypeDoesNotMatch(s"Expected instance of java.lang.String, got ${other.getClass.getName}"))
     }
   )
-  implicit def ordering(implicit O0: Ordering[Instant]): Ordering[TypoInstant] = Ordering.by(_.value)
+  implicit lazy val ordering: Ordering[TypoInstant] = Ordering.by(_.value)
   implicit lazy val parameterMetadata: ParameterMetaData[TypoInstant] = new ParameterMetaData[TypoInstant] {
     override def sqlType: String = "timestamptz"
     override def jdbcType: Int = Types.OTHER

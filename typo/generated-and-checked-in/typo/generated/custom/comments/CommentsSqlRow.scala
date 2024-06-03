@@ -22,6 +22,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** SQL file: custom/comments.sql */
 case class CommentsSqlRow(
   /** Points to [[information_schema.columns.ColumnsViewRow.tableSchema]]
       debug: {"baseColumnName":"table_schema","baseRelationName":"information_schema.columns","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"table_schema","originalName":"table_schema"},"columnName":"table_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"columns"} */

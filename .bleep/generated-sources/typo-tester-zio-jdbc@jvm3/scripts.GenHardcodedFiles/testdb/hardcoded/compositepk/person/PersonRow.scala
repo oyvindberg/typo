@@ -9,7 +9,6 @@ package compositepk
 package person
 
 import java.sql.ResultSet
-import testdb.hardcoded.Text
 import testdb.hardcoded.customtypes.Defaulted
 import zio.jdbc.JdbcDecoder
 import zio.json.JsonDecoder

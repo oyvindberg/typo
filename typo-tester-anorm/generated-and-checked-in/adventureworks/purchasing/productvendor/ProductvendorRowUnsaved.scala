@@ -7,7 +7,6 @@ package adventureworks
 package purchasing
 package productvendor
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId

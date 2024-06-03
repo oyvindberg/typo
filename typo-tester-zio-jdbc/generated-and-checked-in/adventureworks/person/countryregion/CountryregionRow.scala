@@ -7,7 +7,6 @@ package adventureworks
 package person
 package countryregion
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name

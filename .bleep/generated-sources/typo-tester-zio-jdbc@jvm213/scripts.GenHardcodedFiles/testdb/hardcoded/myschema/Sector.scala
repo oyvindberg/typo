@@ -9,7 +9,6 @@ package myschema
 
 import java.sql.ResultSet
 import java.sql.Types
-import testdb.hardcoded.Text
 import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder
 import zio.jdbc.JdbcDecoderError

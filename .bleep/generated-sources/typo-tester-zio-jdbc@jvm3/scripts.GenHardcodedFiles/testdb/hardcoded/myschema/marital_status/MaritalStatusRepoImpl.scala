@@ -8,7 +8,6 @@ package hardcoded
 package myschema
 package marital_status
 
-import testdb.hardcoded.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql

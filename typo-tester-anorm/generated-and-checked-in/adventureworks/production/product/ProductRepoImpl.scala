@@ -16,7 +16,6 @@ import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
-import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue

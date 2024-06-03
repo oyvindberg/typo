@@ -9,7 +9,6 @@ package transactionhistoryarchive
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql

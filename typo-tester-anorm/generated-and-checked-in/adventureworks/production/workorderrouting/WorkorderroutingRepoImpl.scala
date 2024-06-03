@@ -12,7 +12,6 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
-import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue

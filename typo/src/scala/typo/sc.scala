@@ -22,6 +22,7 @@ object sc {
 
   case class QIdent(idents: List[Ident]) extends Tree {
     lazy val dotName = idents.map(_.value).mkString(".")
+    def parentOpt: Option[QIdent] = if (idents.size <= 1) None else Some(QIdent(idents.dropRight(1)))
     require(idents.nonEmpty)
     def /(ident: Ident): QIdent = QIdent(idents :+ ident)
     def /(newIdents: List[Ident]): QIdent = QIdent(idents ++ newIdents)

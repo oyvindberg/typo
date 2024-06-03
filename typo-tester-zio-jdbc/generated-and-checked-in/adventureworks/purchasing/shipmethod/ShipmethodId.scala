@@ -7,7 +7,6 @@ package adventureworks
 package purchasing
 package shipmethod
 
-import adventureworks.Text
 import typo.dsl.Bijection
 import typo.dsl.PGType
 import zio.jdbc.JdbcDecoder

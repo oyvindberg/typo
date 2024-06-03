@@ -7,7 +7,6 @@ package adventureworks
 package public
 package users
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext

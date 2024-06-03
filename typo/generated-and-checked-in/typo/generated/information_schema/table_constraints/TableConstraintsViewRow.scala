@@ -22,6 +22,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** View: information_schema.table_constraints */
 case class TableConstraintsViewRow(
   /** debug: {"columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"constraint_catalog","originalName":"constraint_catalog"},"columnName":"constraint_catalog","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NullableUnknown","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0} */
   constraintCatalog: /* nullability unknown */ Option[String],

@@ -7,7 +7,6 @@ package adventureworks
 package public
 package identity_test
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import java.sql.ResultSet
 import zio.jdbc.JdbcDecoder

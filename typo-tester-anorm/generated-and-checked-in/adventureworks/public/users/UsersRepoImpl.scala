@@ -10,7 +10,6 @@ package users
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
-import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue

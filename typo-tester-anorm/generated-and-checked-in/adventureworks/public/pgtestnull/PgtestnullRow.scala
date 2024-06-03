@@ -7,7 +7,6 @@ package adventureworks
 package public
 package pgtestnull
 
-import adventureworks.Text
 import adventureworks.customtypes.TypoBox
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoCircle
@@ -32,8 +31,6 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoVector
 import adventureworks.customtypes.TypoXml
-import adventureworks.public.Mydomain
-import adventureworks.public.Myenum
 import anorm.Column
 import anorm.RowParser
 import anorm.Success

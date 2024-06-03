@@ -9,7 +9,6 @@ package compositepk
 package person
 
 import testdb.hardcoded.customtypes.Defaulted
-import testdb.hardcoded.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
