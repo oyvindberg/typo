@@ -163,7 +163,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
             silentBanner = true
           ),
           metaDb,
-          ProjectGraph(name = "", target.sources, Selector.All, scripts = Nil, Nil)
+          ProjectGraph(name = "", target.sources, None, Selector.All, scripts = Nil, Nil)
         )
 
       generated.foreach(

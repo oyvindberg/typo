@@ -5,7 +5,7 @@ import typo.internal.FileSync.SoftWrite
 
 import java.nio.file.Path
 
-case class Generated(folder: Path, files: Map[RelPath, sc.Code]) {
+case class Generated(folder: Path, scope: Scope, files: Map[RelPath, sc.Code]) {
   def mapFiles(f: Map[RelPath, sc.Code] => Map[RelPath, sc.Code]): Generated =
     copy(files = f(files))
 
@@ -19,15 +19,23 @@ case class Generated(folder: Path, files: Map[RelPath, sc.Code]) {
 }
 
 object Generated {
-  def apply(folder: Path, files: Iterator[sc.File]): Generated = {
-    val asRelativePaths: Map[RelPath, sc.Code] =
-      files.map { case sc.File(sc.Type.Qualified(sc.QIdent(idents)), code, _) =>
-        val path = idents.init
-        val name = idents.last
-        val relPath = RelPath(path.map(_.value) :+ s"${name.value}.scala")
-        relPath -> code
-      }.toMap
+  def apply(folder: Path, testFolder: Option[Path], files: Iterator[sc.File]): List[Generated] =
+    testFolder match {
+      case Some(testFolder) =>
+        val (mainFiles, testFiles) = files.partition(_.scope == Scope.Main)
+        List(
+          Generated(folder, Scope.Main, asRelativePaths(mainFiles)),
+          Generated(testFolder, Scope.Test, asRelativePaths(testFiles))
+        )
+      case None =>
+        List(Generated(folder, Scope.Main, asRelativePaths(files)))
+    }
 
-    new Generated(folder, asRelativePaths)
-  }
+  def asRelativePaths(files: Iterator[sc.File]): Map[RelPath, sc.Code] =
+    files.map { case sc.File(sc.Type.Qualified(sc.QIdent(idents)), code, _, _) =>
+      val path = idents.init
+      val name = idents.last
+      val relPath = RelPath(path.map(_.value) :+ s"${name.value}.scala")
+      relPath -> code
+    }.toMap
 }

@@ -9,6 +9,6 @@ object FileTestInserts {
              |  ${x.methods.map(x => dbLib.testInsertMethod(x).code).mkCode("\n")}
              |}"""
 
-    sc.File(x.tpe, body, Nil)
+    sc.File(x.tpe, body, Nil, scope = Scope.Test)
   }
 }

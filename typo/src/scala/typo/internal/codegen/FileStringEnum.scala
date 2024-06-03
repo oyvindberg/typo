@@ -41,6 +41,6 @@ object FileStringEnum {
              |$obj
              |""".stripMargin
 
-    sc.File(enm.tpe, body, secondaryTypes = Nil)
+    sc.File(enm.tpe, body, secondaryTypes = Nil, scope = Scope.Main)
   }
 }

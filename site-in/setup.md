@@ -58,6 +58,7 @@ val location = java.nio.file.Path.of(sys.props("user.dir"))
 
 // destination folder. All files in this dir will be overwritten!
 val targetDir = location.resolve("myproject/src/main/scala/org/foo/generated")
+val testTargetDir = location.resolve("myproject/src/test/scala/org/foo/generated")
 
 // where Typo will look for sql files
 val scriptsFolder = location.resolve("sql")
@@ -65,8 +66,13 @@ val scriptsFolder = location.resolve("sql")
 // you can use this to customize which relations you want to generate code for, see below
 val selector = Selector.ExcludePostgresInternal
 
-generateFromDb(options, targetFolder = targetDir, selector = selector, scriptsPaths = List(scriptsFolder))
-  .overwriteFolder()
+generateFromDb(
+  options, 
+  targetFolder = targetDir,
+  testTargetFolder = Some(testTargetDir),
+  selector = selector, 
+  scriptsPaths = List(scriptsFolder)
+).overwriteFolder()
 
 // add changed files to git, so you can keep them under control
 //scala.sys.process.Process(List("git", "add", targetDir.toString)).!!

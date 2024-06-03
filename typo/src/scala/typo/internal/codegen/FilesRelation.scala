@@ -95,7 +95,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
             |${sc.Obj(names.RowName.value, instances, maybeExtraApply)}
             |""".stripMargin
 
-      sc.File(names.RowName, str, secondaryTypes = Nil)
+      sc.File(names.RowName, str, secondaryTypes = Nil, scope = Scope.Main)
     }
 
   val FieldValueFile: Option[sc.File] =
@@ -117,7 +117,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
               |${sc.Obj(fieldValueName.value, Nil, Some(members.mkCode("\n")))}
               |""".stripMargin
 
-      sc.File(fieldValueName, str, secondaryTypes = List(fieldOrIdValueName))
+      sc.File(fieldValueName, str, secondaryTypes = List(fieldOrIdValueName), scope = Scope.Main)
     }
 
   val FieldsFile: Option[sc.File] =
@@ -198,7 +198,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
             |}
             |""".stripMargin
 
-      sc.File(fieldsName, str, Nil)
+      sc.File(fieldsName, str, Nil, scope = Scope.Main)
     }
 
   def structureFile(implName: sc.Ident, fieldsName: sc.Type.Qualified, cols: NonEmptyList[ComputedColumn]) = {
@@ -254,7 +254,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
             |}
             |""".stripMargin
 
-    sc.File(names.RepoName, str, secondaryTypes = Nil)
+    sc.File(names.RepoName, str, secondaryTypes = Nil, scope = Scope.Main)
   }
 
   def RepoImplFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
@@ -269,7 +269,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
              |}
              |""".stripMargin
 
-    sc.File(names.RepoImplName, str, secondaryTypes = Nil)
+    sc.File(names.RepoImplName, str, secondaryTypes = Nil, scope = Scope.Main)
   }
 
   def RepoMockFile(dbLib: DbLib, idComputed: IdComputed, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
@@ -302,7 +302,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
              |}
              |""".stripMargin
 
-    sc.File(names.RepoMockName, str, secondaryTypes = Nil)
+    sc.File(names.RepoMockName, str, secondaryTypes = Nil, scope = Scope.Test)
   }
 
   def dropCommonPrefix[T](a: List[T], b: List[T]): List[T] =

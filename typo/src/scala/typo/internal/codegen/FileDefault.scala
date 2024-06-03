@@ -19,5 +19,5 @@ sealed trait ${default.Defaulted.name}[+T]
 $obj
 """
 
-  val file = sc.File(default.Defaulted, contents, secondaryTypes = Nil)
+  val file = sc.File(default.Defaulted, contents, secondaryTypes = Nil, scope = Scope.Main)
 }

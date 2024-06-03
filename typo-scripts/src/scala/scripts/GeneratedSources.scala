@@ -39,6 +39,7 @@ object GeneratedSources {
         debugTypes = true
       ),
       typoSources,
+      None,
       Selector.relationNames(
         "columns",
         "key_column_usage",

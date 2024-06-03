@@ -66,6 +66,7 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
             ProjectGraph(
               name = "",
               targetSources,
+              None,
               Selector.ExcludePostgresInternal, // All
               readSqlFileDirectories(TypoLogger.Noop, buildDir.resolve("adventureworks_sql")),
               Nil

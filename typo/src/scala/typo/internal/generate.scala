@@ -148,7 +148,7 @@ object generate {
       }
 
     val deduplicated = deduplicate(projectsWithFiles)
-    deduplicated.toList.map { p => Generated(p.target, p.value.valuesIterator ++ p.scripts) }
+    deduplicated.toList.flatMap { p => Generated(p.target, p.testTarget, p.value.valuesIterator ++ p.scripts) }
   }
 
   // projects in graph will have duplicated files, this will pull the files up until they are no longer duplicated

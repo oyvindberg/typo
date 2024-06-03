@@ -34,12 +34,14 @@ def generate(implicit c: Connection): String = {
     ProjectGraph(
       name = "a",
       target = cwd.resolve("a/src/main/typo"),
+      testTarget = None,
       value = Selector.None,
       scripts = Nil,
       downstream = List(
         ProjectGraph(
           name = "b",
           target = cwd.resolve("b/src/main/typo"),
+          testTarget = None,
           value = Selector.fullRelationNames(
             "a.bicycle",
             "b.person"
@@ -51,6 +53,7 @@ def generate(implicit c: Connection): String = {
         ProjectGraph(
           name = "c",
           target = cwd.resolve("b/src/main/typo"),
+          testTarget = None,
           value = Selector.fullRelationNames(
             "a.bicycle",
             "c.animal"

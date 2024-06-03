@@ -14,10 +14,11 @@ object generateFromDb {
   def apply(
       options: Options,
       targetFolder: Path,
+      testTargetFolder: Option[Path],
       selector: Selector = Selector.ExcludePostgresInternal,
       scriptsPaths: List[Path] = Nil
   )(implicit c: Connection): Generated =
-    apply(options, ProjectGraph(name = "", targetFolder, selector, scriptsPaths, Nil)).head
+    apply(options, ProjectGraph(name = "", targetFolder, testTargetFolder, selector, scriptsPaths, Nil)).head
 
   /** Allows you to generate code into multiple folders
     */
