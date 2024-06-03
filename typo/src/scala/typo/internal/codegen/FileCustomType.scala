@@ -30,6 +30,6 @@ object FileCustomType {
             |${sc.Obj(ct.typoType.value, instances, ct.objBody0)}
 """.stripMargin
 
-    sc.File(ct.typoType, str, secondaryTypes = Nil)
+    sc.File(ct.typoType, str, secondaryTypes = Nil, scope = Scope.Main)
   }
 }

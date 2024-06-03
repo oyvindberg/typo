@@ -33,6 +33,6 @@ object FileDomain {
              |case class ${domain.tpe.name}($value: ${domain.underlyingType})
              |${genObject(domain.tpe.value, instances)}""".stripMargin
 
-    sc.File(domain.tpe, str, secondaryTypes = Nil)
+    sc.File(domain.tpe, str, secondaryTypes = Nil, scope = Scope.Main)
   }
 }

@@ -14,8 +14,7 @@ object FilePackageObject {
              |${code"package " ++ genObject(options.pkg, instances)}
              |""".stripMargin
 
-      Some(sc.File(sc.Type.Qualified(options.pkg / sc.Ident("package")), content, secondaryTypes = Nil))
+      Some(sc.File(sc.Type.Qualified(options.pkg / sc.Ident("package")), content, secondaryTypes = Nil, scope = Scope.Main))
     }
   }
-
 }

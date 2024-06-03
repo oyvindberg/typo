@@ -40,8 +40,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
     textSupport match {
       case Some(textSupport) =>
         List(
-          sc.File(textSupport.Text, DbLibTextImplementations.Text, Nil),
-          sc.File(textSupport.streamingInsert, DbLibTextImplementations.streamingInsertAnorm(textSupport.Text), Nil)
+          sc.File(textSupport.Text, DbLibTextImplementations.Text, Nil, scope = Scope.Main),
+          sc.File(textSupport.streamingInsert, DbLibTextImplementations.streamingInsertAnorm(textSupport.Text), Nil, scope = Scope.Main)
         )
       case None => Nil
     }

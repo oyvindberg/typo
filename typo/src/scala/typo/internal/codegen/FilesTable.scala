@@ -96,7 +96,8 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
              |}
              |${genObject(unsaved.tpe.value, instances)}
              |""".stripMargin,
-        secondaryTypes = Nil
+        secondaryTypes = Nil,
+        scope = Scope.Main
       )
     }
 
@@ -128,7 +129,8 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
                    |case class ${id.tpe.name}($value: ${id.underlying}) extends AnyVal
                    |${genObject(id.tpe.value, instances)}
                    |""".stripMargin,
-            secondaryTypes = Nil
+            secondaryTypes = Nil,
+            scope = Scope.Main
           )
         )
 
@@ -147,7 +149,8 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
                    |case class ${qident.name}(${cols.map(_.param.code).mkCode(", ")})
                    |${genObject(qident.value, instances)}
                    |""".stripMargin,
-            secondaryTypes = Nil
+            secondaryTypes = Nil,
+            scope = Scope.Main
           )
         )
     }
