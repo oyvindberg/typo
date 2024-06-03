@@ -9,7 +9,6 @@ package transactionhistoryarchive
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser

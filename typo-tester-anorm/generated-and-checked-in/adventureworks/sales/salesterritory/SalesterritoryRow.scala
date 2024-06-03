@@ -7,7 +7,6 @@ package adventureworks
 package sales
 package salesterritory
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID

@@ -8,7 +8,6 @@ package hardcoded
 package compositepk
 package person
 
-import testdb.hardcoded.Text
 import testdb.hardcoded.customtypes.Defaulted
 import zio.json.JsonDecoder
 import zio.json.JsonEncoder

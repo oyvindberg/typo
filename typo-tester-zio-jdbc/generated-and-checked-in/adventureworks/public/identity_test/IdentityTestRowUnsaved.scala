@@ -7,7 +7,6 @@ package adventureworks
 package public
 package identity_test
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import zio.json.JsonDecoder
 import zio.json.JsonEncoder

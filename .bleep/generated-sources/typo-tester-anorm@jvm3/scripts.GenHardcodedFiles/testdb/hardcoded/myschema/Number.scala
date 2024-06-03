@@ -17,7 +17,6 @@ import play.api.libs.json.JsSuccess
 import play.api.libs.json.JsValue
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
-import testdb.hardcoded.Text
 
 /** Enum `myschema.number`
   *  - one

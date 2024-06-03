@@ -8,7 +8,6 @@ package hardcoded
 package myschema
 package marital_status
 
-import testdb.hardcoded.Text
 import zio.jdbc.JdbcDecoder
 import zio.json.JsonDecoder
 import zio.json.JsonEncoder

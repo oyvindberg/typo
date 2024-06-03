@@ -7,7 +7,6 @@ package adventureworks
 package public
 package flaff
 
-import adventureworks.public.ShortText
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsValue

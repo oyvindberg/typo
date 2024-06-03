@@ -6,7 +6,6 @@
 package adventureworks
 package customtypes
 
-import adventureworks.Text
 import java.sql.ResultSet
 import java.sql.Types
 import org.postgresql.util.PGobject

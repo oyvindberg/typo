@@ -7,7 +7,6 @@ package adventureworks
 package person
 package contacttype
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name

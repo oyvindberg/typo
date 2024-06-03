@@ -22,6 +22,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** SQL file: custom/table_comments.sql */
 case class TableCommentsSqlRow(
   /** Points to [[pg_catalog.pg_namespace.PgNamespaceRow.nspname]]
       debug: {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"schema","originalName":"schema"},"columnName":"schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */

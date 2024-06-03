@@ -4,6 +4,8 @@ import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 import typo.internal.analysis.{DecomposedSql, ParsedName}
 
+import scala.annotation.nowarn
+
 class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
   test("testParsing") {
@@ -96,7 +98,7 @@ class DecomposedSqlTest extends AnyFunSuite with TypeCheckedTripleEquals {
     val expected = List(
       DecomposedSql.NamedParam(ParsedName.of("flaff:org.foo.Id")) -> List(0)
     )
-    assert(actual.paramNamesWithIndices === expected)
+    assert(actual.paramNamesWithIndices === expected): @nowarn
     assert(actual.sqlWithNulls === "SELECT 1 where WHERE foo.bar = ANY(null)")
   }
 

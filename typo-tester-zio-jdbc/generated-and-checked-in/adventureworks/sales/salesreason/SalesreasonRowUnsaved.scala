@@ -7,7 +7,6 @@ package adventureworks
 package sales
 package salesreason
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name

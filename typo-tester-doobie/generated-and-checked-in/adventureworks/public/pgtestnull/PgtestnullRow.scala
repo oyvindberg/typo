@@ -31,8 +31,6 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoVector
 import adventureworks.customtypes.TypoXml
-import adventureworks.public.Mydomain
-import adventureworks.public.Myenum
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read

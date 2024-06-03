@@ -22,6 +22,7 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
+/** SQL file: custom/view_find_all.sql */
 case class ViewFindAllSqlRow(
   /** Points to [[pg_catalog.pg_namespace.PgNamespaceRow.oid]]
       debug: {"baseColumnName":"oid","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.Long","columnDisplaySize":10,"parsedColumnName":{"name":"table_oid","originalName":"table_oid"},"columnName":"table_oid","columnType":"BigInt","columnTypeName":"oid","format":0,"isAutoIncrement":false,"isCaseSensitive":false,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":10,"scale":0,"tableName":"pg_namespace"} */

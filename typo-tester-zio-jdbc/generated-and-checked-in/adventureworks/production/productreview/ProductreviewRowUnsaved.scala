@@ -7,7 +7,6 @@ package adventureworks
 package production
 package productreview
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId

@@ -7,7 +7,6 @@ package adventureworks
 package public
 package flaff
 
-import adventureworks.public.ShortText
 import typo.dsl.ForeignKey
 import typo.dsl.Path
 import typo.dsl.Required

@@ -7,8 +7,6 @@ package adventureworks
 package public
 package flaff
 
-import adventureworks.public.ShortText
-import adventureworks.streamingInsert
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement

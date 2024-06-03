@@ -7,7 +7,6 @@ package adventureworks
 package production
 package productinventory
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort

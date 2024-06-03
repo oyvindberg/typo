@@ -7,7 +7,6 @@ package adventureworks
 package sales
 package salestaxrate
 
-import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement

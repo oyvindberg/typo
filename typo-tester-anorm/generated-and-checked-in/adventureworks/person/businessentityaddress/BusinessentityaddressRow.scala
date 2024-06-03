@@ -7,7 +7,6 @@ package adventureworks
 package person
 package businessentityaddress
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID

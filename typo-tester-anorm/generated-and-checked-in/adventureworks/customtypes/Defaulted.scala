@@ -6,7 +6,6 @@
 package adventureworks
 package customtypes
 
-import adventureworks.Text
 import play.api.libs.json.JsError
 import play.api.libs.json.JsNull
 import play.api.libs.json.JsObject

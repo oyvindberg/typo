@@ -25,7 +25,7 @@ class SeekDbTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
     withConnection { implicit c =>
       // batch insert some rows
-      businessentityRepo.insertStreaming(rows.iterator): Unit
+      businessentityRepo.insertStreaming(rows.iterator): @nowarn
       val rows1 = businessentityRepo.select
         .maybeSeek(_.modifieddate.asc)(None)
         .maybeSeek(_.businessentityid.asc)(None)

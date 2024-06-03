@@ -7,7 +7,6 @@ package adventureworks
 package purchasing
 package purchaseorderheader
 
-import adventureworks.Text
 import anorm.Column
 import anorm.ParameterMetaData
 import anorm.ToStatement

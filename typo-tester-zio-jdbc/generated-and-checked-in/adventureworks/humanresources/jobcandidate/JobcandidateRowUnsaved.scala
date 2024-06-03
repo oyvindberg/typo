@@ -7,7 +7,6 @@ package adventureworks
 package humanresources
 package jobcandidate
 
-import adventureworks.Text
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml

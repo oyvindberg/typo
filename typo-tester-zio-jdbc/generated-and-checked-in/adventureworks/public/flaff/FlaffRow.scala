@@ -7,8 +7,6 @@ package adventureworks
 package public
 package flaff
 
-import adventureworks.Text
-import adventureworks.public.ShortText
 import java.sql.ResultSet
 import zio.jdbc.JdbcDecoder
 import zio.json.JsonDecoder

@@ -19,7 +19,6 @@ import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
-import testdb.hardcoded.Text
 
 /** Table: myschema.football_club
     football club

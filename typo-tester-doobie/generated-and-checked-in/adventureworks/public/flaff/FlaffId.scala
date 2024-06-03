@@ -7,7 +7,6 @@ package adventureworks
 package public
 package flaff
 
-import adventureworks.public.ShortText
 import io.circe.Decoder
 import io.circe.Encoder
 

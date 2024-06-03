@@ -7,7 +7,6 @@ package adventureworks
 package public
 package flaff
 
-import adventureworks.public.ShortText
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite

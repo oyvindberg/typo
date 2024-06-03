@@ -7,7 +7,6 @@ package adventureworks
 package public
 package flaff
 
-import adventureworks.public.ShortText
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read

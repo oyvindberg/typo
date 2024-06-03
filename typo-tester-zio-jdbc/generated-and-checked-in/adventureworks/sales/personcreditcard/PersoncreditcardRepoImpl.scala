@@ -10,7 +10,6 @@ package personcreditcard
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.streamingInsert
 import adventureworks.userdefined.CustomCreditcardId
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder

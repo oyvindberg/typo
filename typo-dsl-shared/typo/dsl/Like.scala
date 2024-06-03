@@ -1,5 +1,7 @@
 package typo.dsl
 
+import scala.annotation.nowarn
+
 // https://www.alibabacloud.com/blog/600079
 object Like {
   private val JAVA_REGEX_SPECIALS = "[]()|^-+*?{}$\\."
@@ -12,7 +14,7 @@ object Like {
     i = 0
     while (i < len) {
       val c = sqlPattern.charAt(i)
-      if (JAVA_REGEX_SPECIALS.indexOf(c.toInt) >= 0) javaPattern.append('\\')
+      if (JAVA_REGEX_SPECIALS.indexOf(c.toInt) >= 0) javaPattern.append('\\'): @nowarn
       if (c == escapeChar) {
         if (i == (sqlPattern.length - 1)) sys.error(s"invalid escape sequence: $sqlPattern: $i")
         val nextChar = sqlPattern.charAt(i + 1)

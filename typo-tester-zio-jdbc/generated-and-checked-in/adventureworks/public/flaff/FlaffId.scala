@@ -7,7 +7,6 @@ package adventureworks
 package public
 package flaff
 
-import adventureworks.public.ShortText
 import zio.json.JsonDecoder
 import zio.json.JsonEncoder
 import zio.json.ast.Json

@@ -5,6 +5,7 @@ import typo.*
 import java.nio.file.Path
 import java.sql.{Connection, DriverManager}
 import java.util
+import scala.annotation.nowarn
 
 object GeneratedSources {
   def main(args: Array[String]): Unit = {
@@ -52,10 +53,10 @@ object GeneratedSources {
       List(buildDir.resolve("sql"))
     )
 
-    files.overwriteFolder()
+    files.overwriteFolder(): @nowarn
 
     import scala.sys.process.*
-    List("git", "add", "-f", typoSources.toString).!!
+    List("git", "add", "-f", typoSources.toString).!! : @nowarn
     ()
   }
 }

@@ -6,6 +6,7 @@ import typo.internal.analysis.{DecomposedSql, NullabilityFromExplain}
 import typo.internal.analysis.NullabilityFromExplain.NullableIndices
 
 import java.sql.{Connection, DriverManager}
+import scala.annotation.nowarn
 
 class NullabilityFromExplainTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("works") {
@@ -32,7 +33,7 @@ class NullabilityFromExplainTest extends AnyFunSuite with TypeCheckedTripleEqual
     )
 
     val planWithNullability = NullabilityFromExplain.from(sql, Nil)
-    assert(planWithNullability.nullableOutputs === List("a.addressline1", "a.city", "a.postalcode"))
+    assert(planWithNullability.nullableOutputs === List("a.addressline1", "a.city", "a.postalcode")): @nowarn
     assert(planWithNullability.nullableIndices === Some(NullableIndices(Set(6, 7, 8))))
   }
 }

@@ -15,18 +15,17 @@ import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
 import typo.generated.customtypes.TypoAclItem
-import typo.generated.streamingInsert
 
 class PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def insert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
     SQL"""insert into pg_catalog.pg_namespace("oid", "nspname", "nspowner", "nspacl")
-          values (${ParameterValue(unsaved.oid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.nspname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.nspowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.nspacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, typo.generated.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::_aclitem)
+          values (${ParameterValue(unsaved.oid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.nspname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.nspowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.nspacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, typo.generated.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::aclitem[])
           returning "oid", "nspname", "nspowner", "nspacl"
        """
       .executeInsert(PgNamespaceRow.rowParser(1).single)
     
   }
-  override def insertStreaming(unsaved: Iterator[PgNamespaceRow], batchSize: Int)(implicit c: Connection): Long = {
+  override def insertStreaming(unsaved: Iterator[PgNamespaceRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY pg_catalog.pg_namespace("oid", "nspname", "nspowner", "nspacl") FROM STDIN""", batchSize, unsaved)(PgNamespaceRow.text, c)
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {

@@ -8,7 +8,6 @@ package public
 package identity_test
 
 import adventureworks.customtypes.Defaulted
-import adventureworks.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql

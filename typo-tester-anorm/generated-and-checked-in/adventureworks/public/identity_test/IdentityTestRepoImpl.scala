@@ -8,7 +8,6 @@ package public
 package identity_test
 
 import adventureworks.customtypes.Defaulted
-import adventureworks.streamingInsert
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser

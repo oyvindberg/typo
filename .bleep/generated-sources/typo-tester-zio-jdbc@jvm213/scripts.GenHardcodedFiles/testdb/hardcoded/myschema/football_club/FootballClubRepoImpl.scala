@@ -8,7 +8,6 @@ package hardcoded
 package myschema
 package football_club
 
-import testdb.hardcoded.streamingInsert
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
