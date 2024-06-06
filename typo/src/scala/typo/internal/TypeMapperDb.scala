@@ -78,7 +78,7 @@ case class TypeMapperDb(enums: List[db.StringEnum], domains: List[db.Domain]) {
       case typeName =>
         enumsByName
           .get(typeName)
-          .map(`enum` => db.Type.EnumRef(`enum`.name))
+          .map(db.Type.EnumRef.apply)
           .orElse(domainsByName.get(typeName).map(domain => db.Type.DomainRef(domain.name, domain.originalType, domain.tpe)))
           .getOrElse {
             logWarning()

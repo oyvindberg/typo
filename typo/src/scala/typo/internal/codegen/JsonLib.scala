@@ -4,7 +4,7 @@ package codegen
 
 trait JsonLib {
   def defaultedInstance(default: ComputedDefault): List[sc.Given]
-  def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.Given]
+  def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, openEnum: Boolean): List[sc.Given]
   def wrapperTypeInstances(wrapperType: sc.Type.Qualified, fieldName: sc.Ident, underlying: sc.Type): List[sc.Given]
   def productInstances(tpe: sc.Type, fields: NonEmptyList[JsonLib.Field]): List[sc.Given]
   def missingInstances: List[sc.ClassMember]

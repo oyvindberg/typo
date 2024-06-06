@@ -2,6 +2,7 @@ package typo
 package internal
 
 import typo.internal.compat.*
+import typo.internal.metadb.OpenEnum
 
 sealed trait IdComputed {
   def paramName: sc.Ident
@@ -35,6 +36,13 @@ object IdComputed {
   case class UnaryNoIdType(col: ComputedColumn, tpe: sc.Type) extends Unary {
     def underlying: sc.Type = col.tpe
   }
+
+  case class UnaryOpenEnum(
+      col: ComputedColumn,
+      tpe: sc.Type.Qualified,
+      underlying: sc.Type,
+      openEnum: OpenEnum
+  ) extends Unary
 
   // if user supplied a type override for an id column
   case class UnaryUserSpecified(col: ComputedColumn, tpe: sc.Type) extends Unary {

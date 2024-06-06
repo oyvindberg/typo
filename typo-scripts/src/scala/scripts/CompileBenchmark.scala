@@ -72,7 +72,8 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
               Selector.ExcludePostgresInternal, // All
               sqlFiles,
               Nil
-            )
+            ),
+            Map.empty
           ).foreach(_.overwriteFolder())
 
           crossIds.map { crossId =>

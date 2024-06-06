@@ -25,7 +25,8 @@ case class Options(
     keepDependencies: Boolean = false,
     rewriteDatabase: MetaDb => MetaDb = identity,
     executionContext: ExecutionContext = ExecutionContext.global,
-    schemaMode: SchemaMode = SchemaMode.MultiSchema
+    schemaMode: SchemaMode = SchemaMode.MultiSchema,
+    openEnums: Selector = Selector.None
 )
 
 object Options {

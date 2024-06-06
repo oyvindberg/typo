@@ -56,7 +56,7 @@ object db {
     case object regrole extends Type
     case object regtype extends Type
     case object xid extends Type
-    case class EnumRef(name: RelationName) extends Type
+    case class EnumRef(enm: StringEnum) extends Type
     case object Text extends Type
     case object Time extends Type
     case object TimeTz extends Type
@@ -70,7 +70,7 @@ object db {
   }
 
   case class Domain(name: RelationName, tpe: Type, originalType: String, isNotNull: Nullability, hasDefault: Boolean, constraintDefinition: Option[String])
-  case class StringEnum(name: RelationName, values: List[String])
+  case class StringEnum(name: RelationName, values: NonEmptyList[String])
   case class ColName(value: String) extends AnyVal
   object ColName {
     implicit val ordering: Ordering[ColName] = Ordering.by(_.value)

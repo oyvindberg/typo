@@ -10,10 +10,8 @@ import typo.internal.{DebugJson, Lazy, generate}
 // this runs automatically at build time to instantly see results.
 // it does not need a running database
 object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
-  val enums = List(
-    db.StringEnum(db.RelationName(Some("myschema"), "sector"), List("PUBLIC", "PRIVATE", "OTHER")),
-    db.StringEnum(db.RelationName(Some("myschema"), "number"), List("one", "two", "three"))
-  )
+  val sector = db.StringEnum(db.RelationName(Some("myschema"), "sector"), NonEmptyList("PUBLIC", "PRIVATE", "OTHER"))
+  val number = db.StringEnum(db.RelationName(Some("myschema"), "number"), NonEmptyList("one", "two", "three"))
 
   val person = db.Table(
     name = db.RelationName(Some("myschema"), "person"),
@@ -51,7 +49,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
       db.Col(ParsedName.of("work_email"), db.Type.VarChar(Some(254)), Some("varchar"), Nullability.Nullable, columnDefault = None, None, None, Nil, DebugJson.Empty),
       db.Col(
         parsedName = ParsedName.of("sector"),
-        tpe = db.Type.EnumRef(db.RelationName(Some("myschema"), "sector")),
+        tpe = db.Type.EnumRef(sector),
         udtName = Some("myschema.sector"),
         nullability = Nullability.NoNulls,
         columnDefault = Some("PUBLIC"),
@@ -62,7 +60,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
       ),
       db.Col(
         parsedName = ParsedName.of("favorite_number"),
-        tpe = db.Type.EnumRef(db.RelationName(Some("myschema"), "number")),
+        tpe = db.Type.EnumRef(number),
         udtName = Some("myschema.number"),
         nullability = Nullability.NoNulls,
         columnDefault = Some("one"),
@@ -144,7 +142,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         else (DbLibName.Anorm, JsonLibName.PlayJson)
       val domains = Nil
 
-      val metaDb = MetaDb(relations = all.map(t => t.name -> Lazy(t)).toMap, enums = enums, domains = domains)
+      val metaDb = MetaDb(relations = all.map(t => t.name -> Lazy(t)).toMap, enums = List(sector, number), domains = domains)
 
       val generated: List[Generated] =
         generate(
@@ -163,7 +161,8 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
             silentBanner = true
           ),
           metaDb,
-          ProjectGraph(name = "", target.sources, None, Selector.All, scripts = Nil, Nil)
+          ProjectGraph(name = "", target.sources, None, Selector.All, scripts = Nil, Nil),
+          Map.empty
         )
 
       generated.foreach(

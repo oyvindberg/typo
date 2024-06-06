@@ -3,6 +3,7 @@ package scripts
 import bleep.logging.{Formatter, LogLevel, Loggers}
 import bleep.{FileWatching, LogPatterns, cli}
 import typo.*
+import typo.internal.metadb.OpenEnum
 import typo.internal.sqlfiles.readSqlFileDirectories
 import typo.internal.{FileSync, generate}
 
@@ -27,8 +28,18 @@ object GeneratedAdventureWorks {
         val ds = TypoDataSource.hikari(server = "localhost", port = 6432, databaseName = "Adventureworks", username = "postgres", password = "password")
         val scriptsPath = buildDir.resolve("adventureworks_sql")
         val selector = Selector.ExcludePostgresInternal
-        val metadb = Await.result(MetaDb.fromDb(TypoLogger.Console, ds, selector, schemaMode = SchemaMode.MultiSchema), Duration.Inf)
-
+        val typoLogger = TypoLogger.Console
+        val metadb = Await.result(MetaDb.fromDb(typoLogger, ds, selector, schemaMode = SchemaMode.MultiSchema), Duration.Inf)
+        val relationNameToOpenEnum = Await.result(
+          OpenEnum.find(
+            ds,
+            typoLogger,
+            Selector.All,
+            openEnumSelector = Selector.relationNames("title", "title_domain"),
+            metaDb = metadb
+          ),
+          Duration.Inf
+        )
         val variants = List(
           (DbLibName.Anorm, JsonLibName.PlayJson, "typo-tester-anorm", new AtomicReference(Map.empty[RelPath, sc.Code])),
           (DbLibName.Doobie, JsonLibName.Circe, "typo-tester-doobie", new AtomicReference(Map.empty[RelPath, sc.Code])),
@@ -36,7 +47,7 @@ object GeneratedAdventureWorks {
         )
 
         def go(): Unit = {
-          val newSqlScripts = Await.result(readSqlFileDirectories(TypoLogger.Console, scriptsPath, ds), Duration.Inf)
+          val newSqlScripts = Await.result(readSqlFileDirectories(typoLogger, scriptsPath, ds), Duration.Inf)
 
           variants.foreach { case (dbLib, jsonLib, projectPath, oldFilesRef) =>
             val options = Options(
@@ -47,6 +58,7 @@ object GeneratedAdventureWorks {
                 case (_, "firstname")                     => "adventureworks.userdefined.FirstName"
                 case ("sales.creditcard", "creditcardid") => "adventureworks.userdefined.CustomCreditcardId"
               },
+              openEnums = Selector.relationNames("title", "title_domain"),
               generateMockRepos = !Selector.relationNames("purchaseorderdetail"),
               enablePrimaryKeyType = !Selector.relationNames("billofmaterials"),
               enableTestInserts = Selector.All,
@@ -56,7 +68,7 @@ object GeneratedAdventureWorks {
             val targetSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 
             val newFiles: Generated =
-              generate(options, metadb, ProjectGraph(name = "", targetSources, None, selector, newSqlScripts, Nil)).head
+              generate(options, metadb, ProjectGraph(name = "", targetSources, None, selector, newSqlScripts, Nil), relationNameToOpenEnum).head
 
             val knownUnchanged: Set[RelPath] = {
               val oldFiles = oldFilesRef.get()

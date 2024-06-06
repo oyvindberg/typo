@@ -6,18 +6,11 @@ import adventureworks.public.pgtestnull.{PgtestnullRepoImpl, PgtestnullRow}
 import adventureworks.public.{Mydomain, Myenum}
 import cats.effect.IO
 import doobie.{ConnectionIO, WeakAsync}
-import io.circe.Encoder
-import org.scalactic.TypeCheckedTripleEquals
-import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 
-class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
+class ArrayTest extends AnyFunSuite with JsonEquals {
   val pgtestnullRepo: PgtestnullRepoImpl = new PgtestnullRepoImpl
   val pgtestRepo: PgtestRepoImpl = new PgtestRepoImpl
-
-  // need to compare json instead of case classes because of arrays
-  def assertJsonEquals[A: Encoder](a1: A, a2: A): Assertion =
-    assert(Encoder[A].apply(a1) === Encoder[A].apply(a2))
 
   test("can insert pgtest rows") {
     withConnection {

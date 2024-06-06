@@ -719,8 +719,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
   override val defaultedInstance: List[sc.Given] =
     textSupport.map(_.defaultedInstance).toList
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, enm: db.StringEnum): List[sc.Given] = {
-    val sqlTypeLit = sc.StrLit(enm.name.value)
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, sqlType: String, openEnum: Boolean): List[sc.Given] = {
+    val sqlTypeLit = sc.StrLit(sqlType)
     val arrayWrapper = sc.Type.ArrayOf(wrapperType)
     List(
       Some(
@@ -729,7 +729,9 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           name = arrayColumnName,
           implicitParams = Nil,
           tpe = Column.of(arrayWrapper),
-          body = code"""$Column.columnToArray($columnName, implicitly)"""
+          body =
+            if (openEnum) code"${lookupColumnFor(sc.Type.ArrayOf(underlying))}.map(_.map($wrapperType.apply))"
+            else code"${lookupColumnFor(sc.Type.ArrayOf(underlying))}.map(_.map($wrapperType.force))"
         )
       ),
       Some(
@@ -738,7 +740,9 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           name = columnName,
           implicitParams = Nil,
           tpe = Column.of(wrapperType),
-          body = code"""${lookupColumnFor(underlying)}.mapResult(str => $wrapperType(str).left.map($SqlMappingError.apply))"""
+          body =
+            if (openEnum) code"${lookupColumnFor(underlying)}.map($wrapperType.apply)"
+            else code"${lookupColumnFor(underlying)}.mapResult(str => $wrapperType(str).left.map($SqlMappingError.apply))"
         )
       ),
       Some(
@@ -756,7 +760,9 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           name = arrayToStatementName,
           implicitParams = Nil,
           tpe = ToStatement.of(arrayWrapper),
-          body = code"$ToStatement[$arrayWrapper]((ps, i, arr) => ps.setArray(i, ps.getConnection.createArrayOf($sqlTypeLit, arr.map[AnyRef](_.value))))"
+          body =
+            if (openEnum) code"${lookupToStatementFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"
+            else code"$ToStatement[$arrayWrapper]((ps, i, arr) => ps.setArray(i, ps.getConnection.createArrayOf($sqlTypeLit, arr.map[AnyRef](_.value))))"
         )
       ),
       Some(

@@ -25,6 +25,7 @@ const sidebars = {
             items: [
                 {type: "doc", id: "type-safety/id-types"},
                 {type: "doc", id: "type-safety/string-enums"},
+                {type: "doc", id: "type-safety/open-string-enums"},
                 {type: "doc", id: "type-safety/domains"},
                 {type: "doc", id: "type-safety/arrays"},
                 {type: "doc", id: "type-safety/date-time"},

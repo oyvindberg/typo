@@ -593,9 +593,9 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
   override val defaultedInstance: List[sc.Given] =
     textSupport.map(_.defaultedInstance).toList
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, enm: db.StringEnum): List[sc.Given] = {
-    val sqlTypeLit = sc.StrLit(enm.name.value)
-    val sqlArrayTypeLit = sc.StrLit(enm.name.value + "[]")
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, sqlType: String, openEnum: Boolean): List[sc.Given] = {
+    val sqlTypeLit = sc.StrLit(sqlType)
+    val sqlArrayTypeLit = sc.StrLit(sqlType + "[]")
     List(
       Some(
         sc.Given(
@@ -603,7 +603,9 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = putName,
           implicitParams = Nil,
           tpe = Put.of(wrapperType),
-          body = code"$Put.Advanced.one[$wrapperType]($JdbcType.Other, $NonEmptyList.one($sqlTypeLit), (ps, i, a) => ps.setString(i, a.value), (rs, i, a) => rs.updateString(i, a.value))"
+          body =
+            if (openEnum) code"${lookupPutFor(underlying)}.contramap(_.value)"
+            else code"$Put.Advanced.one[$wrapperType]($JdbcType.Other, $NonEmptyList.one($sqlTypeLit), (ps, i, a) => ps.setString(i, a.value), (rs, i, a) => rs.updateString(i, a.value))"
         )
       ),
       Some(
@@ -612,7 +614,9 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = arrayPutName,
           implicitParams = Nil,
           tpe = Put.of(sc.Type.ArrayOf(wrapperType)),
-          body = code"$Put.Advanced.array[${TypesScala.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit), $sqlTypeLit).contramap(_.map(_.value))"
+          body =
+            if (openEnum) code"${lookupPutFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"
+            else code"$Put.Advanced.array[${TypesScala.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit), $sqlTypeLit).contramap(_.map(_.value))"
         )
       ),
       Some(
@@ -621,7 +625,9 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = getName,
           implicitParams = Nil,
           tpe = Get.of(wrapperType),
-          body = code"""${lookupGetFor(underlying)}.temap($wrapperType.apply)"""
+          body =
+            if (openEnum) code"""${lookupGetFor(underlying)}.map($wrapperType.apply)"""
+            else code"""${lookupGetFor(underlying)}.temap($wrapperType.apply)"""
         )
       ),
       Some(
@@ -630,7 +636,11 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = arrayGetName,
           implicitParams = Nil,
           tpe = Get.of(sc.Type.ArrayOf(wrapperType)),
-          body = code"${lookupGetFor(sc.Type.ArrayOf(underlying))}.map(_.map(force))"
+          body = {
+            val get = lookupGetFor(sc.Type.ArrayOf(underlying))
+            if (openEnum) code"""$get.map(_.map($wrapperType.apply))"""
+            else code"$get.map(_.map(force))"
+          }
         )
       ),
       Some(

@@ -662,15 +662,17 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
   override val defaultedInstance: List[sc.Given] =
     textSupport.map(_.defaultedInstance).toList
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, enm: db.StringEnum): List[sc.ClassMember] = {
-    val sqlTypeLit = sc.StrLit(enm.name.value)
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, sqlType: String, openEnum: Boolean): List[sc.ClassMember] = {
+    val sqlTypeLit = sc.StrLit(sqlType)
     val arrayWrapper = sc.Type.ArrayOf(wrapperType)
     val arraySetter = sc.Given(
       tparams = Nil,
       name = arraySetterName,
       implicitParams = Nil,
       tpe = Setter.of(arrayWrapper),
-      body = code"""|$Setter.forSqlType[$arrayWrapper](
+      body =
+        if (openEnum) code"${lookupSetter(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"
+        else code"""|$Setter.forSqlType[$arrayWrapper](
                     |    (ps, i, v) => ps.setArray(i, ps.getConnection.createArrayOf($sqlTypeLit, v.map(x => x.value))),
                     |    java.sql.Types.ARRAY
                     |  )""".stripMargin
@@ -680,7 +682,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       name = arrayJdbcDecoderName,
       implicitParams = Nil,
       tpe = JdbcDecoder.of(arrayWrapper),
-      body = code"""${lookupJdbcDecoder(sc.Type.ArrayOf(underlying))}.map(a => if (a == null) null else a.map(force))"""
+      body =
+        if (openEnum)
+          code"""${lookupJdbcDecoder(sc.Type.ArrayOf(underlying))}.map(a => if (a == null) null else a.map(apply))"""
+        else code"""${lookupJdbcDecoder(sc.Type.ArrayOf(underlying))}.map(a => if (a == null) null else a.map(force))"""
     )
     val arrayJdbcEncoder = sc.Given(
       tparams = Nil,
@@ -699,21 +704,22 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
     )
     val jdbcDecoder = {
       val body =
-        code"""|${lookupJdbcDecoder(underlying)}.flatMap { s =>
-               |  new ${JdbcDecoder.of(wrapperType)} {
-               |    override def unsafeDecode(columIndex: ${TypesScala.Int}, rs: ${TypesJava.ResultSet}): (${TypesScala.Int}, $wrapperType) = {
-               |      def error(msg: ${TypesJava.String}): $JdbcDecoderError =
-               |        $JdbcDecoderError(
-               |          message = s"Error decoding $wrapperType from ResultSet",
-               |          cause = new RuntimeException(msg),
-               |          metadata = rs.getMetaData,
-               |          row = rs.getRow
-               |        )
-               |
-               |      $wrapperType.apply(s).fold(e => throw error(e), (columIndex, _))
-               |    }
-               |  }
-               |}""".stripMargin
+        if (openEnum) code"${lookupJdbcDecoder(underlying)}.map($wrapperType.apply)"
+        else code"""|${lookupJdbcDecoder(underlying)}.flatMap { s =>
+                  |  new ${JdbcDecoder.of(wrapperType)} {
+                  |    override def unsafeDecode(columIndex: ${TypesScala.Int}, rs: ${TypesJava.ResultSet}): (${TypesScala.Int}, $wrapperType) = {
+                  |      def error(msg: ${TypesJava.String}): $JdbcDecoderError =
+                  |        $JdbcDecoderError(
+                  |          message = s"Error decoding $wrapperType from ResultSet",
+                  |          cause = new RuntimeException(msg),
+                  |          metadata = rs.getMetaData,
+                  |          row = rs.getRow
+                  |        )
+                  |
+                  |      $wrapperType.apply(s).fold(e => throw error(e), (columIndex, _))
+                  |    }
+                  |  }
+                  |}""".stripMargin
       sc.Given(tparams = Nil, name = jdbcDecoderName, implicitParams = Nil, tpe = JdbcDecoder.of(wrapperType), body = body)
     }
 

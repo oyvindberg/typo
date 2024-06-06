@@ -8,8 +8,10 @@ object Enums {
   def apply(pgEnums: List[EnumsSqlRow]): List[db.StringEnum] = {
     pgEnums
       .groupBy(row => db.RelationName(row.enumSchema, row.enumName))
-      .map { case (relName, values: Seq[EnumsSqlRow]) =>
-        db.StringEnum(relName, values.sortBy(_.enumSortOrder).map(_.enumValue))
+      .flatMap { case (relName, values) =>
+        NonEmptyList
+          .fromList(values.sortBy(_.enumSortOrder))
+          .map(values => db.StringEnum(relName, values.map(_.enumValue)))
       }
       .toList
   }
