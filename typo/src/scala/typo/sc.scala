@@ -14,6 +14,7 @@ object sc {
 
   case class Ident(value: String) extends Tree {
     def appended(suffix: String) = new Ident(value + suffix)
+    def prepended(prefix: String) = new Ident(prefix + value)
   }
 
   object Ident {

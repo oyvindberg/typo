@@ -4,10 +4,17 @@ package codegen
 
 import play.api.libs.json.Json
 
-case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option[NonEmptyList[ComputedColumn]], options: InternalOptions, fks: List[db.ForeignKey]) {
+case class FilesRelation(
+    naming: Naming,
+    names: ComputedNames,
+    maybeCols: Option[NonEmptyList[ComputedColumn]],
+    maybeFkAnalysis: Option[FkAnalysis],
+    options: InternalOptions,
+    fks: List[db.ForeignKey]
+) {
   def RowFile(rowType: DbLib.RowType, comment: Option[String], maybeUnsavedRow: Option[(ComputedRowUnsaved, ComputedDefault)]): Option[sc.File] =
     maybeCols.map { cols =>
-      val members = List[Option[sc.Code]](
+      val members = List[Iterable[sc.Code]](
         names.maybeId.collect { case x: IdComputed.Composite =>
           code"""val ${x.paramName}: ${x.tpe} = ${x.tpe}(${x.cols.map(x => x.name.code).mkCode(", ")})"""
         },
@@ -18,6 +25,16 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
             case id: IdComputed.Unary     => code"val id = ${id.col.name}"
             case id: IdComputed.Composite => code"val id = ${id.paramName}"
           },
+        maybeFkAnalysis.toList.flatMap(_.extractFksIdsFromRowNotId).map { extractFkId =>
+          val args = extractFkId.colPairs.map { case (inComposite, inId) => code"${inComposite.name} = ${inId.name}" }
+
+          val body =
+            code"""|${extractFkId.otherCompositeIdType}(
+                     |  ${args.mkCode(",\n")}
+                     |)""".stripMargin
+
+          sc.Value(Nil, extractFkId.name.prepended("extract"), Nil, Nil, extractFkId.otherCompositeIdType, body)
+        },
         maybeUnsavedRow.map { case (unsaved, defaults) =>
           val (partOfId, rest) = unsaved.defaultCols.toList.partition { case (col, _) => names.isIdColumn(col.dbName) }
           val partOfIdParams = partOfId.map { case (col, tpe) =>
@@ -164,6 +181,27 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
           case Source.SqlFile(_) => Nil
         }
 
+      val extractFkMember: List[sc.Code] =
+        maybeFkAnalysis.toList.flatMap(_.extractFksIdsFromRow).flatMap { x =>
+          val predicateType = sc.Type.dsl.SqlExpr.of(TypesScala.Boolean, sc.Type.dsl.Required)
+          val is = {
+            val expr = x.colPairs
+              .map { case (otherCol, thisCol) => code"${thisCol.name}.isEqual(id.${otherCol.name})" }
+              .reduceLeft[sc.Code] { case (acc, current) => code"$acc.and($current)" }
+            code"""|def extract${x.name}Is(id: ${x.otherCompositeIdType}): $predicateType =
+                   |  $expr""".stripMargin
+
+          }
+          val in = {
+            val parts = x.colPairs.map { case (otherCol, thisCol) => code"${sc.Type.dsl.CompositeTuplePart}(${thisCol.name})(_.${otherCol.name})" }
+            code"""|def extract${x.name}In(ids: ${sc.Type.ArrayOf(x.otherCompositeIdType)}): $predicateType =
+                   |  new ${sc.Type.dsl.CompositeIn}(ids)(${parts.mkCode(", ")})
+                   |""".stripMargin
+          }
+
+          List(is, in)
+
+        }
       val compositeIdMembers: List[sc.Code] =
         names.maybeId
           .collect {
@@ -194,7 +232,7 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
       val ImplName = sc.Ident("Impl")
       val str =
         code"""trait ${fieldsName.name} {
-            |  ${(colMembers ++ fkMembers ++ compositeIdMembers).mkCode("\n")}
+            |  ${(colMembers ++ fkMembers ++ compositeIdMembers ++ extractFkMember).mkCode("\n")}
             |}
             |
             |object ${fieldsName.name} {

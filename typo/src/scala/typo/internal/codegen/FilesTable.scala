@@ -5,8 +5,8 @@ package codegen
 import play.api.libs.json.Json
 import typo.internal.codegen.DbLib.RowType
 
-case class FilesTable(table: ComputedTable, options: InternalOptions, genOrdering: GenOrdering) {
-  val relation = FilesRelation(table.naming, table.names, Some(table.cols), options, table.dbTable.foreignKeys)
+case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: InternalOptions, genOrdering: GenOrdering) {
+  val relation = FilesRelation(table.naming, table.names, Some(table.cols), Some(fkAnalysis), options, table.dbTable.foreignKeys)
   val RowFile = relation.RowFile(RowType.ReadWriteable, table.dbTable.comment, maybeUnsavedRow = table.maybeUnsavedRow.map(u => (u, table.default)))
 
   val UnsavedRowFile: Option[sc.File] =
@@ -136,7 +136,34 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
 
       case _: IdComputed.UnaryUserSpecified | _: IdComputed.UnaryNoIdType | _: IdComputed.UnaryInherited =>
         None
-      case id @ IdComputed.Composite(cols, qident, _) =>
+      case id @ IdComputed.Composite(cols, tpe, _) =>
+        val constructorMethod = fkAnalysis.createWithFkIdsId.map { colsFromFks =>
+          val body =
+            code"""|${tpe.name}(
+                   |  ${colsFromFks.allExpr.map { case (colName, expr) => code"$colName = $expr" }.mkCode(",\n")}
+                   |)""".stripMargin
+
+          sc.Value(Nil, sc.Ident("from"), colsFromFks.allParams, Nil, tpe, body)
+        }
+        val instanceMethods: List[sc.Value] =
+          fkAnalysis.extractFksIdsFromId.map { colsToFk =>
+            val args = colsToFk.colPairs.map { case (inComposite, inId) => code"${inComposite.name} = ${inId.name}" }
+
+            val body =
+              code"""|${colsToFk.otherCompositeIdType}(
+                       |  ${args.mkCode(",\n")}
+                      |)""".stripMargin
+
+            sc.Value(Nil, colsToFk.name.prepended("extract"), Nil, Nil, colsToFk.otherCompositeIdType, body)
+          }
+        val renderedInstanceMethods = instanceMethods match {
+          case Nil => sc.Code.Empty
+          case nonEmpty =>
+            code"""|{
+                   |${nonEmpty.map(_.code).mkCode("\n")}
+                   |}""".stripMargin
+        }
+
         val comments = scaladoc(s"Type for the composite primary key of table `${table.dbTable.name.value}`")(Nil)
         val instances = List(
           List(genOrdering.ordering(id.tpe, cols.map(cc => sc.Param(cc.param.name, cc.tpe, None)))),
@@ -146,10 +173,10 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
           sc.File(
             id.tpe,
             code"""|$comments
-                   |case class ${qident.name}(
+                   |case class ${tpe.name}(
                    |  ${cols.map(_.param.code).mkCode(",\n")}
-                   |)
-                   |${genObject(qident.value, instances)}
+                   |)$renderedInstanceMethods
+                   |${genObject(tpe.value, instances ++ constructorMethod)}
                    |""".stripMargin,
             secondaryTypes = Nil,
             scope = Scope.Main

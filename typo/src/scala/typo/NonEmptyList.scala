@@ -20,6 +20,12 @@ case class NonEmptyList[T](head: T, tail: List[T]) {
     val head :: tail = toList.sorted: @unchecked
     NonEmptyList(head, tail)
   }
+  def iterator: Iterator[T] =
+    Iterator(head) ++ tail.iterator
+
+  def countWhere(f: T => Boolean): Int =
+    (if (f(head)) 1 else 0) + tail.count(f)
+
   def zipWithIndex: NonEmptyList[(T, Int)] =
     NonEmptyList((head, 0), tail.zipWithIndex.map { case (t, i) => (t, i + 1) })
 
