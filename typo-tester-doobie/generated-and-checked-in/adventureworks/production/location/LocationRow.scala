@@ -38,6 +38,7 @@ case class LocationRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = locationid
    def toUnsavedRow(locationid: Defaulted[LocationId], costrate: Defaulted[BigDecimal] = Defaulted.Provided(this.costrate), availability: Defaulted[BigDecimal] = Defaulted.Provided(this.availability), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): LocationRowUnsaved =
      LocationRowUnsaved(name, locationid, costrate, availability, modifieddate)
  }

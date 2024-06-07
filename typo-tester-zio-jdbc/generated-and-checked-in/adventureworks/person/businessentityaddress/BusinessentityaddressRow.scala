@@ -39,6 +39,7 @@ case class BusinessentityaddressRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: BusinessentityaddressId = BusinessentityaddressId(businessentityid, addressid, addresstypeid)
+   val id = compositeId
    def toUnsavedRow(rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): BusinessentityaddressRowUnsaved =
      BusinessentityaddressRowUnsaved(businessentityid, addressid, addresstypeid, rowguid, modifieddate)
  }

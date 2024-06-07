@@ -48,6 +48,7 @@ case class SalestaxrateRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = salestaxrateid
    def toUnsavedRow(salestaxrateid: Defaulted[SalestaxrateId], taxrate: Defaulted[BigDecimal] = Defaulted.Provided(this.taxrate), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SalestaxrateRowUnsaved =
      SalestaxrateRowUnsaved(stateprovinceid, taxtype, name, salestaxrateid, taxrate, rowguid, modifieddate)
  }

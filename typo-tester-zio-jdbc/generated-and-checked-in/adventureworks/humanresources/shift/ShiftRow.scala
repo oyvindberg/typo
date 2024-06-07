@@ -34,6 +34,7 @@ case class ShiftRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = shiftid
    def toUnsavedRow(shiftid: Defaulted[ShiftId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ShiftRowUnsaved =
      ShiftRowUnsaved(name, starttime, endtime, shiftid, modifieddate)
  }

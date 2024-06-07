@@ -46,6 +46,7 @@ case class StateprovinceRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = stateprovinceid
    def toUnsavedRow(stateprovinceid: Defaulted[StateprovinceId], isonlystateprovinceflag: Defaulted[Flag] = Defaulted.Provided(this.isonlystateprovinceflag), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): StateprovinceRowUnsaved =
      StateprovinceRowUnsaved(stateprovincecode, countryregioncode, name, territoryid, stateprovinceid, isonlystateprovinceflag, rowguid, modifieddate)
  }

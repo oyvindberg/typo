@@ -43,6 +43,7 @@ case class ProductreviewRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = productreviewid
    def toUnsavedRow(productreviewid: Defaulted[ProductreviewId], reviewdate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.reviewdate), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductreviewRowUnsaved =
      ProductreviewRowUnsaved(productid, reviewername, emailaddress, rating, comments, productreviewid, reviewdate, modifieddate)
  }

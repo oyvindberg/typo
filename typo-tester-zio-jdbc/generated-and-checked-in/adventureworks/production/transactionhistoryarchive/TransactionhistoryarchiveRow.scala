@@ -42,6 +42,7 @@ case class TransactionhistoryarchiveRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = transactionid
    def toUnsavedRow(referenceorderlineid: Defaulted[Int] = Defaulted.Provided(this.referenceorderlineid), transactiondate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.transactiondate), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): TransactionhistoryarchiveRowUnsaved =
      TransactionhistoryarchiveRowUnsaved(transactionid, productid, referenceorderid, transactiontype, quantity, actualcost, referenceorderlineid, transactiondate, modifieddate)
  }

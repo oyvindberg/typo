@@ -34,6 +34,7 @@ case class PasswordRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = businessentityid
    def toUnsavedRow(rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PasswordRowUnsaved =
      PasswordRowUnsaved(businessentityid, passwordhash, passwordsalt, rowguid, modifieddate)
  }

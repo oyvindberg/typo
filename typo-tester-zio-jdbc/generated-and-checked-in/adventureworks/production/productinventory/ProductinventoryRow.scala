@@ -44,6 +44,7 @@ case class ProductinventoryRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductinventoryId = ProductinventoryId(productid, locationid)
+   val id = compositeId
    def toUnsavedRow(quantity: Defaulted[TypoShort] = Defaulted.Provided(this.quantity), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductinventoryRowUnsaved =
      ProductinventoryRowUnsaved(productid, locationid, shelf, bin, quantity, rowguid, modifieddate)
  }

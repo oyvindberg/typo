@@ -59,6 +59,7 @@ case class DocumentRow(
       Default: '/'::character varying */
   documentnode: DocumentId
 ){
+   val id = documentnode
    def toUnsavedRow(documentnode: Defaulted[DocumentId], folderflag: Defaulted[Flag] = Defaulted.Provided(this.folderflag), changenumber: Defaulted[Int] = Defaulted.Provided(this.changenumber), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): DocumentRowUnsaved =
      DocumentRowUnsaved(title, owner, filename, fileextension, revision, status, documentsummary, document, folderflag, changenumber, rowguid, modifieddate, documentnode)
  }

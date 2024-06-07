@@ -29,6 +29,7 @@ case class IllustrationRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = illustrationid
    def toUnsavedRow(illustrationid: Defaulted[IllustrationId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): IllustrationRowUnsaved =
      IllustrationRowUnsaved(diagram, illustrationid, modifieddate)
  }

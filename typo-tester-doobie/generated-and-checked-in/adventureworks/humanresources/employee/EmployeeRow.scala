@@ -69,6 +69,7 @@ case class EmployeeRow(
       Default: '/'::character varying */
   organizationnode: Option[String]
 ){
+   val id = businessentityid
    def toUnsavedRow(salariedflag: Defaulted[Flag] = Defaulted.Provided(this.salariedflag), vacationhours: Defaulted[TypoShort] = Defaulted.Provided(this.vacationhours), sickleavehours: Defaulted[TypoShort] = Defaulted.Provided(this.sickleavehours), currentflag: Defaulted[Flag] = Defaulted.Provided(this.currentflag), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate), organizationnode: Defaulted[Option[String]] = Defaulted.Provided(this.organizationnode)): EmployeeRowUnsaved =
      EmployeeRowUnsaved(businessentityid, nationalidnumber, loginid, jobtitle, birthdate, maritalstatus, gender, hiredate, salariedflag, vacationhours, sickleavehours, currentflag, rowguid, modifieddate, organizationnode)
  }

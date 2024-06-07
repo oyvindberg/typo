@@ -42,6 +42,7 @@ case class EmployeepayhistoryRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: EmployeepayhistoryId = EmployeepayhistoryId(businessentityid, ratechangedate)
+   val id = compositeId
    def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): EmployeepayhistoryRowUnsaved =
      EmployeepayhistoryRowUnsaved(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
  }

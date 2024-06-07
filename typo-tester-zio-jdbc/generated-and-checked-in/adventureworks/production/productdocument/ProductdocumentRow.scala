@@ -33,6 +33,7 @@ case class ProductdocumentRow(
   documentnode: DocumentId
 ){
    val compositeId: ProductdocumentId = ProductdocumentId(productid, documentnode)
+   val id = compositeId
    def toUnsavedRow(documentnode: Defaulted[DocumentId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductdocumentRowUnsaved =
      ProductdocumentRowUnsaved(productid, modifieddate, documentnode)
  }

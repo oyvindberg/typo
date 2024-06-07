@@ -54,6 +54,7 @@ case class SalesterritoryRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = territoryid
    def toUnsavedRow(territoryid: Defaulted[SalesterritoryId], salesytd: Defaulted[BigDecimal] = Defaulted.Provided(this.salesytd), saleslastyear: Defaulted[BigDecimal] = Defaulted.Provided(this.saleslastyear), costytd: Defaulted[BigDecimal] = Defaulted.Provided(this.costytd), costlastyear: Defaulted[BigDecimal] = Defaulted.Provided(this.costlastyear), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SalesterritoryRowUnsaved =
      SalesterritoryRowUnsaved(name, countryregioncode, group, territoryid, salesytd, saleslastyear, costytd, costlastyear, rowguid, modifieddate)
  }

@@ -45,6 +45,7 @@ case class CustomerRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = customerid
    def toUnsavedRow(customerid: Defaulted[CustomerId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CustomerRowUnsaved =
      CustomerRowUnsaved(personid, storeid, territoryid, customerid, rowguid, modifieddate)
  }

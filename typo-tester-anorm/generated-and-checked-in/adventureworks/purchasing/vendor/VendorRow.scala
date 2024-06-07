@@ -51,6 +51,7 @@ case class VendorRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = businessentityid
    def toUnsavedRow(preferredvendorstatus: Defaulted[Flag] = Defaulted.Provided(this.preferredvendorstatus), activeflag: Defaulted[Flag] = Defaulted.Provided(this.activeflag), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): VendorRowUnsaved =
      VendorRowUnsaved(businessentityid, accountnumber, name, creditrating, purchasingwebserviceurl, preferredvendorstatus, activeflag, modifieddate)
  }

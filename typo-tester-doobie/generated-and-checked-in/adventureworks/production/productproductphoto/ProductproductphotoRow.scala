@@ -36,6 +36,7 @@ case class ProductproductphotoRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductproductphotoId = ProductproductphotoId(productid, productphotoid)
+   val id = compositeId
    def toUnsavedRow(primary: Defaulted[Flag] = Defaulted.Provided(this.primary), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductproductphotoRowUnsaved =
      ProductproductphotoRowUnsaved(productid, productphotoid, primary, modifieddate)
  }

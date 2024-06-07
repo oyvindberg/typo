@@ -60,6 +60,7 @@ case class SalesorderdetailRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SalesorderdetailId = SalesorderdetailId(salesorderid, salesorderdetailid)
+   val id = compositeId
    def toUnsavedRow(salesorderdetailid: Defaulted[Int], unitpricediscount: Defaulted[BigDecimal] = Defaulted.Provided(this.unitpricediscount), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SalesorderdetailRowUnsaved =
      SalesorderdetailRowUnsaved(salesorderid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, salesorderdetailid, unitpricediscount, rowguid, modifieddate)
  }
