@@ -680,7 +680,7 @@ class TestInsert(random: Random) {
                    text: String = random.alphanumeric.take(20).mkString,
                    time: TypoLocalTime = TypoLocalTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)),
                    timestamp: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
-                   timestampz: TypoInstant = TypoInstant(Instant.ofEpochMilli(random.nextLong())),
+                   timestampz: TypoInstant = TypoInstant(Instant.ofEpochMilli(1000000000000L + random.nextLong(1000000000000L))),
                    timez: TypoOffsetTime = TypoOffsetTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong).atOffset(ZoneOffset.ofHours(random.nextInt(24) - 12))),
                    varchar: String = random.alphanumeric.take(20).mkString,
                    bpchares: Array[/* bpchar */ String] = Array.fill(random.nextInt(3))(random.alphanumeric.take(20).mkString),
@@ -698,7 +698,7 @@ class TestInsert(random: Random) {
                    textes: Array[String] = Array.fill(random.nextInt(3))(random.alphanumeric.take(20).mkString),
                    timees: Array[TypoLocalTime] = Array.fill(random.nextInt(3))(TypoLocalTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
                    timestampes: Array[TypoLocalDateTime] = Array.fill(random.nextInt(3))(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
-                   timestampzes: Array[TypoInstant] = Array.fill(random.nextInt(3))(TypoInstant(Instant.ofEpochMilli(random.nextLong()))),
+                   timestampzes: Array[TypoInstant] = Array.fill(random.nextInt(3))(TypoInstant(Instant.ofEpochMilli(1000000000000L + random.nextLong(1000000000000L)))),
                    timezes: Array[TypoOffsetTime] = Array.fill(random.nextInt(3))(TypoOffsetTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong).atOffset(ZoneOffset.ofHours(random.nextInt(24) - 12)))),
                    varchares: Array[String] = Array.fill(random.nextInt(3))(random.alphanumeric.take(20).mkString)
                   ): ZIO[ZConnection, Throwable, PgtestRow] = (new PgtestRepoImpl).insert(new PgtestRow(box = box, bytea = bytea, circle = circle, hstore = hstore, inet = inet, int2vector = int2vector, interval = interval, json = json, jsonb = jsonb, line = line, lseg = lseg, money = money, path = path, point = point, polygon = polygon, uuid = uuid, vector = vector, xml = xml, boxes = boxes, circlees = circlees, inetes = inetes, int2vectores = int2vectores, intervales = intervales, jsones = jsones, jsonbes = jsonbes, linees = linees, lseges = lseges, moneyes = moneyes, pathes = pathes, pointes = pointes, polygones = polygones, uuides = uuides, xmles = xmles, bool = bool, bpchar = bpchar, char = char, date = date, float4 = float4, float8 = float8, int2 = int2, int4 = int4, int8 = int8, mydomain = mydomain, myenum = myenum, name = name, numeric = numeric, text = text, time = time, timestamp = timestamp, timestampz = timestampz, timez = timez, varchar = varchar, bpchares = bpchares, chares = chares, datees = datees, float4es = float4es, float8es = float8es, int2es = int2es, int4es = int4es, int8es = int8es, mydomaines = mydomaines, myenumes = myenumes, namees = namees, numerices = numerices, textes = textes, timees = timees, timestampes = timestampes, timestampzes = timestampzes, timezes = timezes, varchares = varchares))
@@ -733,7 +733,7 @@ class TestInsert(random: Random) {
                        text: Option[String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                        time: Option[TypoLocalTime] = if (random.nextBoolean()) None else Some(TypoLocalTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
                        timestamp: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
-                       timestampz: Option[TypoInstant] = if (random.nextBoolean()) None else Some(TypoInstant(Instant.ofEpochMilli(random.nextLong()))),
+                       timestampz: Option[TypoInstant] = if (random.nextBoolean()) None else Some(TypoInstant(Instant.ofEpochMilli(1000000000000L + random.nextLong(1000000000000L)))),
                        timez: Option[TypoOffsetTime] = if (random.nextBoolean()) None else Some(TypoOffsetTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong).atOffset(ZoneOffset.ofHours(random.nextInt(24) - 12)))),
                        uuid: Option[TypoUUID] = None,
                        varchar: Option[String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
@@ -767,7 +767,7 @@ class TestInsert(random: Random) {
                        textes: Option[Array[String]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(random.alphanumeric.take(20).mkString)),
                        timees: Option[Array[TypoLocalTime]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(TypoLocalTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
                        timestampes: Option[Array[TypoLocalDateTime]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))))),
-                       timestampzes: Option[Array[TypoInstant]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(TypoInstant(Instant.ofEpochMilli(random.nextLong())))),
+                       timestampzes: Option[Array[TypoInstant]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(TypoInstant(Instant.ofEpochMilli(1000000000000L + random.nextLong(1000000000000L))))),
                        timezes: Option[Array[TypoOffsetTime]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(TypoOffsetTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong).atOffset(ZoneOffset.ofHours(random.nextInt(24) - 12))))),
                        uuides: Option[Array[TypoUUID]] = None,
                        varchares: Option[Array[String]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(random.alphanumeric.take(20).mkString)),
@@ -778,7 +778,7 @@ class TestInsert(random: Random) {
                   name: String = random.alphanumeric.take(20).mkString,
                   lastName: Option[String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                   password: String = random.alphanumeric.take(20).mkString,
-                  verifiedOn: Option[TypoInstant] = if (random.nextBoolean()) None else Some(TypoInstant(Instant.ofEpochMilli(random.nextLong()))),
+                  verifiedOn: Option[TypoInstant] = if (random.nextBoolean()) None else Some(TypoInstant(Instant.ofEpochMilli(1000000000000L + random.nextLong(1000000000000L)))),
                   createdAt: Defaulted[TypoInstant] = Defaulted.UseDefault
                  ): ZIO[ZConnection, Throwable, UsersRow] = (new UsersRepoImpl).insert(new UsersRowUnsaved(userId = userId, email = email, name = name, lastName = lastName, password = password, verifiedOn = verifiedOn, createdAt = createdAt))
   def purchasingProductvendor(productid: ProductId,
