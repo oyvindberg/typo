@@ -29,6 +29,7 @@ case class FlaffRow(
   parentspecifier: Option[ShortText]
 ){
    val compositeId: FlaffId = FlaffId(code, anotherCode, someNumber, specifier)
+   val id = compositeId
  }
 
 object FlaffRow {

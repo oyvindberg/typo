@@ -44,6 +44,7 @@ case class ShoppingcartitemRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = shoppingcartitemid
    def toUnsavedRow(shoppingcartitemid: Defaulted[ShoppingcartitemId], quantity: Defaulted[Int] = Defaulted.Provided(this.quantity), datecreated: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.datecreated), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ShoppingcartitemRowUnsaved =
      ShoppingcartitemRowUnsaved(shoppingcartid, productid, shoppingcartitemid, quantity, datecreated, modifieddate)
  }

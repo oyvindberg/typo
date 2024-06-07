@@ -32,6 +32,7 @@ case class ScrapreasonRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = scrapreasonid
    def toUnsavedRow(scrapreasonid: Defaulted[ScrapreasonId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ScrapreasonRowUnsaved =
      ScrapreasonRowUnsaved(name, scrapreasonid, modifieddate)
  }

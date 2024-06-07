@@ -44,6 +44,7 @@ case class StoreRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = businessentityid
    def toUnsavedRow(rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): StoreRowUnsaved =
      StoreRowUnsaved(businessentityid, name, salespersonid, demographics, rowguid, modifieddate)
  }

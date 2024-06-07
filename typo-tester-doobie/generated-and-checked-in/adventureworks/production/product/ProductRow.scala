@@ -101,6 +101,7 @@ case class ProductRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = productid
    def toUnsavedRow(productid: Defaulted[ProductId], makeflag: Defaulted[Flag] = Defaulted.Provided(this.makeflag), finishedgoodsflag: Defaulted[Flag] = Defaulted.Provided(this.finishedgoodsflag), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductRowUnsaved =
      ProductRowUnsaved(name, productnumber, color, safetystocklevel, reorderpoint, standardcost, listprice, size, sizeunitmeasurecode, weightunitmeasurecode, weight, daystomanufacture, productline, `class`, style, productsubcategoryid, productmodelid, sellstartdate, sellenddate, discontinueddate, productid, makeflag, finishedgoodsflag, rowguid, modifieddate)
  }

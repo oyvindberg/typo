@@ -29,6 +29,7 @@ case class PhonenumbertypeRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = phonenumbertypeid
    def toUnsavedRow(phonenumbertypeid: Defaulted[PhonenumbertypeId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PhonenumbertypeRowUnsaved =
      PhonenumbertypeRowUnsaved(name, phonenumbertypeid, modifieddate)
  }

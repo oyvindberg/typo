@@ -36,6 +36,7 @@ case class SalespersonquotahistoryRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SalespersonquotahistoryId = SalespersonquotahistoryId(businessentityid, quotadate)
+   val id = compositeId
    def toUnsavedRow(rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SalespersonquotahistoryRowUnsaved =
      SalespersonquotahistoryRowUnsaved(businessentityid, quotadate, salesquota, rowguid, modifieddate)
  }

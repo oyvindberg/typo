@@ -28,6 +28,7 @@ case class CurrencyRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = currencycode
    def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CurrencyRowUnsaved =
      CurrencyRowUnsaved(currencycode, name, modifieddate)
  }

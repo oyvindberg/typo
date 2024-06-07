@@ -38,6 +38,7 @@ case class ProductcosthistoryRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: ProductcosthistoryId = ProductcosthistoryId(productid, startdate)
+   val id = compositeId
    def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductcosthistoryRowUnsaved =
      ProductcosthistoryRowUnsaved(productid, startdate, enddate, standardcost, modifieddate)
  }

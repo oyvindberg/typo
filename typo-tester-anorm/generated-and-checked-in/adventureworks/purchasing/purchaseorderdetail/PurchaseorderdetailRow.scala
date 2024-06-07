@@ -55,6 +55,7 @@ case class PurchaseorderdetailRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: PurchaseorderdetailId = PurchaseorderdetailId(purchaseorderid, purchaseorderdetailid)
+   val id = compositeId
    def toUnsavedRow(purchaseorderdetailid: Defaulted[Int], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PurchaseorderdetailRowUnsaved =
      PurchaseorderdetailRowUnsaved(purchaseorderid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, purchaseorderdetailid, modifieddate)
  }

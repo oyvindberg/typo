@@ -36,6 +36,7 @@ case class ProductsubcategoryRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = productsubcategoryid
    def toUnsavedRow(productsubcategoryid: Defaulted[ProductsubcategoryId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductsubcategoryRowUnsaved =
      ProductsubcategoryRowUnsaved(productcategoryid, name, productsubcategoryid, rowguid, modifieddate)
  }

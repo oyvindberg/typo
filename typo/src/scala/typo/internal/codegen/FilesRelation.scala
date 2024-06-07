@@ -11,6 +11,13 @@ case class FilesRelation(naming: Naming, names: ComputedNames, maybeCols: Option
         names.maybeId.collect { case x: IdComputed.Composite =>
           code"""val ${x.paramName}: ${x.tpe} = ${x.tpe}(${x.cols.map(x => x.name.code).mkCode(", ")})"""
         },
+        // id member which points to either `compositeId` val defined above or id column
+        if (maybeCols.exists(_.exists(_.name.value == "id"))) None
+        else
+          names.maybeId.collect {
+            case id: IdComputed.Unary     => code"val id = ${id.col.name}"
+            case id: IdComputed.Composite => code"val id = ${id.paramName}"
+          },
         maybeUnsavedRow.map { case (unsaved, defaults) =>
           val (partOfId, rest) = unsaved.defaultCols.toList.partition { case (col, _) => names.isIdColumn(col.dbName) }
           val partOfIdParams = partOfId.map { case (col, tpe) =>

@@ -35,6 +35,7 @@ case class SalesorderheadersalesreasonRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SalesorderheadersalesreasonId = SalesorderheadersalesreasonId(salesorderid, salesreasonid)
+   val id = compositeId
    def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SalesorderheadersalesreasonRowUnsaved =
      SalesorderheadersalesreasonRowUnsaved(salesorderid, salesreasonid, modifieddate)
  }

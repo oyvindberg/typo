@@ -28,6 +28,7 @@ case class CountryregionRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = countryregioncode
    def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CountryregionRowUnsaved =
      CountryregionRowUnsaved(countryregioncode, name, modifieddate)
  }

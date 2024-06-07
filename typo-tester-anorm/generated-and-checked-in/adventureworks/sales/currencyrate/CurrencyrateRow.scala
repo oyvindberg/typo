@@ -44,6 +44,7 @@ case class CurrencyrateRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = currencyrateid
    def toUnsavedRow(currencyrateid: Defaulted[CurrencyrateId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CurrencyrateRowUnsaved =
      CurrencyrateRowUnsaved(currencyratedate, fromcurrencycode, tocurrencycode, averagerate, endofdayrate, currencyrateid, modifieddate)
  }

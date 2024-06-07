@@ -35,6 +35,7 @@ case class SpecialofferproductRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: SpecialofferproductId = SpecialofferproductId(specialofferid, productid)
+   val id = compositeId
    def toUnsavedRow(rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SpecialofferproductRowUnsaved =
      SpecialofferproductRowUnsaved(specialofferid, productid, rowguid, modifieddate)
  }

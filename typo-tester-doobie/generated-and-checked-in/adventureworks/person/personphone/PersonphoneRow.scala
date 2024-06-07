@@ -35,6 +35,7 @@ case class PersonphoneRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: PersonphoneId = PersonphoneId(businessentityid, phonenumber, phonenumbertypeid)
+   val id = compositeId
    def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PersonphoneRowUnsaved =
      PersonphoneRowUnsaved(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
  }

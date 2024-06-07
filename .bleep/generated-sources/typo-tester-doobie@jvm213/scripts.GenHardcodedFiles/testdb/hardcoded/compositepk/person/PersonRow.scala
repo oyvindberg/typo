@@ -27,6 +27,7 @@ case class PersonRow(
   name: Option[String]
 ){
    val compositeId: PersonId = PersonId(one, two)
+   val id = compositeId
    def toUnsavedRow(one: Defaulted[Long], two: Defaulted[Option[String]]): PersonRowUnsaved =
      PersonRowUnsaved(name, one, two)
  }

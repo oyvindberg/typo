@@ -32,6 +32,7 @@ case class CountryregioncurrencyRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: CountryregioncurrencyId = CountryregioncurrencyId(countryregioncode, currencycode)
+   val id = compositeId
    def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CountryregioncurrencyRowUnsaved =
      CountryregioncurrencyRowUnsaved(countryregioncode, currencycode, modifieddate)
  }

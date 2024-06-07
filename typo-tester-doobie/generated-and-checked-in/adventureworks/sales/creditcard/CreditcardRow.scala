@@ -37,6 +37,7 @@ case class CreditcardRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = creditcardid
    def toUnsavedRow(creditcardid: Defaulted[/* user-picked */ CustomCreditcardId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CreditcardRowUnsaved =
      CreditcardRowUnsaved(cardtype, cardnumber, expmonth, expyear, creditcardid, modifieddate)
  }

@@ -38,6 +38,7 @@ case class JobcandidateRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = jobcandidateid
    def toUnsavedRow(jobcandidateid: Defaulted[JobcandidateId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): JobcandidateRowUnsaved =
      JobcandidateRowUnsaved(businessentityid, resume, jobcandidateid, modifieddate)
  }

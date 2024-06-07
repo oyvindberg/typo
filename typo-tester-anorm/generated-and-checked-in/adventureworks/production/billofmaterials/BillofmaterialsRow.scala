@@ -61,6 +61,7 @@ case class BillofmaterialsRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = billofmaterialsid
    def toUnsavedRow(billofmaterialsid: Defaulted[Int], startdate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.startdate), perassemblyqty: Defaulted[BigDecimal] = Defaulted.Provided(this.perassemblyqty), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): BillofmaterialsRowUnsaved =
      BillofmaterialsRowUnsaved(productassemblyid, componentid, enddate, unitmeasurecode, bomlevel, billofmaterialsid, startdate, perassemblyqty, modifieddate)
  }

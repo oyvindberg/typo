@@ -59,6 +59,7 @@ case class WorkorderroutingRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: WorkorderroutingId = WorkorderroutingId(workorderid, productid, operationsequence)
+   val id = compositeId
    def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): WorkorderroutingRowUnsaved =
      WorkorderroutingRowUnsaved(workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)
  }

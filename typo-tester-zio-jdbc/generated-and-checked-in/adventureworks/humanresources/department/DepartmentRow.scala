@@ -31,6 +31,7 @@ case class DepartmentRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = departmentid
    def toUnsavedRow(departmentid: Defaulted[DepartmentId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): DepartmentRowUnsaved =
      DepartmentRowUnsaved(name, groupname, departmentid, modifieddate)
  }

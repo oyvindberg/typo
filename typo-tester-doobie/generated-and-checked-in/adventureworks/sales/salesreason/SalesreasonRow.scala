@@ -31,6 +31,7 @@ case class SalesreasonRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = salesreasonid
    def toUnsavedRow(salesreasonid: Defaulted[SalesreasonId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SalesreasonRowUnsaved =
      SalesreasonRowUnsaved(name, reasontype, salesreasonid, modifieddate)
  }

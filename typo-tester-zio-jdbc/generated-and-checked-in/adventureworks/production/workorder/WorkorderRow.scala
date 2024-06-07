@@ -49,6 +49,7 @@ case class WorkorderRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = workorderid
    def toUnsavedRow(workorderid: Defaulted[WorkorderId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): WorkorderRowUnsaved =
      WorkorderRowUnsaved(productid, orderqty, scrappedqty, startdate, enddate, duedate, scrapreasonid, workorderid, modifieddate)
  }

@@ -31,6 +31,7 @@ case class CultureRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = cultureid
    def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): CultureRowUnsaved =
      CultureRowUnsaved(cultureid, name, modifieddate)
  }

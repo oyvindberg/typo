@@ -34,6 +34,7 @@ case class UsersRow(
   createdAt: TypoInstant,
   verifiedOn: Option[TypoInstant]
 ){
+   val id = userId
    def toUnsavedRow(createdAt: Defaulted[TypoInstant] = Defaulted.Provided(this.createdAt)): UsersRowUnsaved =
      UsersRowUnsaved(userId, name, lastName, email, password, verifiedOn, createdAt)
  }

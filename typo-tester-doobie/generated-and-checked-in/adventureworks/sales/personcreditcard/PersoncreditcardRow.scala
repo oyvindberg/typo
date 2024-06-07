@@ -32,6 +32,7 @@ case class PersoncreditcardRow(
   modifieddate: TypoLocalDateTime
 ){
    val compositeId: PersoncreditcardId = PersoncreditcardId(businessentityid, creditcardid)
+   val id = compositeId
    def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PersoncreditcardRowUnsaved =
      PersoncreditcardRowUnsaved(businessentityid, creditcardid, modifieddate)
  }

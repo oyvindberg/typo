@@ -36,6 +36,7 @@ case class ProductphotoRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = productphotoid
    def toUnsavedRow(productphotoid: Defaulted[ProductphotoId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductphotoRowUnsaved =
      ProductphotoRowUnsaved(thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, productphotoid, modifieddate)
  }

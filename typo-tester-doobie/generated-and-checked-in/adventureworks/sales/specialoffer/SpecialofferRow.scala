@@ -53,6 +53,7 @@ case class SpecialofferRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = specialofferid
    def toUnsavedRow(specialofferid: Defaulted[SpecialofferId], discountpct: Defaulted[BigDecimal] = Defaulted.Provided(this.discountpct), minqty: Defaulted[Int] = Defaulted.Provided(this.minqty), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SpecialofferRowUnsaved =
      SpecialofferRowUnsaved(description, `type`, category, startdate, enddate, maxqty, specialofferid, discountpct, minqty, rowguid, modifieddate)
  }

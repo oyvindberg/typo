@@ -64,6 +64,7 @@ case class PurchaseorderheaderRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = purchaseorderid
    def toUnsavedRow(purchaseorderid: Defaulted[PurchaseorderheaderId], revisionnumber: Defaulted[TypoShort] = Defaulted.Provided(this.revisionnumber), status: Defaulted[TypoShort] = Defaulted.Provided(this.status), orderdate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.orderdate), subtotal: Defaulted[BigDecimal] = Defaulted.Provided(this.subtotal), taxamt: Defaulted[BigDecimal] = Defaulted.Provided(this.taxamt), freight: Defaulted[BigDecimal] = Defaulted.Provided(this.freight), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PurchaseorderheaderRowUnsaved =
      PurchaseorderheaderRowUnsaved(employeeid, vendorid, shipmethodid, shipdate, purchaseorderid, revisionnumber, status, orderdate, subtotal, taxamt, freight, modifieddate)
  }

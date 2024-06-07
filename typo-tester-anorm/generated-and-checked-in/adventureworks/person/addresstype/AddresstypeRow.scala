@@ -35,6 +35,7 @@ case class AddresstypeRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = addresstypeid
    def toUnsavedRow(addresstypeid: Defaulted[AddresstypeId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): AddresstypeRowUnsaved =
      AddresstypeRowUnsaved(name, addresstypeid, rowguid, modifieddate)
  }

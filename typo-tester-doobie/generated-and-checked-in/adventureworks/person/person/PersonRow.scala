@@ -59,6 +59,7 @@ case class PersonRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = businessentityid
    def toUnsavedRow(namestyle: Defaulted[NameStyle] = Defaulted.Provided(this.namestyle), emailpromotion: Defaulted[Int] = Defaulted.Provided(this.emailpromotion), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PersonRowUnsaved =
      PersonRowUnsaved(businessentityid, persontype, title, firstname, middlename, lastname, suffix, additionalcontactinfo, demographics, namestyle, emailpromotion, rowguid, modifieddate)
  }

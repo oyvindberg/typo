@@ -31,6 +31,7 @@ case class UnitmeasureRow(
   /** Default: now() */
   modifieddate: TypoLocalDateTime
 ){
+   val id = unitmeasurecode
    def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): UnitmeasureRowUnsaved =
      UnitmeasureRowUnsaved(unitmeasurecode, name, modifieddate)
  }
