@@ -69,7 +69,8 @@ object ComputedTestInserts {
           case customTypes.TypoOffsetTime.typoType =>
             Some(code"${customTypes.TypoOffsetTime.typoType}($defaultLocalTime.atOffset($defaultZoneOffset))")
           case customTypes.TypoInstant.typoType =>
-            Some(code"${customTypes.TypoInstant.typoType}(${TypesJava.Instant}.ofEpochMilli($random.nextLong()))")
+            // 2001-09-09T01:46:40Z -> 2033-05-18T03:33:20Z
+            Some(code"${customTypes.TypoInstant.typoType}(${TypesJava.Instant}.ofEpochMilli(1000000000000L + $random.nextLong(1000000000000L)))")
           case sc.Type.TApply(table.default.Defaulted, _) =>
             Some(code"${table.default.Defaulted}.${table.default.UseDefault}")
           case tpe if domainsByName.contains(tpe) =>
