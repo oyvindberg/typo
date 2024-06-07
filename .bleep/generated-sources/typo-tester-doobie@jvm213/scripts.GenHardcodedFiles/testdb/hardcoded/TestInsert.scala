@@ -27,8 +27,8 @@ class TestInsert(random: Random) {
                         one: Defaulted[Long] = Defaulted.UseDefault,
                         two: Defaulted[Option[String]] = Defaulted.UseDefault
                        ): ConnectionIO[PersonRow] = (new PersonRepoImpl).insert(new PersonRowUnsaved(name = name, one = one, two = two))
-  def myschemaFootballClub(id: FootballClubId, name: /* max 100 chars */ String = random.alphanumeric.take(20).mkString): ConnectionIO[FootballClubRow] = (new FootballClubRepoImpl).insert(new FootballClubRow(id = id, name = name))
-  def myschemaMaritalStatus(id: MaritalStatusId): ConnectionIO[MaritalStatusRow] = (new MaritalStatusRepoImpl).insert(new MaritalStatusRow(id = id))
+  def myschemaFootballClub(id: FootballClubId = FootballClubId(random.nextLong()), name: /* max 100 chars */ String = random.alphanumeric.take(20).mkString): ConnectionIO[FootballClubRow] = (new FootballClubRepoImpl).insert(new FootballClubRow(id = id, name = name))
+  def myschemaMaritalStatus(id: MaritalStatusId = MaritalStatusId(random.nextLong())): ConnectionIO[MaritalStatusRow] = (new MaritalStatusRepoImpl).insert(new MaritalStatusRow(id = id))
   def myschemaPerson(favouriteFootballClubId: FootballClubId,
                      name: /* max 100 chars */ String = random.alphanumeric.take(20).mkString,
                      nickName: Option[/* max 30 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),

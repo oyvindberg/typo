@@ -108,6 +108,7 @@ object db {
       constraints: List[Constraint],
       jsonDescription: DebugJson
   ) {
+    def isDefaulted = columnDefault.nonEmpty || identity.exists(_.`BY DEFAULT`)
     def name = parsedName.name
   }
   case class RelationName(schema: Option[String], name: String) {
