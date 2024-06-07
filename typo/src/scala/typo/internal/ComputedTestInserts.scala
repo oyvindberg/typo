@@ -12,14 +12,23 @@ object ComputedTestInserts {
       domains.iterator.map(x => x.tpe -> x).toMap
     val enumsByName: Map[sc.Type, ComputedStringEnum] =
       enums.iterator.map(x => x.tpe -> x).toMap
+
     def defaultFor(table: ComputedTable, tpe: sc.Type, dbType: db.Type) = {
       def defaultLocalDate = code"${TypesJava.LocalDate}.ofEpochDay($random.nextInt(30000).toLong)"
       def defaultLocalTime = code"${TypesJava.LocalTime}.ofSecondOfDay($random.nextInt(24 * 60 * 60).toLong)"
       def defaultLocalDateTime = code"${TypesJava.LocalDateTime}.of($defaultLocalDate, $defaultLocalTime)"
       def defaultZoneOffset = code"${TypesJava.ZoneOffset}.ofHours($random.nextInt(24) - 12)"
 
-      def go(tpe: sc.Type, dbType: db.Type): Option[sc.Code] =
+      def go(tpe: sc.Type, dbType: db.Type, tableUnaryId: Option[IdComputed.Unary]): Option[sc.Code] =
         tpe match {
+          case tpe if tableUnaryId.exists(_.tpe == tpe) =>
+            tableUnaryId.get match {
+              case x: IdComputed.UnaryNormal        => go(x.underlying, x.col.dbCol.tpe, None).map(default => code"${x.tpe}($default)")
+              case x: IdComputed.UnaryInherited     => go(x.underlying, x.col.dbCol.tpe, None).map(default => code"${x.tpe}($default)")
+              case x: IdComputed.UnaryNoIdType      => go(x.underlying, x.col.dbCol.tpe, None)
+              case _: IdComputed.UnaryKnownValues   => None // todo
+              case _: IdComputed.UnaryUserSpecified => None
+            }
           case TypesJava.String =>
             val max: Int =
               Option(dbType)
@@ -45,14 +54,14 @@ object ComputedTestInserts {
           case TypesScala.BigDecimal => Some(code"${TypesScala.BigDecimal}.decimal($random.nextDouble())")
           case TypesJava.UUID        => Some(code"${TypesJava.UUID}.nameUUIDFromBytes{val bs = ${TypesScala.Array}.ofDim[${TypesScala.Byte}](16); $random.nextBytes(bs); bs}")
           case TypesScala.Optional(underlying) =>
-            go(underlying, dbType) match {
+            go(underlying, dbType, tableUnaryId) match {
               case None          => Some(TypesScala.None.code)
               case Some(default) => Some(code"if ($random.nextBoolean()) ${TypesScala.None} else ${TypesScala.Some}($default)")
             }
           case sc.Type.ArrayOf(underlying) =>
             dbType match {
               case db.Type.Array(underlyingDb) =>
-                go(underlying, underlyingDb).map { default =>
+                go(underlying, underlyingDb, tableUnaryId).map { default =>
                   code"${TypesScala.Array}.fill(random.nextInt(3))($default)"
                 }
               case _ => None
@@ -74,14 +83,14 @@ object ComputedTestInserts {
           case sc.Type.TApply(table.default.Defaulted, _) =>
             Some(code"${table.default.Defaulted}.${table.default.UseDefault}")
           case tpe if domainsByName.contains(tpe) =>
-            go(domainsByName(tpe).underlyingType, dbType).map(inner => code"$tpe($inner)")
+            go(domainsByName(tpe).underlyingType, dbType, tableUnaryId).map(inner => code"$tpe($inner)")
           case tpe if enumsByName.contains(tpe) =>
             Some(code"$tpe.All($random.nextInt($tpe.All.length))")
           case _ =>
             None
         }
 
-      go(sc.Type.base(tpe), dbType)
+      go(sc.Type.base(tpe), dbType, table.maybeId.collect { case x: IdComputed.Unary => x })
     }
 
     new ComputedTestInserts(
@@ -94,9 +103,21 @@ object ComputedTestInserts {
               case None          => table.cols
             }
 
+          val colNameToForeignKeys: Map[db.ColName, List[db.ForeignKey]] =
+            table.dbTable.foreignKeys
+              .flatMap(fk => fk.cols.toList.map(colName => (colName, fk)))
+              .groupMap { case (colName, _) => colName } { case (_, fk) => fk }
+
           val params: List[sc.Param] = {
             val asParams = cols.map { col =>
-              val default = defaultFor(table, col.tpe, col.dbCol.tpe)
+              val hasFkToOtherTable = colNameToForeignKeys.get(col.dbName) match {
+                case Some(fks) => fks.exists(_.otherTable != table.dbTable.name)
+                case None      => false
+              }
+              val notDefaulted = !col.dbCol.isDefaulted
+              val default =
+                if (hasFkToOtherTable && notDefaulted && col.dbCol.nullability == Nullability.NoNulls) None
+                else defaultFor(table, col.tpe, col.dbCol.tpe)
               sc.Param(col.name, col.tpe, default)
             }
             val (requiredParams, optionalParams) = asParams.toList.partition(_.default.isEmpty)

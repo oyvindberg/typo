@@ -587,7 +587,7 @@ class TestInsert(random: Random) {
                                    transactiondate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
                                    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                   ): ZIO[ZConnection, Throwable, TransactionhistoryRow] = (new TransactionhistoryRepoImpl).insert(new TransactionhistoryRowUnsaved(productid = productid, referenceorderid = referenceorderid, transactiontype = transactiontype, quantity = quantity, actualcost = actualcost, transactionid = transactionid, referenceorderlineid = referenceorderlineid, transactiondate = transactiondate, modifieddate = modifieddate))
-  def productionTransactionhistoryarchive(transactionid: TransactionhistoryarchiveId,
+  def productionTransactionhistoryarchive(transactionid: TransactionhistoryarchiveId = TransactionhistoryarchiveId(random.nextInt()),
                                           productid: Int = random.nextInt(),
                                           referenceorderid: Int = random.nextInt(),
                                           transactiontype: /* bpchar, max 1 chars */ String = random.alphanumeric.take(1).mkString,
