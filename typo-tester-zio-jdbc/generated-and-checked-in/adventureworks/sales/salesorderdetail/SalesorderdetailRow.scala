@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
+import adventureworks.sales.specialofferproduct.SpecialofferproductId
 import java.sql.ResultSet
 import zio.jdbc.JdbcDecoder
 import zio.json.JsonDecoder
@@ -56,6 +57,10 @@ case class SalesorderdetailRow(
 ){
    val compositeId: SalesorderdetailId = SalesorderdetailId(salesorderid, salesorderdetailid)
    val id = compositeId
+   val extractSpecialofferproductId: SpecialofferproductId = SpecialofferproductId(
+     specialofferid = specialofferid,
+     productid = productid
+   )
    def toUnsavedRow(salesorderdetailid: Defaulted[Int], unitpricediscount: Defaulted[BigDecimal] = Defaulted.Provided(this.unitpricediscount), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SalesorderdetailRowUnsaved =
      SalesorderdetailRowUnsaved(salesorderid, carriertrackingnumber, orderqty, productid, specialofferid, unitprice, salesorderdetailid, unitpricediscount, rowguid, modifieddate)
  }

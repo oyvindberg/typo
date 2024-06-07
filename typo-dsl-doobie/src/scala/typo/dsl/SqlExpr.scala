@@ -216,7 +216,7 @@ object SqlExpr {
   }
 
   object CompositeIn {
-    case class TuplePart[Tuple, T, Row](field: IdField[T, Row])(val extract: Tuple => T)(implicit val asConst: Const.As[Array[T], Required], val CT: ClassTag[T])
+    case class TuplePart[Tuple, T, Row](field: FieldLike[T, Required, Row])(val extract: Tuple => T)(implicit val asConst: Const.As[Array[T], Required], val CT: ClassTag[T])
   }
 
   case class RowExpr(exprs: List[SqlExpr.SqlExprNoHkt[?]]) extends SqlExpr[List[?], Required] {

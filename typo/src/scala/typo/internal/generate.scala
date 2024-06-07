@@ -86,14 +86,19 @@ object generate {
         // relations chosen by the selector and the sql files
         val computedRelations = computedLazyRelations.flatMap { case (_, lazyValue) => lazyValue.getIfEvaluated }
 
+        val computedRelationsByName: Map[db.RelationName, ComputedTable] =
+          computedRelations.iterator.collect { case x: ComputedTable => (x.dbTable.name, x) }.toMap
+
         // yeah, sorry about the naming overload. this is a list of output files generated for each input sql file
         val sqlFileFiles: List[sc.File] =
           computedSqlFiles.flatMap(x => FilesSqlFile(x, naming, options).all)
 
         val relationFilesByName = computedRelations.flatMap {
-          case viewComputed: ComputedView   => FilesView(viewComputed, options).all.map(x => (viewComputed.view.name, x))
-          case tableComputed: ComputedTable => FilesTable(tableComputed, options, genOrdering).all.map(x => (tableComputed.dbTable.name, x))
-          case _                            => Nil
+          case viewComputed: ComputedView => FilesView(viewComputed, options).all.map(x => (viewComputed.view.name, x))
+          case tableComputed: ComputedTable =>
+            val fkAnalysis = FkAnalysis(computedRelationsByName, tableComputed)
+            FilesTable(tableComputed, fkAnalysis, options, genOrdering).all.map(x => (tableComputed.dbTable.name, x))
+          case _ => Nil
         }
 
         val mostFiles: List[sc.File] =

@@ -8,6 +8,8 @@ case class ComputedTestInserts(tpe: sc.Type.Qualified, methods: List[ComputedTes
 object ComputedTestInserts {
   val random: sc.Ident = sc.Ident("random")
   def apply(projectName: String, options: InternalOptions, customTypes: CustomTypes, domains: List[ComputedDomain], enums: List[ComputedStringEnum], computedTables: Iterable[ComputedTable]) = {
+    val tablesByName: Map[db.RelationName, ComputedTable] =
+      computedTables.iterator.map(x => x.dbTable.name -> x).toMap
     val domainsByName: Map[sc.Type, ComputedDomain] =
       domains.iterator.map(x => x.tpe -> x).toMap
     val enumsByName: Map[sc.Type, ComputedStringEnum] =
@@ -26,7 +28,6 @@ object ComputedTestInserts {
               case x: IdComputed.UnaryNormal        => go(x.underlying, x.col.dbCol.tpe, None).map(default => code"${x.tpe}($default)")
               case x: IdComputed.UnaryInherited     => go(x.underlying, x.col.dbCol.tpe, None).map(default => code"${x.tpe}($default)")
               case x: IdComputed.UnaryNoIdType      => go(x.underlying, x.col.dbCol.tpe, None)
-              case _: IdComputed.UnaryKnownValues   => None // todo
               case _: IdComputed.UnaryUserSpecified => None
             }
           case TypesJava.String =>
@@ -97,39 +98,59 @@ object ComputedTestInserts {
       sc.Type.Qualified(options.pkg / sc.Ident(s"${Naming.titleCase(projectName)}TestInsert")),
       computedTables.collect {
         case table if !options.readonlyRepo.include(table.dbTable.name) =>
-          val cols: NonEmptyList[ComputedColumn] =
-            table.maybeUnsavedRow match {
-              case Some(unsaved) => unsaved.allCols
-              case None          => table.cols
-            }
+          FkAnalysis(tablesByName, table).createWithFkIdsUnsavedRowOrRow match {
+            case Some(colsFromFks) =>
+              val valuesFromFk: List[(sc.Ident, sc.Code)] =
+                colsFromFks.allColumns.toList.map { col =>
+                  val expr: sc.Code =
+                    colsFromFks.exprForColumn.get(col.name) match {
+                      case Some(expr) =>
+                        if (col.dbCol.isDefaulted && col.dbCol.nullability != Nullability.NoNulls)
+                          code"${table.default.Defaulted}.${table.default.Provided}(${TypesScala.Option}($expr))"
+                        else if (col.dbCol.isDefaulted)
+                          code"${table.default.Defaulted}.${table.default.Provided}($expr)"
+                        else if (col.dbCol.nullability != Nullability.NoNulls)
+                          code"${TypesScala.Option}(${expr})"
+                        else
+                          expr
 
-          val colNameToForeignKeys: Map[db.ColName, List[db.ForeignKey]] =
-            table.dbTable.foreignKeys
-              .flatMap(fk => fk.cols.toList.map(colName => (colName, fk)))
-              .groupMap { case (colName, _) => colName } { case (_, fk) => fk }
+                      case None => col.name.code
+                    }
 
-          val params: List[sc.Param] = {
-            val asParams = cols.map { col =>
-              val hasFkToOtherTable = colNameToForeignKeys.get(col.dbName) match {
-                case Some(fks) => fks.exists(_.otherTable != table.dbTable.name)
-                case None      => false
+                  (col.name, expr)
+                }
+              val (requiredParams, optionalParams) = colsFromFks.remainingColumns
+                .map { col =>
+                  val default = defaultFor(table, col.tpe, col.dbCol.tpe)
+                  sc.Param(col.name, col.tpe, default)
+                }
+                .partition(_.default.isEmpty)
+              ComputedTestInserts.InsertMethod(table, colsFromFks.params ++ requiredParams ++ optionalParams, valuesFromFk)
+            case None =>
+              val cols: List[ComputedColumn] =
+                table.maybeUnsavedRow match {
+                  case Some(unsaved) => unsaved.allCols.toList
+                  case None          => table.cols.toList
+                }
+              val params: List[sc.Param] = {
+                val asParams = cols.map { col =>
+                  val default = defaultFor(table, col.tpe, col.dbCol.tpe)
+                  sc.Param(col.name, col.tpe, default)
+                }
+                val (requiredParams, optionalParams) = asParams.partition(_.default.isEmpty)
+                requiredParams ++ optionalParams
               }
-              val notDefaulted = !col.dbCol.isDefaulted
-              val default =
-                if (hasFkToOtherTable && notDefaulted && col.dbCol.nullability == Nullability.NoNulls) None
-                else defaultFor(table, col.tpe, col.dbCol.tpe)
-              sc.Param(col.name, col.tpe, default)
-            }
-            val (requiredParams, optionalParams) = asParams.toList.partition(_.default.isEmpty)
-            requiredParams ++ optionalParams
+              val values: List[(sc.Ident, sc.Code)] =
+                params.map(p => (p.name, p.name.code))
+
+              ComputedTestInserts.InsertMethod(table, params, values)
           }
 
-          ComputedTestInserts.InsertMethod(table, params)
       }.toList
     )
   }
 
-  case class InsertMethod(table: ComputedTable, params: List[sc.Param]) {
+  case class InsertMethod(table: ComputedTable, params: List[sc.Param], values: List[(sc.Ident, sc.Code)]) {
     val name: sc.Ident =
       table.dbTable.name match {
         case db.RelationName(Some(schema), name) => sc.Ident(s"${Naming.camelCase(schema)}${Naming.titleCase(name)}")

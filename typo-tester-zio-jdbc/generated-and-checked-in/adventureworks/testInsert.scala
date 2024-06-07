@@ -286,6 +286,7 @@ import adventureworks.sales.specialoffer.SpecialofferId
 import adventureworks.sales.specialoffer.SpecialofferRepoImpl
 import adventureworks.sales.specialoffer.SpecialofferRow
 import adventureworks.sales.specialoffer.SpecialofferRowUnsaved
+import adventureworks.sales.specialofferproduct.SpecialofferproductId
 import adventureworks.sales.specialofferproduct.SpecialofferproductRepoImpl
 import adventureworks.sales.specialofferproduct.SpecialofferproductRow
 import adventureworks.sales.specialofferproduct.SpecialofferproductRowUnsaved
@@ -856,9 +857,8 @@ class TestInsert(random: Random) {
                             creditcardid: /* user-picked */ CustomCreditcardId,
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                            ): ZIO[ZConnection, Throwable, PersoncreditcardRow] = (new PersoncreditcardRepoImpl).insert(new PersoncreditcardRowUnsaved(businessentityid = businessentityid, creditcardid = creditcardid, modifieddate = modifieddate))
-  def salesSalesorderdetail(salesorderid: SalesorderheaderId,
-                            productid: ProductId,
-                            specialofferid: SpecialofferId,
+  def salesSalesorderdetail(SpecialofferproductId: SpecialofferproductId,
+                            salesorderid: SalesorderheaderId,
                             carriertrackingnumber: Option[/* max 25 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                             orderqty: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
                             unitprice: BigDecimal = BigDecimal.decimal(random.nextDouble()),
@@ -866,7 +866,7 @@ class TestInsert(random: Random) {
                             unitpricediscount: Defaulted[BigDecimal] = Defaulted.UseDefault,
                             rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                           ): ZIO[ZConnection, Throwable, SalesorderdetailRow] = (new SalesorderdetailRepoImpl).insert(new SalesorderdetailRowUnsaved(salesorderid = salesorderid, productid = productid, specialofferid = specialofferid, carriertrackingnumber = carriertrackingnumber, orderqty = orderqty, unitprice = unitprice, salesorderdetailid = salesorderdetailid, unitpricediscount = unitpricediscount, rowguid = rowguid, modifieddate = modifieddate))
+                           ): ZIO[ZConnection, Throwable, SalesorderdetailRow] = (new SalesorderdetailRepoImpl).insert(new SalesorderdetailRowUnsaved(salesorderid = salesorderid, carriertrackingnumber = carriertrackingnumber, orderqty = orderqty, productid = SpecialofferproductId.productid, specialofferid = SpecialofferproductId.specialofferid, unitprice = unitprice, salesorderdetailid = salesorderdetailid, unitpricediscount = unitpricediscount, rowguid = rowguid, modifieddate = modifieddate))
   def salesSalesorderheader(customerid: CustomerId,
                             billtoaddressid: AddressId,
                             shiptoaddressid: AddressId,
