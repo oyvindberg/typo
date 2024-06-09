@@ -15,7 +15,10 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 /** Type for the composite primary key of table `sales.salesorderheadersalesreason` */
-case class SalesorderheadersalesreasonId(salesorderid: SalesorderheaderId, salesreasonid: SalesreasonId)
+case class SalesorderheadersalesreasonId(
+  salesorderid: SalesorderheaderId,
+  salesreasonid: SalesreasonId
+)
 object SalesorderheadersalesreasonId {
   implicit lazy val jsonDecoder: JsonDecoder[SalesorderheadersalesreasonId] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val salesorderid = jsonObj.get("salesorderid").toRight("Missing field 'salesorderid'").flatMap(_.as(SalesorderheaderId.jsonDecoder))

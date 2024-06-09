@@ -15,7 +15,10 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 /** Type for the composite primary key of table `production.productdocument` */
-case class ProductdocumentId(productid: ProductId, documentnode: DocumentId)
+case class ProductdocumentId(
+  productid: ProductId,
+  documentnode: DocumentId
+)
 object ProductdocumentId {
   implicit lazy val jsonDecoder: JsonDecoder[ProductdocumentId] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val productid = jsonObj.get("productid").toRight("Missing field 'productid'").flatMap(_.as(ProductId.jsonDecoder))

@@ -146,7 +146,9 @@ case class FilesTable(table: ComputedTable, options: InternalOptions, genOrderin
           sc.File(
             id.tpe,
             code"""|$comments
-                   |case class ${qident.name}(${cols.map(_.param.code).mkCode(", ")})
+                   |case class ${qident.name}(
+                   |  ${cols.map(_.param.code).mkCode(",\n")}
+                   |)
                    |${genObject(qident.value, instances)}
                    |""".stripMargin,
             secondaryTypes = Nil,

@@ -18,7 +18,10 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `compositepk.person` */
-case class PersonId(one: Long, two: Option[String])
+case class PersonId(
+  one: Long,
+  two: Option[String]
+)
 object PersonId {
   implicit def ordering(implicit O0: Ordering[Option[String]]): Ordering[PersonId] = Ordering.by(x => (x.one, x.two))
   implicit lazy val reads: Reads[PersonId] = Reads[PersonId](json => JsResult.fromTry(

@@ -13,7 +13,12 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 /** Type for the composite primary key of table `public.flaff` */
-case class FlaffId(code: ShortText, anotherCode: /* max 20 chars */ String, someNumber: Int, specifier: ShortText)
+case class FlaffId(
+  code: ShortText,
+  anotherCode: /* max 20 chars */ String,
+  someNumber: Int,
+  specifier: ShortText
+)
 object FlaffId {
   implicit lazy val jsonDecoder: JsonDecoder[FlaffId] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val code = jsonObj.get("code").toRight("Missing field 'code'").flatMap(_.as(ShortText.jsonDecoder))
