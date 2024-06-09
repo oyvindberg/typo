@@ -15,7 +15,10 @@ import zio.json.ast.Json
 import zio.json.internal.Write
 
 /** Type for the composite primary key of table `sales.countryregioncurrency` */
-case class CountryregioncurrencyId(countryregioncode: CountryregionId, currencycode: CurrencyId)
+case class CountryregioncurrencyId(
+  countryregioncode: CountryregionId,
+  currencycode: CurrencyId
+)
 object CountryregioncurrencyId {
   implicit lazy val jsonDecoder: JsonDecoder[CountryregioncurrencyId] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val countryregioncode = jsonObj.get("countryregioncode").toRight("Missing field 'countryregioncode'").flatMap(_.as(CountryregionId.jsonDecoder))

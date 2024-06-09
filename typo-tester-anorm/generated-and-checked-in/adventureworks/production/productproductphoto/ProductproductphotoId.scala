@@ -18,7 +18,10 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `production.productproductphoto` */
-case class ProductproductphotoId(productid: ProductId, productphotoid: ProductphotoId)
+case class ProductproductphotoId(
+  productid: ProductId,
+  productphotoid: ProductphotoId
+)
 object ProductproductphotoId {
   implicit lazy val ordering: Ordering[ProductproductphotoId] = Ordering.by(x => (x.productid, x.productphotoid))
   implicit lazy val reads: Reads[ProductproductphotoId] = Reads[ProductproductphotoId](json => JsResult.fromTry(

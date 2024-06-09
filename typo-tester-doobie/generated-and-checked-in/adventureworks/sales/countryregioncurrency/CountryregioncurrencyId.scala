@@ -13,7 +13,10 @@ import io.circe.Decoder
 import io.circe.Encoder
 
 /** Type for the composite primary key of table `sales.countryregioncurrency` */
-case class CountryregioncurrencyId(countryregioncode: CountryregionId, currencycode: CurrencyId)
+case class CountryregioncurrencyId(
+  countryregioncode: CountryregionId,
+  currencycode: CurrencyId
+)
 object CountryregioncurrencyId {
   implicit lazy val decoder: Decoder[CountryregioncurrencyId] = Decoder.forProduct2[CountryregioncurrencyId, CountryregionId, CurrencyId]("countryregioncode", "currencycode")(CountryregioncurrencyId.apply)(CountryregionId.decoder, CurrencyId.decoder)
   implicit lazy val encoder: Encoder[CountryregioncurrencyId] = Encoder.forProduct2[CountryregioncurrencyId, CountryregionId, CurrencyId]("countryregioncode", "currencycode")(x => (x.countryregioncode, x.currencycode))(CountryregionId.encoder, CurrencyId.encoder)

@@ -18,7 +18,10 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `sales.countryregioncurrency` */
-case class CountryregioncurrencyId(countryregioncode: CountryregionId, currencycode: CurrencyId)
+case class CountryregioncurrencyId(
+  countryregioncode: CountryregionId,
+  currencycode: CurrencyId
+)
 object CountryregioncurrencyId {
   implicit lazy val ordering: Ordering[CountryregioncurrencyId] = Ordering.by(x => (x.countryregioncode, x.currencycode))
   implicit lazy val reads: Reads[CountryregioncurrencyId] = Reads[CountryregioncurrencyId](json => JsResult.fromTry(

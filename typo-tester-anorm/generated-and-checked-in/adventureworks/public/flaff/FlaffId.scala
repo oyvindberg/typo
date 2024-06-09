@@ -17,7 +17,12 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 
 /** Type for the composite primary key of table `public.flaff` */
-case class FlaffId(code: ShortText, anotherCode: /* max 20 chars */ String, someNumber: Int, specifier: ShortText)
+case class FlaffId(
+  code: ShortText,
+  anotherCode: /* max 20 chars */ String,
+  someNumber: Int,
+  specifier: ShortText
+)
 object FlaffId {
   implicit lazy val ordering: Ordering[FlaffId] = Ordering.by(x => (x.code, x.anotherCode, x.someNumber, x.specifier))
   implicit lazy val reads: Reads[FlaffId] = Reads[FlaffId](json => JsResult.fromTry(
