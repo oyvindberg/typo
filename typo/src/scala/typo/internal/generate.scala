@@ -124,7 +124,7 @@ object generate {
         // this should be a stop-gap solution anyway
         val pkgObject = if (isRoot) FilePackageObject.packageObject(options) else None
 
-        val testInsertsDataFile =
+        val testInsertsDataFiles: List[sc.File] =
           options.dbLib match {
             case Some(dbLib) =>
               val keptTypes = keptMostFiles.flatMap(x => x.tpe :: x.secondaryTypes).toSet
@@ -132,9 +132,9 @@ object generate {
                 computedRelations.collect { case x: ComputedTable if options.enableTestInserts.include(x.dbTable.name) && keptTypes(x.names.RepoImplName) => x }
               if (keptTables.nonEmpty) {
                 val computed = ComputedTestInserts(project.name, options, customTypes, domains, enums, keptTables)
-                Some(FileTestInserts(computed, dbLib))
-              } else None
-            case _ => None
+                FileTestInserts(computed, dbLib)
+              } else Nil
+            case _ => Nil
           }
 
         val allFiles: Iterator[sc.File] = {
@@ -157,7 +157,7 @@ object generate {
               }
               (pkg, allKnown)
             }
-          val withImports = (testInsertsDataFile.iterator ++ keptMostFiles).map(file => addPackageAndImports(knownNamesByPkgWithSuper, file))
+          val withImports = (testInsertsDataFiles.iterator ++ keptMostFiles).map(file => addPackageAndImports(knownNamesByPkgWithSuper, file))
           val all = withImports ++ pkgObject.iterator
           all.map(file => file.copy(contents = options.fileHeader.code ++ file.contents))
         }

@@ -13,7 +13,7 @@ Neither aggregation nor projection is allowed — you always work on whole rows.
 On the other hand, you get predicates, joins, ordering, pagination.
 
 It's designed to cover the "I just need to fetch/update this data" scenario, without requiring you to break flow by creating an sql file.
-Whenever you need more flexibility, you should reach for [SQL files](what-is/sql-is-king.md)
+Whenever you need more flexibility, you should reach for [SQL files](sql-is-king.md)
 
 **Type Safety**:
 With the Typo DSL, you benefit from Scala's robust type system, ensuring that your queries are

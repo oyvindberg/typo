@@ -123,12 +123,25 @@ Here is example usage:
 
 Note that we can easily create a deep dependency graph with random data due to [testInsert](../other-features/testing-with-random-values.md).
 ```scala mdoc:silent
-import adventureworks.{TestInsert, withConnection}
+import adventureworks.{TestInsert, TestDomainInsert, withConnection}
 import adventureworks.userdefined.FirstName
 import scala.util.Random
+import adventureworks.public.{AccountNumber, Flag, Mydomain, Name, NameStyle, Phone, ShortText}
+
+import scala.util.Random
+
+object DomainInsert extends TestDomainInsert {
+  override def publicAccountNumber(random: Random): AccountNumber = AccountNumber(random.nextString(10))
+  override def publicFlag(random: Random): Flag = Flag(random.nextBoolean())
+  override def publicMydomain(random: Random): Mydomain = Mydomain(random.nextString(10))
+  override def publicName(random: Random): Name = Name(random.nextString(10))
+  override def publicNameStyle(random: Random): NameStyle = NameStyle(random.nextBoolean())
+  override def publicPhone(random: Random): Phone = Phone(random.nextString(10))
+  override def publicShortText(random: Random): ShortText = ShortText(random.nextString(10))
+}
 
 // set a fixed seed to get consistent values
-val testInsert = new TestInsert(new Random(1))
+val testInsert = new TestInsert(new Random(1), DomainInsert)
 
 val businessentityRow = testInsert.personBusinessentity()
 val personRow = testInsert.personPerson(businessentityRow.businessentityid, persontype = "SC", FirstName("name"))
