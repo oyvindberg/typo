@@ -8,7 +8,7 @@ import adventureworks.production.productcosthistory.ProductcosthistoryRepoImpl
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.{Name, NameStyle}
 import adventureworks.userdefined.FirstName
-import adventureworks.{TestInsert, withConnection}
+import adventureworks.{DomainInsert, TestInsert, withConnection}
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
@@ -23,7 +23,7 @@ class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
   }
 
   test("works") {
-    val testInsert = new TestInsert(new Random(0))
+    val testInsert = new TestInsert(new Random(0), DomainInsert)
     val repo = new ProductcosthistoryRepoImpl()
 
     withConnection {

@@ -18,6 +18,26 @@ The idea is that you:
 
 In summary, this is a fantastic way of setting up complex test scenarios in the database!
 
+### Domains
+If you use [postgres domains](../type-safety/domains.md) you typically want affect the generation of data yourself.
+For that reason there is a trait you need to implement and pass in. This only affect you if you use domains.
+
+```scala mdoc
+import adventureworks.public.*
+
+import scala.util.Random
+
+// apply domain-specific rules here
+object DomainInsert extends adventureworks.TestDomainInsert {
+  override def publicAccountNumber(random: Random): AccountNumber = AccountNumber(random.nextString(10))
+  override def publicFlag(random: Random): Flag = Flag(random.nextBoolean())
+  override def publicMydomain(random: Random): Mydomain = Mydomain(random.nextString(10))
+  override def publicName(random: Random): Name = Name(random.nextString(10))
+  override def publicNameStyle(random: Random): NameStyle = NameStyle(random.nextBoolean())
+  override def publicPhone(random: Random): Phone = Phone(random.nextString(10))
+  override def publicShortText(random: Random): ShortText = ShortText(random.nextString(10))
+}
+```
 
 ### Usage example
 
@@ -34,7 +54,7 @@ import adventureworks.TestInsert
 
 import scala.util.Random
 
-val testInsert = new TestInsert(new Random(0))
+val testInsert = new TestInsert(new Random(0), DomainInsert)
 
 val unitmeasure = testInsert.productionUnitmeasure(UnitmeasureId("kgg"))
 val productCategory = testInsert.productionProductcategory()

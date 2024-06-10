@@ -598,12 +598,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
   }
   override def testInsertMethod(x: ComputedTestInserts.InsertMethod): sc.Value =
     sc.Value(
-      Nil,
-      x.name,
-      x.params,
-      List(sc.Param(sc.Ident("c"), TypesJava.Connection, None)),
-      x.table.names.RowName,
-      code"(new ${x.table.names.RepoImplName}).insert(new ${x.cls}(${x.values.map { case (p, expr) => code"$p = $expr" }.mkCode(", ")}))"
+      tparams = Nil,
+      name = x.name,
+      params = x.params,
+      implicitParams = List(sc.Param(sc.Ident("c"), TypesJava.Connection, None)),
+      tpe = x.table.names.RowName,
+      body = code"(new ${x.table.names.RepoImplName}).insert(new ${x.cls}(${x.values.map { case (p, expr) => code"$p = $expr" }.mkCode(", ")}))"
     )
 
   override val defaultedInstance: List[sc.Given] =

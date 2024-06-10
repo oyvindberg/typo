@@ -1,6 +1,6 @@
 package adventureworks.person
 
-import adventureworks.{TestInsert, withConnection}
+import adventureworks.{DomainInsert, TestInsert, withConnection}
 import adventureworks.person.address.*
 import adventureworks.person.addresstype.*
 import adventureworks.person.businessentityaddress.*
@@ -89,7 +89,7 @@ class PersonWithAddressesTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("works") {
     withConnection { implicit c =>
       // insert randomly generated rows (with a fixed seed) we base the test on
-      val testInsert = new TestInsert(new Random(1))
+      val testInsert = new TestInsert(new Random(1), DomainInsert)
       val businessentityRow = testInsert.personBusinessentity()
       val personRow = testInsert.personPerson(businessentityRow.businessentityid, persontype = "SC", FirstName("name"))
       val countryregionRow = testInsert.personCountryregion(CountryregionId("NOR"))

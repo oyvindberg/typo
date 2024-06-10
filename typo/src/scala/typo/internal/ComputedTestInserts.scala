@@ -1,19 +1,28 @@
 package typo
 package internal
 
+import typo.db.Type
 import typo.internal.codegen.*
 
-case class ComputedTestInserts(tpe: sc.Type.Qualified, methods: List[ComputedTestInserts.InsertMethod])
+case class ComputedTestInserts(tpe: sc.Type.Qualified, methods: List[ComputedTestInserts.InsertMethod], maybeDomainMethods: Option[ComputedTestInserts.GenerateDomainMethods])
 
 object ComputedTestInserts {
   val random: sc.Ident = sc.Ident("random")
+  val domainInsert: sc.Ident = sc.Ident("domainInsert")
+
   def apply(projectName: String, options: InternalOptions, customTypes: CustomTypes, domains: List[ComputedDomain], enums: List[ComputedStringEnum], computedTables: Iterable[ComputedTable]) = {
     val tablesByName: Map[db.RelationName, ComputedTable] =
       computedTables.iterator.map(x => x.dbTable.name -> x).toMap
-    val domainsByName: Map[sc.Type, ComputedDomain] =
-      domains.iterator.map(x => x.tpe -> x).toMap
     val enumsByName: Map[sc.Type, ComputedStringEnum] =
       enums.iterator.map(x => x.tpe -> x).toMap
+
+    val maybeDomainMethods: Option[GenerateDomainMethods] =
+      GenerateDomainMethod
+        .of(domains, computedTables)
+        .map { methods =>
+          val tpe = sc.Type.Qualified(options.pkg / sc.Ident(s"${Naming.titleCase(projectName)}TestDomainInsert"))
+          GenerateDomainMethods(tpe, methods)
+        }
 
     def defaultFor(table: ComputedTable, tpe: sc.Type, dbType: db.Type) = {
       def defaultLocalDate = code"${TypesJava.LocalDate}.ofEpochDay($random.nextInt(30000).toLong)"
@@ -83,8 +92,9 @@ object ComputedTestInserts {
             Some(code"${customTypes.TypoInstant.typoType}(${TypesJava.Instant}.ofEpochMilli(1000000000000L + $random.nextLong(1000000000000L)))")
           case sc.Type.TApply(table.default.Defaulted, _) =>
             Some(code"${table.default.Defaulted}.${table.default.UseDefault}")
-          case tpe if domainsByName.contains(tpe) =>
-            go(domainsByName(tpe).underlyingType, dbType, tableUnaryId).map(inner => code"$tpe($inner)")
+          case tpe if maybeDomainMethods.exists(_.domainMethodByType.contains(tpe)) =>
+            val method = maybeDomainMethods.get.domainMethodByType(tpe)
+            Some(code"$domainInsert.${method.name}($random)")
           case tpe if enumsByName.contains(tpe) =>
             Some(code"$tpe.All($random.nextInt($tpe.All.length))")
           case _ =>
@@ -153,7 +163,8 @@ object ComputedTestInserts {
               ComputedTestInserts.InsertMethod(table, params, values)
           }
 
-      }.toList
+      }.toList,
+      maybeDomainMethods
     )
   }
 
@@ -167,6 +178,37 @@ object ComputedTestInserts {
     val cls = table.maybeUnsavedRow match {
       case Some(unsaved) => unsaved.tpe
       case None          => table.names.RowName
+    }
+  }
+
+  case class GenerateDomainMethods(tpe: sc.Type.Qualified, methods: NonEmptyList[ComputedTestInserts.GenerateDomainMethod]) {
+    val domainMethodByType: Map[sc.Type, GenerateDomainMethod] =
+      methods.iterator.map(x => (x.dom.tpe: sc.Type) -> x).toMap
+  }
+
+  case class GenerateDomainMethod(dom: ComputedDomain) {
+    val name: sc.Ident =
+      dom.underlying.name match {
+        case db.RelationName(Some(schema), name) => sc.Ident(s"${Naming.camelCase(schema)}${Naming.titleCase(name)}")
+        case db.RelationName(None, name)         => sc.Ident(Naming.titleCase(name))
+      }
+  }
+
+  object GenerateDomainMethod {
+    def of(domains: List[ComputedDomain], computedTables: Iterable[ComputedTable]): Option[NonEmptyList[GenerateDomainMethod]] = {
+      val computedDomainByType: Map[sc.Type, ComputedDomain] =
+        domains.iterator.map(x => x.tpe -> x).toMap
+
+      val all = for {
+        table <- computedTables
+        col <- table.cols.toList
+        domain <- col.dbCol.tpe match {
+          case Type.DomainRef(_, _, _) => computedDomainByType.get(col.tpe)
+          case _                       => None
+        }
+      } yield GenerateDomainMethod(domain)
+
+      NonEmptyList.fromList(all.toList.distinctBy(_.dom.tpe).sortBy(_.dom.tpe))
     }
   }
 }

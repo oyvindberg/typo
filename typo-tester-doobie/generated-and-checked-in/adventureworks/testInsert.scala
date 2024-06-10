@@ -5,6 +5,7 @@
  */
 package adventureworks
 
+import adventureworks.TestDomainInsert
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBox
 import adventureworks.customtypes.TypoBytea
@@ -303,9 +304,9 @@ import java.time.LocalTime
 import java.time.ZoneOffset
 import scala.util.Random
 
-class TestInsert(random: Random) {
-  def humanresourcesDepartment(name: Name = Name(random.alphanumeric.take(20).mkString),
-                               groupname: Name = Name(random.alphanumeric.take(20).mkString),
+class TestInsert(random: Random, domainInsert: TestDomainInsert) {
+  def humanresourcesDepartment(name: Name = domainInsert.publicName(random),
+                               groupname: Name = domainInsert.publicName(random),
                                departmentid: Defaulted[DepartmentId] = Defaulted.UseDefault,
                                modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                               ): ConnectionIO[DepartmentRow] = (new DepartmentRepoImpl).insert(new DepartmentRowUnsaved(name = name, groupname = groupname, departmentid = departmentid, modifieddate = modifieddate))
@@ -343,7 +344,7 @@ class TestInsert(random: Random) {
                                  jobcandidateid: Defaulted[JobcandidateId] = Defaulted.UseDefault,
                                  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                 ): ConnectionIO[JobcandidateRow] = (new JobcandidateRepoImpl).insert(new JobcandidateRowUnsaved(businessentityid = businessentityid, resume = resume, jobcandidateid = jobcandidateid, modifieddate = modifieddate))
-  def humanresourcesShift(name: Name = Name(random.alphanumeric.take(20).mkString),
+  def humanresourcesShift(name: Name = domainInsert.publicName(random),
                           starttime: TypoLocalTime = TypoLocalTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)),
                           endtime: TypoLocalTime = TypoLocalTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)),
                           shiftid: Defaulted[ShiftId] = Defaulted.UseDefault,
@@ -359,7 +360,7 @@ class TestInsert(random: Random) {
                     rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                     modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                    ): ConnectionIO[AddressRow] = (new AddressRepoImpl).insert(new AddressRowUnsaved(stateprovinceid = stateprovinceid, addressline1 = addressline1, addressline2 = addressline2, city = city, postalcode = postalcode, spatiallocation = spatiallocation, addressid = addressid, rowguid = rowguid, modifieddate = modifieddate))
-  def personAddresstype(name: Name = Name(random.alphanumeric.take(20).mkString),
+  def personAddresstype(name: Name = domainInsert.publicName(random),
                         addresstypeid: Defaulted[AddresstypeId] = Defaulted.UseDefault,
                         rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                         modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
@@ -380,12 +381,12 @@ class TestInsert(random: Random) {
                                   rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                  ): ConnectionIO[BusinessentitycontactRow] = (new BusinessentitycontactRepoImpl).insert(new BusinessentitycontactRowUnsaved(businessentityid = businessentityid, personid = personid, contacttypeid = contacttypeid, rowguid = rowguid, modifieddate = modifieddate))
-  def personContacttype(name: Name = Name(random.alphanumeric.take(20).mkString),
+  def personContacttype(name: Name = domainInsert.publicName(random),
                         contacttypeid: Defaulted[ContacttypeId] = Defaulted.UseDefault,
                         modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                        ): ConnectionIO[ContacttypeRow] = (new ContacttypeRepoImpl).insert(new ContacttypeRowUnsaved(name = name, contacttypeid = contacttypeid, modifieddate = modifieddate))
   def personCountryregion(countryregioncode: CountryregionId,
-                          name: Name = Name(random.alphanumeric.take(20).mkString),
+                          name: Name = domainInsert.publicName(random),
                           modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                          ): ConnectionIO[CountryregionRow] = (new CountryregionRepoImpl).insert(new CountryregionRowUnsaved(countryregioncode = countryregioncode, name = name, modifieddate = modifieddate))
   def personEmailaddress(businessentityid: BusinessentityId,
@@ -404,8 +405,8 @@ class TestInsert(random: Random) {
                    persontype: /* bpchar, max 2 chars */ String,
                    firstname: /* user-picked */ FirstName,
                    title: Option[/* max 8 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(8).mkString),
-                   middlename: Option[Name] = if (random.nextBoolean()) None else Some(Name(random.alphanumeric.take(20).mkString)),
-                   lastname: Name = Name(random.alphanumeric.take(20).mkString),
+                   middlename: Option[Name] = if (random.nextBoolean()) None else Some(domainInsert.publicName(random)),
+                   lastname: Name = domainInsert.publicName(random),
                    suffix: Option[/* max 10 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(10).mkString),
                    additionalcontactinfo: Option[TypoXml] = None,
                    demographics: Option[TypoXml] = None,
@@ -416,17 +417,17 @@ class TestInsert(random: Random) {
                   ): ConnectionIO[PersonRow] = (new PersonRepoImpl).insert(new PersonRowUnsaved(businessentityid = businessentityid, persontype = persontype, firstname = firstname, title = title, middlename = middlename, lastname = lastname, suffix = suffix, additionalcontactinfo = additionalcontactinfo, demographics = demographics, namestyle = namestyle, emailpromotion = emailpromotion, rowguid = rowguid, modifieddate = modifieddate))
   def personPersonphone(businessentityid: BusinessentityId,
                         phonenumbertypeid: PhonenumbertypeId,
-                        phonenumber: Phone = Phone(random.alphanumeric.take(20).mkString),
+                        phonenumber: Phone = domainInsert.publicPhone(random),
                         modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                        ): ConnectionIO[PersonphoneRow] = (new PersonphoneRepoImpl).insert(new PersonphoneRowUnsaved(businessentityid = businessentityid, phonenumbertypeid = phonenumbertypeid, phonenumber = phonenumber, modifieddate = modifieddate))
-  def personPhonenumbertype(name: Name = Name(random.alphanumeric.take(20).mkString),
+  def personPhonenumbertype(name: Name = domainInsert.publicName(random),
                             phonenumbertypeid: Defaulted[PhonenumbertypeId] = Defaulted.UseDefault,
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                            ): ConnectionIO[PhonenumbertypeRow] = (new PhonenumbertypeRepoImpl).insert(new PhonenumbertypeRowUnsaved(name = name, phonenumbertypeid = phonenumbertypeid, modifieddate = modifieddate))
   def personStateprovince(countryregioncode: CountryregionId,
                           territoryid: SalesterritoryId,
                           stateprovincecode: /* bpchar, max 3 chars */ String = random.alphanumeric.take(3).mkString,
-                          name: Name = Name(random.alphanumeric.take(20).mkString),
+                          name: Name = domainInsert.publicName(random),
                           stateprovinceid: Defaulted[StateprovinceId] = Defaulted.UseDefault,
                           isonlystateprovinceflag: Defaulted[Flag] = Defaulted.UseDefault,
                           rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
@@ -443,7 +444,7 @@ class TestInsert(random: Random) {
                                 modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                ): ConnectionIO[BillofmaterialsRow] = (new BillofmaterialsRepoImpl).insert(new BillofmaterialsRowUnsaved(componentid = componentid, unitmeasurecode = unitmeasurecode, bomlevel = bomlevel, productassemblyid = productassemblyid, enddate = enddate, billofmaterialsid = billofmaterialsid, startdate = startdate, perassemblyqty = perassemblyqty, modifieddate = modifieddate))
   def productionCulture(cultureid: CultureId,
-                        name: Name = Name(random.alphanumeric.take(20).mkString),
+                        name: Name = domainInsert.publicName(random),
                         modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                        ): ConnectionIO[CultureRow] = (new CultureRepoImpl).insert(new CultureRowUnsaved(cultureid = cultureid, name = name, modifieddate = modifieddate))
   def productionDocument(owner: BusinessentityId,
@@ -464,7 +465,7 @@ class TestInsert(random: Random) {
                              illustrationid: Defaulted[IllustrationId] = Defaulted.UseDefault,
                              modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                             ): ConnectionIO[IllustrationRow] = (new IllustrationRepoImpl).insert(new IllustrationRowUnsaved(diagram = diagram, illustrationid = illustrationid, modifieddate = modifieddate))
-  def productionLocation(name: Name = Name(random.alphanumeric.take(20).mkString),
+  def productionLocation(name: Name = domainInsert.publicName(random),
                          locationid: Defaulted[LocationId] = Defaulted.UseDefault,
                          costrate: Defaulted[BigDecimal] = Defaulted.UseDefault,
                          availability: Defaulted[BigDecimal] = Defaulted.UseDefault,
@@ -476,7 +477,7 @@ class TestInsert(random: Random) {
                         listprice: BigDecimal,
                         daystomanufacture: Int,
                         sellstartdate: TypoLocalDateTime,
-                        name: Name = Name(random.alphanumeric.take(20).mkString),
+                        name: Name = domainInsert.publicName(random),
                         productnumber: /* max 25 chars */ String = random.alphanumeric.take(20).mkString,
                         color: Option[/* max 15 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(15).mkString),
                         size: Option[/* max 5 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(5).mkString),
@@ -496,7 +497,7 @@ class TestInsert(random: Random) {
                         rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                         modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                        ): ConnectionIO[ProductRow] = (new ProductRepoImpl).insert(new ProductRowUnsaved(safetystocklevel = safetystocklevel, reorderpoint = reorderpoint, standardcost = standardcost, listprice = listprice, daystomanufacture = daystomanufacture, sellstartdate = sellstartdate, name = name, productnumber = productnumber, color = color, size = size, sizeunitmeasurecode = sizeunitmeasurecode, weightunitmeasurecode = weightunitmeasurecode, weight = weight, productline = productline, `class` = `class`, style = style, productsubcategoryid = productsubcategoryid, productmodelid = productmodelid, sellenddate = sellenddate, discontinueddate = discontinueddate, productid = productid, makeflag = makeflag, finishedgoodsflag = finishedgoodsflag, rowguid = rowguid, modifieddate = modifieddate))
-  def productionProductcategory(name: Name = Name(random.alphanumeric.take(20).mkString),
+  def productionProductcategory(name: Name = domainInsert.publicName(random),
                                 productcategoryid: Defaulted[ProductcategoryId] = Defaulted.UseDefault,
                                 rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                 modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
@@ -530,7 +531,7 @@ class TestInsert(random: Random) {
                                         enddate: Option[TypoLocalDateTime] = None,
                                         modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                        ): ConnectionIO[ProductlistpricehistoryRow] = (new ProductlistpricehistoryRepoImpl).insert(new ProductlistpricehistoryRowUnsaved(productid = productid, startdate = startdate, listprice = listprice, enddate = enddate, modifieddate = modifieddate))
-  def productionProductmodel(name: Name = Name(random.alphanumeric.take(20).mkString),
+  def productionProductmodel(name: Name = domainInsert.publicName(random),
                              catalogdescription: Option[TypoXml] = None,
                              instructions: Option[TypoXml] = None,
                              productmodelid: Defaulted[ProductmodelId] = Defaulted.UseDefault,
@@ -560,7 +561,7 @@ class TestInsert(random: Random) {
                                    ): ConnectionIO[ProductproductphotoRow] = (new ProductproductphotoRepoImpl).insert(new ProductproductphotoRowUnsaved(productid = productid, productphotoid = productphotoid, primary = primary, modifieddate = modifieddate))
   def productionProductreview(productid: ProductId,
                               rating: Int,
-                              reviewername: Name = Name(random.alphanumeric.take(20).mkString),
+                              reviewername: Name = domainInsert.publicName(random),
                               emailaddress: /* max 50 chars */ String = random.alphanumeric.take(20).mkString,
                               comments: Option[/* max 3850 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                               productreviewid: Defaulted[ProductreviewId] = Defaulted.UseDefault,
@@ -568,12 +569,12 @@ class TestInsert(random: Random) {
                               modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                              ): ConnectionIO[ProductreviewRow] = (new ProductreviewRepoImpl).insert(new ProductreviewRowUnsaved(productid = productid, rating = rating, reviewername = reviewername, emailaddress = emailaddress, comments = comments, productreviewid = productreviewid, reviewdate = reviewdate, modifieddate = modifieddate))
   def productionProductsubcategory(productcategoryid: ProductcategoryId,
-                                   name: Name = Name(random.alphanumeric.take(20).mkString),
+                                   name: Name = domainInsert.publicName(random),
                                    productsubcategoryid: Defaulted[ProductsubcategoryId] = Defaulted.UseDefault,
                                    rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                   ): ConnectionIO[ProductsubcategoryRow] = (new ProductsubcategoryRepoImpl).insert(new ProductsubcategoryRowUnsaved(productcategoryid = productcategoryid, name = name, productsubcategoryid = productsubcategoryid, rowguid = rowguid, modifieddate = modifieddate))
-  def productionScrapreason(name: Name = Name(random.alphanumeric.take(20).mkString),
+  def productionScrapreason(name: Name = domainInsert.publicName(random),
                             scrapreasonid: Defaulted[ScrapreasonId] = Defaulted.UseDefault,
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                            ): ConnectionIO[ScrapreasonRow] = (new ScrapreasonRepoImpl).insert(new ScrapreasonRowUnsaved(name = name, scrapreasonid = scrapreasonid, modifieddate = modifieddate))
@@ -598,7 +599,7 @@ class TestInsert(random: Random) {
                                           modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                          ): ConnectionIO[TransactionhistoryarchiveRow] = (new TransactionhistoryarchiveRepoImpl).insert(new TransactionhistoryarchiveRowUnsaved(transactiontype = transactiontype, transactionid = transactionid, productid = productid, referenceorderid = referenceorderid, quantity = quantity, actualcost = actualcost, referenceorderlineid = referenceorderlineid, transactiondate = transactiondate, modifieddate = modifieddate))
   def productionUnitmeasure(unitmeasurecode: UnitmeasureId,
-                            name: Name = Name(random.alphanumeric.take(20).mkString),
+                            name: Name = domainInsert.publicName(random),
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                            ): ConnectionIO[UnitmeasureRow] = (new UnitmeasureRepoImpl).insert(new UnitmeasureRowUnsaved(unitmeasurecode = unitmeasurecode, name = name, modifieddate = modifieddate))
   def productionWorkorder(productid: ProductId,
@@ -624,11 +625,11 @@ class TestInsert(random: Random) {
                                  actualcost: Option[BigDecimal] = None,
                                  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                 ): ConnectionIO[WorkorderroutingRow] = (new WorkorderroutingRepoImpl).insert(new WorkorderroutingRowUnsaved(workorderid = workorderid, locationid = locationid, scheduledstartdate = scheduledstartdate, scheduledenddate = scheduledenddate, plannedcost = plannedcost, productid = productid, operationsequence = operationsequence, actualstartdate = actualstartdate, actualenddate = actualenddate, actualresourcehrs = actualresourcehrs, actualcost = actualcost, modifieddate = modifieddate))
-  def publicFlaff(code: ShortText = ShortText(random.alphanumeric.take(20).mkString),
+  def publicFlaff(code: ShortText = domainInsert.publicShortText(random),
                   anotherCode: /* max 20 chars */ String = random.alphanumeric.take(20).mkString,
                   someNumber: Int = random.nextInt(),
-                  specifier: ShortText = ShortText(random.alphanumeric.take(20).mkString),
-                  parentspecifier: Option[ShortText] = if (random.nextBoolean()) None else Some(ShortText(random.alphanumeric.take(20).mkString))
+                  specifier: ShortText = domainInsert.publicShortText(random),
+                  parentspecifier: Option[ShortText] = if (random.nextBoolean()) None else Some(domainInsert.publicShortText(random))
                  ): ConnectionIO[FlaffRow] = (new FlaffRepoImpl).insert(new FlaffRow(code = code, anotherCode = anotherCode, someNumber = someNumber, specifier = specifier, parentspecifier = parentspecifier))
   def publicIdentityTest(name: IdentityTestId, defaultGenerated: Defaulted[Int] = Defaulted.UseDefault): ConnectionIO[IdentityTestRow] = (new IdentityTestRepoImpl).insert(new IdentityTestRowUnsaved(name = name, defaultGenerated = defaultGenerated))
   def publicPgtest(box: TypoBox,
@@ -673,7 +674,7 @@ class TestInsert(random: Random) {
                    int2: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
                    int4: Int = random.nextInt(),
                    int8: Long = random.nextLong(),
-                   mydomain: Mydomain = Mydomain(random.alphanumeric.take(20).mkString),
+                   mydomain: Mydomain = domainInsert.publicMydomain(random),
                    myenum: Myenum = Myenum.All(random.nextInt(Myenum.All.length)),
                    name: String = random.alphanumeric.take(20).mkString,
                    numeric: BigDecimal = BigDecimal.decimal(random.nextDouble()),
@@ -691,7 +692,7 @@ class TestInsert(random: Random) {
                    int2es: Array[TypoShort] = Array.fill(random.nextInt(3))(TypoShort(random.nextInt(Short.MaxValue).toShort)),
                    int4es: Array[Int] = Array.fill(random.nextInt(3))(random.nextInt()),
                    int8es: Array[Long] = Array.fill(random.nextInt(3))(random.nextLong()),
-                   mydomaines: Array[Mydomain] = Array.fill(random.nextInt(3))(Mydomain(random.alphanumeric.take(20).mkString)),
+                   mydomaines: Array[Mydomain] = Array.fill(random.nextInt(3))(domainInsert.publicMydomain(random)),
                    myenumes: Array[Myenum] = Array.fill(random.nextInt(3))(Myenum.All(random.nextInt(Myenum.All.length))),
                    namees: Array[String] = Array.fill(random.nextInt(3))(random.alphanumeric.take(20).mkString),
                    numerices: Array[BigDecimal] = Array.fill(random.nextInt(3))(BigDecimal.decimal(random.nextDouble())),
@@ -723,7 +724,7 @@ class TestInsert(random: Random) {
                        line: Option[TypoLine] = None,
                        lseg: Option[TypoLineSegment] = None,
                        money: Option[TypoMoney] = None,
-                       mydomain: Option[Mydomain] = if (random.nextBoolean()) None else Some(Mydomain(random.alphanumeric.take(20).mkString)),
+                       mydomain: Option[Mydomain] = if (random.nextBoolean()) None else Some(domainInsert.publicMydomain(random)),
                        myenum: Option[Myenum] = if (random.nextBoolean()) None else Some(Myenum.All(random.nextInt(Myenum.All.length))),
                        name: Option[String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                        numeric: Option[BigDecimal] = if (random.nextBoolean()) None else Some(BigDecimal.decimal(random.nextDouble())),
@@ -757,7 +758,7 @@ class TestInsert(random: Random) {
                        linees: Option[Array[TypoLine]] = None,
                        lseges: Option[Array[TypoLineSegment]] = None,
                        moneyes: Option[Array[TypoMoney]] = None,
-                       mydomaines: Option[Array[Mydomain]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(Mydomain(random.alphanumeric.take(20).mkString))),
+                       mydomaines: Option[Array[Mydomain]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(domainInsert.publicMydomain(random))),
                        myenumes: Option[Array[Myenum]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(Myenum.All(random.nextInt(Myenum.All.length)))),
                        namees: Option[Array[String]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(random.alphanumeric.take(20).mkString)),
                        numerices: Option[Array[BigDecimal]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(BigDecimal.decimal(random.nextDouble()))),
@@ -806,7 +807,7 @@ class TestInsert(random: Random) {
                                     freight: Defaulted[BigDecimal] = Defaulted.UseDefault,
                                     modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                    ): ConnectionIO[PurchaseorderheaderRow] = (new PurchaseorderheaderRepoImpl).insert(new PurchaseorderheaderRowUnsaved(employeeid = employeeid, vendorid = vendorid, shipmethodid = shipmethodid, shipdate = shipdate, purchaseorderid = purchaseorderid, revisionnumber = revisionnumber, status = status, orderdate = orderdate, subtotal = subtotal, taxamt = taxamt, freight = freight, modifieddate = modifieddate))
-  def purchasingShipmethod(name: Name = Name(random.alphanumeric.take(20).mkString),
+  def purchasingShipmethod(name: Name = domainInsert.publicName(random),
                            shipmethodid: Defaulted[ShipmethodId] = Defaulted.UseDefault,
                            shipbase: Defaulted[BigDecimal] = Defaulted.UseDefault,
                            shiprate: Defaulted[BigDecimal] = Defaulted.UseDefault,
@@ -815,8 +816,8 @@ class TestInsert(random: Random) {
                           ): ConnectionIO[ShipmethodRow] = (new ShipmethodRepoImpl).insert(new ShipmethodRowUnsaved(name = name, shipmethodid = shipmethodid, shipbase = shipbase, shiprate = shiprate, rowguid = rowguid, modifieddate = modifieddate))
   def purchasingVendor(businessentityid: BusinessentityId,
                        creditrating: TypoShort,
-                       accountnumber: AccountNumber = AccountNumber(random.alphanumeric.take(20).mkString),
-                       name: Name = Name(random.alphanumeric.take(20).mkString),
+                       accountnumber: AccountNumber = domainInsert.publicAccountNumber(random),
+                       name: Name = domainInsert.publicName(random),
                        purchasingwebserviceurl: Option[/* max 1024 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                        preferredvendorstatus: Defaulted[Flag] = Defaulted.UseDefault,
                        activeflag: Defaulted[Flag] = Defaulted.UseDefault,
@@ -834,7 +835,7 @@ class TestInsert(random: Random) {
                       modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                      ): ConnectionIO[CreditcardRow] = (new CreditcardRepoImpl).insert(new CreditcardRowUnsaved(cardtype = cardtype, cardnumber = cardnumber, expmonth = expmonth, expyear = expyear, creditcardid = creditcardid, modifieddate = modifieddate))
   def salesCurrency(currencycode: CurrencyId,
-                    name: Name = Name(random.alphanumeric.take(20).mkString),
+                    name: Name = domainInsert.publicName(random),
                     modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                    ): ConnectionIO[CurrencyRow] = (new CurrencyRepoImpl).insert(new CurrencyRowUnsaved(currencycode = currencycode, name = name, modifieddate = modifieddate))
   def salesCurrencyrate(fromcurrencycode: CurrencyId,
@@ -872,8 +873,8 @@ class TestInsert(random: Random) {
                             shiptoaddressid: AddressId,
                             shipmethodid: ShipmethodId,
                             shipdate: Option[TypoLocalDateTime] = None,
-                            purchaseordernumber: Option[OrderNumber] = if (random.nextBoolean()) None else Some(OrderNumber(random.alphanumeric.take(20).mkString)),
-                            accountnumber: Option[AccountNumber] = if (random.nextBoolean()) None else Some(AccountNumber(random.alphanumeric.take(20).mkString)),
+                            purchaseordernumber: Option[OrderNumber] = None,
+                            accountnumber: Option[AccountNumber] = if (random.nextBoolean()) None else Some(domainInsert.publicAccountNumber(random)),
                             salespersonid: Option[BusinessentityId] = None,
                             territoryid: Option[SalesterritoryId] = None,
                             creditcardid: Option[/* user-picked */ CustomCreditcardId] = None,
@@ -912,21 +913,21 @@ class TestInsert(random: Random) {
                                    rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                   ): ConnectionIO[SalespersonquotahistoryRow] = (new SalespersonquotahistoryRepoImpl).insert(new SalespersonquotahistoryRowUnsaved(businessentityid = businessentityid, salesquota = salesquota, quotadate = quotadate, rowguid = rowguid, modifieddate = modifieddate))
-  def salesSalesreason(name: Name = Name(random.alphanumeric.take(20).mkString),
-                       reasontype: Name = Name(random.alphanumeric.take(20).mkString),
+  def salesSalesreason(name: Name = domainInsert.publicName(random),
+                       reasontype: Name = domainInsert.publicName(random),
                        salesreasonid: Defaulted[SalesreasonId] = Defaulted.UseDefault,
                        modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                       ): ConnectionIO[SalesreasonRow] = (new SalesreasonRepoImpl).insert(new SalesreasonRowUnsaved(name = name, reasontype = reasontype, salesreasonid = salesreasonid, modifieddate = modifieddate))
   def salesSalestaxrate(stateprovinceid: StateprovinceId,
                         taxtype: TypoShort,
-                        name: Name = Name(random.alphanumeric.take(20).mkString),
+                        name: Name = domainInsert.publicName(random),
                         salestaxrateid: Defaulted[SalestaxrateId] = Defaulted.UseDefault,
                         taxrate: Defaulted[BigDecimal] = Defaulted.UseDefault,
                         rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                         modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                        ): ConnectionIO[SalestaxrateRow] = (new SalestaxrateRepoImpl).insert(new SalestaxrateRowUnsaved(stateprovinceid = stateprovinceid, taxtype = taxtype, name = name, salestaxrateid = salestaxrateid, taxrate = taxrate, rowguid = rowguid, modifieddate = modifieddate))
   def salesSalesterritory(countryregioncode: CountryregionId,
-                          name: Name = Name(random.alphanumeric.take(20).mkString),
+                          name: Name = domainInsert.publicName(random),
                           group: /* max 50 chars */ String = random.alphanumeric.take(20).mkString,
                           territoryid: Defaulted[SalesterritoryId] = Defaulted.UseDefault,
                           salesytd: Defaulted[BigDecimal] = Defaulted.UseDefault,
@@ -968,7 +969,7 @@ class TestInsert(random: Random) {
                                modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                               ): ConnectionIO[SpecialofferproductRow] = (new SpecialofferproductRepoImpl).insert(new SpecialofferproductRowUnsaved(specialofferid = specialofferid, productid = productid, rowguid = rowguid, modifieddate = modifieddate))
   def salesStore(businessentityid: BusinessentityId,
-                 name: Name = Name(random.alphanumeric.take(20).mkString),
+                 name: Name = domainInsert.publicName(random),
                  salespersonid: Option[BusinessentityId] = None,
                  demographics: Option[TypoXml] = None,
                  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,

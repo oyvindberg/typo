@@ -13,8 +13,9 @@ class RecordTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val personRowJoinSqlRepo = new PersonRowJoinSqlRepoImpl
 
   test("works") {
+
     withConnection { implicit c =>
-      val testInsert = new TestInsert(new Random(0))
+      val testInsert = new TestInsert(new Random(0), DomainInsert)
       val businessentityRow = testInsert.personBusinessentity()
       val personRow = testInsert.personPerson(businessentityRow.businessentityid, persontype = "EM", FirstName("a"))
       testInsert.personEmailaddress(personRow.businessentityid, Some("a@b.c")): @nowarn
