@@ -91,7 +91,7 @@ class PersonWithAddressesTest extends AnyFunSuite with TypeCheckedTripleEquals {
       // insert randomly generated rows (with a fixed seed) we base the test on
       val testInsert = new TestInsert(new Random(1))
       val businessentityRow = testInsert.personBusinessentity()
-      val personRow = testInsert.personPerson(businessentityRow.businessentityid, FirstName("name"), persontype = "SC")
+      val personRow = testInsert.personPerson(businessentityRow.businessentityid, persontype = "SC", FirstName("name"))
       val countryregionRow = testInsert.personCountryregion(CountryregionId("NOR"))
       val salesterritoryRow = testInsert.salesSalesterritory(countryregionRow.countryregioncode)
       val stateprovinceRow = testInsert.personStateprovince(countryregionRow.countryregioncode, salesterritoryRow.territoryid)

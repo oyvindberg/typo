@@ -33,6 +33,12 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
       val productSubcategory = testInsert.productionProductsubcategory(productCategory.productcategoryid)
       val productModel = testInsert.productionProductmodel(catalogdescription = Some(new TypoXml("<xml/>")), instructions = Some(new TypoXml("<instructions/>")))
       val product = testInsert.productionProduct(
+        safetystocklevel = TypoShort(1),
+        reorderpoint = TypoShort(1),
+        standardcost = BigDecimal(1),
+        listprice = BigDecimal(1),
+        daystomanufacture = 10,
+        sellstartdate = TypoLocalDateTime.now,
         sizeunitmeasurecode = Some(unitmeasure.unitmeasurecode),
         weightunitmeasurecode = Some(unitmeasure.unitmeasurecode),
         `class` = Some("H "),
