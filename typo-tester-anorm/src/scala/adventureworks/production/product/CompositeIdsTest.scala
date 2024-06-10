@@ -1,6 +1,6 @@
 package adventureworks.production.product
 
-import adventureworks.customtypes.{TypoLocalDateTime, TypoUUID, TypoXml}
+import adventureworks.customtypes.{TypoLocalDateTime, TypoShort, TypoUUID, TypoXml}
 import adventureworks.person.businessentity.{BusinessentityId, BusinessentityRepo, BusinessentityRepoImpl, BusinessentityRepoMock, BusinessentityRow}
 import adventureworks.person.emailaddress.{EmailaddressRepo, EmailaddressRepoImpl, EmailaddressRepoMock, EmailaddressRow}
 import adventureworks.person.person.{PersonRepo, PersonRepoImpl, PersonRepoMock, PersonRow}
@@ -31,6 +31,12 @@ class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
       val productSubcategory = testInsert.productionProductsubcategory(productCategory.productcategoryid)
       val productModel = testInsert.productionProductmodel(catalogdescription = Some(new TypoXml("<xml/>")), instructions = Some(new TypoXml("<instructions/>")))
       val product = testInsert.productionProduct(
+        safetystocklevel = TypoShort(1),
+        reorderpoint = TypoShort(1),
+        standardcost = BigDecimal(1),
+        listprice = BigDecimal(1),
+        daystomanufacture = 10,
+        sellstartdate = TypoLocalDateTime.now,
         sizeunitmeasurecode = Some(unitmeasure.unitmeasurecode),
         weightunitmeasurecode = Some(unitmeasure.unitmeasurecode),
         `class` = Some("H "),
@@ -40,9 +46,9 @@ class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
       )
 
       val now = TypoLocalDateTime.now
-      val ph1 = testInsert.productionProductcosthistory(product.productid, startdate = now, enddate = Some(now.map(_.plusDays(1))))
-      val ph2 = testInsert.productionProductcosthistory(product.productid, startdate = now.map(_.plusDays(1)), enddate = Some(now.map(_.plusDays(2))))
-      val ph3 = testInsert.productionProductcosthistory(product.productid, startdate = now.map(_.plusDays(2)), enddate = Some(now.map(_.plusDays(3))))
+      val ph1 = testInsert.productionProductcosthistory(product.productid, standardcost = BigDecimal(1), startdate = now, enddate = Some(now.map(_.plusDays(1))))
+      val ph2 = testInsert.productionProductcosthistory(product.productid, standardcost = BigDecimal(1), startdate = now.map(_.plusDays(1)), enddate = Some(now.map(_.plusDays(2))))
+      val ph3 = testInsert.productionProductcosthistory(product.productid, standardcost = BigDecimal(1), startdate = now.map(_.plusDays(2)), enddate = Some(now.map(_.plusDays(3))))
       List(ph1.compositeId, ph2.compositeId, ph3.compositeId) foreach println
       val wanted = Array(ph1.compositeId, ph2.compositeId, ph3.compositeId.copy(productid = ProductId(9999)))
 

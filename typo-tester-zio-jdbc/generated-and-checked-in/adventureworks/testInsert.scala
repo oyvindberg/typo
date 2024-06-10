@@ -311,13 +311,13 @@ class TestInsert(random: Random) {
                                modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                               ): ZIO[ZConnection, Throwable, DepartmentRow] = (new DepartmentRepoImpl).insert(new DepartmentRowUnsaved(name = name, groupname = groupname, departmentid = departmentid, modifieddate = modifieddate))
   def humanresourcesEmployee(businessentityid: BusinessentityId,
+                             birthdate: TypoLocalDate,
+                             maritalstatus: /* bpchar, max 1 chars */ String,
+                             gender: /* bpchar, max 1 chars */ String,
+                             hiredate: TypoLocalDate,
                              nationalidnumber: /* max 15 chars */ String = random.alphanumeric.take(15).mkString,
                              loginid: /* max 256 chars */ String = random.alphanumeric.take(20).mkString,
                              jobtitle: /* max 50 chars */ String = random.alphanumeric.take(20).mkString,
-                             birthdate: TypoLocalDate = TypoLocalDate(LocalDate.ofEpochDay(random.nextInt(30000).toLong)),
-                             maritalstatus: /* bpchar, max 1 chars */ String = random.alphanumeric.take(1).mkString,
-                             gender: /* bpchar, max 1 chars */ String = random.alphanumeric.take(1).mkString,
-                             hiredate: TypoLocalDate = TypoLocalDate(LocalDate.ofEpochDay(random.nextInt(30000).toLong)),
                              salariedflag: Defaulted[Flag] = Defaulted.UseDefault,
                              vacationhours: Defaulted[TypoShort] = Defaulted.UseDefault,
                              sickleavehours: Defaulted[TypoShort] = Defaulted.UseDefault,
@@ -325,20 +325,20 @@ class TestInsert(random: Random) {
                              rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                              modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
                              organizationnode: Defaulted[Option[String]] = Defaulted.UseDefault
-                            ): ZIO[ZConnection, Throwable, EmployeeRow] = (new EmployeeRepoImpl).insert(new EmployeeRowUnsaved(businessentityid = businessentityid, nationalidnumber = nationalidnumber, loginid = loginid, jobtitle = jobtitle, birthdate = birthdate, maritalstatus = maritalstatus, gender = gender, hiredate = hiredate, salariedflag = salariedflag, vacationhours = vacationhours, sickleavehours = sickleavehours, currentflag = currentflag, rowguid = rowguid, modifieddate = modifieddate, organizationnode = organizationnode))
+                            ): ZIO[ZConnection, Throwable, EmployeeRow] = (new EmployeeRepoImpl).insert(new EmployeeRowUnsaved(businessentityid = businessentityid, birthdate = birthdate, maritalstatus = maritalstatus, gender = gender, hiredate = hiredate, nationalidnumber = nationalidnumber, loginid = loginid, jobtitle = jobtitle, salariedflag = salariedflag, vacationhours = vacationhours, sickleavehours = sickleavehours, currentflag = currentflag, rowguid = rowguid, modifieddate = modifieddate, organizationnode = organizationnode))
   def humanresourcesEmployeedepartmenthistory(businessentityid: BusinessentityId,
                                               departmentid: DepartmentId,
                                               shiftid: ShiftId,
-                                              startdate: TypoLocalDate = TypoLocalDate(LocalDate.ofEpochDay(random.nextInt(30000).toLong)),
-                                              enddate: Option[TypoLocalDate] = if (random.nextBoolean()) None else Some(TypoLocalDate(LocalDate.ofEpochDay(random.nextInt(30000).toLong))),
+                                              startdate: TypoLocalDate,
+                                              enddate: Option[TypoLocalDate] = None,
                                               modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                              ): ZIO[ZConnection, Throwable, EmployeedepartmenthistoryRow] = (new EmployeedepartmenthistoryRepoImpl).insert(new EmployeedepartmenthistoryRowUnsaved(businessentityid = businessentityid, departmentid = departmentid, shiftid = shiftid, startdate = startdate, enddate = enddate, modifieddate = modifieddate))
   def humanresourcesEmployeepayhistory(businessentityid: BusinessentityId,
+                                       rate: BigDecimal,
+                                       payfrequency: TypoShort,
                                        ratechangedate: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
-                                       rate: BigDecimal = BigDecimal.decimal(random.nextDouble()),
-                                       payfrequency: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
                                        modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                                      ): ZIO[ZConnection, Throwable, EmployeepayhistoryRow] = (new EmployeepayhistoryRepoImpl).insert(new EmployeepayhistoryRowUnsaved(businessentityid = businessentityid, ratechangedate = ratechangedate, rate = rate, payfrequency = payfrequency, modifieddate = modifieddate))
+                                      ): ZIO[ZConnection, Throwable, EmployeepayhistoryRow] = (new EmployeepayhistoryRepoImpl).insert(new EmployeepayhistoryRowUnsaved(businessentityid = businessentityid, rate = rate, payfrequency = payfrequency, ratechangedate = ratechangedate, modifieddate = modifieddate))
   def humanresourcesJobcandidate(businessentityid: Option[BusinessentityId] = None,
                                  resume: Option[TypoXml] = None,
                                  jobcandidateid: Defaulted[JobcandidateId] = Defaulted.UseDefault,
@@ -402,8 +402,8 @@ class TestInsert(random: Random) {
                      modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                     ): ZIO[ZConnection, Throwable, PasswordRow] = (new PasswordRepoImpl).insert(new PasswordRowUnsaved(businessentityid = businessentityid, passwordhash = passwordhash, passwordsalt = passwordsalt, rowguid = rowguid, modifieddate = modifieddate))
   def personPerson(businessentityid: BusinessentityId,
+                   persontype: /* bpchar, max 2 chars */ String,
                    firstname: /* user-picked */ FirstName,
-                   persontype: /* bpchar, max 2 chars */ String = random.alphanumeric.take(2).mkString,
                    title: Option[/* max 8 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(8).mkString),
                    middlename: Option[Name] = if (random.nextBoolean()) None else Some(Name(random.alphanumeric.take(20).mkString)),
                    lastname: Name = Name(random.alphanumeric.take(20).mkString),
@@ -414,7 +414,7 @@ class TestInsert(random: Random) {
                    emailpromotion: Defaulted[Int] = Defaulted.UseDefault,
                    rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                  ): ZIO[ZConnection, Throwable, PersonRow] = (new PersonRepoImpl).insert(new PersonRowUnsaved(businessentityid = businessentityid, firstname = firstname, persontype = persontype, title = title, middlename = middlename, lastname = lastname, suffix = suffix, additionalcontactinfo = additionalcontactinfo, demographics = demographics, namestyle = namestyle, emailpromotion = emailpromotion, rowguid = rowguid, modifieddate = modifieddate))
+                  ): ZIO[ZConnection, Throwable, PersonRow] = (new PersonRepoImpl).insert(new PersonRowUnsaved(businessentityid = businessentityid, persontype = persontype, firstname = firstname, title = title, middlename = middlename, lastname = lastname, suffix = suffix, additionalcontactinfo = additionalcontactinfo, demographics = demographics, namestyle = namestyle, emailpromotion = emailpromotion, rowguid = rowguid, modifieddate = modifieddate))
   def personPersonphone(businessentityid: BusinessentityId,
                         phonenumbertypeid: PhonenumbertypeId,
                         phonenumber: Phone = Phone(random.alphanumeric.take(20).mkString),
@@ -435,24 +435,24 @@ class TestInsert(random: Random) {
                          ): ZIO[ZConnection, Throwable, StateprovinceRow] = (new StateprovinceRepoImpl).insert(new StateprovinceRowUnsaved(countryregioncode = countryregioncode, territoryid = territoryid, stateprovincecode = stateprovincecode, name = name, stateprovinceid = stateprovinceid, isonlystateprovinceflag = isonlystateprovinceflag, rowguid = rowguid, modifieddate = modifieddate))
   def productionBillofmaterials(componentid: ProductId,
                                 unitmeasurecode: UnitmeasureId,
+                                bomlevel: TypoShort,
                                 productassemblyid: Option[ProductId] = None,
-                                enddate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
-                                bomlevel: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
+                                enddate: Option[TypoLocalDateTime] = None,
                                 billofmaterialsid: Defaulted[Int] = Defaulted.UseDefault,
                                 startdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
                                 perassemblyqty: Defaulted[BigDecimal] = Defaulted.UseDefault,
                                 modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                               ): ZIO[ZConnection, Throwable, BillofmaterialsRow] = (new BillofmaterialsRepoImpl).insert(new BillofmaterialsRowUnsaved(componentid = componentid, unitmeasurecode = unitmeasurecode, productassemblyid = productassemblyid, enddate = enddate, bomlevel = bomlevel, billofmaterialsid = billofmaterialsid, startdate = startdate, perassemblyqty = perassemblyqty, modifieddate = modifieddate))
+                               ): ZIO[ZConnection, Throwable, BillofmaterialsRow] = (new BillofmaterialsRepoImpl).insert(new BillofmaterialsRowUnsaved(componentid = componentid, unitmeasurecode = unitmeasurecode, bomlevel = bomlevel, productassemblyid = productassemblyid, enddate = enddate, billofmaterialsid = billofmaterialsid, startdate = startdate, perassemblyqty = perassemblyqty, modifieddate = modifieddate))
   def productionCulture(cultureid: CultureId,
                         name: Name = Name(random.alphanumeric.take(20).mkString),
                         modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                        ): ZIO[ZConnection, Throwable, CultureRow] = (new CultureRepoImpl).insert(new CultureRowUnsaved(cultureid = cultureid, name = name, modifieddate = modifieddate))
   def productionDocument(owner: BusinessentityId,
+                         status: TypoShort,
                          title: /* max 50 chars */ String = random.alphanumeric.take(20).mkString,
                          filename: /* max 400 chars */ String = random.alphanumeric.take(20).mkString,
                          fileextension: Option[/* max 8 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(8).mkString),
                          revision: /* bpchar, max 5 chars */ String = random.alphanumeric.take(5).mkString,
-                         status: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
                          documentsummary: Option[String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                          document: Option[TypoBytea] = None,
                          folderflag: Defaulted[Flag] = Defaulted.UseDefault,
@@ -460,7 +460,7 @@ class TestInsert(random: Random) {
                          rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                          modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
                          documentnode: Defaulted[DocumentId] = Defaulted.UseDefault
-                        ): ZIO[ZConnection, Throwable, DocumentRow] = (new DocumentRepoImpl).insert(new DocumentRowUnsaved(owner = owner, title = title, filename = filename, fileextension = fileextension, revision = revision, status = status, documentsummary = documentsummary, document = document, folderflag = folderflag, changenumber = changenumber, rowguid = rowguid, modifieddate = modifieddate, documentnode = documentnode))
+                        ): ZIO[ZConnection, Throwable, DocumentRow] = (new DocumentRepoImpl).insert(new DocumentRowUnsaved(owner = owner, status = status, title = title, filename = filename, fileextension = fileextension, revision = revision, documentsummary = documentsummary, document = document, folderflag = folderflag, changenumber = changenumber, rowguid = rowguid, modifieddate = modifieddate, documentnode = documentnode))
   def productionIllustration(diagram: Option[TypoXml] = None,
                              illustrationid: Defaulted[IllustrationId] = Defaulted.UseDefault,
                              modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
@@ -471,43 +471,43 @@ class TestInsert(random: Random) {
                          availability: Defaulted[BigDecimal] = Defaulted.UseDefault,
                          modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                         ): ZIO[ZConnection, Throwable, LocationRow] = (new LocationRepoImpl).insert(new LocationRowUnsaved(name = name, locationid = locationid, costrate = costrate, availability = availability, modifieddate = modifieddate))
-  def productionProduct(name: Name = Name(random.alphanumeric.take(20).mkString),
+  def productionProduct(safetystocklevel: TypoShort,
+                        reorderpoint: TypoShort,
+                        standardcost: BigDecimal,
+                        listprice: BigDecimal,
+                        daystomanufacture: Int,
+                        sellstartdate: TypoLocalDateTime,
+                        name: Name = Name(random.alphanumeric.take(20).mkString),
                         productnumber: /* max 25 chars */ String = random.alphanumeric.take(20).mkString,
                         color: Option[/* max 15 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(15).mkString),
-                        safetystocklevel: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
-                        reorderpoint: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
-                        standardcost: BigDecimal = BigDecimal.decimal(random.nextDouble()),
-                        listprice: BigDecimal = BigDecimal.decimal(random.nextDouble()),
                         size: Option[/* max 5 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(5).mkString),
                         sizeunitmeasurecode: Option[UnitmeasureId] = None,
                         weightunitmeasurecode: Option[UnitmeasureId] = None,
-                        weight: Option[BigDecimal] = if (random.nextBoolean()) None else Some(BigDecimal.decimal(random.nextDouble())),
-                        daystomanufacture: Int = random.nextInt(),
-                        productline: Option[/* bpchar, max 2 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(2).mkString),
-                        `class`: Option[/* bpchar, max 2 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(2).mkString),
-                        style: Option[/* bpchar, max 2 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(2).mkString),
+                        weight: Option[BigDecimal] = None,
+                        productline: Option[/* bpchar, max 2 chars */ String] = None,
+                        `class`: Option[/* bpchar, max 2 chars */ String] = None,
+                        style: Option[/* bpchar, max 2 chars */ String] = None,
                         productsubcategoryid: Option[ProductsubcategoryId] = None,
                         productmodelid: Option[ProductmodelId] = None,
-                        sellstartdate: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
-                        sellenddate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
+                        sellenddate: Option[TypoLocalDateTime] = None,
                         discontinueddate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
                         productid: Defaulted[ProductId] = Defaulted.UseDefault,
                         makeflag: Defaulted[Flag] = Defaulted.UseDefault,
                         finishedgoodsflag: Defaulted[Flag] = Defaulted.UseDefault,
                         rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                         modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                       ): ZIO[ZConnection, Throwable, ProductRow] = (new ProductRepoImpl).insert(new ProductRowUnsaved(name = name, productnumber = productnumber, color = color, safetystocklevel = safetystocklevel, reorderpoint = reorderpoint, standardcost = standardcost, listprice = listprice, size = size, sizeunitmeasurecode = sizeunitmeasurecode, weightunitmeasurecode = weightunitmeasurecode, weight = weight, daystomanufacture = daystomanufacture, productline = productline, `class` = `class`, style = style, productsubcategoryid = productsubcategoryid, productmodelid = productmodelid, sellstartdate = sellstartdate, sellenddate = sellenddate, discontinueddate = discontinueddate, productid = productid, makeflag = makeflag, finishedgoodsflag = finishedgoodsflag, rowguid = rowguid, modifieddate = modifieddate))
+                       ): ZIO[ZConnection, Throwable, ProductRow] = (new ProductRepoImpl).insert(new ProductRowUnsaved(safetystocklevel = safetystocklevel, reorderpoint = reorderpoint, standardcost = standardcost, listprice = listprice, daystomanufacture = daystomanufacture, sellstartdate = sellstartdate, name = name, productnumber = productnumber, color = color, size = size, sizeunitmeasurecode = sizeunitmeasurecode, weightunitmeasurecode = weightunitmeasurecode, weight = weight, productline = productline, `class` = `class`, style = style, productsubcategoryid = productsubcategoryid, productmodelid = productmodelid, sellenddate = sellenddate, discontinueddate = discontinueddate, productid = productid, makeflag = makeflag, finishedgoodsflag = finishedgoodsflag, rowguid = rowguid, modifieddate = modifieddate))
   def productionProductcategory(name: Name = Name(random.alphanumeric.take(20).mkString),
                                 productcategoryid: Defaulted[ProductcategoryId] = Defaulted.UseDefault,
                                 rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                 modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                ): ZIO[ZConnection, Throwable, ProductcategoryRow] = (new ProductcategoryRepoImpl).insert(new ProductcategoryRowUnsaved(name = name, productcategoryid = productcategoryid, rowguid = rowguid, modifieddate = modifieddate))
   def productionProductcosthistory(productid: ProductId,
-                                   startdate: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
-                                   enddate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
-                                   standardcost: BigDecimal = BigDecimal.decimal(random.nextDouble()),
+                                   startdate: TypoLocalDateTime,
+                                   standardcost: BigDecimal,
+                                   enddate: Option[TypoLocalDateTime] = None,
                                    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                                  ): ZIO[ZConnection, Throwable, ProductcosthistoryRow] = (new ProductcosthistoryRepoImpl).insert(new ProductcosthistoryRowUnsaved(productid = productid, startdate = startdate, enddate = enddate, standardcost = standardcost, modifieddate = modifieddate))
+                                  ): ZIO[ZConnection, Throwable, ProductcosthistoryRow] = (new ProductcosthistoryRepoImpl).insert(new ProductcosthistoryRowUnsaved(productid = productid, startdate = startdate, standardcost = standardcost, enddate = enddate, modifieddate = modifieddate))
   def productionProductdescription(description: /* max 400 chars */ String = random.alphanumeric.take(20).mkString,
                                    productdescriptionid: Defaulted[ProductdescriptionId] = Defaulted.UseDefault,
                                    rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
@@ -519,18 +519,18 @@ class TestInsert(random: Random) {
                                ): ZIO[ZConnection, Throwable, ProductdocumentRow] = (new ProductdocumentRepoImpl).insert(new ProductdocumentRowUnsaved(productid = productid, modifieddate = modifieddate, documentnode = documentnode))
   def productionProductinventory(productid: ProductId,
                                  locationid: LocationId,
+                                 bin: TypoShort,
                                  shelf: /* max 10 chars */ String = random.alphanumeric.take(10).mkString,
-                                 bin: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
                                  quantity: Defaulted[TypoShort] = Defaulted.UseDefault,
                                  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                                ): ZIO[ZConnection, Throwable, ProductinventoryRow] = (new ProductinventoryRepoImpl).insert(new ProductinventoryRowUnsaved(productid = productid, locationid = locationid, shelf = shelf, bin = bin, quantity = quantity, rowguid = rowguid, modifieddate = modifieddate))
+                                ): ZIO[ZConnection, Throwable, ProductinventoryRow] = (new ProductinventoryRepoImpl).insert(new ProductinventoryRowUnsaved(productid = productid, locationid = locationid, bin = bin, shelf = shelf, quantity = quantity, rowguid = rowguid, modifieddate = modifieddate))
   def productionProductlistpricehistory(productid: ProductId,
-                                        startdate: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
-                                        enddate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
-                                        listprice: BigDecimal = BigDecimal.decimal(random.nextDouble()),
+                                        startdate: TypoLocalDateTime,
+                                        listprice: BigDecimal,
+                                        enddate: Option[TypoLocalDateTime] = None,
                                         modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                                       ): ZIO[ZConnection, Throwable, ProductlistpricehistoryRow] = (new ProductlistpricehistoryRepoImpl).insert(new ProductlistpricehistoryRowUnsaved(productid = productid, startdate = startdate, enddate = enddate, listprice = listprice, modifieddate = modifieddate))
+                                       ): ZIO[ZConnection, Throwable, ProductlistpricehistoryRow] = (new ProductlistpricehistoryRepoImpl).insert(new ProductlistpricehistoryRowUnsaved(productid = productid, startdate = startdate, listprice = listprice, enddate = enddate, modifieddate = modifieddate))
   def productionProductmodel(name: Name = Name(random.alphanumeric.take(20).mkString),
                              catalogdescription: Option[TypoXml] = None,
                              instructions: Option[TypoXml] = None,
@@ -560,14 +560,14 @@ class TestInsert(random: Random) {
                                     modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                    ): ZIO[ZConnection, Throwable, ProductproductphotoRow] = (new ProductproductphotoRepoImpl).insert(new ProductproductphotoRowUnsaved(productid = productid, productphotoid = productphotoid, primary = primary, modifieddate = modifieddate))
   def productionProductreview(productid: ProductId,
+                              rating: Int,
                               reviewername: Name = Name(random.alphanumeric.take(20).mkString),
                               emailaddress: /* max 50 chars */ String = random.alphanumeric.take(20).mkString,
-                              rating: Int = random.nextInt(),
                               comments: Option[/* max 3850 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                               productreviewid: Defaulted[ProductreviewId] = Defaulted.UseDefault,
                               reviewdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
                               modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                             ): ZIO[ZConnection, Throwable, ProductreviewRow] = (new ProductreviewRepoImpl).insert(new ProductreviewRowUnsaved(productid = productid, reviewername = reviewername, emailaddress = emailaddress, rating = rating, comments = comments, productreviewid = productreviewid, reviewdate = reviewdate, modifieddate = modifieddate))
+                             ): ZIO[ZConnection, Throwable, ProductreviewRow] = (new ProductreviewRepoImpl).insert(new ProductreviewRowUnsaved(productid = productid, rating = rating, reviewername = reviewername, emailaddress = emailaddress, comments = comments, productreviewid = productreviewid, reviewdate = reviewdate, modifieddate = modifieddate))
   def productionProductsubcategory(productcategoryid: ProductcategoryId,
                                    name: Name = Name(random.alphanumeric.take(20).mkString),
                                    productsubcategoryid: Defaulted[ProductsubcategoryId] = Defaulted.UseDefault,
@@ -579,34 +579,34 @@ class TestInsert(random: Random) {
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                            ): ZIO[ZConnection, Throwable, ScrapreasonRow] = (new ScrapreasonRepoImpl).insert(new ScrapreasonRowUnsaved(name = name, scrapreasonid = scrapreasonid, modifieddate = modifieddate))
   def productionTransactionhistory(productid: ProductId,
+                                   transactiontype: /* bpchar, max 1 chars */ String,
                                    referenceorderid: Int = random.nextInt(),
-                                   transactiontype: /* bpchar, max 1 chars */ String = random.alphanumeric.take(1).mkString,
                                    quantity: Int = random.nextInt(),
                                    actualcost: BigDecimal = BigDecimal.decimal(random.nextDouble()),
                                    transactionid: Defaulted[TransactionhistoryId] = Defaulted.UseDefault,
                                    referenceorderlineid: Defaulted[Int] = Defaulted.UseDefault,
                                    transactiondate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
                                    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                                  ): ZIO[ZConnection, Throwable, TransactionhistoryRow] = (new TransactionhistoryRepoImpl).insert(new TransactionhistoryRowUnsaved(productid = productid, referenceorderid = referenceorderid, transactiontype = transactiontype, quantity = quantity, actualcost = actualcost, transactionid = transactionid, referenceorderlineid = referenceorderlineid, transactiondate = transactiondate, modifieddate = modifieddate))
-  def productionTransactionhistoryarchive(transactionid: TransactionhistoryarchiveId = TransactionhistoryarchiveId(random.nextInt()),
+                                  ): ZIO[ZConnection, Throwable, TransactionhistoryRow] = (new TransactionhistoryRepoImpl).insert(new TransactionhistoryRowUnsaved(productid = productid, transactiontype = transactiontype, referenceorderid = referenceorderid, quantity = quantity, actualcost = actualcost, transactionid = transactionid, referenceorderlineid = referenceorderlineid, transactiondate = transactiondate, modifieddate = modifieddate))
+  def productionTransactionhistoryarchive(transactiontype: /* bpchar, max 1 chars */ String,
+                                          transactionid: TransactionhistoryarchiveId = TransactionhistoryarchiveId(random.nextInt()),
                                           productid: Int = random.nextInt(),
                                           referenceorderid: Int = random.nextInt(),
-                                          transactiontype: /* bpchar, max 1 chars */ String = random.alphanumeric.take(1).mkString,
                                           quantity: Int = random.nextInt(),
                                           actualcost: BigDecimal = BigDecimal.decimal(random.nextDouble()),
                                           referenceorderlineid: Defaulted[Int] = Defaulted.UseDefault,
                                           transactiondate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
                                           modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                                         ): ZIO[ZConnection, Throwable, TransactionhistoryarchiveRow] = (new TransactionhistoryarchiveRepoImpl).insert(new TransactionhistoryarchiveRowUnsaved(transactionid = transactionid, productid = productid, referenceorderid = referenceorderid, transactiontype = transactiontype, quantity = quantity, actualcost = actualcost, referenceorderlineid = referenceorderlineid, transactiondate = transactiondate, modifieddate = modifieddate))
+                                         ): ZIO[ZConnection, Throwable, TransactionhistoryarchiveRow] = (new TransactionhistoryarchiveRepoImpl).insert(new TransactionhistoryarchiveRowUnsaved(transactiontype = transactiontype, transactionid = transactionid, productid = productid, referenceorderid = referenceorderid, quantity = quantity, actualcost = actualcost, referenceorderlineid = referenceorderlineid, transactiondate = transactiondate, modifieddate = modifieddate))
   def productionUnitmeasure(unitmeasurecode: UnitmeasureId,
                             name: Name = Name(random.alphanumeric.take(20).mkString),
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                            ): ZIO[ZConnection, Throwable, UnitmeasureRow] = (new UnitmeasureRepoImpl).insert(new UnitmeasureRowUnsaved(unitmeasurecode = unitmeasurecode, name = name, modifieddate = modifieddate))
   def productionWorkorder(productid: ProductId,
-                          orderqty: Int = random.nextInt(),
-                          scrappedqty: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
-                          startdate: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
-                          enddate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
+                          orderqty: Int,
+                          scrappedqty: TypoShort,
+                          startdate: TypoLocalDateTime,
+                          enddate: Option[TypoLocalDateTime] = None,
                           duedate: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
                           scrapreasonid: Option[ScrapreasonId] = None,
                           workorderid: Defaulted[WorkorderId] = Defaulted.UseDefault,
@@ -614,17 +614,17 @@ class TestInsert(random: Random) {
                          ): ZIO[ZConnection, Throwable, WorkorderRow] = (new WorkorderRepoImpl).insert(new WorkorderRowUnsaved(productid = productid, orderqty = orderqty, scrappedqty = scrappedqty, startdate = startdate, enddate = enddate, duedate = duedate, scrapreasonid = scrapreasonid, workorderid = workorderid, modifieddate = modifieddate))
   def productionWorkorderrouting(workorderid: WorkorderId,
                                  locationid: LocationId,
+                                 scheduledstartdate: TypoLocalDateTime,
+                                 scheduledenddate: TypoLocalDateTime,
+                                 plannedcost: BigDecimal,
                                  productid: Int = random.nextInt(),
                                  operationsequence: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
-                                 scheduledstartdate: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
-                                 scheduledenddate: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
-                                 actualstartdate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
-                                 actualenddate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
-                                 actualresourcehrs: Option[BigDecimal] = if (random.nextBoolean()) None else Some(BigDecimal.decimal(random.nextDouble())),
-                                 plannedcost: BigDecimal = BigDecimal.decimal(random.nextDouble()),
-                                 actualcost: Option[BigDecimal] = if (random.nextBoolean()) None else Some(BigDecimal.decimal(random.nextDouble())),
+                                 actualstartdate: Option[TypoLocalDateTime] = None,
+                                 actualenddate: Option[TypoLocalDateTime] = None,
+                                 actualresourcehrs: Option[BigDecimal] = None,
+                                 actualcost: Option[BigDecimal] = None,
                                  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                                ): ZIO[ZConnection, Throwable, WorkorderroutingRow] = (new WorkorderroutingRepoImpl).insert(new WorkorderroutingRowUnsaved(workorderid = workorderid, locationid = locationid, productid = productid, operationsequence = operationsequence, scheduledstartdate = scheduledstartdate, scheduledenddate = scheduledenddate, actualstartdate = actualstartdate, actualenddate = actualenddate, actualresourcehrs = actualresourcehrs, plannedcost = plannedcost, actualcost = actualcost, modifieddate = modifieddate))
+                                ): ZIO[ZConnection, Throwable, WorkorderroutingRow] = (new WorkorderroutingRepoImpl).insert(new WorkorderroutingRowUnsaved(workorderid = workorderid, locationid = locationid, scheduledstartdate = scheduledstartdate, scheduledenddate = scheduledenddate, plannedcost = plannedcost, productid = productid, operationsequence = operationsequence, actualstartdate = actualstartdate, actualenddate = actualenddate, actualresourcehrs = actualresourcehrs, actualcost = actualcost, modifieddate = modifieddate))
   def publicFlaff(code: ShortText = ShortText(random.alphanumeric.take(20).mkString),
                   anotherCode: /* max 20 chars */ String = random.alphanumeric.take(20).mkString,
                   someNumber: Int = random.nextInt(),
@@ -784,20 +784,20 @@ class TestInsert(random: Random) {
                  ): ZIO[ZConnection, Throwable, UsersRow] = (new UsersRepoImpl).insert(new UsersRowUnsaved(userId = userId, email = email, name = name, lastName = lastName, password = password, verifiedOn = verifiedOn, createdAt = createdAt))
   def purchasingProductvendor(productid: ProductId,
                               businessentityid: BusinessentityId,
+                              averageleadtime: Int,
+                              standardprice: BigDecimal,
+                              minorderqty: Int,
+                              maxorderqty: Int,
                               unitmeasurecode: UnitmeasureId,
-                              averageleadtime: Int = random.nextInt(),
-                              standardprice: BigDecimal = BigDecimal.decimal(random.nextDouble()),
-                              lastreceiptcost: Option[BigDecimal] = if (random.nextBoolean()) None else Some(BigDecimal.decimal(random.nextDouble())),
+                              lastreceiptcost: Option[BigDecimal] = None,
                               lastreceiptdate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
-                              minorderqty: Int = random.nextInt(),
-                              maxorderqty: Int = random.nextInt(),
-                              onorderqty: Option[Int] = if (random.nextBoolean()) None else Some(random.nextInt()),
+                              onorderqty: Option[Int] = None,
                               modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                             ): ZIO[ZConnection, Throwable, ProductvendorRow] = (new ProductvendorRepoImpl).insert(new ProductvendorRowUnsaved(productid = productid, businessentityid = businessentityid, unitmeasurecode = unitmeasurecode, averageleadtime = averageleadtime, standardprice = standardprice, lastreceiptcost = lastreceiptcost, lastreceiptdate = lastreceiptdate, minorderqty = minorderqty, maxorderqty = maxorderqty, onorderqty = onorderqty, modifieddate = modifieddate))
+                             ): ZIO[ZConnection, Throwable, ProductvendorRow] = (new ProductvendorRepoImpl).insert(new ProductvendorRowUnsaved(productid = productid, businessentityid = businessentityid, averageleadtime = averageleadtime, standardprice = standardprice, minorderqty = minorderqty, maxorderqty = maxorderqty, unitmeasurecode = unitmeasurecode, lastreceiptcost = lastreceiptcost, lastreceiptdate = lastreceiptdate, onorderqty = onorderqty, modifieddate = modifieddate))
   def purchasingPurchaseorderheader(employeeid: BusinessentityId,
                                     vendorid: BusinessentityId,
                                     shipmethodid: ShipmethodId,
-                                    shipdate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
+                                    shipdate: Option[TypoLocalDateTime] = None,
                                     purchaseorderid: Defaulted[PurchaseorderheaderId] = Defaulted.UseDefault,
                                     revisionnumber: Defaulted[TypoShort] = Defaulted.UseDefault,
                                     status: Defaulted[TypoShort] = Defaulted.UseDefault,
@@ -815,14 +815,14 @@ class TestInsert(random: Random) {
                            modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                           ): ZIO[ZConnection, Throwable, ShipmethodRow] = (new ShipmethodRepoImpl).insert(new ShipmethodRowUnsaved(name = name, shipmethodid = shipmethodid, shipbase = shipbase, shiprate = shiprate, rowguid = rowguid, modifieddate = modifieddate))
   def purchasingVendor(businessentityid: BusinessentityId,
+                       creditrating: TypoShort,
                        accountnumber: AccountNumber = AccountNumber(random.alphanumeric.take(20).mkString),
                        name: Name = Name(random.alphanumeric.take(20).mkString),
-                       creditrating: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
                        purchasingwebserviceurl: Option[/* max 1024 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                        preferredvendorstatus: Defaulted[Flag] = Defaulted.UseDefault,
                        activeflag: Defaulted[Flag] = Defaulted.UseDefault,
                        modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                      ): ZIO[ZConnection, Throwable, VendorRow] = (new VendorRepoImpl).insert(new VendorRowUnsaved(businessentityid = businessentityid, accountnumber = accountnumber, name = name, creditrating = creditrating, purchasingwebserviceurl = purchasingwebserviceurl, preferredvendorstatus = preferredvendorstatus, activeflag = activeflag, modifieddate = modifieddate))
+                      ): ZIO[ZConnection, Throwable, VendorRow] = (new VendorRepoImpl).insert(new VendorRowUnsaved(businessentityid = businessentityid, creditrating = creditrating, accountnumber = accountnumber, name = name, purchasingwebserviceurl = purchasingwebserviceurl, preferredvendorstatus = preferredvendorstatus, activeflag = activeflag, modifieddate = modifieddate))
   def salesCountryregioncurrency(countryregioncode: CountryregionId,
                                  currencycode: CurrencyId,
                                  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
@@ -859,20 +859,20 @@ class TestInsert(random: Random) {
                            ): ZIO[ZConnection, Throwable, PersoncreditcardRow] = (new PersoncreditcardRepoImpl).insert(new PersoncreditcardRowUnsaved(businessentityid = businessentityid, creditcardid = creditcardid, modifieddate = modifieddate))
   def salesSalesorderdetail(SpecialofferproductId: SpecialofferproductId,
                             salesorderid: SalesorderheaderId,
+                            orderqty: TypoShort,
+                            unitprice: BigDecimal,
                             carriertrackingnumber: Option[/* max 25 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
-                            orderqty: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
-                            unitprice: BigDecimal = BigDecimal.decimal(random.nextDouble()),
                             salesorderdetailid: Defaulted[Int] = Defaulted.UseDefault,
                             unitpricediscount: Defaulted[BigDecimal] = Defaulted.UseDefault,
                             rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                            ): ZIO[ZConnection, Throwable, SalesorderdetailRow] = (new SalesorderdetailRepoImpl).insert(new SalesorderdetailRowUnsaved(salesorderid = salesorderid, carriertrackingnumber = carriertrackingnumber, orderqty = orderqty, productid = SpecialofferproductId.productid, specialofferid = SpecialofferproductId.specialofferid, unitprice = unitprice, salesorderdetailid = salesorderdetailid, unitpricediscount = unitpricediscount, rowguid = rowguid, modifieddate = modifieddate))
-  def salesSalesorderheader(customerid: CustomerId,
+  def salesSalesorderheader(duedate: TypoLocalDateTime,
+                            customerid: CustomerId,
                             billtoaddressid: AddressId,
                             shiptoaddressid: AddressId,
                             shipmethodid: ShipmethodId,
-                            duedate: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
-                            shipdate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
+                            shipdate: Option[TypoLocalDateTime] = None,
                             purchaseordernumber: Option[OrderNumber] = if (random.nextBoolean()) None else Some(OrderNumber(random.alphanumeric.take(20).mkString)),
                             accountnumber: Option[AccountNumber] = if (random.nextBoolean()) None else Some(AccountNumber(random.alphanumeric.take(20).mkString)),
                             salespersonid: Option[BusinessentityId] = None,
@@ -892,14 +892,14 @@ class TestInsert(random: Random) {
                             freight: Defaulted[BigDecimal] = Defaulted.UseDefault,
                             rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                           ): ZIO[ZConnection, Throwable, SalesorderheaderRow] = (new SalesorderheaderRepoImpl).insert(new SalesorderheaderRowUnsaved(customerid = customerid, billtoaddressid = billtoaddressid, shiptoaddressid = shiptoaddressid, shipmethodid = shipmethodid, duedate = duedate, shipdate = shipdate, purchaseordernumber = purchaseordernumber, accountnumber = accountnumber, salespersonid = salespersonid, territoryid = territoryid, creditcardid = creditcardid, creditcardapprovalcode = creditcardapprovalcode, currencyrateid = currencyrateid, totaldue = totaldue, comment = comment, salesorderid = salesorderid, revisionnumber = revisionnumber, orderdate = orderdate, status = status, onlineorderflag = onlineorderflag, subtotal = subtotal, taxamt = taxamt, freight = freight, rowguid = rowguid, modifieddate = modifieddate))
+                           ): ZIO[ZConnection, Throwable, SalesorderheaderRow] = (new SalesorderheaderRepoImpl).insert(new SalesorderheaderRowUnsaved(duedate = duedate, customerid = customerid, billtoaddressid = billtoaddressid, shiptoaddressid = shiptoaddressid, shipmethodid = shipmethodid, shipdate = shipdate, purchaseordernumber = purchaseordernumber, accountnumber = accountnumber, salespersonid = salespersonid, territoryid = territoryid, creditcardid = creditcardid, creditcardapprovalcode = creditcardapprovalcode, currencyrateid = currencyrateid, totaldue = totaldue, comment = comment, salesorderid = salesorderid, revisionnumber = revisionnumber, orderdate = orderdate, status = status, onlineorderflag = onlineorderflag, subtotal = subtotal, taxamt = taxamt, freight = freight, rowguid = rowguid, modifieddate = modifieddate))
   def salesSalesorderheadersalesreason(salesorderid: SalesorderheaderId,
                                        salesreasonid: SalesreasonId,
                                        modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                       ): ZIO[ZConnection, Throwable, SalesorderheadersalesreasonRow] = (new SalesorderheadersalesreasonRepoImpl).insert(new SalesorderheadersalesreasonRowUnsaved(salesorderid = salesorderid, salesreasonid = salesreasonid, modifieddate = modifieddate))
   def salesSalesperson(businessentityid: BusinessentityId,
                        territoryid: Option[SalesterritoryId] = None,
-                       salesquota: Option[BigDecimal] = if (random.nextBoolean()) None else Some(BigDecimal.decimal(random.nextDouble())),
+                       salesquota: Option[BigDecimal] = None,
                        bonus: Defaulted[BigDecimal] = Defaulted.UseDefault,
                        commissionpct: Defaulted[BigDecimal] = Defaulted.UseDefault,
                        salesytd: Defaulted[BigDecimal] = Defaulted.UseDefault,
@@ -908,18 +908,18 @@ class TestInsert(random: Random) {
                        modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                       ): ZIO[ZConnection, Throwable, SalespersonRow] = (new SalespersonRepoImpl).insert(new SalespersonRowUnsaved(businessentityid = businessentityid, territoryid = territoryid, salesquota = salesquota, bonus = bonus, commissionpct = commissionpct, salesytd = salesytd, saleslastyear = saleslastyear, rowguid = rowguid, modifieddate = modifieddate))
   def salesSalespersonquotahistory(businessentityid: BusinessentityId,
+                                   salesquota: BigDecimal,
                                    quotadate: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
-                                   salesquota: BigDecimal = BigDecimal.decimal(random.nextDouble()),
                                    rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                                  ): ZIO[ZConnection, Throwable, SalespersonquotahistoryRow] = (new SalespersonquotahistoryRepoImpl).insert(new SalespersonquotahistoryRowUnsaved(businessentityid = businessentityid, quotadate = quotadate, salesquota = salesquota, rowguid = rowguid, modifieddate = modifieddate))
+                                  ): ZIO[ZConnection, Throwable, SalespersonquotahistoryRow] = (new SalespersonquotahistoryRepoImpl).insert(new SalespersonquotahistoryRowUnsaved(businessentityid = businessentityid, salesquota = salesquota, quotadate = quotadate, rowguid = rowguid, modifieddate = modifieddate))
   def salesSalesreason(name: Name = Name(random.alphanumeric.take(20).mkString),
                        reasontype: Name = Name(random.alphanumeric.take(20).mkString),
                        salesreasonid: Defaulted[SalesreasonId] = Defaulted.UseDefault,
                        modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                       ): ZIO[ZConnection, Throwable, SalesreasonRow] = (new SalesreasonRepoImpl).insert(new SalesreasonRowUnsaved(name = name, reasontype = reasontype, salesreasonid = salesreasonid, modifieddate = modifieddate))
   def salesSalestaxrate(stateprovinceid: StateprovinceId,
-                        taxtype: TypoShort = TypoShort(random.nextInt(Short.MaxValue).toShort),
+                        taxtype: TypoShort,
                         name: Name = Name(random.alphanumeric.take(20).mkString),
                         salestaxrateid: Defaulted[SalestaxrateId] = Defaulted.UseDefault,
                         taxrate: Defaulted[BigDecimal] = Defaulted.UseDefault,
@@ -939,8 +939,8 @@ class TestInsert(random: Random) {
                          ): ZIO[ZConnection, Throwable, SalesterritoryRow] = (new SalesterritoryRepoImpl).insert(new SalesterritoryRowUnsaved(countryregioncode = countryregioncode, name = name, group = group, territoryid = territoryid, salesytd = salesytd, saleslastyear = saleslastyear, costytd = costytd, costlastyear = costlastyear, rowguid = rowguid, modifieddate = modifieddate))
   def salesSalesterritoryhistory(businessentityid: BusinessentityId,
                                  territoryid: SalesterritoryId,
-                                 startdate: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
-                                 enddate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
+                                 startdate: TypoLocalDateTime,
+                                 enddate: Option[TypoLocalDateTime] = None,
                                  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                 ): ZIO[ZConnection, Throwable, SalesterritoryhistoryRow] = (new SalesterritoryhistoryRepoImpl).insert(new SalesterritoryhistoryRowUnsaved(businessentityid = businessentityid, territoryid = territoryid, startdate = startdate, enddate = enddate, rowguid = rowguid, modifieddate = modifieddate))
@@ -951,18 +951,18 @@ class TestInsert(random: Random) {
                             datecreated: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                            ): ZIO[ZConnection, Throwable, ShoppingcartitemRow] = (new ShoppingcartitemRepoImpl).insert(new ShoppingcartitemRowUnsaved(productid = productid, shoppingcartid = shoppingcartid, shoppingcartitemid = shoppingcartitemid, quantity = quantity, datecreated = datecreated, modifieddate = modifieddate))
-  def salesSpecialoffer(description: /* max 255 chars */ String = random.alphanumeric.take(20).mkString,
+  def salesSpecialoffer(startdate: TypoLocalDateTime,
+                        enddate: TypoLocalDateTime,
+                        description: /* max 255 chars */ String = random.alphanumeric.take(20).mkString,
                         `type`: /* max 50 chars */ String = random.alphanumeric.take(20).mkString,
                         category: /* max 50 chars */ String = random.alphanumeric.take(20).mkString,
-                        startdate: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
-                        enddate: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
-                        maxqty: Option[Int] = if (random.nextBoolean()) None else Some(random.nextInt()),
+                        maxqty: Option[Int] = None,
                         specialofferid: Defaulted[SpecialofferId] = Defaulted.UseDefault,
                         discountpct: Defaulted[BigDecimal] = Defaulted.UseDefault,
                         minqty: Defaulted[Int] = Defaulted.UseDefault,
                         rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                         modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                       ): ZIO[ZConnection, Throwable, SpecialofferRow] = (new SpecialofferRepoImpl).insert(new SpecialofferRowUnsaved(description = description, `type` = `type`, category = category, startdate = startdate, enddate = enddate, maxqty = maxqty, specialofferid = specialofferid, discountpct = discountpct, minqty = minqty, rowguid = rowguid, modifieddate = modifieddate))
+                       ): ZIO[ZConnection, Throwable, SpecialofferRow] = (new SpecialofferRepoImpl).insert(new SpecialofferRowUnsaved(startdate = startdate, enddate = enddate, description = description, `type` = `type`, category = category, maxqty = maxqty, specialofferid = specialofferid, discountpct = discountpct, minqty = minqty, rowguid = rowguid, modifieddate = modifieddate))
   def salesSpecialofferproduct(specialofferid: SpecialofferId,
                                productid: ProductId,
                                rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,

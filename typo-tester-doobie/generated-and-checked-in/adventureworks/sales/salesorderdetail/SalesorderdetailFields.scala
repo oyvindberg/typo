@@ -16,6 +16,7 @@ import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesorderheader.SalesorderheaderRow
 import adventureworks.sales.specialoffer.SpecialofferId
 import adventureworks.sales.specialofferproduct.SpecialofferproductFields
+import adventureworks.sales.specialofferproduct.SpecialofferproductId
 import adventureworks.sales.specialofferproduct.SpecialofferproductRow
 import typo.dsl.ForeignKey
 import typo.dsl.Path
@@ -51,6 +52,11 @@ trait SalesorderdetailFields {
     salesorderid.isEqual(compositeId.salesorderid).and(salesorderdetailid.isEqual(compositeId.salesorderdetailid))
   def compositeIdIn(compositeIds: Array[SalesorderdetailId]): SqlExpr[Boolean, Required] =
     new CompositeIn(compositeIds)(TuplePart(salesorderid)(_.salesorderid), TuplePart(salesorderdetailid)(_.salesorderdetailid))
+  
+  def extractSpecialofferproductIdIs(id: SpecialofferproductId): SqlExpr[Boolean, Required] =
+    specialofferid.isEqual(id.specialofferid).and(productid.isEqual(id.productid))
+  def extractSpecialofferproductIdIn(ids: Array[SpecialofferproductId]): SqlExpr[Boolean, Required] =
+    new CompositeIn(ids)(TuplePart(specialofferid)(_.specialofferid), TuplePart(productid)(_.productid))
   
 }
 

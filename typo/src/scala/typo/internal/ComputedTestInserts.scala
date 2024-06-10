@@ -98,6 +98,9 @@ object ComputedTestInserts {
       sc.Type.Qualified(options.pkg / sc.Ident(s"${Naming.titleCase(projectName)}TestInsert")),
       computedTables.collect {
         case table if !options.readonlyRepo.include(table.dbTable.name) =>
+          val hasConstraints: Set[db.ColName] =
+            table.dbTable.cols.iterator.flatMap(_.constraints.flatMap(_.columns)).toSet
+
           FkAnalysis(tablesByName, table).createWithFkIdsUnsavedRowOrRow match {
             case Some(colsFromFks) =>
               val valuesFromFk: List[(sc.Ident, sc.Code)] =
@@ -121,7 +124,9 @@ object ComputedTestInserts {
                 }
               val (requiredParams, optionalParams) = colsFromFks.remainingColumns
                 .map { col =>
-                  val default = defaultFor(table, col.tpe, col.dbCol.tpe)
+                  val default = if (hasConstraints(col.dbName) && !col.dbCol.isDefaulted) {
+                    if (col.dbCol.nullability == Nullability.NoNulls) None else Some(TypesScala.None.code)
+                  } else defaultFor(table, col.tpe, col.dbCol.tpe)
                   sc.Param(col.name, col.tpe, default)
                 }
                 .partition(_.default.isEmpty)
@@ -134,7 +139,9 @@ object ComputedTestInserts {
                 }
               val params: List[sc.Param] = {
                 val asParams = cols.map { col =>
-                  val default = defaultFor(table, col.tpe, col.dbCol.tpe)
+                  val default = if (hasConstraints(col.dbName) && !col.dbCol.isDefaulted) {
+                    if (col.dbCol.nullability == Nullability.NoNulls) None else Some(TypesScala.None.code)
+                  } else defaultFor(table, col.tpe, col.dbCol.tpe)
                   sc.Param(col.name, col.tpe, default)
                 }
                 val (requiredParams, optionalParams) = asParams.partition(_.default.isEmpty)

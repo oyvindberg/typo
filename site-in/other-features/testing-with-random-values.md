@@ -28,7 +28,7 @@ c.setAutoCommit(false)
 ```
 
 ```scala mdoc
-import adventureworks.customtypes.{Defaulted, TypoXml}
+import adventureworks.customtypes.{Defaulted, TypoShort, TypoLocalDateTime, TypoXml}
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.TestInsert
 
@@ -41,6 +41,12 @@ val productCategory = testInsert.productionProductcategory()
 val productSubcategory = testInsert.productionProductsubcategory(productCategory.productcategoryid)
 val productModel = testInsert.productionProductmodel(catalogdescription = Some(new TypoXml("<xml/>")), instructions = Some(new TypoXml("<instructions/>")))
 testInsert.productionProduct(
+  safetystocklevel = TypoShort(1),
+  reorderpoint = TypoShort(1),
+  standardcost = BigDecimal(1),
+  listprice = BigDecimal(1),
+  daystomanufacture = 10,
+  sellstartdate = TypoLocalDateTime.now,
   sizeunitmeasurecode = Some(unitmeasure.unitmeasurecode),
   weightunitmeasurecode = Some(unitmeasure.unitmeasurecode),
   `class` = Some("H "),
