@@ -139,7 +139,7 @@ object generate {
 
         val allFiles: Iterator[sc.File] = {
           val knownNamesByPkg: Map[sc.QIdent, Map[sc.Ident, sc.Type.Qualified]] =
-            keptMostFiles.groupBy(_.pkg).map { case (pkg, files) =>
+            (keptMostFiles ++ testInsertsDataFiles).groupBy(_.pkg).map { case (pkg, files) =>
               (pkg, files.flatMap(f => (f.name, f.tpe) :: f.secondaryTypes.map(tpe => (tpe.value.name, tpe))).toMap)
             }
 
@@ -176,7 +176,7 @@ object generate {
   }
 
   // projects in graph will have duplicated files, this will pull the files up until they are no longer duplicated
-  def deduplicate[S](graph: ProjectGraph[Files, S]) = {
+  def deduplicate[S](graph: ProjectGraph[Files, S]): ProjectGraph[Files, S] = {
     def go(current: ProjectGraph[Files, S]): (Files, ProjectGraph[Files, S]) = {
       // start at leaves, so we can pull up files from the bottom up
       val (downstreamAccFiles: List[Files], rewrittenDownstream: List[ProjectGraph[Files, S]]) =

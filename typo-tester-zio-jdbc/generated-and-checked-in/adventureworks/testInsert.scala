@@ -5,7 +5,6 @@
  */
 package adventureworks
 
-import adventureworks.TestDomainInsert
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBox
 import adventureworks.customtypes.TypoBytea
