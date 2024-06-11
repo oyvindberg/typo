@@ -873,7 +873,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                             shiptoaddressid: AddressId,
                             shipmethodid: ShipmethodId,
                             shipdate: Option[TypoLocalDateTime] = None,
-                            purchaseordernumber: Option[OrderNumber] = None,
+                            purchaseordernumber: Option[OrderNumber] = if (random.nextBoolean()) None else Some(domainInsert.publicOrderNumber(random)),
                             accountnumber: Option[AccountNumber] = if (random.nextBoolean()) None else Some(domainInsert.publicAccountNumber(random)),
                             salespersonid: Option[BusinessentityId] = None,
                             territoryid: Option[SalesterritoryId] = None,

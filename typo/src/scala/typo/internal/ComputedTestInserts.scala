@@ -196,15 +196,15 @@ object ComputedTestInserts {
 
   object GenerateDomainMethod {
     def of(domains: List[ComputedDomain], computedTables: Iterable[ComputedTable]): Option[NonEmptyList[GenerateDomainMethod]] = {
-      val computedDomainByType: Map[sc.Type, ComputedDomain] =
-        domains.iterator.map(x => x.tpe -> x).toMap
+      val computedDomainByType: Map[db.RelationName, ComputedDomain] =
+        domains.iterator.map(x => x.underlying.name -> x).toMap
 
       val all = for {
         table <- computedTables
         col <- table.cols.toList
         domain <- col.dbCol.tpe match {
-          case Type.DomainRef(_, _, _) => computedDomainByType.get(col.tpe)
-          case _                       => None
+          case Type.DomainRef(name, _, _) => computedDomainByType.get(name)
+          case _                          => None
         }
       } yield GenerateDomainMethod(domain)
 

@@ -10,6 +10,7 @@ import adventureworks.public.Flag
 import adventureworks.public.Mydomain
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
+import adventureworks.public.OrderNumber
 import adventureworks.public.Phone
 import adventureworks.public.ShortText
 import scala.util.Random
@@ -35,6 +36,10 @@ trait TestDomainInsert {
     * No constraint
     */
   def publicNameStyle(random: Random): NameStyle
+  /** Domain `public.OrderNumber`
+    * No constraint
+    */
+  def publicOrderNumber(random: Random): OrderNumber
   /** Domain `public.Phone`
     * No constraint
     */
