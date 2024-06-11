@@ -131,7 +131,7 @@ object generate {
               val keptTables =
                 computedRelations.collect { case x: ComputedTable if options.enableTestInserts.include(x.dbTable.name) && keptTypes(x.names.RepoImplName) => x }
               if (keptTables.nonEmpty) {
-                val computed = ComputedTestInserts(project.name, options, customTypes, domains, enums, keptTables)
+                val computed = ComputedTestInserts(project.name, options, customTypes, domains, enums, computedRelationsByName, keptTables)
                 FileTestInserts(computed, dbLib)
               } else Nil
             case _ => Nil

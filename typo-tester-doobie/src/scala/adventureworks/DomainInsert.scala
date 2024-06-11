@@ -12,4 +12,5 @@ object DomainInsert extends TestDomainInsert {
   override def publicNameStyle(random: Random): NameStyle = NameStyle(random.nextBoolean())
   override def publicPhone(random: Random): Phone = Phone(random.nextString(10))
   override def publicShortText(random: Random): ShortText = ShortText(random.nextString(10))
+  override def publicOrderNumber(random: Random): OrderNumber = OrderNumber(random.nextString(10))
 }

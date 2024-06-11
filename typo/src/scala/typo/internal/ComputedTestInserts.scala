@@ -10,15 +10,23 @@ object ComputedTestInserts {
   val random: sc.Ident = sc.Ident("random")
   val domainInsert: sc.Ident = sc.Ident("domainInsert")
 
-  def apply(projectName: String, options: InternalOptions, customTypes: CustomTypes, domains: List[ComputedDomain], enums: List[ComputedStringEnum], computedTables: Iterable[ComputedTable]) = {
-    val tablesByName: Map[db.RelationName, ComputedTable] =
-      computedTables.iterator.map(x => x.dbTable.name -> x).toMap
+  def apply(
+      projectName: String,
+      options: InternalOptions,
+      // global data
+      customTypes: CustomTypes,
+      domains: List[ComputedDomain],
+      enums: List[ComputedStringEnum],
+      allTablesByName: Map[db.RelationName, ComputedTable],
+      // project data
+      tables: Iterable[ComputedTable]
+  ): ComputedTestInserts = {
     val enumsByName: Map[sc.Type, ComputedStringEnum] =
       enums.iterator.map(x => x.tpe -> x).toMap
 
     val maybeDomainMethods: Option[GenerateDomainMethods] =
       GenerateDomainMethod
-        .of(domains, computedTables)
+        .of(domains, tables)
         .map { methods =>
           val tpe = sc.Type.Qualified(options.pkg / sc.Ident(s"${Naming.titleCase(projectName)}TestDomainInsert"))
           GenerateDomainMethods(tpe, methods)
@@ -106,12 +114,12 @@ object ComputedTestInserts {
 
     new ComputedTestInserts(
       sc.Type.Qualified(options.pkg / sc.Ident(s"${Naming.titleCase(projectName)}TestInsert")),
-      computedTables.collect {
+      tables.collect {
         case table if !options.readonlyRepo.include(table.dbTable.name) =>
           val hasConstraints: Set[db.ColName] =
             table.dbTable.cols.iterator.flatMap(_.constraints.flatMap(_.columns)).toSet
 
-          FkAnalysis(tablesByName, table).createWithFkIdsUnsavedRowOrRow match {
+          FkAnalysis(allTablesByName, table).createWithFkIdsUnsavedRowOrRow match {
             case Some(colsFromFks) =>
               val valuesFromFk: List[(sc.Ident, sc.Code)] =
                 colsFromFks.allColumns.toList.map { col =>
