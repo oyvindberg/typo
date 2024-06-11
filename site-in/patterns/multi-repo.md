@@ -126,7 +126,7 @@ Note that we can easily create a deep dependency graph with random data due to [
 import adventureworks.{TestInsert, TestDomainInsert, withConnection}
 import adventureworks.userdefined.FirstName
 import scala.util.Random
-import adventureworks.public.{AccountNumber, Flag, Mydomain, Name, NameStyle, Phone, ShortText}
+import adventureworks.public.*
 
 import scala.util.Random
 
@@ -138,6 +138,7 @@ object DomainInsert extends TestDomainInsert {
   override def publicNameStyle(random: Random): NameStyle = NameStyle(random.nextBoolean())
   override def publicPhone(random: Random): Phone = Phone(random.nextString(10))
   override def publicShortText(random: Random): ShortText = ShortText(random.nextString(10))
+  override def publicOrderNumber(random: Random): OrderNumber = OrderNumber(random.nextString(10))
 }
 
 // set a fixed seed to get consistent values
