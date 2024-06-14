@@ -54,7 +54,7 @@ object generate {
     val scalaTypeMapper = TypeMapperScala(options.typeOverride, publicOptions.nullabilityOverride, naming, customTypes)
     val enums = metaDb.enums.map(ComputedStringEnum(naming))
     val domains = metaDb.domains.map(ComputedDomain(naming, scalaTypeMapper))
-
+    val domainsByName = domains.map(d => (d.underlying.name, d)).toMap
     val projectsWithFiles: ProjectGraph[Files, List[sc.File]] =
       graph.valueFromProject { project =>
         val isRoot = graph == project
@@ -97,7 +97,7 @@ object generate {
           case viewComputed: ComputedView => FilesView(viewComputed, options).all.map(x => (viewComputed.view.name, x))
           case tableComputed: ComputedTable =>
             val fkAnalysis = FkAnalysis(computedRelationsByName, tableComputed)
-            FilesTable(tableComputed, fkAnalysis, options, genOrdering).all.map(x => (tableComputed.dbTable.name, x))
+            FilesTable(tableComputed, fkAnalysis, options, genOrdering, domainsByName).all.map(x => (tableComputed.dbTable.name, x))
           case _ => Nil
         }
 

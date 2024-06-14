@@ -13,6 +13,7 @@ object sc {
   sealed trait Tree
 
   case class Ident(value: String) extends Tree {
+    def map(f: String => String): Ident = Ident(f(value))
     def appended(suffix: String) = new Ident(value + suffix)
     def prepended(prefix: String) = new Ident(prefix + value)
   }
