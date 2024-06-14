@@ -11,9 +11,7 @@ sealed trait SelectBuilderSql[Fields, Row] extends SelectBuilder[Fields, Row] {
   override lazy val renderCtx: RenderCtx = RenderCtx.from(this)
   override def sql: Option[SqlFragment] = Some(sqlFor(renderCtx).sql)
 
-  final override def joinOn[Fields2, N[_]: Nullability, Row2](
-      other: SelectBuilder[Fields2, Row2]
-  )(pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)] =
+  final override def joinOn[Fields2, N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(pred: Fields ~ Fields2 => SqlExpr[Boolean, N]): SelectBuilder[Fields ~ Fields2, Row ~ Row2] =
     other match {
       case otherSql: SelectBuilderSql[Fields2, Row2] =>
         new SelectBuilderSql.TableJoin[Fields, Fields2, N, Row, Row2](this.withPath(Path.LeftInJoin), otherSql.withPath(Path.RightInJoin), pred, SelectParams.empty)
@@ -22,7 +20,7 @@ sealed trait SelectBuilderSql[Fields, Row] extends SelectBuilder[Fields, Row] {
 
   final override def leftJoinOn[Fields2, N[_]: Nullability, Row2](
       other: SelectBuilder[Fields2, Row2]
-  )(pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]): SelectBuilder[LeftJoined[Fields, Fields2], (Row, Option[Row2])] =
+  )(pred: Fields ~ Fields2 => SqlExpr[Boolean, N]): SelectBuilder[Fields ~ OuterJoined[Fields2], Row ~ Option[Row2]] =
     other match {
       case otherSql: SelectBuilderSql[Fields2, Row2] =>
         SelectBuilderSql.TableLeftJoin(this.withPath(Path.LeftInJoin), otherSql.withPath(Path.RightInJoin), pred, SelectParams.empty)
@@ -80,19 +78,19 @@ object SelectBuilderSql {
   final case class TableJoin[Fields1, Fields2, N[_]: Nullability, Row1, Row2](
       left: SelectBuilderSql[Fields1, Row1],
       right: SelectBuilderSql[Fields2, Row2],
-      pred: Joined[Fields1, Fields2] => SqlExpr[Boolean, N],
-      params: SelectParams[Joined[Fields1, Fields2], (Row1, Row2)]
-  ) extends SelectBuilderSql[Joined[Fields1, Fields2], (Row1, Row2)] {
-    override lazy val structure: Structure[(Fields1, Fields2), (Row1, Row2)] =
+      pred: Fields1 ~ Fields2 => SqlExpr[Boolean, N],
+      params: SelectParams[Fields1 ~ Fields2, Row1 ~ Row2]
+  ) extends SelectBuilderSql[Fields1 ~ Fields2, Row1 ~ Row2] {
+    override lazy val structure: Structure[(Fields1, Fields2), Row1 ~ Row2] =
       left.structure.join(right.structure)
 
-    override def withPath(path: Path): SelectBuilderSql[Joined[Fields1, Fields2], (Row1, Row2)] =
+    override def withPath(path: Path): SelectBuilderSql[Fields1 ~ Fields2, Row1 ~ Row2] =
       copy(left = left.withPath(path), right = right.withPath(path))
 
-    override def withParams(sqlParams: SelectParams[Joined[Fields1, Fields2], (Row1, Row2)]): SelectBuilder[Joined[Fields1, Fields2], (Row1, Row2)] =
+    override def withParams(sqlParams: SelectParams[Fields1 ~ Fields2, Row1 ~ Row2]): SelectBuilder[Fields1 ~ Fields2, Row1 ~ Row2] =
       copy(params = sqlParams)
 
-    override def instantiate(ctx: RenderCtx): Instantiated[Joined[Fields1, Fields2], (Row1, Row2)] = {
+    override def instantiate(ctx: RenderCtx): Instantiated[Fields1 ~ Fields2, Row1 ~ Row2] = {
       val leftInstantiated: Instantiated[Fields1, Row1] = left.instantiate(ctx)
       val rightInstantiated: Instantiated[Fields2, Row2] = right.instantiate(ctx)
 
@@ -111,7 +109,7 @@ object SelectBuilderSql {
         decoder = JdbcDecoder.tuple2Decoder(leftInstantiated.decoder, rightInstantiated.decoder)
       )
     }
-    override def sqlFor(ctx: RenderCtx): Query[(Row1, Row2)] = {
+    override def sqlFor(ctx: RenderCtx): Query[Row1 ~ Row2] = {
       val instance = instantiate(ctx)
       val combinedFrag = {
         val size = instance.parts.size
@@ -137,7 +135,7 @@ object SelectBuilderSql {
           prelude ++ joins.reduce(_ ++ _)
         }
       }
-      val newCombinedFrag = SelectParams.render[Joined[Fields1, Fields2], (Row1, Row2)](instance.structure.fields, combinedFrag, ctx, params)
+      val newCombinedFrag = SelectParams.render[Fields1 ~ Fields2, Row1 ~ Row2](instance.structure.fields, combinedFrag, ctx, params)
 
       newCombinedFrag.query(using instance.decoder)
     }
@@ -146,21 +144,21 @@ object SelectBuilderSql {
   final case class TableLeftJoin[Fields1, Fields2, N[_]: Nullability, Row1, Row2](
       left: SelectBuilderSql[Fields1, Row1],
       right: SelectBuilderSql[Fields2, Row2],
-      pred: Joined[Fields1, Fields2] => SqlExpr[Boolean, N],
-      params: SelectParams[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])]
-  ) extends SelectBuilderSql[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])] {
-    override lazy val structure: Structure[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])] =
+      pred: Fields1 ~ Fields2 => SqlExpr[Boolean, N],
+      params: SelectParams[Fields1 ~ OuterJoined[Fields2], Row1 ~ Option[Row2]]
+  ) extends SelectBuilderSql[Fields1 ~ OuterJoined[Fields2], Row1 ~ Option[Row2]] {
+    override lazy val structure: Structure[Fields1 ~ OuterJoined[Fields2], Row1 ~ Option[Row2]] =
       left.structure.leftJoin(right.structure)
 
-    override def withPath(path: Path): SelectBuilderSql[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])] =
+    override def withPath(path: Path): SelectBuilderSql[Fields1 ~ OuterJoined[Fields2], Row1 ~ Option[Row2]] =
       copy(left = left.withPath(path), right = right.withPath(path))
 
     override def withParams(
-        sqlParams: SelectParams[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])]
-    ): SelectBuilder[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])] =
+        sqlParams: SelectParams[Fields1 ~ OuterJoined[Fields2], Row1 ~ Option[Row2]]
+    ): SelectBuilder[Fields1 ~ OuterJoined[Fields2], Row1 ~ Option[Row2]] =
       copy(params = sqlParams)
 
-    override def instantiate(ctx: RenderCtx): Instantiated[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])] = {
+    override def instantiate(ctx: RenderCtx): Instantiated[Fields1 ~ OuterJoined[Fields2], Row1 ~ Option[Row2]] = {
       val leftInstantiated = left.instantiate(ctx)
       val rightInstantiated = right.instantiate(ctx)
 
@@ -180,7 +178,7 @@ object SelectBuilderSql {
       )
     }
 
-    override def sqlFor(ctx: RenderCtx): Query[(Row1, Option[Row2])] = {
+    override def sqlFor(ctx: RenderCtx): Query[Row1 ~ Option[Row2]] = {
       val instance = instantiate(ctx)
       val combinedFrag = {
         val size = instance.parts.size
@@ -206,7 +204,7 @@ object SelectBuilderSql {
         }
       }
       val newCombinedFrag =
-        SelectParams.render[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])](instance.structure.fields, combinedFrag, ctx, params)
+        SelectParams.render[Fields1 ~ OuterJoined[Fields2], Row1 ~ Option[Row2]](instance.structure.fields, combinedFrag, ctx, params)
 
       newCombinedFrag.query(using instance.decoder)
     }

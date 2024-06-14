@@ -68,7 +68,7 @@ trait SelectBuilder[Fields, Row] {
   /** Return sql for debugging. [[None]] if backed by a mock repository */
   def sql: Option[Fragment]
 
-  final def joinFk[Fields2, Row2](f: Fields => ForeignKey[Fields2, Row2])(other: SelectBuilder[Fields2, Row2]): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)] =
+  final def joinFk[Fields2, Row2](f: Fields => ForeignKey[Fields2, Row2])(other: SelectBuilder[Fields2, Row2]): SelectBuilder[Fields ~ Fields2, Row ~ Row2] =
     joinOn[Fields2, Option, Row2](other) { case (thisFields, thatFields) =>
       val fk: ForeignKey[Fields2, Row2] = f(thisFields)
 
@@ -87,7 +87,7 @@ trait SelectBuilder[Fields, Row] {
     new PartialJoin[F2, Row2](other)
 
   final class PartialJoin[Fields2, Row2](other: SelectBuilder[Fields2, Row2]) {
-    def onFk(f: Fields => ForeignKey[Fields2, Row2]): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)] =
+    def onFk(f: Fields => ForeignKey[Fields2, Row2]): SelectBuilder[Fields ~ Fields2, Row ~ Row2] =
       joinFk(f)(other)
 
     /** inner join with the given predicate
@@ -97,11 +97,11 @@ trait SelectBuilder[Fields, Row] {
       *   .on { case (p, um) => p.sizeunitmeasurecode === um.unitmeasurecode }
       * }}}
       */
-    def on[N[_]: Nullability](pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)] =
+    def on[N[_]: Nullability](pred: Fields ~ Fields2 => SqlExpr[Boolean, N]): SelectBuilder[Fields ~ Fields2, Row ~ Row2] =
       joinOn(other)(pred)
 
     /** Variant of `on` that requires the join predicate to not be nullable */
-    def onStrict(pred: Joined[Fields, Fields2] => SqlExpr[Boolean, Required]): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)] =
+    def onStrict(pred: Fields ~ Fields2 => SqlExpr[Boolean, Required]): SelectBuilder[Fields ~ Fields2, Row ~ Row2] =
       joinOn(other)(pred)
 
     /** left join with the given predicate
@@ -111,11 +111,11 @@ trait SelectBuilder[Fields, Row] {
       * .leftOn { case (p, pm) => p.productmodelid === pm.productmodelid }
       * }}}
       */
-    def leftOn[N[_]: Nullability](pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]): SelectBuilder[LeftJoined[Fields, Fields2], (Row, Option[Row2])] =
+    def leftOn[N[_]: Nullability](pred: Fields ~ Fields2 => SqlExpr[Boolean, N]): SelectBuilder[Fields ~ OuterJoined[Fields2], Row ~ Option[Row2]] =
       leftJoinOn(other)(pred)
 
     /** Variant of `leftOn` that requires the join predicate to not be nullable */
-    def leftOnStrict(pred: Joined[Fields, Fields2] => SqlExpr[Boolean, Required]): SelectBuilder[LeftJoined[Fields, Fields2], (Row, Option[Row2])] =
+    def leftOnStrict(pred: Fields ~ Fields2 => SqlExpr[Boolean, Required]): SelectBuilder[Fields ~ OuterJoined[Fields2], Row ~ Option[Row2]] =
       leftJoinOn(other)(pred)
   }
 
@@ -123,11 +123,7 @@ trait SelectBuilder[Fields, Row] {
 
   protected def withParams(sqlParams: SelectParams[Fields, Row]): SelectBuilder[Fields, Row]
 
-  def joinOn[Fields2, N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(
-      pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]
-  ): SelectBuilder[Joined[Fields, Fields2], (Row, Row2)]
+  def joinOn[Fields2, N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(pred: Fields ~ Fields2 => SqlExpr[Boolean, N]): SelectBuilder[Fields ~ Fields2, Row ~ Row2]
 
-  def leftJoinOn[Fields2, N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(
-      pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]
-  ): SelectBuilder[LeftJoined[Fields, Fields2], (Row, Option[Row2])]
+  def leftJoinOn[Fields2, N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(pred: Fields ~ Fields2 => SqlExpr[Boolean, N]): SelectBuilder[Fields ~ OuterJoined[Fields2], Row ~ Option[Row2]]
 }

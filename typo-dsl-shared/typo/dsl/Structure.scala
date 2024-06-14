@@ -63,10 +63,10 @@ trait Structure[Fields, Row] {
         }
     }
 
-  final def join[Fields2, Row2](other: Structure[Fields2, Row2]): Structure[Joined[Fields, Fields2], (Row, Row2)] =
+  final def join[Fields2, Row2](other: Structure[Fields2, Row2]): Structure[Fields ~ Fields2, Row ~ Row2] =
     new Structure.Tupled(left = this, right = other)
 
-  final def leftJoin[Fields2, Row2](other: Structure[Fields2, Row2]): Structure[LeftJoined[Fields, Fields2], (Row, Option[Row2])] =
+  final def leftJoin[Fields2, Row2](other: Structure[Fields2, Row2]): Structure[Fields ~ OuterJoined[Fields2], Row ~ Option[Row2]] =
     new Structure.LeftTupled(left = this, right = other)
 }
 
@@ -88,14 +88,14 @@ object Structure {
       field.castRow[Row].get(row)
   }
 
-  private class Tupled[Fields1, Fields2, Row1, Row2](val left: Structure[Fields1, Row1], val right: Structure[Fields2, Row2]) extends Structure[Joined[Fields1, Fields2], (Row1, Row2)] {
-    override val fields: Joined[Fields1, Fields2] =
+  private class Tupled[Fields1, Fields2, Row1, Row2](val left: Structure[Fields1, Row1], val right: Structure[Fields2, Row2]) extends Structure[Fields1 ~ Fields2, Row1 ~ Row2] {
+    override val fields: Fields1 ~ Fields2 =
       (left.fields, right.fields)
 
     override val columns: List[SqlExpr.FieldLikeNoHkt[?, ?]] =
       left.columns ++ right.columns
 
-    override def untypedGet[T, N[_]](field: SqlExpr.FieldLike[T, N, ?], row: (Row1, Row2)): N[T] =
+    override def untypedGet[T, N[_]](field: SqlExpr.FieldLike[T, N, ?], row: Row1 ~ Row2): N[T] =
       if (left.columns.contains(field)) left.untypedGet(field.castRow, row._1)
       else right.untypedGet(field.castRow, row._2)
 
@@ -104,15 +104,15 @@ object Structure {
   }
 
   private class LeftTupled[Fields1, Fields2, Row1, Row2](val left: Structure[Fields1, Row1], val right: Structure[Fields2, Row2])
-      extends Structure[LeftJoined[Fields1, Fields2], (Row1, Option[Row2])] {
+      extends Structure[Fields1 ~ OuterJoined[Fields2], Row1 ~ Option[Row2]] {
 
-    override val fields: LeftJoined[Fields1, Fields2] =
+    override val fields: Fields1 ~ OuterJoined[Fields2] =
       (left.fields, new OuterJoined(right.fields))
 
     override val columns: List[SqlExpr.FieldLikeNoHkt[?, ?]] =
       left.columns ++ right.columns
 
-    override def untypedGet[T, N[_]](field: SqlExpr.FieldLike[T, N, ?], row: (Row1, Option[Row2])): N[T] =
+    override def untypedGet[T, N[_]](field: SqlExpr.FieldLike[T, N, ?], row: Row1 ~ Option[Row2]): N[T] =
       if (left.columns.contains(field)) left.untypedGet(field, row._1)
       else {
         val option: Option[N[T]] = row._2.map(v => right.untypedGet(field, v))

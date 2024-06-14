@@ -20,9 +20,7 @@ final case class SelectBuilderMock[Fields, Row](
   override def toList(implicit c: Connection): List[Row] =
     SelectBuilderMock.applyParams(structure, all(), params)
 
-  override def joinOn[Fields2, N[_]: Nullability, Row2](
-      other: SelectBuilder[Fields2, Row2]
-  )(pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]): SelectBuilderMock[Joined[Fields, Fields2], (Row, Row2)] = {
+  override def joinOn[Fields2, N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(pred: (Fields ~ Fields2) => SqlExpr[Boolean, N]): SelectBuilderMock[Fields ~ Fields2, Row ~ Row2] = {
     val otherMock: SelectBuilderMock[Fields2, Row2] = other match {
       case x: SelectBuilderMock[Fields2, Row2] => x.withPath(Path.RightInJoin)
       case _                                   => sys.error("you cannot mix mock and sql repos")
@@ -31,7 +29,7 @@ final case class SelectBuilderMock[Fields, Row](
     val self = this.withPath(Path.LeftInJoin)
     val newStructure = self.structure.join(otherMock.structure)
 
-    val newRows: () => List[(Row, Row2)] = () =>
+    val newRows: () => List[Row ~ Row2] = () =>
       for {
         left <- self.toList(null)
         right <- otherMock.toList(null)
@@ -39,18 +37,18 @@ final case class SelectBuilderMock[Fields, Row](
         if Nullability[N].toOpt(newStructure.untypedEval(pred(newStructure.fields), newRow)).getOrElse(false)
       } yield newRow
 
-    SelectBuilderMock[Joined[Fields, Fields2], (Row, Row2)](newStructure, newRows, SelectParams.empty)
+    SelectBuilderMock[Fields ~ Fields2, Row ~ Row2](newStructure, newRows, SelectParams.empty)
   }
   override def leftJoinOn[Fields2, N[_]: Nullability, Row2](
       other: SelectBuilder[Fields2, Row2]
-  )(pred: Joined[Fields, Fields2] => SqlExpr[Boolean, N]): SelectBuilder[LeftJoined[Fields, Fields2], (Row, Option[Row2])] = {
+  )(pred: Fields ~ Fields2 => SqlExpr[Boolean, N]): SelectBuilder[Fields ~ OuterJoined[Fields2], Row ~ Option[Row2]] = {
     val otherMock: SelectBuilderMock[Fields2, Row2] = other match {
       case x: SelectBuilderMock[Fields2, Row2] => x.withPath(Path.RightInJoin)
       case _                                   => sys.error("you cannot mix mock and sql repos")
     }
     val self = this.withPath(Path.LeftInJoin)
 
-    val newRows: () => List[(Row, Option[Row2])] = () => {
+    val newRows: () => List[Row ~ Option[Row2]] = () => {
       val rights = otherMock.toList(null)
       self.toList(null).map { left =>
         val maybeRight = rights.find { right =>
@@ -60,7 +58,7 @@ final case class SelectBuilderMock[Fields, Row](
         (left, maybeRight)
       }
     }
-    SelectBuilderMock[LeftJoined[Fields, Fields2], (Row, Option[Row2])](self.structure.leftJoin(otherMock.structure), newRows, SelectParams.empty)
+    SelectBuilderMock[Fields ~ OuterJoined[Fields2], Row ~ Option[Row2]](self.structure.leftJoin(otherMock.structure), newRows, SelectParams.empty)
   }
 
   override def sql: Option[Fragment] = None
