@@ -13,10 +13,10 @@ import typo.dsl.SqlExpr.OptField
 import typo.dsl.Structure.Relation
 
 trait VsalespersonsalesbyfiscalyearsViewFields {
-  def SalesPersonID: OptField[Int, VsalespersonsalesbyfiscalyearsViewRow]
-  def FullName: OptField[String, VsalespersonsalesbyfiscalyearsViewRow]
-  def JobTitle: OptField[String, VsalespersonsalesbyfiscalyearsViewRow]
-  def SalesTerritory: OptField[String, VsalespersonsalesbyfiscalyearsViewRow]
+  def salesPersonID: OptField[Int, VsalespersonsalesbyfiscalyearsViewRow]
+  def fullName: OptField[String, VsalespersonsalesbyfiscalyearsViewRow]
+  def jobTitle: OptField[String, VsalespersonsalesbyfiscalyearsViewRow]
+  def salesTerritory: OptField[String, VsalespersonsalesbyfiscalyearsViewRow]
   def `2012`: OptField[BigDecimal, VsalespersonsalesbyfiscalyearsViewRow]
   def `2013`: OptField[BigDecimal, VsalespersonsalesbyfiscalyearsViewRow]
   def `2014`: OptField[BigDecimal, VsalespersonsalesbyfiscalyearsViewRow]
@@ -30,17 +30,17 @@ object VsalespersonsalesbyfiscalyearsViewFields {
     extends Relation[VsalespersonsalesbyfiscalyearsViewFields, VsalespersonsalesbyfiscalyearsViewRow] {
   
     override lazy val fields: VsalespersonsalesbyfiscalyearsViewFields = new VsalespersonsalesbyfiscalyearsViewFields {
-      override def SalesPersonID = OptField[Int, VsalespersonsalesbyfiscalyearsViewRow](_path, "SalesPersonID", None, None, x => x.SalesPersonID, (row, value) => row.copy(SalesPersonID = value))
-      override def FullName = OptField[String, VsalespersonsalesbyfiscalyearsViewRow](_path, "FullName", None, None, x => x.FullName, (row, value) => row.copy(FullName = value))
-      override def JobTitle = OptField[String, VsalespersonsalesbyfiscalyearsViewRow](_path, "JobTitle", None, None, x => x.JobTitle, (row, value) => row.copy(JobTitle = value))
-      override def SalesTerritory = OptField[String, VsalespersonsalesbyfiscalyearsViewRow](_path, "SalesTerritory", None, None, x => x.SalesTerritory, (row, value) => row.copy(SalesTerritory = value))
+      override def salesPersonID = OptField[Int, VsalespersonsalesbyfiscalyearsViewRow](_path, "SalesPersonID", None, None, x => x.salesPersonID, (row, value) => row.copy(salesPersonID = value))
+      override def fullName = OptField[String, VsalespersonsalesbyfiscalyearsViewRow](_path, "FullName", None, None, x => x.fullName, (row, value) => row.copy(fullName = value))
+      override def jobTitle = OptField[String, VsalespersonsalesbyfiscalyearsViewRow](_path, "JobTitle", None, None, x => x.jobTitle, (row, value) => row.copy(jobTitle = value))
+      override def salesTerritory = OptField[String, VsalespersonsalesbyfiscalyearsViewRow](_path, "SalesTerritory", None, None, x => x.salesTerritory, (row, value) => row.copy(salesTerritory = value))
       override def `2012` = OptField[BigDecimal, VsalespersonsalesbyfiscalyearsViewRow](_path, "2012", None, None, x => x.`2012`, (row, value) => row.copy(`2012` = value))
       override def `2013` = OptField[BigDecimal, VsalespersonsalesbyfiscalyearsViewRow](_path, "2013", None, None, x => x.`2013`, (row, value) => row.copy(`2013` = value))
       override def `2014` = OptField[BigDecimal, VsalespersonsalesbyfiscalyearsViewRow](_path, "2014", None, None, x => x.`2014`, (row, value) => row.copy(`2014` = value))
     }
   
     override lazy val columns: List[FieldLikeNoHkt[?, VsalespersonsalesbyfiscalyearsViewRow]] =
-      List[FieldLikeNoHkt[?, VsalespersonsalesbyfiscalyearsViewRow]](fields.SalesPersonID, fields.FullName, fields.JobTitle, fields.SalesTerritory, fields.`2012`, fields.`2013`, fields.`2014`)
+      List[FieldLikeNoHkt[?, VsalespersonsalesbyfiscalyearsViewRow]](fields.salesPersonID, fields.fullName, fields.jobTitle, fields.salesTerritory, fields.`2012`, fields.`2013`, fields.`2014`)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

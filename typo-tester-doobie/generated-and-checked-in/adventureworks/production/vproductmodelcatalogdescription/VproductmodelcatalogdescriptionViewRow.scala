@@ -28,7 +28,7 @@ case class VproductmodelcatalogdescriptionViewRow(
   productmodelid: ProductmodelId,
   /** Points to [[productmodel.ProductmodelRow.name]] */
   name: Name,
-  Summary: /* nullability unknown */ Option[String],
+  summary: /* nullability unknown */ Option[String],
   manufacturer: /* nullability unknown */ Option[String],
   copyright: /* nullability unknown */ Option[/* max 30 chars */ String],
   producturl: /* nullability unknown */ Option[/* max 256 chars */ String],
@@ -65,7 +65,7 @@ object VproductmodelcatalogdescriptionViewRow {
       VproductmodelcatalogdescriptionViewRow(
         productmodelid = orThrow(c.get("productmodelid")(ProductmodelId.decoder)),
         name = orThrow(c.get("name")(Name.decoder)),
-        Summary = orThrow(c.get("Summary")(Decoder.decodeOption(Decoder.decodeString))),
+        summary = orThrow(c.get("Summary")(Decoder.decodeOption(Decoder.decodeString))),
         manufacturer = orThrow(c.get("manufacturer")(Decoder.decodeOption(Decoder.decodeString))),
         copyright = orThrow(c.get("copyright")(Decoder.decodeOption(Decoder.decodeString))),
         producturl = orThrow(c.get("producturl")(Decoder.decodeOption(Decoder.decodeString))),
@@ -95,7 +95,7 @@ object VproductmodelcatalogdescriptionViewRow {
     Json.obj(
       "productmodelid" -> ProductmodelId.encoder.apply(row.productmodelid),
       "name" -> Name.encoder.apply(row.name),
-      "Summary" -> Encoder.encodeOption(Encoder.encodeString).apply(row.Summary),
+      "Summary" -> Encoder.encodeOption(Encoder.encodeString).apply(row.summary),
       "manufacturer" -> Encoder.encodeOption(Encoder.encodeString).apply(row.manufacturer),
       "copyright" -> Encoder.encodeOption(Encoder.encodeString).apply(row.copyright),
       "producturl" -> Encoder.encodeOption(Encoder.encodeString).apply(row.producturl),
@@ -151,7 +151,7 @@ object VproductmodelcatalogdescriptionViewRow {
     unsafeGet = (rs: ResultSet, i: Int) => VproductmodelcatalogdescriptionViewRow(
       productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
       name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      Summary = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+      summary = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
       manufacturer = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
       copyright = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
       producturl = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),

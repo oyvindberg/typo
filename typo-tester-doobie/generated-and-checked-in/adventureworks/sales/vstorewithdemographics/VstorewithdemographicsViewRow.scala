@@ -23,21 +23,21 @@ case class VstorewithdemographicsViewRow(
   businessentityid: BusinessentityId,
   /** Points to [[store.StoreRow.name]] */
   name: Name,
-  AnnualSales: /* nullability unknown */ Option[TypoMoney],
-  AnnualRevenue: /* nullability unknown */ Option[TypoMoney],
-  BankName: /* nullability unknown */ Option[/* max 50 chars */ String],
-  BusinessType: /* nullability unknown */ Option[/* max 5 chars */ String],
-  YearOpened: /* nullability unknown */ Option[Int],
-  Specialty: /* nullability unknown */ Option[/* max 50 chars */ String],
-  SquareFeet: /* nullability unknown */ Option[Int],
-  Brands: /* nullability unknown */ Option[/* max 30 chars */ String],
-  Internet: /* nullability unknown */ Option[/* max 30 chars */ String],
-  NumberEmployees: /* nullability unknown */ Option[Int]
+  annualSales: /* nullability unknown */ Option[TypoMoney],
+  annualRevenue: /* nullability unknown */ Option[TypoMoney],
+  bankName: /* nullability unknown */ Option[/* max 50 chars */ String],
+  businessType: /* nullability unknown */ Option[/* max 5 chars */ String],
+  yearOpened: /* nullability unknown */ Option[Int],
+  specialty: /* nullability unknown */ Option[/* max 50 chars */ String],
+  squareFeet: /* nullability unknown */ Option[Int],
+  brands: /* nullability unknown */ Option[/* max 30 chars */ String],
+  internet: /* nullability unknown */ Option[/* max 30 chars */ String],
+  numberEmployees: /* nullability unknown */ Option[Int]
 )
 
 object VstorewithdemographicsViewRow {
   implicit lazy val decoder: Decoder[VstorewithdemographicsViewRow] = Decoder.forProduct12[VstorewithdemographicsViewRow, BusinessentityId, Name, /* nullability unknown */ Option[TypoMoney], /* nullability unknown */ Option[TypoMoney], /* nullability unknown */ Option[/* max 50 chars */ String], /* nullability unknown */ Option[/* max 5 chars */ String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[/* max 50 chars */ String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[Int]]("businessentityid", "name", "AnnualSales", "AnnualRevenue", "BankName", "BusinessType", "YearOpened", "Specialty", "SquareFeet", "Brands", "Internet", "NumberEmployees")(VstorewithdemographicsViewRow.apply)(BusinessentityId.decoder, Name.decoder, Decoder.decodeOption(TypoMoney.decoder), Decoder.decodeOption(TypoMoney.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt))
-  implicit lazy val encoder: Encoder[VstorewithdemographicsViewRow] = Encoder.forProduct12[VstorewithdemographicsViewRow, BusinessentityId, Name, /* nullability unknown */ Option[TypoMoney], /* nullability unknown */ Option[TypoMoney], /* nullability unknown */ Option[/* max 50 chars */ String], /* nullability unknown */ Option[/* max 5 chars */ String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[/* max 50 chars */ String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[Int]]("businessentityid", "name", "AnnualSales", "AnnualRevenue", "BankName", "BusinessType", "YearOpened", "Specialty", "SquareFeet", "Brands", "Internet", "NumberEmployees")(x => (x.businessentityid, x.name, x.AnnualSales, x.AnnualRevenue, x.BankName, x.BusinessType, x.YearOpened, x.Specialty, x.SquareFeet, x.Brands, x.Internet, x.NumberEmployees))(BusinessentityId.encoder, Name.encoder, Encoder.encodeOption(TypoMoney.encoder), Encoder.encodeOption(TypoMoney.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt))
+  implicit lazy val encoder: Encoder[VstorewithdemographicsViewRow] = Encoder.forProduct12[VstorewithdemographicsViewRow, BusinessentityId, Name, /* nullability unknown */ Option[TypoMoney], /* nullability unknown */ Option[TypoMoney], /* nullability unknown */ Option[/* max 50 chars */ String], /* nullability unknown */ Option[/* max 5 chars */ String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[/* max 50 chars */ String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[Int]]("businessentityid", "name", "AnnualSales", "AnnualRevenue", "BankName", "BusinessType", "YearOpened", "Specialty", "SquareFeet", "Brands", "Internet", "NumberEmployees")(x => (x.businessentityid, x.name, x.annualSales, x.annualRevenue, x.bankName, x.businessType, x.yearOpened, x.specialty, x.squareFeet, x.brands, x.internet, x.numberEmployees))(BusinessentityId.encoder, Name.encoder, Encoder.encodeOption(TypoMoney.encoder), Encoder.encodeOption(TypoMoney.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt))
   implicit lazy val read: Read[VstorewithdemographicsViewRow] = new Read[VstorewithdemographicsViewRow](
     gets = List(
       (BusinessentityId.get, Nullability.NoNulls),
@@ -56,16 +56,16 @@ object VstorewithdemographicsViewRow {
     unsafeGet = (rs: ResultSet, i: Int) => VstorewithdemographicsViewRow(
       businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
       name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      AnnualSales = TypoMoney.get.unsafeGetNullable(rs, i + 2),
-      AnnualRevenue = TypoMoney.get.unsafeGetNullable(rs, i + 3),
-      BankName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      BusinessType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
-      YearOpened = Meta.IntMeta.get.unsafeGetNullable(rs, i + 6),
-      Specialty = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
-      SquareFeet = Meta.IntMeta.get.unsafeGetNullable(rs, i + 8),
-      Brands = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
-      Internet = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
-      NumberEmployees = Meta.IntMeta.get.unsafeGetNullable(rs, i + 11)
+      annualSales = TypoMoney.get.unsafeGetNullable(rs, i + 2),
+      annualRevenue = TypoMoney.get.unsafeGetNullable(rs, i + 3),
+      bankName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+      businessType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
+      yearOpened = Meta.IntMeta.get.unsafeGetNullable(rs, i + 6),
+      specialty = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
+      squareFeet = Meta.IntMeta.get.unsafeGetNullable(rs, i + 8),
+      brands = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
+      internet = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
+      numberEmployees = Meta.IntMeta.get.unsafeGetNullable(rs, i + 11)
     )
   )
 }

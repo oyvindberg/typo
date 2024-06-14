@@ -29,7 +29,7 @@ case class VproductmodelcatalogdescriptionViewRow(
   productmodelid: ProductmodelId,
   /** Points to [[productmodel.ProductmodelRow.name]] */
   name: Name,
-  Summary: /* nullability unknown */ Option[String],
+  summary: /* nullability unknown */ Option[String],
   manufacturer: /* nullability unknown */ Option[String],
   copyright: /* nullability unknown */ Option[/* max 30 chars */ String],
   producturl: /* nullability unknown */ Option[/* max 256 chars */ String],
@@ -62,7 +62,7 @@ object VproductmodelcatalogdescriptionViewRow {
         VproductmodelcatalogdescriptionViewRow(
           productmodelid = json.\("productmodelid").as(ProductmodelId.reads),
           name = json.\("name").as(Name.reads),
-          Summary = json.\("Summary").toOption.map(_.as(Reads.StringReads)),
+          summary = json.\("Summary").toOption.map(_.as(Reads.StringReads)),
           manufacturer = json.\("manufacturer").toOption.map(_.as(Reads.StringReads)),
           copyright = json.\("copyright").toOption.map(_.as(Reads.StringReads)),
           producturl = json.\("producturl").toOption.map(_.as(Reads.StringReads)),
@@ -94,7 +94,7 @@ object VproductmodelcatalogdescriptionViewRow {
       VproductmodelcatalogdescriptionViewRow(
         productmodelid = row(idx + 0)(ProductmodelId.column),
         name = row(idx + 1)(Name.column),
-        Summary = row(idx + 2)(Column.columnToOption(Column.columnToString)),
+        summary = row(idx + 2)(Column.columnToOption(Column.columnToString)),
         manufacturer = row(idx + 3)(Column.columnToOption(Column.columnToString)),
         copyright = row(idx + 4)(Column.columnToOption(Column.columnToString)),
         producturl = row(idx + 5)(Column.columnToOption(Column.columnToString)),
@@ -124,7 +124,7 @@ object VproductmodelcatalogdescriptionViewRow {
     new JsObject(ListMap[String, JsValue](
       "productmodelid" -> ProductmodelId.writes.writes(o.productmodelid),
       "name" -> Name.writes.writes(o.name),
-      "Summary" -> Writes.OptionWrites(Writes.StringWrites).writes(o.Summary),
+      "Summary" -> Writes.OptionWrites(Writes.StringWrites).writes(o.summary),
       "manufacturer" -> Writes.OptionWrites(Writes.StringWrites).writes(o.manufacturer),
       "copyright" -> Writes.OptionWrites(Writes.StringWrites).writes(o.copyright),
       "producturl" -> Writes.OptionWrites(Writes.StringWrites).writes(o.producturl),

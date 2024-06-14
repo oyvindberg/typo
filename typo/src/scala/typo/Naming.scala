@@ -86,7 +86,7 @@ object Naming {
       .flatMap(splitOnSymbol)
       .zipWithIndex
       .map {
-        case (s, 0) => s
+        case (s, 0) => s.updated(0, s.head.toLower)
         case (s, _) => s.capitalize
       }
       .mkString("")

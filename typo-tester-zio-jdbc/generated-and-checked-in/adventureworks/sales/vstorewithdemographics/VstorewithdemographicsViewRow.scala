@@ -23,16 +23,16 @@ case class VstorewithdemographicsViewRow(
   businessentityid: BusinessentityId,
   /** Points to [[store.StoreRow.name]] */
   name: Name,
-  AnnualSales: /* nullability unknown */ Option[TypoMoney],
-  AnnualRevenue: /* nullability unknown */ Option[TypoMoney],
-  BankName: /* nullability unknown */ Option[/* max 50 chars */ String],
-  BusinessType: /* nullability unknown */ Option[/* max 5 chars */ String],
-  YearOpened: /* nullability unknown */ Option[Int],
-  Specialty: /* nullability unknown */ Option[/* max 50 chars */ String],
-  SquareFeet: /* nullability unknown */ Option[Int],
-  Brands: /* nullability unknown */ Option[/* max 30 chars */ String],
-  Internet: /* nullability unknown */ Option[/* max 30 chars */ String],
-  NumberEmployees: /* nullability unknown */ Option[Int]
+  annualSales: /* nullability unknown */ Option[TypoMoney],
+  annualRevenue: /* nullability unknown */ Option[TypoMoney],
+  bankName: /* nullability unknown */ Option[/* max 50 chars */ String],
+  businessType: /* nullability unknown */ Option[/* max 5 chars */ String],
+  yearOpened: /* nullability unknown */ Option[Int],
+  specialty: /* nullability unknown */ Option[/* max 50 chars */ String],
+  squareFeet: /* nullability unknown */ Option[Int],
+  brands: /* nullability unknown */ Option[/* max 30 chars */ String],
+  internet: /* nullability unknown */ Option[/* max 30 chars */ String],
+  numberEmployees: /* nullability unknown */ Option[Int]
 )
 
 object VstorewithdemographicsViewRow {
@@ -42,34 +42,34 @@ object VstorewithdemographicsViewRow {
         VstorewithdemographicsViewRow(
           businessentityid = BusinessentityId.jdbcDecoder.unsafeDecode(columIndex + 0, rs)._2,
           name = Name.jdbcDecoder.unsafeDecode(columIndex + 1, rs)._2,
-          AnnualSales = JdbcDecoder.optionDecoder(TypoMoney.jdbcDecoder).unsafeDecode(columIndex + 2, rs)._2,
-          AnnualRevenue = JdbcDecoder.optionDecoder(TypoMoney.jdbcDecoder).unsafeDecode(columIndex + 3, rs)._2,
-          BankName = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 4, rs)._2,
-          BusinessType = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 5, rs)._2,
-          YearOpened = JdbcDecoder.optionDecoder(JdbcDecoder.intDecoder).unsafeDecode(columIndex + 6, rs)._2,
-          Specialty = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 7, rs)._2,
-          SquareFeet = JdbcDecoder.optionDecoder(JdbcDecoder.intDecoder).unsafeDecode(columIndex + 8, rs)._2,
-          Brands = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 9, rs)._2,
-          Internet = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 10, rs)._2,
-          NumberEmployees = JdbcDecoder.optionDecoder(JdbcDecoder.intDecoder).unsafeDecode(columIndex + 11, rs)._2
+          annualSales = JdbcDecoder.optionDecoder(TypoMoney.jdbcDecoder).unsafeDecode(columIndex + 2, rs)._2,
+          annualRevenue = JdbcDecoder.optionDecoder(TypoMoney.jdbcDecoder).unsafeDecode(columIndex + 3, rs)._2,
+          bankName = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 4, rs)._2,
+          businessType = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 5, rs)._2,
+          yearOpened = JdbcDecoder.optionDecoder(JdbcDecoder.intDecoder).unsafeDecode(columIndex + 6, rs)._2,
+          specialty = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 7, rs)._2,
+          squareFeet = JdbcDecoder.optionDecoder(JdbcDecoder.intDecoder).unsafeDecode(columIndex + 8, rs)._2,
+          brands = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 9, rs)._2,
+          internet = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 10, rs)._2,
+          numberEmployees = JdbcDecoder.optionDecoder(JdbcDecoder.intDecoder).unsafeDecode(columIndex + 11, rs)._2
         )
   }
   implicit lazy val jsonDecoder: JsonDecoder[VstorewithdemographicsViewRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val businessentityid = jsonObj.get("businessentityid").toRight("Missing field 'businessentityid'").flatMap(_.as(BusinessentityId.jsonDecoder))
     val name = jsonObj.get("name").toRight("Missing field 'name'").flatMap(_.as(Name.jsonDecoder))
-    val AnnualSales = jsonObj.get("AnnualSales").fold[Either[String, Option[TypoMoney]]](Right(None))(_.as(JsonDecoder.option(using TypoMoney.jsonDecoder)))
-    val AnnualRevenue = jsonObj.get("AnnualRevenue").fold[Either[String, Option[TypoMoney]]](Right(None))(_.as(JsonDecoder.option(using TypoMoney.jsonDecoder)))
-    val BankName = jsonObj.get("BankName").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
-    val BusinessType = jsonObj.get("BusinessType").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
-    val YearOpened = jsonObj.get("YearOpened").fold[Either[String, Option[Int]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.int)))
-    val Specialty = jsonObj.get("Specialty").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
-    val SquareFeet = jsonObj.get("SquareFeet").fold[Either[String, Option[Int]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.int)))
-    val Brands = jsonObj.get("Brands").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
-    val Internet = jsonObj.get("Internet").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
-    val NumberEmployees = jsonObj.get("NumberEmployees").fold[Either[String, Option[Int]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.int)))
-    if (businessentityid.isRight && name.isRight && AnnualSales.isRight && AnnualRevenue.isRight && BankName.isRight && BusinessType.isRight && YearOpened.isRight && Specialty.isRight && SquareFeet.isRight && Brands.isRight && Internet.isRight && NumberEmployees.isRight)
-      Right(VstorewithdemographicsViewRow(businessentityid = businessentityid.toOption.get, name = name.toOption.get, AnnualSales = AnnualSales.toOption.get, AnnualRevenue = AnnualRevenue.toOption.get, BankName = BankName.toOption.get, BusinessType = BusinessType.toOption.get, YearOpened = YearOpened.toOption.get, Specialty = Specialty.toOption.get, SquareFeet = SquareFeet.toOption.get, Brands = Brands.toOption.get, Internet = Internet.toOption.get, NumberEmployees = NumberEmployees.toOption.get))
-    else Left(List[Either[String, Any]](businessentityid, name, AnnualSales, AnnualRevenue, BankName, BusinessType, YearOpened, Specialty, SquareFeet, Brands, Internet, NumberEmployees).flatMap(_.left.toOption).mkString(", "))
+    val annualSales = jsonObj.get("AnnualSales").fold[Either[String, Option[TypoMoney]]](Right(None))(_.as(JsonDecoder.option(using TypoMoney.jsonDecoder)))
+    val annualRevenue = jsonObj.get("AnnualRevenue").fold[Either[String, Option[TypoMoney]]](Right(None))(_.as(JsonDecoder.option(using TypoMoney.jsonDecoder)))
+    val bankName = jsonObj.get("BankName").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
+    val businessType = jsonObj.get("BusinessType").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
+    val yearOpened = jsonObj.get("YearOpened").fold[Either[String, Option[Int]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.int)))
+    val specialty = jsonObj.get("Specialty").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
+    val squareFeet = jsonObj.get("SquareFeet").fold[Either[String, Option[Int]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.int)))
+    val brands = jsonObj.get("Brands").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
+    val internet = jsonObj.get("Internet").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
+    val numberEmployees = jsonObj.get("NumberEmployees").fold[Either[String, Option[Int]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.int)))
+    if (businessentityid.isRight && name.isRight && annualSales.isRight && annualRevenue.isRight && bankName.isRight && businessType.isRight && yearOpened.isRight && specialty.isRight && squareFeet.isRight && brands.isRight && internet.isRight && numberEmployees.isRight)
+      Right(VstorewithdemographicsViewRow(businessentityid = businessentityid.toOption.get, name = name.toOption.get, annualSales = annualSales.toOption.get, annualRevenue = annualRevenue.toOption.get, bankName = bankName.toOption.get, businessType = businessType.toOption.get, yearOpened = yearOpened.toOption.get, specialty = specialty.toOption.get, squareFeet = squareFeet.toOption.get, brands = brands.toOption.get, internet = internet.toOption.get, numberEmployees = numberEmployees.toOption.get))
+    else Left(List[Either[String, Any]](businessentityid, name, annualSales, annualRevenue, bankName, businessType, yearOpened, specialty, squareFeet, brands, internet, numberEmployees).flatMap(_.left.toOption).mkString(", "))
   }
   implicit lazy val jsonEncoder: JsonEncoder[VstorewithdemographicsViewRow] = new JsonEncoder[VstorewithdemographicsViewRow] {
     override def unsafeEncode(a: VstorewithdemographicsViewRow, indent: Option[Int], out: Write): Unit = {
@@ -81,34 +81,34 @@ object VstorewithdemographicsViewRow {
       Name.jsonEncoder.unsafeEncode(a.name, indent, out)
       out.write(",")
       out.write(""""AnnualSales":""")
-      JsonEncoder.option(using TypoMoney.jsonEncoder).unsafeEncode(a.AnnualSales, indent, out)
+      JsonEncoder.option(using TypoMoney.jsonEncoder).unsafeEncode(a.annualSales, indent, out)
       out.write(",")
       out.write(""""AnnualRevenue":""")
-      JsonEncoder.option(using TypoMoney.jsonEncoder).unsafeEncode(a.AnnualRevenue, indent, out)
+      JsonEncoder.option(using TypoMoney.jsonEncoder).unsafeEncode(a.annualRevenue, indent, out)
       out.write(",")
       out.write(""""BankName":""")
-      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.BankName, indent, out)
+      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.bankName, indent, out)
       out.write(",")
       out.write(""""BusinessType":""")
-      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.BusinessType, indent, out)
+      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.businessType, indent, out)
       out.write(",")
       out.write(""""YearOpened":""")
-      JsonEncoder.option(using JsonEncoder.int).unsafeEncode(a.YearOpened, indent, out)
+      JsonEncoder.option(using JsonEncoder.int).unsafeEncode(a.yearOpened, indent, out)
       out.write(",")
       out.write(""""Specialty":""")
-      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.Specialty, indent, out)
+      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.specialty, indent, out)
       out.write(",")
       out.write(""""SquareFeet":""")
-      JsonEncoder.option(using JsonEncoder.int).unsafeEncode(a.SquareFeet, indent, out)
+      JsonEncoder.option(using JsonEncoder.int).unsafeEncode(a.squareFeet, indent, out)
       out.write(",")
       out.write(""""Brands":""")
-      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.Brands, indent, out)
+      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.brands, indent, out)
       out.write(",")
       out.write(""""Internet":""")
-      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.Internet, indent, out)
+      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.internet, indent, out)
       out.write(",")
       out.write(""""NumberEmployees":""")
-      JsonEncoder.option(using JsonEncoder.int).unsafeEncode(a.NumberEmployees, indent, out)
+      JsonEncoder.option(using JsonEncoder.int).unsafeEncode(a.numberEmployees, indent, out)
       out.write("}")
     }
   }

@@ -25,16 +25,16 @@ import scala.util.Try
 case class VjobcandidateemploymentViewRow(
   /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]] */
   jobcandidateid: JobcandidateId,
-  EmpStartDate: /* nullability unknown */ Option[TypoLocalDate],
-  EmpEndDate: /* nullability unknown */ Option[TypoLocalDate],
-  EmpOrgName: /* nullability unknown */ Option[/* max 100 chars */ String],
-  EmpJobTitle: /* nullability unknown */ Option[/* max 100 chars */ String],
-  EmpResponsibility: /* nullability unknown */ Option[String],
-  EmpFunctionCategory: /* nullability unknown */ Option[String],
-  EmpIndustryCategory: /* nullability unknown */ Option[String],
-  EmpLocCountryRegion: /* nullability unknown */ Option[String],
-  EmpLocState: /* nullability unknown */ Option[String],
-  EmpLocCity: /* nullability unknown */ Option[String]
+  empStartDate: /* nullability unknown */ Option[TypoLocalDate],
+  empEndDate: /* nullability unknown */ Option[TypoLocalDate],
+  empOrgName: /* nullability unknown */ Option[/* max 100 chars */ String],
+  empJobTitle: /* nullability unknown */ Option[/* max 100 chars */ String],
+  empResponsibility: /* nullability unknown */ Option[String],
+  empFunctionCategory: /* nullability unknown */ Option[String],
+  empIndustryCategory: /* nullability unknown */ Option[String],
+  empLocCountryRegion: /* nullability unknown */ Option[String],
+  empLocState: /* nullability unknown */ Option[String],
+  empLocCity: /* nullability unknown */ Option[String]
 )
 
 object VjobcandidateemploymentViewRow {
@@ -42,16 +42,16 @@ object VjobcandidateemploymentViewRow {
       Try(
         VjobcandidateemploymentViewRow(
           jobcandidateid = json.\("jobcandidateid").as(JobcandidateId.reads),
-          EmpStartDate = json.\("Emp.StartDate").toOption.map(_.as(TypoLocalDate.reads)),
-          EmpEndDate = json.\("Emp.EndDate").toOption.map(_.as(TypoLocalDate.reads)),
-          EmpOrgName = json.\("Emp.OrgName").toOption.map(_.as(Reads.StringReads)),
-          EmpJobTitle = json.\("Emp.JobTitle").toOption.map(_.as(Reads.StringReads)),
-          EmpResponsibility = json.\("Emp.Responsibility").toOption.map(_.as(Reads.StringReads)),
-          EmpFunctionCategory = json.\("Emp.FunctionCategory").toOption.map(_.as(Reads.StringReads)),
-          EmpIndustryCategory = json.\("Emp.IndustryCategory").toOption.map(_.as(Reads.StringReads)),
-          EmpLocCountryRegion = json.\("Emp.Loc.CountryRegion").toOption.map(_.as(Reads.StringReads)),
-          EmpLocState = json.\("Emp.Loc.State").toOption.map(_.as(Reads.StringReads)),
-          EmpLocCity = json.\("Emp.Loc.City").toOption.map(_.as(Reads.StringReads))
+          empStartDate = json.\("Emp.StartDate").toOption.map(_.as(TypoLocalDate.reads)),
+          empEndDate = json.\("Emp.EndDate").toOption.map(_.as(TypoLocalDate.reads)),
+          empOrgName = json.\("Emp.OrgName").toOption.map(_.as(Reads.StringReads)),
+          empJobTitle = json.\("Emp.JobTitle").toOption.map(_.as(Reads.StringReads)),
+          empResponsibility = json.\("Emp.Responsibility").toOption.map(_.as(Reads.StringReads)),
+          empFunctionCategory = json.\("Emp.FunctionCategory").toOption.map(_.as(Reads.StringReads)),
+          empIndustryCategory = json.\("Emp.IndustryCategory").toOption.map(_.as(Reads.StringReads)),
+          empLocCountryRegion = json.\("Emp.Loc.CountryRegion").toOption.map(_.as(Reads.StringReads)),
+          empLocState = json.\("Emp.Loc.State").toOption.map(_.as(Reads.StringReads)),
+          empLocCity = json.\("Emp.Loc.City").toOption.map(_.as(Reads.StringReads))
         )
       )
     ),
@@ -60,32 +60,32 @@ object VjobcandidateemploymentViewRow {
     Success(
       VjobcandidateemploymentViewRow(
         jobcandidateid = row(idx + 0)(JobcandidateId.column),
-        EmpStartDate = row(idx + 1)(Column.columnToOption(TypoLocalDate.column)),
-        EmpEndDate = row(idx + 2)(Column.columnToOption(TypoLocalDate.column)),
-        EmpOrgName = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        EmpJobTitle = row(idx + 4)(Column.columnToOption(Column.columnToString)),
-        EmpResponsibility = row(idx + 5)(Column.columnToOption(Column.columnToString)),
-        EmpFunctionCategory = row(idx + 6)(Column.columnToOption(Column.columnToString)),
-        EmpIndustryCategory = row(idx + 7)(Column.columnToOption(Column.columnToString)),
-        EmpLocCountryRegion = row(idx + 8)(Column.columnToOption(Column.columnToString)),
-        EmpLocState = row(idx + 9)(Column.columnToOption(Column.columnToString)),
-        EmpLocCity = row(idx + 10)(Column.columnToOption(Column.columnToString))
+        empStartDate = row(idx + 1)(Column.columnToOption(TypoLocalDate.column)),
+        empEndDate = row(idx + 2)(Column.columnToOption(TypoLocalDate.column)),
+        empOrgName = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+        empJobTitle = row(idx + 4)(Column.columnToOption(Column.columnToString)),
+        empResponsibility = row(idx + 5)(Column.columnToOption(Column.columnToString)),
+        empFunctionCategory = row(idx + 6)(Column.columnToOption(Column.columnToString)),
+        empIndustryCategory = row(idx + 7)(Column.columnToOption(Column.columnToString)),
+        empLocCountryRegion = row(idx + 8)(Column.columnToOption(Column.columnToString)),
+        empLocState = row(idx + 9)(Column.columnToOption(Column.columnToString)),
+        empLocCity = row(idx + 10)(Column.columnToOption(Column.columnToString))
       )
     )
   }
   implicit lazy val writes: OWrites[VjobcandidateemploymentViewRow] = OWrites[VjobcandidateemploymentViewRow](o =>
     new JsObject(ListMap[String, JsValue](
       "jobcandidateid" -> JobcandidateId.writes.writes(o.jobcandidateid),
-      "Emp.StartDate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.EmpStartDate),
-      "Emp.EndDate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.EmpEndDate),
-      "Emp.OrgName" -> Writes.OptionWrites(Writes.StringWrites).writes(o.EmpOrgName),
-      "Emp.JobTitle" -> Writes.OptionWrites(Writes.StringWrites).writes(o.EmpJobTitle),
-      "Emp.Responsibility" -> Writes.OptionWrites(Writes.StringWrites).writes(o.EmpResponsibility),
-      "Emp.FunctionCategory" -> Writes.OptionWrites(Writes.StringWrites).writes(o.EmpFunctionCategory),
-      "Emp.IndustryCategory" -> Writes.OptionWrites(Writes.StringWrites).writes(o.EmpIndustryCategory),
-      "Emp.Loc.CountryRegion" -> Writes.OptionWrites(Writes.StringWrites).writes(o.EmpLocCountryRegion),
-      "Emp.Loc.State" -> Writes.OptionWrites(Writes.StringWrites).writes(o.EmpLocState),
-      "Emp.Loc.City" -> Writes.OptionWrites(Writes.StringWrites).writes(o.EmpLocCity)
+      "Emp.StartDate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.empStartDate),
+      "Emp.EndDate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.empEndDate),
+      "Emp.OrgName" -> Writes.OptionWrites(Writes.StringWrites).writes(o.empOrgName),
+      "Emp.JobTitle" -> Writes.OptionWrites(Writes.StringWrites).writes(o.empJobTitle),
+      "Emp.Responsibility" -> Writes.OptionWrites(Writes.StringWrites).writes(o.empResponsibility),
+      "Emp.FunctionCategory" -> Writes.OptionWrites(Writes.StringWrites).writes(o.empFunctionCategory),
+      "Emp.IndustryCategory" -> Writes.OptionWrites(Writes.StringWrites).writes(o.empIndustryCategory),
+      "Emp.Loc.CountryRegion" -> Writes.OptionWrites(Writes.StringWrites).writes(o.empLocCountryRegion),
+      "Emp.Loc.State" -> Writes.OptionWrites(Writes.StringWrites).writes(o.empLocState),
+      "Emp.Loc.City" -> Writes.OptionWrites(Writes.StringWrites).writes(o.empLocCity)
     ))
   )
 }

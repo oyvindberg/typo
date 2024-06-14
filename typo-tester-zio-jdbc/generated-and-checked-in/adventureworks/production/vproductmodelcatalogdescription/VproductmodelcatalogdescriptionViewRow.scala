@@ -24,7 +24,7 @@ case class VproductmodelcatalogdescriptionViewRow(
   productmodelid: ProductmodelId,
   /** Points to [[productmodel.ProductmodelRow.name]] */
   name: Name,
-  Summary: /* nullability unknown */ Option[String],
+  summary: /* nullability unknown */ Option[String],
   manufacturer: /* nullability unknown */ Option[String],
   copyright: /* nullability unknown */ Option[/* max 30 chars */ String],
   producturl: /* nullability unknown */ Option[/* max 256 chars */ String],
@@ -58,7 +58,7 @@ object VproductmodelcatalogdescriptionViewRow {
         VproductmodelcatalogdescriptionViewRow(
           productmodelid = ProductmodelId.jdbcDecoder.unsafeDecode(columIndex + 0, rs)._2,
           name = Name.jdbcDecoder.unsafeDecode(columIndex + 1, rs)._2,
-          Summary = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 2, rs)._2,
+          summary = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 2, rs)._2,
           manufacturer = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 3, rs)._2,
           copyright = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 4, rs)._2,
           producturl = JdbcDecoder.optionDecoder(JdbcDecoder.stringDecoder).unsafeDecode(columIndex + 5, rs)._2,
@@ -86,7 +86,7 @@ object VproductmodelcatalogdescriptionViewRow {
   implicit lazy val jsonDecoder: JsonDecoder[VproductmodelcatalogdescriptionViewRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val productmodelid = jsonObj.get("productmodelid").toRight("Missing field 'productmodelid'").flatMap(_.as(ProductmodelId.jsonDecoder))
     val name = jsonObj.get("name").toRight("Missing field 'name'").flatMap(_.as(Name.jsonDecoder))
-    val Summary = jsonObj.get("Summary").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
+    val summary = jsonObj.get("Summary").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
     val manufacturer = jsonObj.get("manufacturer").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
     val copyright = jsonObj.get("copyright").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
     val producturl = jsonObj.get("producturl").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
@@ -109,9 +109,9 @@ object VproductmodelcatalogdescriptionViewRow {
     val riderexperience = jsonObj.get("riderexperience").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
     val rowguid = jsonObj.get("rowguid").toRight("Missing field 'rowguid'").flatMap(_.as(TypoUUID.jsonDecoder))
     val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(TypoLocalDateTime.jsonDecoder))
-    if (productmodelid.isRight && name.isRight && Summary.isRight && manufacturer.isRight && copyright.isRight && producturl.isRight && warrantyperiod.isRight && warrantydescription.isRight && noofyears.isRight && maintenancedescription.isRight && wheel.isRight && saddle.isRight && pedal.isRight && bikeframe.isRight && crankset.isRight && pictureangle.isRight && picturesize.isRight && productphotoid.isRight && material.isRight && color.isRight && productline.isRight && style.isRight && riderexperience.isRight && rowguid.isRight && modifieddate.isRight)
-      Right(VproductmodelcatalogdescriptionViewRow(productmodelid = productmodelid.toOption.get, name = name.toOption.get, Summary = Summary.toOption.get, manufacturer = manufacturer.toOption.get, copyright = copyright.toOption.get, producturl = producturl.toOption.get, warrantyperiod = warrantyperiod.toOption.get, warrantydescription = warrantydescription.toOption.get, noofyears = noofyears.toOption.get, maintenancedescription = maintenancedescription.toOption.get, wheel = wheel.toOption.get, saddle = saddle.toOption.get, pedal = pedal.toOption.get, bikeframe = bikeframe.toOption.get, crankset = crankset.toOption.get, pictureangle = pictureangle.toOption.get, picturesize = picturesize.toOption.get, productphotoid = productphotoid.toOption.get, material = material.toOption.get, color = color.toOption.get, productline = productline.toOption.get, style = style.toOption.get, riderexperience = riderexperience.toOption.get, rowguid = rowguid.toOption.get, modifieddate = modifieddate.toOption.get))
-    else Left(List[Either[String, Any]](productmodelid, name, Summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, style, riderexperience, rowguid, modifieddate).flatMap(_.left.toOption).mkString(", "))
+    if (productmodelid.isRight && name.isRight && summary.isRight && manufacturer.isRight && copyright.isRight && producturl.isRight && warrantyperiod.isRight && warrantydescription.isRight && noofyears.isRight && maintenancedescription.isRight && wheel.isRight && saddle.isRight && pedal.isRight && bikeframe.isRight && crankset.isRight && pictureangle.isRight && picturesize.isRight && productphotoid.isRight && material.isRight && color.isRight && productline.isRight && style.isRight && riderexperience.isRight && rowguid.isRight && modifieddate.isRight)
+      Right(VproductmodelcatalogdescriptionViewRow(productmodelid = productmodelid.toOption.get, name = name.toOption.get, summary = summary.toOption.get, manufacturer = manufacturer.toOption.get, copyright = copyright.toOption.get, producturl = producturl.toOption.get, warrantyperiod = warrantyperiod.toOption.get, warrantydescription = warrantydescription.toOption.get, noofyears = noofyears.toOption.get, maintenancedescription = maintenancedescription.toOption.get, wheel = wheel.toOption.get, saddle = saddle.toOption.get, pedal = pedal.toOption.get, bikeframe = bikeframe.toOption.get, crankset = crankset.toOption.get, pictureangle = pictureangle.toOption.get, picturesize = picturesize.toOption.get, productphotoid = productphotoid.toOption.get, material = material.toOption.get, color = color.toOption.get, productline = productline.toOption.get, style = style.toOption.get, riderexperience = riderexperience.toOption.get, rowguid = rowguid.toOption.get, modifieddate = modifieddate.toOption.get))
+    else Left(List[Either[String, Any]](productmodelid, name, summary, manufacturer, copyright, producturl, warrantyperiod, warrantydescription, noofyears, maintenancedescription, wheel, saddle, pedal, bikeframe, crankset, pictureangle, picturesize, productphotoid, material, color, productline, style, riderexperience, rowguid, modifieddate).flatMap(_.left.toOption).mkString(", "))
   }
   implicit lazy val jsonEncoder: JsonEncoder[VproductmodelcatalogdescriptionViewRow] = new JsonEncoder[VproductmodelcatalogdescriptionViewRow] {
     override def unsafeEncode(a: VproductmodelcatalogdescriptionViewRow, indent: Option[Int], out: Write): Unit = {
@@ -123,7 +123,7 @@ object VproductmodelcatalogdescriptionViewRow {
       Name.jsonEncoder.unsafeEncode(a.name, indent, out)
       out.write(",")
       out.write(""""Summary":""")
-      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.Summary, indent, out)
+      JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.summary, indent, out)
       out.write(",")
       out.write(""""manufacturer":""")
       JsonEncoder.option(using JsonEncoder.string).unsafeEncode(a.manufacturer, indent, out)

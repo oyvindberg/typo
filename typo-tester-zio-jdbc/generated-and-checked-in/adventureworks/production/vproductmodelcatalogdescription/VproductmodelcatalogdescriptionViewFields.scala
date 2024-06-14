@@ -20,7 +20,7 @@ import typo.dsl.Structure.Relation
 trait VproductmodelcatalogdescriptionViewFields {
   def productmodelid: Field[ProductmodelId, VproductmodelcatalogdescriptionViewRow]
   def name: Field[Name, VproductmodelcatalogdescriptionViewRow]
-  def Summary: OptField[String, VproductmodelcatalogdescriptionViewRow]
+  def summary: OptField[String, VproductmodelcatalogdescriptionViewRow]
   def manufacturer: OptField[String, VproductmodelcatalogdescriptionViewRow]
   def copyright: OptField[/* max 30 chars */ String, VproductmodelcatalogdescriptionViewRow]
   def producturl: OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow]
@@ -55,7 +55,7 @@ object VproductmodelcatalogdescriptionViewFields {
     override lazy val fields: VproductmodelcatalogdescriptionViewFields = new VproductmodelcatalogdescriptionViewFields {
       override def productmodelid = Field[ProductmodelId, VproductmodelcatalogdescriptionViewRow](_path, "productmodelid", None, None, x => x.productmodelid, (row, value) => row.copy(productmodelid = value))
       override def name = Field[Name, VproductmodelcatalogdescriptionViewRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
-      override def Summary = OptField[String, VproductmodelcatalogdescriptionViewRow](_path, "Summary", None, None, x => x.Summary, (row, value) => row.copy(Summary = value))
+      override def summary = OptField[String, VproductmodelcatalogdescriptionViewRow](_path, "Summary", None, None, x => x.summary, (row, value) => row.copy(summary = value))
       override def manufacturer = OptField[String, VproductmodelcatalogdescriptionViewRow](_path, "manufacturer", None, None, x => x.manufacturer, (row, value) => row.copy(manufacturer = value))
       override def copyright = OptField[/* max 30 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "copyright", None, None, x => x.copyright, (row, value) => row.copy(copyright = value))
       override def producturl = OptField[/* max 256 chars */ String, VproductmodelcatalogdescriptionViewRow](_path, "producturl", None, None, x => x.producturl, (row, value) => row.copy(producturl = value))
@@ -81,7 +81,7 @@ object VproductmodelcatalogdescriptionViewFields {
     }
   
     override lazy val columns: List[FieldLikeNoHkt[?, VproductmodelcatalogdescriptionViewRow]] =
-      List[FieldLikeNoHkt[?, VproductmodelcatalogdescriptionViewRow]](fields.productmodelid, fields.name, fields.Summary, fields.manufacturer, fields.copyright, fields.producturl, fields.warrantyperiod, fields.warrantydescription, fields.noofyears, fields.maintenancedescription, fields.wheel, fields.saddle, fields.pedal, fields.bikeframe, fields.crankset, fields.pictureangle, fields.picturesize, fields.productphotoid, fields.material, fields.color, fields.productline, fields.style, fields.riderexperience, fields.rowguid, fields.modifieddate)
+      List[FieldLikeNoHkt[?, VproductmodelcatalogdescriptionViewRow]](fields.productmodelid, fields.name, fields.summary, fields.manufacturer, fields.copyright, fields.producturl, fields.warrantyperiod, fields.warrantydescription, fields.noofyears, fields.maintenancedescription, fields.wheel, fields.saddle, fields.pedal, fields.bikeframe, fields.crankset, fields.pictureangle, fields.picturesize, fields.productphotoid, fields.material, fields.color, fields.productline, fields.style, fields.riderexperience, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

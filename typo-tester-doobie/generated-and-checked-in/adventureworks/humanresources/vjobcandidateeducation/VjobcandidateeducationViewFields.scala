@@ -17,18 +17,18 @@ import typo.dsl.Structure.Relation
 
 trait VjobcandidateeducationViewFields {
   def jobcandidateid: Field[JobcandidateId, VjobcandidateeducationViewRow]
-  def EduLevel: OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow]
-  def EduStartDate: OptField[TypoLocalDate, VjobcandidateeducationViewRow]
-  def EduEndDate: OptField[TypoLocalDate, VjobcandidateeducationViewRow]
-  def EduDegree: OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow]
-  def EduMajor: OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow]
-  def EduMinor: OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow]
-  def EduGPA: OptField[/* max 5 chars */ String, VjobcandidateeducationViewRow]
-  def EduGPAScale: OptField[/* max 5 chars */ String, VjobcandidateeducationViewRow]
-  def EduSchool: OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow]
-  def EduLocCountryRegion: OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow]
-  def EduLocState: OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow]
-  def EduLocCity: OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow]
+  def eduLevel: OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow]
+  def eduStartDate: OptField[TypoLocalDate, VjobcandidateeducationViewRow]
+  def eduEndDate: OptField[TypoLocalDate, VjobcandidateeducationViewRow]
+  def eduDegree: OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow]
+  def eduMajor: OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow]
+  def eduMinor: OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow]
+  def eduGPA: OptField[/* max 5 chars */ String, VjobcandidateeducationViewRow]
+  def eduGPAScale: OptField[/* max 5 chars */ String, VjobcandidateeducationViewRow]
+  def eduSchool: OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow]
+  def eduLocCountryRegion: OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow]
+  def eduLocState: OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow]
+  def eduLocCity: OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow]
 }
 
 object VjobcandidateeducationViewFields {
@@ -40,22 +40,22 @@ object VjobcandidateeducationViewFields {
   
     override lazy val fields: VjobcandidateeducationViewFields = new VjobcandidateeducationViewFields {
       override def jobcandidateid = Field[JobcandidateId, VjobcandidateeducationViewRow](_path, "jobcandidateid", None, None, x => x.jobcandidateid, (row, value) => row.copy(jobcandidateid = value))
-      override def EduLevel = OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Level", None, None, x => x.EduLevel, (row, value) => row.copy(EduLevel = value))
-      override def EduStartDate = OptField[TypoLocalDate, VjobcandidateeducationViewRow](_path, "Edu.StartDate", Some("text"), None, x => x.EduStartDate, (row, value) => row.copy(EduStartDate = value))
-      override def EduEndDate = OptField[TypoLocalDate, VjobcandidateeducationViewRow](_path, "Edu.EndDate", Some("text"), None, x => x.EduEndDate, (row, value) => row.copy(EduEndDate = value))
-      override def EduDegree = OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Degree", None, None, x => x.EduDegree, (row, value) => row.copy(EduDegree = value))
-      override def EduMajor = OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Major", None, None, x => x.EduMajor, (row, value) => row.copy(EduMajor = value))
-      override def EduMinor = OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Minor", None, None, x => x.EduMinor, (row, value) => row.copy(EduMinor = value))
-      override def EduGPA = OptField[/* max 5 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.GPA", None, None, x => x.EduGPA, (row, value) => row.copy(EduGPA = value))
-      override def EduGPAScale = OptField[/* max 5 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.GPAScale", None, None, x => x.EduGPAScale, (row, value) => row.copy(EduGPAScale = value))
-      override def EduSchool = OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.School", None, None, x => x.EduSchool, (row, value) => row.copy(EduSchool = value))
-      override def EduLocCountryRegion = OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Loc.CountryRegion", None, None, x => x.EduLocCountryRegion, (row, value) => row.copy(EduLocCountryRegion = value))
-      override def EduLocState = OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Loc.State", None, None, x => x.EduLocState, (row, value) => row.copy(EduLocState = value))
-      override def EduLocCity = OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Loc.City", None, None, x => x.EduLocCity, (row, value) => row.copy(EduLocCity = value))
+      override def eduLevel = OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Level", None, None, x => x.eduLevel, (row, value) => row.copy(eduLevel = value))
+      override def eduStartDate = OptField[TypoLocalDate, VjobcandidateeducationViewRow](_path, "Edu.StartDate", Some("text"), None, x => x.eduStartDate, (row, value) => row.copy(eduStartDate = value))
+      override def eduEndDate = OptField[TypoLocalDate, VjobcandidateeducationViewRow](_path, "Edu.EndDate", Some("text"), None, x => x.eduEndDate, (row, value) => row.copy(eduEndDate = value))
+      override def eduDegree = OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Degree", None, None, x => x.eduDegree, (row, value) => row.copy(eduDegree = value))
+      override def eduMajor = OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Major", None, None, x => x.eduMajor, (row, value) => row.copy(eduMajor = value))
+      override def eduMinor = OptField[/* max 50 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Minor", None, None, x => x.eduMinor, (row, value) => row.copy(eduMinor = value))
+      override def eduGPA = OptField[/* max 5 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.GPA", None, None, x => x.eduGPA, (row, value) => row.copy(eduGPA = value))
+      override def eduGPAScale = OptField[/* max 5 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.GPAScale", None, None, x => x.eduGPAScale, (row, value) => row.copy(eduGPAScale = value))
+      override def eduSchool = OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.School", None, None, x => x.eduSchool, (row, value) => row.copy(eduSchool = value))
+      override def eduLocCountryRegion = OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Loc.CountryRegion", None, None, x => x.eduLocCountryRegion, (row, value) => row.copy(eduLocCountryRegion = value))
+      override def eduLocState = OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Loc.State", None, None, x => x.eduLocState, (row, value) => row.copy(eduLocState = value))
+      override def eduLocCity = OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Loc.City", None, None, x => x.eduLocCity, (row, value) => row.copy(eduLocCity = value))
     }
   
     override lazy val columns: List[FieldLikeNoHkt[?, VjobcandidateeducationViewRow]] =
-      List[FieldLikeNoHkt[?, VjobcandidateeducationViewRow]](fields.jobcandidateid, fields.EduLevel, fields.EduStartDate, fields.EduEndDate, fields.EduDegree, fields.EduMajor, fields.EduMinor, fields.EduGPA, fields.EduGPAScale, fields.EduSchool, fields.EduLocCountryRegion, fields.EduLocState, fields.EduLocCity)
+      List[FieldLikeNoHkt[?, VjobcandidateeducationViewRow]](fields.jobcandidateid, fields.eduLevel, fields.eduStartDate, fields.eduEndDate, fields.eduDegree, fields.eduMajor, fields.eduMinor, fields.eduGPA, fields.eduGPAScale, fields.eduSchool, fields.eduLocCountryRegion, fields.eduLocState, fields.eduLocCity)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)
