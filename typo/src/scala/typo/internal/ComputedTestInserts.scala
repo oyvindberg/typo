@@ -118,6 +118,24 @@ object ComputedTestInserts {
         case table if !options.readonlyRepo.include(table.dbTable.name) =>
           val hasConstraints: Set[db.ColName] =
             table.dbTable.cols.iterator.flatMap(_.constraints.flatMap(_.columns)).toSet
+          val pkColumns: Set[db.ColName] =
+            table.maybeId.iterator.flatMap(_.cols.iterator.map(_.dbCol.name)).toSet
+          val appearsInFkButNotPk: Set[db.ColName] =
+            table.dbTable.foreignKeys.iterator.flatMap(_.cols.toList).filterNot(pkColumns).toSet
+
+          def defaultedParametersFor(cols: List[ComputedColumn]): List[sc.Param] = {
+            val params = cols.map { col =>
+              val isMeaningful = hasConstraints(col.dbName) || appearsInFkButNotPk(col.dbName)
+              val default = if (isMeaningful && !col.dbCol.isDefaulted) {
+                if (col.dbCol.nullability == Nullability.NoNulls) None else Some(TypesScala.None.code)
+              } else defaultFor(table, col.tpe, col.dbCol.tpe)
+              sc.Param(col.name, col.tpe, default)
+            }
+
+            // keep order but pull all required parameters first
+            val (requiredParams, optionalParams) = params.partition(_.default.isEmpty)
+            requiredParams ++ optionalParams
+          }
 
           FkAnalysis(allTablesByName, table).createWithFkIdsUnsavedRowOrRow match {
             case Some(colsFromFks) =>
@@ -140,31 +158,18 @@ object ComputedTestInserts {
 
                   (col.name, expr)
                 }
-              val (requiredParams, optionalParams) = colsFromFks.remainingColumns
-                .map { col =>
-                  val default = if (hasConstraints(col.dbName) && !col.dbCol.isDefaulted) {
-                    if (col.dbCol.nullability == Nullability.NoNulls) None else Some(TypesScala.None.code)
-                  } else defaultFor(table, col.tpe, col.dbCol.tpe)
-                  sc.Param(col.name, col.tpe, default)
-                }
-                .partition(_.default.isEmpty)
-              ComputedTestInserts.InsertMethod(table, colsFromFks.params ++ requiredParams ++ optionalParams, valuesFromFk)
+
+              val params = defaultedParametersFor(colsFromFks.remainingColumns)
+
+              ComputedTestInserts.InsertMethod(table, colsFromFks.params ++ params, valuesFromFk)
+
             case None =>
               val cols: List[ComputedColumn] =
                 table.maybeUnsavedRow match {
                   case Some(unsaved) => unsaved.allCols.toList
                   case None          => table.cols.toList
                 }
-              val params: List[sc.Param] = {
-                val asParams = cols.map { col =>
-                  val default = if (hasConstraints(col.dbName) && !col.dbCol.isDefaulted) {
-                    if (col.dbCol.nullability == Nullability.NoNulls) None else Some(TypesScala.None.code)
-                  } else defaultFor(table, col.tpe, col.dbCol.tpe)
-                  sc.Param(col.name, col.tpe, default)
-                }
-                val (requiredParams, optionalParams) = asParams.partition(_.default.isEmpty)
-                requiredParams ++ optionalParams
-              }
+              val params: List[sc.Param] = defaultedParametersFor(cols)
               val values: List[(sc.Ident, sc.Code)] =
                 params.map(p => (p.name, p.name.code))
 

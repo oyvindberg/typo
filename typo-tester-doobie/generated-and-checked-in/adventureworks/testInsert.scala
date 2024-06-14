@@ -628,7 +628,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                   anotherCode: /* max 20 chars */ String = random.alphanumeric.take(20).mkString,
                   someNumber: Int = random.nextInt(),
                   specifier: ShortText = domainInsert.publicShortText(random),
-                  parentspecifier: Option[ShortText] = if (random.nextBoolean()) None else Some(domainInsert.publicShortText(random))
+                  parentspecifier: Option[ShortText] = None
                  ): ConnectionIO[FlaffRow] = (new FlaffRepoImpl).insert(new FlaffRow(code = code, anotherCode = anotherCode, someNumber = someNumber, specifier = specifier, parentspecifier = parentspecifier))
   def publicIdentityTest(name: IdentityTestId, defaultGenerated: Defaulted[Int] = Defaulted.UseDefault): ConnectionIO[IdentityTestRow] = (new IdentityTestRepoImpl).insert(new IdentityTestRowUnsaved(name = name, defaultGenerated = defaultGenerated))
   def publicPgtest(box: TypoBox,
