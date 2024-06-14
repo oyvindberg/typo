@@ -646,7 +646,6 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                    path: TypoPath,
                    point: TypoPoint,
                    polygon: TypoPolygon,
-                   uuid: TypoUUID,
                    vector: TypoVector,
                    xml: TypoXml,
                    boxes: Array[TypoBox],
@@ -662,7 +661,6 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                    pathes: Array[TypoPath],
                    pointes: Array[TypoPoint],
                    polygones: Array[TypoPolygon],
-                   uuides: Array[TypoUUID],
                    xmles: Array[TypoXml],
                    bool: Boolean = random.nextBoolean(),
                    bpchar: /* bpchar, max 3 chars */ String = random.alphanumeric.take(3).mkString,
@@ -682,6 +680,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                    timestamp: TypoLocalDateTime = TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))),
                    timestampz: TypoInstant = TypoInstant(Instant.ofEpochMilli(1000000000000L + random.nextLong(1000000000000L))),
                    timez: TypoOffsetTime = TypoOffsetTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong).atOffset(ZoneOffset.ofHours(random.nextInt(24) - 12))),
+                   uuid: TypoUUID = TypoUUID.randomUUID,
                    varchar: String = random.alphanumeric.take(20).mkString,
                    bpchares: Array[/* bpchar */ String] = Array.fill(random.nextInt(3))(random.alphanumeric.take(20).mkString),
                    chares: Array[/* bpchar */ String] = Array.fill(random.nextInt(3))(random.alphanumeric.take(20).mkString),
@@ -700,8 +699,9 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                    timestampes: Array[TypoLocalDateTime] = Array.fill(random.nextInt(3))(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
                    timestampzes: Array[TypoInstant] = Array.fill(random.nextInt(3))(TypoInstant(Instant.ofEpochMilli(1000000000000L + random.nextLong(1000000000000L)))),
                    timezes: Array[TypoOffsetTime] = Array.fill(random.nextInt(3))(TypoOffsetTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong).atOffset(ZoneOffset.ofHours(random.nextInt(24) - 12)))),
+                   uuides: Array[TypoUUID] = Array.fill(random.nextInt(3))(TypoUUID.randomUUID),
                    varchares: Array[String] = Array.fill(random.nextInt(3))(random.alphanumeric.take(20).mkString)
-                  ): ConnectionIO[PgtestRow] = (new PgtestRepoImpl).insert(new PgtestRow(box = box, bytea = bytea, circle = circle, hstore = hstore, inet = inet, int2vector = int2vector, interval = interval, json = json, jsonb = jsonb, line = line, lseg = lseg, money = money, path = path, point = point, polygon = polygon, uuid = uuid, vector = vector, xml = xml, boxes = boxes, circlees = circlees, inetes = inetes, int2vectores = int2vectores, intervales = intervales, jsones = jsones, jsonbes = jsonbes, linees = linees, lseges = lseges, moneyes = moneyes, pathes = pathes, pointes = pointes, polygones = polygones, uuides = uuides, xmles = xmles, bool = bool, bpchar = bpchar, char = char, date = date, float4 = float4, float8 = float8, int2 = int2, int4 = int4, int8 = int8, mydomain = mydomain, myenum = myenum, name = name, numeric = numeric, text = text, time = time, timestamp = timestamp, timestampz = timestampz, timez = timez, varchar = varchar, bpchares = bpchares, chares = chares, datees = datees, float4es = float4es, float8es = float8es, int2es = int2es, int4es = int4es, int8es = int8es, mydomaines = mydomaines, myenumes = myenumes, namees = namees, numerices = numerices, textes = textes, timees = timees, timestampes = timestampes, timestampzes = timestampzes, timezes = timezes, varchares = varchares))
+                  ): ConnectionIO[PgtestRow] = (new PgtestRepoImpl).insert(new PgtestRow(box = box, bytea = bytea, circle = circle, hstore = hstore, inet = inet, int2vector = int2vector, interval = interval, json = json, jsonb = jsonb, line = line, lseg = lseg, money = money, path = path, point = point, polygon = polygon, vector = vector, xml = xml, boxes = boxes, circlees = circlees, inetes = inetes, int2vectores = int2vectores, intervales = intervales, jsones = jsones, jsonbes = jsonbes, linees = linees, lseges = lseges, moneyes = moneyes, pathes = pathes, pointes = pointes, polygones = polygones, xmles = xmles, bool = bool, bpchar = bpchar, char = char, date = date, float4 = float4, float8 = float8, int2 = int2, int4 = int4, int8 = int8, mydomain = mydomain, myenum = myenum, name = name, numeric = numeric, text = text, time = time, timestamp = timestamp, timestampz = timestampz, timez = timez, uuid = uuid, varchar = varchar, bpchares = bpchares, chares = chares, datees = datees, float4es = float4es, float8es = float8es, int2es = int2es, int4es = int4es, int8es = int8es, mydomaines = mydomaines, myenumes = myenumes, namees = namees, numerices = numerices, textes = textes, timees = timees, timestampes = timestampes, timestampzes = timestampzes, timezes = timezes, uuides = uuides, varchares = varchares))
   def publicPgtestnull(bool: Option[Boolean] = if (random.nextBoolean()) None else Some(random.nextBoolean()),
                        box: Option[TypoBox] = None,
                        bpchar: Option[/* bpchar, max 3 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(3).mkString),
@@ -735,7 +735,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                        timestamp: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
                        timestampz: Option[TypoInstant] = if (random.nextBoolean()) None else Some(TypoInstant(Instant.ofEpochMilli(1000000000000L + random.nextLong(1000000000000L)))),
                        timez: Option[TypoOffsetTime] = if (random.nextBoolean()) None else Some(TypoOffsetTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong).atOffset(ZoneOffset.ofHours(random.nextInt(24) - 12)))),
-                       uuid: Option[TypoUUID] = None,
+                       uuid: Option[TypoUUID] = if (random.nextBoolean()) None else Some(TypoUUID.randomUUID),
                        varchar: Option[String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                        vector: Option[TypoVector] = None,
                        xml: Option[TypoXml] = None,
@@ -769,18 +769,18 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                        timestampes: Option[Array[TypoLocalDateTime]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong))))),
                        timestampzes: Option[Array[TypoInstant]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(TypoInstant(Instant.ofEpochMilli(1000000000000L + random.nextLong(1000000000000L))))),
                        timezes: Option[Array[TypoOffsetTime]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(TypoOffsetTime(LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong).atOffset(ZoneOffset.ofHours(random.nextInt(24) - 12))))),
-                       uuides: Option[Array[TypoUUID]] = None,
+                       uuides: Option[Array[TypoUUID]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(TypoUUID.randomUUID)),
                        varchares: Option[Array[String]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(random.alphanumeric.take(20).mkString)),
                        xmles: Option[Array[TypoXml]] = None
                       ): ConnectionIO[PgtestnullRow] = (new PgtestnullRepoImpl).insert(new PgtestnullRow(bool = bool, box = box, bpchar = bpchar, bytea = bytea, char = char, circle = circle, date = date, float4 = float4, float8 = float8, hstore = hstore, inet = inet, int2 = int2, int2vector = int2vector, int4 = int4, int8 = int8, interval = interval, json = json, jsonb = jsonb, line = line, lseg = lseg, money = money, mydomain = mydomain, myenum = myenum, name = name, numeric = numeric, path = path, point = point, polygon = polygon, text = text, time = time, timestamp = timestamp, timestampz = timestampz, timez = timez, uuid = uuid, varchar = varchar, vector = vector, xml = xml, boxes = boxes, bpchares = bpchares, chares = chares, circlees = circlees, datees = datees, float4es = float4es, float8es = float8es, inetes = inetes, int2es = int2es, int2vectores = int2vectores, int4es = int4es, int8es = int8es, intervales = intervales, jsones = jsones, jsonbes = jsonbes, linees = linees, lseges = lseges, moneyes = moneyes, mydomaines = mydomaines, myenumes = myenumes, namees = namees, numerices = numerices, pathes = pathes, pointes = pointes, polygones = polygones, textes = textes, timees = timees, timestampes = timestampes, timestampzes = timestampzes, timezes = timezes, uuides = uuides, varchares = varchares, xmles = xmles))
-  def publicUsers(userId: UsersId,
-                  email: TypoUnknownCitext,
+  def publicUsers(email: TypoUnknownCitext,
+                  userId: UsersId = UsersId(TypoUUID.randomUUID),
                   name: String = random.alphanumeric.take(20).mkString,
                   lastName: Option[String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                   password: String = random.alphanumeric.take(20).mkString,
                   verifiedOn: Option[TypoInstant] = if (random.nextBoolean()) None else Some(TypoInstant(Instant.ofEpochMilli(1000000000000L + random.nextLong(1000000000000L)))),
                   createdAt: Defaulted[TypoInstant] = Defaulted.UseDefault
-                 ): ConnectionIO[UsersRow] = (new UsersRepoImpl).insert(new UsersRowUnsaved(userId = userId, email = email, name = name, lastName = lastName, password = password, verifiedOn = verifiedOn, createdAt = createdAt))
+                 ): ConnectionIO[UsersRow] = (new UsersRepoImpl).insert(new UsersRowUnsaved(email = email, userId = userId, name = name, lastName = lastName, password = password, verifiedOn = verifiedOn, createdAt = createdAt))
   def purchasingProductvendor(productid: ProductId,
                               businessentityid: BusinessentityId,
                               averageleadtime: Int,

@@ -95,6 +95,8 @@ object ComputedTestInserts {
             Some(code"${customTypes.TypoLocalDateTime.typoType}($defaultLocalDateTime)")
           case customTypes.TypoOffsetTime.typoType =>
             Some(code"${customTypes.TypoOffsetTime.typoType}($defaultLocalTime.atOffset($defaultZoneOffset))")
+          case customTypes.TypoUUID.typoType =>
+            Some(code"${customTypes.TypoUUID.typoType}.randomUUID")
           case customTypes.TypoInstant.typoType =>
             // 2001-09-09T01:46:40Z -> 2033-05-18T03:33:20Z
             Some(code"${customTypes.TypoInstant.typoType}(${TypesJava.Instant}.ofEpochMilli(1000000000000L + $random.nextLong(1000000000000L)))")
