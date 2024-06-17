@@ -45,6 +45,8 @@ projects:
     - typo
     - typo-tester-anorm
     extends: template-nocross
+    scala:
+      strict: false
   # scripts generate code into the tester projects, and there are hand-written tests inside as well
   typo-tester-anorm:
     dependencies:
