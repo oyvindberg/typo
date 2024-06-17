@@ -164,20 +164,26 @@ case class FilesRelation(
         names.source match {
           case relation: Source.Relation =>
             val byOtherTable = fks.groupBy(_.otherTable)
-            fks.sortBy(_.constraintName.value).map { fk =>
-              val otherTableSource = Source.Table(fk.otherTable)
-              val fkType = sc.Type.dsl.ForeignKey.of(
-                sc.Type.Qualified(naming.fieldsName(otherTableSource)),
-                sc.Type.Qualified(naming.rowName(otherTableSource))
-              )
-              val columnPairs = fk.cols.zip(fk.otherCols).map { case (col, otherCol) =>
-                code".withColumnPair(${naming.field(col)}, _.${naming.field(otherCol)})"
+            fks
+              .sortBy(_.constraintName.value)
+              .map { fk =>
+                val otherTableSource = Source.Table(fk.otherTable)
+                val fkType = sc.Type.dsl.ForeignKey.of(
+                  sc.Type.Qualified(naming.fieldsName(otherTableSource)),
+                  sc.Type.Qualified(naming.rowName(otherTableSource))
+                )
+                val columnPairs = fk.cols.zip(fk.otherCols).map { case (col, otherCol) =>
+                  code".withColumnPair(${naming.field(col)}, _.${naming.field(otherCol)})"
+                }
+                val fkName = naming.fk(relation.name, fk, includeCols = byOtherTable(fk.otherTable).size > 1)
+                val body =
+                  code"""|def $fkName: $fkType =
+                       |  $fkType(${sc.StrLit(fk.constraintName.value)}, Nil)
+                       |    ${columnPairs.mkCode("\n")}""".stripMargin
+                (fkName, body)
               }
-              val fkName = naming.fk(relation.name, fk, includeCols = byOtherTable(fk.otherTable).size > 1)
-              code"""|def $fkName: $fkType =
-                     |  $fkType(${sc.StrLit(fk.constraintName.value)}, Nil)
-                     |    ${columnPairs.mkCode("\n")}""".stripMargin
-            }
+              .distinctBy(_._1)
+              .map(_._2)
           case Source.SqlFile(_) => Nil
         }
 

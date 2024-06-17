@@ -164,6 +164,7 @@ object FkAnalysis {
         .toList
         // consider longest first, plus disambiguate for consistency
         .sortBy(x => (-x.colPairs.length, x.name))
+        .distinctBy(_.name)
   }
 
   case class CandidateFk(thisFk: db.ForeignKey, otherTable: ComputedTable, otherId: IdComputed.Composite)
