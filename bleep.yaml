@@ -1,18 +1,18 @@
 $schema: https://raw.githubusercontent.com/oyvindberg/bleep/master/schema.json
-$version: 0.0.3
+$version: 0.0.4
 jvm:
   name: graalvm-community:21.0.2
 projects:
   # these tests do not depend on running codegen, just unit tests and so on
   tests:
-    dependencies: org.scalatest::scalatest:3.3.0-SNAP4
+    dependencies: org.scalatest::scalatest:3.2.18
     dependsOn: typo
     extends: template-nocross
     isTestProject: true
   # main project
   typo:
     dependencies:
-    - com.typesafe.play::play-json:2.10.4
+    - com.typesafe.play::play-json:2.10.6
     - org.playframework.anorm::anorm:2.7.0
     - org.postgresql:postgresql:42.7.3
     extends: template-cross
@@ -48,9 +48,9 @@ projects:
   # scripts generate code into the tester projects, and there are hand-written tests inside as well
   typo-tester-anorm:
     dependencies:
-    - com.typesafe.play::play-json:2.10.4
+    - com.typesafe.play::play-json:2.10.6
     - org.postgresql:postgresql:42.7.3
-    - org.scalatest::scalatest:3.3.0-SNAP4
+    - org.scalatest::scalatest:3.2.18
     dependsOn: typo-dsl-anorm
     extends: template-cross
     isTestProject: true
@@ -60,9 +60,9 @@ projects:
     sources: ./generated-and-checked-in
   typo-tester-doobie:
     dependencies:
-    - io.circe::circe-core:0.14.4
+    - io.circe::circe-core:0.14.7
     - org.postgresql:postgresql:42.7.3
-    - org.scalatest::scalatest:3.3.0-SNAP4
+    - org.scalatest::scalatest:3.2.18
     dependsOn: typo-dsl-doobie
     extends: template-cross
     isTestProject: true
@@ -75,9 +75,9 @@ projects:
     sources: ./generated-and-checked-in
   typo-tester-zio-jdbc:
     dependencies:
-    - dev.zio::zio-json:0.6.2
+    - dev.zio::zio-json:0.7.0
     - org.postgresql:postgresql:42.7.3
-    - org.scalatest::scalatest:3.3.0-SNAP4
+    - org.scalatest::scalatest:3.2.18
     dependsOn: typo-dsl-zio-jdbc
     extends: template-cross
     isTestProject: true
@@ -124,5 +124,5 @@ templates:
   template-nocross:
     extends: template-common
     scala:
-      version: 3.4.1
       options: -source 3.4
+      version: 3.4.1
