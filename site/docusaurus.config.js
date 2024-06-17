@@ -84,7 +84,7 @@ const config = {
       prism: {
         theme: require("prism-react-renderer").themes.github,
         darkTheme: require("prism-react-renderer").themes.oceanicNext,
-        additionalLanguages: ["java", "scala", "yaml"],
+        additionalLanguages: ["java", "scala", "yaml", "sql"],
       },
     }),
 };
