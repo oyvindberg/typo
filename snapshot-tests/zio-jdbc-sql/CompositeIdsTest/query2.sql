@@ -1,1 +1,5 @@
-select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from person.emailaddress emailaddress0 WHERE (emailaddress0.businessentityid, emailaddress0.emailaddressid) in (select unnest(?::int4[]), unnest(?::int4[]))
+with
+emailaddress0 as (
+  (select emailaddress0 from person.emailaddress emailaddress0  WHERE ((emailaddress0).businessentityid, (emailaddress0).emailaddressid) in (select unnest(?::int4[]), unnest(?::int4[])))
+)
+select (emailaddress0)."businessentityid",(emailaddress0)."emailaddressid",(emailaddress0)."emailaddress",(emailaddress0)."rowguid",(emailaddress0)."modifieddate"::text from emailaddress0

@@ -108,7 +108,7 @@ object SqlExpr {
     val set: (R, NT) => R
     val sqlReadCast: Option[String]
     val sqlWriteCast: Option[String]
-    final def value(ctx: RenderCtx): String = ctx.alias.get(path).fold("")(_ + ".") + name
+    final def value(ctx: RenderCtx): String = ctx.alias.get(path).fold("")(alias => s"($alias).") + name
     final def render(ctx: RenderCtx): Fragment = Fragment.const0(value(ctx))
   }
 

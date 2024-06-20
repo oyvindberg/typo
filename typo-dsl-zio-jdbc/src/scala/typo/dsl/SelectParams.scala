@@ -20,14 +20,13 @@ object SelectParams {
   def empty[Fields, R]: SelectParams[Fields, R] =
     SelectParams[Fields, R](List.empty, List.empty, None, None)
 
-  def render[Fields, R](fields: Fields, baseSql: SqlFragment, ctx: RenderCtx, params: SelectParams[Fields, R]): SqlFragment = {
+  def render[Fields, R](fields: Fields, ctx: RenderCtx, params: SelectParams[Fields, R]): Option[SqlFragment] = {
     val (filters, orderBys) = OrderByOrSeek.expand(fields, params)
     List[Option[SqlFragment]](
-      Some(baseSql),
       NonEmptyChunk.fromIterableOption(filters.map(f => f.render(ctx))).map(fs => fs.mkFragment(" WHERE ", " AND ", "")),
       NonEmptyChunk.fromIterableOption(orderBys.map(f => f.render(ctx))).map(fs => fs.mkFragment(" ORDER BY ", ", ", "")),
       params.offset.map(value => sql" offset $value"),
       params.limit.map(value => sql" limit $value")
-    ).flatten.reduce(_ ++ _)
+    ).flatten.reduceOption(_ ++ _)
   }
 }

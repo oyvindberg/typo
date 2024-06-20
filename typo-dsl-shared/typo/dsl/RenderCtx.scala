@@ -11,9 +11,9 @@ object RenderCtx {
   def from[F, R](s: SelectBuilderSql[F, R]): RenderCtx = {
     def findPathsAndTableNames(s: SelectBuilderSql[?, ?]): List[(List[Path], String)] =
       s match {
-        case SelectBuilderSql.Relation(name, structure, _, _)  => List(structure._path -> name)
-        case SelectBuilderSql.TableJoin(left, right, _, _)     => findPathsAndTableNames(left) ++ findPathsAndTableNames(right)
-        case SelectBuilderSql.TableLeftJoin(left, right, _, _) => findPathsAndTableNames(left) ++ findPathsAndTableNames(right)
+        case SelectBuilderSql.Relation(name, structure, _, _)      => List(structure._path -> name)
+        case x @ SelectBuilderSql.TableJoin(left, right, _, _)     => List(x.structure._path -> "join_cte") ++ findPathsAndTableNames(left) ++ findPathsAndTableNames(right)
+        case x @ SelectBuilderSql.TableLeftJoin(left, right, _, _) => List(x.structure._path -> "left_join_cte") ++ findPathsAndTableNames(left) ++ findPathsAndTableNames(right)
       }
 
     val nameForPathsMap: Map[List[Path], String] =

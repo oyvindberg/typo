@@ -7,7 +7,7 @@ package typo.dsl
 trait Structure[Fields, Row] {
   def fields: Fields
   def columns: List[SqlExpr.FieldLikeNoHkt[?, ?]]
-
+  def _path: List[Path]
   def withPath(path: Path): Structure[Fields, Row]
 
   // It's up to you to ensure that the `Row` in `field` is the same type as `row`
@@ -64,21 +64,23 @@ trait Structure[Fields, Row] {
     }
 
   final def join[Fields2, Row2](other: Structure[Fields2, Row2]): Structure[Fields ~ Fields2, Row ~ Row2] =
-    new Structure.Tupled(left = this, right = other)
+    new Structure.Tupled(Structure.sharedPrefix(this._path, other._path), left = this, right = other)
 
   final def leftJoin[Fields2, Row2](other: Structure[Fields2, Row2]): Structure[Fields ~ OuterJoined[Fields2], Row ~ Option[Row2]] =
-    new Structure.LeftTupled(left = this, right = other)
+    new Structure.LeftTupled(Structure.sharedPrefix(this._path, other._path), left = this, right = other)
 }
 
 object Structure {
+  def sharedPrefix[T](left: List[T], right: List[T]): List[T] = {
+    val prefix = left.zip(right).takeWhile { case (a, b) => a == b }
+    prefix.map(_._1)
+  }
   // some of the row types are discarded, exchanging some type-safety for a cleaner API
   implicit class FieldOps[T, N[_], R0](private val field: SqlExpr.FieldLike[T, N, R0]) extends AnyVal {
     def castRow[R1]: SqlExpr.FieldLike[T, N, R1] = field.asInstanceOf[SqlExpr.FieldLike[T, N, R1]]
   }
 
   trait Relation[Fields, Row] extends Structure[Fields, Row] { outer =>
-    val _path: List[Path]
-
     def copy(path: List[Path]): Relation[Fields, Row]
 
     override def withPath(newPath: Path): Relation[Fields, Row] =
@@ -88,7 +90,7 @@ object Structure {
       field.castRow[Row].get(row)
   }
 
-  private class Tupled[Fields1, Fields2, Row1, Row2](val left: Structure[Fields1, Row1], val right: Structure[Fields2, Row2]) extends Structure[Fields1 ~ Fields2, Row1 ~ Row2] {
+  private class Tupled[Fields1, Fields2, Row1, Row2](val _path: List[Path], val left: Structure[Fields1, Row1], val right: Structure[Fields2, Row2]) extends Structure[Fields1 ~ Fields2, Row1 ~ Row2] {
     override val fields: Fields1 ~ Fields2 =
       (left.fields, right.fields)
 
@@ -99,11 +101,11 @@ object Structure {
       if (left.columns.contains(field)) left.untypedGet(field.castRow, row._1)
       else right.untypedGet(field.castRow, row._2)
 
-    override def withPath(path: Path): Tupled[Fields1, Fields2, Row1, Row2] =
-      new Tupled(left.withPath(path), right.withPath(path))
+    override def withPath(newPath: Path): Tupled[Fields1, Fields2, Row1, Row2] =
+      new Tupled(newPath :: _path, left.withPath(newPath), right.withPath(newPath))
   }
 
-  private class LeftTupled[Fields1, Fields2, Row1, Row2](val left: Structure[Fields1, Row1], val right: Structure[Fields2, Row2])
+  private class LeftTupled[Fields1, Fields2, Row1, Row2](val _path: List[Path], val left: Structure[Fields1, Row1], val right: Structure[Fields2, Row2])
       extends Structure[Fields1 ~ OuterJoined[Fields2], Row1 ~ Option[Row2]] {
 
     override val fields: Fields1 ~ OuterJoined[Fields2] =
@@ -125,7 +127,7 @@ object Structure {
         flattened.asInstanceOf[N[T]]
       }
 
-    override def withPath(path: Path): LeftTupled[Fields1, Fields2, Row1, Row2] =
-      new LeftTupled(left.withPath(path), right.withPath(path))
+    override def withPath(newPath: Path): LeftTupled[Fields1, Fields2, Row1, Row2] =
+      new LeftTupled(newPath :: _path, left.withPath(newPath), right.withPath(newPath))
   }
 }
