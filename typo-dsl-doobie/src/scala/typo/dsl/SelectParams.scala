@@ -22,15 +22,14 @@ object SelectParams {
   def empty[Fields, R]: SelectParams[Fields, R] =
     SelectParams[Fields, R](List.empty, List.empty, None, None)
 
-  def render[Fields, R](fields: Fields, baseSql: Fragment, ctx: RenderCtx, params: SelectParams[Fields, R]): Fragment = {
+  def render[Fields, R](fields: Fields, ctx: RenderCtx, params: SelectParams[Fields, R]): Option[Fragment] = {
     val (filters, orderBys) = OrderByOrSeek.expand(fields, params)
 
     List[Option[Fragment]](
-      Some(baseSql),
       NonEmptyList.fromFoldable(filters.map(f => f.render(ctx))).map(fragments.whereAnd(_)),
       NonEmptyList.fromFoldable(orderBys.map(f => f.render(ctx))).map(fragments.orderBy(_)),
       params.offset.map(value => fr"offset $value"),
       params.limit.map(value => fr"limit $value")
-    ).flatten.reduce(_ ++ _)
+    ).flatten.reduceOption(_ ++ _)
   }
 }

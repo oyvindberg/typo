@@ -129,7 +129,6 @@ class ProductTest extends SnapshotTest {
         .joinFk(_._2.fkProductcategory)(productcategoryRepo.select)
       compareFragment("query0")(query0.sql)
       query0.toList.foreach(println)
-      println("foo")
 
       val query =
         productRepo.select
