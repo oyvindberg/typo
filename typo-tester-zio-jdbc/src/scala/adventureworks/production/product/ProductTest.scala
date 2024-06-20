@@ -6,15 +6,13 @@ import adventureworks.production.productmodel.*
 import adventureworks.production.productsubcategory.*
 import adventureworks.production.unitmeasure.*
 import adventureworks.public.{Flag, Name}
-import adventureworks.withConnection
-import org.scalactic.TypeCheckedTripleEquals
+import adventureworks.{SnapshotTest, withConnection}
 import org.scalatest.Assertion
-import org.scalatest.funsuite.AnyFunSuite
 import zio.{Chunk, ZIO}
 
 import java.time.LocalDateTime
 
-class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
+class ProductTest extends SnapshotTest {
   def runTest(
       productRepo: ProductRepo,
       projectModelRepo: ProductmodelRepo,
@@ -95,8 +93,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
           .joinFk(_._1.fkProductsubcategory)(productsubcategoryRepo.select)
           .joinFk(_._2.fkProductcategory)(productcategoryRepo.select)
         _ <- query0.toChunk.map(println(_))
-        _ <- ZIO.succeed(query0.sql.foreach(f => println(f)))
-        _ <- ZIO.succeed(println("foo"))
+        _ <- ZIO.succeed(compareFragment("query0")(query0.sql))
         query = productRepo.select
           .where(_.`class` === "H ")
           .where(x => (x.daystomanufacture > 25).or(x.daystomanufacture <= 0))
@@ -109,10 +106,10 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
           .orderBy { case ((product, _), _) => product.productmodelid.asc }
           .orderBy { case ((_, _), productModel) => productModel(_.name).desc.withNullsFirst }
 
-        _ <- ZIO.succeed(query.sql.foreach(f => println(f)))
+        _ <- ZIO.succeed(compareFragment("query")(query.sql))
         _ <- query.toChunk.map(println(_))
         leftJoined = productRepo.select.join(projectModelRepo.select).leftOn { case (p, pm) => p.productmodelid === pm.productmodelid }
-        _ <- ZIO.succeed(leftJoined.sql.foreach(println))
+        _ <- ZIO.succeed(compareFragment("leftJoined")(leftJoined.sql))
         _ <- leftJoined.toChunk.map(println)
 
         update = productRepo.update
@@ -122,7 +119,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
 //          .setComputedValue(_.sizeunitmeasurecode)(_ => Some(unitmeasure.unitmeasurecode))
           .where(_.productid === saved1.productid)
 
-        _ <- ZIO.succeed(update.sql(returning = true).foreach(println(_)))
+        _ <- ZIO.succeed(compareFragment("updateReturning")(update.sql(returning = true)))
         foo <- update.executeReturnChanged
         Chunk(updated) = foo
         _ <- ZIO.succeed(assert(updated.name === Name("MANf")))
@@ -138,11 +135,11 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
             .on { case (p, pm) => p.productmodelid === pm.productmodelid }
             .where { case (_, pm) => !pm.instructions.isNull }
 
-          q.sql.foreach(f => println(f))
+          compareFragment("q")(q.sql)
           q.toChunk.map(list => list.foreach(println))
         }
         _ <- {
-          val q = productRepo.select
+          val q2 = productRepo.select
             // select from id, arrays work
             .where(p => p.productid.in(Array(saved1.productid, new ProductId(22))))
             // call `length` function and compare result
@@ -167,8 +164,8 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
             .orderBy { case ((_, pm), _) => pm.rowguid.desc.withNullsFirst }
             .orderBy { case ((_, _), pm2) => pm2(_.rowguid).asc }
 
-//          q.sql.foreach(f => println(f.sql))
-          q.toChunk.map {
+          compareFragment("q2")(q2.sql)
+          q2.toChunk.map {
             _.map { case ((p, pm1), pm2) =>
               println(p)
               println(pm1)
@@ -177,7 +174,9 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
           }
         }
         // delete
-        _ <- productRepo.deleteById(saved1.productid)
+        delete = productRepo.delete.where(_.productid === saved1.productid)
+        _ <- ZIO.succeed(compareFragment("delete")(delete.sql))
+        _ <- delete.execute
         _ <- productRepo.selectAll.runCollect.map(_.toList).map {
           case Nil   => ()
           case other => throw new MatchError(other)

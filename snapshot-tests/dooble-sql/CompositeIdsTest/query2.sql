@@ -1,0 +1,1 @@
+select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from person.emailaddress emailaddress0 WHERE (emailaddress0.businessentityid , emailaddress0.emailaddressid ) in (select unnest(?::_int4 ), unnest(?::_int4 ))

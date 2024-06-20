@@ -1,23 +1,21 @@
 package adventureworks.production.product
 
 import adventureworks.customtypes.{TypoLocalDateTime, TypoShort, TypoUUID, TypoXml}
-import adventureworks.person.businessentity.{BusinessentityId, BusinessentityRepo, BusinessentityRepoImpl, BusinessentityRepoMock, BusinessentityRow}
+import adventureworks.person.businessentity.*
 import adventureworks.person.emailaddress.{EmailaddressRepo, EmailaddressRepoImpl, EmailaddressRepoMock, EmailaddressRow}
 import adventureworks.person.person.{PersonRepo, PersonRepoImpl, PersonRepoMock, PersonRow}
 import adventureworks.production.productcosthistory.*
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.{Name, NameStyle}
 import adventureworks.userdefined.FirstName
-import adventureworks.{DomainInsert, TestInsert, withConnection}
-import org.scalactic.TypeCheckedTripleEquals
+import adventureworks.{DomainInsert, SnapshotTest, TestInsert, withConnection}
 import org.scalatest.Assertion
-import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.LocalDateTime
 import scala.annotation.nowarn
 import scala.util.Random
 
-class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
+class CompositeIdsTest extends SnapshotTest {
   implicit class Foo(x: TypoLocalDateTime) {
     def map(f: LocalDateTime => LocalDateTime): TypoLocalDateTime = TypoLocalDateTime(f(x.value))
   }
@@ -103,7 +101,7 @@ class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
           )
         )
       val res2 = query2.toList
-      query2.sql.foreach(x => println(x))
+      compareFragment("query2")(query2.sql)
       assert(res2 === List(emailaddress1_2, emailaddress1_3))
     }
   }

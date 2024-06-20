@@ -8,16 +8,14 @@ import adventureworks.production.productcosthistory.ProductcosthistoryRepoImpl
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.{Name, NameStyle}
 import adventureworks.userdefined.FirstName
-import adventureworks.{DomainInsert, TestInsert, withConnection}
-import org.scalactic.TypeCheckedTripleEquals
+import adventureworks.{DomainInsert, SnapshotTest, TestInsert, withConnection}
 import org.scalatest.Assertion
-import org.scalatest.funsuite.AnyFunSuite
 import zio.{Chunk, ZIO}
 
 import java.time.LocalDateTime
 import scala.util.Random
 
-class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
+class CompositeIdsTest extends SnapshotTest {
   implicit class Foo(x: TypoLocalDateTime) {
     def map(f: LocalDateTime => LocalDateTime): TypoLocalDateTime = TypoLocalDateTime(f(x.value))
   }
@@ -107,7 +105,7 @@ class CompositeIdsTest extends AnyFunSuite with TypeCheckedTripleEquals {
             )
           )
         res2 <- query2.toChunk
-        _ <- ZIO.attempt(query2.sql.foreach(x => println(x)))
+        _ <- ZIO.attempt(compareFragment("query2")(query2.sql))
       } yield assert(res2.toList === List(emailaddress1_2, emailaddress1_3))
     }
   }
