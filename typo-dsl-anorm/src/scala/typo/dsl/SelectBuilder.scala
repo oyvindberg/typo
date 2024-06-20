@@ -48,11 +48,11 @@ trait SelectBuilder[Fields, Row] {
     withParams(params.orderBy(v))
 
   final def seek[T, N[_]](v: Fields => SortOrder[T, N])(value: SqlExpr.Const[T, N]): SelectBuilder[Fields, Row] =
-    withParams(params.seek(SelectParams.Seek[Fields, T, N](v, value)))
+    withParams(params.seek(v, value))
 
-  final def maybeSeek[T, N[_]](v: Fields => SortOrder[T, N])(maybeValue: Option[SqlExpr.Const[T, N]]): SelectBuilder[Fields, Row] =
+  final def maybeSeek[T, N[_]](v: Fields => SortOrder[T, N])(maybeValue: Option[N[T]])(implicit asConst: SqlExpr.Const.As[T, N]): SelectBuilder[Fields, Row] =
     maybeValue match {
-      case Some(value) => seek(v)(value)
+      case Some(value) => seek(v)(asConst(value))
       case None        => orderBy(v)
     }
 

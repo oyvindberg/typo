@@ -1,18 +1,25 @@
-package typo.dsl.internal
+package typo.dsl
 
-import typo.dsl.SelectParams.Seek
-import typo.dsl.*
+sealed trait OrderByOrSeek[Fields, NT] {
+  val f: Fields => SortOrderNoHkt[NT]
+}
 
-object seeks {
-  def expand[Fields, Row](fields: Fields, params: SelectParams[Fields, Row]): (List[SqlExpr[Boolean, Option]], List[SortOrderNoHkt[?]]) =
-    params.seeks match {
-      case Nil => (params.where.map(_.apply(fields)), params.orderBy.map(_.apply(fields)))
-      case nonEmpty =>
-        require(params.orderBy.isEmpty, "Cannot have both seeks and orderBy")
-        val seekOrderBys: List[SortOrderNoHkt[?]] =
-          nonEmpty.map { case seek: Seek[Fields, _, _] @unchecked /* for 2.13*/ => seek.f(fields) }
+object OrderByOrSeek {
+  case class OrderBy[Fields, NT](f: Fields => SortOrderNoHkt[NT]) extends OrderByOrSeek[Fields, NT]
+  sealed trait SeekNoHkt[Fields, NT] extends OrderByOrSeek[Fields, NT]
+  case class Seek[Fields, T, N[_]](f: Fields => SortOrder[T, N], value: SqlExpr.Const[T, N]) extends SeekNoHkt[Fields, N[T]]
 
-        val seekWhere: SqlExpr[Boolean, Option] =
+  def expand[Fields, Row](fields: Fields, params: SelectParams[Fields, Row]): (List[SqlExpr[Boolean, Option]], List[SortOrderNoHkt[?]]) = {
+    val seeks: List[SeekNoHkt[Fields, ?]] =
+      params.orderBy.collect { case x: OrderByOrSeek.SeekNoHkt[Fields, nt] => x }
+
+    val maybeSeekPredicate: Option[SqlExpr[Boolean, Option]] =
+      seeks match {
+        case Nil => None
+        case nonEmpty =>
+          val seekOrderBys: List[SortOrderNoHkt[?]] =
+            nonEmpty.map { case seek: Seek[Fields, _, _] @unchecked /* for 2.13*/ => seek.f(fields) }
+
           seekOrderBys.map(_.ascending).distinct match {
             case List(uniformIsAscending) =>
               val dbTuple = SqlExpr.RowExpr(seekOrderBys.map(so => so.expr))
@@ -29,7 +36,7 @@ object seeks {
                   .find(_ != 0)
                   .getOrElse(0)
 
-              if (uniformIsAscending) dbTuple > valueTuple else dbTuple < valueTuple
+              Some(if (uniformIsAscending) dbTuple > valueTuple else dbTuple < valueTuple)
             case _ =>
               val orConditions: Seq[SqlExpr[Boolean, Option]] =
                 nonEmpty.indices.map { i =>
@@ -52,9 +59,9 @@ object seeks {
                   }
                 }
 
-              orConditions.reduce(_ or _)
+              Some(orConditions.reduce(_ or _))
           }
-
-        (params.where.map(_.apply(fields)) :+ seekWhere, seekOrderBys)
-    }
+      }
+    (params.where.map(_.apply(fields)) ++ maybeSeekPredicate, params.orderBy.map(_.f(fields)))
+  }
 }
