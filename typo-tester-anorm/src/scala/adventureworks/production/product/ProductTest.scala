@@ -7,16 +7,14 @@ import adventureworks.production.productmodel.*
 import adventureworks.production.productsubcategory.*
 import adventureworks.production.unitmeasure.*
 import adventureworks.public.{Flag, Name}
-import adventureworks.{DomainInsert, TestInsert, withConnection}
-import org.scalactic.TypeCheckedTripleEquals
+import adventureworks.{DomainInsert, SnapshotTest, TestInsert, withConnection}
 import org.scalatest.Assertion
-import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.LocalDateTime
 import scala.annotation.nowarn
 import scala.util.Random
 
-class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
+class ProductTest extends SnapshotTest {
   val personDynamicSqlRepo = new PersonDynamicSqlRepoImpl
 
   test("flaf") {
@@ -129,8 +127,8 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         .joinFk(_.fkProductmodel)(projectModelRepo.select)
         .joinFk(_._1.fkProductsubcategory)(productsubcategoryRepo.select)
         .joinFk(_._2.fkProductcategory)(productcategoryRepo.select)
+      compareFragment("query0")(query0.sql)
       query0.toList.foreach(println)
-      query0.sql.foreach(println)
       println("foo")
 
       val query =
@@ -146,15 +144,14 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
           .orderBy { case ((product, _), _) => product.productmodelid.asc }
           .orderBy { case ((_, _), productModel) => productModel(_.name).desc.withNullsFirst }
 
-      query.sql.foreach(f => println(f.sql))
-
+      compareFragment("query")(query.sql)
       println(query.toList)
 
       val leftJoined = productRepo.select
         .join(projectModelRepo.select)
         .leftOn { case (p, pm) => p.productmodelid === pm.productmodelid }
 
-      leftJoined.sql.foreach(f => println(f.sql))
+      compareFragment("leftJoined")(leftJoined.sql)
       leftJoined.toList.foreach(println)
 
       val sellStartDate = TypoLocalDateTime.now
@@ -166,7 +163,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         .setComputedValue(_.sellstartdate)(_ => sellStartDate)
         .where(_.productid === saved1.productid)
 
-      update.sql(returning = true).foreach(f => println(f.sql))
+      compareFragment("updateReturning")(update.sql(returning = true))
       val List(updated) = update.executeReturnChanged()
       assert(updated.name === Name("MANf")): @nowarn
       assert(updated.listprice === BigDecimal(2)): @nowarn
@@ -182,7 +179,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         .on { case (p, pm) => p.productmodelid === pm.productmodelid }
         .where { case (_, pm) => !pm.instructions.isNull }
 
-      q.sql.foreach(f => println(f.sql))
+      compareFragment("q")(q.sql)
       q.toList.foreach(println)
 
       val q2 = productRepo.select
@@ -210,7 +207,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
         .orderBy { case (_, pm2) => pm2(_.name).asc }
         .orderBy { case ((p, _), _) => p.color.desc.withNullsFirst }
 
-      q2.sql.foreach(println)
+      compareFragment("q2")(q2.sql)
       q2.toList.foreach { case ((p, pm1), pm2) =>
         println(p)
         println(pm1)
@@ -218,7 +215,10 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
       }
 
       // delete
-      productRepo.delete.where(_.productid === saved1.productid).execute(): @nowarn
+      val delete = productRepo.delete.where(_.productid === saved1.productid)
+      compareFragment("delete")(delete.sql)
+
+      delete.execute(): @nowarn
 
       val List() = productRepo.selectAll: @unchecked
 

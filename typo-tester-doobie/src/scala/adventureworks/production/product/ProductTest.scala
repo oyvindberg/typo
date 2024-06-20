@@ -6,15 +6,13 @@ import adventureworks.production.productmodel.*
 import adventureworks.production.productsubcategory.*
 import adventureworks.production.unitmeasure.*
 import adventureworks.public.{Flag, Name}
-import adventureworks.withConnection
+import adventureworks.{SnapshotTest, withConnection}
 import doobie.free.connection.delay
-import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.Assertion
-import org.scalatest.funsuite.AnyFunSuite
 
 import java.time.LocalDateTime
 
-class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
+class ProductTest extends SnapshotTest {
   def runTest(
       productRepo: ProductRepo,
       projectModelRepo: ProductmodelRepo,
@@ -95,8 +93,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
           .joinFk(_._1.fkProductsubcategory)(productsubcategoryRepo.select)
           .joinFk(_._2.fkProductcategory)(productcategoryRepo.select)
         _ <- query0.toList.map(println(_))
-        _ <- delay(query0.sql.foreach(f => println(f)))
-        _ <- delay(println("foo"))
+        _ <- delay(compareFragment("query0")(query0.sql))
 
         query = productRepo.select
           .where(_.`class` === "H ")
@@ -110,10 +107,10 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
           .orderBy { case ((product, _), _) => product.productmodelid.asc }
           .orderBy { case ((_, _), productModel) => productModel(_.name).desc.withNullsFirst }
 
-        _ <- delay(query.sql.foreach(f => println(f)))
+        _ <- delay(compareFragment("query")(query.sql))
         _ <- query.toList.map(println(_))
         leftJoined = productRepo.select.join(projectModelRepo.select).leftOn { case (p, pm) => p.productmodelid === pm.productmodelid }
-        _ <- delay(leftJoined.sql.foreach(println))
+        _ <- delay(compareFragment("leftJoined")(leftJoined.sql))
         _ <- leftJoined.toList.map(println)
 
         update = productRepo.update
@@ -123,7 +120,7 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
 //          .setComputedValue(_.sizeunitmeasurecode)(_ => Some(unitmeasure.unitmeasurecode))
           .where(_.productid === saved1.productid)
 
-        _ <- delay(update.sql(returning = true).foreach(println(_)))
+        _ <- delay(compareFragment("updateReturning")(update.sql(returning = true)))
         foo <- update.executeReturnChanged
         List(updated) = foo
         _ <- delay(assert(updated.name === Name("MANf")))
@@ -139,11 +136,11 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
             .on { case (p, pm) => p.productmodelid === pm.productmodelid }
             .where { case (_, pm) => !pm.instructions.isNull }
 
-          q.sql.foreach(f => println(f))
+          compareFragment("q")(q.sql)
           q.toList.map(list => list.foreach(println))
         }
         _ <- {
-          val q = productRepo.select
+          val q2 = productRepo.select
             // select from id, arrays work
             .where(p => p.productid.in(Array(saved1.productid, new ProductId(22))))
             // call `length` function and compare result
@@ -168,8 +165,8 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
             .orderBy { case ((_, pm), _) => pm.rowguid.desc.withNullsFirst }
             .orderBy { case ((_, _), pm2) => pm2(_.rowguid).asc }
 
-//          q.sql.foreach(f => println(f.sql))
-          q.toList.map {
+          compareFragment("q2")(q2.sql)
+          q2.toList.map {
             _.map { case ((p, pm1), pm2) =>
               println(p)
               println(pm1)
@@ -178,7 +175,9 @@ class ProductTest extends AnyFunSuite with TypeCheckedTripleEquals {
           }
         }
         // delete
-        _ <- productRepo.deleteById(saved1.productid)
+        delete = productRepo.delete.where(_.productid === saved1.productid)
+        _ <- delay(compareFragment("delete")(delete.sql))
+        _ <- delete.execute
         _ <- productRepo.selectAll.compile.toList.map {
           case Nil   => ()
           case other => throw new MatchError(other)
