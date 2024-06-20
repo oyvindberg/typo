@@ -1,7 +1,6 @@
 package typo.dsl
 
 import java.sql.Connection
-import typo.dsl.internal.seeks
 import typo.dsl.internal.mocks.RowOrdering
 
 final case class SelectBuilderMock[Fields, Row](
@@ -66,7 +65,7 @@ final case class SelectBuilderMock[Fields, Row](
 
 object SelectBuilderMock {
   def applyParams[Fields, R](structure: Structure[Fields, R], rows: List[R], params: SelectParams[Fields, R]): List[R] = {
-    val (filters, orderBys) = seeks.expand(structure.fields, params)
+    val (filters, orderBys) = OrderByOrSeek.expand(structure.fields, params)
     implicit val rowOrdering: Ordering[R] = new RowOrdering(structure, orderBys)
     rows
       .filter(row => filters.forall(expr => structure.untypedEval(expr, row).getOrElse(false)))
