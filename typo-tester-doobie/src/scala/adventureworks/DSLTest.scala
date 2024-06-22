@@ -40,6 +40,7 @@ class DSLTest extends SnapshotTest {
         doubled = q.join(q).on { case (((_, e1), _), ((_, e2), _)) => e1.businessentityid === e2.businessentityid }
         doubledRes <- doubled.toList
         _ <- delay(doubledRes.foreach(println))
+        _ <- doubled.count.map(v => assert(v == 1))
         _ <- delay(compareFragment("doubled")(doubled.sql))
       } yield ()
     }

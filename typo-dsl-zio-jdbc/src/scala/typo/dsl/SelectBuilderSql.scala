@@ -52,6 +52,10 @@ select ${SqlFragment(cols.mkString(","))} from ${SqlFragment(ctes.last.name)}"""
     val (frag, read) = sqlAndRowParser
     frag.query(using read).selectAll
   }
+  final override def count: ZIO[ZConnection, Throwable, Int] = {
+    val (frag, _) = sqlAndRowParser
+    sql"select count(*) from ($frag) rows".query[Int].selectOne.map(_.get)
+  }
 }
 
 object SelectBuilderSql {

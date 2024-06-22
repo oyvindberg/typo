@@ -59,6 +59,10 @@ sealed trait SelectBuilderSql[Fields, Row] extends SelectBuilder[Fields, Row] {
     val (frag, read) = sqlAndRowParser
     frag.query(using read).to[List]
   }
+  final override def count: ConnectionIO[Int] = {
+    val (frag, _) = sqlAndRowParser
+    fr"select count(*) from ($frag) rows".query[Int].unique
+  }
 }
 
 object SelectBuilderSql {

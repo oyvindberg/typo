@@ -20,6 +20,9 @@ final case class SelectBuilderMock[Fields, Row](
   override def toList: ConnectionIO[List[Row]] =
     all.map(all => SelectBuilderMock.applyParams(structure, all, params))
 
+  override def count: ConnectionIO[Int] =
+    all.map(all => SelectBuilderMock.applyParams(structure, all, params)).map(_.length)
+
   override def joinOn[Fields2, N[_]: Nullability, Row2](other: SelectBuilder[Fields2, Row2])(pred: Fields ~ Fields2 => SqlExpr[Boolean, N]): SelectBuilderMock[Fields ~ Fields2, Row ~ Row2] = {
     val otherMock: SelectBuilderMock[Fields2, Row2] = other match {
       case x: SelectBuilderMock[Fields2, Row2] => x.withPath(Path.RightInJoin)

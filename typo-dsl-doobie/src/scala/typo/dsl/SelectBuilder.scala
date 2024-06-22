@@ -65,6 +65,8 @@ trait SelectBuilder[Fields, Row] {
   /** Execute the query and return the results as a list */
   def toList: ConnectionIO[List[Row]]
 
+  def count: ConnectionIO[Int]
+
   /** Return sql for debugging. [[None]] if backed by a mock repository */
   def sql: Option[Fragment]
 
