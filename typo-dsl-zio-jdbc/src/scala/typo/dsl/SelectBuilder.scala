@@ -65,6 +65,8 @@ trait SelectBuilder[Fields, Row] {
   /** Execute the query and return the results as a list */
   def toChunk: ZIO[ZConnection, Throwable, Chunk[Row]]
 
+  def count: ZIO[ZConnection, Throwable, Int]
+
   /** Return sql for debugging. [[None]] if backed by a mock repository */
   def sql: Option[SqlFragment]
 

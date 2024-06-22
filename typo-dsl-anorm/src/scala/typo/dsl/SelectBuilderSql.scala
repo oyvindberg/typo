@@ -56,6 +56,11 @@ sealed trait SelectBuilderSql[Fields, Row] extends SelectBuilder[Fields, Row] {
     val (frag, rowParser) = sqlAndRowParser
     SimpleSql(SQL(frag.sql), frag.params.map(_.tupled).toMap, RowParser.successful).as(rowParser.*)(c)
   }
+
+  final override def count(implicit c: Connection): Int = {
+    val (frag, _) = sqlAndRowParser
+    SimpleSql(SQL(s"select count(*) from (${frag.sql}) rows"), frag.params.map(_.tupled).toMap, RowParser.successful).as(SqlParser.int(1).single)(c)
+  }
 }
 
 object SelectBuilderSql {

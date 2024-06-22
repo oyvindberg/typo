@@ -42,6 +42,7 @@ class DSLTest extends SnapshotTest {
       val doubled = q.join(q).on { case (((_, e1), _), ((_, e2), _)) => e1.businessentityid === e2.businessentityid }
 
       doubled.toList.foreach(println)
+      assert(doubled.count == 1): @nowarn
 
       compareFragment("doubled")(doubled.sql)
     }
