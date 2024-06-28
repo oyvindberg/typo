@@ -489,7 +489,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         } yield {
           // this is necessary to make custom types work with sql scripts, unfortunately.
           val renderedWithCasts: sc.Code =
-            cols.toList.flatMap(c => SqlCast.fromPg(c.dbCol)) match {
+            cols.toList.flatMap(c => SqlCast.fromPg(c.dbCol.tpe)) match {
               case Nil => renderedScript.code
               case _ =>
                 val row = sc.Ident("row")

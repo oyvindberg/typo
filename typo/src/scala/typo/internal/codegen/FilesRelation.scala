@@ -264,7 +264,7 @@ case class FilesRelation(
                 case _                               => (sc.Type.dsl.Field, col.tpe)
               }
 
-          val readSqlCast = SqlCast.fromPg(col.dbCol) match {
+          val readSqlCast = SqlCast.fromPg(col.dbCol.tpe) match {
             case Some(sqlCast) => code"${TypesScala.Some}(${sc.StrLit(sqlCast.typeName)})"
             case None          => TypesScala.None.code
           }

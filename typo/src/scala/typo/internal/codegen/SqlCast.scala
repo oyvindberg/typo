@@ -38,12 +38,14 @@ object SqlCast {
 
   /** avoid whatever the postgres driver does for these data formats by going through basic data types
     */
-  def fromPg(dbCol: db.Col): Option[SqlCast] =
-    dbCol.tpe match {
+  def fromPg(dbType: db.Type): Option[SqlCast] =
+    dbType match {
       case db.Type.Array(db.Type.Unknown(_)) | db.Type.Array(db.Type.DomainRef(_, _, db.Type.Unknown(_))) =>
         Some(SqlCast("text[]"))
-      case db.Type.Unknown(_) | db.Type.DomainRef(_, _, db.Type.Unknown(_)) =>
+      case db.Type.Unknown(_) =>
         Some(SqlCast("text"))
+      case db.Type.DomainRef(_, _, underlying) =>
+        fromPg(underlying)
       case db.Type.PGmoney =>
         Some(SqlCast("numeric"))
       case db.Type.Vector =>
@@ -60,5 +62,5 @@ object SqlCast {
     }
 
   def fromPgCode(c: ComputedColumn): sc.Code =
-    fromPg(c.dbCol).fold(sc.Code.Empty)(_.asCode)
+    fromPg(c.dbCol.tpe).fold(sc.Code.Empty)(_.asCode)
 }
