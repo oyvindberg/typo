@@ -168,11 +168,11 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       case RepoMethod.SelectById(_, _, id, rowType) =>
         code"def $name(${id.param})(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}"
       case RepoMethod.SelectByIds(_, _, idComputed, idsParam, rowType) =>
-        val usedDefineds = idComputed.userDefinedCols.zipWithIndex.map { case (col, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(col.tpe)), None) }
+        val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(colType)), None) }
         val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
         code"def $name($idsParam)(implicit ${params.map(_.code).mkCode(", ")}): ${TypesScala.List.of(rowType)}"
       case RepoMethod.SelectByIdsTracked(x) =>
-        val usedDefineds = x.idComputed.userDefinedCols.zipWithIndex.map { case (col, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(col.tpe)), None) }
+        val usedDefineds = x.idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(colType)), None) }
         val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
         code"def $name(${x.idsParam})(implicit ${params.map(_.code).mkCode(", ")}): ${TypesScala.Map.of(x.idComputed.tpe, x.rowType)}"
       case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
@@ -200,7 +200,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       case RepoMethod.Delete(_, id) =>
         code"def $name(${id.param})(implicit c: ${TypesJava.Connection}): ${TypesScala.Boolean}"
       case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
-        val usedDefineds = idComputed.userDefinedCols.zipWithIndex.map { case (col, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(col.tpe)), None) }
+        val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(colType)), None) }
         val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
         code"def $name($idsParam)(implicit ${params.map(_.code).mkCode(", ")}): ${TypesScala.Int}"
       case RepoMethod.SqlFile(sqlScript) =>

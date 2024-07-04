@@ -188,7 +188,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       case RepoMethod.SelectById(_, _, id, rowType) =>
         code"def $name(${id.param}): ${ZIO.of(ZConnection, Throwable, TypesScala.Option.of(rowType))}"
       case RepoMethod.SelectByIds(_, _, idComputed, idsParam, rowType) =>
-        val usedDefineds = idComputed.userDefinedCols.zipWithIndex.map { case (col, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(col.tpe)), None) }
+        val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(colType)), None) }
 
         usedDefineds match {
           case Nil =>
@@ -197,7 +197,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
             code"def $name($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ZStream.of(ZConnection, Throwable, rowType)}"
         }
       case RepoMethod.SelectByIdsTracked(x) =>
-        val usedDefineds = x.idComputed.userDefinedCols.zipWithIndex.map { case (col, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(col.tpe)), None) }
+        val usedDefineds = x.idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(colType)), None) }
         val returnType = ZIO.of(ZConnection, Throwable, TypesScala.Map.of(x.idComputed.tpe, x.rowType))
         usedDefineds match {
           case Nil =>
@@ -235,8 +235,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       case RepoMethod.Delete(_, id) =>
         code"def $name(${id.param}): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}"
       case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
-        val usedDefineds = idComputed.userDefinedCols.zipWithIndex
-          .map { case (col, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(col.tpe)), None) }
+        val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(colType)), None) }
         usedDefineds match {
           case Nil =>
             code"def $name(${idsParam}): ${ZIO.of(ZConnection, Throwable, TypesScala.Long)}"

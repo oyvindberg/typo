@@ -71,7 +71,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       case RepoMethod.SelectById(_, _, id, rowType) =>
         code"def $name(${id.param}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}"
       case RepoMethod.SelectByIds(_, _, idComputed, idsParam, rowType) =>
-        val usedDefineds = idComputed.userDefinedCols.zipWithIndex.map { case (col, i) => sc.Param(sc.Ident(s"puts$i"), Put.of(sc.Type.ArrayOf(col.tpe)), None) }
+        val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"puts$i"), Put.of(sc.Type.ArrayOf(colType)), None) }
         usedDefineds match {
           case Nil =>
             code"def $name($idsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
@@ -79,7 +79,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
             code"def $name($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${fs2Stream.of(ConnectionIO, rowType)}"
         }
       case RepoMethod.SelectByIdsTracked(x) =>
-        val usedDefineds = x.idComputed.userDefinedCols.zipWithIndex.map { case (col, i) => sc.Param(sc.Ident(s"puts$i"), Put.of(sc.Type.ArrayOf(col.tpe)), None) }
+        val usedDefineds = x.idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"puts$i"), Put.of(sc.Type.ArrayOf(colType)), None) }
         val returnType = ConnectionIO.of(TypesScala.Map.of(x.idComputed.tpe, x.rowType))
         usedDefineds match {
           case Nil =>
@@ -113,9 +113,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       case RepoMethod.Delete(_, id) =>
         code"def $name(${id.param}): ${ConnectionIO.of(TypesScala.Boolean)}"
       case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
-        val usedDefineds =
-          idComputed.userDefinedCols.zipWithIndex
-            .map { case (col, i) => sc.Param(sc.Ident(s"put$i"), Put.of(sc.Type.ArrayOf(col.tpe)), None) }
+        val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"put$i"), Put.of(sc.Type.ArrayOf(colType)), None) }
         usedDefineds match {
           case Nil =>
             code"def $name(${idsParam}): ${ConnectionIO.of(TypesScala.Int)}"
