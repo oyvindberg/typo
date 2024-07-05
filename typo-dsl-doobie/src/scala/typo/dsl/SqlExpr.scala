@@ -9,6 +9,9 @@ import typo.dsl.internal.mkFragment.FragmentOps
 import scala.reflect.ClassTag
 
 sealed trait SqlExpr[T, N[_]] extends SqlExpr.SqlExprNoHkt[N[T]] {
+  final def customBinaryOp[T2, N2[_], NC[_]](op: String, right: SqlExpr[T2, N2])(f: (T, T2) => Boolean)(implicit N: Nullability2[N, N2, NC]): SqlExpr[Boolean, NC] =
+    SqlExpr.Binary[T, T2, Boolean, N, N2, NC](this, new SqlOperator(op, f), right, N)
+
   final def isEqual[N2[_], NC[_]](t: SqlExpr[T, N2])(implicit O: Ordering[T], N: Nullability2[N, N2, NC]): SqlExpr[Boolean, NC] =
     this === t
 
