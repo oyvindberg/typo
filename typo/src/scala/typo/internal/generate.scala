@@ -101,12 +101,14 @@ object generate {
           case _ => Nil
         }
 
+        val domainFiles = domains.map(d => FileDomain(d, options, genOrdering))
+
         val mostFiles: List[sc.File] =
           List(
             options.dbLib.toList.flatMap(_.additionalFiles),
             List(FileDefault(default, options.jsonLibs, options.dbLib).file),
             enums.map(enm => FileStringEnum(options, enm, genOrdering)),
-            domains.map(d => FileDomain(d, options, genOrdering)),
+            domainFiles,
             customTypes.All.values.map(FileCustomType(options, genOrdering)),
             relationFilesByName.map { case (_, f) => f },
             sqlFileFiles
@@ -117,7 +119,7 @@ object generate {
             if (options.keepDependencies) relationFilesByName.map { case (_, f) => f }
             else relationFilesByName.collect { case (name, f) if selector.include(name) => f }
 
-          minimize(mostFiles, sqlFileFiles ++ keptRelations)
+          minimize(mostFiles, entryPoints = sqlFileFiles ++ keptRelations ++ domainFiles)
         }
 
         // package objects have weird scoping, so don't attempt to automatically write imports for them.
