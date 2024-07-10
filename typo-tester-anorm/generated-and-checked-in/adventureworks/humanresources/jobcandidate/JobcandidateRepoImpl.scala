@@ -19,6 +19,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -136,5 +137,19 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
        """
       .executeInsert(JobcandidateRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[JobcandidateRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table jobcandidate_TEMP (like humanresources.jobcandidate) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy jobcandidate_TEMP("jobcandidateid", "businessentityid", "resume", "modifieddate") from stdin""", batchSize, unsaved)(JobcandidateRow.text, c): @nowarn
+    SQL"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
+          select * from jobcandidate_TEMP
+          on conflict ("jobcandidateid")
+          do update set
+            "businessentityid" = EXCLUDED."businessentityid",
+            "resume" = EXCLUDED."resume",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table jobcandidate_TEMP;""".executeUpdate()
   }
 }

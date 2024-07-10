@@ -29,4 +29,6 @@ trait SpecialofferproductRepo {
   def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow]
   def update(row: SpecialofferproductRow)(implicit c: Connection): Boolean
   def upsert(unsaved: SpecialofferproductRow)(implicit c: Connection): SpecialofferproductRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[SpecialofferproductRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

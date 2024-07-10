@@ -104,4 +104,13 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
       UpdateResult(1, Chunk.single(unsaved))
     }
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, IllustrationRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    unsaved.scanZIO(0L) { case (acc, row) =>
+      ZIO.succeed {
+        map += (row.illustrationid -> row)
+        acc + 1
+      }
+    }.runLast.map(_.getOrElse(0L))
+  }
 }

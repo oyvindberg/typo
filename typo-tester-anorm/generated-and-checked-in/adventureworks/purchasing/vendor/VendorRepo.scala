@@ -30,4 +30,6 @@ trait VendorRepo {
   def update: UpdateBuilder[VendorFields, VendorRow]
   def update(row: VendorRow)(implicit c: Connection): Boolean
   def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[VendorRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

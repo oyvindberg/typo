@@ -30,4 +30,6 @@ trait JobcandidateRepo {
   def update: UpdateBuilder[JobcandidateFields, JobcandidateRow]
   def update(row: JobcandidateRow): ConnectionIO[Boolean]
   def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

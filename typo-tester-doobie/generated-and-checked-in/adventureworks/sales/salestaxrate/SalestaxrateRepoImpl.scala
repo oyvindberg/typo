@@ -143,4 +143,23 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
           returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
        """.query(using SalestaxrateRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table salestaxrate_TEMP (like sales.salestaxrate) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy salestaxrate_TEMP("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SalestaxrateRow.text)
+      res <- sql"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+                   select * from salestaxrate_TEMP
+                   on conflict ("salestaxrateid")
+                   do update set
+                     "stateprovinceid" = EXCLUDED."stateprovinceid",
+                     "taxtype" = EXCLUDED."taxtype",
+                     "taxrate" = EXCLUDED."taxrate",
+                     "name" = EXCLUDED."name",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table salestaxrate_TEMP;""".update.run
+    } yield res
+  }
 }

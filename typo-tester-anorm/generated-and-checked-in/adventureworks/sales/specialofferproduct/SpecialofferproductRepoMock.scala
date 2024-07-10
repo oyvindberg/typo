@@ -87,4 +87,11 @@ class SpecialofferproductRepoMock(toRow: Function1[SpecialofferproductRowUnsaved
     map.put(unsaved.compositeId, unsaved): @nowarn
     unsaved
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SpecialofferproductRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    unsaved.foreach { row =>
+      map += (row.compositeId -> row)
+    }
+    unsaved.size
+  }
 }

@@ -21,6 +21,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -147,5 +148,18 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
        """
       .executeInsert(EmployeedepartmenthistoryRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[EmployeedepartmenthistoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table employeedepartmenthistory_TEMP (like humanresources.employeedepartmenthistory) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy employeedepartmenthistory_TEMP("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") from stdin""", batchSize, unsaved)(EmployeedepartmenthistoryRow.text, c): @nowarn
+    SQL"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
+          select * from employeedepartmenthistory_TEMP
+          on conflict ("businessentityid", "startdate", "departmentid", "shiftid")
+          do update set
+            "enddate" = EXCLUDED."enddate",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table employeedepartmenthistory_TEMP;""".executeUpdate()
   }
 }

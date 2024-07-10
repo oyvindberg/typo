@@ -30,4 +30,6 @@ trait UnitmeasureRepo {
   def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow]
   def update(row: UnitmeasureRow): ConnectionIO[Boolean]
   def upsert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

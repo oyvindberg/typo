@@ -132,4 +132,22 @@ class CreditcardRepoImpl extends CreditcardRepo {
           returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
        """.query(using CreditcardRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, CreditcardRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table creditcard_TEMP (like sales.creditcard) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy creditcard_TEMP("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using CreditcardRow.text)
+      res <- sql"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
+                   select * from creditcard_TEMP
+                   on conflict ("creditcardid")
+                   do update set
+                     "cardtype" = EXCLUDED."cardtype",
+                     "cardnumber" = EXCLUDED."cardnumber",
+                     "expmonth" = EXCLUDED."expmonth",
+                     "expyear" = EXCLUDED."expyear",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table creditcard_TEMP;""".update.run
+    } yield res
+  }
 }

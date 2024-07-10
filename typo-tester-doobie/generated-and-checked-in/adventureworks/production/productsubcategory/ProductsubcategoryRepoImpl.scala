@@ -130,4 +130,21 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
           returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text
        """.query(using ProductsubcategoryRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductsubcategoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productsubcategory_TEMP (like production.productsubcategory) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productsubcategory_TEMP("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductsubcategoryRow.text)
+      res <- sql"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
+                   select * from productsubcategory_TEMP
+                   on conflict ("productsubcategoryid")
+                   do update set
+                     "productcategoryid" = EXCLUDED."productcategoryid",
+                     "name" = EXCLUDED."name",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productsubcategory_TEMP;""".update.run
+    } yield res
+  }
 }

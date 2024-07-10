@@ -144,4 +144,25 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
        """.query(using TransactionhistoryarchiveRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryarchiveRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table transactionhistoryarchive_TEMP (like production.transactionhistoryarchive) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy transactionhistoryarchive_TEMP("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using TransactionhistoryarchiveRow.text)
+      res <- sql"""insert into production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
+                   select * from transactionhistoryarchive_TEMP
+                   on conflict ("transactionid")
+                   do update set
+                     "productid" = EXCLUDED."productid",
+                     "referenceorderid" = EXCLUDED."referenceorderid",
+                     "referenceorderlineid" = EXCLUDED."referenceorderlineid",
+                     "transactiondate" = EXCLUDED."transactiondate",
+                     "transactiontype" = EXCLUDED."transactiontype",
+                     "quantity" = EXCLUDED."quantity",
+                     "actualcost" = EXCLUDED."actualcost",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table transactionhistoryarchive_TEMP;""".update.run
+    } yield res
+  }
 }

@@ -168,4 +168,25 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
           returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
        """.query(using SalesorderdetailRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, SalesorderdetailRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table salesorderdetail_TEMP (like sales.salesorderdetail) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy salesorderdetail_TEMP("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SalesorderdetailRow.text)
+      res <- sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+                   select * from salesorderdetail_TEMP
+                   on conflict ("salesorderid", "salesorderdetailid")
+                   do update set
+                     "carriertrackingnumber" = EXCLUDED."carriertrackingnumber",
+                     "orderqty" = EXCLUDED."orderqty",
+                     "productid" = EXCLUDED."productid",
+                     "specialofferid" = EXCLUDED."specialofferid",
+                     "unitprice" = EXCLUDED."unitprice",
+                     "unitpricediscount" = EXCLUDED."unitpricediscount",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table salesorderdetail_TEMP;""".update.run
+    } yield res
+  }
 }

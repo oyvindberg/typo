@@ -17,6 +17,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -127,5 +128,18 @@ class CountryregionRepoImpl extends CountryregionRepo {
        """
       .executeInsert(CountryregionRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[CountryregionRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table countryregion_TEMP (like person.countryregion) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy countryregion_TEMP("countryregioncode", "name", "modifieddate") from stdin""", batchSize, unsaved)(CountryregionRow.text, c): @nowarn
+    SQL"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+          select * from countryregion_TEMP
+          on conflict ("countryregioncode")
+          do update set
+            "name" = EXCLUDED."name",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table countryregion_TEMP;""".executeUpdate()
   }
 }

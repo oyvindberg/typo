@@ -135,4 +135,19 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
           returning "specialofferid", "productid", "rowguid", "modifieddate"::text
        """.query(using SpecialofferproductRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, SpecialofferproductRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table specialofferproduct_TEMP (like sales.specialofferproduct) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy specialofferproduct_TEMP("specialofferid", "productid", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SpecialofferproductRow.text)
+      res <- sql"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")
+                   select * from specialofferproduct_TEMP
+                   on conflict ("specialofferid", "productid")
+                   do update set
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table specialofferproduct_TEMP;""".update.run
+    } yield res
+  }
 }

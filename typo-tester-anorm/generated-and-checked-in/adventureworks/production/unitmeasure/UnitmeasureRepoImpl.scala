@@ -17,6 +17,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -127,5 +128,18 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
        """
       .executeInsert(UnitmeasureRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[UnitmeasureRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table unitmeasure_TEMP (like production.unitmeasure) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy unitmeasure_TEMP("unitmeasurecode", "name", "modifieddate") from stdin""", batchSize, unsaved)(UnitmeasureRow.text, c): @nowarn
+    SQL"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
+          select * from unitmeasure_TEMP
+          on conflict ("unitmeasurecode")
+          do update set
+            "name" = EXCLUDED."name",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table unitmeasure_TEMP;""".executeUpdate()
   }
 }

@@ -18,6 +18,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -147,5 +148,22 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
        """
       .executeInsert(CurrencyrateRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[CurrencyrateRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table currencyrate_TEMP (like sales.currencyrate) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy currencyrate_TEMP("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate") from stdin""", batchSize, unsaved)(CurrencyrateRow.text, c): @nowarn
+    SQL"""insert into sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")
+          select * from currencyrate_TEMP
+          on conflict ("currencyrateid")
+          do update set
+            "currencyratedate" = EXCLUDED."currencyratedate",
+            "fromcurrencycode" = EXCLUDED."fromcurrencycode",
+            "tocurrencycode" = EXCLUDED."tocurrencycode",
+            "averagerate" = EXCLUDED."averagerate",
+            "endofdayrate" = EXCLUDED."endofdayrate",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table currencyrate_TEMP;""".executeUpdate()
   }
 }

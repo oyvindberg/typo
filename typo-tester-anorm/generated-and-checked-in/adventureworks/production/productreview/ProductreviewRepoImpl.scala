@@ -20,6 +20,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -156,5 +157,23 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
        """
       .executeInsert(ProductreviewRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ProductreviewRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table productreview_TEMP (like production.productreview) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy productreview_TEMP("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") from stdin""", batchSize, unsaved)(ProductreviewRow.text, c): @nowarn
+    SQL"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+          select * from productreview_TEMP
+          on conflict ("productreviewid")
+          do update set
+            "productid" = EXCLUDED."productid",
+            "reviewername" = EXCLUDED."reviewername",
+            "reviewdate" = EXCLUDED."reviewdate",
+            "emailaddress" = EXCLUDED."emailaddress",
+            "rating" = EXCLUDED."rating",
+            "comments" = EXCLUDED."comments",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table productreview_TEMP;""".executeUpdate()
   }
 }

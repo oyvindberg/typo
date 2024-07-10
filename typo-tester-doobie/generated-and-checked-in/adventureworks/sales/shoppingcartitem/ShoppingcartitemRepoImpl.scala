@@ -136,4 +136,22 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
           returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
        """.query(using ShoppingcartitemRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table shoppingcartitem_TEMP (like sales.shoppingcartitem) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy shoppingcartitem_TEMP("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ShoppingcartitemRow.text)
+      res <- sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
+                   select * from shoppingcartitem_TEMP
+                   on conflict ("shoppingcartitemid")
+                   do update set
+                     "shoppingcartid" = EXCLUDED."shoppingcartid",
+                     "quantity" = EXCLUDED."quantity",
+                     "productid" = EXCLUDED."productid",
+                     "datecreated" = EXCLUDED."datecreated",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table shoppingcartitem_TEMP;""".update.run
+    } yield res
+  }
 }

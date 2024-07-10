@@ -21,6 +21,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -156,5 +157,22 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
        """
       .executeInsert(SalestaxrateRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SalestaxrateRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table salestaxrate_TEMP (like sales.salestaxrate) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy salestaxrate_TEMP("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalestaxrateRow.text, c): @nowarn
+    SQL"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+          select * from salestaxrate_TEMP
+          on conflict ("salestaxrateid")
+          do update set
+            "stateprovinceid" = EXCLUDED."stateprovinceid",
+            "taxtype" = EXCLUDED."taxtype",
+            "taxrate" = EXCLUDED."taxrate",
+            "name" = EXCLUDED."name",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table salestaxrate_TEMP;""".executeUpdate()
   }
 }

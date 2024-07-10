@@ -114,4 +114,19 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
           returning "unitmeasurecode", "name", "modifieddate"::text
        """.query(using UnitmeasureRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table unitmeasure_TEMP (like production.unitmeasure) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy unitmeasure_TEMP("unitmeasurecode", "name", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using UnitmeasureRow.text)
+      res <- sql"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
+                   select * from unitmeasure_TEMP
+                   on conflict ("unitmeasurecode")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table unitmeasure_TEMP;""".update.run
+    } yield res
+  }
 }

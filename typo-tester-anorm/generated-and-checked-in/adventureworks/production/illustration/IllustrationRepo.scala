@@ -29,4 +29,6 @@ trait IllustrationRepo {
   def update: UpdateBuilder[IllustrationFields, IllustrationRow]
   def update(row: IllustrationRow)(implicit c: Connection): Boolean
   def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[IllustrationRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

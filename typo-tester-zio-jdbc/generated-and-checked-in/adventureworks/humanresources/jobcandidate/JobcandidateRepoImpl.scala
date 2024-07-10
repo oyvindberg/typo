@@ -117,4 +117,19 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text""".insertReturning(using JobcandidateRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, JobcandidateRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table jobcandidate_TEMP (like humanresources.jobcandidate) on commit drop".execute
+    val copied = streamingInsert(s"""copy jobcandidate_TEMP("jobcandidateid", "businessentityid", "resume", "modifieddate") from stdin""", batchSize, unsaved)(JobcandidateRow.text)
+    val merged = sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
+                       select * from jobcandidate_TEMP
+                       on conflict ("jobcandidateid")
+                       do update set
+                         "businessentityid" = EXCLUDED."businessentityid",
+                         "resume" = EXCLUDED."resume",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table jobcandidate_TEMP;""".update
+    created *> copied *> merged
+  }
 }

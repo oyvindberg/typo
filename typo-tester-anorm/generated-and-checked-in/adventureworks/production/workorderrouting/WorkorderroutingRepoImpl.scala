@@ -21,6 +21,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -171,5 +172,25 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
        """
       .executeInsert(WorkorderroutingRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table workorderrouting_TEMP (like production.workorderrouting) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy workorderrouting_TEMP("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") from stdin""", batchSize, unsaved)(WorkorderroutingRow.text, c): @nowarn
+    SQL"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
+          select * from workorderrouting_TEMP
+          on conflict ("workorderid", "productid", "operationsequence")
+          do update set
+            "locationid" = EXCLUDED."locationid",
+            "scheduledstartdate" = EXCLUDED."scheduledstartdate",
+            "scheduledenddate" = EXCLUDED."scheduledenddate",
+            "actualstartdate" = EXCLUDED."actualstartdate",
+            "actualenddate" = EXCLUDED."actualenddate",
+            "actualresourcehrs" = EXCLUDED."actualresourcehrs",
+            "plannedcost" = EXCLUDED."plannedcost",
+            "actualcost" = EXCLUDED."actualcost",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table workorderrouting_TEMP;""".executeUpdate()
   }
 }

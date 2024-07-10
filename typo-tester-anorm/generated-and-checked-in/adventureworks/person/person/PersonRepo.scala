@@ -30,4 +30,6 @@ trait PersonRepo {
   def update: UpdateBuilder[PersonFields, PersonRow]
   def update(row: PersonRow)(implicit c: Connection): Boolean
   def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[PersonRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

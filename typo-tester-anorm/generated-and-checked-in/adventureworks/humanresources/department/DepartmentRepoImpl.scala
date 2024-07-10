@@ -17,6 +17,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -134,5 +135,19 @@ class DepartmentRepoImpl extends DepartmentRepo {
        """
       .executeInsert(DepartmentRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[DepartmentRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table department_TEMP (like humanresources.department) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy department_TEMP("departmentid", "name", "groupname", "modifieddate") from stdin""", batchSize, unsaved)(DepartmentRow.text, c): @nowarn
+    SQL"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
+          select * from department_TEMP
+          on conflict ("departmentid")
+          do update set
+            "name" = EXCLUDED."name",
+            "groupname" = EXCLUDED."groupname",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table department_TEMP;""".executeUpdate()
   }
 }

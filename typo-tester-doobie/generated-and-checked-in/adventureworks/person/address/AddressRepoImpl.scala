@@ -147,4 +147,25 @@ class AddressRepoImpl extends AddressRepo {
           returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
        """.query(using AddressRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, AddressRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table address_TEMP (like person.address) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy address_TEMP("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using AddressRow.text)
+      res <- sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
+                   select * from address_TEMP
+                   on conflict ("addressid")
+                   do update set
+                     "addressline1" = EXCLUDED."addressline1",
+                     "addressline2" = EXCLUDED."addressline2",
+                     "city" = EXCLUDED."city",
+                     "stateprovinceid" = EXCLUDED."stateprovinceid",
+                     "postalcode" = EXCLUDED."postalcode",
+                     "spatiallocation" = EXCLUDED."spatiallocation",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table address_TEMP;""".update.run
+    } yield res
+  }
 }

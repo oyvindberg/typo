@@ -29,4 +29,6 @@ trait IdentityTestRepo {
   def update: UpdateBuilder[IdentityTestFields, IdentityTestRow]
   def update(row: IdentityTestRow)(implicit c: Connection): Boolean
   def upsert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[IdentityTestRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

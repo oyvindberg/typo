@@ -32,4 +32,6 @@ trait CountryregionRepo {
   def update: UpdateBuilder[CountryregionFields, CountryregionRow]
   def update(row: CountryregionRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CountryregionRow): ZIO[ZConnection, Throwable, UpdateResult[CountryregionRow]]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregionRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

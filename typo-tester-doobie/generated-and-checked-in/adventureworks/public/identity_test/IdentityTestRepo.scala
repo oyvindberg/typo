@@ -30,4 +30,6 @@ trait IdentityTestRepo {
   def update: UpdateBuilder[IdentityTestFields, IdentityTestRow]
   def update(row: IdentityTestRow): ConnectionIO[Boolean]
   def upsert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, IdentityTestRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

@@ -161,4 +161,26 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
           returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
        """.query(using ProductvendorRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductvendorRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productvendor_TEMP (like purchasing.productvendor) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productvendor_TEMP("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductvendorRow.text)
+      res <- sql"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
+                   select * from productvendor_TEMP
+                   on conflict ("productid", "businessentityid")
+                   do update set
+                     "averageleadtime" = EXCLUDED."averageleadtime",
+                     "standardprice" = EXCLUDED."standardprice",
+                     "lastreceiptcost" = EXCLUDED."lastreceiptcost",
+                     "lastreceiptdate" = EXCLUDED."lastreceiptdate",
+                     "minorderqty" = EXCLUDED."minorderqty",
+                     "maxorderqty" = EXCLUDED."maxorderqty",
+                     "onorderqty" = EXCLUDED."onorderqty",
+                     "unitmeasurecode" = EXCLUDED."unitmeasurecode",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productvendor_TEMP;""".update.run
+    } yield res
+  }
 }

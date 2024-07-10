@@ -19,6 +19,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -144,5 +145,21 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
        """
       .executeInsert(ProductphotoRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ProductphotoRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table productphoto_TEMP (like production.productphoto) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy productphoto_TEMP("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate") from stdin""", batchSize, unsaved)(ProductphotoRow.text, c): @nowarn
+    SQL"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+          select * from productphoto_TEMP
+          on conflict ("productphotoid")
+          do update set
+            "thumbnailphoto" = EXCLUDED."thumbnailphoto",
+            "thumbnailphotofilename" = EXCLUDED."thumbnailphotofilename",
+            "largephoto" = EXCLUDED."largephoto",
+            "largephotofilename" = EXCLUDED."largephotofilename",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table productphoto_TEMP;""".executeUpdate()
   }
 }

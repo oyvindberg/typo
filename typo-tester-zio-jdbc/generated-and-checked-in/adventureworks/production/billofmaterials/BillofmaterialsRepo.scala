@@ -32,4 +32,6 @@ trait BillofmaterialsRepo {
   def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def update(row: BillofmaterialsRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: BillofmaterialsRow): ZIO[ZConnection, Throwable, UpdateResult[BillofmaterialsRow]]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, BillofmaterialsRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

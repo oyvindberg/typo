@@ -169,4 +169,29 @@ class PersonRepoImpl extends PersonRepo {
           returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
        """.query(using PersonRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table person_TEMP (like person.person) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy person_TEMP("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using PersonRow.text)
+      res <- sql"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
+                   select * from person_TEMP
+                   on conflict ("businessentityid")
+                   do update set
+                     "persontype" = EXCLUDED."persontype",
+                     "namestyle" = EXCLUDED."namestyle",
+                     "title" = EXCLUDED."title",
+                     "firstname" = EXCLUDED."firstname",
+                     "middlename" = EXCLUDED."middlename",
+                     "lastname" = EXCLUDED."lastname",
+                     "suffix" = EXCLUDED."suffix",
+                     "emailpromotion" = EXCLUDED."emailpromotion",
+                     "additionalcontactinfo" = EXCLUDED."additionalcontactinfo",
+                     "demographics" = EXCLUDED."demographics",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table person_TEMP;""".update.run
+    } yield res
+  }
 }

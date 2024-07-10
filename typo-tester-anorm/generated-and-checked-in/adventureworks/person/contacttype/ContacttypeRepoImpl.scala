@@ -17,6 +17,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -130,5 +131,18 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
        """
       .executeInsert(ContacttypeRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ContacttypeRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table contacttype_TEMP (like person.contacttype) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy contacttype_TEMP("contacttypeid", "name", "modifieddate") from stdin""", batchSize, unsaved)(ContacttypeRow.text, c): @nowarn
+    SQL"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+          select * from contacttype_TEMP
+          on conflict ("contacttypeid")
+          do update set
+            "name" = EXCLUDED."name",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table contacttype_TEMP;""".executeUpdate()
   }
 }

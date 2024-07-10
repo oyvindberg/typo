@@ -125,4 +125,20 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
           returning "addresstypeid", "name", "rowguid", "modifieddate"::text
        """.query(using AddresstypeRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, AddresstypeRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table addresstype_TEMP (like person.addresstype) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy addresstype_TEMP("addresstypeid", "name", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using AddresstypeRow.text)
+      res <- sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
+                   select * from addresstype_TEMP
+                   on conflict ("addresstypeid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table addresstype_TEMP;""".update.run
+    } yield res
+  }
 }

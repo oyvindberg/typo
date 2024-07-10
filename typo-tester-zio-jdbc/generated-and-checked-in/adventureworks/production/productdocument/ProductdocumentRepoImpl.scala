@@ -124,4 +124,17 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productid", "modifieddate"::text, "documentnode"""".insertReturning(using ProductdocumentRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductdocumentRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table productdocument_TEMP (like production.productdocument) on commit drop".execute
+    val copied = streamingInsert(s"""copy productdocument_TEMP("productid", "modifieddate", "documentnode") from stdin""", batchSize, unsaved)(ProductdocumentRow.text)
+    val merged = sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")
+                       select * from productdocument_TEMP
+                       on conflict ("productid", "documentnode")
+                       do update set
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table productdocument_TEMP;""".update
+    created *> copied *> merged
+  }
 }

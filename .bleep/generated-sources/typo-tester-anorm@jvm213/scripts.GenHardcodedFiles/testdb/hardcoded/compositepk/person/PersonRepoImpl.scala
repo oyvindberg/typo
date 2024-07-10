@@ -17,6 +17,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import testdb.hardcoded.customtypes.Defaulted
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -147,5 +148,17 @@ class PersonRepoImpl extends PersonRepo {
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[PersonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table person_TEMP (like compositepk.person) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy person_TEMP("one", "two", "name") from stdin""", batchSize, unsaved)(PersonRow.text, c): @nowarn
+    SQL"""insert into compositepk.person("one", "two", "name")
+          select * from person_TEMP
+          on conflict ("one", "two")
+          do update set
+            "name" = EXCLUDED."name"
+          ;
+          drop table person_TEMP;""".executeUpdate()
   }
 }

@@ -108,4 +108,18 @@ class CountryregionRepoImpl extends CountryregionRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "countryregioncode", "name", "modifieddate"::text""".insertReturning(using CountryregionRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregionRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table countryregion_TEMP (like person.countryregion) on commit drop".execute
+    val copied = streamingInsert(s"""copy countryregion_TEMP("countryregioncode", "name", "modifieddate") from stdin""", batchSize, unsaved)(CountryregionRow.text)
+    val merged = sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+                       select * from countryregion_TEMP
+                       on conflict ("countryregioncode")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table countryregion_TEMP;""".update
+    created *> copied *> merged
+  }
 }

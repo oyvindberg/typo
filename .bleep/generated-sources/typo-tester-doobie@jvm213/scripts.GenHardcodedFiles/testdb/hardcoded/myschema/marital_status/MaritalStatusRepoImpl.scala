@@ -79,4 +79,18 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
           returning "id"
        """.query(using MaritalStatusRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, MaritalStatusRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table marital_status_TEMP (like myschema.marital_status) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy marital_status_TEMP("id") from stdin""").copyIn(unsaved, batchSize)(using MaritalStatusRow.text)
+      res <- sql"""insert into myschema.marital_status("id")
+                   select * from marital_status_TEMP
+                   on conflict ("id")
+                   do update set
+                     
+                   ;
+                   drop table marital_status_TEMP;""".update.run
+    } yield res
+  }
 }

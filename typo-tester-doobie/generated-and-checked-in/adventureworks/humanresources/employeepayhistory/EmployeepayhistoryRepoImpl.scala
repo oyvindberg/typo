@@ -136,4 +136,20 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
           returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
        """.query(using EmployeepayhistoryRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, EmployeepayhistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table employeepayhistory_TEMP (like humanresources.employeepayhistory) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy employeepayhistory_TEMP("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using EmployeepayhistoryRow.text)
+      res <- sql"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
+                   select * from employeepayhistory_TEMP
+                   on conflict ("businessentityid", "ratechangedate")
+                   do update set
+                     "rate" = EXCLUDED."rate",
+                     "payfrequency" = EXCLUDED."payfrequency",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table employeepayhistory_TEMP;""".update.run
+    } yield res
+  }
 }

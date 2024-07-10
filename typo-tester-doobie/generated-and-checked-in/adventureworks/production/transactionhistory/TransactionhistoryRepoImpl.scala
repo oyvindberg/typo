@@ -148,4 +148,25 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
        """.query(using TransactionhistoryRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table transactionhistory_TEMP (like production.transactionhistory) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy transactionhistory_TEMP("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using TransactionhistoryRow.text)
+      res <- sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
+                   select * from transactionhistory_TEMP
+                   on conflict ("transactionid")
+                   do update set
+                     "productid" = EXCLUDED."productid",
+                     "referenceorderid" = EXCLUDED."referenceorderid",
+                     "referenceorderlineid" = EXCLUDED."referenceorderlineid",
+                     "transactiondate" = EXCLUDED."transactiondate",
+                     "transactiontype" = EXCLUDED."transactiontype",
+                     "quantity" = EXCLUDED."quantity",
+                     "actualcost" = EXCLUDED."actualcost",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table transactionhistory_TEMP;""".update.run
+    } yield res
+  }
 }

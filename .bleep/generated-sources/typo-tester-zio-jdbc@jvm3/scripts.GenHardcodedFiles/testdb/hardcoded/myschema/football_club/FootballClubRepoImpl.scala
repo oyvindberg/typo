@@ -103,4 +103,17 @@ class FootballClubRepoImpl extends FootballClubRepo {
             "name" = EXCLUDED."name"
           returning "id", "name"""".insertReturning(using FootballClubRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, FootballClubRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table football_club_TEMP (like myschema.football_club) on commit drop".execute
+    val copied = streamingInsert(s"""copy football_club_TEMP("id", "name") from stdin""", batchSize, unsaved)(FootballClubRow.text)
+    val merged = sql"""insert into myschema.football_club("id", "name")
+                       select * from football_club_TEMP
+                       on conflict ("id")
+                       do update set
+                         "name" = EXCLUDED."name"
+                       ;
+                       drop table football_club_TEMP;""".update
+    created *> copied *> merged
+  }
 }

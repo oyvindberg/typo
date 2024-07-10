@@ -29,4 +29,6 @@ trait AddresstypeRepo {
   def update: UpdateBuilder[AddresstypeFields, AddresstypeRow]
   def update(row: AddresstypeRow)(implicit c: Connection): Boolean
   def upsert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[AddresstypeRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

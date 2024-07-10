@@ -159,4 +159,25 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text""".insertReturning(using WorkorderroutingRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderroutingRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table workorderrouting_TEMP (like production.workorderrouting) on commit drop".execute
+    val copied = streamingInsert(s"""copy workorderrouting_TEMP("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") from stdin""", batchSize, unsaved)(WorkorderroutingRow.text)
+    val merged = sql"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
+                       select * from workorderrouting_TEMP
+                       on conflict ("workorderid", "productid", "operationsequence")
+                       do update set
+                         "locationid" = EXCLUDED."locationid",
+                         "scheduledstartdate" = EXCLUDED."scheduledstartdate",
+                         "scheduledenddate" = EXCLUDED."scheduledenddate",
+                         "actualstartdate" = EXCLUDED."actualstartdate",
+                         "actualenddate" = EXCLUDED."actualenddate",
+                         "actualresourcehrs" = EXCLUDED."actualresourcehrs",
+                         "plannedcost" = EXCLUDED."plannedcost",
+                         "actualcost" = EXCLUDED."actualcost",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table workorderrouting_TEMP;""".update
+    created *> copied *> merged
+  }
 }

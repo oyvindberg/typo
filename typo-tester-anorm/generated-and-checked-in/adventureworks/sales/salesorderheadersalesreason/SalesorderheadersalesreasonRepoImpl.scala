@@ -18,6 +18,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -132,5 +133,17 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
        """
       .executeInsert(SalesorderheadersalesreasonRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SalesorderheadersalesreasonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table salesorderheadersalesreason_TEMP (like sales.salesorderheadersalesreason) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy salesorderheadersalesreason_TEMP("salesorderid", "salesreasonid", "modifieddate") from stdin""", batchSize, unsaved)(SalesorderheadersalesreasonRow.text, c): @nowarn
+    SQL"""insert into sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate")
+          select * from salesorderheadersalesreason_TEMP
+          on conflict ("salesorderid", "salesreasonid")
+          do update set
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table salesorderheadersalesreason_TEMP;""".executeUpdate()
   }
 }

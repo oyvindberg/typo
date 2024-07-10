@@ -122,4 +122,20 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
           returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
        """.query(using JobcandidateRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table jobcandidate_TEMP (like humanresources.jobcandidate) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy jobcandidate_TEMP("jobcandidateid", "businessentityid", "resume", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using JobcandidateRow.text)
+      res <- sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
+                   select * from jobcandidate_TEMP
+                   on conflict ("jobcandidateid")
+                   do update set
+                     "businessentityid" = EXCLUDED."businessentityid",
+                     "resume" = EXCLUDED."resume",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table jobcandidate_TEMP;""".update.run
+    } yield res
+  }
 }

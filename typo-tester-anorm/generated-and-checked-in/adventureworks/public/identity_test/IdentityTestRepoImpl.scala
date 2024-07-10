@@ -16,6 +16,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -125,5 +126,18 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
        """
       .executeInsert(IdentityTestRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[IdentityTestRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table identity-test_TEMP (like public.identity-test) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy identity-test_TEMP("always_generated", "default_generated", "name") from stdin""", batchSize, unsaved)(IdentityTestRow.text, c): @nowarn
+    SQL"""insert into public.identity-test("always_generated", "default_generated", "name")
+          select * from identity-test_TEMP
+          on conflict ("name")
+          do update set
+            "always_generated" = EXCLUDED."always_generated",
+            "default_generated" = EXCLUDED."default_generated"
+          ;
+          drop table identity-test_TEMP;""".executeUpdate()
   }
 }

@@ -86,6 +86,15 @@ object RepoMethod {
       rowType: sc.Type
   ) extends Mutator("upsert")
 
+  case class UpsertStreaming(
+      relName: db.RelationName,
+      cols: NonEmptyList[ComputedColumn],
+      id: IdComputed,
+      rowType: sc.Type
+  ) extends Mutator("upsertStreaming") {
+    override val comment: Option[String] = Some("/* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */")
+  }
+
   case class Insert(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],

@@ -145,4 +145,24 @@ class VendorRepoImpl extends VendorRepo {
           returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
        """.query(using VendorRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, VendorRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table vendor_TEMP (like purchasing.vendor) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy vendor_TEMP("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using VendorRow.text)
+      res <- sql"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
+                   select * from vendor_TEMP
+                   on conflict ("businessentityid")
+                   do update set
+                     "accountnumber" = EXCLUDED."accountnumber",
+                     "name" = EXCLUDED."name",
+                     "creditrating" = EXCLUDED."creditrating",
+                     "preferredvendorstatus" = EXCLUDED."preferredvendorstatus",
+                     "activeflag" = EXCLUDED."activeflag",
+                     "purchasingwebserviceurl" = EXCLUDED."purchasingwebserviceurl",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table vendor_TEMP;""".update.run
+    } yield res
+  }
 }

@@ -107,4 +107,18 @@ class FootballClubRepoImpl extends FootballClubRepo {
           returning "id", "name"
        """.query(using FootballClubRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table football_club_TEMP (like myschema.football_club) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy football_club_TEMP("id", "name") from stdin""").copyIn(unsaved, batchSize)(using FootballClubRow.text)
+      res <- sql"""insert into myschema.football_club("id", "name")
+                   select * from football_club_TEMP
+                   on conflict ("id")
+                   do update set
+                     "name" = EXCLUDED."name"
+                   ;
+                   drop table football_club_TEMP;""".update.run
+    } yield res
+  }
 }

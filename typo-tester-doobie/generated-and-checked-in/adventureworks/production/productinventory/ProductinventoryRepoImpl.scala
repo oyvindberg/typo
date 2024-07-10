@@ -152,4 +152,22 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
           returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
        """.query(using ProductinventoryRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productinventory_TEMP (like production.productinventory) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productinventory_TEMP("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductinventoryRow.text)
+      res <- sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
+                   select * from productinventory_TEMP
+                   on conflict ("productid", "locationid")
+                   do update set
+                     "shelf" = EXCLUDED."shelf",
+                     "bin" = EXCLUDED."bin",
+                     "quantity" = EXCLUDED."quantity",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productinventory_TEMP;""".update.run
+    } yield res
+  }
 }

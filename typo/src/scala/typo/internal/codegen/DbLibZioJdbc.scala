@@ -224,6 +224,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         val in = ZStream.of(ZConnection, TypesJava.Throwable, rowType)
         val out = ZIO.of(ZConnection, TypesJava.Throwable, TypesScala.Long)
         code"def $name(unsaved: $in, batchSize: Int = 10000): $out"
+      case RepoMethod.UpsertStreaming(_, _, _, rowType) =>
+        val in = ZStream.of(ZConnection, TypesJava.Throwable, rowType)
+        val out = ZIO.of(ZConnection, TypesJava.Throwable, TypesScala.Long)
+        code"def $name(unsaved: $in, batchSize: Int = 10000): $out"
       case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
         code"def $name($unsavedParam): ${ZIO.of(ZConnection, Throwable, UpdateResult.of(rowType))}"
       case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
@@ -425,6 +429,28 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
 
         code"$sql.insertReturning(using ${lookupJdbcDecoder(rowType)})"
 
+      case RepoMethod.UpsertStreaming(relName, cols, id, rowType) =>
+        val pickExcludedCols = cols.toList
+          .filterNot(c => id.cols.exists(_.name == c.name))
+          .map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }
+        val tempTablename = s"${relName.name}_TEMP"
+
+        val copySql = sc.s(code"copy $tempTablename(${dbNames(cols, isRead = false)}) from stdin")
+
+        val mergeSql = SQL {
+          code"""|insert into $relName(${dbNames(cols, isRead = false)})
+                 |select * from $tempTablename
+                 |on conflict (${dbNames(id.cols, isRead = false)})
+                 |do update set
+                 |  ${pickExcludedCols.mkCode(",\n")}
+                 |;
+                 |drop table $tempTablename;""".stripMargin
+        }
+        code"""|val created = ${SQL(code"create temporary table $tempTablename (like $relName) on commit drop")}.execute
+               |val copied = ${textSupport.get.streamingInsert}($copySql, batchSize, unsaved)(${textSupport.get.lookupTextFor(rowType)})
+               |val merged = $mergeSql.update
+               |created *> copied *> merged""".stripMargin
+
       case RepoMethod.Insert(relName, cols, unsavedParam, rowType) =>
         val values = cols.map { c =>
           code"${runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}", c.tpe)}${SqlCast.toPgCode(c)}"
@@ -579,6 +605,13 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
                |  map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name}): @${TypesScala.nowarn}
                |  $UpdateResult(1, $Chunk.single(${unsavedParam.name}))
                |}""".stripMargin
+      case RepoMethod.UpsertStreaming(_, _, _, _) =>
+        code"""|unsaved.scanZIO(0L) { case (acc, row) =>
+               |  ZIO.succeed {
+               |    map += (row.${id.paramName} -> row)
+               |    acc + 1
+               |  }
+               |}.runLast.map(_.getOrElse(0L))""".stripMargin
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, _) =>
         code"insert(${maybeToRow.get.name}(${unsavedParam.name}))"
 

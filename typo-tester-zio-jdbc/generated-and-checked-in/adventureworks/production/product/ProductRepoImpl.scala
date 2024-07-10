@@ -215,4 +215,40 @@ class ProductRepoImpl extends ProductRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text""".insertReturning(using ProductRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table product_TEMP (like production.product) on commit drop".execute
+    val copied = streamingInsert(s"""copy product_TEMP("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(ProductRow.text)
+    val merged = sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
+                       select * from product_TEMP
+                       on conflict ("productid")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "productnumber" = EXCLUDED."productnumber",
+                         "makeflag" = EXCLUDED."makeflag",
+                         "finishedgoodsflag" = EXCLUDED."finishedgoodsflag",
+                         "color" = EXCLUDED."color",
+                         "safetystocklevel" = EXCLUDED."safetystocklevel",
+                         "reorderpoint" = EXCLUDED."reorderpoint",
+                         "standardcost" = EXCLUDED."standardcost",
+                         "listprice" = EXCLUDED."listprice",
+                         "size" = EXCLUDED."size",
+                         "sizeunitmeasurecode" = EXCLUDED."sizeunitmeasurecode",
+                         "weightunitmeasurecode" = EXCLUDED."weightunitmeasurecode",
+                         "weight" = EXCLUDED."weight",
+                         "daystomanufacture" = EXCLUDED."daystomanufacture",
+                         "productline" = EXCLUDED."productline",
+                         "class" = EXCLUDED."class",
+                         "style" = EXCLUDED."style",
+                         "productsubcategoryid" = EXCLUDED."productsubcategoryid",
+                         "productmodelid" = EXCLUDED."productmodelid",
+                         "sellstartdate" = EXCLUDED."sellstartdate",
+                         "sellenddate" = EXCLUDED."sellenddate",
+                         "discontinueddate" = EXCLUDED."discontinueddate",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table product_TEMP;""".update
+    created *> copied *> merged
+  }
 }

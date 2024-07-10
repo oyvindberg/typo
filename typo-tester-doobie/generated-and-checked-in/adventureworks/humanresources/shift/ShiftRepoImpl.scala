@@ -126,4 +126,21 @@ class ShiftRepoImpl extends ShiftRepo {
           returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
        """.query(using ShiftRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table shift_TEMP (like humanresources.shift) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy shift_TEMP("shiftid", "name", "starttime", "endtime", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ShiftRow.text)
+      res <- sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
+                   select * from shift_TEMP
+                   on conflict ("shiftid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "starttime" = EXCLUDED."starttime",
+                     "endtime" = EXCLUDED."endtime",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table shift_TEMP;""".update.run
+    } yield res
+  }
 }

@@ -127,4 +127,21 @@ class StoreRepoImpl extends StoreRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text""".insertReturning(using StoreRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, StoreRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table store_TEMP (like sales.store) on commit drop".execute
+    val copied = streamingInsert(s"""copy store_TEMP("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(StoreRow.text)
+    val merged = sql"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
+                       select * from store_TEMP
+                       on conflict ("businessentityid")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "salespersonid" = EXCLUDED."salespersonid",
+                         "demographics" = EXCLUDED."demographics",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table store_TEMP;""".update
+    created *> copied *> merged
+  }
 }

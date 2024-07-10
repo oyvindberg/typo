@@ -87,4 +87,11 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
     map.put(unsaved.scrapreasonid, unsaved): @nowarn
     unsaved
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ScrapreasonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    unsaved.foreach { row =>
+      map += (row.scrapreasonid -> row)
+    }
+    unsaved.size
+  }
 }

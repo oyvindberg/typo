@@ -112,4 +112,19 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
           returning "always_generated", "default_generated", "name"
        """.query(using IdentityTestRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, IdentityTestRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table identity-test_TEMP (like public.identity-test) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy identity-test_TEMP("always_generated", "default_generated", "name") from stdin""").copyIn(unsaved, batchSize)(using IdentityTestRow.text)
+      res <- sql"""insert into public.identity-test("always_generated", "default_generated", "name")
+                   select * from identity-test_TEMP
+                   on conflict ("name")
+                   do update set
+                     "always_generated" = EXCLUDED."always_generated",
+                     "default_generated" = EXCLUDED."default_generated"
+                   ;
+                   drop table identity-test_TEMP;""".update.run
+    } yield res
+  }
 }

@@ -19,6 +19,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -144,5 +145,21 @@ class CreditcardRepoImpl extends CreditcardRepo {
        """
       .executeInsert(CreditcardRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[CreditcardRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table creditcard_TEMP (like sales.creditcard) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy creditcard_TEMP("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate") from stdin""", batchSize, unsaved)(CreditcardRow.text, c): @nowarn
+    SQL"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
+          select * from creditcard_TEMP
+          on conflict ("creditcardid")
+          do update set
+            "cardtype" = EXCLUDED."cardtype",
+            "cardnumber" = EXCLUDED."cardnumber",
+            "expmonth" = EXCLUDED."expmonth",
+            "expyear" = EXCLUDED."expyear",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table creditcard_TEMP;""".executeUpdate()
   }
 }

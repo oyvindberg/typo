@@ -19,6 +19,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -152,5 +153,22 @@ class UsersRepoImpl extends UsersRepo {
        """
       .executeInsert(UsersRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[UsersRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table users_TEMP (like public.users) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy users_TEMP("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") from stdin""", batchSize, unsaved)(UsersRow.text, c): @nowarn
+    SQL"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
+          select * from users_TEMP
+          on conflict ("user_id")
+          do update set
+            "name" = EXCLUDED."name",
+            "last_name" = EXCLUDED."last_name",
+            "email" = EXCLUDED."email",
+            "password" = EXCLUDED."password",
+            "created_at" = EXCLUDED."created_at",
+            "verified_on" = EXCLUDED."verified_on"
+          ;
+          drop table users_TEMP;""".executeUpdate()
   }
 }

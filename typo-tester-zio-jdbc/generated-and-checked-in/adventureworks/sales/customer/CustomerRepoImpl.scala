@@ -129,4 +129,21 @@ class CustomerRepoImpl extends CustomerRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text""".insertReturning(using CustomerRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CustomerRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table customer_TEMP (like sales.customer) on commit drop".execute
+    val copied = streamingInsert(s"""copy customer_TEMP("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(CustomerRow.text)
+    val merged = sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
+                       select * from customer_TEMP
+                       on conflict ("customerid")
+                       do update set
+                         "personid" = EXCLUDED."personid",
+                         "storeid" = EXCLUDED."storeid",
+                         "territoryid" = EXCLUDED."territoryid",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table customer_TEMP;""".update
+    created *> copied *> merged
+  }
 }

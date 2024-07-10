@@ -32,4 +32,6 @@ trait CreditcardRepo {
   def update: UpdateBuilder[CreditcardFields, CreditcardRow]
   def update(row: CreditcardRow): ConnectionIO[Boolean]
   def upsert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, CreditcardRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

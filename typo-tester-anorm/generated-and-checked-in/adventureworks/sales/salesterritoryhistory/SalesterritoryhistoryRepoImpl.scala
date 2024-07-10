@@ -20,6 +20,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -149,5 +150,19 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
        """
       .executeInsert(SalesterritoryhistoryRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SalesterritoryhistoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table salesterritoryhistory_TEMP (like sales.salesterritoryhistory) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy salesterritoryhistory_TEMP("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalesterritoryhistoryRow.text, c): @nowarn
+    SQL"""insert into sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")
+          select * from salesterritoryhistory_TEMP
+          on conflict ("businessentityid", "startdate", "territoryid")
+          do update set
+            "enddate" = EXCLUDED."enddate",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table salesterritoryhistory_TEMP;""".executeUpdate()
   }
 }

@@ -130,4 +130,22 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
           returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
        """.query(using ProductphotoRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductphotoRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productphoto_TEMP (like production.productphoto) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productphoto_TEMP("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductphotoRow.text)
+      res <- sql"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+                   select * from productphoto_TEMP
+                   on conflict ("productphotoid")
+                   do update set
+                     "thumbnailphoto" = EXCLUDED."thumbnailphoto",
+                     "thumbnailphotofilename" = EXCLUDED."thumbnailphotofilename",
+                     "largephoto" = EXCLUDED."largephoto",
+                     "largephotofilename" = EXCLUDED."largephotofilename",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productphoto_TEMP;""".update.run
+    } yield res
+  }
 }

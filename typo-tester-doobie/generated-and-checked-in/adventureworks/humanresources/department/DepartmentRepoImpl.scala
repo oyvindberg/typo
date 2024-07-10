@@ -121,4 +121,20 @@ class DepartmentRepoImpl extends DepartmentRepo {
           returning "departmentid", "name", "groupname", "modifieddate"::text
        """.query(using DepartmentRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, DepartmentRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table department_TEMP (like humanresources.department) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy department_TEMP("departmentid", "name", "groupname", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using DepartmentRow.text)
+      res <- sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
+                   select * from department_TEMP
+                   on conflict ("departmentid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "groupname" = EXCLUDED."groupname",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table department_TEMP;""".update.run
+    } yield res
+  }
 }

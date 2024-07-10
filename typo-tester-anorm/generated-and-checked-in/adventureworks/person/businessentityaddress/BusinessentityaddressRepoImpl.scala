@@ -20,6 +20,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -145,5 +146,18 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
        """
       .executeInsert(BusinessentityaddressRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[BusinessentityaddressRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table businessentityaddress_TEMP (like person.businessentityaddress) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy businessentityaddress_TEMP("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(BusinessentityaddressRow.text, c): @nowarn
+    SQL"""insert into person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")
+          select * from businessentityaddress_TEMP
+          on conflict ("businessentityid", "addressid", "addresstypeid")
+          do update set
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table businessentityaddress_TEMP;""".executeUpdate()
   }
 }

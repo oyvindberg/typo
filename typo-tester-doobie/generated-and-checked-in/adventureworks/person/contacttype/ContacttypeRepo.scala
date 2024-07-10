@@ -30,4 +30,6 @@ trait ContacttypeRepo {
   def update: UpdateBuilder[ContacttypeFields, ContacttypeRow]
   def update(row: ContacttypeRow): ConnectionIO[Boolean]
   def upsert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

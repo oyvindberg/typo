@@ -29,4 +29,6 @@ trait SalesterritoryRepo {
   def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow]
   def update(row: SalesterritoryRow)(implicit c: Connection): Boolean
   def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[SalesterritoryRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

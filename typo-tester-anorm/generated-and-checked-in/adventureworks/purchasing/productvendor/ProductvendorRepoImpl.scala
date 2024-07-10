@@ -21,6 +21,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -167,5 +168,25 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
        """
       .executeInsert(ProductvendorRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ProductvendorRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table productvendor_TEMP (like purchasing.productvendor) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy productvendor_TEMP("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") from stdin""", batchSize, unsaved)(ProductvendorRow.text, c): @nowarn
+    SQL"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
+          select * from productvendor_TEMP
+          on conflict ("productid", "businessentityid")
+          do update set
+            "averageleadtime" = EXCLUDED."averageleadtime",
+            "standardprice" = EXCLUDED."standardprice",
+            "lastreceiptcost" = EXCLUDED."lastreceiptcost",
+            "lastreceiptdate" = EXCLUDED."lastreceiptdate",
+            "minorderqty" = EXCLUDED."minorderqty",
+            "maxorderqty" = EXCLUDED."maxorderqty",
+            "onorderqty" = EXCLUDED."onorderqty",
+            "unitmeasurecode" = EXCLUDED."unitmeasurecode",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table productvendor_TEMP;""".executeUpdate()
   }
 }

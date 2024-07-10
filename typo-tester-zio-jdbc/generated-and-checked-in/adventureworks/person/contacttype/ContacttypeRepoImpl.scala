@@ -111,4 +111,18 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "contacttypeid", "name", "modifieddate"::text""".insertReturning(using ContacttypeRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ContacttypeRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table contacttype_TEMP (like person.contacttype) on commit drop".execute
+    val copied = streamingInsert(s"""copy contacttype_TEMP("contacttypeid", "name", "modifieddate") from stdin""", batchSize, unsaved)(ContacttypeRow.text)
+    val merged = sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+                       select * from contacttype_TEMP
+                       on conflict ("contacttypeid")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table contacttype_TEMP;""".update
+    created *> copied *> merged
+  }
 }

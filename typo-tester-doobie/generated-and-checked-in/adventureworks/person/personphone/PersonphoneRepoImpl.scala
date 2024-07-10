@@ -132,4 +132,18 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
           returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
        """.query(using PersonphoneRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, PersonphoneRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table personphone_TEMP (like person.personphone) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy personphone_TEMP("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using PersonphoneRow.text)
+      res <- sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
+                   select * from personphone_TEMP
+                   on conflict ("businessentityid", "phonenumber", "phonenumbertypeid")
+                   do update set
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table personphone_TEMP;""".update.run
+    } yield res
+  }
 }

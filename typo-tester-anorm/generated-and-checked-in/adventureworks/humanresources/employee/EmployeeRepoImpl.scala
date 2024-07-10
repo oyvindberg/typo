@@ -23,6 +23,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -199,5 +200,30 @@ class EmployeeRepoImpl extends EmployeeRepo {
        """
       .executeInsert(EmployeeRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[EmployeeRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table employee_TEMP (like humanresources.employee) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy employee_TEMP("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") from stdin""", batchSize, unsaved)(EmployeeRow.text, c): @nowarn
+    SQL"""insert into humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
+          select * from employee_TEMP
+          on conflict ("businessentityid")
+          do update set
+            "nationalidnumber" = EXCLUDED."nationalidnumber",
+            "loginid" = EXCLUDED."loginid",
+            "jobtitle" = EXCLUDED."jobtitle",
+            "birthdate" = EXCLUDED."birthdate",
+            "maritalstatus" = EXCLUDED."maritalstatus",
+            "gender" = EXCLUDED."gender",
+            "hiredate" = EXCLUDED."hiredate",
+            "salariedflag" = EXCLUDED."salariedflag",
+            "vacationhours" = EXCLUDED."vacationhours",
+            "sickleavehours" = EXCLUDED."sickleavehours",
+            "currentflag" = EXCLUDED."currentflag",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate",
+            "organizationnode" = EXCLUDED."organizationnode"
+          ;
+          drop table employee_TEMP;""".executeUpdate()
   }
 }

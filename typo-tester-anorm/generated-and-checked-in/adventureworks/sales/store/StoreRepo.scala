@@ -30,4 +30,6 @@ trait StoreRepo {
   def update: UpdateBuilder[StoreFields, StoreRow]
   def update(row: StoreRow)(implicit c: Connection): Boolean
   def upsert(unsaved: StoreRow)(implicit c: Connection): StoreRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[StoreRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

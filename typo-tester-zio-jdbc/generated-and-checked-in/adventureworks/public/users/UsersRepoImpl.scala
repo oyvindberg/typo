@@ -131,4 +131,22 @@ class UsersRepoImpl extends UsersRepo {
             "verified_on" = EXCLUDED."verified_on"
           returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text""".insertReturning(using UsersRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table users_TEMP (like public.users) on commit drop".execute
+    val copied = streamingInsert(s"""copy users_TEMP("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") from stdin""", batchSize, unsaved)(UsersRow.text)
+    val merged = sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
+                       select * from users_TEMP
+                       on conflict ("user_id")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "last_name" = EXCLUDED."last_name",
+                         "email" = EXCLUDED."email",
+                         "password" = EXCLUDED."password",
+                         "created_at" = EXCLUDED."created_at",
+                         "verified_on" = EXCLUDED."verified_on"
+                       ;
+                       drop table users_TEMP;""".update
+    created *> copied *> merged
+  }
 }

@@ -127,4 +127,18 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           returning "countryregioncode", "currencycode", "modifieddate"::text
        """.query(using CountryregioncurrencyRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, CountryregioncurrencyRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table countryregioncurrency_TEMP (like sales.countryregioncurrency) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy countryregioncurrency_TEMP("countryregioncode", "currencycode", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using CountryregioncurrencyRow.text)
+      res <- sql"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")
+                   select * from countryregioncurrency_TEMP
+                   on conflict ("countryregioncode", "currencycode")
+                   do update set
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table countryregioncurrency_TEMP;""".update.run
+    } yield res
+  }
 }

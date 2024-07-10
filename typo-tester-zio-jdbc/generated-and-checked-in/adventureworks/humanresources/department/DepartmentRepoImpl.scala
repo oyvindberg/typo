@@ -115,4 +115,19 @@ class DepartmentRepoImpl extends DepartmentRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "departmentid", "name", "groupname", "modifieddate"::text""".insertReturning(using DepartmentRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, DepartmentRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table department_TEMP (like humanresources.department) on commit drop".execute
+    val copied = streamingInsert(s"""copy department_TEMP("departmentid", "name", "groupname", "modifieddate") from stdin""", batchSize, unsaved)(DepartmentRow.text)
+    val merged = sql"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
+                       select * from department_TEMP
+                       on conflict ("departmentid")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "groupname" = EXCLUDED."groupname",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table department_TEMP;""".update
+    created *> copied *> merged
+  }
 }

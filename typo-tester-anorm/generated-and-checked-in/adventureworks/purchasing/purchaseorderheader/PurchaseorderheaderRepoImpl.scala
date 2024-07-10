@@ -20,6 +20,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -187,5 +188,27 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
        """
       .executeInsert(PurchaseorderheaderRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[PurchaseorderheaderRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table purchaseorderheader_TEMP (like purchasing.purchaseorderheader) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy purchaseorderheader_TEMP("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate") from stdin""", batchSize, unsaved)(PurchaseorderheaderRow.text, c): @nowarn
+    SQL"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
+          select * from purchaseorderheader_TEMP
+          on conflict ("purchaseorderid")
+          do update set
+            "revisionnumber" = EXCLUDED."revisionnumber",
+            "status" = EXCLUDED."status",
+            "employeeid" = EXCLUDED."employeeid",
+            "vendorid" = EXCLUDED."vendorid",
+            "shipmethodid" = EXCLUDED."shipmethodid",
+            "orderdate" = EXCLUDED."orderdate",
+            "shipdate" = EXCLUDED."shipdate",
+            "subtotal" = EXCLUDED."subtotal",
+            "taxamt" = EXCLUDED."taxamt",
+            "freight" = EXCLUDED."freight",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table purchaseorderheader_TEMP;""".executeUpdate()
   }
 }

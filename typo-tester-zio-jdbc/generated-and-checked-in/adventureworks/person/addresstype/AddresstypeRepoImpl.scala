@@ -119,4 +119,19 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "addresstypeid", "name", "rowguid", "modifieddate"::text""".insertReturning(using AddresstypeRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, AddresstypeRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table addresstype_TEMP (like person.addresstype) on commit drop".execute
+    val copied = streamingInsert(s"""copy addresstype_TEMP("addresstypeid", "name", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(AddresstypeRow.text)
+    val merged = sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
+                       select * from addresstype_TEMP
+                       on conflict ("addresstypeid")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table addresstype_TEMP;""".update
+    created *> copied *> merged
+  }
 }

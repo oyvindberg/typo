@@ -29,4 +29,6 @@ trait WorkorderRepo {
   def update: UpdateBuilder[WorkorderFields, WorkorderRow]
   def update(row: WorkorderRow)(implicit c: Connection): Boolean
   def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[WorkorderRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

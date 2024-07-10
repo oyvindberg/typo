@@ -27,4 +27,6 @@ trait FlaffRepo {
   def update: UpdateBuilder[FlaffFields, FlaffRow]
   def update(row: FlaffRow): ConnectionIO[Boolean]
   def upsert(unsaved: FlaffRow): ConnectionIO[FlaffRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, FlaffRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

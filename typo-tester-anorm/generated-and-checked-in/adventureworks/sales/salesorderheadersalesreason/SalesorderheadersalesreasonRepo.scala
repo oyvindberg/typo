@@ -29,4 +29,6 @@ trait SalesorderheadersalesreasonRepo {
   def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow]
   def update(row: SalesorderheadersalesreasonRow)(implicit c: Connection): Boolean
   def upsert(unsaved: SalesorderheadersalesreasonRow)(implicit c: Connection): SalesorderheadersalesreasonRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[SalesorderheadersalesreasonRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

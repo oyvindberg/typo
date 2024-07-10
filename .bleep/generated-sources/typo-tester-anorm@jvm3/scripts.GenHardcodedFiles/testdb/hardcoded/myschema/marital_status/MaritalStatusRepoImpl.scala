@@ -15,6 +15,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -102,5 +103,17 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
        """
       .executeInsert(MaritalStatusRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[MaritalStatusRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table marital_status_TEMP (like myschema.marital_status) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy marital_status_TEMP("id") from stdin""", batchSize, unsaved)(MaritalStatusRow.text, c): @nowarn
+    SQL"""insert into myschema.marital_status("id")
+          select * from marital_status_TEMP
+          on conflict ("id")
+          do update set
+            
+          ;
+          drop table marital_status_TEMP;""".executeUpdate()
   }
 }

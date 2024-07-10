@@ -134,4 +134,18 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text""".insertReturning(using BusinessentityaddressRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityaddressRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table businessentityaddress_TEMP (like person.businessentityaddress) on commit drop".execute
+    val copied = streamingInsert(s"""copy businessentityaddress_TEMP("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(BusinessentityaddressRow.text)
+    val merged = sql"""insert into person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")
+                       select * from businessentityaddress_TEMP
+                       on conflict ("businessentityid", "addressid", "addresstypeid")
+                       do update set
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table businessentityaddress_TEMP;""".update
+    created *> copied *> merged
+  }
 }

@@ -21,6 +21,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -161,5 +162,24 @@ class AddressRepoImpl extends AddressRepo {
        """
       .executeInsert(AddressRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[AddressRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table address_TEMP (like person.address) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy address_TEMP("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(AddressRow.text, c): @nowarn
+    SQL"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
+          select * from address_TEMP
+          on conflict ("addressid")
+          do update set
+            "addressline1" = EXCLUDED."addressline1",
+            "addressline2" = EXCLUDED."addressline2",
+            "city" = EXCLUDED."city",
+            "stateprovinceid" = EXCLUDED."stateprovinceid",
+            "postalcode" = EXCLUDED."postalcode",
+            "spatiallocation" = EXCLUDED."spatiallocation",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table address_TEMP;""".executeUpdate()
   }
 }

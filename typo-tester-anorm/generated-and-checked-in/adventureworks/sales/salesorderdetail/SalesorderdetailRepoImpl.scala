@@ -23,6 +23,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -174,5 +175,24 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
        """
       .executeInsert(SalesorderdetailRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SalesorderdetailRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table salesorderdetail_TEMP (like sales.salesorderdetail) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy salesorderdetail_TEMP("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalesorderdetailRow.text, c): @nowarn
+    SQL"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+          select * from salesorderdetail_TEMP
+          on conflict ("salesorderid", "salesorderdetailid")
+          do update set
+            "carriertrackingnumber" = EXCLUDED."carriertrackingnumber",
+            "orderqty" = EXCLUDED."orderqty",
+            "productid" = EXCLUDED."productid",
+            "specialofferid" = EXCLUDED."specialofferid",
+            "unitprice" = EXCLUDED."unitprice",
+            "unitpricediscount" = EXCLUDED."unitpricediscount",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table salesorderdetail_TEMP;""".executeUpdate()
   }
 }

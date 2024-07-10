@@ -87,4 +87,11 @@ class ProductRepoMock(toRow: Function1[ProductRowUnsaved, ProductRow],
     map.put(unsaved.productid, unsaved): @nowarn
     unsaved
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ProductRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    unsaved.foreach { row =>
+      map += (row.productid -> row)
+    }
+    unsaved.size
+  }
 }

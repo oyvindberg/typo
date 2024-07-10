@@ -19,6 +19,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -143,5 +144,20 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
        """
       .executeInsert(ProductsubcategoryRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ProductsubcategoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table productsubcategory_TEMP (like production.productsubcategory) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy productsubcategory_TEMP("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(ProductsubcategoryRow.text, c): @nowarn
+    SQL"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
+          select * from productsubcategory_TEMP
+          on conflict ("productsubcategoryid")
+          do update set
+            "productcategoryid" = EXCLUDED."productcategoryid",
+            "name" = EXCLUDED."name",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table productsubcategory_TEMP;""".executeUpdate()
   }
 }

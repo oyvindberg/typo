@@ -165,4 +165,26 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
           returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
        """.query(using WorkorderroutingRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, WorkorderroutingRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table workorderrouting_TEMP (like production.workorderrouting) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy workorderrouting_TEMP("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using WorkorderroutingRow.text)
+      res <- sql"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
+                   select * from workorderrouting_TEMP
+                   on conflict ("workorderid", "productid", "operationsequence")
+                   do update set
+                     "locationid" = EXCLUDED."locationid",
+                     "scheduledstartdate" = EXCLUDED."scheduledstartdate",
+                     "scheduledenddate" = EXCLUDED."scheduledenddate",
+                     "actualstartdate" = EXCLUDED."actualstartdate",
+                     "actualenddate" = EXCLUDED."actualenddate",
+                     "actualresourcehrs" = EXCLUDED."actualresourcehrs",
+                     "plannedcost" = EXCLUDED."plannedcost",
+                     "actualcost" = EXCLUDED."actualcost",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table workorderrouting_TEMP;""".update.run
+    } yield res
+  }
 }

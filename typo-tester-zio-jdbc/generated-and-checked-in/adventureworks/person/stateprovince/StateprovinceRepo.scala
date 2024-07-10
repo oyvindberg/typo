@@ -32,4 +32,6 @@ trait StateprovinceRepo {
   def update: UpdateBuilder[StateprovinceFields, StateprovinceRow]
   def update(row: StateprovinceRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, UpdateResult[StateprovinceRow]]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

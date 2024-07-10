@@ -109,4 +109,15 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
       unsaved
     }
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0
+      rows.foreach { row =>
+        map += (row.documentnode -> row)
+        num += 1
+      }
+      num
+    }
+  }
 }

@@ -134,4 +134,22 @@ class CustomerRepoImpl extends CustomerRepo {
           returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
        """.query(using CustomerRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, CustomerRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table customer_TEMP (like sales.customer) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy customer_TEMP("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using CustomerRow.text)
+      res <- sql"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
+                   select * from customer_TEMP
+                   on conflict ("customerid")
+                   do update set
+                     "personid" = EXCLUDED."personid",
+                     "storeid" = EXCLUDED."storeid",
+                     "territoryid" = EXCLUDED."territoryid",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table customer_TEMP;""".update.run
+    } yield res
+  }
 }

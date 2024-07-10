@@ -140,4 +140,22 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
           returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
        """.query(using ShipmethodRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ShipmethodRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table shipmethod_TEMP (like purchasing.shipmethod) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy shipmethod_TEMP("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ShipmethodRow.text)
+      res <- sql"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
+                   select * from shipmethod_TEMP
+                   on conflict ("shipmethodid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "shipbase" = EXCLUDED."shipbase",
+                     "shiprate" = EXCLUDED."shiprate",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table shipmethod_TEMP;""".update.run
+    } yield res
+  }
 }

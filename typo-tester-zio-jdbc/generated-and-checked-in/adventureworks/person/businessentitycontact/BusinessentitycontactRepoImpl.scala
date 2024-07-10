@@ -133,4 +133,18 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text""".insertReturning(using BusinessentitycontactRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentitycontactRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table businessentitycontact_TEMP (like person.businessentitycontact) on commit drop".execute
+    val copied = streamingInsert(s"""copy businessentitycontact_TEMP("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(BusinessentitycontactRow.text)
+    val merged = sql"""insert into person.businessentitycontact("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")
+                       select * from businessentitycontact_TEMP
+                       on conflict ("businessentityid", "personid", "contacttypeid")
+                       do update set
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table businessentitycontact_TEMP;""".update
+    created *> copied *> merged
+  }
 }

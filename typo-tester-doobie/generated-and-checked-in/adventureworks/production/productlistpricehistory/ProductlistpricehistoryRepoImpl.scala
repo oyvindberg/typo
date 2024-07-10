@@ -135,4 +135,20 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
           returning "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text
        """.query(using ProductlistpricehistoryRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductlistpricehistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productlistpricehistory_TEMP (like production.productlistpricehistory) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productlistpricehistory_TEMP("productid", "startdate", "enddate", "listprice", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductlistpricehistoryRow.text)
+      res <- sql"""insert into production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate")
+                   select * from productlistpricehistory_TEMP
+                   on conflict ("productid", "startdate")
+                   do update set
+                     "enddate" = EXCLUDED."enddate",
+                     "listprice" = EXCLUDED."listprice",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productlistpricehistory_TEMP;""".update.run
+    } yield res
+  }
 }

@@ -32,4 +32,6 @@ trait LocationRepo {
   def update: UpdateBuilder[LocationFields, LocationRow]
   def update(row: LocationRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: LocationRow): ZIO[ZConnection, Throwable, UpdateResult[LocationRow]]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

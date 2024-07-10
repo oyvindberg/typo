@@ -29,4 +29,6 @@ trait PurchaseorderheaderRepo {
   def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
   def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean
   def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[PurchaseorderheaderRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

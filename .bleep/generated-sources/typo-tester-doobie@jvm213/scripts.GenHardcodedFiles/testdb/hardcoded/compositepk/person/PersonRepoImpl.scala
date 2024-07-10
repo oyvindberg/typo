@@ -130,4 +130,18 @@ class PersonRepoImpl extends PersonRepo {
           returning "one", "two", "name"
        """.query(using PersonRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table person_TEMP (like compositepk.person) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy person_TEMP("one", "two", "name") from stdin""").copyIn(unsaved, batchSize)(using PersonRow.text)
+      res <- sql"""insert into compositepk.person("one", "two", "name")
+                   select * from person_TEMP
+                   on conflict ("one", "two")
+                   do update set
+                     "name" = EXCLUDED."name"
+                   ;
+                   drop table person_TEMP;""".update.run
+    } yield res
+  }
 }

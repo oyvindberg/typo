@@ -30,4 +30,6 @@ trait CountryregionRepo {
   def update: UpdateBuilder[CountryregionFields, CountryregionRow]
   def update(row: CountryregionRow): ConnectionIO[Boolean]
   def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

@@ -141,4 +141,19 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
           returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
        """.query(using EmployeedepartmenthistoryRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, EmployeedepartmenthistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table employeedepartmenthistory_TEMP (like humanresources.employeedepartmenthistory) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy employeedepartmenthistory_TEMP("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using EmployeedepartmenthistoryRow.text)
+      res <- sql"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
+                   select * from employeedepartmenthistory_TEMP
+                   on conflict ("businessentityid", "startdate", "departmentid", "shiftid")
+                   do update set
+                     "enddate" = EXCLUDED."enddate",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table employeedepartmenthistory_TEMP;""".update.run
+    } yield res
+  }
 }

@@ -132,4 +132,18 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
           returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
        """.query(using ProductmodelproductdescriptioncultureRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productmodelproductdescriptionculture_TEMP (like production.productmodelproductdescriptionculture) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productmodelproductdescriptionculture_TEMP("productmodelid", "productdescriptionid", "cultureid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductmodelproductdescriptioncultureRow.text)
+      res <- sql"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
+                   select * from productmodelproductdescriptionculture_TEMP
+                   on conflict ("productmodelid", "productdescriptionid", "cultureid")
+                   do update set
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productmodelproductdescriptionculture_TEMP;""".update.run
+    } yield res
+  }
 }

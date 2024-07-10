@@ -148,4 +148,24 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
           returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
        """.query(using StateprovinceRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, StateprovinceRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table stateprovince_TEMP (like person.stateprovince) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy stateprovince_TEMP("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using StateprovinceRow.text)
+      res <- sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
+                   select * from stateprovince_TEMP
+                   on conflict ("stateprovinceid")
+                   do update set
+                     "stateprovincecode" = EXCLUDED."stateprovincecode",
+                     "countryregioncode" = EXCLUDED."countryregioncode",
+                     "isonlystateprovinceflag" = EXCLUDED."isonlystateprovinceflag",
+                     "name" = EXCLUDED."name",
+                     "territoryid" = EXCLUDED."territoryid",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table stateprovince_TEMP;""".update.run
+    } yield res
+  }
 }

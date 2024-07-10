@@ -105,4 +105,15 @@ class CustomerRepoMock(toRow: Function1[CustomerRowUnsaved, CustomerRow],
       unsaved
     }
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, CustomerRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0
+      rows.foreach { row =>
+        map += (row.customerid -> row)
+        num += 1
+      }
+      num
+    }
+  }
 }

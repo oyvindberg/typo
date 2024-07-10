@@ -136,4 +136,18 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text""".insertReturning(using EmployeedepartmenthistoryRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, EmployeedepartmenthistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table employeedepartmenthistory_TEMP (like humanresources.employeedepartmenthistory) on commit drop".execute
+    val copied = streamingInsert(s"""copy employeedepartmenthistory_TEMP("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") from stdin""", batchSize, unsaved)(EmployeedepartmenthistoryRow.text)
+    val merged = sql"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
+                       select * from employeedepartmenthistory_TEMP
+                       on conflict ("businessentityid", "startdate", "departmentid", "shiftid")
+                       do update set
+                         "enddate" = EXCLUDED."enddate",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table employeedepartmenthistory_TEMP;""".update
+    created *> copied *> merged
+  }
 }

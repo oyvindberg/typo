@@ -30,4 +30,6 @@ trait EmployeedepartmenthistoryRepo {
   def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow]
   def update(row: EmployeedepartmenthistoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, EmployeedepartmenthistoryRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

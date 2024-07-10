@@ -115,4 +115,19 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "salesreasonid", "name", "reasontype", "modifieddate"::text""".insertReturning(using SalesreasonRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesreasonRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table salesreason_TEMP (like sales.salesreason) on commit drop".execute
+    val copied = streamingInsert(s"""copy salesreason_TEMP("salesreasonid", "name", "reasontype", "modifieddate") from stdin""", batchSize, unsaved)(SalesreasonRow.text)
+    val merged = sql"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
+                       select * from salesreason_TEMP
+                       on conflict ("salesreasonid")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "reasontype" = EXCLUDED."reasontype",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table salesreason_TEMP;""".update
+    created *> copied *> merged
+  }
 }

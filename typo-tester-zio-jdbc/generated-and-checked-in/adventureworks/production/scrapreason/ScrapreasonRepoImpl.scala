@@ -111,4 +111,18 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "scrapreasonid", "name", "modifieddate"::text""".insertReturning(using ScrapreasonRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ScrapreasonRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table scrapreason_TEMP (like production.scrapreason) on commit drop".execute
+    val copied = streamingInsert(s"""copy scrapreason_TEMP("scrapreasonid", "name", "modifieddate") from stdin""", batchSize, unsaved)(ScrapreasonRow.text)
+    val merged = sql"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
+                       select * from scrapreason_TEMP
+                       on conflict ("scrapreasonid")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table scrapreason_TEMP;""".update
+    created *> copied *> merged
+  }
 }

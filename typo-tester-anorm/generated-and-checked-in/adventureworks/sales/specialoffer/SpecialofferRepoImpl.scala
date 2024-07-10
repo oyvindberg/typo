@@ -19,6 +19,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -173,5 +174,26 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
        """
       .executeInsert(SpecialofferRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SpecialofferRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table specialoffer_TEMP (like sales.specialoffer) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy specialoffer_TEMP("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SpecialofferRow.text, c): @nowarn
+    SQL"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
+          select * from specialoffer_TEMP
+          on conflict ("specialofferid")
+          do update set
+            "description" = EXCLUDED."description",
+            "discountpct" = EXCLUDED."discountpct",
+            "type" = EXCLUDED."type",
+            "category" = EXCLUDED."category",
+            "startdate" = EXCLUDED."startdate",
+            "enddate" = EXCLUDED."enddate",
+            "minqty" = EXCLUDED."minqty",
+            "maxqty" = EXCLUDED."maxqty",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table specialoffer_TEMP;""".executeUpdate()
   }
 }

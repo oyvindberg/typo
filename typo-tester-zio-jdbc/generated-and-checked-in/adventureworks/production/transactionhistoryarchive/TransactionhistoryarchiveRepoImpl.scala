@@ -138,4 +138,24 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text""".insertReturning(using TransactionhistoryarchiveRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, TransactionhistoryarchiveRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table transactionhistoryarchive_TEMP (like production.transactionhistoryarchive) on commit drop".execute
+    val copied = streamingInsert(s"""copy transactionhistoryarchive_TEMP("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") from stdin""", batchSize, unsaved)(TransactionhistoryarchiveRow.text)
+    val merged = sql"""insert into production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
+                       select * from transactionhistoryarchive_TEMP
+                       on conflict ("transactionid")
+                       do update set
+                         "productid" = EXCLUDED."productid",
+                         "referenceorderid" = EXCLUDED."referenceorderid",
+                         "referenceorderlineid" = EXCLUDED."referenceorderlineid",
+                         "transactiondate" = EXCLUDED."transactiondate",
+                         "transactiontype" = EXCLUDED."transactiontype",
+                         "quantity" = EXCLUDED."quantity",
+                         "actualcost" = EXCLUDED."actualcost",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table transactionhistoryarchive_TEMP;""".update
+    created *> copied *> merged
+  }
 }

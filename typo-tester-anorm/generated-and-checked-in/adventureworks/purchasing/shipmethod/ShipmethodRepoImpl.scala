@@ -19,6 +19,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -153,5 +154,21 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
        """
       .executeInsert(ShipmethodRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ShipmethodRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table shipmethod_TEMP (like purchasing.shipmethod) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy shipmethod_TEMP("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(ShipmethodRow.text, c): @nowarn
+    SQL"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
+          select * from shipmethod_TEMP
+          on conflict ("shipmethodid")
+          do update set
+            "name" = EXCLUDED."name",
+            "shipbase" = EXCLUDED."shipbase",
+            "shiprate" = EXCLUDED."shiprate",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table shipmethod_TEMP;""".executeUpdate()
   }
 }

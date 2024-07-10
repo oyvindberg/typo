@@ -135,4 +135,20 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
           returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
        """.query(using ProductcosthistoryRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductcosthistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productcosthistory_TEMP (like production.productcosthistory) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productcosthistory_TEMP("productid", "startdate", "enddate", "standardcost", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductcosthistoryRow.text)
+      res <- sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
+                   select * from productcosthistory_TEMP
+                   on conflict ("productid", "startdate")
+                   do update set
+                     "enddate" = EXCLUDED."enddate",
+                     "standardcost" = EXCLUDED."standardcost",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productcosthistory_TEMP;""".update.run
+    } yield res
+  }
 }

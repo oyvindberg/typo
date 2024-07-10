@@ -114,4 +114,19 @@ class CurrencyRepoImpl extends CurrencyRepo {
           returning "currencycode", "name", "modifieddate"::text
        """.query(using CurrencyRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, CurrencyRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table currency_TEMP (like sales.currency) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy currency_TEMP("currencycode", "name", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using CurrencyRow.text)
+      res <- sql"""insert into sales.currency("currencycode", "name", "modifieddate")
+                   select * from currency_TEMP
+                   on conflict ("currencycode")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table currency_TEMP;""".update.run
+    } yield res
+  }
 }

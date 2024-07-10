@@ -117,4 +117,19 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
           returning "contacttypeid", "name", "modifieddate"::text
        """.query(using ContacttypeRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table contacttype_TEMP (like person.contacttype) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy contacttype_TEMP("contacttypeid", "name", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ContacttypeRow.text)
+      res <- sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+                   select * from contacttype_TEMP
+                   on conflict ("contacttypeid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table contacttype_TEMP;""".update.run
+    } yield res
+  }
 }

@@ -32,4 +32,6 @@ trait CultureRepo {
   def update: UpdateBuilder[CultureFields, CultureRow]
   def update(row: CultureRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CultureRow): ZIO[ZConnection, Throwable, UpdateResult[CultureRow]]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

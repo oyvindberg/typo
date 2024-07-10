@@ -108,4 +108,18 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "unitmeasurecode", "name", "modifieddate"::text""".insertReturning(using UnitmeasureRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, UnitmeasureRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table unitmeasure_TEMP (like production.unitmeasure) on commit drop".execute
+    val copied = streamingInsert(s"""copy unitmeasure_TEMP("unitmeasurecode", "name", "modifieddate") from stdin""", batchSize, unsaved)(UnitmeasureRow.text)
+    val merged = sql"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
+                       select * from unitmeasure_TEMP
+                       on conflict ("unitmeasurecode")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table unitmeasure_TEMP;""".update
+    created *> copied *> merged
+  }
 }

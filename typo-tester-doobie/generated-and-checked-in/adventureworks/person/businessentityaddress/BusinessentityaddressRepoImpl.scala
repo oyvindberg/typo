@@ -140,4 +140,19 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
           returning "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
        """.query(using BusinessentityaddressRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, BusinessentityaddressRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table businessentityaddress_TEMP (like person.businessentityaddress) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy businessentityaddress_TEMP("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using BusinessentityaddressRow.text)
+      res <- sql"""insert into person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")
+                   select * from businessentityaddress_TEMP
+                   on conflict ("businessentityid", "addressid", "addresstypeid")
+                   do update set
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table businessentityaddress_TEMP;""".update.run
+    } yield res
+  }
 }

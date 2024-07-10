@@ -32,4 +32,6 @@ trait ProductlistpricehistoryRepo {
   def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow]
   def update(row: ProductlistpricehistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ProductlistpricehistoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductlistpricehistoryRow]]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductlistpricehistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

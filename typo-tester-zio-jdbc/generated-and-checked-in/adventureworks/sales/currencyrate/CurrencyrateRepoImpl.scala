@@ -128,4 +128,22 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text""".insertReturning(using CurrencyrateRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyrateRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table currencyrate_TEMP (like sales.currencyrate) on commit drop".execute
+    val copied = streamingInsert(s"""copy currencyrate_TEMP("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate") from stdin""", batchSize, unsaved)(CurrencyrateRow.text)
+    val merged = sql"""insert into sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")
+                       select * from currencyrate_TEMP
+                       on conflict ("currencyrateid")
+                       do update set
+                         "currencyratedate" = EXCLUDED."currencyratedate",
+                         "fromcurrencycode" = EXCLUDED."fromcurrencycode",
+                         "tocurrencycode" = EXCLUDED."tocurrencycode",
+                         "averagerate" = EXCLUDED."averagerate",
+                         "endofdayrate" = EXCLUDED."endofdayrate",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table currencyrate_TEMP;""".update
+    created *> copied *> merged
+  }
 }

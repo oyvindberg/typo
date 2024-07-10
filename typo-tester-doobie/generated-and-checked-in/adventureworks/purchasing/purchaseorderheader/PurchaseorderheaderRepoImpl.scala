@@ -174,4 +174,28 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
           returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text
        """.query(using PurchaseorderheaderRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, PurchaseorderheaderRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table purchaseorderheader_TEMP (like purchasing.purchaseorderheader) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy purchaseorderheader_TEMP("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using PurchaseorderheaderRow.text)
+      res <- sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
+                   select * from purchaseorderheader_TEMP
+                   on conflict ("purchaseorderid")
+                   do update set
+                     "revisionnumber" = EXCLUDED."revisionnumber",
+                     "status" = EXCLUDED."status",
+                     "employeeid" = EXCLUDED."employeeid",
+                     "vendorid" = EXCLUDED."vendorid",
+                     "shipmethodid" = EXCLUDED."shipmethodid",
+                     "orderdate" = EXCLUDED."orderdate",
+                     "shipdate" = EXCLUDED."shipdate",
+                     "subtotal" = EXCLUDED."subtotal",
+                     "taxamt" = EXCLUDED."taxamt",
+                     "freight" = EXCLUDED."freight",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table purchaseorderheader_TEMP;""".update.run
+    } yield res
+  }
 }

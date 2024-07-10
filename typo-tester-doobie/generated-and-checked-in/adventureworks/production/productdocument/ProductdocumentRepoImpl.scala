@@ -130,4 +130,18 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
           returning "productid", "modifieddate"::text, "documentnode"
        """.query(using ProductdocumentRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductdocumentRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productdocument_TEMP (like production.productdocument) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productdocument_TEMP("productid", "modifieddate", "documentnode") from stdin""").copyIn(unsaved, batchSize)(using ProductdocumentRow.text)
+      res <- sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")
+                   select * from productdocument_TEMP
+                   on conflict ("productid", "documentnode")
+                   do update set
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productdocument_TEMP;""".update.run
+    } yield res
+  }
 }

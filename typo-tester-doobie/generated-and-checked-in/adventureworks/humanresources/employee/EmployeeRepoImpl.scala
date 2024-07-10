@@ -185,4 +185,31 @@ class EmployeeRepoImpl extends EmployeeRepo {
           returning "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode"
        """.query(using EmployeeRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, EmployeeRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table employee_TEMP (like humanresources.employee) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy employee_TEMP("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") from stdin""").copyIn(unsaved, batchSize)(using EmployeeRow.text)
+      res <- sql"""insert into humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
+                   select * from employee_TEMP
+                   on conflict ("businessentityid")
+                   do update set
+                     "nationalidnumber" = EXCLUDED."nationalidnumber",
+                     "loginid" = EXCLUDED."loginid",
+                     "jobtitle" = EXCLUDED."jobtitle",
+                     "birthdate" = EXCLUDED."birthdate",
+                     "maritalstatus" = EXCLUDED."maritalstatus",
+                     "gender" = EXCLUDED."gender",
+                     "hiredate" = EXCLUDED."hiredate",
+                     "salariedflag" = EXCLUDED."salariedflag",
+                     "vacationhours" = EXCLUDED."vacationhours",
+                     "sickleavehours" = EXCLUDED."sickleavehours",
+                     "currentflag" = EXCLUDED."currentflag",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate",
+                     "organizationnode" = EXCLUDED."organizationnode"
+                   ;
+                   drop table employee_TEMP;""".update.run
+    } yield res
+  }
 }

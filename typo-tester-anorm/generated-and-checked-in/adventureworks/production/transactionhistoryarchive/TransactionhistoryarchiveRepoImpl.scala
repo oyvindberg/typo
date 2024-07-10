@@ -17,6 +17,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -157,5 +158,24 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
        """
       .executeInsert(TransactionhistoryarchiveRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[TransactionhistoryarchiveRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table transactionhistoryarchive_TEMP (like production.transactionhistoryarchive) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy transactionhistoryarchive_TEMP("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") from stdin""", batchSize, unsaved)(TransactionhistoryarchiveRow.text, c): @nowarn
+    SQL"""insert into production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
+          select * from transactionhistoryarchive_TEMP
+          on conflict ("transactionid")
+          do update set
+            "productid" = EXCLUDED."productid",
+            "referenceorderid" = EXCLUDED."referenceorderid",
+            "referenceorderlineid" = EXCLUDED."referenceorderlineid",
+            "transactiondate" = EXCLUDED."transactiondate",
+            "transactiontype" = EXCLUDED."transactiontype",
+            "quantity" = EXCLUDED."quantity",
+            "actualcost" = EXCLUDED."actualcost",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table transactionhistoryarchive_TEMP;""".executeUpdate()
   }
 }

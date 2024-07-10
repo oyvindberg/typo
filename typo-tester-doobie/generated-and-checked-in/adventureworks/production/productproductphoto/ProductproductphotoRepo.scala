@@ -30,4 +30,6 @@ trait ProductproductphotoRepo {
   def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow]
   def update(row: ProductproductphotoRow): ConnectionIO[Boolean]
   def upsert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, ProductproductphotoRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

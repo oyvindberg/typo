@@ -32,4 +32,6 @@ trait ProductreviewRepo {
   def update: UpdateBuilder[ProductreviewFields, ProductreviewRow]
   def update(row: ProductreviewRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ProductreviewRow): ZIO[ZConnection, Throwable, UpdateResult[ProductreviewRow]]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductreviewRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

@@ -20,6 +20,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -148,5 +149,21 @@ class CustomerRepoImpl extends CustomerRepo {
        """
       .executeInsert(CustomerRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[CustomerRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table customer_TEMP (like sales.customer) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy customer_TEMP("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(CustomerRow.text, c): @nowarn
+    SQL"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
+          select * from customer_TEMP
+          on conflict ("customerid")
+          do update set
+            "personid" = EXCLUDED."personid",
+            "storeid" = EXCLUDED."storeid",
+            "territoryid" = EXCLUDED."territoryid",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table customer_TEMP;""".executeUpdate()
   }
 }

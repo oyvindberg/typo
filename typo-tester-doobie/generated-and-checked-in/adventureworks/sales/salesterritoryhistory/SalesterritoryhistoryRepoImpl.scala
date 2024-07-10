@@ -143,4 +143,20 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
        """.query(using SalesterritoryhistoryRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table salesterritoryhistory_TEMP (like sales.salesterritoryhistory) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy salesterritoryhistory_TEMP("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SalesterritoryhistoryRow.text)
+      res <- sql"""insert into sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")
+                   select * from salesterritoryhistory_TEMP
+                   on conflict ("businessentityid", "startdate", "territoryid")
+                   do update set
+                     "enddate" = EXCLUDED."enddate",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table salesterritoryhistory_TEMP;""".update.run
+    } yield res
+  }
 }

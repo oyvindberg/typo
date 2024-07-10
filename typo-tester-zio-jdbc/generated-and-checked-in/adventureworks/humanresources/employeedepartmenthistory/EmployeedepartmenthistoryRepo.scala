@@ -32,4 +32,6 @@ trait EmployeedepartmenthistoryRepo {
   def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow]
   def update(row: EmployeedepartmenthistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: EmployeedepartmenthistoryRow): ZIO[ZConnection, Throwable, UpdateResult[EmployeedepartmenthistoryRow]]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, EmployeedepartmenthistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

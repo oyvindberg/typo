@@ -29,4 +29,6 @@ trait CountryregionRepo {
   def update: UpdateBuilder[CountryregionFields, CountryregionRow]
   def update(row: CountryregionRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[CountryregionRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

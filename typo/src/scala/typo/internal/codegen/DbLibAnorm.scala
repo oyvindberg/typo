@@ -191,6 +191,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         code"def $name(unsaved: ${TypesScala.Iterator.of(rowType)}, batchSize: ${TypesScala.Int} = 10000)(implicit c: ${TypesJava.Connection}): ${TypesScala.Long}"
       case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
         code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType"
+      case RepoMethod.UpsertStreaming(_, _, _, rowType) =>
+        code"def $name(unsaved: ${TypesScala.Iterator.of(rowType)}, batchSize: ${TypesScala.Int} = 10000)(implicit c: ${TypesJava.Connection}): ${TypesScala.Int}"
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
         code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType"
       case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
@@ -394,6 +396,26 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         code"""|$sql
                |  .executeInsert(${rowParserFor(rowType)}.single)
                |"""
+      case RepoMethod.UpsertStreaming(relName, cols, id, rowType) =>
+        val pickExcludedCols = cols.toList
+          .filterNot(c => id.cols.exists(_.name == c.name))
+          .map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }
+        val tempTablename = s"${relName.name}_TEMP"
+
+        val copySql = sc.s(code"copy $tempTablename(${dbNames(cols, isRead = false)}) from stdin")
+
+        val mergeSql = SQL {
+          code"""|insert into $relName(${dbNames(cols, isRead = false)})
+                 |select * from $tempTablename
+                 |on conflict (${dbNames(id.cols, isRead = false)})
+                 |do update set
+                 |  ${pickExcludedCols.mkCode(",\n")}
+                 |;
+                 |drop table $tempTablename;""".stripMargin
+        }
+        code"""|${SQL(code"create temporary table $tempTablename (like $relName) on commit drop")}.execute(): @${TypesScala.nowarn}
+               |${textSupport.get.streamingInsert}($copySql, batchSize, unsaved)(${textSupport.get.lookupTextFor(rowType)}, c): @${TypesScala.nowarn}
+               |$mergeSql.executeUpdate()""".stripMargin
 
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
         val cases0 = unsaved.restCols.map { col =>
@@ -572,6 +594,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       case RepoMethod.Upsert(_, _, _, unsavedParam, _) =>
         code"""|map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name}): @${TypesScala.nowarn}
                |${unsavedParam.name}"""
+      case RepoMethod.UpsertStreaming(_, _, id, _) =>
+        code"""|unsaved.foreach { row =>
+               |  map += (row.${id.paramName} -> row)
+               |}
+               |unsaved.size""".stripMargin
+
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, _) =>
         code"insert(${maybeToRow.get.name}(${unsavedParam.name}))"
       case RepoMethod.InsertStreaming(_, _, _) =>

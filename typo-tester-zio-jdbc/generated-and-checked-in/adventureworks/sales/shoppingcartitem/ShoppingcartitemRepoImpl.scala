@@ -130,4 +130,21 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text""".insertReturning(using ShoppingcartitemRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ShoppingcartitemRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table shoppingcartitem_TEMP (like sales.shoppingcartitem) on commit drop".execute
+    val copied = streamingInsert(s"""copy shoppingcartitem_TEMP("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") from stdin""", batchSize, unsaved)(ShoppingcartitemRow.text)
+    val merged = sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
+                       select * from shoppingcartitem_TEMP
+                       on conflict ("shoppingcartitemid")
+                       do update set
+                         "shoppingcartid" = EXCLUDED."shoppingcartid",
+                         "quantity" = EXCLUDED."quantity",
+                         "productid" = EXCLUDED."productid",
+                         "datecreated" = EXCLUDED."datecreated",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table shoppingcartitem_TEMP;""".update
+    created *> copied *> merged
+  }
 }

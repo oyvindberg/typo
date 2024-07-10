@@ -23,6 +23,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -159,5 +160,23 @@ class VendorRepoImpl extends VendorRepo {
        """
       .executeInsert(VendorRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[VendorRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table vendor_TEMP (like purchasing.vendor) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy vendor_TEMP("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") from stdin""", batchSize, unsaved)(VendorRow.text, c): @nowarn
+    SQL"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
+          select * from vendor_TEMP
+          on conflict ("businessentityid")
+          do update set
+            "accountnumber" = EXCLUDED."accountnumber",
+            "name" = EXCLUDED."name",
+            "creditrating" = EXCLUDED."creditrating",
+            "preferredvendorstatus" = EXCLUDED."preferredvendorstatus",
+            "activeflag" = EXCLUDED."activeflag",
+            "purchasingwebserviceurl" = EXCLUDED."purchasingwebserviceurl",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table vendor_TEMP;""".executeUpdate()
   }
 }

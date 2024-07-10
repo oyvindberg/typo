@@ -11,6 +11,7 @@ import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -102,5 +103,17 @@ class FlaffRepoImpl extends FlaffRepo {
        """
       .executeInsert(FlaffRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table flaff_TEMP (like public.flaff) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy flaff_TEMP("code", "another_code", "some_number", "specifier", "parentspecifier") from stdin""", batchSize, unsaved)(FlaffRow.text, c): @nowarn
+    SQL"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")
+          select * from flaff_TEMP
+          on conflict ("code", "another_code", "some_number", "specifier")
+          do update set
+            "parentspecifier" = EXCLUDED."parentspecifier"
+          ;
+          drop table flaff_TEMP;""".executeUpdate()
   }
 }

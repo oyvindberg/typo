@@ -30,4 +30,6 @@ trait TransactionhistoryRepo {
   def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow]
   def update(row: TransactionhistoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

@@ -132,4 +132,22 @@ class StoreRepoImpl extends StoreRepo {
           returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
        """.query(using StoreRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, StoreRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table store_TEMP (like sales.store) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy store_TEMP("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using StoreRow.text)
+      res <- sql"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
+                   select * from store_TEMP
+                   on conflict ("businessentityid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "salespersonid" = EXCLUDED."salespersonid",
+                     "demographics" = EXCLUDED."demographics",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table store_TEMP;""".update.run
+    } yield res
+  }
 }

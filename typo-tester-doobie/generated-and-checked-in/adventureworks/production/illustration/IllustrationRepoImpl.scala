@@ -117,4 +117,19 @@ class IllustrationRepoImpl extends IllustrationRepo {
           returning "illustrationid", "diagram", "modifieddate"::text
        """.query(using IllustrationRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table illustration_TEMP (like production.illustration) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy illustration_TEMP("illustrationid", "diagram", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using IllustrationRow.text)
+      res <- sql"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+                   select * from illustration_TEMP
+                   on conflict ("illustrationid")
+                   do update set
+                     "diagram" = EXCLUDED."diagram",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table illustration_TEMP;""".update.run
+    } yield res
+  }
 }

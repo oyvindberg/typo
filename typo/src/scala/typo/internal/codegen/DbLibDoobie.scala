@@ -108,6 +108,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, unsaved.tpe)}, batchSize: ${TypesScala.Int} = 10000): ${ConnectionIO.of(TypesScala.Long)}"
       case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
         code"def $name($unsavedParam): ${ConnectionIO.of(rowType)}"
+      case RepoMethod.UpsertStreaming(_, _, _, rowType) =>
+        code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, rowType)}, batchSize: ${TypesScala.Int} = 10000): ${ConnectionIO.of(TypesScala.Int)}"
       case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
         code"def $name: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
       case RepoMethod.Delete(_, id) =>
@@ -315,6 +317,34 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
 
         code"${query(sql, rowType)}.unique"
 
+      case RepoMethod.UpsertStreaming(relName, cols, id, rowType) =>
+        val pickExcludedCols = cols.toList
+          .filterNot(c => id.cols.exists(_.name == c.name))
+          .map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }
+        val tempTablename = s"${relName.name}_TEMP"
+
+        val streamingInsert = {
+          val sql = SQL(code"copy $tempTablename(${dbNames(cols, isRead = false)}) from stdin")
+          if (fixVerySlowImplicit) code"new $FragmentOps($sql).copyIn(unsaved, batchSize)(using ${textSupport.get.lookupTextFor(rowType)})"
+          else code"new $FragmentOps($sql).copyIn[$rowType](unsaved, batchSize)"
+        }
+
+        val mergeSql = SQL {
+          code"""|insert into $relName(${dbNames(cols, isRead = false)})
+                 |select * from $tempTablename
+                 |on conflict (${dbNames(id.cols, isRead = false)})
+                 |do update set
+                 |  ${pickExcludedCols.mkCode(",\n")}
+                 |;
+                 |drop table $tempTablename;""".stripMargin
+        }
+
+        code"""|for {
+               |  _ <- ${SQL(code"create temporary table $tempTablename (like $relName) on commit drop")}.update.run
+               |  _ <- $streamingInsert
+               |  res <- $mergeSql.update.run
+               |} yield res""".stripMargin
+
       case RepoMethod.Insert(relName, cols, unsavedParam, rowType) =>
         val values = cols.map { c =>
           code"${runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}", c.tpe)}${SqlCast.toPgCode(c)}"
@@ -461,6 +491,15 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         code"""|$delayCIO {
                |  map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name}): @${TypesScala.nowarn}
                |  ${unsavedParam.name}
+               |}""".stripMargin
+      case RepoMethod.UpsertStreaming(_, _, _, _) =>
+        code"""|unsaved.compile.toList.map { rows =>
+               |  var num = 0
+               |  rows.foreach { row =>
+               |    map += (row.${id.paramName} -> row)
+               |    num += 1
+               |  }
+               |  num
                |}""".stripMargin
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, _) =>
         code"insert(${maybeToRow.get.name}(${unsavedParam.name}))"

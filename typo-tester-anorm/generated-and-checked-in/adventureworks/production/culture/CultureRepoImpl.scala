@@ -17,6 +17,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -127,5 +128,18 @@ class CultureRepoImpl extends CultureRepo {
        """
       .executeInsert(CultureRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[CultureRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table culture_TEMP (like production.culture) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy culture_TEMP("cultureid", "name", "modifieddate") from stdin""", batchSize, unsaved)(CultureRow.text, c): @nowarn
+    SQL"""insert into production.culture("cultureid", "name", "modifieddate")
+          select * from culture_TEMP
+          on conflict ("cultureid")
+          do update set
+            "name" = EXCLUDED."name",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table culture_TEMP;""".executeUpdate()
   }
 }

@@ -30,4 +30,6 @@ trait CurrencyrateRepo {
   def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow]
   def update(row: CurrencyrateRow): ConnectionIO[Boolean]
   def upsert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, CurrencyrateRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

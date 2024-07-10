@@ -19,6 +19,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -137,5 +138,17 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
        """
       .executeInsert(ProductmodelproductdescriptioncultureRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ProductmodelproductdescriptioncultureRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table productmodelproductdescriptionculture_TEMP (like production.productmodelproductdescriptionculture) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy productmodelproductdescriptionculture_TEMP("productmodelid", "productdescriptionid", "cultureid", "modifieddate") from stdin""", batchSize, unsaved)(ProductmodelproductdescriptioncultureRow.text, c): @nowarn
+    SQL"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
+          select * from productmodelproductdescriptionculture_TEMP
+          on conflict ("productmodelid", "productdescriptionid", "cultureid")
+          do update set
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table productmodelproductdescriptionculture_TEMP;""".executeUpdate()
   }
 }

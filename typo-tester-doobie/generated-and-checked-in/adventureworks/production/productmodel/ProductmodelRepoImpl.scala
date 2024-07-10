@@ -134,4 +134,22 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
           returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
        """.query(using ProductmodelRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductmodelRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productmodel_TEMP (like production.productmodel) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productmodel_TEMP("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductmodelRow.text)
+      res <- sql"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
+                   select * from productmodel_TEMP
+                   on conflict ("productmodelid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "catalogdescription" = EXCLUDED."catalogdescription",
+                     "instructions" = EXCLUDED."instructions",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productmodel_TEMP;""".update.run
+    } yield res
+  }
 }

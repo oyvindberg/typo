@@ -97,4 +97,17 @@ class FlaffRepoImpl extends FlaffRepo {
             "parentspecifier" = EXCLUDED."parentspecifier"
           returning "code", "another_code", "some_number", "specifier", "parentspecifier"""".insertReturning(using FlaffRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, FlaffRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table flaff_TEMP (like public.flaff) on commit drop".execute
+    val copied = streamingInsert(s"""copy flaff_TEMP("code", "another_code", "some_number", "specifier", "parentspecifier") from stdin""", batchSize, unsaved)(FlaffRow.text)
+    val merged = sql"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")
+                       select * from flaff_TEMP
+                       on conflict ("code", "another_code", "some_number", "specifier")
+                       do update set
+                         "parentspecifier" = EXCLUDED."parentspecifier"
+                       ;
+                       drop table flaff_TEMP;""".update
+    created *> copied *> merged
+  }
 }

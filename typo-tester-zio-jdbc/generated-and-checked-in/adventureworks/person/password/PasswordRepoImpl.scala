@@ -121,4 +121,20 @@ class PasswordRepoImpl extends PasswordRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text""".insertReturning(using PasswordRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, PasswordRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table password_TEMP (like person.password) on commit drop".execute
+    val copied = streamingInsert(s"""copy password_TEMP("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(PasswordRow.text)
+    val merged = sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+                       select * from password_TEMP
+                       on conflict ("businessentityid")
+                       do update set
+                         "passwordhash" = EXCLUDED."passwordhash",
+                         "passwordsalt" = EXCLUDED."passwordsalt",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table password_TEMP;""".update
+    created *> copied *> merged
+  }
 }

@@ -121,4 +121,20 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
           returning "salesreasonid", "name", "reasontype", "modifieddate"::text
        """.query(using SalesreasonRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, SalesreasonRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table salesreason_TEMP (like sales.salesreason) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy salesreason_TEMP("salesreasonid", "name", "reasontype", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SalesreasonRow.text)
+      res <- sql"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
+                   select * from salesreason_TEMP
+                   on conflict ("salesreasonid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "reasontype" = EXCLUDED."reasontype",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table salesreason_TEMP;""".update.run
+    } yield res
+  }
 }

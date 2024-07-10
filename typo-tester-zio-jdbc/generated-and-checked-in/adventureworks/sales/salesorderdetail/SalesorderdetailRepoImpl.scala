@@ -162,4 +162,24 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text""".insertReturning(using SalesorderdetailRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderdetailRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table salesorderdetail_TEMP (like sales.salesorderdetail) on commit drop".execute
+    val copied = streamingInsert(s"""copy salesorderdetail_TEMP("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalesorderdetailRow.text)
+    val merged = sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+                       select * from salesorderdetail_TEMP
+                       on conflict ("salesorderid", "salesorderdetailid")
+                       do update set
+                         "carriertrackingnumber" = EXCLUDED."carriertrackingnumber",
+                         "orderqty" = EXCLUDED."orderqty",
+                         "productid" = EXCLUDED."productid",
+                         "specialofferid" = EXCLUDED."specialofferid",
+                         "unitprice" = EXCLUDED."unitprice",
+                         "unitpricediscount" = EXCLUDED."unitpricediscount",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table salesorderdetail_TEMP;""".update
+    created *> copied *> merged
+  }
 }

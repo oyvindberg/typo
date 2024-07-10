@@ -30,6 +30,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -255,5 +256,40 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
        """
       .executeInsert(SalesorderheaderRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SalesorderheaderRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table salesorderheader_TEMP (like sales.salesorderheader) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy salesorderheader_TEMP("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalesorderheaderRow.text, c): @nowarn
+    SQL"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
+          select * from salesorderheader_TEMP
+          on conflict ("salesorderid")
+          do update set
+            "revisionnumber" = EXCLUDED."revisionnumber",
+            "orderdate" = EXCLUDED."orderdate",
+            "duedate" = EXCLUDED."duedate",
+            "shipdate" = EXCLUDED."shipdate",
+            "status" = EXCLUDED."status",
+            "onlineorderflag" = EXCLUDED."onlineorderflag",
+            "purchaseordernumber" = EXCLUDED."purchaseordernumber",
+            "accountnumber" = EXCLUDED."accountnumber",
+            "customerid" = EXCLUDED."customerid",
+            "salespersonid" = EXCLUDED."salespersonid",
+            "territoryid" = EXCLUDED."territoryid",
+            "billtoaddressid" = EXCLUDED."billtoaddressid",
+            "shiptoaddressid" = EXCLUDED."shiptoaddressid",
+            "shipmethodid" = EXCLUDED."shipmethodid",
+            "creditcardid" = EXCLUDED."creditcardid",
+            "creditcardapprovalcode" = EXCLUDED."creditcardapprovalcode",
+            "currencyrateid" = EXCLUDED."currencyrateid",
+            "subtotal" = EXCLUDED."subtotal",
+            "taxamt" = EXCLUDED."taxamt",
+            "freight" = EXCLUDED."freight",
+            "totaldue" = EXCLUDED."totaldue",
+            "comment" = EXCLUDED."comment",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table salesorderheader_TEMP;""".executeUpdate()
   }
 }

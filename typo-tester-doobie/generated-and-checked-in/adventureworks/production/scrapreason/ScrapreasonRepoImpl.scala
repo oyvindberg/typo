@@ -117,4 +117,19 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
           returning "scrapreasonid", "name", "modifieddate"::text
        """.query(using ScrapreasonRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ScrapreasonRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table scrapreason_TEMP (like production.scrapreason) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy scrapreason_TEMP("scrapreasonid", "name", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ScrapreasonRow.text)
+      res <- sql"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
+                   select * from scrapreason_TEMP
+                   on conflict ("scrapreasonid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table scrapreason_TEMP;""".update.run
+    } yield res
+  }
 }

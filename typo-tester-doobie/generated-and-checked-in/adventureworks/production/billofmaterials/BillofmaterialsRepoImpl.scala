@@ -150,4 +150,25 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
           returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
        """.query(using BillofmaterialsRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, BillofmaterialsRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table billofmaterials_TEMP (like production.billofmaterials) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy billofmaterials_TEMP("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using BillofmaterialsRow.text)
+      res <- sql"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
+                   select * from billofmaterials_TEMP
+                   on conflict ("billofmaterialsid")
+                   do update set
+                     "productassemblyid" = EXCLUDED."productassemblyid",
+                     "componentid" = EXCLUDED."componentid",
+                     "startdate" = EXCLUDED."startdate",
+                     "enddate" = EXCLUDED."enddate",
+                     "unitmeasurecode" = EXCLUDED."unitmeasurecode",
+                     "bomlevel" = EXCLUDED."bomlevel",
+                     "perassemblyqty" = EXCLUDED."perassemblyqty",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table billofmaterials_TEMP;""".update.run
+    } yield res
+  }
 }

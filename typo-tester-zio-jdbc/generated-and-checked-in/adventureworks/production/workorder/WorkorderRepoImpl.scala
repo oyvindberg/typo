@@ -138,4 +138,24 @@ class WorkorderRepoImpl extends WorkorderRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text""".insertReturning(using WorkorderRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table workorder_TEMP (like production.workorder) on commit drop".execute
+    val copied = streamingInsert(s"""copy workorder_TEMP("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") from stdin""", batchSize, unsaved)(WorkorderRow.text)
+    val merged = sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
+                       select * from workorder_TEMP
+                       on conflict ("workorderid")
+                       do update set
+                         "productid" = EXCLUDED."productid",
+                         "orderqty" = EXCLUDED."orderqty",
+                         "scrappedqty" = EXCLUDED."scrappedqty",
+                         "startdate" = EXCLUDED."startdate",
+                         "enddate" = EXCLUDED."enddate",
+                         "duedate" = EXCLUDED."duedate",
+                         "scrapreasonid" = EXCLUDED."scrapreasonid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table workorder_TEMP;""".update
+    created *> copied *> merged
+  }
 }

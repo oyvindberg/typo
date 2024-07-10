@@ -87,4 +87,11 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
     map.put(unsaved.locationid, unsaved): @nowarn
     unsaved
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[LocationRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    unsaved.foreach { row =>
+      map += (row.locationid -> row)
+    }
+    unsaved.size
+  }
 }

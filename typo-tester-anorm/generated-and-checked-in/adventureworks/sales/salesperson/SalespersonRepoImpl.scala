@@ -21,6 +21,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -170,5 +171,24 @@ class SalespersonRepoImpl extends SalespersonRepo {
        """
       .executeInsert(SalespersonRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SalespersonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table salesperson_TEMP (like sales.salesperson) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy salesperson_TEMP("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalespersonRow.text, c): @nowarn
+    SQL"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")
+          select * from salesperson_TEMP
+          on conflict ("businessentityid")
+          do update set
+            "territoryid" = EXCLUDED."territoryid",
+            "salesquota" = EXCLUDED."salesquota",
+            "bonus" = EXCLUDED."bonus",
+            "commissionpct" = EXCLUDED."commissionpct",
+            "salesytd" = EXCLUDED."salesytd",
+            "saleslastyear" = EXCLUDED."saleslastyear",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table salesperson_TEMP;""".executeUpdate()
   }
 }

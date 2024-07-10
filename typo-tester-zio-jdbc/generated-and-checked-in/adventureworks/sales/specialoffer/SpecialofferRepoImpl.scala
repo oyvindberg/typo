@@ -153,4 +153,26 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text""".insertReturning(using SpecialofferRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table specialoffer_TEMP (like sales.specialoffer) on commit drop".execute
+    val copied = streamingInsert(s"""copy specialoffer_TEMP("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SpecialofferRow.text)
+    val merged = sql"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
+                       select * from specialoffer_TEMP
+                       on conflict ("specialofferid")
+                       do update set
+                         "description" = EXCLUDED."description",
+                         "discountpct" = EXCLUDED."discountpct",
+                         "type" = EXCLUDED."type",
+                         "category" = EXCLUDED."category",
+                         "startdate" = EXCLUDED."startdate",
+                         "enddate" = EXCLUDED."enddate",
+                         "minqty" = EXCLUDED."minqty",
+                         "maxqty" = EXCLUDED."maxqty",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table specialoffer_TEMP;""".update
+    created *> copied *> merged
+  }
 }

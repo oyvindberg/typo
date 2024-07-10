@@ -150,4 +150,24 @@ class SalespersonRepoImpl extends SalespersonRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text""".insertReturning(using SalespersonRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table salesperson_TEMP (like sales.salesperson) on commit drop".execute
+    val copied = streamingInsert(s"""copy salesperson_TEMP("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalespersonRow.text)
+    val merged = sql"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")
+                       select * from salesperson_TEMP
+                       on conflict ("businessentityid")
+                       do update set
+                         "territoryid" = EXCLUDED."territoryid",
+                         "salesquota" = EXCLUDED."salesquota",
+                         "bonus" = EXCLUDED."bonus",
+                         "commissionpct" = EXCLUDED."commissionpct",
+                         "salesytd" = EXCLUDED."salesytd",
+                         "saleslastyear" = EXCLUDED."saleslastyear",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table salesperson_TEMP;""".update
+    created *> copied *> merged
+  }
 }

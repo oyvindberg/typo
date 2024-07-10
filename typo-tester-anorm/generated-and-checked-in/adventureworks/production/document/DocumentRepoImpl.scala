@@ -23,6 +23,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -192,5 +193,28 @@ class DocumentRepoImpl extends DocumentRepo {
        """
       .executeInsert(DocumentRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[DocumentRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table document_TEMP (like production.document) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy document_TEMP("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") from stdin""", batchSize, unsaved)(DocumentRow.text, c): @nowarn
+    SQL"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
+          select * from document_TEMP
+          on conflict ("documentnode")
+          do update set
+            "title" = EXCLUDED."title",
+            "owner" = EXCLUDED."owner",
+            "folderflag" = EXCLUDED."folderflag",
+            "filename" = EXCLUDED."filename",
+            "fileextension" = EXCLUDED."fileextension",
+            "revision" = EXCLUDED."revision",
+            "changenumber" = EXCLUDED."changenumber",
+            "status" = EXCLUDED."status",
+            "documentsummary" = EXCLUDED."documentsummary",
+            "document" = EXCLUDED."document",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table document_TEMP;""".executeUpdate()
   }
 }

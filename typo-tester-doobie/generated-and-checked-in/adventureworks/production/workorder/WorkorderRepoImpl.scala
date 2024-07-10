@@ -144,4 +144,25 @@ class WorkorderRepoImpl extends WorkorderRepo {
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
        """.query(using WorkorderRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, WorkorderRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table workorder_TEMP (like production.workorder) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy workorder_TEMP("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using WorkorderRow.text)
+      res <- sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
+                   select * from workorder_TEMP
+                   on conflict ("workorderid")
+                   do update set
+                     "productid" = EXCLUDED."productid",
+                     "orderqty" = EXCLUDED."orderqty",
+                     "scrappedqty" = EXCLUDED."scrappedqty",
+                     "startdate" = EXCLUDED."startdate",
+                     "enddate" = EXCLUDED."enddate",
+                     "duedate" = EXCLUDED."duedate",
+                     "scrapreasonid" = EXCLUDED."scrapreasonid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table workorder_TEMP;""".update.run
+    } yield res
+  }
 }

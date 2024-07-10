@@ -17,6 +17,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -130,5 +131,18 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
        """
       .executeInsert(ScrapreasonRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ScrapreasonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table scrapreason_TEMP (like production.scrapreason) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy scrapreason_TEMP("scrapreasonid", "name", "modifieddate") from stdin""", batchSize, unsaved)(ScrapreasonRow.text, c): @nowarn
+    SQL"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
+          select * from scrapreason_TEMP
+          on conflict ("scrapreasonid")
+          do update set
+            "name" = EXCLUDED."name",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table scrapreason_TEMP;""".executeUpdate()
   }
 }

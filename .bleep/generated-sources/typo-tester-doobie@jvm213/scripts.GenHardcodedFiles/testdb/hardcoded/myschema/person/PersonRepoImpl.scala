@@ -207,4 +207,28 @@ class PersonRepoImpl extends PersonRepo {
           returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
        """.query(using PersonRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table person_TEMP (like myschema.person) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy person_TEMP("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number") from stdin""").copyIn(unsaved, batchSize)(using PersonRow.text)
+      res <- sql"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
+                   select * from person_TEMP
+                   on conflict ("id")
+                   do update set
+                     "favourite_football_club_id" = EXCLUDED."favourite_football_club_id",
+                     "name" = EXCLUDED."name",
+                     "nick_name" = EXCLUDED."nick_name",
+                     "blog_url" = EXCLUDED."blog_url",
+                     "email" = EXCLUDED."email",
+                     "phone" = EXCLUDED."phone",
+                     "likes_pizza" = EXCLUDED."likes_pizza",
+                     "marital_status_id" = EXCLUDED."marital_status_id",
+                     "work_email" = EXCLUDED."work_email",
+                     "sector" = EXCLUDED."sector",
+                     "favorite_number" = EXCLUDED."favorite_number"
+                   ;
+                   drop table person_TEMP;""".update.run
+    } yield res
+  }
 }

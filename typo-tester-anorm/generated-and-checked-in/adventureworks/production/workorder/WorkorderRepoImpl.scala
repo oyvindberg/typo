@@ -20,6 +20,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -157,5 +158,24 @@ class WorkorderRepoImpl extends WorkorderRepo {
        """
       .executeInsert(WorkorderRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[WorkorderRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table workorder_TEMP (like production.workorder) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy workorder_TEMP("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") from stdin""", batchSize, unsaved)(WorkorderRow.text, c): @nowarn
+    SQL"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
+          select * from workorder_TEMP
+          on conflict ("workorderid")
+          do update set
+            "productid" = EXCLUDED."productid",
+            "orderqty" = EXCLUDED."orderqty",
+            "scrappedqty" = EXCLUDED."scrappedqty",
+            "startdate" = EXCLUDED."startdate",
+            "enddate" = EXCLUDED."enddate",
+            "duedate" = EXCLUDED."duedate",
+            "scrapreasonid" = EXCLUDED."scrapreasonid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table workorder_TEMP;""".executeUpdate()
   }
 }

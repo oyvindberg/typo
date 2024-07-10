@@ -32,4 +32,6 @@ trait ShipmethodRepo {
   def update: UpdateBuilder[ShipmethodFields, ShipmethodRow]
   def update(row: ShipmethodRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, UpdateResult[ShipmethodRow]]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

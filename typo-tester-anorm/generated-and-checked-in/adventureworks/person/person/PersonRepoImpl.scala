@@ -24,6 +24,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -183,5 +184,28 @@ class PersonRepoImpl extends PersonRepo {
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[PersonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table person_TEMP (like person.person) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy person_TEMP("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(PersonRow.text, c): @nowarn
+    SQL"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
+          select * from person_TEMP
+          on conflict ("businessentityid")
+          do update set
+            "persontype" = EXCLUDED."persontype",
+            "namestyle" = EXCLUDED."namestyle",
+            "title" = EXCLUDED."title",
+            "firstname" = EXCLUDED."firstname",
+            "middlename" = EXCLUDED."middlename",
+            "lastname" = EXCLUDED."lastname",
+            "suffix" = EXCLUDED."suffix",
+            "emailpromotion" = EXCLUDED."emailpromotion",
+            "additionalcontactinfo" = EXCLUDED."additionalcontactinfo",
+            "demographics" = EXCLUDED."demographics",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table person_TEMP;""".executeUpdate()
   }
 }

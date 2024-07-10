@@ -168,4 +168,27 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text""".insertReturning(using PurchaseorderheaderRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, PurchaseorderheaderRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table purchaseorderheader_TEMP (like purchasing.purchaseorderheader) on commit drop".execute
+    val copied = streamingInsert(s"""copy purchaseorderheader_TEMP("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate") from stdin""", batchSize, unsaved)(PurchaseorderheaderRow.text)
+    val merged = sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
+                       select * from purchaseorderheader_TEMP
+                       on conflict ("purchaseorderid")
+                       do update set
+                         "revisionnumber" = EXCLUDED."revisionnumber",
+                         "status" = EXCLUDED."status",
+                         "employeeid" = EXCLUDED."employeeid",
+                         "vendorid" = EXCLUDED."vendorid",
+                         "shipmethodid" = EXCLUDED."shipmethodid",
+                         "orderdate" = EXCLUDED."orderdate",
+                         "shipdate" = EXCLUDED."shipdate",
+                         "subtotal" = EXCLUDED."subtotal",
+                         "taxamt" = EXCLUDED."taxamt",
+                         "freight" = EXCLUDED."freight",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table purchaseorderheader_TEMP;""".update
+    created *> copied *> merged
+  }
 }

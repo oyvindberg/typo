@@ -101,4 +101,18 @@ class FlaffRepoImpl extends FlaffRepo {
           returning "code", "another_code", "some_number", "specifier", "parentspecifier"
        """.query(using FlaffRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, FlaffRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table flaff_TEMP (like public.flaff) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy flaff_TEMP("code", "another_code", "some_number", "specifier", "parentspecifier") from stdin""").copyIn(unsaved, batchSize)(using FlaffRow.text)
+      res <- sql"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")
+                   select * from flaff_TEMP
+                   on conflict ("code", "another_code", "some_number", "specifier")
+                   do update set
+                     "parentspecifier" = EXCLUDED."parentspecifier"
+                   ;
+                   drop table flaff_TEMP;""".update.run
+    } yield res
+  }
 }

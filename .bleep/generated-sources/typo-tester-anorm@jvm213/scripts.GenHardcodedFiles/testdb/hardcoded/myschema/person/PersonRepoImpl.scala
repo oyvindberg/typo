@@ -17,6 +17,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import testdb.hardcoded.customtypes.Defaulted
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.marital_status.MaritalStatusId
@@ -230,5 +231,27 @@ class PersonRepoImpl extends PersonRepo {
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[PersonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table person_TEMP (like myschema.person) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy person_TEMP("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number") from stdin""", batchSize, unsaved)(PersonRow.text, c): @nowarn
+    SQL"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
+          select * from person_TEMP
+          on conflict ("id")
+          do update set
+            "favourite_football_club_id" = EXCLUDED."favourite_football_club_id",
+            "name" = EXCLUDED."name",
+            "nick_name" = EXCLUDED."nick_name",
+            "blog_url" = EXCLUDED."blog_url",
+            "email" = EXCLUDED."email",
+            "phone" = EXCLUDED."phone",
+            "likes_pizza" = EXCLUDED."likes_pizza",
+            "marital_status_id" = EXCLUDED."marital_status_id",
+            "work_email" = EXCLUDED."work_email",
+            "sector" = EXCLUDED."sector",
+            "favorite_number" = EXCLUDED."favorite_number"
+          ;
+          drop table person_TEMP;""".executeUpdate()
   }
 }

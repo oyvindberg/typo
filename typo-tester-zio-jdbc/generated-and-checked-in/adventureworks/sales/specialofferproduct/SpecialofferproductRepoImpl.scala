@@ -129,4 +129,18 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "specialofferid", "productid", "rowguid", "modifieddate"::text""".insertReturning(using SpecialofferproductRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferproductRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table specialofferproduct_TEMP (like sales.specialofferproduct) on commit drop".execute
+    val copied = streamingInsert(s"""copy specialofferproduct_TEMP("specialofferid", "productid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SpecialofferproductRow.text)
+    val merged = sql"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")
+                       select * from specialofferproduct_TEMP
+                       on conflict ("specialofferid", "productid")
+                       do update set
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table specialofferproduct_TEMP;""".update
+    created *> copied *> merged
+  }
 }

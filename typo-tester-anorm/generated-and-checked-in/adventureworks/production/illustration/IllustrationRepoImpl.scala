@@ -18,6 +18,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -131,5 +132,18 @@ class IllustrationRepoImpl extends IllustrationRepo {
        """
       .executeInsert(IllustrationRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[IllustrationRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table illustration_TEMP (like production.illustration) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy illustration_TEMP("illustrationid", "diagram", "modifieddate") from stdin""", batchSize, unsaved)(IllustrationRow.text, c): @nowarn
+    SQL"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+          select * from illustration_TEMP
+          on conflict ("illustrationid")
+          do update set
+            "diagram" = EXCLUDED."diagram",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table illustration_TEMP;""".executeUpdate()
   }
 }

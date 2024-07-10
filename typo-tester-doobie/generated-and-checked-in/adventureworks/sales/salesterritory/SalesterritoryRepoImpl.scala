@@ -163,4 +163,26 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
           returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
        """.query(using SalesterritoryRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table salesterritory_TEMP (like sales.salesterritory) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy salesterritory_TEMP("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SalesterritoryRow.text)
+      res <- sql"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
+                   select * from salesterritory_TEMP
+                   on conflict ("territoryid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "countryregioncode" = EXCLUDED."countryregioncode",
+                     "group" = EXCLUDED."group",
+                     "salesytd" = EXCLUDED."salesytd",
+                     "saleslastyear" = EXCLUDED."saleslastyear",
+                     "costytd" = EXCLUDED."costytd",
+                     "costlastyear" = EXCLUDED."costlastyear",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table salesterritory_TEMP;""".update.run
+    } yield res
+  }
 }

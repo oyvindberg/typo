@@ -159,4 +159,27 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
           returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
        """.query(using SpecialofferRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, SpecialofferRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table specialoffer_TEMP (like sales.specialoffer) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy specialoffer_TEMP("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SpecialofferRow.text)
+      res <- sql"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
+                   select * from specialoffer_TEMP
+                   on conflict ("specialofferid")
+                   do update set
+                     "description" = EXCLUDED."description",
+                     "discountpct" = EXCLUDED."discountpct",
+                     "type" = EXCLUDED."type",
+                     "category" = EXCLUDED."category",
+                     "startdate" = EXCLUDED."startdate",
+                     "enddate" = EXCLUDED."enddate",
+                     "minqty" = EXCLUDED."minqty",
+                     "maxqty" = EXCLUDED."maxqty",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table specialoffer_TEMP;""".update.run
+    } yield res
+  }
 }

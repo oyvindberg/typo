@@ -119,4 +119,19 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productcategoryid", "name", "rowguid", "modifieddate"::text""".insertReturning(using ProductcategoryRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductcategoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table productcategory_TEMP (like production.productcategory) on commit drop".execute
+    val copied = streamingInsert(s"""copy productcategory_TEMP("productcategoryid", "name", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(ProductcategoryRow.text)
+    val merged = sql"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")
+                       select * from productcategory_TEMP
+                       on conflict ("productcategoryid")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table productcategory_TEMP;""".update
+    created *> copied *> merged
+  }
 }

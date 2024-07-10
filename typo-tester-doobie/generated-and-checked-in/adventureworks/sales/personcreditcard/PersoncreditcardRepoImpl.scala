@@ -128,4 +128,18 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
           returning "businessentityid", "creditcardid", "modifieddate"::text
        """.query(using PersoncreditcardRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, PersoncreditcardRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table personcreditcard_TEMP (like sales.personcreditcard) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy personcreditcard_TEMP("businessentityid", "creditcardid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using PersoncreditcardRow.text)
+      res <- sql"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
+                   select * from personcreditcard_TEMP
+                   on conflict ("businessentityid", "creditcardid")
+                   do update set
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table personcreditcard_TEMP;""".update.run
+    } yield res
+  }
 }

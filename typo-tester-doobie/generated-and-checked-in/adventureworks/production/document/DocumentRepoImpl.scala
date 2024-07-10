@@ -177,4 +177,29 @@ class DocumentRepoImpl extends DocumentRepo {
           returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
        """.query(using DocumentRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table document_TEMP (like production.document) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy document_TEMP("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") from stdin""").copyIn(unsaved, batchSize)(using DocumentRow.text)
+      res <- sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
+                   select * from document_TEMP
+                   on conflict ("documentnode")
+                   do update set
+                     "title" = EXCLUDED."title",
+                     "owner" = EXCLUDED."owner",
+                     "folderflag" = EXCLUDED."folderflag",
+                     "filename" = EXCLUDED."filename",
+                     "fileextension" = EXCLUDED."fileextension",
+                     "revision" = EXCLUDED."revision",
+                     "changenumber" = EXCLUDED."changenumber",
+                     "status" = EXCLUDED."status",
+                     "documentsummary" = EXCLUDED."documentsummary",
+                     "document" = EXCLUDED."document",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table document_TEMP;""".update.run
+    } yield res
+  }
 }

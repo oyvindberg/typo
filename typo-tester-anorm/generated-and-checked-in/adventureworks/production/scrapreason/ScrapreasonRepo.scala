@@ -29,4 +29,6 @@ trait ScrapreasonRepo {
   def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow]
   def update(row: ScrapreasonRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[ScrapreasonRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

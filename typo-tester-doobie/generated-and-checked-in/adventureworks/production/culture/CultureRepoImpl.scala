@@ -114,4 +114,19 @@ class CultureRepoImpl extends CultureRepo {
           returning "cultureid", "name", "modifieddate"::text
        """.query(using CultureRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, CultureRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table culture_TEMP (like production.culture) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy culture_TEMP("cultureid", "name", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using CultureRow.text)
+      res <- sql"""insert into production.culture("cultureid", "name", "modifieddate")
+                   select * from culture_TEMP
+                   on conflict ("cultureid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table culture_TEMP;""".update.run
+    } yield res
+  }
 }

@@ -31,4 +31,6 @@ trait StoreRepo {
   def update: UpdateBuilder[StoreFields, StoreRow]
   def update(row: StoreRow): ConnectionIO[Boolean]
   def upsert(unsaved: StoreRow): ConnectionIO[StoreRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, StoreRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

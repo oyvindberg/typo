@@ -29,4 +29,6 @@ trait ProductdocumentRepo {
   def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow]
   def update(row: ProductdocumentRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[ProductdocumentRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

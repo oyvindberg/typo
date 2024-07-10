@@ -142,4 +142,24 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
           returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
        """.query(using ProductreviewRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductreviewRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productreview_TEMP (like production.productreview) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productreview_TEMP("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductreviewRow.text)
+      res <- sql"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+                   select * from productreview_TEMP
+                   on conflict ("productreviewid")
+                   do update set
+                     "productid" = EXCLUDED."productid",
+                     "reviewername" = EXCLUDED."reviewername",
+                     "reviewdate" = EXCLUDED."reviewdate",
+                     "emailaddress" = EXCLUDED."emailaddress",
+                     "rating" = EXCLUDED."rating",
+                     "comments" = EXCLUDED."comments",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productreview_TEMP;""".update.run
+    } yield res
+  }
 }

@@ -241,4 +241,41 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
           returning "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
        """.query(using SalesorderheaderRow.read).unique
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, SalesorderheaderRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table salesorderheader_TEMP (like sales.salesorderheader) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy salesorderheader_TEMP("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SalesorderheaderRow.text)
+      res <- sql"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
+                   select * from salesorderheader_TEMP
+                   on conflict ("salesorderid")
+                   do update set
+                     "revisionnumber" = EXCLUDED."revisionnumber",
+                     "orderdate" = EXCLUDED."orderdate",
+                     "duedate" = EXCLUDED."duedate",
+                     "shipdate" = EXCLUDED."shipdate",
+                     "status" = EXCLUDED."status",
+                     "onlineorderflag" = EXCLUDED."onlineorderflag",
+                     "purchaseordernumber" = EXCLUDED."purchaseordernumber",
+                     "accountnumber" = EXCLUDED."accountnumber",
+                     "customerid" = EXCLUDED."customerid",
+                     "salespersonid" = EXCLUDED."salespersonid",
+                     "territoryid" = EXCLUDED."territoryid",
+                     "billtoaddressid" = EXCLUDED."billtoaddressid",
+                     "shiptoaddressid" = EXCLUDED."shiptoaddressid",
+                     "shipmethodid" = EXCLUDED."shipmethodid",
+                     "creditcardid" = EXCLUDED."creditcardid",
+                     "creditcardapprovalcode" = EXCLUDED."creditcardapprovalcode",
+                     "currencyrateid" = EXCLUDED."currencyrateid",
+                     "subtotal" = EXCLUDED."subtotal",
+                     "taxamt" = EXCLUDED."taxamt",
+                     "freight" = EXCLUDED."freight",
+                     "totaldue" = EXCLUDED."totaldue",
+                     "comment" = EXCLUDED."comment",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table salesorderheader_TEMP;""".update.run
+    } yield res
+  }
 }

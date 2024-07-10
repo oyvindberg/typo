@@ -19,6 +19,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -140,5 +141,20 @@ class PasswordRepoImpl extends PasswordRepo {
        """
       .executeInsert(PasswordRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[PasswordRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table password_TEMP (like person.password) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy password_TEMP("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(PasswordRow.text, c): @nowarn
+    SQL"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+          select * from password_TEMP
+          on conflict ("businessentityid")
+          do update set
+            "passwordhash" = EXCLUDED."passwordhash",
+            "passwordsalt" = EXCLUDED."passwordsalt",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table password_TEMP;""".executeUpdate()
   }
 }

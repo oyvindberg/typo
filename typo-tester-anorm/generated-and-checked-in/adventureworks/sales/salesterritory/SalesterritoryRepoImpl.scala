@@ -20,6 +20,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -176,5 +177,25 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
        """
       .executeInsert(SalesterritoryRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SalesterritoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table salesterritory_TEMP (like sales.salesterritory) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy salesterritory_TEMP("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalesterritoryRow.text, c): @nowarn
+    SQL"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
+          select * from salesterritory_TEMP
+          on conflict ("territoryid")
+          do update set
+            "name" = EXCLUDED."name",
+            "countryregioncode" = EXCLUDED."countryregioncode",
+            "group" = EXCLUDED."group",
+            "salesytd" = EXCLUDED."salesytd",
+            "saleslastyear" = EXCLUDED."saleslastyear",
+            "costytd" = EXCLUDED."costytd",
+            "costlastyear" = EXCLUDED."costlastyear",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table salesterritory_TEMP;""".executeUpdate()
   }
 }

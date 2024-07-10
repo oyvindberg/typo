@@ -22,6 +22,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -161,5 +162,23 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
        """
       .executeInsert(StateprovinceRow.rowParser(1).single)
     
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[StateprovinceRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table stateprovince_TEMP (like person.stateprovince) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy stateprovince_TEMP("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(StateprovinceRow.text, c): @nowarn
+    SQL"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
+          select * from stateprovince_TEMP
+          on conflict ("stateprovinceid")
+          do update set
+            "stateprovincecode" = EXCLUDED."stateprovincecode",
+            "countryregioncode" = EXCLUDED."countryregioncode",
+            "isonlystateprovinceflag" = EXCLUDED."isonlystateprovinceflag",
+            "name" = EXCLUDED."name",
+            "territoryid" = EXCLUDED."territoryid",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table stateprovince_TEMP;""".executeUpdate()
   }
 }

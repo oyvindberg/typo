@@ -34,4 +34,6 @@ trait CreditcardRepo {
   def update: UpdateBuilder[CreditcardFields, CreditcardRow]
   def update(row: CreditcardRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CreditcardRow): ZIO[ZConnection, Throwable, UpdateResult[CreditcardRow]]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CreditcardRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }
