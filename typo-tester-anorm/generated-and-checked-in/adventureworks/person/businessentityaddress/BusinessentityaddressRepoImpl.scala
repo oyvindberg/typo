@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -146,6 +147,33 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
        """
       .executeInsert(BusinessentityaddressRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[BusinessentityaddressRow])(implicit c: Connection): List[BusinessentityaddressRow] = {
+    def toNamedParameter(row: BusinessentityaddressRow): List[NamedParameter] = List(
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, BusinessentityId.toStatement)),
+      NamedParameter("addressid", ParameterValue(row.addressid, null, AddressId.toStatement)),
+      NamedParameter("addresstypeid", ParameterValue(row.addresstypeid, null, AddresstypeId.toStatement)),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")
+                values ({businessentityid}::int4, {addressid}::int4, {addresstypeid}::int4, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("businessentityid", "addressid", "addresstypeid")
+                do update set
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(BusinessentityaddressRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[BusinessentityaddressRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

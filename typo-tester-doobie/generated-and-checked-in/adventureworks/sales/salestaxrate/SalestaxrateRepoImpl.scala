@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -20,6 +21,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -142,6 +144,22 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
        """.query(using SalestaxrateRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[SalestaxrateRow]): Stream[ConnectionIO, SalestaxrateRow] = {
+    Update[SalestaxrateRow](
+      s"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+          values (?::int4,?::int4,?::int2,?::numeric,?::varchar,?::uuid,?::timestamp)
+          on conflict ("salestaxrateid")
+          do update set
+            "stateprovinceid" = EXCLUDED."stateprovinceid",
+            "taxtype" = EXCLUDED."taxtype",
+            "taxrate" = EXCLUDED."taxrate",
+            "name" = EXCLUDED."name",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text"""
+    )(using SalestaxrateRow.write)
+    .updateManyWithGeneratedKeys[SalestaxrateRow]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, SalestaxrateRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRow], batchSize: Int = 10000): ConnectionIO[Int] = {

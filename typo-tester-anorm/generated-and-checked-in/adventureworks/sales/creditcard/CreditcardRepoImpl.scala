@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.userdefined.CustomCreditcardId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -145,6 +146,37 @@ class CreditcardRepoImpl extends CreditcardRepo {
        """
       .executeInsert(CreditcardRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[CreditcardRow])(implicit c: Connection): List[CreditcardRow] = {
+    def toNamedParameter(row: CreditcardRow): List[NamedParameter] = List(
+      NamedParameter("creditcardid", ParameterValue(row.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)),
+      NamedParameter("cardtype", ParameterValue(row.cardtype, null, ToStatement.stringToStatement)),
+      NamedParameter("cardnumber", ParameterValue(row.cardnumber, null, ToStatement.stringToStatement)),
+      NamedParameter("expmonth", ParameterValue(row.expmonth, null, TypoShort.toStatement)),
+      NamedParameter("expyear", ParameterValue(row.expyear, null, TypoShort.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
+                values ({creditcardid}::int4, {cardtype}, {cardnumber}, {expmonth}::int2, {expyear}::int2, {modifieddate}::timestamp)
+                on conflict ("creditcardid")
+                do update set
+                  "cardtype" = EXCLUDED."cardtype",
+                  "cardnumber" = EXCLUDED."cardnumber",
+                  "expmonth" = EXCLUDED."expmonth",
+                  "expyear" = EXCLUDED."expyear",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(CreditcardRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[CreditcardRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

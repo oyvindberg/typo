@@ -75,6 +75,12 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
     map.put(unsaved.compositeId, unsaved): @nowarn
     unsaved
   }
+  override def upsertBatch(unsaved: Iterable[FlaffRow])(implicit c: Connection): List[FlaffRow] = {
+    unsaved.map { row =>
+      map += (row.compositeId -> row)
+      row
+    }.toList
+  }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     unsaved.foreach { row =>

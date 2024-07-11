@@ -7,12 +7,14 @@ package adventureworks
 package public
 package flaff
 
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -100,6 +102,17 @@ class FlaffRepoImpl extends FlaffRepo {
             "parentspecifier" = EXCLUDED."parentspecifier"
           returning "code", "another_code", "some_number", "specifier", "parentspecifier"
        """.query(using FlaffRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[FlaffRow]): Stream[ConnectionIO, FlaffRow] = {
+    Update[FlaffRow](
+      s"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")
+          values (?::text,?,?::int4,?::text,?::text)
+          on conflict ("code", "another_code", "some_number", "specifier")
+          do update set
+            "parentspecifier" = EXCLUDED."parentspecifier"
+          returning "code", "another_code", "some_number", "specifier", "parentspecifier""""
+    )(using FlaffRow.write)
+    .updateManyWithGeneratedKeys[FlaffRow]("code", "another_code", "some_number", "specifier", "parentspecifier")(unsaved)(using catsStdInstancesForList, FlaffRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, FlaffRow], batchSize: Int = 10000): ConnectionIO[Int] = {

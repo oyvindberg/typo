@@ -15,6 +15,7 @@ import adventureworks.production.workorder.WorkorderId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -124,4 +125,47 @@ object WorkorderroutingRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[WorkorderroutingRow] = new Write[WorkorderroutingRow](
+    puts = List((WorkorderId.put, Nullability.NoNulls),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (TypoShort.put, Nullability.NoNulls),
+                (LocationId.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.Nullable),
+                (TypoLocalDateTime.put, Nullability.Nullable),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.workorderid, x.productid, x.operationsequence, x.locationid, x.scheduledstartdate, x.scheduledenddate, x.actualstartdate, x.actualenddate, x.actualresourcehrs, x.plannedcost, x.actualcost, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  WorkorderId.put.unsafeSetNonNullable(rs, i + 0, a.workorderid)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 1, a.productid)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 2, a.operationsequence)
+                  LocationId.put.unsafeSetNonNullable(rs, i + 3, a.locationid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.scheduledstartdate)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.scheduledenddate)
+                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 6, a.actualstartdate)
+                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 7, a.actualenddate)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 8, a.actualresourcehrs)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 9, a.plannedcost)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 10, a.actualcost)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 11, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     WorkorderId.put.unsafeUpdateNonNullable(ps, i + 0, a.workorderid)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.productid)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 2, a.operationsequence)
+                     LocationId.put.unsafeUpdateNonNullable(ps, i + 3, a.locationid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.scheduledstartdate)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.scheduledenddate)
+                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 6, a.actualstartdate)
+                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 7, a.actualenddate)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 8, a.actualresourcehrs)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 9, a.plannedcost)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 10, a.actualcost)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 11, a.modifieddate)
+                   }
+  )
 }

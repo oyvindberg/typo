@@ -10,6 +10,7 @@ package productlistpricehistory
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -17,6 +18,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -134,6 +136,19 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text
        """.query(using ProductlistpricehistoryRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ProductlistpricehistoryRow]): Stream[ConnectionIO, ProductlistpricehistoryRow] = {
+    Update[ProductlistpricehistoryRow](
+      s"""insert into production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate")
+          values (?::int4,?::timestamp,?::timestamp,?::numeric,?::timestamp)
+          on conflict ("productid", "startdate")
+          do update set
+            "enddate" = EXCLUDED."enddate",
+            "listprice" = EXCLUDED."listprice",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text"""
+    )(using ProductlistpricehistoryRow.write)
+    .updateManyWithGeneratedKeys[ProductlistpricehistoryRow]("productid", "startdate", "enddate", "listprice", "modifieddate")(unsaved)(using catsStdInstancesForList, ProductlistpricehistoryRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductlistpricehistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {

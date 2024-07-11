@@ -11,6 +11,7 @@ package person
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -56,4 +57,20 @@ object PersonRow {
     sb.append(Text.DELIMETER)
     Text.option(Text.stringInstance).unsafeEncode(row.name, sb)
   }
+  implicit lazy val write: Write[PersonRow] = new Write[PersonRow](
+    puts = List((Meta.LongMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (Meta.StringMeta.put, Nullability.Nullable)),
+    toList = x => List(x.one, x.two, x.name),
+    unsafeSet = (rs, i, a) => {
+                  Meta.LongMeta.put.unsafeSetNonNullable(rs, i + 0, a.one)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 1, a.two)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 2, a.name)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     Meta.LongMeta.put.unsafeUpdateNonNullable(ps, i + 0, a.one)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 1, a.two)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 2, a.name)
+                   }
+  )
 }

@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -19,6 +20,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -160,6 +162,25 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
        """.query(using ProductvendorRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ProductvendorRow]): Stream[ConnectionIO, ProductvendorRow] = {
+    Update[ProductvendorRow](
+      s"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
+          values (?::int4,?::int4,?::int4,?::numeric,?::numeric,?::timestamp,?::int4,?::int4,?::int4,?::bpchar,?::timestamp)
+          on conflict ("productid", "businessentityid")
+          do update set
+            "averageleadtime" = EXCLUDED."averageleadtime",
+            "standardprice" = EXCLUDED."standardprice",
+            "lastreceiptcost" = EXCLUDED."lastreceiptcost",
+            "lastreceiptdate" = EXCLUDED."lastreceiptdate",
+            "minorderqty" = EXCLUDED."minorderqty",
+            "maxorderqty" = EXCLUDED."maxorderqty",
+            "onorderqty" = EXCLUDED."onorderqty",
+            "unitmeasurecode" = EXCLUDED."unitmeasurecode",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text"""
+    )(using ProductvendorRow.write)
+    .updateManyWithGeneratedKeys[ProductvendorRow]("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")(unsaved)(using catsStdInstancesForList, ProductvendorRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductvendorRow], batchSize: Int = 10000): ConnectionIO[Int] = {

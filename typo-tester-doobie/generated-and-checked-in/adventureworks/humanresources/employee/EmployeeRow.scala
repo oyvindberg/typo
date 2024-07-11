@@ -17,6 +17,7 @@ import adventureworks.public.Flag
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -144,4 +145,56 @@ object EmployeeRow {
     sb.append(Text.DELIMETER)
     Text.option(Text.stringInstance).unsafeEncode(row.organizationnode, sb)
   }
+  implicit lazy val write: Write[EmployeeRow] = new Write[EmployeeRow](
+    puts = List((BusinessentityId.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (TypoLocalDate.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (TypoLocalDate.put, Nullability.NoNulls),
+                (Flag.put, Nullability.NoNulls),
+                (TypoShort.put, Nullability.NoNulls),
+                (TypoShort.put, Nullability.NoNulls),
+                (Flag.put, Nullability.NoNulls),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable)),
+    toList = x => List(x.businessentityid, x.nationalidnumber, x.loginid, x.jobtitle, x.birthdate, x.maritalstatus, x.gender, x.hiredate, x.salariedflag, x.vacationhours, x.sickleavehours, x.currentflag, x.rowguid, x.modifieddate, x.organizationnode),
+    unsafeSet = (rs, i, a) => {
+                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.nationalidnumber)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 2, a.loginid)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 3, a.jobtitle)
+                  TypoLocalDate.put.unsafeSetNonNullable(rs, i + 4, a.birthdate)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 5, a.maritalstatus)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 6, a.gender)
+                  TypoLocalDate.put.unsafeSetNonNullable(rs, i + 7, a.hiredate)
+                  Flag.put.unsafeSetNonNullable(rs, i + 8, a.salariedflag)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 9, a.vacationhours)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 10, a.sickleavehours)
+                  Flag.put.unsafeSetNonNullable(rs, i + 11, a.currentflag)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 12, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 13, a.modifieddate)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 14, a.organizationnode)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.nationalidnumber)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.loginid)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.jobtitle)
+                     TypoLocalDate.put.unsafeUpdateNonNullable(ps, i + 4, a.birthdate)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.maritalstatus)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.gender)
+                     TypoLocalDate.put.unsafeUpdateNonNullable(ps, i + 7, a.hiredate)
+                     Flag.put.unsafeUpdateNonNullable(ps, i + 8, a.salariedflag)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 9, a.vacationhours)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 10, a.sickleavehours)
+                     Flag.put.unsafeUpdateNonNullable(ps, i + 11, a.currentflag)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 12, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 13, a.modifieddate)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 14, a.organizationnode)
+                   }
+  )
 }

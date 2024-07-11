@@ -14,6 +14,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -75,4 +76,26 @@ object EmployeepayhistoryRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[EmployeepayhistoryRow] = new Write[EmployeepayhistoryRow](
+    puts = List((BusinessentityId.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (TypoShort.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 1, a.ratechangedate)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 2, a.rate)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 3, a.payfrequency)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 1, a.ratechangedate)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.rate)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 3, a.payfrequency)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
+                   }
+  )
 }

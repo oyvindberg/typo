@@ -29,6 +29,7 @@ trait FootballClubRepo {
   def update(row: FootballClubRow)(implicit c: Connection): Boolean
   def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]])(implicit c: Connection): Boolean
   def upsert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow
+  def upsertBatch(unsaved: Iterable[FootballClubRow])(implicit c: Connection): List[FootballClubRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[FootballClubRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

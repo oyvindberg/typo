@@ -30,6 +30,7 @@ trait SalesreasonRepo {
   def update: UpdateBuilder[SalesreasonFields, SalesreasonRow]
   def update(row: SalesreasonRow): ConnectionIO[Boolean]
   def upsert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow]
+  def upsertBatch(unsaved: List[SalesreasonRow]): Stream[ConnectionIO, SalesreasonRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, SalesreasonRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

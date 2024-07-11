@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -138,6 +139,31 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
        """
       .executeInsert(ProductmodelproductdescriptioncultureRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ProductmodelproductdescriptioncultureRow])(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
+    def toNamedParameter(row: ProductmodelproductdescriptioncultureRow): List[NamedParameter] = List(
+      NamedParameter("productmodelid", ParameterValue(row.productmodelid, null, ProductmodelId.toStatement)),
+      NamedParameter("productdescriptionid", ParameterValue(row.productdescriptionid, null, ProductdescriptionId.toStatement)),
+      NamedParameter("cultureid", ParameterValue(row.cultureid, null, CultureId.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
+                values ({productmodelid}::int4, {productdescriptionid}::int4, {cultureid}::bpchar, {modifieddate}::timestamp)
+                on conflict ("productmodelid", "productdescriptionid", "cultureid")
+                do update set
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ProductmodelproductdescriptioncultureRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductmodelproductdescriptioncultureRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

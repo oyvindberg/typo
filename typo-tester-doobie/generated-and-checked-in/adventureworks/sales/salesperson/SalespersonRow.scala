@@ -15,6 +15,7 @@ import adventureworks.sales.salesterritory.SalesterritoryId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -105,4 +106,38 @@ object SalespersonRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[SalespersonRow] = new Write[SalespersonRow](
+    puts = List((BusinessentityId.put, Nullability.NoNulls),
+                (SalesterritoryId.put, Nullability.Nullable),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.businessentityid, x.territoryid, x.salesquota, x.bonus, x.commissionpct, x.salesytd, x.saleslastyear, x.rowguid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
+                  SalesterritoryId.put.unsafeSetNullable(rs, i + 1, a.territoryid)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 2, a.salesquota)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 3, a.bonus)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 4, a.commissionpct)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 5, a.salesytd)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 6, a.saleslastyear)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 7, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 8, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
+                     SalesterritoryId.put.unsafeUpdateNullable(ps, i + 1, a.territoryid)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 2, a.salesquota)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.bonus)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 4, a.commissionpct)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.salesytd)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.saleslastyear)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 7, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 8, a.modifieddate)
+                   }
+  )
 }

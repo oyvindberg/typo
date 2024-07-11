@@ -18,6 +18,7 @@ import adventureworks.userdefined.FirstName
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -126,4 +127,50 @@ object PersonRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[PersonRow] = new Write[PersonRow](
+    puts = List((BusinessentityId.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (NameStyle.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (/* user-picked */ FirstName.put, Nullability.NoNulls),
+                (Name.put, Nullability.Nullable),
+                (Name.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (TypoXml.put, Nullability.Nullable),
+                (TypoXml.put, Nullability.Nullable),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.businessentityid, x.persontype, x.namestyle, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.emailpromotion, x.additionalcontactinfo, x.demographics, x.rowguid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.persontype)
+                  NameStyle.put.unsafeSetNonNullable(rs, i + 2, a.namestyle)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 3, a.title)
+                  /* user-picked */ FirstName.put.unsafeSetNonNullable(rs, i + 4, a.firstname)
+                  Name.put.unsafeSetNullable(rs, i + 5, a.middlename)
+                  Name.put.unsafeSetNonNullable(rs, i + 6, a.lastname)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 7, a.suffix)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 8, a.emailpromotion)
+                  TypoXml.put.unsafeSetNullable(rs, i + 9, a.additionalcontactinfo)
+                  TypoXml.put.unsafeSetNullable(rs, i + 10, a.demographics)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 11, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 12, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.persontype)
+                     NameStyle.put.unsafeUpdateNonNullable(ps, i + 2, a.namestyle)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 3, a.title)
+                     /* user-picked */ FirstName.put.unsafeUpdateNonNullable(ps, i + 4, a.firstname)
+                     Name.put.unsafeUpdateNullable(ps, i + 5, a.middlename)
+                     Name.put.unsafeUpdateNonNullable(ps, i + 6, a.lastname)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 7, a.suffix)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 8, a.emailpromotion)
+                     TypoXml.put.unsafeUpdateNullable(ps, i + 9, a.additionalcontactinfo)
+                     TypoXml.put.unsafeUpdateNullable(ps, i + 10, a.demographics)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 11, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 12, a.modifieddate)
+                   }
+  )
 }

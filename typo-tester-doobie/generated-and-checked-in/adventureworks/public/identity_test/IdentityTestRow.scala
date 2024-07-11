@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -52,4 +53,20 @@ object IdentityTestRow {
     sb.append(Text.DELIMETER)
     IdentityTestId.text.unsafeEncode(row.name, sb)
   }
+  implicit lazy val write: Write[IdentityTestRow] = new Write[IdentityTestRow](
+    puts = List((Meta.IntMeta.put, Nullability.NoNulls),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (IdentityTestId.put, Nullability.NoNulls)),
+    toList = x => List(x.alwaysGenerated, x.defaultGenerated, x.name),
+    unsafeSet = (rs, i, a) => {
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 0, a.alwaysGenerated)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 1, a.defaultGenerated)
+                  IdentityTestId.put.unsafeSetNonNullable(rs, i + 2, a.name)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 0, a.alwaysGenerated)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.defaultGenerated)
+                     IdentityTestId.put.unsafeUpdateNonNullable(ps, i + 2, a.name)
+                   }
+  )
 }

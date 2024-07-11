@@ -10,12 +10,14 @@ package illustration
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -116,6 +118,18 @@ class IllustrationRepoImpl extends IllustrationRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "illustrationid", "diagram", "modifieddate"::text
        """.query(using IllustrationRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[IllustrationRow]): Stream[ConnectionIO, IllustrationRow] = {
+    Update[IllustrationRow](
+      s"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+          values (?::int4,?::xml,?::timestamp)
+          on conflict ("illustrationid")
+          do update set
+            "diagram" = EXCLUDED."diagram",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "illustrationid", "diagram", "modifieddate"::text"""
+    )(using IllustrationRow.write)
+    .updateManyWithGeneratedKeys[IllustrationRow]("illustrationid", "diagram", "modifieddate")(unsaved)(using catsStdInstancesForList, IllustrationRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int = 10000): ConnectionIO[Int] = {

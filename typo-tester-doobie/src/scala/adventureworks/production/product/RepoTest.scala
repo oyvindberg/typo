@@ -5,9 +5,10 @@ import adventureworks.production.unitmeasure.*
 import adventureworks.public.Name
 import adventureworks.{SnapshotTest, withConnection}
 import org.scalatest.Assertion
+import doobie.free.connection.delay
 
 class RepoTest extends SnapshotTest {
-  def runTest(unitmeasureRepo: UnitmeasureRepo): Assertion =
+  def upsertStreaming(unitmeasureRepo: UnitmeasureRepo): Assertion =
     withConnection {
       val um1 = UnitmeasureRow(unitmeasurecode = UnitmeasureId("kg1"), name = Name("name1"), TypoLocalDateTime.now)
       val um2 = UnitmeasureRow(unitmeasurecode = UnitmeasureId("kg2"), name = Name("name2"), TypoLocalDateTime.now)
@@ -21,11 +22,24 @@ class RepoTest extends SnapshotTest {
       } yield assert(List(um1a, um2a) == all.sortBy(_.name))
     }
 
-  test("in-memory") {
-    runTest(new UnitmeasureRepoMock(_.toRow(TypoLocalDateTime.now)))
-  }
+  def upsertBatch(unitmeasureRepo: UnitmeasureRepo): Assertion =
+    withConnection {
+      val um1 = UnitmeasureRow(unitmeasurecode = UnitmeasureId("kg1"), name = Name("name1"), TypoLocalDateTime.now)
+      val um2 = UnitmeasureRow(unitmeasurecode = UnitmeasureId("kg2"), name = Name("name2"), TypoLocalDateTime.now)
+      for {
+        initial <- unitmeasureRepo.upsertBatch(List(um1, um2)).compile.toList
+        _ <- delay(assert(List(um1, um2) == initial.sortBy(_.name)))
+        um1a = um1.copy(name = Name("name1a"))
+        um2a = um2.copy(name = Name("name2a"))
+        returned <- unitmeasureRepo.upsertBatch(List(um1a, um2a)).compile.toList
+        _ <- delay(assert(List(um1a, um2a) == returned.sortBy(_.name)))
+        all <- unitmeasureRepo.selectAll.compile.toList
+      } yield assert(List(um1a, um2a) == all.sortBy(_.name))
+    }
 
-  test("pg") {
-    runTest(new UnitmeasureRepoImpl)
-  }
+  test("upsertStreaming in-memory")(upsertStreaming(new UnitmeasureRepoMock(_.toRow(TypoLocalDateTime.now))))
+  test("upsertStreaming pg")(upsertStreaming(new UnitmeasureRepoImpl))
+
+  test("upsertBatch in-memory")(upsertBatch(new UnitmeasureRepoMock(_.toRow(TypoLocalDateTime.now))))
+  test("upsertBatch pg")(upsertBatch(new UnitmeasureRepoImpl))
 }

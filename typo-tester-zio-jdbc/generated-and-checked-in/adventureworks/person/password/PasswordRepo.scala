@@ -33,6 +33,7 @@ trait PasswordRepo {
   def update: UpdateBuilder[PasswordFields, PasswordRow]
   def update(row: PasswordRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: PasswordRow): ZIO[ZConnection, Throwable, UpdateResult[PasswordRow]]
+  // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, PasswordRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

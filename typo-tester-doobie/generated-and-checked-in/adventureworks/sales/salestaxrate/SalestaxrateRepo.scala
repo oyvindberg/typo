@@ -30,6 +30,7 @@ trait SalestaxrateRepo {
   def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow]
   def update(row: SalestaxrateRow): ConnectionIO[Boolean]
   def upsert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow]
+  def upsertBatch(unsaved: List[SalestaxrateRow]): Stream[ConnectionIO, SalestaxrateRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

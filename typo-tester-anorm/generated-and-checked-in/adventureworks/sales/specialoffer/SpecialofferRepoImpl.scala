@@ -10,6 +10,7 @@ package specialoffer
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -174,6 +175,47 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
        """
       .executeInsert(SpecialofferRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[SpecialofferRow])(implicit c: Connection): List[SpecialofferRow] = {
+    def toNamedParameter(row: SpecialofferRow): List[NamedParameter] = List(
+      NamedParameter("specialofferid", ParameterValue(row.specialofferid, null, SpecialofferId.toStatement)),
+      NamedParameter("description", ParameterValue(row.description, null, ToStatement.stringToStatement)),
+      NamedParameter("discountpct", ParameterValue(row.discountpct, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("type", ParameterValue(row.`type`, null, ToStatement.stringToStatement)),
+      NamedParameter("category", ParameterValue(row.category, null, ToStatement.stringToStatement)),
+      NamedParameter("startdate", ParameterValue(row.startdate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("enddate", ParameterValue(row.enddate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("minqty", ParameterValue(row.minqty, null, ToStatement.intToStatement)),
+      NamedParameter("maxqty", ParameterValue(row.maxqty, null, ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData))),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
+                values ({specialofferid}::int4, {description}, {discountpct}::numeric, {type}, {category}, {startdate}::timestamp, {enddate}::timestamp, {minqty}::int4, {maxqty}::int4, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("specialofferid")
+                do update set
+                  "description" = EXCLUDED."description",
+                  "discountpct" = EXCLUDED."discountpct",
+                  "type" = EXCLUDED."type",
+                  "category" = EXCLUDED."category",
+                  "startdate" = EXCLUDED."startdate",
+                  "enddate" = EXCLUDED."enddate",
+                  "minqty" = EXCLUDED."minqty",
+                  "maxqty" = EXCLUDED."maxqty",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(SpecialofferRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[SpecialofferRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

@@ -105,6 +105,14 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
       unsaved
     }
   }
+  override def upsertBatch(unsaved: List[AddressRow]): Stream[ConnectionIO, AddressRow] = {
+    Stream.emits {
+      unsaved.map { row =>
+        map += (row.addressid -> row)
+        row
+      }
+    }
+  }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, AddressRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     unsaved.compile.toList.map { rows =>

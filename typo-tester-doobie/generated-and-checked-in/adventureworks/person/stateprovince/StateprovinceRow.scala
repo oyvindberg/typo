@@ -17,6 +17,7 @@ import adventureworks.sales.salesterritory.SalesterritoryId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -94,4 +95,35 @@ object StateprovinceRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[StateprovinceRow] = new Write[StateprovinceRow](
+    puts = List((StateprovinceId.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (CountryregionId.put, Nullability.NoNulls),
+                (Flag.put, Nullability.NoNulls),
+                (Name.put, Nullability.NoNulls),
+                (SalesterritoryId.put, Nullability.NoNulls),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  StateprovinceId.put.unsafeSetNonNullable(rs, i + 0, a.stateprovinceid)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.stateprovincecode)
+                  CountryregionId.put.unsafeSetNonNullable(rs, i + 2, a.countryregioncode)
+                  Flag.put.unsafeSetNonNullable(rs, i + 3, a.isonlystateprovinceflag)
+                  Name.put.unsafeSetNonNullable(rs, i + 4, a.name)
+                  SalesterritoryId.put.unsafeSetNonNullable(rs, i + 5, a.territoryid)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 6, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 7, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     StateprovinceId.put.unsafeUpdateNonNullable(ps, i + 0, a.stateprovinceid)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.stateprovincecode)
+                     CountryregionId.put.unsafeUpdateNonNullable(ps, i + 2, a.countryregioncode)
+                     Flag.put.unsafeUpdateNonNullable(ps, i + 3, a.isonlystateprovinceflag)
+                     Name.put.unsafeUpdateNonNullable(ps, i + 4, a.name)
+                     SalesterritoryId.put.unsafeUpdateNonNullable(ps, i + 5, a.territoryid)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 6, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 7, a.modifieddate)
+                   }
+  )
 }

@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -19,6 +20,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -162,6 +164,25 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
        """.query(using SalesterritoryRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[SalesterritoryRow]): Stream[ConnectionIO, SalesterritoryRow] = {
+    Update[SalesterritoryRow](
+      s"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
+          values (?::int4,?::varchar,?,?,?::numeric,?::numeric,?::numeric,?::numeric,?::uuid,?::timestamp)
+          on conflict ("territoryid")
+          do update set
+            "name" = EXCLUDED."name",
+            "countryregioncode" = EXCLUDED."countryregioncode",
+            "group" = EXCLUDED."group",
+            "salesytd" = EXCLUDED."salesytd",
+            "saleslastyear" = EXCLUDED."saleslastyear",
+            "costytd" = EXCLUDED."costytd",
+            "costlastyear" = EXCLUDED."costlastyear",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text"""
+    )(using SalesterritoryRow.write)
+    .updateManyWithGeneratedKeys[SalesterritoryRow]("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, SalesterritoryRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {

@@ -107,6 +107,12 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
     map.put(unsaved.addressid, unsaved): @nowarn
     unsaved
   }
+  override def upsertBatch(unsaved: Iterable[AddressRow])(implicit c: Connection): List[AddressRow] = {
+    unsaved.map { row =>
+      map += (row.addressid -> row)
+      row
+    }.toList
+  }
   override def upsertStreaming(unsaved: Iterator[AddressRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     unsaved.foreach { row =>
       map += (row.addressid -> row)

@@ -10,6 +10,7 @@ package contacttype
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -131,6 +132,31 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
        """
       .executeInsert(ContacttypeRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ContacttypeRow])(implicit c: Connection): List[ContacttypeRow] = {
+    def toNamedParameter(row: ContacttypeRow): List[NamedParameter] = List(
+      NamedParameter("contacttypeid", ParameterValue(row.contacttypeid, null, ContacttypeId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+                values ({contacttypeid}::int4, {name}::varchar, {modifieddate}::timestamp)
+                on conflict ("contacttypeid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "contacttypeid", "name", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ContacttypeRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ContacttypeRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

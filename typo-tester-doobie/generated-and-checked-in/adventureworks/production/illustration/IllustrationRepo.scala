@@ -30,6 +30,7 @@ trait IllustrationRepo {
   def update: UpdateBuilder[IllustrationFields, IllustrationRow]
   def update(row: IllustrationRow): ConnectionIO[Boolean]
   def upsert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow]
+  def upsertBatch(unsaved: List[IllustrationRow]): Stream[ConnectionIO, IllustrationRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

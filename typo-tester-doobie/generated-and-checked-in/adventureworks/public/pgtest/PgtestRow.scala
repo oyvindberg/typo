@@ -34,6 +34,7 @@ import adventureworks.customtypes.TypoXml
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.DecodingFailure
@@ -559,4 +560,221 @@ object PgtestRow {
     sb.append(Text.DELIMETER)
     Text.iterableInstance[Array, TypoXml](TypoXml.text, implicitly).unsafeEncode(row.xmles, sb)
   }
+  implicit lazy val write: Write[PgtestRow] = new Write[PgtestRow](
+    puts = List((Meta.BooleanMeta.put, Nullability.NoNulls),
+                (TypoBox.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (TypoBytea.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (TypoCircle.put, Nullability.NoNulls),
+                (TypoLocalDate.put, Nullability.NoNulls),
+                (Meta.FloatMeta.put, Nullability.NoNulls),
+                (Meta.DoubleMeta.put, Nullability.NoNulls),
+                (TypoHStore.put, Nullability.NoNulls),
+                (TypoInet.put, Nullability.NoNulls),
+                (TypoShort.put, Nullability.NoNulls),
+                (TypoInt2Vector.put, Nullability.NoNulls),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (Meta.LongMeta.put, Nullability.NoNulls),
+                (TypoInterval.put, Nullability.NoNulls),
+                (TypoJson.put, Nullability.NoNulls),
+                (TypoJsonb.put, Nullability.NoNulls),
+                (TypoLine.put, Nullability.NoNulls),
+                (TypoLineSegment.put, Nullability.NoNulls),
+                (TypoMoney.put, Nullability.NoNulls),
+                (Mydomain.put, Nullability.NoNulls),
+                (Myenum.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (TypoPath.put, Nullability.NoNulls),
+                (TypoPoint.put, Nullability.NoNulls),
+                (TypoPolygon.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (TypoLocalTime.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (TypoInstant.put, Nullability.NoNulls),
+                (TypoOffsetTime.put, Nullability.NoNulls),
+                (TypoUUID.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (TypoVector.put, Nullability.NoNulls),
+                (TypoXml.put, Nullability.NoNulls),
+                (TypoBox.arrayPut, Nullability.NoNulls),
+                (adventureworks.StringArrayMeta.put, Nullability.NoNulls),
+                (adventureworks.StringArrayMeta.put, Nullability.NoNulls),
+                (TypoCircle.arrayPut, Nullability.NoNulls),
+                (TypoLocalDate.arrayPut, Nullability.NoNulls),
+                (adventureworks.FloatArrayMeta.put, Nullability.NoNulls),
+                (adventureworks.DoubleArrayMeta.put, Nullability.NoNulls),
+                (TypoInet.arrayPut, Nullability.NoNulls),
+                (TypoShort.arrayPut, Nullability.NoNulls),
+                (TypoInt2Vector.arrayPut, Nullability.NoNulls),
+                (adventureworks.IntegerArrayMeta.put, Nullability.NoNulls),
+                (adventureworks.LongArrayMeta.put, Nullability.NoNulls),
+                (TypoInterval.arrayPut, Nullability.NoNulls),
+                (TypoJson.arrayPut, Nullability.NoNulls),
+                (TypoJsonb.arrayPut, Nullability.NoNulls),
+                (TypoLine.arrayPut, Nullability.NoNulls),
+                (TypoLineSegment.arrayPut, Nullability.NoNulls),
+                (TypoMoney.arrayPut, Nullability.NoNulls),
+                (Mydomain.arrayPut, Nullability.NoNulls),
+                (Myenum.arrayPut, Nullability.NoNulls),
+                (adventureworks.StringArrayMeta.put, Nullability.NoNulls),
+                (adventureworks.BigDecimalMeta.put, Nullability.NoNulls),
+                (TypoPath.arrayPut, Nullability.NoNulls),
+                (TypoPoint.arrayPut, Nullability.NoNulls),
+                (TypoPolygon.arrayPut, Nullability.NoNulls),
+                (adventureworks.StringArrayMeta.put, Nullability.NoNulls),
+                (TypoLocalTime.arrayPut, Nullability.NoNulls),
+                (TypoLocalDateTime.arrayPut, Nullability.NoNulls),
+                (TypoInstant.arrayPut, Nullability.NoNulls),
+                (TypoOffsetTime.arrayPut, Nullability.NoNulls),
+                (TypoUUID.arrayPut, Nullability.NoNulls),
+                (adventureworks.StringArrayMeta.put, Nullability.NoNulls),
+                (TypoXml.arrayPut, Nullability.NoNulls)),
+    toList = x => List(x.bool, x.box, x.bpchar, x.bytea, x.char, x.circle, x.date, x.float4, x.float8, x.hstore, x.inet, x.int2, x.int2vector, x.int4, x.int8, x.interval, x.json, x.jsonb, x.line, x.lseg, x.money, x.mydomain, x.myenum, x.name, x.numeric, x.path, x.point, x.polygon, x.text, x.time, x.timestamp, x.timestampz, x.timez, x.uuid, x.varchar, x.vector, x.xml, x.boxes, x.bpchares, x.chares, x.circlees, x.datees, x.float4es, x.float8es, x.inetes, x.int2es, x.int2vectores, x.int4es, x.int8es, x.intervales, x.jsones, x.jsonbes, x.linees, x.lseges, x.moneyes, x.mydomaines, x.myenumes, x.namees, x.numerices, x.pathes, x.pointes, x.polygones, x.textes, x.timees, x.timestampes, x.timestampzes, x.timezes, x.uuides, x.varchares, x.xmles),
+    unsafeSet = (rs, i, a) => {
+                  Meta.BooleanMeta.put.unsafeSetNonNullable(rs, i + 0, a.bool)
+                  TypoBox.put.unsafeSetNonNullable(rs, i + 1, a.box)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 2, a.bpchar)
+                  TypoBytea.put.unsafeSetNonNullable(rs, i + 3, a.bytea)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 4, a.char)
+                  TypoCircle.put.unsafeSetNonNullable(rs, i + 5, a.circle)
+                  TypoLocalDate.put.unsafeSetNonNullable(rs, i + 6, a.date)
+                  Meta.FloatMeta.put.unsafeSetNonNullable(rs, i + 7, a.float4)
+                  Meta.DoubleMeta.put.unsafeSetNonNullable(rs, i + 8, a.float8)
+                  TypoHStore.put.unsafeSetNonNullable(rs, i + 9, a.hstore)
+                  TypoInet.put.unsafeSetNonNullable(rs, i + 10, a.inet)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 11, a.int2)
+                  TypoInt2Vector.put.unsafeSetNonNullable(rs, i + 12, a.int2vector)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 13, a.int4)
+                  Meta.LongMeta.put.unsafeSetNonNullable(rs, i + 14, a.int8)
+                  TypoInterval.put.unsafeSetNonNullable(rs, i + 15, a.interval)
+                  TypoJson.put.unsafeSetNonNullable(rs, i + 16, a.json)
+                  TypoJsonb.put.unsafeSetNonNullable(rs, i + 17, a.jsonb)
+                  TypoLine.put.unsafeSetNonNullable(rs, i + 18, a.line)
+                  TypoLineSegment.put.unsafeSetNonNullable(rs, i + 19, a.lseg)
+                  TypoMoney.put.unsafeSetNonNullable(rs, i + 20, a.money)
+                  Mydomain.put.unsafeSetNonNullable(rs, i + 21, a.mydomain)
+                  Myenum.put.unsafeSetNonNullable(rs, i + 22, a.myenum)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 23, a.name)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 24, a.numeric)
+                  TypoPath.put.unsafeSetNonNullable(rs, i + 25, a.path)
+                  TypoPoint.put.unsafeSetNonNullable(rs, i + 26, a.point)
+                  TypoPolygon.put.unsafeSetNonNullable(rs, i + 27, a.polygon)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 28, a.text)
+                  TypoLocalTime.put.unsafeSetNonNullable(rs, i + 29, a.time)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 30, a.timestamp)
+                  TypoInstant.put.unsafeSetNonNullable(rs, i + 31, a.timestampz)
+                  TypoOffsetTime.put.unsafeSetNonNullable(rs, i + 32, a.timez)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 33, a.uuid)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 34, a.varchar)
+                  TypoVector.put.unsafeSetNonNullable(rs, i + 35, a.vector)
+                  TypoXml.put.unsafeSetNonNullable(rs, i + 36, a.xml)
+                  TypoBox.arrayPut.unsafeSetNonNullable(rs, i + 37, a.boxes)
+                  adventureworks.StringArrayMeta.put.unsafeSetNonNullable(rs, i + 38, a.bpchares)
+                  adventureworks.StringArrayMeta.put.unsafeSetNonNullable(rs, i + 39, a.chares)
+                  TypoCircle.arrayPut.unsafeSetNonNullable(rs, i + 40, a.circlees)
+                  TypoLocalDate.arrayPut.unsafeSetNonNullable(rs, i + 41, a.datees)
+                  adventureworks.FloatArrayMeta.put.unsafeSetNonNullable(rs, i + 42, a.float4es)
+                  adventureworks.DoubleArrayMeta.put.unsafeSetNonNullable(rs, i + 43, a.float8es)
+                  TypoInet.arrayPut.unsafeSetNonNullable(rs, i + 44, a.inetes)
+                  TypoShort.arrayPut.unsafeSetNonNullable(rs, i + 45, a.int2es)
+                  TypoInt2Vector.arrayPut.unsafeSetNonNullable(rs, i + 46, a.int2vectores)
+                  adventureworks.IntegerArrayMeta.put.unsafeSetNonNullable(rs, i + 47, a.int4es)
+                  adventureworks.LongArrayMeta.put.unsafeSetNonNullable(rs, i + 48, a.int8es)
+                  TypoInterval.arrayPut.unsafeSetNonNullable(rs, i + 49, a.intervales)
+                  TypoJson.arrayPut.unsafeSetNonNullable(rs, i + 50, a.jsones)
+                  TypoJsonb.arrayPut.unsafeSetNonNullable(rs, i + 51, a.jsonbes)
+                  TypoLine.arrayPut.unsafeSetNonNullable(rs, i + 52, a.linees)
+                  TypoLineSegment.arrayPut.unsafeSetNonNullable(rs, i + 53, a.lseges)
+                  TypoMoney.arrayPut.unsafeSetNonNullable(rs, i + 54, a.moneyes)
+                  Mydomain.arrayPut.unsafeSetNonNullable(rs, i + 55, a.mydomaines)
+                  Myenum.arrayPut.unsafeSetNonNullable(rs, i + 56, a.myenumes)
+                  adventureworks.StringArrayMeta.put.unsafeSetNonNullable(rs, i + 57, a.namees)
+                  adventureworks.BigDecimalMeta.put.unsafeSetNonNullable(rs, i + 58, a.numerices)
+                  TypoPath.arrayPut.unsafeSetNonNullable(rs, i + 59, a.pathes)
+                  TypoPoint.arrayPut.unsafeSetNonNullable(rs, i + 60, a.pointes)
+                  TypoPolygon.arrayPut.unsafeSetNonNullable(rs, i + 61, a.polygones)
+                  adventureworks.StringArrayMeta.put.unsafeSetNonNullable(rs, i + 62, a.textes)
+                  TypoLocalTime.arrayPut.unsafeSetNonNullable(rs, i + 63, a.timees)
+                  TypoLocalDateTime.arrayPut.unsafeSetNonNullable(rs, i + 64, a.timestampes)
+                  TypoInstant.arrayPut.unsafeSetNonNullable(rs, i + 65, a.timestampzes)
+                  TypoOffsetTime.arrayPut.unsafeSetNonNullable(rs, i + 66, a.timezes)
+                  TypoUUID.arrayPut.unsafeSetNonNullable(rs, i + 67, a.uuides)
+                  adventureworks.StringArrayMeta.put.unsafeSetNonNullable(rs, i + 68, a.varchares)
+                  TypoXml.arrayPut.unsafeSetNonNullable(rs, i + 69, a.xmles)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     Meta.BooleanMeta.put.unsafeUpdateNonNullable(ps, i + 0, a.bool)
+                     TypoBox.put.unsafeUpdateNonNullable(ps, i + 1, a.box)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.bpchar)
+                     TypoBytea.put.unsafeUpdateNonNullable(ps, i + 3, a.bytea)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 4, a.char)
+                     TypoCircle.put.unsafeUpdateNonNullable(ps, i + 5, a.circle)
+                     TypoLocalDate.put.unsafeUpdateNonNullable(ps, i + 6, a.date)
+                     Meta.FloatMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.float4)
+                     Meta.DoubleMeta.put.unsafeUpdateNonNullable(ps, i + 8, a.float8)
+                     TypoHStore.put.unsafeUpdateNonNullable(ps, i + 9, a.hstore)
+                     TypoInet.put.unsafeUpdateNonNullable(ps, i + 10, a.inet)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 11, a.int2)
+                     TypoInt2Vector.put.unsafeUpdateNonNullable(ps, i + 12, a.int2vector)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 13, a.int4)
+                     Meta.LongMeta.put.unsafeUpdateNonNullable(ps, i + 14, a.int8)
+                     TypoInterval.put.unsafeUpdateNonNullable(ps, i + 15, a.interval)
+                     TypoJson.put.unsafeUpdateNonNullable(ps, i + 16, a.json)
+                     TypoJsonb.put.unsafeUpdateNonNullable(ps, i + 17, a.jsonb)
+                     TypoLine.put.unsafeUpdateNonNullable(ps, i + 18, a.line)
+                     TypoLineSegment.put.unsafeUpdateNonNullable(ps, i + 19, a.lseg)
+                     TypoMoney.put.unsafeUpdateNonNullable(ps, i + 20, a.money)
+                     Mydomain.put.unsafeUpdateNonNullable(ps, i + 21, a.mydomain)
+                     Myenum.put.unsafeUpdateNonNullable(ps, i + 22, a.myenum)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 23, a.name)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 24, a.numeric)
+                     TypoPath.put.unsafeUpdateNonNullable(ps, i + 25, a.path)
+                     TypoPoint.put.unsafeUpdateNonNullable(ps, i + 26, a.point)
+                     TypoPolygon.put.unsafeUpdateNonNullable(ps, i + 27, a.polygon)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 28, a.text)
+                     TypoLocalTime.put.unsafeUpdateNonNullable(ps, i + 29, a.time)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 30, a.timestamp)
+                     TypoInstant.put.unsafeUpdateNonNullable(ps, i + 31, a.timestampz)
+                     TypoOffsetTime.put.unsafeUpdateNonNullable(ps, i + 32, a.timez)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 33, a.uuid)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 34, a.varchar)
+                     TypoVector.put.unsafeUpdateNonNullable(ps, i + 35, a.vector)
+                     TypoXml.put.unsafeUpdateNonNullable(ps, i + 36, a.xml)
+                     TypoBox.arrayPut.unsafeUpdateNonNullable(ps, i + 37, a.boxes)
+                     adventureworks.StringArrayMeta.put.unsafeUpdateNonNullable(ps, i + 38, a.bpchares)
+                     adventureworks.StringArrayMeta.put.unsafeUpdateNonNullable(ps, i + 39, a.chares)
+                     TypoCircle.arrayPut.unsafeUpdateNonNullable(ps, i + 40, a.circlees)
+                     TypoLocalDate.arrayPut.unsafeUpdateNonNullable(ps, i + 41, a.datees)
+                     adventureworks.FloatArrayMeta.put.unsafeUpdateNonNullable(ps, i + 42, a.float4es)
+                     adventureworks.DoubleArrayMeta.put.unsafeUpdateNonNullable(ps, i + 43, a.float8es)
+                     TypoInet.arrayPut.unsafeUpdateNonNullable(ps, i + 44, a.inetes)
+                     TypoShort.arrayPut.unsafeUpdateNonNullable(ps, i + 45, a.int2es)
+                     TypoInt2Vector.arrayPut.unsafeUpdateNonNullable(ps, i + 46, a.int2vectores)
+                     adventureworks.IntegerArrayMeta.put.unsafeUpdateNonNullable(ps, i + 47, a.int4es)
+                     adventureworks.LongArrayMeta.put.unsafeUpdateNonNullable(ps, i + 48, a.int8es)
+                     TypoInterval.arrayPut.unsafeUpdateNonNullable(ps, i + 49, a.intervales)
+                     TypoJson.arrayPut.unsafeUpdateNonNullable(ps, i + 50, a.jsones)
+                     TypoJsonb.arrayPut.unsafeUpdateNonNullable(ps, i + 51, a.jsonbes)
+                     TypoLine.arrayPut.unsafeUpdateNonNullable(ps, i + 52, a.linees)
+                     TypoLineSegment.arrayPut.unsafeUpdateNonNullable(ps, i + 53, a.lseges)
+                     TypoMoney.arrayPut.unsafeUpdateNonNullable(ps, i + 54, a.moneyes)
+                     Mydomain.arrayPut.unsafeUpdateNonNullable(ps, i + 55, a.mydomaines)
+                     Myenum.arrayPut.unsafeUpdateNonNullable(ps, i + 56, a.myenumes)
+                     adventureworks.StringArrayMeta.put.unsafeUpdateNonNullable(ps, i + 57, a.namees)
+                     adventureworks.BigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 58, a.numerices)
+                     TypoPath.arrayPut.unsafeUpdateNonNullable(ps, i + 59, a.pathes)
+                     TypoPoint.arrayPut.unsafeUpdateNonNullable(ps, i + 60, a.pointes)
+                     TypoPolygon.arrayPut.unsafeUpdateNonNullable(ps, i + 61, a.polygones)
+                     adventureworks.StringArrayMeta.put.unsafeUpdateNonNullable(ps, i + 62, a.textes)
+                     TypoLocalTime.arrayPut.unsafeUpdateNonNullable(ps, i + 63, a.timees)
+                     TypoLocalDateTime.arrayPut.unsafeUpdateNonNullable(ps, i + 64, a.timestampes)
+                     TypoInstant.arrayPut.unsafeUpdateNonNullable(ps, i + 65, a.timestampzes)
+                     TypoOffsetTime.arrayPut.unsafeUpdateNonNullable(ps, i + 66, a.timezes)
+                     TypoUUID.arrayPut.unsafeUpdateNonNullable(ps, i + 67, a.uuides)
+                     adventureworks.StringArrayMeta.put.unsafeUpdateNonNullable(ps, i + 68, a.varchares)
+                     TypoXml.arrayPut.unsafeUpdateNonNullable(ps, i + 69, a.xmles)
+                   }
+  )
 }

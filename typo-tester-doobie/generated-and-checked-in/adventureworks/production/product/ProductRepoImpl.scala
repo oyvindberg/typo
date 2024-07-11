@@ -16,6 +16,7 @@ import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -23,6 +24,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -220,6 +222,40 @@ class ProductRepoImpl extends ProductRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text
        """.query(using ProductRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ProductRow]): Stream[ConnectionIO, ProductRow] = {
+    Update[ProductRow](
+      s"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
+          values (?::int4,?::varchar,?,?::bool,?::bool,?,?::int2,?::int2,?::numeric,?::numeric,?,?::bpchar,?::bpchar,?::numeric,?::int4,?::bpchar,?::bpchar,?::bpchar,?::int4,?::int4,?::timestamp,?::timestamp,?::timestamp,?::uuid,?::timestamp)
+          on conflict ("productid")
+          do update set
+            "name" = EXCLUDED."name",
+            "productnumber" = EXCLUDED."productnumber",
+            "makeflag" = EXCLUDED."makeflag",
+            "finishedgoodsflag" = EXCLUDED."finishedgoodsflag",
+            "color" = EXCLUDED."color",
+            "safetystocklevel" = EXCLUDED."safetystocklevel",
+            "reorderpoint" = EXCLUDED."reorderpoint",
+            "standardcost" = EXCLUDED."standardcost",
+            "listprice" = EXCLUDED."listprice",
+            "size" = EXCLUDED."size",
+            "sizeunitmeasurecode" = EXCLUDED."sizeunitmeasurecode",
+            "weightunitmeasurecode" = EXCLUDED."weightunitmeasurecode",
+            "weight" = EXCLUDED."weight",
+            "daystomanufacture" = EXCLUDED."daystomanufacture",
+            "productline" = EXCLUDED."productline",
+            "class" = EXCLUDED."class",
+            "style" = EXCLUDED."style",
+            "productsubcategoryid" = EXCLUDED."productsubcategoryid",
+            "productmodelid" = EXCLUDED."productmodelid",
+            "sellstartdate" = EXCLUDED."sellstartdate",
+            "sellenddate" = EXCLUDED."sellenddate",
+            "discontinueddate" = EXCLUDED."discontinueddate",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text"""
+    )(using ProductRow.write)
+    .updateManyWithGeneratedKeys[ProductRow]("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, ProductRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductRow], batchSize: Int = 10000): ConnectionIO[Int] = {

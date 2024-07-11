@@ -17,6 +17,7 @@ import adventureworks.public.Flag
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -126,4 +127,50 @@ object DocumentRow {
     sb.append(Text.DELIMETER)
     DocumentId.text.unsafeEncode(row.documentnode, sb)
   }
+  implicit lazy val write: Write[DocumentRow] = new Write[DocumentRow](
+    puts = List((Meta.StringMeta.put, Nullability.NoNulls),
+                (BusinessentityId.put, Nullability.NoNulls),
+                (Flag.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (TypoShort.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (TypoBytea.put, Nullability.Nullable),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (DocumentId.put, Nullability.NoNulls)),
+    toList = x => List(x.title, x.owner, x.folderflag, x.filename, x.fileextension, x.revision, x.changenumber, x.status, x.documentsummary, x.document, x.rowguid, x.modifieddate, x.documentnode),
+    unsafeSet = (rs, i, a) => {
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 0, a.title)
+                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 1, a.owner)
+                  Flag.put.unsafeSetNonNullable(rs, i + 2, a.folderflag)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 3, a.filename)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 4, a.fileextension)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 5, a.revision)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 6, a.changenumber)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 7, a.status)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 8, a.documentsummary)
+                  TypoBytea.put.unsafeSetNullable(rs, i + 9, a.document)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 10, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 11, a.modifieddate)
+                  DocumentId.put.unsafeSetNonNullable(rs, i + 12, a.documentnode)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 0, a.title)
+                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 1, a.owner)
+                     Flag.put.unsafeUpdateNonNullable(ps, i + 2, a.folderflag)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.filename)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 4, a.fileextension)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.revision)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.changenumber)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 7, a.status)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 8, a.documentsummary)
+                     TypoBytea.put.unsafeUpdateNullable(ps, i + 9, a.document)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 10, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 11, a.modifieddate)
+                     DocumentId.put.unsafeUpdateNonNullable(ps, i + 12, a.documentnode)
+                   }
+  )
 }

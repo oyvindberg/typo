@@ -105,6 +105,14 @@ class JobcandidateRepoMock(toRow: Function1[JobcandidateRowUnsaved, Jobcandidate
       unsaved
     }
   }
+  override def upsertBatch(unsaved: List[JobcandidateRow]): Stream[ConnectionIO, JobcandidateRow] = {
+    Stream.emits {
+      unsaved.map { row =>
+        map += (row.jobcandidateid -> row)
+        row
+      }
+    }
+  }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     unsaved.compile.toList.map { rows =>

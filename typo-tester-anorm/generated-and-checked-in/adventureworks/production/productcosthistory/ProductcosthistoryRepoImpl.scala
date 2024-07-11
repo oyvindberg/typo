@@ -10,6 +10,7 @@ package productcosthistory
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -141,6 +142,34 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
        """
       .executeInsert(ProductcosthistoryRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ProductcosthistoryRow])(implicit c: Connection): List[ProductcosthistoryRow] = {
+    def toNamedParameter(row: ProductcosthistoryRow): List[NamedParameter] = List(
+      NamedParameter("productid", ParameterValue(row.productid, null, ProductId.toStatement)),
+      NamedParameter("startdate", ParameterValue(row.startdate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("enddate", ParameterValue(row.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))),
+      NamedParameter("standardcost", ParameterValue(row.standardcost, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
+                values ({productid}::int4, {startdate}::timestamp, {enddate}::timestamp, {standardcost}::numeric, {modifieddate}::timestamp)
+                on conflict ("productid", "startdate")
+                do update set
+                  "enddate" = EXCLUDED."enddate",
+                  "standardcost" = EXCLUDED."standardcost",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ProductcosthistoryRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductcosthistoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

@@ -105,6 +105,14 @@ class ProductphotoRepoMock(toRow: Function1[ProductphotoRowUnsaved, Productphoto
       unsaved
     }
   }
+  override def upsertBatch(unsaved: List[ProductphotoRow]): Stream[ConnectionIO, ProductphotoRow] = {
+    Stream.emits {
+      unsaved.map { row =>
+        map += (row.productphotoid -> row)
+        row
+      }
+    }
+  }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductphotoRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     unsaved.compile.toList.map { rows =>

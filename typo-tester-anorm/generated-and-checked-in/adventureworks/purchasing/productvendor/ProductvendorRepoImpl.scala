@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -168,6 +169,46 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
        """
       .executeInsert(ProductvendorRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ProductvendorRow])(implicit c: Connection): List[ProductvendorRow] = {
+    def toNamedParameter(row: ProductvendorRow): List[NamedParameter] = List(
+      NamedParameter("productid", ParameterValue(row.productid, null, ProductId.toStatement)),
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, BusinessentityId.toStatement)),
+      NamedParameter("averageleadtime", ParameterValue(row.averageleadtime, null, ToStatement.intToStatement)),
+      NamedParameter("standardprice", ParameterValue(row.standardprice, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("lastreceiptcost", ParameterValue(row.lastreceiptcost, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))),
+      NamedParameter("lastreceiptdate", ParameterValue(row.lastreceiptdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))),
+      NamedParameter("minorderqty", ParameterValue(row.minorderqty, null, ToStatement.intToStatement)),
+      NamedParameter("maxorderqty", ParameterValue(row.maxorderqty, null, ToStatement.intToStatement)),
+      NamedParameter("onorderqty", ParameterValue(row.onorderqty, null, ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData))),
+      NamedParameter("unitmeasurecode", ParameterValue(row.unitmeasurecode, null, UnitmeasureId.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
+                values ({productid}::int4, {businessentityid}::int4, {averageleadtime}::int4, {standardprice}::numeric, {lastreceiptcost}::numeric, {lastreceiptdate}::timestamp, {minorderqty}::int4, {maxorderqty}::int4, {onorderqty}::int4, {unitmeasurecode}::bpchar, {modifieddate}::timestamp)
+                on conflict ("productid", "businessentityid")
+                do update set
+                  "averageleadtime" = EXCLUDED."averageleadtime",
+                  "standardprice" = EXCLUDED."standardprice",
+                  "lastreceiptcost" = EXCLUDED."lastreceiptcost",
+                  "lastreceiptdate" = EXCLUDED."lastreceiptdate",
+                  "minorderqty" = EXCLUDED."minorderqty",
+                  "maxorderqty" = EXCLUDED."maxorderqty",
+                  "onorderqty" = EXCLUDED."onorderqty",
+                  "unitmeasurecode" = EXCLUDED."unitmeasurecode",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ProductvendorRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductvendorRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

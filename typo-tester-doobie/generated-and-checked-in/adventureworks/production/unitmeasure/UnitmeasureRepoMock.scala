@@ -105,6 +105,14 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
       unsaved
     }
   }
+  override def upsertBatch(unsaved: List[UnitmeasureRow]): Stream[ConnectionIO, UnitmeasureRow] = {
+    Stream.emits {
+      unsaved.map { row =>
+        map += (row.unitmeasurecode -> row)
+        row
+      }
+    }
+  }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     unsaved.compile.toList.map { rows =>

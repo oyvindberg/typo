@@ -32,6 +32,7 @@ trait PersonRepo {
   def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean]
   def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: PersonRow): ZIO[ZConnection, Throwable, UpdateResult[PersonRow]]
+  // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

@@ -297,7 +297,10 @@ case class FilesRelation(
 
   def RepoTraitFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val renderedMethods = repoMethods.map { repoMethod =>
-      code"${repoMethod.comment.fold("")(c => c + "\n")}${dbLib.repoSig(repoMethod)}"
+      dbLib.repoSig(repoMethod) match {
+        case Left(DbLib.NotImplementedFor(lib)) => code"// Not implementable for $lib: ${repoMethod.methodName}"
+        case Right(sig)                         => code"${repoMethod.comment.fold("")(c => c + "\n")}$sig"
+      }
     }
     val str =
       code"""trait ${names.RepoName.name} {
@@ -309,10 +312,12 @@ case class FilesRelation(
   }
 
   def RepoImplFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
-    val renderedMethods: NonEmptyList[sc.Code] = repoMethods.map { repoMethod =>
-      code"""|${repoMethod.comment.fold("")(c => c + "\n")}override ${dbLib.repoSig(repoMethod)} = {
-             |  ${dbLib.repoImpl(repoMethod)}
-             |}""".stripMargin
+    val renderedMethods: List[sc.Code] = repoMethods.toList.flatMap { repoMethod =>
+      dbLib.repoSig(repoMethod).toOption.map { sig =>
+        code"""|${repoMethod.comment.fold("")(c => c + "\n")}override $sig = {
+               |  ${dbLib.repoImpl(repoMethod)}
+               |}""".stripMargin
+      }
     }
     val str =
       code"""|class ${names.RepoImplName.name} extends ${names.RepoName} {
@@ -329,11 +334,13 @@ case class FilesRelation(
         sc.Param(sc.Ident("toRow"), TypesScala.Function1.of(unsaved.tpe, names.RowName), None)
       }
 
-    val methods: NonEmptyList[sc.Code] =
-      repoMethods.map { repoMethod =>
-        code"""|${repoMethod.comment.fold("")(c => c + "\n")}override ${dbLib.repoSig(repoMethod)} = {
-               |  ${dbLib.mockRepoImpl(idComputed, repoMethod, maybeToRowParam)}
-               |}""".stripMargin
+    val methods: List[sc.Code] =
+      repoMethods.toList.flatMap { repoMethod =>
+        dbLib.repoSig(repoMethod).toOption.map { sig =>
+          code"""|${repoMethod.comment.fold("")(c => c + "\n")}override $sig = {
+                 |  ${dbLib.mockRepoImpl(idComputed, repoMethod, maybeToRowParam)}
+                 |}""".stripMargin
+        }
       }
 
     val classParams = List(

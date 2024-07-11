@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -149,6 +150,34 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
        """
       .executeInsert(EmailaddressRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[EmailaddressRow])(implicit c: Connection): List[EmailaddressRow] = {
+    def toNamedParameter(row: EmailaddressRow): List[NamedParameter] = List(
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, BusinessentityId.toStatement)),
+      NamedParameter("emailaddressid", ParameterValue(row.emailaddressid, null, ToStatement.intToStatement)),
+      NamedParameter("emailaddress", ParameterValue(row.emailaddress, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")
+                values ({businessentityid}::int4, {emailaddressid}::int4, {emailaddress}, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("businessentityid", "emailaddressid")
+                do update set
+                  "emailaddress" = EXCLUDED."emailaddress",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(EmailaddressRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[EmailaddressRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

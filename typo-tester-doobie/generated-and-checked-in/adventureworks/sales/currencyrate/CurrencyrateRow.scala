@@ -13,6 +13,7 @@ import adventureworks.sales.currency.CurrencyId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -83,4 +84,32 @@ object CurrencyrateRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[CurrencyrateRow] = new Write[CurrencyrateRow](
+    puts = List((CurrencyrateId.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (CurrencyId.put, Nullability.NoNulls),
+                (CurrencyId.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.currencyrateid, x.currencyratedate, x.fromcurrencycode, x.tocurrencycode, x.averagerate, x.endofdayrate, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  CurrencyrateId.put.unsafeSetNonNullable(rs, i + 0, a.currencyrateid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 1, a.currencyratedate)
+                  CurrencyId.put.unsafeSetNonNullable(rs, i + 2, a.fromcurrencycode)
+                  CurrencyId.put.unsafeSetNonNullable(rs, i + 3, a.tocurrencycode)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 4, a.averagerate)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 5, a.endofdayrate)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 6, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     CurrencyrateId.put.unsafeUpdateNonNullable(ps, i + 0, a.currencyrateid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 1, a.currencyratedate)
+                     CurrencyId.put.unsafeUpdateNonNullable(ps, i + 2, a.fromcurrencycode)
+                     CurrencyId.put.unsafeUpdateNonNullable(ps, i + 3, a.tocurrencycode)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 4, a.averagerate)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.endofdayrate)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 6, a.modifieddate)
+                   }
+  )
 }

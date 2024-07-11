@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -200,6 +201,55 @@ class EmployeeRepoImpl extends EmployeeRepo {
        """
       .executeInsert(EmployeeRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[EmployeeRow])(implicit c: Connection): List[EmployeeRow] = {
+    def toNamedParameter(row: EmployeeRow): List[NamedParameter] = List(
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, BusinessentityId.toStatement)),
+      NamedParameter("nationalidnumber", ParameterValue(row.nationalidnumber, null, ToStatement.stringToStatement)),
+      NamedParameter("loginid", ParameterValue(row.loginid, null, ToStatement.stringToStatement)),
+      NamedParameter("jobtitle", ParameterValue(row.jobtitle, null, ToStatement.stringToStatement)),
+      NamedParameter("birthdate", ParameterValue(row.birthdate, null, TypoLocalDate.toStatement)),
+      NamedParameter("maritalstatus", ParameterValue(row.maritalstatus, null, ToStatement.stringToStatement)),
+      NamedParameter("gender", ParameterValue(row.gender, null, ToStatement.stringToStatement)),
+      NamedParameter("hiredate", ParameterValue(row.hiredate, null, TypoLocalDate.toStatement)),
+      NamedParameter("salariedflag", ParameterValue(row.salariedflag, null, Flag.toStatement)),
+      NamedParameter("vacationhours", ParameterValue(row.vacationhours, null, TypoShort.toStatement)),
+      NamedParameter("sickleavehours", ParameterValue(row.sickleavehours, null, TypoShort.toStatement)),
+      NamedParameter("currentflag", ParameterValue(row.currentflag, null, Flag.toStatement)),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("organizationnode", ParameterValue(row.organizationnode, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData)))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
+                values ({businessentityid}::int4, {nationalidnumber}, {loginid}, {jobtitle}, {birthdate}::date, {maritalstatus}::bpchar, {gender}::bpchar, {hiredate}::date, {salariedflag}::bool, {vacationhours}::int2, {sickleavehours}::int2, {currentflag}::bool, {rowguid}::uuid, {modifieddate}::timestamp, {organizationnode})
+                on conflict ("businessentityid")
+                do update set
+                  "nationalidnumber" = EXCLUDED."nationalidnumber",
+                  "loginid" = EXCLUDED."loginid",
+                  "jobtitle" = EXCLUDED."jobtitle",
+                  "birthdate" = EXCLUDED."birthdate",
+                  "maritalstatus" = EXCLUDED."maritalstatus",
+                  "gender" = EXCLUDED."gender",
+                  "hiredate" = EXCLUDED."hiredate",
+                  "salariedflag" = EXCLUDED."salariedflag",
+                  "vacationhours" = EXCLUDED."vacationhours",
+                  "sickleavehours" = EXCLUDED."sickleavehours",
+                  "currentflag" = EXCLUDED."currentflag",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate",
+                  "organizationnode" = EXCLUDED."organizationnode"
+                returning "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode"
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(EmployeeRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[EmployeeRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

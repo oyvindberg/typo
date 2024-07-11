@@ -8,6 +8,7 @@ package hardcoded
 package myschema
 package marital_status
 
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -103,6 +104,28 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
        """
       .executeInsert(MaritalStatusRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[MaritalStatusRow])(implicit c: Connection): List[MaritalStatusRow] = {
+    def toNamedParameter(row: MaritalStatusRow): List[NamedParameter] = List(
+      NamedParameter("id", ParameterValue(row.id, null, MaritalStatusId.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.testdb.hardcoded.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into myschema.marital_status("id")
+                values ({id}::int8)
+                on conflict ("id")
+                do update set
+                  
+                returning "id"
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(MaritalStatusRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[MaritalStatusRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

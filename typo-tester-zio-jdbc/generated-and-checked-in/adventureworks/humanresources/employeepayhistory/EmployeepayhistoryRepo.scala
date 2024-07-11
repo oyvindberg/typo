@@ -32,6 +32,7 @@ trait EmployeepayhistoryRepo {
   def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def update(row: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[EmployeepayhistoryRow]]
+  // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, EmployeepayhistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

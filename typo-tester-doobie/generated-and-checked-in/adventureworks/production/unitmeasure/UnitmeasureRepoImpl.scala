@@ -10,12 +10,14 @@ package unitmeasure
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -113,6 +115,18 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "unitmeasurecode", "name", "modifieddate"::text
        """.query(using UnitmeasureRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[UnitmeasureRow]): Stream[ConnectionIO, UnitmeasureRow] = {
+    Update[UnitmeasureRow](
+      s"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
+          values (?::bpchar,?::varchar,?::timestamp)
+          on conflict ("unitmeasurecode")
+          do update set
+            "name" = EXCLUDED."name",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "unitmeasurecode", "name", "modifieddate"::text"""
+    )(using UnitmeasureRow.write)
+    .updateManyWithGeneratedKeys[UnitmeasureRow]("unitmeasurecode", "name", "modifieddate")(unsaved)(using catsStdInstancesForList, UnitmeasureRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRow], batchSize: Int = 10000): ConnectionIO[Int] = {

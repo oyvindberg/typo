@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -149,6 +150,37 @@ class CustomerRepoImpl extends CustomerRepo {
        """
       .executeInsert(CustomerRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[CustomerRow])(implicit c: Connection): List[CustomerRow] = {
+    def toNamedParameter(row: CustomerRow): List[NamedParameter] = List(
+      NamedParameter("customerid", ParameterValue(row.customerid, null, CustomerId.toStatement)),
+      NamedParameter("personid", ParameterValue(row.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))),
+      NamedParameter("storeid", ParameterValue(row.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))),
+      NamedParameter("territoryid", ParameterValue(row.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
+                values ({customerid}::int4, {personid}::int4, {storeid}::int4, {territoryid}::int4, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("customerid")
+                do update set
+                  "personid" = EXCLUDED."personid",
+                  "storeid" = EXCLUDED."storeid",
+                  "territoryid" = EXCLUDED."territoryid",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(CustomerRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[CustomerRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

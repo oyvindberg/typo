@@ -9,6 +9,7 @@ package myschema
 package football_club
 
 import cats.data.NonEmptyList
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.postgres.syntax.FragmentOps
@@ -17,6 +18,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragments
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -106,6 +108,17 @@ class FootballClubRepoImpl extends FootballClubRepo {
             "name" = EXCLUDED."name"
           returning "id", "name"
        """.query(using FootballClubRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[FootballClubRow]): Stream[ConnectionIO, FootballClubRow] = {
+    Update[FootballClubRow](
+      s"""insert into myschema.football_club("id", "name")
+          values (?::int8,?)
+          on conflict ("id")
+          do update set
+            "name" = EXCLUDED."name"
+          returning "id", "name""""
+    )(using FootballClubRow.write)
+    .updateManyWithGeneratedKeys[FootballClubRow]("id", "name")(unsaved)(using catsStdInstancesForList, FootballClubRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int = 10000): ConnectionIO[Int] = {

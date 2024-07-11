@@ -10,6 +10,7 @@ package users
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -153,6 +154,39 @@ class UsersRepoImpl extends UsersRepo {
        """
       .executeInsert(UsersRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[UsersRow])(implicit c: Connection): List[UsersRow] = {
+    def toNamedParameter(row: UsersRow): List[NamedParameter] = List(
+      NamedParameter("user_id", ParameterValue(row.userId, null, UsersId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, ToStatement.stringToStatement)),
+      NamedParameter("last_name", ParameterValue(row.lastName, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("email", ParameterValue(row.email, null, TypoUnknownCitext.toStatement)),
+      NamedParameter("password", ParameterValue(row.password, null, ToStatement.stringToStatement)),
+      NamedParameter("created_at", ParameterValue(row.createdAt, null, TypoInstant.toStatement)),
+      NamedParameter("verified_on", ParameterValue(row.verifiedOn, null, ToStatement.optionToStatement(TypoInstant.toStatement, TypoInstant.parameterMetadata)))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
+                values ({user_id}::uuid, {name}, {last_name}, {email}::citext, {password}, {created_at}::timestamptz, {verified_on}::timestamptz)
+                on conflict ("user_id")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "last_name" = EXCLUDED."last_name",
+                  "email" = EXCLUDED."email",
+                  "password" = EXCLUDED."password",
+                  "created_at" = EXCLUDED."created_at",
+                  "verified_on" = EXCLUDED."verified_on"
+                returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(UsersRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[UsersRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

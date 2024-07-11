@@ -8,6 +8,7 @@ package hardcoded
 package myschema
 package football_club
 
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -130,6 +131,29 @@ class FootballClubRepoImpl extends FootballClubRepo {
        """
       .executeInsert(FootballClubRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[FootballClubRow])(implicit c: Connection): List[FootballClubRow] = {
+    def toNamedParameter(row: FootballClubRow): List[NamedParameter] = List(
+      NamedParameter("id", ParameterValue(row.id, null, FootballClubId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, ToStatement.stringToStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.testdb.hardcoded.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into myschema.football_club("id", "name")
+                values ({id}::int8, {name})
+                on conflict ("id")
+                do update set
+                  "name" = EXCLUDED."name"
+                returning "id", "name"
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(FootballClubRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[FootballClubRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

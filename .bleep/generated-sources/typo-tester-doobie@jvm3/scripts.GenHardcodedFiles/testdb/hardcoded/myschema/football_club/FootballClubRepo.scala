@@ -30,6 +30,7 @@ trait FootballClubRepo {
   def update(row: FootballClubRow): ConnectionIO[Boolean]
   def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ConnectionIO[Boolean]
   def upsert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow]
+  def upsertBatch(unsaved: List[FootballClubRow]): Stream[ConnectionIO, FootballClubRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

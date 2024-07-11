@@ -10,6 +10,7 @@ package productphoto
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -145,6 +146,37 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
        """
       .executeInsert(ProductphotoRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ProductphotoRow])(implicit c: Connection): List[ProductphotoRow] = {
+    def toNamedParameter(row: ProductphotoRow): List[NamedParameter] = List(
+      NamedParameter("productphotoid", ParameterValue(row.productphotoid, null, ProductphotoId.toStatement)),
+      NamedParameter("thumbnailphoto", ParameterValue(row.thumbnailphoto, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))),
+      NamedParameter("thumbnailphotofilename", ParameterValue(row.thumbnailphotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("largephoto", ParameterValue(row.largephoto, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))),
+      NamedParameter("largephotofilename", ParameterValue(row.largephotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+                values ({productphotoid}::int4, {thumbnailphoto}::bytea, {thumbnailphotofilename}, {largephoto}::bytea, {largephotofilename}, {modifieddate}::timestamp)
+                on conflict ("productphotoid")
+                do update set
+                  "thumbnailphoto" = EXCLUDED."thumbnailphoto",
+                  "thumbnailphotofilename" = EXCLUDED."thumbnailphotofilename",
+                  "largephoto" = EXCLUDED."largephoto",
+                  "largephotofilename" = EXCLUDED."largephotofilename",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ProductphotoRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductphotoRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

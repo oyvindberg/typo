@@ -32,6 +32,7 @@ trait ShiftRepo {
   def update: UpdateBuilder[ShiftFields, ShiftRow]
   def update(row: ShiftRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, UpdateResult[ShiftRow]]
+  // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

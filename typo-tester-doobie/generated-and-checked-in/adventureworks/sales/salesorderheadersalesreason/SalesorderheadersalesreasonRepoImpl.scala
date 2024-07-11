@@ -11,12 +11,14 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -126,6 +128,17 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
             "modifieddate" = EXCLUDED."modifieddate"
           returning "salesorderid", "salesreasonid", "modifieddate"::text
        """.query(using SalesorderheadersalesreasonRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[SalesorderheadersalesreasonRow]): Stream[ConnectionIO, SalesorderheadersalesreasonRow] = {
+    Update[SalesorderheadersalesreasonRow](
+      s"""insert into sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate")
+          values (?::int4,?::int4,?::timestamp)
+          on conflict ("salesorderid", "salesreasonid")
+          do update set
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "salesorderid", "salesreasonid", "modifieddate"::text"""
+    )(using SalesorderheadersalesreasonRow.write)
+    .updateManyWithGeneratedKeys[SalesorderheadersalesreasonRow]("salesorderid", "salesreasonid", "modifieddate")(unsaved)(using catsStdInstancesForList, SalesorderheadersalesreasonRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, SalesorderheadersalesreasonRow], batchSize: Int = 10000): ConnectionIO[Int] = {

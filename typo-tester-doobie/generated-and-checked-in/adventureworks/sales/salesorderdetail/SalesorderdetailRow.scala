@@ -18,6 +18,7 @@ import adventureworks.sales.specialofferproduct.SpecialofferproductId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -118,4 +119,41 @@ object SalesorderdetailRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[SalesorderdetailRow] = new Write[SalesorderdetailRow](
+    puts = List((SalesorderheaderId.put, Nullability.NoNulls),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (TypoShort.put, Nullability.NoNulls),
+                (ProductId.put, Nullability.NoNulls),
+                (SpecialofferId.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.salesorderid, x.salesorderdetailid, x.carriertrackingnumber, x.orderqty, x.productid, x.specialofferid, x.unitprice, x.unitpricediscount, x.rowguid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  SalesorderheaderId.put.unsafeSetNonNullable(rs, i + 0, a.salesorderid)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 1, a.salesorderdetailid)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 2, a.carriertrackingnumber)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 3, a.orderqty)
+                  ProductId.put.unsafeSetNonNullable(rs, i + 4, a.productid)
+                  SpecialofferId.put.unsafeSetNonNullable(rs, i + 5, a.specialofferid)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 6, a.unitprice)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 7, a.unitpricediscount)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 8, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 9, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     SalesorderheaderId.put.unsafeUpdateNonNullable(ps, i + 0, a.salesorderid)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.salesorderdetailid)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 2, a.carriertrackingnumber)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 3, a.orderqty)
+                     ProductId.put.unsafeUpdateNonNullable(ps, i + 4, a.productid)
+                     SpecialofferId.put.unsafeUpdateNonNullable(ps, i + 5, a.specialofferid)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.unitprice)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.unitpricediscount)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 8, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 9, a.modifieddate)
+                   }
+  )
 }

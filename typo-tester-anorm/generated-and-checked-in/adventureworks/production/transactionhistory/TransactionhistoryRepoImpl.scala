@@ -10,6 +10,7 @@ package transactionhistory
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -162,6 +163,43 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
        """
       .executeInsert(TransactionhistoryRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[TransactionhistoryRow])(implicit c: Connection): List[TransactionhistoryRow] = {
+    def toNamedParameter(row: TransactionhistoryRow): List[NamedParameter] = List(
+      NamedParameter("transactionid", ParameterValue(row.transactionid, null, TransactionhistoryId.toStatement)),
+      NamedParameter("productid", ParameterValue(row.productid, null, ProductId.toStatement)),
+      NamedParameter("referenceorderid", ParameterValue(row.referenceorderid, null, ToStatement.intToStatement)),
+      NamedParameter("referenceorderlineid", ParameterValue(row.referenceorderlineid, null, ToStatement.intToStatement)),
+      NamedParameter("transactiondate", ParameterValue(row.transactiondate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("transactiontype", ParameterValue(row.transactiontype, null, ToStatement.stringToStatement)),
+      NamedParameter("quantity", ParameterValue(row.quantity, null, ToStatement.intToStatement)),
+      NamedParameter("actualcost", ParameterValue(row.actualcost, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
+                values ({transactionid}::int4, {productid}::int4, {referenceorderid}::int4, {referenceorderlineid}::int4, {transactiondate}::timestamp, {transactiontype}::bpchar, {quantity}::int4, {actualcost}::numeric, {modifieddate}::timestamp)
+                on conflict ("transactionid")
+                do update set
+                  "productid" = EXCLUDED."productid",
+                  "referenceorderid" = EXCLUDED."referenceorderid",
+                  "referenceorderlineid" = EXCLUDED."referenceorderlineid",
+                  "transactiondate" = EXCLUDED."transactiondate",
+                  "transactiontype" = EXCLUDED."transactiontype",
+                  "quantity" = EXCLUDED."quantity",
+                  "actualcost" = EXCLUDED."actualcost",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(TransactionhistoryRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[TransactionhistoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

@@ -105,6 +105,14 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
       unsaved
     }
   }
+  override def upsertBatch(unsaved: List[ShiftRow]): Stream[ConnectionIO, ShiftRow] = {
+    Stream.emits {
+      unsaved.map { row =>
+        map += (row.shiftid -> row)
+        row
+      }
+    }
+  }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     unsaved.compile.toList.map { rows =>

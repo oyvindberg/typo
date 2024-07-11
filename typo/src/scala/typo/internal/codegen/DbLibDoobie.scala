@@ -27,6 +27,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
   val fromWrite = sc.Type.Qualified("doobie.syntax.SqlInterpolator.SingleFragment.fromWrite")
   val FragmentOps = sc.Type.Qualified("doobie.postgres.syntax.FragmentOps")
   val JdbcType = sc.Type.Qualified("doobie.enumerated.JdbcType")
+  val Update = sc.Type.Qualified("doobie.util.update.Update")
+  val catsStdInstancesForList = sc.Type.Qualified("cats.instances.list.catsStdInstancesForList")
 
   val arrayGetName: sc.Ident = sc.Ident("arrayGet")
   val arrayPutName: sc.Ident = sc.Ident("arrayPut")
@@ -61,66 +63,68 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         code"${composite.cols.map(cc => code"${cc.dbName.code} = ${runtimeInterpolateValue(code"${composite.paramName}.${cc.name}", cc.tpe)}").mkCode(" AND ")}"
     }
 
-  override def repoSig(repoMethod: RepoMethod): sc.Code = {
+  override def repoSig(repoMethod: RepoMethod): Right[Nothing, sc.Code] = {
     val name = repoMethod.methodName
     repoMethod match {
       case RepoMethod.SelectBuilder(_, fieldsType, rowType) =>
-        code"def $name: ${sc.Type.dsl.SelectBuilder.of(fieldsType, rowType)}"
+        Right(code"def $name: ${sc.Type.dsl.SelectBuilder.of(fieldsType, rowType)}")
       case RepoMethod.SelectAll(_, _, rowType) =>
-        code"def $name: ${fs2Stream.of(ConnectionIO, rowType)}"
+        Right(code"def $name: ${fs2Stream.of(ConnectionIO, rowType)}")
       case RepoMethod.SelectById(_, _, id, rowType) =>
-        code"def $name(${id.param}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}"
+        Right(code"def $name(${id.param}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}")
       case RepoMethod.SelectByIds(_, _, idComputed, idsParam, rowType) =>
         val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"puts$i"), Put.of(sc.Type.ArrayOf(colType)), None) }
         usedDefineds match {
           case Nil =>
-            code"def $name($idsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
+            Right(code"def $name($idsParam): ${fs2Stream.of(ConnectionIO, rowType)}")
           case nonEmpty =>
-            code"def $name($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${fs2Stream.of(ConnectionIO, rowType)}"
+            Right(code"def $name($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${fs2Stream.of(ConnectionIO, rowType)}")
         }
       case RepoMethod.SelectByIdsTracked(x) =>
         val usedDefineds = x.idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"puts$i"), Put.of(sc.Type.ArrayOf(colType)), None) }
         val returnType = ConnectionIO.of(TypesScala.Map.of(x.idComputed.tpe, x.rowType))
         usedDefineds match {
           case Nil =>
-            code"def $name(${x.idsParam}): $returnType"
+            Right(code"def $name(${x.idsParam}): $returnType")
           case nonEmpty =>
-            code"def $name(${x.idsParam})(implicit ${nonEmpty.map(_.code).mkCode(", ")}): $returnType"
+            Right(code"def $name(${x.idsParam})(implicit ${nonEmpty.map(_.code).mkCode(", ")}): $returnType")
         }
 
       case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
-        code"def $name(${keyColumns.map(_.param.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}"
+        Right(code"def $name(${keyColumns.map(_.param.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Option.of(rowType))}")
       case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
-        code"def $name($fieldValueOrIdsParam): ${fs2Stream.of(ConnectionIO, rowType)}"
+        Right(code"def $name($fieldValueOrIdsParam): ${fs2Stream.of(ConnectionIO, rowType)}")
       case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
-        code"def $name: ${sc.Type.dsl.UpdateBuilder.of(fieldsType, rowType)}"
+        Right(code"def $name: ${sc.Type.dsl.UpdateBuilder.of(fieldsType, rowType)}")
       case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
-        code"def $name(${id.param}, $varargs): ${ConnectionIO.of(TypesScala.Boolean)}"
+        Right(code"def $name(${id.param}, $varargs): ${ConnectionIO.of(TypesScala.Boolean)}")
       case RepoMethod.Update(_, _, _, param, _) =>
-        code"def $name($param): ${ConnectionIO.of(TypesScala.Boolean)}"
+        Right(code"def $name($param): ${ConnectionIO.of(TypesScala.Boolean)}")
       case RepoMethod.Insert(_, _, unsavedParam, rowType) =>
-        code"def $name($unsavedParam): ${ConnectionIO.of(rowType)}"
+        Right(code"def $name($unsavedParam): ${ConnectionIO.of(rowType)}")
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
-        code"def $name($unsavedParam): ${ConnectionIO.of(rowType)}"
+        Right(code"def $name($unsavedParam): ${ConnectionIO.of(rowType)}")
       case RepoMethod.InsertStreaming(_, _, rowType) =>
-        code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, rowType)}, batchSize: ${TypesScala.Int} = 10000): ${ConnectionIO.of(TypesScala.Long)}"
+        Right(code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, rowType)}, batchSize: ${TypesScala.Int} = 10000): ${ConnectionIO.of(TypesScala.Long)}")
+      case RepoMethod.UpsertBatch(_, _, _, rowType) =>
+        Right(code"def $name(unsaved: ${TypesScala.List.of(rowType)}): ${fs2Stream.of(ConnectionIO, rowType)}")
       case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
-        code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, unsaved.tpe)}, batchSize: ${TypesScala.Int} = 10000): ${ConnectionIO.of(TypesScala.Long)}"
+        Right(code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, unsaved.tpe)}, batchSize: ${TypesScala.Int} = 10000): ${ConnectionIO.of(TypesScala.Long)}")
       case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
-        code"def $name($unsavedParam): ${ConnectionIO.of(rowType)}"
+        Right(code"def $name($unsavedParam): ${ConnectionIO.of(rowType)}")
       case RepoMethod.UpsertStreaming(_, _, _, rowType) =>
-        code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, rowType)}, batchSize: ${TypesScala.Int} = 10000): ${ConnectionIO.of(TypesScala.Int)}"
+        Right(code"def $name(unsaved: ${fs2Stream.of(ConnectionIO, rowType)}, batchSize: ${TypesScala.Int} = 10000): ${ConnectionIO.of(TypesScala.Int)}")
       case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
-        code"def $name: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}"
+        Right(code"def $name: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}")
       case RepoMethod.Delete(_, id) =>
-        code"def $name(${id.param}): ${ConnectionIO.of(TypesScala.Boolean)}"
+        Right(code"def $name(${id.param}): ${ConnectionIO.of(TypesScala.Boolean)}")
       case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
         val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"put$i"), Put.of(sc.Type.ArrayOf(colType)), None) }
         usedDefineds match {
           case Nil =>
-            code"def $name(${idsParam}): ${ConnectionIO.of(TypesScala.Int)}"
+            Right(code"def $name($idsParam): ${ConnectionIO.of(TypesScala.Int)}")
           case nonEmpty =>
-            code"def $name(${idsParam})(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Int)}"
+            Right(code"def $name($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Int)}")
         }
 
       case RepoMethod.SqlFile(sqlScript) =>
@@ -131,7 +135,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           case MaybeReturnsRows.Update         => ConnectionIO.of(TypesScala.Int)
         }
 
-        code"def $name$params: $retType"
+        Right(code"def $name$params: $retType")
     }
   }
 
@@ -288,6 +292,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
 
         if (fixVerySlowImplicit) code"new $FragmentOps($sql).copyIn(unsaved, batchSize)(using ${textSupport.get.lookupTextFor(rowType)})"
         else code"new $FragmentOps($sql).copyIn[$rowType](unsaved, batchSize)"
+
       case RepoMethod.InsertUnsavedStreaming(relName, unsaved) =>
         val sql = SQL(code"COPY $relName(${dbNames(unsaved.allCols, isRead = false)}) FROM STDIN (DEFAULT '${textSupport.get.DefaultValue}')")
 
@@ -316,6 +321,30 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         }
 
         code"${query(sql, rowType)}.unique"
+
+      case RepoMethod.UpsertBatch(relName, cols, id, rowType) =>
+        val pickExcludedCols = cols.toList
+          .filterNot(c => id.cols.exists(_.name == c.name))
+          .map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }
+
+        val sql = sc.s {
+          code"""|insert into $relName(${dbNames(cols, isRead = false)})
+                 |values (${cols.map(c => code"?${SqlCast.toPgCode(c)}").mkCode(code",")})
+                 |on conflict (${dbNames(id.cols, isRead = false)})
+                 |do update set
+                 |  ${pickExcludedCols.mkCode(",\n")}
+                 |returning ${dbNames(cols, isRead = true)}""".stripMargin
+        }
+
+        if (fixVerySlowImplicit)
+          code"""|${Update.of(rowType)}(
+                 |  $sql
+                 |)(using $rowType.$writeName)
+                 |.updateManyWithGeneratedKeys[$rowType](${dbNames(cols, isRead = false)})(unsaved)(using $catsStdInstancesForList, $rowType.$readName)""".stripMargin
+        else
+          code"""|${Update.of(rowType)}(
+                 |  $sql
+                 |).updateManyWithGeneratedKeys[$rowType](${dbNames(cols, isRead = false)})(unsaved)"""
 
       case RepoMethod.UpsertStreaming(relName, cols, id, rowType) =>
         val pickExcludedCols = cols.toList
@@ -435,8 +464,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
                |  ${x.idsParam.name}.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
                |}""".stripMargin
       case RepoMethod.SelectByUnique(_, keyColumns, _, _) =>
-        code"${delayCIO}(map.values.find(v => ${keyColumns.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")}))"
-
+        code"$delayCIO(map.values.find(v => ${keyColumns.map(c => code"${c.name} == v.${c.name}").mkCode(" && ")}))"
       case RepoMethod.SelectByFieldValues(_, cols, fieldValue, fieldValueOrIdsParam, _) =>
         val cases = cols.map { col =>
           code"case (acc, $fieldValue.${col.name}(value)) => acc.filter(_.${col.name} == value)"
@@ -500,6 +528,13 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
                |    num += 1
                |  }
                |  num
+               |}""".stripMargin
+      case RepoMethod.UpsertBatch(_, _, _, _) =>
+        code"""|$fs2Stream.emits {
+               |  unsaved.map { row =>
+               |    map += (row.${id.paramName} -> row)
+               |    row
+               |  }
                |}""".stripMargin
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, _) =>
         code"insert(${maybeToRow.get.name}(${unsavedParam.name}))"
@@ -754,9 +789,60 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
 
       sc.Given(tparams = Nil, name = readName, implicitParams = Nil, tpe = Read.of(tpe), body = body)
     }
+
+    val write = {
+      val puts = {
+        val all = cols.map { c =>
+          c.tpe match {
+            case TypesScala.Optional(underlying) => code"(${lookupPutFor(underlying)}, $Nullability.Nullable)"
+            case other                           => code"(${lookupPutFor(other)}, $Nullability.NoNulls)"
+          }
+        }
+        code"${TypesScala.List}(${all.mkCode(",\n")})"
+      }
+
+      val toList = {
+        val all = cols.map(c => code"x.${c.name}")
+        code"x => ${TypesScala.List}(${all.mkCode(", ")})"
+      }
+      val unsafeSet = {
+        val all = cols.zipWithIndex.map { case (c, i) =>
+          c.tpe match {
+            case TypesScala.Optional(underlying) => code"${lookupPutFor(underlying)}.unsafeSetNullable(rs, i + $i, a.${c.name})"
+            case other                           => code"${lookupPutFor(other)}.unsafeSetNonNullable(rs, i + $i, a.${c.name})"
+          }
+        }
+        code"""|(rs, i, a) => {
+               |  ${all.mkCode("\n")}
+               |}""".stripMargin
+      }
+
+      val unsafeUpdate = {
+        val all = cols.zipWithIndex.map { case (c, i) =>
+          c.tpe match {
+            case TypesScala.Optional(underlying) => code"${lookupPutFor(underlying)}.unsafeUpdateNullable(ps, i + $i, a.${c.name})"
+            case other                           => code"${lookupPutFor(other)}.unsafeUpdateNonNullable(ps, i + $i, a.${c.name})"
+          }
+        }
+        code"""|(ps, i, a) => {
+               |  ${all.mkCode("\n")}
+               |}""".stripMargin
+      }
+
+      val body =
+        code"""|new ${Write.of(tpe)}(
+               |  puts = $puts,
+               |  toList = $toList,
+               |  unsafeSet = $unsafeSet,
+               |  unsafeUpdate = $unsafeUpdate
+               |)
+               |""".stripMargin
+
+      sc.Given(tparams = Nil, name = writeName, implicitParams = Nil, tpe = Write.of(tpe), body = body)
+    }
     rowType match {
       case DbLib.RowType.Writable      => text.toList
-      case DbLib.RowType.ReadWriteable => List(read) ++ text
+      case DbLib.RowType.ReadWriteable => List(read, write) ++ text
       case DbLib.RowType.Readable      => List(read)
     }
   }

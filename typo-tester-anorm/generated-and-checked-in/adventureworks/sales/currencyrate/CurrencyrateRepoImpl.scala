@@ -10,6 +10,7 @@ package currencyrate
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -148,6 +149,39 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
        """
       .executeInsert(CurrencyrateRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[CurrencyrateRow])(implicit c: Connection): List[CurrencyrateRow] = {
+    def toNamedParameter(row: CurrencyrateRow): List[NamedParameter] = List(
+      NamedParameter("currencyrateid", ParameterValue(row.currencyrateid, null, CurrencyrateId.toStatement)),
+      NamedParameter("currencyratedate", ParameterValue(row.currencyratedate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("fromcurrencycode", ParameterValue(row.fromcurrencycode, null, CurrencyId.toStatement)),
+      NamedParameter("tocurrencycode", ParameterValue(row.tocurrencycode, null, CurrencyId.toStatement)),
+      NamedParameter("averagerate", ParameterValue(row.averagerate, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("endofdayrate", ParameterValue(row.endofdayrate, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")
+                values ({currencyrateid}::int4, {currencyratedate}::timestamp, {fromcurrencycode}::bpchar, {tocurrencycode}::bpchar, {averagerate}::numeric, {endofdayrate}::numeric, {modifieddate}::timestamp)
+                on conflict ("currencyrateid")
+                do update set
+                  "currencyratedate" = EXCLUDED."currencyratedate",
+                  "fromcurrencycode" = EXCLUDED."fromcurrencycode",
+                  "tocurrencycode" = EXCLUDED."tocurrencycode",
+                  "averagerate" = EXCLUDED."averagerate",
+                  "endofdayrate" = EXCLUDED."endofdayrate",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(CurrencyrateRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[CurrencyrateRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

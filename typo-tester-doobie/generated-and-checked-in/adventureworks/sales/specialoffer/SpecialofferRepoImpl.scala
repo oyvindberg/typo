@@ -10,6 +10,7 @@ package specialoffer
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -17,6 +18,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -158,6 +160,26 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
        """.query(using SpecialofferRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[SpecialofferRow]): Stream[ConnectionIO, SpecialofferRow] = {
+    Update[SpecialofferRow](
+      s"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
+          values (?::int4,?,?::numeric,?,?,?::timestamp,?::timestamp,?::int4,?::int4,?::uuid,?::timestamp)
+          on conflict ("specialofferid")
+          do update set
+            "description" = EXCLUDED."description",
+            "discountpct" = EXCLUDED."discountpct",
+            "type" = EXCLUDED."type",
+            "category" = EXCLUDED."category",
+            "startdate" = EXCLUDED."startdate",
+            "enddate" = EXCLUDED."enddate",
+            "minqty" = EXCLUDED."minqty",
+            "maxqty" = EXCLUDED."maxqty",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text"""
+    )(using SpecialofferRow.write)
+    .updateManyWithGeneratedKeys[SpecialofferRow]("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, SpecialofferRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, SpecialofferRow], batchSize: Int = 10000): ConnectionIO[Int] = {

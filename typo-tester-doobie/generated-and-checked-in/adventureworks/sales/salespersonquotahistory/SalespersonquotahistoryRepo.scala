@@ -30,6 +30,7 @@ trait SalespersonquotahistoryRepo {
   def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def update(row: SalespersonquotahistoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow]
+  def upsertBatch(unsaved: List[SalespersonquotahistoryRow]): Stream[ConnectionIO, SalespersonquotahistoryRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, SalespersonquotahistoryRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

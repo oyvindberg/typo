@@ -10,6 +10,7 @@ package countryregion
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -128,6 +129,31 @@ class CountryregionRepoImpl extends CountryregionRepo {
        """
       .executeInsert(CountryregionRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[CountryregionRow])(implicit c: Connection): List[CountryregionRow] = {
+    def toNamedParameter(row: CountryregionRow): List[NamedParameter] = List(
+      NamedParameter("countryregioncode", ParameterValue(row.countryregioncode, null, CountryregionId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+                values ({countryregioncode}, {name}::varchar, {modifieddate}::timestamp)
+                on conflict ("countryregioncode")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "countryregioncode", "name", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(CountryregionRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[CountryregionRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

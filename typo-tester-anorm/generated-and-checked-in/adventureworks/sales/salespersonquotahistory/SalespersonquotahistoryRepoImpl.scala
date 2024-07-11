@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -145,6 +146,34 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
        """
       .executeInsert(SalespersonquotahistoryRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[SalespersonquotahistoryRow])(implicit c: Connection): List[SalespersonquotahistoryRow] = {
+    def toNamedParameter(row: SalespersonquotahistoryRow): List[NamedParameter] = List(
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, BusinessentityId.toStatement)),
+      NamedParameter("quotadate", ParameterValue(row.quotadate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("salesquota", ParameterValue(row.salesquota, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
+                values ({businessentityid}::int4, {quotadate}::timestamp, {salesquota}::numeric, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("businessentityid", "quotadate")
+                do update set
+                  "salesquota" = EXCLUDED."salesquota",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(SalespersonquotahistoryRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[SalespersonquotahistoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

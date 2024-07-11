@@ -32,6 +32,7 @@ trait IdentityTestRepo {
   def update: UpdateBuilder[IdentityTestFields, IdentityTestRow]
   def update(row: IdentityTestRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, UpdateResult[IdentityTestRow]]
+  // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

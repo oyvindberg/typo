@@ -31,6 +31,7 @@ trait VendorRepo {
   def update: UpdateBuilder[VendorFields, VendorRow]
   def update(row: VendorRow): ConnectionIO[Boolean]
   def upsert(unsaved: VendorRow): ConnectionIO[VendorRow]
+  def upsertBatch(unsaved: List[VendorRow]): Stream[ConnectionIO, VendorRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, VendorRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

@@ -12,12 +12,14 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -131,6 +133,17 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
        """.query(using ProductmodelproductdescriptioncultureRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ProductmodelproductdescriptioncultureRow]): Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow] = {
+    Update[ProductmodelproductdescriptioncultureRow](
+      s"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
+          values (?::int4,?::int4,?::bpchar,?::timestamp)
+          on conflict ("productmodelid", "productdescriptionid", "cultureid")
+          do update set
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text"""
+    )(using ProductmodelproductdescriptioncultureRow.write)
+    .updateManyWithGeneratedKeys[ProductmodelproductdescriptioncultureRow]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(unsaved)(using catsStdInstancesForList, ProductmodelproductdescriptioncultureRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow], batchSize: Int = 10000): ConnectionIO[Int] = {

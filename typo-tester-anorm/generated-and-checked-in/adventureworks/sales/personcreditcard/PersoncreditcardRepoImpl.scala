@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.userdefined.CustomCreditcardId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -134,6 +135,30 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
        """
       .executeInsert(PersoncreditcardRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[PersoncreditcardRow])(implicit c: Connection): List[PersoncreditcardRow] = {
+    def toNamedParameter(row: PersoncreditcardRow): List[NamedParameter] = List(
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, BusinessentityId.toStatement)),
+      NamedParameter("creditcardid", ParameterValue(row.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
+                values ({businessentityid}::int4, {creditcardid}::int4, {modifieddate}::timestamp)
+                on conflict ("businessentityid", "creditcardid")
+                do update set
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "businessentityid", "creditcardid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(PersoncreditcardRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[PersoncreditcardRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

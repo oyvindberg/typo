@@ -87,6 +87,12 @@ class ProductvendorRepoMock(toRow: Function1[ProductvendorRowUnsaved, Productven
     map.put(unsaved.compositeId, unsaved): @nowarn
     unsaved
   }
+  override def upsertBatch(unsaved: Iterable[ProductvendorRow])(implicit c: Connection): List[ProductvendorRow] = {
+    unsaved.map { row =>
+      map += (row.compositeId -> row)
+      row
+    }.toList
+  }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductvendorRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     unsaved.foreach { row =>

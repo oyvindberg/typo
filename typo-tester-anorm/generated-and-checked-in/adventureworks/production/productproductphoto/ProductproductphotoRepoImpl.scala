@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -141,6 +142,32 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
        """
       .executeInsert(ProductproductphotoRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ProductproductphotoRow])(implicit c: Connection): List[ProductproductphotoRow] = {
+    def toNamedParameter(row: ProductproductphotoRow): List[NamedParameter] = List(
+      NamedParameter("productid", ParameterValue(row.productid, null, ProductId.toStatement)),
+      NamedParameter("productphotoid", ParameterValue(row.productphotoid, null, ProductphotoId.toStatement)),
+      NamedParameter("primary", ParameterValue(row.primary, null, Flag.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
+                values ({productid}::int4, {productphotoid}::int4, {primary}::bool, {modifieddate}::timestamp)
+                on conflict ("productid", "productphotoid")
+                do update set
+                  "primary" = EXCLUDED."primary",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "productid", "productphotoid", "primary", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ProductproductphotoRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductproductphotoRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

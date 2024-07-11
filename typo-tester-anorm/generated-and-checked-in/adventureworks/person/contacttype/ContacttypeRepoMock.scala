@@ -87,6 +87,12 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
     map.put(unsaved.contacttypeid, unsaved): @nowarn
     unsaved
   }
+  override def upsertBatch(unsaved: Iterable[ContacttypeRow])(implicit c: Connection): List[ContacttypeRow] = {
+    unsaved.map { row =>
+      map += (row.contacttypeid -> row)
+      row
+    }.toList
+  }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ContacttypeRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     unsaved.foreach { row =>

@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoLocalTime
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -140,6 +141,35 @@ class ShiftRepoImpl extends ShiftRepo {
        """
       .executeInsert(ShiftRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ShiftRow])(implicit c: Connection): List[ShiftRow] = {
+    def toNamedParameter(row: ShiftRow): List[NamedParameter] = List(
+      NamedParameter("shiftid", ParameterValue(row.shiftid, null, ShiftId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("starttime", ParameterValue(row.starttime, null, TypoLocalTime.toStatement)),
+      NamedParameter("endtime", ParameterValue(row.endtime, null, TypoLocalTime.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
+                values ({shiftid}::int4, {name}::varchar, {starttime}::time, {endtime}::time, {modifieddate}::timestamp)
+                on conflict ("shiftid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "starttime" = EXCLUDED."starttime",
+                  "endtime" = EXCLUDED."endtime",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ShiftRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ShiftRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

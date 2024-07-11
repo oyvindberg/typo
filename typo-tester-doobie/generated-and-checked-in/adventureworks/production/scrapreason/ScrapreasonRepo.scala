@@ -30,6 +30,7 @@ trait ScrapreasonRepo {
   def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow]
   def update(row: ScrapreasonRow): ConnectionIO[Boolean]
   def upsert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow]
+  def upsertBatch(unsaved: List[ScrapreasonRow]): Stream[ConnectionIO, ScrapreasonRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, ScrapreasonRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

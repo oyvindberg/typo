@@ -10,12 +10,14 @@ package phonenumbertype
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -116,6 +118,18 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "phonenumbertypeid", "name", "modifieddate"::text
        """.query(using PhonenumbertypeRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[PhonenumbertypeRow]): Stream[ConnectionIO, PhonenumbertypeRow] = {
+    Update[PhonenumbertypeRow](
+      s"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
+          values (?::int4,?::varchar,?::timestamp)
+          on conflict ("phonenumbertypeid")
+          do update set
+            "name" = EXCLUDED."name",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "phonenumbertypeid", "name", "modifieddate"::text"""
+    )(using PhonenumbertypeRow.write)
+    .updateManyWithGeneratedKeys[PhonenumbertypeRow]("phonenumbertypeid", "name", "modifieddate")(unsaved)(using catsStdInstancesForList, PhonenumbertypeRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, PhonenumbertypeRow], batchSize: Int = 10000): ConnectionIO[Int] = {

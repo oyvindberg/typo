@@ -12,12 +12,14 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -142,6 +144,19 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
        """.query(using SalesterritoryhistoryRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[SalesterritoryhistoryRow]): Stream[ConnectionIO, SalesterritoryhistoryRow] = {
+    Update[SalesterritoryhistoryRow](
+      s"""insert into sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")
+          values (?::int4,?::int4,?::timestamp,?::timestamp,?::uuid,?::timestamp)
+          on conflict ("businessentityid", "startdate", "territoryid")
+          do update set
+            "enddate" = EXCLUDED."enddate",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text"""
+    )(using SalesterritoryhistoryRow.write)
+    .updateManyWithGeneratedKeys[SalesterritoryhistoryRow]("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, SalesterritoryhistoryRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {

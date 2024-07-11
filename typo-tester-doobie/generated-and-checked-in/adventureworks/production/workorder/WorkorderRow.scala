@@ -15,6 +15,7 @@ import adventureworks.production.scrapreason.ScrapreasonId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -101,4 +102,38 @@ object WorkorderRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[WorkorderRow] = new Write[WorkorderRow](
+    puts = List((WorkorderId.put, Nullability.NoNulls),
+                (ProductId.put, Nullability.NoNulls),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (TypoShort.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.Nullable),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (ScrapreasonId.put, Nullability.Nullable),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.workorderid, x.productid, x.orderqty, x.scrappedqty, x.startdate, x.enddate, x.duedate, x.scrapreasonid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  WorkorderId.put.unsafeSetNonNullable(rs, i + 0, a.workorderid)
+                  ProductId.put.unsafeSetNonNullable(rs, i + 1, a.productid)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 2, a.orderqty)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 3, a.scrappedqty)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.startdate)
+                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 5, a.enddate)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 6, a.duedate)
+                  ScrapreasonId.put.unsafeSetNullable(rs, i + 7, a.scrapreasonid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 8, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     WorkorderId.put.unsafeUpdateNonNullable(ps, i + 0, a.workorderid)
+                     ProductId.put.unsafeUpdateNonNullable(ps, i + 1, a.productid)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.orderqty)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 3, a.scrappedqty)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.startdate)
+                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 5, a.enddate)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 6, a.duedate)
+                     ScrapreasonId.put.unsafeUpdateNullable(ps, i + 7, a.scrapreasonid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 8, a.modifieddate)
+                   }
+  )
 }

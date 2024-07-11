@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoUnknownCitext
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -73,4 +74,32 @@ object UsersRow {
     sb.append(Text.DELIMETER)
     Text.option(TypoInstant.text).unsafeEncode(row.verifiedOn, sb)
   }
+  implicit lazy val write: Write[UsersRow] = new Write[UsersRow](
+    puts = List((UsersId.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (TypoUnknownCitext.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (TypoInstant.put, Nullability.NoNulls),
+                (TypoInstant.put, Nullability.Nullable)),
+    toList = x => List(x.userId, x.name, x.lastName, x.email, x.password, x.createdAt, x.verifiedOn),
+    unsafeSet = (rs, i, a) => {
+                  UsersId.put.unsafeSetNonNullable(rs, i + 0, a.userId)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 2, a.lastName)
+                  TypoUnknownCitext.put.unsafeSetNonNullable(rs, i + 3, a.email)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 4, a.password)
+                  TypoInstant.put.unsafeSetNonNullable(rs, i + 5, a.createdAt)
+                  TypoInstant.put.unsafeSetNullable(rs, i + 6, a.verifiedOn)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     UsersId.put.unsafeUpdateNonNullable(ps, i + 0, a.userId)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 2, a.lastName)
+                     TypoUnknownCitext.put.unsafeUpdateNonNullable(ps, i + 3, a.email)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 4, a.password)
+                     TypoInstant.put.unsafeUpdateNonNullable(ps, i + 5, a.createdAt)
+                     TypoInstant.put.unsafeUpdateNullable(ps, i + 6, a.verifiedOn)
+                   }
+  )
 }

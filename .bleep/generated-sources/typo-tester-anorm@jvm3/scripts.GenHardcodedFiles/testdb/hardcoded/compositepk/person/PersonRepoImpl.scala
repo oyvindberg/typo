@@ -8,6 +8,7 @@ package hardcoded
 package compositepk
 package person
 
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -148,6 +149,30 @@ class PersonRepoImpl extends PersonRepo {
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[PersonRow])(implicit c: Connection): List[PersonRow] = {
+    def toNamedParameter(row: PersonRow): List[NamedParameter] = List(
+      NamedParameter("one", ParameterValue(row.one, null, ToStatement.longToStatement)),
+      NamedParameter("two", ParameterValue(row.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("name", ParameterValue(row.name, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData)))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.testdb.hardcoded.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into compositepk.person("one", "two", "name")
+                values ({one}::int8, {two}, {name})
+                on conflict ("one", "two")
+                do update set
+                  "name" = EXCLUDED."name"
+                returning "one", "two", "name"
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(PersonRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[PersonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

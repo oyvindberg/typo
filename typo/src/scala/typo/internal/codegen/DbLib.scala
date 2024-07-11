@@ -4,7 +4,7 @@ package codegen
 
 trait DbLib {
   def defaultedInstance: List[sc.Given]
-  def repoSig(repoMethod: RepoMethod): sc.Code
+  def repoSig(repoMethod: RepoMethod): Either[DbLib.NotImplementedFor, sc.Code]
   def repoImpl(repoMethod: RepoMethod): sc.Code
   def mockRepoImpl(id: IdComputed, repoMethod: RepoMethod, maybeToRow: Option[sc.Param]): sc.Code
   def testInsertMethod(x: ComputedTestInserts.InsertMethod): sc.Value
@@ -17,6 +17,8 @@ trait DbLib {
 }
 
 object DbLib {
+  case class NotImplementedFor(library: String)
+
   sealed trait RowType
   object RowType {
     case object Readable extends RowType

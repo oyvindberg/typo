@@ -105,6 +105,14 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
       unsaved
     }
   }
+  override def upsertBatch(unsaved: List[CurrencyrateRow]): Stream[ConnectionIO, CurrencyrateRow] = {
+    Stream.emits {
+      unsaved.map { row =>
+        map += (row.currencyrateid -> row)
+        row
+      }
+    }
+  }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, CurrencyrateRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     unsaved.compile.toList.map { rows =>

@@ -140,6 +140,7 @@ object sc {
         TypesScala.Float,
         TypesScala.Function1,
         TypesScala.Int,
+        TypesScala.Iterable,
         TypesScala.Iterator,
         TypesJava.Character,
         TypesJava.Integer,

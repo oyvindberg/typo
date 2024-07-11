@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -133,6 +134,30 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
        """
       .executeInsert(ProductmodelillustrationRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ProductmodelillustrationRow])(implicit c: Connection): List[ProductmodelillustrationRow] = {
+    def toNamedParameter(row: ProductmodelillustrationRow): List[NamedParameter] = List(
+      NamedParameter("productmodelid", ParameterValue(row.productmodelid, null, ProductmodelId.toStatement)),
+      NamedParameter("illustrationid", ParameterValue(row.illustrationid, null, IllustrationId.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")
+                values ({productmodelid}::int4, {illustrationid}::int4, {modifieddate}::timestamp)
+                on conflict ("productmodelid", "illustrationid")
+                do update set
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "productmodelid", "illustrationid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ProductmodelillustrationRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductmodelillustrationRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

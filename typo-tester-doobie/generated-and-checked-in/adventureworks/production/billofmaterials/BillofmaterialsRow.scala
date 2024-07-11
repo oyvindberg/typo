@@ -15,6 +15,7 @@ import adventureworks.production.unitmeasure.UnitmeasureId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -108,4 +109,38 @@ object BillofmaterialsRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[BillofmaterialsRow] = new Write[BillofmaterialsRow](
+    puts = List((Meta.IntMeta.put, Nullability.NoNulls),
+                (ProductId.put, Nullability.Nullable),
+                (ProductId.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.Nullable),
+                (UnitmeasureId.put, Nullability.NoNulls),
+                (TypoShort.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.billofmaterialsid, x.productassemblyid, x.componentid, x.startdate, x.enddate, x.unitmeasurecode, x.bomlevel, x.perassemblyqty, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 0, a.billofmaterialsid)
+                  ProductId.put.unsafeSetNullable(rs, i + 1, a.productassemblyid)
+                  ProductId.put.unsafeSetNonNullable(rs, i + 2, a.componentid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.startdate)
+                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 4, a.enddate)
+                  UnitmeasureId.put.unsafeSetNonNullable(rs, i + 5, a.unitmeasurecode)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 6, a.bomlevel)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 7, a.perassemblyqty)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 8, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 0, a.billofmaterialsid)
+                     ProductId.put.unsafeUpdateNullable(ps, i + 1, a.productassemblyid)
+                     ProductId.put.unsafeUpdateNonNullable(ps, i + 2, a.componentid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.startdate)
+                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 4, a.enddate)
+                     UnitmeasureId.put.unsafeUpdateNonNullable(ps, i + 5, a.unitmeasurecode)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 6, a.bomlevel)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.perassemblyqty)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 8, a.modifieddate)
+                   }
+  )
 }

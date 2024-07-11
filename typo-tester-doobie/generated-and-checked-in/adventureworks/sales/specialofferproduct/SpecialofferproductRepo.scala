@@ -30,6 +30,7 @@ trait SpecialofferproductRepo {
   def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow]
   def update(row: SpecialofferproductRow): ConnectionIO[Boolean]
   def upsert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow]
+  def upsertBatch(unsaved: List[SpecialofferproductRow]): Stream[ConnectionIO, SpecialofferproductRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, SpecialofferproductRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

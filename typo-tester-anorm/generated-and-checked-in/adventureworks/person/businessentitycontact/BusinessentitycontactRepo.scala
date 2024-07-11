@@ -29,6 +29,7 @@ trait BusinessentitycontactRepo {
   def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def update(row: BusinessentitycontactRow)(implicit c: Connection): Boolean
   def upsert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow
+  def upsertBatch(unsaved: Iterable[BusinessentitycontactRow])(implicit c: Connection): List[BusinessentitycontactRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[BusinessentitycontactRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

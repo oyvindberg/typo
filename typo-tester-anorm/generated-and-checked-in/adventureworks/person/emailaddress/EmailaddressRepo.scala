@@ -29,6 +29,7 @@ trait EmailaddressRepo {
   def update: UpdateBuilder[EmailaddressFields, EmailaddressRow]
   def update(row: EmailaddressRow)(implicit c: Connection): Boolean
   def upsert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow
+  def upsertBatch(unsaved: Iterable[EmailaddressRow])(implicit c: Connection): List[EmailaddressRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[EmailaddressRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

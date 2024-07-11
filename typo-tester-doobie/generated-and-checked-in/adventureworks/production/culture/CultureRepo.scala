@@ -30,6 +30,7 @@ trait CultureRepo {
   def update: UpdateBuilder[CultureFields, CultureRow]
   def update(row: CultureRow): ConnectionIO[Boolean]
   def upsert(unsaved: CultureRow): ConnectionIO[CultureRow]
+  def upsertBatch(unsaved: List[CultureRow]): Stream[ConnectionIO, CultureRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, CultureRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

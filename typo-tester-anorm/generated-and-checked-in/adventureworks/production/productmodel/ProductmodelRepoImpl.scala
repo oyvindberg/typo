@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -149,6 +150,37 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
        """
       .executeInsert(ProductmodelRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ProductmodelRow])(implicit c: Connection): List[ProductmodelRow] = {
+    def toNamedParameter(row: ProductmodelRow): List[NamedParameter] = List(
+      NamedParameter("productmodelid", ParameterValue(row.productmodelid, null, ProductmodelId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("catalogdescription", ParameterValue(row.catalogdescription, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))),
+      NamedParameter("instructions", ParameterValue(row.instructions, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
+                values ({productmodelid}::int4, {name}::varchar, {catalogdescription}::xml, {instructions}::xml, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("productmodelid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "catalogdescription" = EXCLUDED."catalogdescription",
+                  "instructions" = EXCLUDED."instructions",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ProductmodelRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductmodelRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

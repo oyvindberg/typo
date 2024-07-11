@@ -10,6 +10,7 @@ package shoppingcartitem
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -150,6 +151,37 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
        """
       .executeInsert(ShoppingcartitemRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ShoppingcartitemRow])(implicit c: Connection): List[ShoppingcartitemRow] = {
+    def toNamedParameter(row: ShoppingcartitemRow): List[NamedParameter] = List(
+      NamedParameter("shoppingcartitemid", ParameterValue(row.shoppingcartitemid, null, ShoppingcartitemId.toStatement)),
+      NamedParameter("shoppingcartid", ParameterValue(row.shoppingcartid, null, ToStatement.stringToStatement)),
+      NamedParameter("quantity", ParameterValue(row.quantity, null, ToStatement.intToStatement)),
+      NamedParameter("productid", ParameterValue(row.productid, null, ProductId.toStatement)),
+      NamedParameter("datecreated", ParameterValue(row.datecreated, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
+                values ({shoppingcartitemid}::int4, {shoppingcartid}, {quantity}::int4, {productid}::int4, {datecreated}::timestamp, {modifieddate}::timestamp)
+                on conflict ("shoppingcartitemid")
+                do update set
+                  "shoppingcartid" = EXCLUDED."shoppingcartid",
+                  "quantity" = EXCLUDED."quantity",
+                  "productid" = EXCLUDED."productid",
+                  "datecreated" = EXCLUDED."datecreated",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ShoppingcartitemRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ShoppingcartitemRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

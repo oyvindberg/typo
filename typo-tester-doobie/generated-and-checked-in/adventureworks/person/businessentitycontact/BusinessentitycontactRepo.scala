@@ -30,6 +30,7 @@ trait BusinessentitycontactRepo {
   def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def update(row: BusinessentitycontactRow): ConnectionIO[Boolean]
   def upsert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow]
+  def upsertBatch(unsaved: List[BusinessentitycontactRow]): Stream[ConnectionIO, BusinessentitycontactRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, BusinessentitycontactRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

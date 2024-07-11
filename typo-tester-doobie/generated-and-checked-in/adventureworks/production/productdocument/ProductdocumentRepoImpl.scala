@@ -11,12 +11,14 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -129,6 +131,17 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productid", "modifieddate"::text, "documentnode"
        """.query(using ProductdocumentRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ProductdocumentRow]): Stream[ConnectionIO, ProductdocumentRow] = {
+    Update[ProductdocumentRow](
+      s"""insert into production.productdocument("productid", "modifieddate", "documentnode")
+          values (?::int4,?::timestamp,?)
+          on conflict ("productid", "documentnode")
+          do update set
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productid", "modifieddate"::text, "documentnode""""
+    )(using ProductdocumentRow.write)
+    .updateManyWithGeneratedKeys[ProductdocumentRow]("productid", "modifieddate", "documentnode")(unsaved)(using catsStdInstancesForList, ProductdocumentRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductdocumentRow], batchSize: Int = 10000): ConnectionIO[Int] = {

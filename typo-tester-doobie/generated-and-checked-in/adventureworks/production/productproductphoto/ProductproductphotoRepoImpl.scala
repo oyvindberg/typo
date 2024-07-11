@@ -12,12 +12,14 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productphoto.ProductphotoId
 import adventureworks.public.Flag
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -134,6 +136,18 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productid", "productphotoid", "primary", "modifieddate"::text
        """.query(using ProductproductphotoRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ProductproductphotoRow]): Stream[ConnectionIO, ProductproductphotoRow] = {
+    Update[ProductproductphotoRow](
+      s"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
+          values (?::int4,?::int4,?::bool,?::timestamp)
+          on conflict ("productid", "productphotoid")
+          do update set
+            "primary" = EXCLUDED."primary",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productid", "productphotoid", "primary", "modifieddate"::text"""
+    )(using ProductproductphotoRow.write)
+    .updateManyWithGeneratedKeys[ProductproductphotoRow]("productid", "productphotoid", "primary", "modifieddate")(unsaved)(using catsStdInstancesForList, ProductproductphotoRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductproductphotoRow], batchSize: Int = 10000): ConnectionIO[Int] = {

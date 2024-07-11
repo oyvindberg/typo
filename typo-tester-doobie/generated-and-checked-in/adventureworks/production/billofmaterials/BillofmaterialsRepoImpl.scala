@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -19,6 +20,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -149,6 +151,24 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
        """.query(using BillofmaterialsRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[BillofmaterialsRow]): Stream[ConnectionIO, BillofmaterialsRow] = {
+    Update[BillofmaterialsRow](
+      s"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
+          values (?::int4,?::int4,?::int4,?::timestamp,?::timestamp,?::bpchar,?::int2,?::numeric,?::timestamp)
+          on conflict ("billofmaterialsid")
+          do update set
+            "productassemblyid" = EXCLUDED."productassemblyid",
+            "componentid" = EXCLUDED."componentid",
+            "startdate" = EXCLUDED."startdate",
+            "enddate" = EXCLUDED."enddate",
+            "unitmeasurecode" = EXCLUDED."unitmeasurecode",
+            "bomlevel" = EXCLUDED."bomlevel",
+            "perassemblyqty" = EXCLUDED."perassemblyqty",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text"""
+    )(using BillofmaterialsRow.write)
+    .updateManyWithGeneratedKeys[BillofmaterialsRow]("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(unsaved)(using catsStdInstancesForList, BillofmaterialsRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, BillofmaterialsRow], batchSize: Int = 10000): ConnectionIO[Int] = {

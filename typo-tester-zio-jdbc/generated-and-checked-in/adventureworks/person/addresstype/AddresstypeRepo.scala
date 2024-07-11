@@ -32,6 +32,7 @@ trait AddresstypeRepo {
   def update: UpdateBuilder[AddresstypeFields, AddresstypeRow]
   def update(row: AddresstypeRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: AddresstypeRow): ZIO[ZConnection, Throwable, UpdateResult[AddresstypeRow]]
+  // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, AddresstypeRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

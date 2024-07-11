@@ -13,12 +13,14 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -131,6 +133,21 @@ class StoreRepoImpl extends StoreRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
        """.query(using StoreRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[StoreRow]): Stream[ConnectionIO, StoreRow] = {
+    Update[StoreRow](
+      s"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
+          values (?::int4,?::varchar,?::int4,?::xml,?::uuid,?::timestamp)
+          on conflict ("businessentityid")
+          do update set
+            "name" = EXCLUDED."name",
+            "salespersonid" = EXCLUDED."salespersonid",
+            "demographics" = EXCLUDED."demographics",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text"""
+    )(using StoreRow.write)
+    .updateManyWithGeneratedKeys[StoreRow]("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, StoreRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, StoreRow], batchSize: Int = 10000): ConnectionIO[Int] = {

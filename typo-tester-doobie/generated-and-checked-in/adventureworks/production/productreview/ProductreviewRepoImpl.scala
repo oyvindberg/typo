@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -18,6 +19,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -141,6 +143,23 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
        """.query(using ProductreviewRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ProductreviewRow]): Stream[ConnectionIO, ProductreviewRow] = {
+    Update[ProductreviewRow](
+      s"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+          values (?::int4,?::int4,?::varchar,?::timestamp,?,?::int4,?,?::timestamp)
+          on conflict ("productreviewid")
+          do update set
+            "productid" = EXCLUDED."productid",
+            "reviewername" = EXCLUDED."reviewername",
+            "reviewdate" = EXCLUDED."reviewdate",
+            "emailaddress" = EXCLUDED."emailaddress",
+            "rating" = EXCLUDED."rating",
+            "comments" = EXCLUDED."comments",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text"""
+    )(using ProductreviewRow.write)
+    .updateManyWithGeneratedKeys[ProductreviewRow]("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")(unsaved)(using catsStdInstancesForList, ProductreviewRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductreviewRow], batchSize: Int = 10000): ConnectionIO[Int] = {

@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.location.LocationId
 import adventureworks.production.workorder.WorkorderId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -172,6 +173,47 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
        """
       .executeInsert(WorkorderroutingRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[WorkorderroutingRow])(implicit c: Connection): List[WorkorderroutingRow] = {
+    def toNamedParameter(row: WorkorderroutingRow): List[NamedParameter] = List(
+      NamedParameter("workorderid", ParameterValue(row.workorderid, null, WorkorderId.toStatement)),
+      NamedParameter("productid", ParameterValue(row.productid, null, ToStatement.intToStatement)),
+      NamedParameter("operationsequence", ParameterValue(row.operationsequence, null, TypoShort.toStatement)),
+      NamedParameter("locationid", ParameterValue(row.locationid, null, LocationId.toStatement)),
+      NamedParameter("scheduledstartdate", ParameterValue(row.scheduledstartdate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("scheduledenddate", ParameterValue(row.scheduledenddate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("actualstartdate", ParameterValue(row.actualstartdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))),
+      NamedParameter("actualenddate", ParameterValue(row.actualenddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))),
+      NamedParameter("actualresourcehrs", ParameterValue(row.actualresourcehrs, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))),
+      NamedParameter("plannedcost", ParameterValue(row.plannedcost, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("actualcost", ParameterValue(row.actualcost, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
+                values ({workorderid}::int4, {productid}::int4, {operationsequence}::int2, {locationid}::int2, {scheduledstartdate}::timestamp, {scheduledenddate}::timestamp, {actualstartdate}::timestamp, {actualenddate}::timestamp, {actualresourcehrs}::numeric, {plannedcost}::numeric, {actualcost}::numeric, {modifieddate}::timestamp)
+                on conflict ("workorderid", "productid", "operationsequence")
+                do update set
+                  "locationid" = EXCLUDED."locationid",
+                  "scheduledstartdate" = EXCLUDED."scheduledstartdate",
+                  "scheduledenddate" = EXCLUDED."scheduledenddate",
+                  "actualstartdate" = EXCLUDED."actualstartdate",
+                  "actualenddate" = EXCLUDED."actualenddate",
+                  "actualresourcehrs" = EXCLUDED."actualresourcehrs",
+                  "plannedcost" = EXCLUDED."plannedcost",
+                  "actualcost" = EXCLUDED."actualcost",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(WorkorderroutingRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -21,6 +22,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -184,6 +186,30 @@ class EmployeeRepoImpl extends EmployeeRepo {
             "organizationnode" = EXCLUDED."organizationnode"
           returning "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode"
        """.query(using EmployeeRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[EmployeeRow]): Stream[ConnectionIO, EmployeeRow] = {
+    Update[EmployeeRow](
+      s"""insert into humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
+          values (?::int4,?,?,?,?::date,?::bpchar,?::bpchar,?::date,?::bool,?::int2,?::int2,?::bool,?::uuid,?::timestamp,?)
+          on conflict ("businessentityid")
+          do update set
+            "nationalidnumber" = EXCLUDED."nationalidnumber",
+            "loginid" = EXCLUDED."loginid",
+            "jobtitle" = EXCLUDED."jobtitle",
+            "birthdate" = EXCLUDED."birthdate",
+            "maritalstatus" = EXCLUDED."maritalstatus",
+            "gender" = EXCLUDED."gender",
+            "hiredate" = EXCLUDED."hiredate",
+            "salariedflag" = EXCLUDED."salariedflag",
+            "vacationhours" = EXCLUDED."vacationhours",
+            "sickleavehours" = EXCLUDED."sickleavehours",
+            "currentflag" = EXCLUDED."currentflag",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate",
+            "organizationnode" = EXCLUDED."organizationnode"
+          returning "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode""""
+    )(using EmployeeRow.write)
+    .updateManyWithGeneratedKeys[EmployeeRow]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(unsaved)(using catsStdInstancesForList, EmployeeRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, EmployeeRow], batchSize: Int = 10000): ConnectionIO[Int] = {

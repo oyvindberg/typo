@@ -86,6 +86,13 @@ object RepoMethod {
       rowType: sc.Type
   ) extends Mutator("upsert")
 
+  case class UpsertBatch(
+      relName: db.RelationName,
+      cols: NonEmptyList[ComputedColumn],
+      id: IdComputed,
+      rowType: sc.Type
+  ) extends Mutator("upsertBatch")
+
   case class UpsertStreaming(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],

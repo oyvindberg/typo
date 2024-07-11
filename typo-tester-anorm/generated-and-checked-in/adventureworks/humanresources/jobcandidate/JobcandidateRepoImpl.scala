@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -137,6 +138,33 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
        """
       .executeInsert(JobcandidateRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[JobcandidateRow])(implicit c: Connection): List[JobcandidateRow] = {
+    def toNamedParameter(row: JobcandidateRow): List[NamedParameter] = List(
+      NamedParameter("jobcandidateid", ParameterValue(row.jobcandidateid, null, JobcandidateId.toStatement)),
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))),
+      NamedParameter("resume", ParameterValue(row.resume, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
+                values ({jobcandidateid}::int4, {businessentityid}::int4, {resume}::xml, {modifieddate}::timestamp)
+                on conflict ("jobcandidateid")
+                do update set
+                  "businessentityid" = EXCLUDED."businessentityid",
+                  "resume" = EXCLUDED."resume",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(JobcandidateRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[JobcandidateRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

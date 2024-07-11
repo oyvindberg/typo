@@ -15,6 +15,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import adventureworks.userdefined.FirstName
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -184,6 +185,51 @@ class PersonRepoImpl extends PersonRepo {
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[PersonRow])(implicit c: Connection): List[PersonRow] = {
+    def toNamedParameter(row: PersonRow): List[NamedParameter] = List(
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, BusinessentityId.toStatement)),
+      NamedParameter("persontype", ParameterValue(row.persontype, null, ToStatement.stringToStatement)),
+      NamedParameter("namestyle", ParameterValue(row.namestyle, null, NameStyle.toStatement)),
+      NamedParameter("title", ParameterValue(row.title, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("firstname", ParameterValue(row.firstname, null, /* user-picked */ FirstName.toStatement)),
+      NamedParameter("middlename", ParameterValue(row.middlename, null, ToStatement.optionToStatement(Name.toStatement, Name.parameterMetadata))),
+      NamedParameter("lastname", ParameterValue(row.lastname, null, Name.toStatement)),
+      NamedParameter("suffix", ParameterValue(row.suffix, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("emailpromotion", ParameterValue(row.emailpromotion, null, ToStatement.intToStatement)),
+      NamedParameter("additionalcontactinfo", ParameterValue(row.additionalcontactinfo, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))),
+      NamedParameter("demographics", ParameterValue(row.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
+                values ({businessentityid}::int4, {persontype}::bpchar, {namestyle}::bool, {title}, {firstname}::varchar, {middlename}::varchar, {lastname}::varchar, {suffix}, {emailpromotion}::int4, {additionalcontactinfo}::xml, {demographics}::xml, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("businessentityid")
+                do update set
+                  "persontype" = EXCLUDED."persontype",
+                  "namestyle" = EXCLUDED."namestyle",
+                  "title" = EXCLUDED."title",
+                  "firstname" = EXCLUDED."firstname",
+                  "middlename" = EXCLUDED."middlename",
+                  "lastname" = EXCLUDED."lastname",
+                  "suffix" = EXCLUDED."suffix",
+                  "emailpromotion" = EXCLUDED."emailpromotion",
+                  "additionalcontactinfo" = EXCLUDED."additionalcontactinfo",
+                  "demographics" = EXCLUDED."demographics",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(PersonRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[PersonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

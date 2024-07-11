@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -188,6 +189,49 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
        """
       .executeInsert(PurchaseorderheaderRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[PurchaseorderheaderRow])(implicit c: Connection): List[PurchaseorderheaderRow] = {
+    def toNamedParameter(row: PurchaseorderheaderRow): List[NamedParameter] = List(
+      NamedParameter("purchaseorderid", ParameterValue(row.purchaseorderid, null, PurchaseorderheaderId.toStatement)),
+      NamedParameter("revisionnumber", ParameterValue(row.revisionnumber, null, TypoShort.toStatement)),
+      NamedParameter("status", ParameterValue(row.status, null, TypoShort.toStatement)),
+      NamedParameter("employeeid", ParameterValue(row.employeeid, null, BusinessentityId.toStatement)),
+      NamedParameter("vendorid", ParameterValue(row.vendorid, null, BusinessentityId.toStatement)),
+      NamedParameter("shipmethodid", ParameterValue(row.shipmethodid, null, ShipmethodId.toStatement)),
+      NamedParameter("orderdate", ParameterValue(row.orderdate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("shipdate", ParameterValue(row.shipdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))),
+      NamedParameter("subtotal", ParameterValue(row.subtotal, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("taxamt", ParameterValue(row.taxamt, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("freight", ParameterValue(row.freight, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
+                values ({purchaseorderid}::int4, {revisionnumber}::int2, {status}::int2, {employeeid}::int4, {vendorid}::int4, {shipmethodid}::int4, {orderdate}::timestamp, {shipdate}::timestamp, {subtotal}::numeric, {taxamt}::numeric, {freight}::numeric, {modifieddate}::timestamp)
+                on conflict ("purchaseorderid")
+                do update set
+                  "revisionnumber" = EXCLUDED."revisionnumber",
+                  "status" = EXCLUDED."status",
+                  "employeeid" = EXCLUDED."employeeid",
+                  "vendorid" = EXCLUDED."vendorid",
+                  "shipmethodid" = EXCLUDED."shipmethodid",
+                  "orderdate" = EXCLUDED."orderdate",
+                  "shipdate" = EXCLUDED."shipdate",
+                  "subtotal" = EXCLUDED."subtotal",
+                  "taxamt" = EXCLUDED."taxamt",
+                  "freight" = EXCLUDED."freight",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(PurchaseorderheaderRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[PurchaseorderheaderRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

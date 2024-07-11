@@ -14,6 +14,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -160,6 +161,41 @@ class VendorRepoImpl extends VendorRepo {
        """
       .executeInsert(VendorRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[VendorRow])(implicit c: Connection): List[VendorRow] = {
+    def toNamedParameter(row: VendorRow): List[NamedParameter] = List(
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, BusinessentityId.toStatement)),
+      NamedParameter("accountnumber", ParameterValue(row.accountnumber, null, AccountNumber.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("creditrating", ParameterValue(row.creditrating, null, TypoShort.toStatement)),
+      NamedParameter("preferredvendorstatus", ParameterValue(row.preferredvendorstatus, null, Flag.toStatement)),
+      NamedParameter("activeflag", ParameterValue(row.activeflag, null, Flag.toStatement)),
+      NamedParameter("purchasingwebserviceurl", ParameterValue(row.purchasingwebserviceurl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
+                values ({businessentityid}::int4, {accountnumber}::varchar, {name}::varchar, {creditrating}::int2, {preferredvendorstatus}::bool, {activeflag}::bool, {purchasingwebserviceurl}, {modifieddate}::timestamp)
+                on conflict ("businessentityid")
+                do update set
+                  "accountnumber" = EXCLUDED."accountnumber",
+                  "name" = EXCLUDED."name",
+                  "creditrating" = EXCLUDED."creditrating",
+                  "preferredvendorstatus" = EXCLUDED."preferredvendorstatus",
+                  "activeflag" = EXCLUDED."activeflag",
+                  "purchasingwebserviceurl" = EXCLUDED."purchasingwebserviceurl",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(VendorRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[VendorRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

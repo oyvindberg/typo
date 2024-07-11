@@ -87,6 +87,12 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
     map.put(unsaved.transactionid, unsaved): @nowarn
     unsaved
   }
+  override def upsertBatch(unsaved: Iterable[TransactionhistoryarchiveRow])(implicit c: Connection): List[TransactionhistoryarchiveRow] = {
+    unsaved.map { row =>
+      map += (row.transactionid -> row)
+      row
+    }.toList
+  }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[TransactionhistoryarchiveRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     unsaved.foreach { row =>

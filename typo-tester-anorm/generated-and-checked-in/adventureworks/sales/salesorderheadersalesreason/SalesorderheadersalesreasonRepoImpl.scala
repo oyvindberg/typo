@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -133,6 +134,30 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
        """
       .executeInsert(SalesorderheadersalesreasonRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[SalesorderheadersalesreasonRow])(implicit c: Connection): List[SalesorderheadersalesreasonRow] = {
+    def toNamedParameter(row: SalesorderheadersalesreasonRow): List[NamedParameter] = List(
+      NamedParameter("salesorderid", ParameterValue(row.salesorderid, null, SalesorderheaderId.toStatement)),
+      NamedParameter("salesreasonid", ParameterValue(row.salesreasonid, null, SalesreasonId.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.salesorderheadersalesreason("salesorderid", "salesreasonid", "modifieddate")
+                values ({salesorderid}::int4, {salesreasonid}::int4, {modifieddate}::timestamp)
+                on conflict ("salesorderid", "salesreasonid")
+                do update set
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "salesorderid", "salesreasonid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(SalesorderheadersalesreasonRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[SalesorderheadersalesreasonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

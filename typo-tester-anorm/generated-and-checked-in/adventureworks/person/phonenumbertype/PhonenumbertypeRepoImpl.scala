@@ -10,6 +10,7 @@ package phonenumbertype
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -131,6 +132,31 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
        """
       .executeInsert(PhonenumbertypeRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[PhonenumbertypeRow])(implicit c: Connection): List[PhonenumbertypeRow] = {
+    def toNamedParameter(row: PhonenumbertypeRow): List[NamedParameter] = List(
+      NamedParameter("phonenumbertypeid", ParameterValue(row.phonenumbertypeid, null, PhonenumbertypeId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
+                values ({phonenumbertypeid}::int4, {name}::varchar, {modifieddate}::timestamp)
+                on conflict ("phonenumbertypeid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "phonenumbertypeid", "name", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(PhonenumbertypeRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[PhonenumbertypeRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

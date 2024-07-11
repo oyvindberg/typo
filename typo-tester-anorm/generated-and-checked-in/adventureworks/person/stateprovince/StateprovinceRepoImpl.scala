@@ -14,6 +14,7 @@ import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -162,6 +163,41 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
        """
       .executeInsert(StateprovinceRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[StateprovinceRow])(implicit c: Connection): List[StateprovinceRow] = {
+    def toNamedParameter(row: StateprovinceRow): List[NamedParameter] = List(
+      NamedParameter("stateprovinceid", ParameterValue(row.stateprovinceid, null, StateprovinceId.toStatement)),
+      NamedParameter("stateprovincecode", ParameterValue(row.stateprovincecode, null, ToStatement.stringToStatement)),
+      NamedParameter("countryregioncode", ParameterValue(row.countryregioncode, null, CountryregionId.toStatement)),
+      NamedParameter("isonlystateprovinceflag", ParameterValue(row.isonlystateprovinceflag, null, Flag.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("territoryid", ParameterValue(row.territoryid, null, SalesterritoryId.toStatement)),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
+                values ({stateprovinceid}::int4, {stateprovincecode}::bpchar, {countryregioncode}, {isonlystateprovinceflag}::bool, {name}::varchar, {territoryid}::int4, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("stateprovinceid")
+                do update set
+                  "stateprovincecode" = EXCLUDED."stateprovincecode",
+                  "countryregioncode" = EXCLUDED."countryregioncode",
+                  "isonlystateprovinceflag" = EXCLUDED."isonlystateprovinceflag",
+                  "name" = EXCLUDED."name",
+                  "territoryid" = EXCLUDED."territoryid",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(StateprovinceRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[StateprovinceRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

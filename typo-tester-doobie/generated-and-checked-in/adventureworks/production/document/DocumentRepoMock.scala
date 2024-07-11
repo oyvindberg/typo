@@ -109,6 +109,14 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
       unsaved
     }
   }
+  override def upsertBatch(unsaved: List[DocumentRow]): Stream[ConnectionIO, DocumentRow] = {
+    Stream.emits {
+      unsaved.map { row =>
+        map += (row.documentnode -> row)
+        row
+      }
+    }
+  }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     unsaved.compile.toList.map { rows =>

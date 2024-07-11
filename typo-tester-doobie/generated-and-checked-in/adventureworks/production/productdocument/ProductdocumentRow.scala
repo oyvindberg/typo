@@ -14,6 +14,7 @@ import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -62,4 +63,20 @@ object ProductdocumentRow {
     sb.append(Text.DELIMETER)
     DocumentId.text.unsafeEncode(row.documentnode, sb)
   }
+  implicit lazy val write: Write[ProductdocumentRow] = new Write[ProductdocumentRow](
+    puts = List((ProductId.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (DocumentId.put, Nullability.NoNulls)),
+    toList = x => List(x.productid, x.modifieddate, x.documentnode),
+    unsafeSet = (rs, i, a) => {
+                  ProductId.put.unsafeSetNonNullable(rs, i + 0, a.productid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 1, a.modifieddate)
+                  DocumentId.put.unsafeSetNonNullable(rs, i + 2, a.documentnode)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     ProductId.put.unsafeUpdateNonNullable(ps, i + 0, a.productid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 1, a.modifieddate)
+                     DocumentId.put.unsafeUpdateNonNullable(ps, i + 2, a.documentnode)
+                   }
+  )
 }

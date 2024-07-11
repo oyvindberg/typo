@@ -8,6 +8,7 @@ package hardcoded
 package myschema
 package person
 
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -231,6 +232,49 @@ class PersonRepoImpl extends PersonRepo {
        """
       .executeInsert(PersonRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[PersonRow])(implicit c: Connection): List[PersonRow] = {
+    def toNamedParameter(row: PersonRow): List[NamedParameter] = List(
+      NamedParameter("id", ParameterValue(row.id, null, PersonId.toStatement)),
+      NamedParameter("favourite_football_club_id", ParameterValue(row.favouriteFootballClubId, null, FootballClubId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, ToStatement.stringToStatement)),
+      NamedParameter("nick_name", ParameterValue(row.nickName, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("blog_url", ParameterValue(row.blogUrl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("email", ParameterValue(row.email, null, ToStatement.stringToStatement)),
+      NamedParameter("phone", ParameterValue(row.phone, null, ToStatement.stringToStatement)),
+      NamedParameter("likes_pizza", ParameterValue(row.likesPizza, null, ToStatement.booleanToStatement)),
+      NamedParameter("marital_status_id", ParameterValue(row.maritalStatusId, null, MaritalStatusId.toStatement)),
+      NamedParameter("work_email", ParameterValue(row.workEmail, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("sector", ParameterValue(row.sector, null, Sector.toStatement)),
+      NamedParameter("favorite_number", ParameterValue(row.favoriteNumber, null, Number.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.testdb.hardcoded.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
+                values ({id}::int8, {favourite_football_club_id}, {name}, {nick_name}, {blog_url}, {email}, {phone}, {likes_pizza}, {marital_status_id}, {work_email}, {sector}::myschema.sector, {favorite_number}::myschema.number)
+                on conflict ("id")
+                do update set
+                  "favourite_football_club_id" = EXCLUDED."favourite_football_club_id",
+                  "name" = EXCLUDED."name",
+                  "nick_name" = EXCLUDED."nick_name",
+                  "blog_url" = EXCLUDED."blog_url",
+                  "email" = EXCLUDED."email",
+                  "phone" = EXCLUDED."phone",
+                  "likes_pizza" = EXCLUDED."likes_pizza",
+                  "marital_status_id" = EXCLUDED."marital_status_id",
+                  "work_email" = EXCLUDED."work_email",
+                  "sector" = EXCLUDED."sector",
+                  "favorite_number" = EXCLUDED."favorite_number"
+                returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(PersonRow.rowParser(1).*)
+    }
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[PersonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {

@@ -10,6 +10,7 @@ package users
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -17,6 +18,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -136,6 +138,22 @@ class UsersRepoImpl extends UsersRepo {
             "verified_on" = EXCLUDED."verified_on"
           returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
        """.query(using UsersRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[UsersRow]): Stream[ConnectionIO, UsersRow] = {
+    Update[UsersRow](
+      s"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
+          values (?::uuid,?,?,?::citext,?,?::timestamptz,?::timestamptz)
+          on conflict ("user_id")
+          do update set
+            "name" = EXCLUDED."name",
+            "last_name" = EXCLUDED."last_name",
+            "email" = EXCLUDED."email",
+            "password" = EXCLUDED."password",
+            "created_at" = EXCLUDED."created_at",
+            "verified_on" = EXCLUDED."verified_on"
+          returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text"""
+    )(using UsersRow.write)
+    .updateManyWithGeneratedKeys[UsersRow]("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")(unsaved)(using catsStdInstancesForList, UsersRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int = 10000): ConnectionIO[Int] = {

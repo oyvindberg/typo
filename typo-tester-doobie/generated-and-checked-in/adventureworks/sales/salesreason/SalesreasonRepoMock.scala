@@ -105,6 +105,14 @@ class SalesreasonRepoMock(toRow: Function1[SalesreasonRowUnsaved, SalesreasonRow
       unsaved
     }
   }
+  override def upsertBatch(unsaved: List[SalesreasonRow]): Stream[ConnectionIO, SalesreasonRow] = {
+    Stream.emits {
+      unsaved.map { row =>
+        map += (row.salesreasonid -> row)
+        row
+      }
+    }
+  }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, SalesreasonRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     unsaved.compile.toList.map { rows =>

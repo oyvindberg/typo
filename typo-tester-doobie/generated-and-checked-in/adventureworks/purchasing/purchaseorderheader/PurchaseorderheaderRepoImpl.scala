@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.purchasing.shipmethod.ShipmethodId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -19,6 +20,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -173,6 +175,27 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text
        """.query(using PurchaseorderheaderRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[PurchaseorderheaderRow]): Stream[ConnectionIO, PurchaseorderheaderRow] = {
+    Update[PurchaseorderheaderRow](
+      s"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
+          values (?::int4,?::int2,?::int2,?::int4,?::int4,?::int4,?::timestamp,?::timestamp,?::numeric,?::numeric,?::numeric,?::timestamp)
+          on conflict ("purchaseorderid")
+          do update set
+            "revisionnumber" = EXCLUDED."revisionnumber",
+            "status" = EXCLUDED."status",
+            "employeeid" = EXCLUDED."employeeid",
+            "vendorid" = EXCLUDED."vendorid",
+            "shipmethodid" = EXCLUDED."shipmethodid",
+            "orderdate" = EXCLUDED."orderdate",
+            "shipdate" = EXCLUDED."shipdate",
+            "subtotal" = EXCLUDED."subtotal",
+            "taxamt" = EXCLUDED."taxamt",
+            "freight" = EXCLUDED."freight",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text"""
+    )(using PurchaseorderheaderRow.write)
+    .updateManyWithGeneratedKeys[PurchaseorderheaderRow]("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(unsaved)(using catsStdInstancesForList, PurchaseorderheaderRow.read)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, PurchaseorderheaderRow], batchSize: Int = 10000): ConnectionIO[Int] = {
