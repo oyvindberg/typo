@@ -19,8 +19,8 @@ object generateFromDb {
       testTargetFolder: Option[Path],
       selector: Selector = Selector.ExcludePostgresInternal,
       scriptsPaths: List[Path] = Nil
-  ): Generated =
-    apply(dataSource, options, ProjectGraph(name = "", targetFolder, testTargetFolder, selector, scriptsPaths, Nil)).head
+  ): List[Generated] =
+    apply(dataSource, options, ProjectGraph(name = "", targetFolder, testTargetFolder, selector, scriptsPaths, Nil))
 
   /** Allows you to generate code into multiple folders
     */
