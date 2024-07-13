@@ -19,10 +19,11 @@ import typo.*
 import java.nio.file.Path
 import java.sql.Connection
 
-def generate(implicit c: Connection): String = {
+def generate(ds: TypoDataSource): String = {
   val cwd: Path = Path.of(sys.props("user.dir"))
 
   val generated = generateFromDb(
+    ds,
     Options(
       pkg = "org.mypkg",
       jsonLibs = Nil,

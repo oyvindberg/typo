@@ -1,6 +1,7 @@
 package typo
 
 import java.nio.file.Path
+import scala.concurrent.{ExecutionContext, Future}
 
 /** this can be used to separate generated source in groups, typically because you want to put them in different projects in your build.
   *
@@ -20,6 +21,12 @@ final case class ProjectGraph[T, S](name: String, target: Path, testTarget: Opti
   def mapValue[TT](f: T => TT): ProjectGraph[TT, S] =
     ProjectGraph(name, target, testTarget, f(value), scripts, downstream.map(_.mapValue(f)))
 
-  def mapScripts[SS](f: S => SS): ProjectGraph[T, SS] =
-    ProjectGraph(name, target, testTarget, value, f(scripts), downstream.map(_.mapScripts(f)))
+  def mapScripts[SS](f: S => Future[SS])(implicit ec: ExecutionContext): Future[ProjectGraph[T, SS]] = {
+    val eventualSs = f(scripts)
+    val eventualDownstream = Future.sequence(downstream.map(_.mapScripts(f)))
+    for {
+      ss <- eventualSs
+      downstream <- eventualDownstream
+    } yield ProjectGraph(name, target, testTarget, value, ss, downstream)
+  }
 }
