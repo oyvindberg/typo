@@ -403,33 +403,21 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
           code"${runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}", c.tpe)}${SqlCast.toPgCode(c)}"
         }
 
-        val pickExcludedCols = cols.toList
-          .filterNot(c => id.cols.exists(_.name == c.name))
-          .map { c => code"${c.dbName} = EXCLUDED.${c.dbName}" }
+        val conflictAction = cols.toList.filterNot(c => id.cols.exists(_.name == c.name)) match {
+          case Nil => code"do nothing"
+          case nonEmpty =>
+            code"""|do update set
+                   |  ${nonEmpty.map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }.mkCode(",\n")}""".stripMargin
+        }
 
-        val base: sc.Code =
+        val sql = SQL {
           code"""|insert into $relName(${dbNames(cols, isRead = false)})
                  |values (
                  |  ${values.mkCode(",\n")}
                  |)
-                 |on conflict (${dbNames(id.cols, isRead = false)})""".stripMargin
-
-        val exclusion: Option[sc.Code] =
-          if (pickExcludedCols.isEmpty) None
-          else
-            Some {
-              code"""|do update set
-                   |  ${pickExcludedCols.mkCode(",\n")}""".stripMargin
-            }
-
-        val returning: sc.Code = code"returning ${dbNames(cols, isRead = true)}"
-
-        val sql = SQL {
-          List(
-            Some(base),
-            exclusion,
-            Some(returning)
-          ).flatten.mkCode("\n")
+                 |on conflict (${dbNames(id.cols, isRead = false)})
+                 |$conflictAction
+                 |returning ${dbNames(cols, isRead = true)}""".stripMargin
         }
 
         code"$sql.insertReturning(using ${lookupJdbcDecoder(rowType)})"
@@ -437,9 +425,12 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       case RepoMethod.UpsertBatch(_, _, _, _) =>
         "???"
       case RepoMethod.UpsertStreaming(relName, cols, id, rowType) =>
-        val pickExcludedCols = cols.toList
-          .filterNot(c => id.cols.exists(_.name == c.name))
-          .map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }
+        val conflictAction = cols.toList.filterNot(c => id.cols.exists(_.name == c.name)) match {
+          case Nil => code"do nothing"
+          case nonEmpty =>
+            code"""|do update set
+                   |  ${nonEmpty.map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }.mkCode(",\n")}""".stripMargin
+        }
         val tempTablename = s"${relName.name}_TEMP"
 
         val copySql = sc.s(code"copy $tempTablename(${dbNames(cols, isRead = false)}) from stdin")
@@ -448,8 +439,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
           code"""|insert into $relName(${dbNames(cols, isRead = false)})
                  |select * from $tempTablename
                  |on conflict (${dbNames(id.cols, isRead = false)})
-                 |do update set
-                 |  ${pickExcludedCols.mkCode(",\n")}
+                 |$conflictAction
                  |;
                  |drop table $tempTablename;""".stripMargin
         }

@@ -413,9 +413,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}", c.tpe).code ++ SqlCast.toPgCode(c)
         }
 
-        val pickExcludedCols = cols.toList
-          .filterNot(c => id.cols.exists(_.name == c.name))
-          .map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }
+        val conflictAction = cols.toList.filterNot(c => id.cols.exists(_.name == c.name)) match {
+          case Nil => code"do nothing"
+          case nonEmpty =>
+            code"""|do update set
+                   |  ${nonEmpty.map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }.mkCode(",\n")}""".stripMargin
+        }
 
         val sql = SQL {
           code"""|insert into $relName(${dbNames(cols, isRead = false)})
@@ -423,8 +426,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                  |  ${values.mkCode(",\n")}
                  |)
                  |on conflict (${dbNames(id.cols, isRead = false)})
-                 |do update set
-                 |  ${pickExcludedCols.mkCode(",\n")}
+                 |$conflictAction
                  |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
         }
@@ -433,16 +435,18 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                |  .executeInsert(${rowParserFor(rowType)}.single)
                |"""
       case RepoMethod.UpsertBatch(relName, cols, id, rowType) =>
-        val pickExcludedCols = cols.toList
-          .filterNot(c => id.cols.exists(_.name == c.name))
-          .map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }
+        val conflictAction = cols.toList.filterNot(c => id.cols.exists(_.name == c.name)) match {
+          case Nil => code"do nothing"
+          case nonEmpty =>
+            code"""|do update set
+                   |  ${nonEmpty.map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }.mkCode(",\n")}""".stripMargin
+        }
 
         val sql = sc.s {
           code"""|insert into $relName(${dbNames(cols, isRead = false)})
                  |values (${cols.map(c => code"{${c.dbName.value}}${SqlCast.toPgCode(c)}").mkCode(", ")})
                  |on conflict (${dbNames(id.cols, isRead = false)})
-                 |do update set
-                 |  ${pickExcludedCols.mkCode(",\n")}
+                 |$conflictAction
                  |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
         }
@@ -463,9 +467,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                |}""".stripMargin
 
       case RepoMethod.UpsertStreaming(relName, cols, id, rowType) =>
-        val pickExcludedCols = cols.toList
-          .filterNot(c => id.cols.exists(_.name == c.name))
-          .map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }
+        val conflictAction = cols.toList.filterNot(c => id.cols.exists(_.name == c.name)) match {
+          case Nil => code"do nothing"
+          case nonEmpty =>
+            code"""|do update set
+                   |  ${nonEmpty.map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }.mkCode(",\n")}""".stripMargin
+        }
         val tempTablename = s"${relName.name}_TEMP"
 
         val copySql = sc.s(code"copy $tempTablename(${dbNames(cols, isRead = false)}) from stdin")
@@ -474,8 +481,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           code"""|insert into $relName(${dbNames(cols, isRead = false)})
                  |select * from $tempTablename
                  |on conflict (${dbNames(id.cols, isRead = false)})
-                 |do update set
-                 |  ${pickExcludedCols.mkCode(",\n")}
+                 |$conflictAction
                  |;
                  |drop table $tempTablename;""".stripMargin
         }

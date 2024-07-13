@@ -76,8 +76,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
             ${fromWrite(unsaved.id)(Write.fromPut(MaritalStatusId.put))}::int8
           )
           on conflict ("id")
-          do update set
-            
+          do nothing
           returning "id"
        """.query(using MaritalStatusRow.read).unique
   }
@@ -86,8 +85,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
       s"""insert into myschema.marital_status("id")
           values (?::int8)
           on conflict ("id")
-          do update set
-            
+          do nothing
           returning "id""""
     )(using MaritalStatusRow.write)
     .updateManyWithGeneratedKeys[MaritalStatusRow]("id")(unsaved)(using catsStdInstancesForList, MaritalStatusRow.read)
@@ -100,8 +98,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
       res <- sql"""insert into myschema.marital_status("id")
                    select * from marital_status_TEMP
                    on conflict ("id")
-                   do update set
-                     
+                   do nothing
                    ;
                    drop table marital_status_TEMP;""".update.run
     } yield res

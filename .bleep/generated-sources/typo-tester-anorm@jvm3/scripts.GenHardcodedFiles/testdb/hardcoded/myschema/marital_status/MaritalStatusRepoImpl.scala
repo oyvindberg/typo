@@ -98,8 +98,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
             ${ParameterValue(unsaved.id, null, MaritalStatusId.toStatement)}::int8
           )
           on conflict ("id")
-          do update set
-            
+          do nothing
           returning "id"
        """
       .executeInsert(MaritalStatusRow.rowParser(1).single)
@@ -117,8 +116,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
             s"""insert into myschema.marital_status("id")
                 values ({id}::int8)
                 on conflict ("id")
-                do update set
-                  
+                do nothing
                 returning "id"
              """,
             toNamedParameter(head),
@@ -134,8 +132,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     SQL"""insert into myschema.marital_status("id")
           select * from marital_status_TEMP
           on conflict ("id")
-          do update set
-            
+          do nothing
           ;
           drop table marital_status_TEMP;""".executeUpdate()
   }

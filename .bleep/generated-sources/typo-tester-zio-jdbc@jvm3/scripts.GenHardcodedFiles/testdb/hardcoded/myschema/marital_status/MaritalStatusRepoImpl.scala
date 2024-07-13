@@ -78,6 +78,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
             ${Segment.paramSegment(unsaved.id)(MaritalStatusId.setter)}::int8
           )
           on conflict ("id")
+          do nothing
           returning "id"""".insertReturning(using MaritalStatusRow.jdbcDecoder)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
@@ -87,8 +88,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     val merged = sql"""insert into myschema.marital_status("id")
                        select * from marital_status_TEMP
                        on conflict ("id")
-                       do update set
-                         
+                       do nothing
                        ;
                        drop table marital_status_TEMP;""".update
     created *> copied *> merged
