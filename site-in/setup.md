@@ -78,7 +78,7 @@ generateFromDb(
   testTargetFolder = Some(testTargetDir),
   selector = selector, 
   scriptsPaths = List(scriptsFolder)
-).overwriteFolder()
+).foreach(_.overwriteFolder())
 
 // add changed files to git, so you can keep them under control
 //scala.sys.process.Process(List("git", "add", targetDir.toString)).!!

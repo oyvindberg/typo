@@ -46,7 +46,7 @@ object GeneratedSources {
       List(buildDir.resolve("sql"))
     )
 
-    files.overwriteFolder(): @nowarn
+    files.foreach(_.overwriteFolder())
 
     import scala.sys.process.*
     List("git", "add", "-f", typoSources.toString).!! : @nowarn
