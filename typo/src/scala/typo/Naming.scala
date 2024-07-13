@@ -35,7 +35,10 @@ class Naming(val pkg: sc.QIdent) {
   protected def tpe(name: db.RelationName, suffix: String): sc.QIdent =
     pkg / name.schema.map(sc.Ident.apply).toList / sc.Ident(Naming.titleCase(name.name)).appended(suffix)
 
-  def idName(source: Source): sc.QIdent = relation(source, "Id")
+  def idName(source: Source, cols: List[db.Col]): sc.QIdent = {
+    ((), cols)._1 // allow implementors to use this
+    relation(source, "Id")
+  }
   def repoName(source: Source): sc.QIdent = relation(source, "Repo")
   def repoImplName(source: Source): sc.QIdent = relation(source, "RepoImpl")
   def repoMockName(source: Source): sc.QIdent = relation(source, "RepoMock")

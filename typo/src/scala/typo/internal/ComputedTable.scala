@@ -43,7 +43,6 @@ case class ComputedTable(
 
   val maybeId: Option[IdComputed] =
     dbTable.primaryKey.flatMap { pk =>
-      val tpe = sc.Type.Qualified(naming.idName(source))
       pk.colNames match {
         case NonEmptyList(colName, Nil) =>
           val dbCol = dbColsByName(colName)
@@ -60,8 +59,10 @@ case class ComputedTable(
                 Some(IdComputed.UnaryUserSpecified(col, underlying))
               else if (!options.enablePrimaryKeyType.include(dbTable.name))
                 Some(IdComputed.UnaryNoIdType(col, underlying))
-              else
+              else {
+                val tpe = sc.Type.Qualified(naming.idName(source, List(col.dbCol)))
                 Some(IdComputed.UnaryNormal(col, tpe))
+              }
           }
 
         case colNames =>
@@ -74,6 +75,7 @@ case class ComputedTable(
                 dbCol = dbColsByName(colName)
               )
             }
+          val tpe = sc.Type.Qualified(naming.idName(source, cols.toList.map(_.dbCol)))
           Some(IdComputed.Composite(cols, tpe, paramName = sc.Ident("compositeId")))
       }
     }
