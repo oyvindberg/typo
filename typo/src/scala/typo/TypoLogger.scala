@@ -1,8 +1,17 @@
 package typo
 
+import scala.concurrent.{ExecutionContext, Future}
+
 trait TypoLogger {
   def warn(str: String): Unit
   def info(str: String): Unit
+
+  final def timed[T](name: String)(f: Future[T])(implicit ec: ExecutionContext): Future[T] =
+    for {
+      start <- Future.successful(System.currentTimeMillis())
+      res <- f
+      _ <- Future.successful(info(s"finished $name in ${System.currentTimeMillis() - start}ms"))
+    } yield res
 }
 
 object TypoLogger {

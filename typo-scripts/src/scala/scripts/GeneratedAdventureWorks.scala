@@ -7,8 +7,10 @@ import typo.internal.sqlfiles.readSqlFileDirectories
 import typo.internal.{FileSync, generate}
 
 import java.nio.file.Path
-import java.sql.{Connection, DriverManager}
 import java.util.concurrent.atomic.AtomicReference
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
 object GeneratedAdventureWorks {
   val buildDir = Path.of(sys.props("user.dir"))
@@ -22,11 +24,10 @@ object GeneratedAdventureWorks {
       .map(_.minLogLevel(LogLevel.info))
       .untyped
       .use { logger =>
-        implicit val c: Connection = DriverManager.getConnection(
-          "jdbc:postgresql://localhost:6432/Adventureworks?user=postgres&password=password"
-        )
+        val ds = TypoDataSource.hikari(server = "localhost", port = 6432, databaseName = "Adventureworks", username = "postgres", password = "password")
         val scriptsPath = buildDir.resolve("adventureworks_sql")
-        val metadb = MetaDb.fromDb(TypoLogger.Console)
+        val selector = Selector.ExcludePostgresInternal
+        val metadb = Await.result(MetaDb.fromDb(TypoLogger.Console, ds, selector), Duration.Inf)
 
         val variants = List(
           (DbLibName.Anorm, JsonLibName.PlayJson, "typo-tester-anorm", new AtomicReference(Map.empty[RelPath, sc.Code])),
@@ -35,7 +36,7 @@ object GeneratedAdventureWorks {
         )
 
         def go(): Unit = {
-          val newSqlScripts = readSqlFileDirectories(TypoLogger.Console, scriptsPath)
+          val newSqlScripts = Await.result(readSqlFileDirectories(TypoLogger.Console, scriptsPath, ds), Duration.Inf)
 
           variants.foreach { case (dbLib, jsonLib, projectPath, oldFilesRef) =>
             val options = Options(
@@ -55,7 +56,7 @@ object GeneratedAdventureWorks {
             val targetSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 
             val newFiles: Generated =
-              generate(options, metadb, ProjectGraph(name = "", targetSources, None, Selector.ExcludePostgresInternal, newSqlScripts, Nil)).head
+              generate(options, metadb, ProjectGraph(name = "", targetSources, None, selector, newSqlScripts, Nil)).head
 
             val knownUnchanged: Set[RelPath] = {
               val oldFiles = oldFilesRef.get()

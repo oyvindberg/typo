@@ -3,20 +3,11 @@ package scripts
 import typo.*
 
 import java.nio.file.Path
-import java.sql.{Connection, DriverManager}
-import java.util
 import scala.annotation.nowarn
 
 object GeneratedSources {
   def main(args: Array[String]): Unit = {
-    implicit val c: Connection = {
-      val url = "jdbc:postgresql://localhost:6432/postgres"
-      val props = new util.Properties
-      props.setProperty("user", "postgres")
-      props.setProperty("password", "password")
-      props.setProperty("port", "6432")
-      DriverManager.getConnection(url, props)
-    }
+    val ds = TypoDataSource.hikari(server = "localhost", port = 6432, databaseName = "Adventureworks", username = "postgres", password = "password")
 
     val header =
       """|/**
@@ -32,6 +23,7 @@ object GeneratedSources {
     val typoSources = buildDir.resolve("typo/generated-and-checked-in")
 
     val files = generateFromDb(
+      ds,
       Options(
         pkg = "typo.generated",
         jsonLibs = List(JsonLibName.PlayJson),

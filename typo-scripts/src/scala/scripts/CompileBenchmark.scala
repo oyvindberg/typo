@@ -8,8 +8,10 @@ import typo.internal.generate
 import typo.internal.sqlfiles.readSqlFileDirectories
 
 import java.nio.file.Path
-import java.sql.{Connection, DriverManager}
 import scala.annotation.nowarn
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
 object CompileBenchmark extends BleepScript("CompileBenchmark") {
   val buildDir = Path.of(sys.props("user.dir"))
@@ -25,10 +27,9 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
   )
 
   override def run(started: Started, commands: Commands, args: List[String]): Unit = {
-    implicit val c: Connection = DriverManager.getConnection(
-      "jdbc:postgresql://localhost:6432/Adventureworks?user=postgres&password=password"
-    )
-    val metadb = MetaDb.fromDb(TypoLogger.Noop)
+    val ds = TypoDataSource.hikari(server = "localhost", port = 6432, databaseName = "Adventureworks", username = "postgres", password = "password")
+    val metadb = Await.result(MetaDb.fromDb(logger = TypoLogger.Noop, ds = ds, viewSelector = Selector.All), Duration.Inf)
+    val sqlFiles = Await.result(readSqlFileDirectories(TypoLogger.Noop, buildDir.resolve("adventureworks_sql"), ds), Duration.Inf)
 
     val crossIds = List(
       "jvm212",
@@ -69,7 +70,7 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
               targetSources,
               None,
               Selector.ExcludePostgresInternal, // All
-              readSqlFileDirectories(TypoLogger.Noop, buildDir.resolve("adventureworks_sql")),
+              sqlFiles,
               Nil
             )
           ).foreach(_.overwriteFolder())

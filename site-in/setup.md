@@ -40,8 +40,13 @@ put it in `gen-db.sc` and run `scala-cli gen-db.sc`
 import typo.*
 
 // adapt to your instance and credentials
-implicit val c: java.sql.Connection =
-  java.sql.DriverManager.getConnection("jdbc:postgresql://localhost:6432/postgres?user=postgres&password=password")
+val ds = TypoDataSource.hikari(
+  server = "localhost", 
+  port = 6432, 
+  databaseName = "Adventureworks", 
+  username = "postgres", 
+  password = "password"
+)
 
 val options = Options(
   // customize package name for generated code
@@ -67,6 +72,7 @@ val scriptsFolder = location.resolve("sql")
 val selector = Selector.ExcludePostgresInternal
 
 generateFromDb(
+  ds,
   options, 
   targetFolder = targetDir,
   testTargetFolder = Some(testTargetDir),

@@ -3,7 +3,8 @@ package typo
 import typo.internal.sqlfiles.readSqlFileDirectories
 
 import java.nio.file.Path
-import java.sql.Connection
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /** Main entry-point for generating code from a database.
   */
@@ -12,25 +13,32 @@ object generateFromDb {
   /** Allows you to generate code into *one* folder
     */
   def apply(
+      dataSource: TypoDataSource,
       options: Options,
       targetFolder: Path,
       testTargetFolder: Option[Path],
       selector: Selector = Selector.ExcludePostgresInternal,
       scriptsPaths: List[Path] = Nil
-  )(implicit c: Connection): Generated =
-    apply(options, ProjectGraph(name = "", targetFolder, testTargetFolder, selector, scriptsPaths, Nil)).head
+  ): Generated =
+    apply(dataSource, options, ProjectGraph(name = "", targetFolder, testTargetFolder, selector, scriptsPaths, Nil)).head
 
   /** Allows you to generate code into multiple folders
     */
   def apply(
+      dataSource: TypoDataSource,
       options: Options,
       graph: ProjectGraph[Selector, List[Path]]
-  )(implicit c: Connection): List[Generated] = {
+  ): List[Generated] = {
     Banner.maybePrint(options)
-    internal.generate(
-      options,
-      MetaDb.fromDb(options.logger),
-      graph.mapScripts(paths => paths.flatMap(p => readSqlFileDirectories(options.logger, p)))
-    )
+    implicit val ec: ExecutionContext = options.executionContext
+    val viewSelector = graph.toList.map(_.value).foldLeft(Selector.None)(_.or(_))
+    val eventualMetaDb = MetaDb.fromDb(options.logger, dataSource, viewSelector)
+    val eventualScripts = graph.mapScripts(paths => Future.sequence(paths.map(p => readSqlFileDirectories(options.logger, p, dataSource))).map(_.flatten))
+    val combined = for {
+      metaDb <- eventualMetaDb
+      scripts <- eventualScripts
+    } yield internal.generate(options, metaDb, scripts)
+
+    Await.result(combined, Duration.Inf)
   }
 }

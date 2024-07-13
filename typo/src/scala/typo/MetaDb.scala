@@ -4,19 +4,19 @@ import typo.generated.custom.comments.{CommentsSqlRepoImpl, CommentsSqlRow}
 import typo.generated.custom.constraints.{ConstraintsSqlRepoImpl, ConstraintsSqlRow}
 import typo.generated.custom.domains.{DomainsSqlRepoImpl, DomainsSqlRow}
 import typo.generated.custom.enums.{EnumsSqlRepoImpl, EnumsSqlRow}
-import typo.generated.custom.view_find_all.*
 import typo.generated.custom.table_comments.*
+import typo.generated.custom.view_find_all.*
 import typo.generated.information_schema.columns.{ColumnsViewRepoImpl, ColumnsViewRow}
 import typo.generated.information_schema.key_column_usage.{KeyColumnUsageViewRepoImpl, KeyColumnUsageViewRow}
 import typo.generated.information_schema.referential_constraints.{ReferentialConstraintsViewRepoImpl, ReferentialConstraintsViewRow}
 import typo.generated.information_schema.table_constraints.{TableConstraintsViewRepoImpl, TableConstraintsViewRow}
 import typo.generated.information_schema.tables.{TablesViewRepoImpl, TablesViewRow}
-import typo.internal.analysis.{DecomposedSql, JdbcMetadata, MaybeReturnsRows, NullabilityFromExplain, ParsedName}
+import typo.internal.analysis.*
 import typo.internal.metadb.{Enums, ForeignKeys, PrimaryKeys, UniqueKeys}
 import typo.internal.{DebugJson, Lazy, TypeMapperDb}
 
-import java.sql.Connection
 import scala.collection.immutable.SortedSet
+import scala.concurrent.{ExecutionContext, Future}
 
 case class MetaDb(
     relations: Map[db.RelationName, Lazy[db.Relation]],
@@ -24,7 +24,6 @@ case class MetaDb(
     domains: List[db.Domain]
 ) {
   val typeMapperDb = TypeMapperDb(enums, domains)
-
 }
 
 object MetaDb {
@@ -35,42 +34,84 @@ object MetaDb {
       pgEnums: List[EnumsSqlRow],
       tables: List[TablesViewRow],
       columns: List[ColumnsViewRow],
-      views: List[ViewFindAllSqlRow],
+      views: Map[db.RelationName, AnalyzedView],
       domains: List[DomainsSqlRow],
       columnComments: List[CommentsSqlRow],
       constraints: List[ConstraintsSqlRow],
       tableComments: List[TableCommentsSqlRow]
   )
 
-  object Input {
-    def fromDb(logger: TypoLogger)(implicit c: Connection): Input = {
-      def timed[T](name: String)(f: => T): T = {
-        val start = System.currentTimeMillis()
-        val result = f
-        val end = System.currentTimeMillis()
-        logger.info(s"fetched $name from PG in ${end - start}ms")
-        result
-      }
+  case class AnalyzedView(
+      row: ViewFindAllSqlRow,
+      decomposedSql: DecomposedSql,
+      jdbcMetadata: JdbcMetadata,
+      nullabilityAnalysis: NullabilityFromExplain.NullableColumns
+  )
 
-      Input(
-        tableConstraints = timed("tableConstraints")((new TableConstraintsViewRepoImpl).selectAll),
-        keyColumnUsage = timed("keyColumnUsage")((new KeyColumnUsageViewRepoImpl).selectAll),
-        referentialConstraints = timed("referentialConstraints")((new ReferentialConstraintsViewRepoImpl).selectAll),
-        pgEnums = timed("pgEnums")((new EnumsSqlRepoImpl)()),
-        tables = timed("tables")((new TablesViewRepoImpl).selectAll.filter(_.tableType.contains("BASE TABLE"))),
-        columns = timed("columns")((new ColumnsViewRepoImpl).selectAll),
-        views = timed("views")((new ViewFindAllSqlRepoImpl)()),
-        domains = timed("domains")((new DomainsSqlRepoImpl)()),
-        columnComments = timed("columnComments")((new CommentsSqlRepoImpl)()),
-        constraints = timed("constraints")((new ConstraintsSqlRepoImpl)()),
-        tableComments = timed("tableComments")((new TableCommentsSqlRepoImpl)())
+  object Input {
+    def fromDb(logger: TypoLogger, ds: TypoDataSource, viewSelector: Selector)(implicit ev: ExecutionContext): Future[Input] = {
+      val tableConstraints = logger.timed("fetching tableConstraints")(ds.run(implicit c => (new TableConstraintsViewRepoImpl).selectAll))
+      val keyColumnUsage = logger.timed("fetching keyColumnUsage")(ds.run(implicit c => (new KeyColumnUsageViewRepoImpl).selectAll))
+      val referentialConstraints = logger.timed("fetching referentialConstraints")(ds.run(implicit c => (new ReferentialConstraintsViewRepoImpl).selectAll))
+      val pgEnums = logger.timed("fetching pgEnums")(ds.run(implicit c => (new EnumsSqlRepoImpl)()))
+      val tables = logger.timed("fetching tables")(ds.run(implicit c => (new TablesViewRepoImpl).selectAll.filter(_.tableType.contains("BASE TABLE"))))
+      val columns = logger.timed("fetching columns")(ds.run(implicit c => (new ColumnsViewRepoImpl).selectAll))
+      val views = logger.timed("fetching and analyzing views")(ds.run(implicit c => (new ViewFindAllSqlRepoImpl)())).flatMap { viewRows =>
+        val analyzedRows: List[Future[(db.RelationName, AnalyzedView)]] = viewRows.flatMap { viewRow =>
+          val name = db.RelationName(viewRow.tableSchema, viewRow.tableName.get)
+          if (viewRow.viewDefinition.isDefined && viewSelector.include(name)) Some {
+            val sqlContent = viewRow.viewDefinition.get
+            val decomposedSql = DecomposedSql.parse(sqlContent)
+            val jdbcMetadata = ds.run(implicit c => JdbcMetadata.from(sqlContent))
+            val nullabilityAnalysis = ds.run(implicit c => NullabilityFromExplain.from(decomposedSql, Nil))
+            for {
+              jdbcMetadata <- jdbcMetadata.map {
+                case Left(str)    => sys.error(str)
+                case Right(value) => value
+              }
+              nullabilityAnalysis <- nullabilityAnalysis
+            } yield name -> AnalyzedView(viewRow, decomposedSql, jdbcMetadata, nullabilityAnalysis)
+          }
+          else None
+        }
+        Future.sequence(analyzedRows).map(_.toMap)
+      }
+      val domains = logger.timed("fetching domains")(ds.run(implicit c => (new DomainsSqlRepoImpl)()))
+      val columnComments = logger.timed("fetching columnComments")(ds.run(implicit c => (new CommentsSqlRepoImpl)()))
+      val constraints = logger.timed("fetching constraints")(ds.run(implicit c => (new ConstraintsSqlRepoImpl)()))
+      val tableComments = logger.timed("fetching tableComments")(ds.run(implicit c => (new TableCommentsSqlRepoImpl)()))
+      for {
+        tableConstraints <- tableConstraints
+        keyColumnUsage <- keyColumnUsage
+        referentialConstraints <- referentialConstraints
+        pgEnums <- pgEnums
+        tables <- tables
+        columns <- columns
+        views <- views
+        domains <- domains
+        columnComments <- columnComments
+        constraints <- constraints
+        tableComments <- tableComments
+      } yield Input(
+        tableConstraints,
+        keyColumnUsage,
+        referentialConstraints,
+        pgEnums,
+        tables,
+        columns,
+        views,
+        domains,
+        columnComments,
+        constraints,
+        tableComments
       )
     }
   }
 
-  def fromDb(logger: TypoLogger)(implicit c: Connection): MetaDb = {
-    val input = Input.fromDb(logger)
+  def fromDb(logger: TypoLogger, ds: TypoDataSource, viewSelector: Selector)(implicit ec: ExecutionContext): Future[MetaDb] =
+    Input.fromDb(logger, ds, viewSelector).map(input => fromInput(logger, input))
 
+  def fromInput(logger: TypoLogger, input: Input): MetaDb = {
     val foreignKeys = ForeignKeys(input.tableConstraints, input.keyColumnUsage, input.referentialConstraints)
     val primaryKeys = PrimaryKeys(input.tableConstraints, input.keyColumnUsage)
     val uniqueKeys = UniqueKeys(input.tableConstraints, input.keyColumnUsage)
@@ -114,59 +155,52 @@ object MetaDb {
     val tableCommentsByTable: Map[db.RelationName, String] =
       input.tableComments.flatMap(c => c.description.map(d => (db.RelationName(Some(c.schema), c.name), d))).toMap
     val views: Map[db.RelationName, Lazy[db.View]] =
-      input.views.flatMap { viewRow =>
-        viewRow.viewDefinition.map { sqlContent =>
-          val relationName = db.RelationName(viewRow.tableSchema, viewRow.tableName.get)
-          val lazyAnalysis = Lazy {
-            logger.info(s"Analyzing view ${relationName.value}")
-            val decomposedSql = DecomposedSql.parse(sqlContent)
-            val Right(jdbcMetadata) = JdbcMetadata.from(sqlContent): @unchecked
-            val nullabilityInfo = NullabilityFromExplain.from(decomposedSql, Nil).nullableIndices
-            val deps: Map[db.ColName, List[(db.RelationName, db.ColName)]] =
-              jdbcMetadata.columns match {
-                case MaybeReturnsRows.Query(columns) =>
-                  columns.toList.flatMap(col => col.baseRelationName.zip(col.baseColumnName).map(t => col.name -> List(t))).toMap
-                case MaybeReturnsRows.Update =>
-                  Map.empty
-              }
+      input.views.map { case (relationName, AnalyzedView(viewRow, decomposedSql, jdbcMetadata, nullabilityAnalysis)) =>
+        val lazyAnalysis = Lazy {
+          val deps: Map[db.ColName, List[(db.RelationName, db.ColName)]] =
+            jdbcMetadata.columns match {
+              case MaybeReturnsRows.Query(columns) =>
+                columns.toList.flatMap(col => col.baseRelationName.zip(col.baseColumnName).map(t => col.name -> List(t))).toMap
+              case MaybeReturnsRows.Update =>
+                Map.empty
+            }
 
-            val cols: NonEmptyList[(db.Col, ParsedName)] =
-              jdbcMetadata.columns match {
-                case MaybeReturnsRows.Query(metadataCols) =>
-                  metadataCols.zipWithIndex.map { case (mdCol, idx) =>
-                    val nullability: Nullability =
-                      mdCol.parsedColumnName.nullability.getOrElse {
-                        if (nullabilityInfo.exists(_.values(idx))) Nullability.Nullable
-                        else mdCol.isNullable.toNullability
-                      }
-
-                    val dbType = typeMapperDb.dbTypeFrom(mdCol.columnTypeName, Some(mdCol.precision)) { () =>
-                      logger.warn(s"Couldn't translate type from view ${relationName.value} column ${mdCol.name.value} with type ${mdCol.columnTypeName}. Falling back to text")
+          val cols: NonEmptyList[(db.Col, ParsedName)] =
+            jdbcMetadata.columns match {
+              case MaybeReturnsRows.Query(metadataCols) =>
+                metadataCols.zipWithIndex.map { case (mdCol, idx) =>
+                  val nullability: Nullability =
+                    mdCol.parsedColumnName.nullability.getOrElse {
+                      if (nullabilityAnalysis.nullableIndices.exists(_.values(idx))) Nullability.Nullable
+                      else mdCol.isNullable.toNullability
                     }
 
-                    val coord = (relationName, mdCol.name)
-                    val dbCol = db.Col(
-                      parsedName = mdCol.parsedColumnName,
-                      tpe = dbType,
-                      udtName = None,
-                      columnDefault = None,
-                      identity = None,
-                      comment = comments.get(coord),
-                      jsonDescription = DebugJson(mdCol),
-                      nullability = nullability,
-                      constraints = constraints.getOrElse(coord, Nil)
-                    )
-                    (dbCol, mdCol.parsedColumnName)
+                  val dbType = typeMapperDb.dbTypeFrom(mdCol.columnTypeName, Some(mdCol.precision)) { () =>
+                    logger.warn(s"Couldn't translate type from view ${relationName.value} column ${mdCol.name.value} with type ${mdCol.columnTypeName}. Falling back to text")
                   }
 
-                case MaybeReturnsRows.Update => ???
-              }
+                  val coord = (relationName, mdCol.name)
+                  val dbCol = db.Col(
+                    parsedName = mdCol.parsedColumnName,
+                    tpe = dbType,
+                    udtName = None,
+                    columnDefault = None,
+                    identity = None,
+                    comment = comments.get(coord),
+                    jsonDescription = DebugJson(mdCol),
+                    nullability = nullability,
+                    constraints = constraints.getOrElse(coord, Nil)
+                  )
+                  (dbCol, mdCol.parsedColumnName)
+                }
 
-            db.View(relationName, tableCommentsByTable.get(relationName), decomposedSql, cols, deps, isMaterialized = viewRow.relkind == "m")
-          }
-          (relationName, lazyAnalysis)
+              case MaybeReturnsRows.Update => ???
+            }
+
+          db.View(relationName, tableCommentsByTable.get(relationName), decomposedSql, cols, deps, isMaterialized = viewRow.relkind == "m")
         }
-      }.toMap
+        (relationName, lazyAnalysis)
+      }
 
     val tables: Map[db.RelationName, Lazy[db.Table]] =
       input.tables.flatMap { relation =>

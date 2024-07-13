@@ -1,5 +1,7 @@
 package typo
 
+import scala.concurrent.ExecutionContext
+
 case class Options(
     pkg: String,
     dbLib: Option[DbLibName],
@@ -21,7 +23,8 @@ case class Options(
     inlineImplicits: Boolean = true,
     fixVerySlowImplicit: Boolean = true,
     keepDependencies: Boolean = false,
-    rewriteDatabase: MetaDb => MetaDb = identity
+    rewriteDatabase: MetaDb => MetaDb = identity,
+    executionContext: ExecutionContext = ExecutionContext.global
 )
 
 object Options {
