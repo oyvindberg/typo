@@ -87,4 +87,17 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
     map.put(unsaved.phonenumbertypeid, unsaved): @nowarn
     unsaved
   }
+  override def upsertBatch(unsaved: Iterable[PhonenumbertypeRow])(implicit c: Connection): List[PhonenumbertypeRow] = {
+    unsaved.map { row =>
+      map += (row.phonenumbertypeid -> row)
+      row
+    }.toList
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[PhonenumbertypeRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    unsaved.foreach { row =>
+      map += (row.phonenumbertypeid -> row)
+    }
+    unsaved.size
+  }
 }

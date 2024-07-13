@@ -10,6 +10,7 @@ package currency
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -17,6 +18,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -127,5 +129,43 @@ class CurrencyRepoImpl extends CurrencyRepo {
        """
       .executeInsert(CurrencyRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[CurrencyRow])(implicit c: Connection): List[CurrencyRow] = {
+    def toNamedParameter(row: CurrencyRow): List[NamedParameter] = List(
+      NamedParameter("currencycode", ParameterValue(row.currencycode, null, CurrencyId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.currency("currencycode", "name", "modifieddate")
+                values ({currencycode}::bpchar, {name}::varchar, {modifieddate}::timestamp)
+                on conflict ("currencycode")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "currencycode", "name", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(CurrencyRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[CurrencyRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table currency_TEMP (like sales.currency) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy currency_TEMP("currencycode", "name", "modifieddate") from stdin""", batchSize, unsaved)(CurrencyRow.text, c): @nowarn
+    SQL"""insert into sales.currency("currencycode", "name", "modifieddate")
+          select * from currency_TEMP
+          on conflict ("currencycode")
+          do update set
+            "name" = EXCLUDED."name",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table currency_TEMP;""".executeUpdate()
   }
 }

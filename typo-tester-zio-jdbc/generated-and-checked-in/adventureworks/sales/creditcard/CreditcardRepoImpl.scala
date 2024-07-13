@@ -126,4 +126,21 @@ class CreditcardRepoImpl extends CreditcardRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text""".insertReturning(using CreditcardRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CreditcardRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table creditcard_TEMP (like sales.creditcard) on commit drop".execute
+    val copied = streamingInsert(s"""copy creditcard_TEMP("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate") from stdin""", batchSize, unsaved)(CreditcardRow.text)
+    val merged = sql"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
+                       select * from creditcard_TEMP
+                       on conflict ("creditcardid")
+                       do update set
+                         "cardtype" = EXCLUDED."cardtype",
+                         "cardnumber" = EXCLUDED."cardnumber",
+                         "expmonth" = EXCLUDED."expmonth",
+                         "expyear" = EXCLUDED."expyear",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table creditcard_TEMP;""".update
+    created *> copied *> merged
+  }
 }

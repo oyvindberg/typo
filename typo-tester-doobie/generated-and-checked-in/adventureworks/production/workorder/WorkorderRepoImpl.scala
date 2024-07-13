@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -19,6 +20,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -143,5 +145,44 @@ class WorkorderRepoImpl extends WorkorderRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
        """.query(using WorkorderRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[WorkorderRow]): Stream[ConnectionIO, WorkorderRow] = {
+    Update[WorkorderRow](
+      s"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
+          values (?::int4,?::int4,?::int4,?::int2,?::timestamp,?::timestamp,?::timestamp,?::int2,?::timestamp)
+          on conflict ("workorderid")
+          do update set
+            "productid" = EXCLUDED."productid",
+            "orderqty" = EXCLUDED."orderqty",
+            "scrappedqty" = EXCLUDED."scrappedqty",
+            "startdate" = EXCLUDED."startdate",
+            "enddate" = EXCLUDED."enddate",
+            "duedate" = EXCLUDED."duedate",
+            "scrapreasonid" = EXCLUDED."scrapreasonid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text"""
+    )(using WorkorderRow.write)
+    .updateManyWithGeneratedKeys[WorkorderRow]("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")(unsaved)(using catsStdInstancesForList, WorkorderRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, WorkorderRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table workorder_TEMP (like production.workorder) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy workorder_TEMP("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using WorkorderRow.text)
+      res <- sql"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
+                   select * from workorder_TEMP
+                   on conflict ("workorderid")
+                   do update set
+                     "productid" = EXCLUDED."productid",
+                     "orderqty" = EXCLUDED."orderqty",
+                     "scrappedqty" = EXCLUDED."scrappedqty",
+                     "startdate" = EXCLUDED."startdate",
+                     "enddate" = EXCLUDED."enddate",
+                     "duedate" = EXCLUDED."duedate",
+                     "scrapreasonid" = EXCLUDED."scrapreasonid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table workorder_TEMP;""".update.run
+    } yield res
   }
 }

@@ -8,6 +8,7 @@ package public
 package identity_test
 
 import adventureworks.customtypes.Defaulted
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -16,6 +17,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -125,5 +127,43 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
        """
       .executeInsert(IdentityTestRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[IdentityTestRow])(implicit c: Connection): List[IdentityTestRow] = {
+    def toNamedParameter(row: IdentityTestRow): List[NamedParameter] = List(
+      NamedParameter("always_generated", ParameterValue(row.alwaysGenerated, null, ToStatement.intToStatement)),
+      NamedParameter("default_generated", ParameterValue(row.defaultGenerated, null, ToStatement.intToStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, IdentityTestId.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into public.identity-test("always_generated", "default_generated", "name")
+                values ({always_generated}::int4, {default_generated}::int4, {name})
+                on conflict ("name")
+                do update set
+                  "always_generated" = EXCLUDED."always_generated",
+                  "default_generated" = EXCLUDED."default_generated"
+                returning "always_generated", "default_generated", "name"
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(IdentityTestRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[IdentityTestRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table identity-test_TEMP (like public.identity-test) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy identity-test_TEMP("always_generated", "default_generated", "name") from stdin""", batchSize, unsaved)(IdentityTestRow.text, c): @nowarn
+    SQL"""insert into public.identity-test("always_generated", "default_generated", "name")
+          select * from identity-test_TEMP
+          on conflict ("name")
+          do update set
+            "always_generated" = EXCLUDED."always_generated",
+            "default_generated" = EXCLUDED."default_generated"
+          ;
+          drop table identity-test_TEMP;""".executeUpdate()
   }
 }

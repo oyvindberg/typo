@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -21,6 +22,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -147,5 +149,46 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
        """
       .executeInsert(EmployeedepartmenthistoryRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[EmployeedepartmenthistoryRow])(implicit c: Connection): List[EmployeedepartmenthistoryRow] = {
+    def toNamedParameter(row: EmployeedepartmenthistoryRow): List[NamedParameter] = List(
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, BusinessentityId.toStatement)),
+      NamedParameter("departmentid", ParameterValue(row.departmentid, null, DepartmentId.toStatement)),
+      NamedParameter("shiftid", ParameterValue(row.shiftid, null, ShiftId.toStatement)),
+      NamedParameter("startdate", ParameterValue(row.startdate, null, TypoLocalDate.toStatement)),
+      NamedParameter("enddate", ParameterValue(row.enddate, null, ToStatement.optionToStatement(TypoLocalDate.toStatement, TypoLocalDate.parameterMetadata))),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
+                values ({businessentityid}::int4, {departmentid}::int2, {shiftid}::int2, {startdate}::date, {enddate}::date, {modifieddate}::timestamp)
+                on conflict ("businessentityid", "startdate", "departmentid", "shiftid")
+                do update set
+                  "enddate" = EXCLUDED."enddate",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(EmployeedepartmenthistoryRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[EmployeedepartmenthistoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table employeedepartmenthistory_TEMP (like humanresources.employeedepartmenthistory) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy employeedepartmenthistory_TEMP("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") from stdin""", batchSize, unsaved)(EmployeedepartmenthistoryRow.text, c): @nowarn
+    SQL"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
+          select * from employeedepartmenthistory_TEMP
+          on conflict ("businessentityid", "startdate", "departmentid", "shiftid")
+          do update set
+            "enddate" = EXCLUDED."enddate",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table employeedepartmenthistory_TEMP;""".executeUpdate()
   }
 }

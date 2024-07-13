@@ -105,4 +105,23 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
       unsaved
     }
   }
+  override def upsertBatch(unsaved: List[CountryregionRow]): Stream[ConnectionIO, CountryregionRow] = {
+    Stream.emits {
+      unsaved.map { row =>
+        map += (row.countryregioncode -> row)
+        row
+      }
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0
+      rows.foreach { row =>
+        map += (row.countryregioncode -> row)
+        num += 1
+      }
+      num
+    }
+  }
 }

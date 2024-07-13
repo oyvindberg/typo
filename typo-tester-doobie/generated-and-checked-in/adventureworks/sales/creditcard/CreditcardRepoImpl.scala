@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.userdefined.CustomCreditcardId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -19,6 +20,7 @@ import doobie.util.Put
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -131,5 +133,38 @@ class CreditcardRepoImpl extends CreditcardRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
        """.query(using CreditcardRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[CreditcardRow]): Stream[ConnectionIO, CreditcardRow] = {
+    Update[CreditcardRow](
+      s"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
+          values (?::int4,?,?,?::int2,?::int2,?::timestamp)
+          on conflict ("creditcardid")
+          do update set
+            "cardtype" = EXCLUDED."cardtype",
+            "cardnumber" = EXCLUDED."cardnumber",
+            "expmonth" = EXCLUDED."expmonth",
+            "expyear" = EXCLUDED."expyear",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text"""
+    )(using CreditcardRow.write)
+    .updateManyWithGeneratedKeys[CreditcardRow]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(unsaved)(using catsStdInstancesForList, CreditcardRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, CreditcardRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table creditcard_TEMP (like sales.creditcard) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy creditcard_TEMP("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using CreditcardRow.text)
+      res <- sql"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
+                   select * from creditcard_TEMP
+                   on conflict ("creditcardid")
+                   do update set
+                     "cardtype" = EXCLUDED."cardtype",
+                     "cardnumber" = EXCLUDED."cardnumber",
+                     "expmonth" = EXCLUDED."expmonth",
+                     "expyear" = EXCLUDED."expyear",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table creditcard_TEMP;""".update.run
+    } yield res
   }
 }

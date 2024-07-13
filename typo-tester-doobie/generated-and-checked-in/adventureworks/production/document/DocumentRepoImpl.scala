@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -21,6 +22,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -176,5 +178,52 @@ class DocumentRepoImpl extends DocumentRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
        """.query(using DocumentRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[DocumentRow]): Stream[ConnectionIO, DocumentRow] = {
+    Update[DocumentRow](
+      s"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
+          values (?,?::int4,?::bool,?,?,?::bpchar,?::int4,?::int2,?,?::bytea,?::uuid,?::timestamp,?)
+          on conflict ("documentnode")
+          do update set
+            "title" = EXCLUDED."title",
+            "owner" = EXCLUDED."owner",
+            "folderflag" = EXCLUDED."folderflag",
+            "filename" = EXCLUDED."filename",
+            "fileextension" = EXCLUDED."fileextension",
+            "revision" = EXCLUDED."revision",
+            "changenumber" = EXCLUDED."changenumber",
+            "status" = EXCLUDED."status",
+            "documentsummary" = EXCLUDED."documentsummary",
+            "document" = EXCLUDED."document",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode""""
+    )(using DocumentRow.write)
+    .updateManyWithGeneratedKeys[DocumentRow]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(unsaved)(using catsStdInstancesForList, DocumentRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table document_TEMP (like production.document) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy document_TEMP("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") from stdin""").copyIn(unsaved, batchSize)(using DocumentRow.text)
+      res <- sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
+                   select * from document_TEMP
+                   on conflict ("documentnode")
+                   do update set
+                     "title" = EXCLUDED."title",
+                     "owner" = EXCLUDED."owner",
+                     "folderflag" = EXCLUDED."folderflag",
+                     "filename" = EXCLUDED."filename",
+                     "fileextension" = EXCLUDED."fileextension",
+                     "revision" = EXCLUDED."revision",
+                     "changenumber" = EXCLUDED."changenumber",
+                     "status" = EXCLUDED."status",
+                     "documentsummary" = EXCLUDED."documentsummary",
+                     "document" = EXCLUDED."document",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table document_TEMP;""".update.run
+    } yield res
   }
 }

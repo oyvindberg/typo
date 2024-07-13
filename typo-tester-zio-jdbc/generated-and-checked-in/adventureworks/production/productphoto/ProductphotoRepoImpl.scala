@@ -124,4 +124,21 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text""".insertReturning(using ProductphotoRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductphotoRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table productphoto_TEMP (like production.productphoto) on commit drop".execute
+    val copied = streamingInsert(s"""copy productphoto_TEMP("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate") from stdin""", batchSize, unsaved)(ProductphotoRow.text)
+    val merged = sql"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+                       select * from productphoto_TEMP
+                       on conflict ("productphotoid")
+                       do update set
+                         "thumbnailphoto" = EXCLUDED."thumbnailphoto",
+                         "thumbnailphotofilename" = EXCLUDED."thumbnailphotofilename",
+                         "largephoto" = EXCLUDED."largephoto",
+                         "largephotofilename" = EXCLUDED."largephotofilename",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table productphoto_TEMP;""".update
+    created *> copied *> merged
+  }
 }

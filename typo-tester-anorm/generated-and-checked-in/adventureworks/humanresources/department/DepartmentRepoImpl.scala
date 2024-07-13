@@ -10,6 +10,7 @@ package department
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -17,6 +18,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -134,5 +136,46 @@ class DepartmentRepoImpl extends DepartmentRepo {
        """
       .executeInsert(DepartmentRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[DepartmentRow])(implicit c: Connection): List[DepartmentRow] = {
+    def toNamedParameter(row: DepartmentRow): List[NamedParameter] = List(
+      NamedParameter("departmentid", ParameterValue(row.departmentid, null, DepartmentId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("groupname", ParameterValue(row.groupname, null, Name.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
+                values ({departmentid}::int4, {name}::varchar, {groupname}::varchar, {modifieddate}::timestamp)
+                on conflict ("departmentid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "groupname" = EXCLUDED."groupname",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "departmentid", "name", "groupname", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(DepartmentRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[DepartmentRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table department_TEMP (like humanresources.department) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy department_TEMP("departmentid", "name", "groupname", "modifieddate") from stdin""", batchSize, unsaved)(DepartmentRow.text, c): @nowarn
+    SQL"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
+          select * from department_TEMP
+          on conflict ("departmentid")
+          do update set
+            "name" = EXCLUDED."name",
+            "groupname" = EXCLUDED."groupname",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table department_TEMP;""".executeUpdate()
   }
 }

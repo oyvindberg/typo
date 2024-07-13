@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -19,6 +20,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -140,5 +142,49 @@ class PasswordRepoImpl extends PasswordRepo {
        """
       .executeInsert(PasswordRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[PasswordRow])(implicit c: Connection): List[PasswordRow] = {
+    def toNamedParameter(row: PasswordRow): List[NamedParameter] = List(
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, BusinessentityId.toStatement)),
+      NamedParameter("passwordhash", ParameterValue(row.passwordhash, null, ToStatement.stringToStatement)),
+      NamedParameter("passwordsalt", ParameterValue(row.passwordsalt, null, ToStatement.stringToStatement)),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+                values ({businessentityid}::int4, {passwordhash}, {passwordsalt}, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("businessentityid")
+                do update set
+                  "passwordhash" = EXCLUDED."passwordhash",
+                  "passwordsalt" = EXCLUDED."passwordsalt",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(PasswordRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[PasswordRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table password_TEMP (like person.password) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy password_TEMP("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(PasswordRow.text, c): @nowarn
+    SQL"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+          select * from password_TEMP
+          on conflict ("businessentityid")
+          do update set
+            "passwordhash" = EXCLUDED."passwordhash",
+            "passwordsalt" = EXCLUDED."passwordsalt",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table password_TEMP;""".executeUpdate()
   }
 }

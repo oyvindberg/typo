@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoUUID
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -112,4 +113,44 @@ object SpecialofferRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[SpecialofferRow] = new Write[SpecialofferRow](
+    puts = List((SpecialofferId.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (Meta.IntMeta.put, Nullability.Nullable),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.specialofferid, x.description, x.discountpct, x.`type`, x.category, x.startdate, x.enddate, x.minqty, x.maxqty, x.rowguid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  SpecialofferId.put.unsafeSetNonNullable(rs, i + 0, a.specialofferid)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.description)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 2, a.discountpct)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 3, a.`type`)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 4, a.category)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.startdate)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 6, a.enddate)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 7, a.minqty)
+                  Meta.IntMeta.put.unsafeSetNullable(rs, i + 8, a.maxqty)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 9, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 10, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     SpecialofferId.put.unsafeUpdateNonNullable(ps, i + 0, a.specialofferid)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.description)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.discountpct)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.`type`)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 4, a.category)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.startdate)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 6, a.enddate)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.minqty)
+                     Meta.IntMeta.put.unsafeUpdateNullable(ps, i + 8, a.maxqty)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 9, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 10, a.modifieddate)
+                   }
+  )
 }

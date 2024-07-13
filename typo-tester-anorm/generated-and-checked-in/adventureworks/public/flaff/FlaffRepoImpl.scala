@@ -7,10 +7,13 @@ package adventureworks
 package public
 package flaff
 
+import anorm.BatchSql
+import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -102,5 +105,43 @@ class FlaffRepoImpl extends FlaffRepo {
        """
       .executeInsert(FlaffRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[FlaffRow])(implicit c: Connection): List[FlaffRow] = {
+    def toNamedParameter(row: FlaffRow): List[NamedParameter] = List(
+      NamedParameter("code", ParameterValue(row.code, null, ShortText.toStatement)),
+      NamedParameter("another_code", ParameterValue(row.anotherCode, null, ToStatement.stringToStatement)),
+      NamedParameter("some_number", ParameterValue(row.someNumber, null, ToStatement.intToStatement)),
+      NamedParameter("specifier", ParameterValue(row.specifier, null, ShortText.toStatement)),
+      NamedParameter("parentspecifier", ParameterValue(row.parentspecifier, null, ToStatement.optionToStatement(ShortText.toStatement, ShortText.parameterMetadata)))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")
+                values ({code}::text, {another_code}, {some_number}::int4, {specifier}::text, {parentspecifier}::text)
+                on conflict ("code", "another_code", "some_number", "specifier")
+                do update set
+                  "parentspecifier" = EXCLUDED."parentspecifier"
+                returning "code", "another_code", "some_number", "specifier", "parentspecifier"
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(FlaffRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table flaff_TEMP (like public.flaff) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy flaff_TEMP("code", "another_code", "some_number", "specifier", "parentspecifier") from stdin""", batchSize, unsaved)(FlaffRow.text, c): @nowarn
+    SQL"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")
+          select * from flaff_TEMP
+          on conflict ("code", "another_code", "some_number", "specifier")
+          do update set
+            "parentspecifier" = EXCLUDED."parentspecifier"
+          ;
+          drop table flaff_TEMP;""".executeUpdate()
   }
 }

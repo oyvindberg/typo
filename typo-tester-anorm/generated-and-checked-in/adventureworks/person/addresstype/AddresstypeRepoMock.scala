@@ -87,4 +87,17 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
     map.put(unsaved.addresstypeid, unsaved): @nowarn
     unsaved
   }
+  override def upsertBatch(unsaved: Iterable[AddresstypeRow])(implicit c: Connection): List[AddresstypeRow] = {
+    unsaved.map { row =>
+      map += (row.addresstypeid -> row)
+      row
+    }.toList
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[AddresstypeRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    unsaved.foreach { row =>
+      map += (row.addresstypeid -> row)
+    }
+    unsaved.size
+  }
 }

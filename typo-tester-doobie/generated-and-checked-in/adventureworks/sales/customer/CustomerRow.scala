@@ -15,6 +15,7 @@ import adventureworks.sales.salesterritory.SalesterritoryId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -79,4 +80,29 @@ object CustomerRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[CustomerRow] = new Write[CustomerRow](
+    puts = List((CustomerId.put, Nullability.NoNulls),
+                (BusinessentityId.put, Nullability.Nullable),
+                (BusinessentityId.put, Nullability.Nullable),
+                (SalesterritoryId.put, Nullability.Nullable),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  CustomerId.put.unsafeSetNonNullable(rs, i + 0, a.customerid)
+                  BusinessentityId.put.unsafeSetNullable(rs, i + 1, a.personid)
+                  BusinessentityId.put.unsafeSetNullable(rs, i + 2, a.storeid)
+                  SalesterritoryId.put.unsafeSetNullable(rs, i + 3, a.territoryid)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 4, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     CustomerId.put.unsafeUpdateNonNullable(ps, i + 0, a.customerid)
+                     BusinessentityId.put.unsafeUpdateNullable(ps, i + 1, a.personid)
+                     BusinessentityId.put.unsafeUpdateNullable(ps, i + 2, a.storeid)
+                     SalesterritoryId.put.unsafeUpdateNullable(ps, i + 3, a.territoryid)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 4, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
+                   }
+  )
 }

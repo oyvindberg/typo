@@ -29,4 +29,7 @@ trait UnitmeasureRepo {
   def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow]
   def update(row: UnitmeasureRow)(implicit c: Connection): Boolean
   def upsert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow
+  def upsertBatch(unsaved: Iterable[UnitmeasureRow])(implicit c: Connection): List[UnitmeasureRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[UnitmeasureRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

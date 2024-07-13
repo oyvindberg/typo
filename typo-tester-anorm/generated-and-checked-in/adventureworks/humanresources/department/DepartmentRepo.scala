@@ -29,4 +29,7 @@ trait DepartmentRepo {
   def update: UpdateBuilder[DepartmentFields, DepartmentRow]
   def update(row: DepartmentRow)(implicit c: Connection): Boolean
   def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow
+  def upsertBatch(unsaved: Iterable[DepartmentRow])(implicit c: Connection): List[DepartmentRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[DepartmentRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

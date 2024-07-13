@@ -28,4 +28,7 @@ trait MaritalStatusRepo {
   def selectByIdsTracked(ids: Array[MaritalStatusId]): ConnectionIO[Map[MaritalStatusId, MaritalStatusRow]]
   def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow]
   def upsert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow]
+  def upsertBatch(unsaved: List[MaritalStatusRow]): Stream[ConnectionIO, MaritalStatusRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, MaritalStatusRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

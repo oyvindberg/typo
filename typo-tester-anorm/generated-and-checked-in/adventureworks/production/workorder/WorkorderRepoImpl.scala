@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -20,6 +21,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -157,5 +159,61 @@ class WorkorderRepoImpl extends WorkorderRepo {
        """
       .executeInsert(WorkorderRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[WorkorderRow])(implicit c: Connection): List[WorkorderRow] = {
+    def toNamedParameter(row: WorkorderRow): List[NamedParameter] = List(
+      NamedParameter("workorderid", ParameterValue(row.workorderid, null, WorkorderId.toStatement)),
+      NamedParameter("productid", ParameterValue(row.productid, null, ProductId.toStatement)),
+      NamedParameter("orderqty", ParameterValue(row.orderqty, null, ToStatement.intToStatement)),
+      NamedParameter("scrappedqty", ParameterValue(row.scrappedqty, null, TypoShort.toStatement)),
+      NamedParameter("startdate", ParameterValue(row.startdate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("enddate", ParameterValue(row.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))),
+      NamedParameter("duedate", ParameterValue(row.duedate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("scrapreasonid", ParameterValue(row.scrapreasonid, null, ToStatement.optionToStatement(ScrapreasonId.toStatement, ScrapreasonId.parameterMetadata))),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
+                values ({workorderid}::int4, {productid}::int4, {orderqty}::int4, {scrappedqty}::int2, {startdate}::timestamp, {enddate}::timestamp, {duedate}::timestamp, {scrapreasonid}::int2, {modifieddate}::timestamp)
+                on conflict ("workorderid")
+                do update set
+                  "productid" = EXCLUDED."productid",
+                  "orderqty" = EXCLUDED."orderqty",
+                  "scrappedqty" = EXCLUDED."scrappedqty",
+                  "startdate" = EXCLUDED."startdate",
+                  "enddate" = EXCLUDED."enddate",
+                  "duedate" = EXCLUDED."duedate",
+                  "scrapreasonid" = EXCLUDED."scrapreasonid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(WorkorderRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[WorkorderRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table workorder_TEMP (like production.workorder) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy workorder_TEMP("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") from stdin""", batchSize, unsaved)(WorkorderRow.text, c): @nowarn
+    SQL"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
+          select * from workorder_TEMP
+          on conflict ("workorderid")
+          do update set
+            "productid" = EXCLUDED."productid",
+            "orderqty" = EXCLUDED."orderqty",
+            "scrappedqty" = EXCLUDED."scrappedqty",
+            "startdate" = EXCLUDED."startdate",
+            "enddate" = EXCLUDED."enddate",
+            "duedate" = EXCLUDED."duedate",
+            "scrapreasonid" = EXCLUDED."scrapreasonid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table workorder_TEMP;""".executeUpdate()
   }
 }

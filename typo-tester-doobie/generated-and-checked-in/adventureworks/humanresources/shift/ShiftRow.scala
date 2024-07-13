@@ -14,6 +14,7 @@ import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -69,4 +70,26 @@ object ShiftRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[ShiftRow] = new Write[ShiftRow](
+    puts = List((ShiftId.put, Nullability.NoNulls),
+                (Name.put, Nullability.NoNulls),
+                (TypoLocalTime.put, Nullability.NoNulls),
+                (TypoLocalTime.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  ShiftId.put.unsafeSetNonNullable(rs, i + 0, a.shiftid)
+                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                  TypoLocalTime.put.unsafeSetNonNullable(rs, i + 2, a.starttime)
+                  TypoLocalTime.put.unsafeSetNonNullable(rs, i + 3, a.endtime)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     ShiftId.put.unsafeUpdateNonNullable(ps, i + 0, a.shiftid)
+                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                     TypoLocalTime.put.unsafeUpdateNonNullable(ps, i + 2, a.starttime)
+                     TypoLocalTime.put.unsafeUpdateNonNullable(ps, i + 3, a.endtime)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
+                   }
+  )
 }

@@ -13,12 +13,14 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -139,5 +141,32 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
        """.query(using BusinessentityaddressRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[BusinessentityaddressRow]): Stream[ConnectionIO, BusinessentityaddressRow] = {
+    Update[BusinessentityaddressRow](
+      s"""insert into person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")
+          values (?::int4,?::int4,?::int4,?::uuid,?::timestamp)
+          on conflict ("businessentityid", "addressid", "addresstypeid")
+          do update set
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text"""
+    )(using BusinessentityaddressRow.write)
+    .updateManyWithGeneratedKeys[BusinessentityaddressRow]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, BusinessentityaddressRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, BusinessentityaddressRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table businessentityaddress_TEMP (like person.businessentityaddress) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy businessentityaddress_TEMP("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using BusinessentityaddressRow.text)
+      res <- sql"""insert into person.businessentityaddress("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")
+                   select * from businessentityaddress_TEMP
+                   on conflict ("businessentityid", "addressid", "addresstypeid")
+                   do update set
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table businessentityaddress_TEMP;""".update.run
+    } yield res
   }
 }

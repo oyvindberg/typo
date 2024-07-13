@@ -15,6 +15,7 @@ import adventureworks.production.productmodel.ProductmodelId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -69,4 +70,23 @@ object ProductmodelproductdescriptioncultureRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[ProductmodelproductdescriptioncultureRow] = new Write[ProductmodelproductdescriptioncultureRow](
+    puts = List((ProductmodelId.put, Nullability.NoNulls),
+                (ProductdescriptionId.put, Nullability.NoNulls),
+                (CultureId.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  ProductmodelId.put.unsafeSetNonNullable(rs, i + 0, a.productmodelid)
+                  ProductdescriptionId.put.unsafeSetNonNullable(rs, i + 1, a.productdescriptionid)
+                  CultureId.put.unsafeSetNonNullable(rs, i + 2, a.cultureid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     ProductmodelId.put.unsafeUpdateNonNullable(ps, i + 0, a.productmodelid)
+                     ProductdescriptionId.put.unsafeUpdateNonNullable(ps, i + 1, a.productdescriptionid)
+                     CultureId.put.unsafeUpdateNonNullable(ps, i + 2, a.cultureid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
+                   }
+  )
 }

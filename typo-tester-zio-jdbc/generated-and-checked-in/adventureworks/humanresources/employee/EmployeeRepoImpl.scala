@@ -179,4 +179,30 @@ class EmployeeRepoImpl extends EmployeeRepo {
             "organizationnode" = EXCLUDED."organizationnode"
           returning "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode"""".insertReturning(using EmployeeRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, EmployeeRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table employee_TEMP (like humanresources.employee) on commit drop".execute
+    val copied = streamingInsert(s"""copy employee_TEMP("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") from stdin""", batchSize, unsaved)(EmployeeRow.text)
+    val merged = sql"""insert into humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
+                       select * from employee_TEMP
+                       on conflict ("businessentityid")
+                       do update set
+                         "nationalidnumber" = EXCLUDED."nationalidnumber",
+                         "loginid" = EXCLUDED."loginid",
+                         "jobtitle" = EXCLUDED."jobtitle",
+                         "birthdate" = EXCLUDED."birthdate",
+                         "maritalstatus" = EXCLUDED."maritalstatus",
+                         "gender" = EXCLUDED."gender",
+                         "hiredate" = EXCLUDED."hiredate",
+                         "salariedflag" = EXCLUDED."salariedflag",
+                         "vacationhours" = EXCLUDED."vacationhours",
+                         "sickleavehours" = EXCLUDED."sickleavehours",
+                         "currentflag" = EXCLUDED."currentflag",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate",
+                         "organizationnode" = EXCLUDED."organizationnode"
+                       ;
+                       drop table employee_TEMP;""".update
+    created *> copied *> merged
+  }
 }

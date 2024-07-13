@@ -31,4 +31,7 @@ trait PasswordRepo {
   def update: UpdateBuilder[PasswordFields, PasswordRow]
   def update(row: PasswordRow): ConnectionIO[Boolean]
   def upsert(unsaved: PasswordRow): ConnectionIO[PasswordRow]
+  def upsertBatch(unsaved: List[PasswordRow]): Stream[ConnectionIO, PasswordRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, PasswordRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

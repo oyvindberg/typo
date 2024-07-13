@@ -97,4 +97,17 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
     map.put(unsaved.id, unsaved): @nowarn
     unsaved
   }
+  override def upsertBatch(unsaved: Iterable[FootballClubRow])(implicit c: Connection): List[FootballClubRow] = {
+    unsaved.map { row =>
+      map += (row.id -> row)
+      row
+    }.toList
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[FootballClubRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    unsaved.foreach { row =>
+      map += (row.id -> row)
+    }
+    unsaved.size
+  }
 }

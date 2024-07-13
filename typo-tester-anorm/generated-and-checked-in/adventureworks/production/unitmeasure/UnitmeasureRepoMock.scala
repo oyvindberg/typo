@@ -87,4 +87,17 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
     map.put(unsaved.unitmeasurecode, unsaved): @nowarn
     unsaved
   }
+  override def upsertBatch(unsaved: Iterable[UnitmeasureRow])(implicit c: Connection): List[UnitmeasureRow] = {
+    unsaved.map { row =>
+      map += (row.unitmeasurecode -> row)
+      row
+    }.toList
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[UnitmeasureRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    unsaved.foreach { row =>
+      map += (row.unitmeasurecode -> row)
+    }
+    unsaved.size
+  }
 }

@@ -10,12 +10,14 @@ package businessentity
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -119,5 +121,32 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "rowguid", "modifieddate"::text
        """.query(using BusinessentityRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[BusinessentityRow]): Stream[ConnectionIO, BusinessentityRow] = {
+    Update[BusinessentityRow](
+      s"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
+          values (?::int4,?::uuid,?::timestamp)
+          on conflict ("businessentityid")
+          do update set
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "rowguid", "modifieddate"::text"""
+    )(using BusinessentityRow.write)
+    .updateManyWithGeneratedKeys[BusinessentityRow]("businessentityid", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, BusinessentityRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, BusinessentityRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table businessentity_TEMP (like person.businessentity) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy businessentity_TEMP("businessentityid", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using BusinessentityRow.text)
+      res <- sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
+                   select * from businessentity_TEMP
+                   on conflict ("businessentityid")
+                   do update set
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table businessentity_TEMP;""".update.run
+    } yield res
   }
 }

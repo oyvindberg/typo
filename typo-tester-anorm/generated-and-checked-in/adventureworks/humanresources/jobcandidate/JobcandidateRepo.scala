@@ -29,4 +29,7 @@ trait JobcandidateRepo {
   def update: UpdateBuilder[JobcandidateFields, JobcandidateRow]
   def update(row: JobcandidateRow)(implicit c: Connection): Boolean
   def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow
+  def upsertBatch(unsaved: Iterable[JobcandidateRow])(implicit c: Connection): List[JobcandidateRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[JobcandidateRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

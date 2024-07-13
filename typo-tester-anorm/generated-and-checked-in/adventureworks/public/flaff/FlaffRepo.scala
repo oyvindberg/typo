@@ -26,4 +26,7 @@ trait FlaffRepo {
   def update: UpdateBuilder[FlaffFields, FlaffRow]
   def update(row: FlaffRow)(implicit c: Connection): Boolean
   def upsert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow
+  def upsertBatch(unsaved: Iterable[FlaffRow])(implicit c: Connection): List[FlaffRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

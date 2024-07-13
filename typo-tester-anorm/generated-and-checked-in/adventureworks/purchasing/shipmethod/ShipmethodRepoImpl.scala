@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -19,6 +20,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -153,5 +155,52 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
        """
       .executeInsert(ShipmethodRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ShipmethodRow])(implicit c: Connection): List[ShipmethodRow] = {
+    def toNamedParameter(row: ShipmethodRow): List[NamedParameter] = List(
+      NamedParameter("shipmethodid", ParameterValue(row.shipmethodid, null, ShipmethodId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("shipbase", ParameterValue(row.shipbase, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("shiprate", ParameterValue(row.shiprate, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
+                values ({shipmethodid}::int4, {name}::varchar, {shipbase}::numeric, {shiprate}::numeric, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("shipmethodid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "shipbase" = EXCLUDED."shipbase",
+                  "shiprate" = EXCLUDED."shiprate",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ShipmethodRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ShipmethodRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table shipmethod_TEMP (like purchasing.shipmethod) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy shipmethod_TEMP("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(ShipmethodRow.text, c): @nowarn
+    SQL"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
+          select * from shipmethod_TEMP
+          on conflict ("shipmethodid")
+          do update set
+            "name" = EXCLUDED."name",
+            "shipbase" = EXCLUDED."shipbase",
+            "shiprate" = EXCLUDED."shiprate",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table shipmethod_TEMP;""".executeUpdate()
   }
 }

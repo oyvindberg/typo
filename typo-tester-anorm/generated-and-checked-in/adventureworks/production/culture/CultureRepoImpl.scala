@@ -10,6 +10,7 @@ package culture
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -17,6 +18,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -127,5 +129,43 @@ class CultureRepoImpl extends CultureRepo {
        """
       .executeInsert(CultureRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[CultureRow])(implicit c: Connection): List[CultureRow] = {
+    def toNamedParameter(row: CultureRow): List[NamedParameter] = List(
+      NamedParameter("cultureid", ParameterValue(row.cultureid, null, CultureId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.culture("cultureid", "name", "modifieddate")
+                values ({cultureid}::bpchar, {name}::varchar, {modifieddate}::timestamp)
+                on conflict ("cultureid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "cultureid", "name", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(CultureRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[CultureRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table culture_TEMP (like production.culture) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy culture_TEMP("cultureid", "name", "modifieddate") from stdin""", batchSize, unsaved)(CultureRow.text, c): @nowarn
+    SQL"""insert into production.culture("cultureid", "name", "modifieddate")
+          select * from culture_TEMP
+          on conflict ("cultureid")
+          do update set
+            "name" = EXCLUDED."name",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table culture_TEMP;""".executeUpdate()
   }
 }

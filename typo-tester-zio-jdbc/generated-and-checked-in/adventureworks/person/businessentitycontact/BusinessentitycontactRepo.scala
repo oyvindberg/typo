@@ -32,4 +32,7 @@ trait BusinessentitycontactRepo {
   def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def update(row: BusinessentitycontactRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: BusinessentitycontactRow): ZIO[ZConnection, Throwable, UpdateResult[BusinessentitycontactRow]]
+  // Not implementable for zio-jdbc: upsertBatch
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentitycontactRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

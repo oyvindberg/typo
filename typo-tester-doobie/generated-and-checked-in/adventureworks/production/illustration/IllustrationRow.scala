@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoXml
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -56,4 +57,20 @@ object IllustrationRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[IllustrationRow] = new Write[IllustrationRow](
+    puts = List((IllustrationId.put, Nullability.NoNulls),
+                (TypoXml.put, Nullability.Nullable),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.illustrationid, x.diagram, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  IllustrationId.put.unsafeSetNonNullable(rs, i + 0, a.illustrationid)
+                  TypoXml.put.unsafeSetNullable(rs, i + 1, a.diagram)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     IllustrationId.put.unsafeUpdateNonNullable(ps, i + 0, a.illustrationid)
+                     TypoXml.put.unsafeUpdateNullable(ps, i + 1, a.diagram)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
+                   }
+  )
 }

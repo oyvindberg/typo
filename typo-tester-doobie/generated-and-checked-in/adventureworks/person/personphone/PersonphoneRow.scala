@@ -15,6 +15,7 @@ import adventureworks.public.Phone
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -68,4 +69,23 @@ object PersonphoneRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[PersonphoneRow] = new Write[PersonphoneRow](
+    puts = List((BusinessentityId.put, Nullability.NoNulls),
+                (Phone.put, Nullability.NoNulls),
+                (PhonenumbertypeId.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
+                  Phone.put.unsafeSetNonNullable(rs, i + 1, a.phonenumber)
+                  PhonenumbertypeId.put.unsafeSetNonNullable(rs, i + 2, a.phonenumbertypeid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
+                     Phone.put.unsafeUpdateNonNullable(ps, i + 1, a.phonenumber)
+                     PhonenumbertypeId.put.unsafeUpdateNonNullable(ps, i + 2, a.phonenumbertypeid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
+                   }
+  )
 }

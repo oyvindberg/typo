@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -21,6 +22,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -161,5 +163,61 @@ class AddressRepoImpl extends AddressRepo {
        """
       .executeInsert(AddressRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[AddressRow])(implicit c: Connection): List[AddressRow] = {
+    def toNamedParameter(row: AddressRow): List[NamedParameter] = List(
+      NamedParameter("addressid", ParameterValue(row.addressid, null, AddressId.toStatement)),
+      NamedParameter("addressline1", ParameterValue(row.addressline1, null, ToStatement.stringToStatement)),
+      NamedParameter("addressline2", ParameterValue(row.addressline2, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("city", ParameterValue(row.city, null, ToStatement.stringToStatement)),
+      NamedParameter("stateprovinceid", ParameterValue(row.stateprovinceid, null, StateprovinceId.toStatement)),
+      NamedParameter("postalcode", ParameterValue(row.postalcode, null, ToStatement.stringToStatement)),
+      NamedParameter("spatiallocation", ParameterValue(row.spatiallocation, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
+                values ({addressid}::int4, {addressline1}, {addressline2}, {city}, {stateprovinceid}::int4, {postalcode}, {spatiallocation}::bytea, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("addressid")
+                do update set
+                  "addressline1" = EXCLUDED."addressline1",
+                  "addressline2" = EXCLUDED."addressline2",
+                  "city" = EXCLUDED."city",
+                  "stateprovinceid" = EXCLUDED."stateprovinceid",
+                  "postalcode" = EXCLUDED."postalcode",
+                  "spatiallocation" = EXCLUDED."spatiallocation",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(AddressRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[AddressRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table address_TEMP (like person.address) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy address_TEMP("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(AddressRow.text, c): @nowarn
+    SQL"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
+          select * from address_TEMP
+          on conflict ("addressid")
+          do update set
+            "addressline1" = EXCLUDED."addressline1",
+            "addressline2" = EXCLUDED."addressline2",
+            "city" = EXCLUDED."city",
+            "stateprovinceid" = EXCLUDED."stateprovinceid",
+            "postalcode" = EXCLUDED."postalcode",
+            "spatiallocation" = EXCLUDED."spatiallocation",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table address_TEMP;""".executeUpdate()
   }
 }

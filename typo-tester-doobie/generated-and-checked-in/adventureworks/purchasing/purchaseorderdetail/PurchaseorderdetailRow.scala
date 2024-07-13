@@ -15,6 +15,7 @@ import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -104,4 +105,38 @@ object PurchaseorderdetailRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[PurchaseorderdetailRow] = new Write[PurchaseorderdetailRow](
+    puts = List((PurchaseorderheaderId.put, Nullability.NoNulls),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (TypoShort.put, Nullability.NoNulls),
+                (ProductId.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.purchaseorderid, x.purchaseorderdetailid, x.duedate, x.orderqty, x.productid, x.unitprice, x.receivedqty, x.rejectedqty, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  PurchaseorderheaderId.put.unsafeSetNonNullable(rs, i + 0, a.purchaseorderid)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 1, a.purchaseorderdetailid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.duedate)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 3, a.orderqty)
+                  ProductId.put.unsafeSetNonNullable(rs, i + 4, a.productid)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 5, a.unitprice)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 6, a.receivedqty)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 7, a.rejectedqty)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 8, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     PurchaseorderheaderId.put.unsafeUpdateNonNullable(ps, i + 0, a.purchaseorderid)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.purchaseorderdetailid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.duedate)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 3, a.orderqty)
+                     ProductId.put.unsafeUpdateNonNullable(ps, i + 4, a.productid)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.unitprice)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.receivedqty)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.rejectedqty)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 8, a.modifieddate)
+                   }
+  )
 }

@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -21,6 +22,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -156,5 +158,55 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
        """
       .executeInsert(SalestaxrateRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[SalestaxrateRow])(implicit c: Connection): List[SalestaxrateRow] = {
+    def toNamedParameter(row: SalestaxrateRow): List[NamedParameter] = List(
+      NamedParameter("salestaxrateid", ParameterValue(row.salestaxrateid, null, SalestaxrateId.toStatement)),
+      NamedParameter("stateprovinceid", ParameterValue(row.stateprovinceid, null, StateprovinceId.toStatement)),
+      NamedParameter("taxtype", ParameterValue(row.taxtype, null, TypoShort.toStatement)),
+      NamedParameter("taxrate", ParameterValue(row.taxrate, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+                values ({salestaxrateid}::int4, {stateprovinceid}::int4, {taxtype}::int2, {taxrate}::numeric, {name}::varchar, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("salestaxrateid")
+                do update set
+                  "stateprovinceid" = EXCLUDED."stateprovinceid",
+                  "taxtype" = EXCLUDED."taxtype",
+                  "taxrate" = EXCLUDED."taxrate",
+                  "name" = EXCLUDED."name",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(SalestaxrateRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SalestaxrateRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table salestaxrate_TEMP (like sales.salestaxrate) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy salestaxrate_TEMP("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalestaxrateRow.text, c): @nowarn
+    SQL"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+          select * from salestaxrate_TEMP
+          on conflict ("salestaxrateid")
+          do update set
+            "stateprovinceid" = EXCLUDED."stateprovinceid",
+            "taxtype" = EXCLUDED."taxtype",
+            "taxrate" = EXCLUDED."taxrate",
+            "name" = EXCLUDED."name",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table salestaxrate_TEMP;""".executeUpdate()
   }
 }

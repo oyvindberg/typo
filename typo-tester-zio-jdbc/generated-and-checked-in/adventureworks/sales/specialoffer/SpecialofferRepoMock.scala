@@ -104,4 +104,13 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
       UpdateResult(1, Chunk.single(unsaved))
     }
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    unsaved.scanZIO(0L) { case (acc, row) =>
+      ZIO.succeed {
+        map += (row.specialofferid -> row)
+        acc + 1
+      }
+    }.runLast.map(_.getOrElse(0L))
+  }
 }

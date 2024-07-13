@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -20,6 +21,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -156,5 +158,58 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
        """
       .executeInsert(ProductreviewRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ProductreviewRow])(implicit c: Connection): List[ProductreviewRow] = {
+    def toNamedParameter(row: ProductreviewRow): List[NamedParameter] = List(
+      NamedParameter("productreviewid", ParameterValue(row.productreviewid, null, ProductreviewId.toStatement)),
+      NamedParameter("productid", ParameterValue(row.productid, null, ProductId.toStatement)),
+      NamedParameter("reviewername", ParameterValue(row.reviewername, null, Name.toStatement)),
+      NamedParameter("reviewdate", ParameterValue(row.reviewdate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("emailaddress", ParameterValue(row.emailaddress, null, ToStatement.stringToStatement)),
+      NamedParameter("rating", ParameterValue(row.rating, null, ToStatement.intToStatement)),
+      NamedParameter("comments", ParameterValue(row.comments, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+                values ({productreviewid}::int4, {productid}::int4, {reviewername}::varchar, {reviewdate}::timestamp, {emailaddress}, {rating}::int4, {comments}, {modifieddate}::timestamp)
+                on conflict ("productreviewid")
+                do update set
+                  "productid" = EXCLUDED."productid",
+                  "reviewername" = EXCLUDED."reviewername",
+                  "reviewdate" = EXCLUDED."reviewdate",
+                  "emailaddress" = EXCLUDED."emailaddress",
+                  "rating" = EXCLUDED."rating",
+                  "comments" = EXCLUDED."comments",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ProductreviewRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ProductreviewRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table productreview_TEMP (like production.productreview) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy productreview_TEMP("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") from stdin""", batchSize, unsaved)(ProductreviewRow.text, c): @nowarn
+    SQL"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+          select * from productreview_TEMP
+          on conflict ("productreviewid")
+          do update set
+            "productid" = EXCLUDED."productid",
+            "reviewername" = EXCLUDED."reviewername",
+            "reviewdate" = EXCLUDED."reviewdate",
+            "emailaddress" = EXCLUDED."emailaddress",
+            "rating" = EXCLUDED."rating",
+            "comments" = EXCLUDED."comments",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table productreview_TEMP;""".executeUpdate()
   }
 }

@@ -10,6 +10,7 @@ package shoppingcartitem
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -17,6 +18,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -135,5 +137,38 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
        """.query(using ShoppingcartitemRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ShoppingcartitemRow]): Stream[ConnectionIO, ShoppingcartitemRow] = {
+    Update[ShoppingcartitemRow](
+      s"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
+          values (?::int4,?,?::int4,?::int4,?::timestamp,?::timestamp)
+          on conflict ("shoppingcartitemid")
+          do update set
+            "shoppingcartid" = EXCLUDED."shoppingcartid",
+            "quantity" = EXCLUDED."quantity",
+            "productid" = EXCLUDED."productid",
+            "datecreated" = EXCLUDED."datecreated",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text"""
+    )(using ShoppingcartitemRow.write)
+    .updateManyWithGeneratedKeys[ShoppingcartitemRow]("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(unsaved)(using catsStdInstancesForList, ShoppingcartitemRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table shoppingcartitem_TEMP (like sales.shoppingcartitem) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy shoppingcartitem_TEMP("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ShoppingcartitemRow.text)
+      res <- sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
+                   select * from shoppingcartitem_TEMP
+                   on conflict ("shoppingcartitemid")
+                   do update set
+                     "shoppingcartid" = EXCLUDED."shoppingcartid",
+                     "quantity" = EXCLUDED."quantity",
+                     "productid" = EXCLUDED."productid",
+                     "datecreated" = EXCLUDED."datecreated",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table shoppingcartitem_TEMP;""".update.run
+    } yield res
   }
 }

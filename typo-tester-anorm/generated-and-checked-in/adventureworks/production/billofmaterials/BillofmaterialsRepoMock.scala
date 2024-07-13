@@ -87,4 +87,17 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     map.put(unsaved.billofmaterialsid, unsaved): @nowarn
     unsaved
   }
+  override def upsertBatch(unsaved: Iterable[BillofmaterialsRow])(implicit c: Connection): List[BillofmaterialsRow] = {
+    unsaved.map { row =>
+      map += (row.billofmaterialsid -> row)
+      row
+    }.toList
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[BillofmaterialsRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    unsaved.foreach { row =>
+      map += (row.billofmaterialsid -> row)
+    }
+    unsaved.size
+  }
 }

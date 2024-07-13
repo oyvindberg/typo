@@ -14,6 +14,7 @@ import adventureworks.sales.salesreason.SalesreasonId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -61,4 +62,20 @@ object SalesorderheadersalesreasonRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[SalesorderheadersalesreasonRow] = new Write[SalesorderheadersalesreasonRow](
+    puts = List((SalesorderheaderId.put, Nullability.NoNulls),
+                (SalesreasonId.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.salesorderid, x.salesreasonid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  SalesorderheaderId.put.unsafeSetNonNullable(rs, i + 0, a.salesorderid)
+                  SalesreasonId.put.unsafeSetNonNullable(rs, i + 1, a.salesreasonid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     SalesorderheaderId.put.unsafeUpdateNonNullable(ps, i + 0, a.salesorderid)
+                     SalesreasonId.put.unsafeUpdateNonNullable(ps, i + 1, a.salesreasonid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
+                   }
+  )
 }

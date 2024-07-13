@@ -105,4 +105,23 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
       unsaved
     }
   }
+  override def upsertBatch(unsaved: List[SalestaxrateRow]): Stream[ConnectionIO, SalestaxrateRow] = {
+    Stream.emits {
+      unsaved.map { row =>
+        map += (row.salestaxrateid -> row)
+        row
+      }
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0
+      rows.foreach { row =>
+        map += (row.salestaxrateid -> row)
+        num += 1
+      }
+      num
+    }
+  }
 }

@@ -104,4 +104,13 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
       UpdateResult(1, Chunk.single(unsaved))
     }
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, AddresstypeRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    unsaved.scanZIO(0L) { case (acc, row) =>
+      ZIO.succeed {
+        map += (row.addresstypeid -> row)
+        acc + 1
+      }
+    }.runLast.map(_.getOrElse(0L))
+  }
 }

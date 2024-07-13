@@ -10,6 +10,7 @@ package scrapreason
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -17,6 +18,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -130,5 +132,43 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
        """
       .executeInsert(ScrapreasonRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ScrapreasonRow])(implicit c: Connection): List[ScrapreasonRow] = {
+    def toNamedParameter(row: ScrapreasonRow): List[NamedParameter] = List(
+      NamedParameter("scrapreasonid", ParameterValue(row.scrapreasonid, null, ScrapreasonId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
+                values ({scrapreasonid}::int4, {name}::varchar, {modifieddate}::timestamp)
+                on conflict ("scrapreasonid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "scrapreasonid", "name", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ScrapreasonRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ScrapreasonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table scrapreason_TEMP (like production.scrapreason) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy scrapreason_TEMP("scrapreasonid", "name", "modifieddate") from stdin""", batchSize, unsaved)(ScrapreasonRow.text, c): @nowarn
+    SQL"""insert into production.scrapreason("scrapreasonid", "name", "modifieddate")
+          select * from scrapreason_TEMP
+          on conflict ("scrapreasonid")
+          do update set
+            "name" = EXCLUDED."name",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table scrapreason_TEMP;""".executeUpdate()
   }
 }

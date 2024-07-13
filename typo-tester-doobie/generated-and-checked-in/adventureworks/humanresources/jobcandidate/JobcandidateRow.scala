@@ -14,6 +14,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -64,4 +65,23 @@ object JobcandidateRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[JobcandidateRow] = new Write[JobcandidateRow](
+    puts = List((JobcandidateId.put, Nullability.NoNulls),
+                (BusinessentityId.put, Nullability.Nullable),
+                (TypoXml.put, Nullability.Nullable),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.jobcandidateid, x.businessentityid, x.resume, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  JobcandidateId.put.unsafeSetNonNullable(rs, i + 0, a.jobcandidateid)
+                  BusinessentityId.put.unsafeSetNullable(rs, i + 1, a.businessentityid)
+                  TypoXml.put.unsafeSetNullable(rs, i + 2, a.resume)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     JobcandidateId.put.unsafeUpdateNonNullable(ps, i + 0, a.jobcandidateid)
+                     BusinessentityId.put.unsafeUpdateNullable(ps, i + 1, a.businessentityid)
+                     TypoXml.put.unsafeUpdateNullable(ps, i + 2, a.resume)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
+                   }
+  )
 }

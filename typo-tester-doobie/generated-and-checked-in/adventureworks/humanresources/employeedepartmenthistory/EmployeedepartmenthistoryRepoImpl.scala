@@ -13,12 +13,14 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -140,5 +142,32 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
        """.query(using EmployeedepartmenthistoryRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[EmployeedepartmenthistoryRow]): Stream[ConnectionIO, EmployeedepartmenthistoryRow] = {
+    Update[EmployeedepartmenthistoryRow](
+      s"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
+          values (?::int4,?::int2,?::int2,?::date,?::date,?::timestamp)
+          on conflict ("businessentityid", "startdate", "departmentid", "shiftid")
+          do update set
+            "enddate" = EXCLUDED."enddate",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text"""
+    )(using EmployeedepartmenthistoryRow.write)
+    .updateManyWithGeneratedKeys[EmployeedepartmenthistoryRow]("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(unsaved)(using catsStdInstancesForList, EmployeedepartmenthistoryRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, EmployeedepartmenthistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table employeedepartmenthistory_TEMP (like humanresources.employeedepartmenthistory) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy employeedepartmenthistory_TEMP("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using EmployeedepartmenthistoryRow.text)
+      res <- sql"""insert into humanresources.employeedepartmenthistory("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
+                   select * from employeedepartmenthistory_TEMP
+                   on conflict ("businessentityid", "startdate", "departmentid", "shiftid")
+                   do update set
+                     "enddate" = EXCLUDED."enddate",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table employeedepartmenthistory_TEMP;""".update.run
+    } yield res
   }
 }

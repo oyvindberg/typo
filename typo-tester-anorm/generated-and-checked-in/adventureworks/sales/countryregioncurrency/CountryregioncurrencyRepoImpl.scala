@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -18,6 +19,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -132,5 +134,41 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
        """
       .executeInsert(CountryregioncurrencyRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[CountryregioncurrencyRow])(implicit c: Connection): List[CountryregioncurrencyRow] = {
+    def toNamedParameter(row: CountryregioncurrencyRow): List[NamedParameter] = List(
+      NamedParameter("countryregioncode", ParameterValue(row.countryregioncode, null, CountryregionId.toStatement)),
+      NamedParameter("currencycode", ParameterValue(row.currencycode, null, CurrencyId.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")
+                values ({countryregioncode}, {currencycode}::bpchar, {modifieddate}::timestamp)
+                on conflict ("countryregioncode", "currencycode")
+                do update set
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "countryregioncode", "currencycode", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(CountryregioncurrencyRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[CountryregioncurrencyRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table countryregioncurrency_TEMP (like sales.countryregioncurrency) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy countryregioncurrency_TEMP("countryregioncode", "currencycode", "modifieddate") from stdin""", batchSize, unsaved)(CountryregioncurrencyRow.text, c): @nowarn
+    SQL"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")
+          select * from countryregioncurrency_TEMP
+          on conflict ("countryregioncode", "currencycode")
+          do update set
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table countryregioncurrency_TEMP;""".executeUpdate()
   }
 }

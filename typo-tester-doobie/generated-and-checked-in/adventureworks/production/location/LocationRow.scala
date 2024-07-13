@@ -13,6 +13,7 @@ import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -73,4 +74,26 @@ object LocationRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[LocationRow] = new Write[LocationRow](
+    puts = List((LocationId.put, Nullability.NoNulls),
+                (Name.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.locationid, x.name, x.costrate, x.availability, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  LocationId.put.unsafeSetNonNullable(rs, i + 0, a.locationid)
+                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 2, a.costrate)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 3, a.availability)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     LocationId.put.unsafeUpdateNonNullable(ps, i + 0, a.locationid)
+                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.costrate)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.availability)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
+                   }
+  )
 }

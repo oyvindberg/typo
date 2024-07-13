@@ -30,4 +30,7 @@ trait AddresstypeRepo {
   def update: UpdateBuilder[AddresstypeFields, AddresstypeRow]
   def update(row: AddresstypeRow): ConnectionIO[Boolean]
   def upsert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow]
+  def upsertBatch(unsaved: List[AddresstypeRow]): Stream[ConnectionIO, AddresstypeRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, AddresstypeRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

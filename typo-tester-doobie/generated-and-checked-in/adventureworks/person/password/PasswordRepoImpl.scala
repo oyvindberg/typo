@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -18,6 +19,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -126,5 +128,36 @@ class PasswordRepoImpl extends PasswordRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
        """.query(using PasswordRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[PasswordRow]): Stream[ConnectionIO, PasswordRow] = {
+    Update[PasswordRow](
+      s"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+          values (?::int4,?,?,?::uuid,?::timestamp)
+          on conflict ("businessentityid")
+          do update set
+            "passwordhash" = EXCLUDED."passwordhash",
+            "passwordsalt" = EXCLUDED."passwordsalt",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text"""
+    )(using PasswordRow.write)
+    .updateManyWithGeneratedKeys[PasswordRow]("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, PasswordRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, PasswordRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table password_TEMP (like person.password) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy password_TEMP("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using PasswordRow.text)
+      res <- sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+                   select * from password_TEMP
+                   on conflict ("businessentityid")
+                   do update set
+                     "passwordhash" = EXCLUDED."passwordhash",
+                     "passwordsalt" = EXCLUDED."passwordsalt",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table password_TEMP;""".update.run
+    } yield res
   }
 }

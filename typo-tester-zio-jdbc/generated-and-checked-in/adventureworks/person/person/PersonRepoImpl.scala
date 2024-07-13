@@ -163,4 +163,28 @@ class PersonRepoImpl extends PersonRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text""".insertReturning(using PersonRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table person_TEMP (like person.person) on commit drop".execute
+    val copied = streamingInsert(s"""copy person_TEMP("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(PersonRow.text)
+    val merged = sql"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
+                       select * from person_TEMP
+                       on conflict ("businessentityid")
+                       do update set
+                         "persontype" = EXCLUDED."persontype",
+                         "namestyle" = EXCLUDED."namestyle",
+                         "title" = EXCLUDED."title",
+                         "firstname" = EXCLUDED."firstname",
+                         "middlename" = EXCLUDED."middlename",
+                         "lastname" = EXCLUDED."lastname",
+                         "suffix" = EXCLUDED."suffix",
+                         "emailpromotion" = EXCLUDED."emailpromotion",
+                         "additionalcontactinfo" = EXCLUDED."additionalcontactinfo",
+                         "demographics" = EXCLUDED."demographics",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table person_TEMP;""".update
+    created *> copied *> merged
+  }
 }

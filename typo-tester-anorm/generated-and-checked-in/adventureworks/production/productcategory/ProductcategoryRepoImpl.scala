@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -18,6 +19,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -138,5 +140,46 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
        """
       .executeInsert(ProductcategoryRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ProductcategoryRow])(implicit c: Connection): List[ProductcategoryRow] = {
+    def toNamedParameter(row: ProductcategoryRow): List[NamedParameter] = List(
+      NamedParameter("productcategoryid", ParameterValue(row.productcategoryid, null, ProductcategoryId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")
+                values ({productcategoryid}::int4, {name}::varchar, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("productcategoryid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "productcategoryid", "name", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ProductcategoryRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ProductcategoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table productcategory_TEMP (like production.productcategory) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy productcategory_TEMP("productcategoryid", "name", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(ProductcategoryRow.text, c): @nowarn
+    SQL"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")
+          select * from productcategory_TEMP
+          on conflict ("productcategoryid")
+          do update set
+            "name" = EXCLUDED."name",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table productcategory_TEMP;""".executeUpdate()
   }
 }

@@ -29,4 +29,7 @@ trait LocationRepo {
   def update: UpdateBuilder[LocationFields, LocationRow]
   def update(row: LocationRow)(implicit c: Connection): Boolean
   def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow
+  def upsertBatch(unsaved: Iterable[LocationRow])(implicit c: Connection): List[LocationRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[LocationRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -18,6 +19,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -138,5 +140,46 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
        """
       .executeInsert(AddresstypeRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[AddresstypeRow])(implicit c: Connection): List[AddresstypeRow] = {
+    def toNamedParameter(row: AddresstypeRow): List[NamedParameter] = List(
+      NamedParameter("addresstypeid", ParameterValue(row.addresstypeid, null, AddresstypeId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
+                values ({addresstypeid}::int4, {name}::varchar, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("addresstypeid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "addresstypeid", "name", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(AddresstypeRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[AddresstypeRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table addresstype_TEMP (like person.addresstype) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy addresstype_TEMP("addresstypeid", "name", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(AddresstypeRow.text, c): @nowarn
+    SQL"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
+          select * from addresstype_TEMP
+          on conflict ("addresstypeid")
+          do update set
+            "name" = EXCLUDED."name",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table addresstype_TEMP;""".executeUpdate()
   }
 }

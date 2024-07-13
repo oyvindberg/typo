@@ -15,6 +15,7 @@ import adventureworks.sales.specialoffer.SpecialofferId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -68,4 +69,23 @@ object SpecialofferproductRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[SpecialofferproductRow] = new Write[SpecialofferproductRow](
+    puts = List((SpecialofferId.put, Nullability.NoNulls),
+                (ProductId.put, Nullability.NoNulls),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.specialofferid, x.productid, x.rowguid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  SpecialofferId.put.unsafeSetNonNullable(rs, i + 0, a.specialofferid)
+                  ProductId.put.unsafeSetNonNullable(rs, i + 1, a.productid)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 2, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     SpecialofferId.put.unsafeUpdateNonNullable(ps, i + 0, a.specialofferid)
+                     ProductId.put.unsafeUpdateNonNullable(ps, i + 1, a.productid)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 2, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
+                   }
+  )
 }

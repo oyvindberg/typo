@@ -32,4 +32,7 @@ trait FootballClubRepo {
   def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Boolean]
   def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: FootballClubRow): ZIO[ZConnection, Throwable, UpdateResult[FootballClubRow]]
+  // Not implementable for zio-jdbc: upsertBatch
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, FootballClubRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

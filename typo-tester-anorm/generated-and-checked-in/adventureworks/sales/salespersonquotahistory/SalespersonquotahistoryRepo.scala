@@ -29,4 +29,7 @@ trait SalespersonquotahistoryRepo {
   def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean
   def upsert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow
+  def upsertBatch(unsaved: Iterable[SalespersonquotahistoryRow])(implicit c: Connection): List[SalespersonquotahistoryRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[SalespersonquotahistoryRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

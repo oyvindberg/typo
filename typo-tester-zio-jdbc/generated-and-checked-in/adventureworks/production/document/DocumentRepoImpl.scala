@@ -171,4 +171,28 @@ class DocumentRepoImpl extends DocumentRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"""".insertReturning(using DocumentRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, DocumentRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table document_TEMP (like production.document) on commit drop".execute
+    val copied = streamingInsert(s"""copy document_TEMP("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") from stdin""", batchSize, unsaved)(DocumentRow.text)
+    val merged = sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
+                       select * from document_TEMP
+                       on conflict ("documentnode")
+                       do update set
+                         "title" = EXCLUDED."title",
+                         "owner" = EXCLUDED."owner",
+                         "folderflag" = EXCLUDED."folderflag",
+                         "filename" = EXCLUDED."filename",
+                         "fileextension" = EXCLUDED."fileextension",
+                         "revision" = EXCLUDED."revision",
+                         "changenumber" = EXCLUDED."changenumber",
+                         "status" = EXCLUDED."status",
+                         "documentsummary" = EXCLUDED."documentsummary",
+                         "document" = EXCLUDED."document",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table document_TEMP;""".update
+    created *> copied *> merged
+  }
 }

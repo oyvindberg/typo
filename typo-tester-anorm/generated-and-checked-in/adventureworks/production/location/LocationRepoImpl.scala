@@ -10,6 +10,7 @@ package location
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -18,6 +19,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -145,5 +147,49 @@ class LocationRepoImpl extends LocationRepo {
        """
       .executeInsert(LocationRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[LocationRow])(implicit c: Connection): List[LocationRow] = {
+    def toNamedParameter(row: LocationRow): List[NamedParameter] = List(
+      NamedParameter("locationid", ParameterValue(row.locationid, null, LocationId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("costrate", ParameterValue(row.costrate, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("availability", ParameterValue(row.availability, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
+                values ({locationid}::int4, {name}::varchar, {costrate}::numeric, {availability}::numeric, {modifieddate}::timestamp)
+                on conflict ("locationid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "costrate" = EXCLUDED."costrate",
+                  "availability" = EXCLUDED."availability",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "locationid", "name", "costrate", "availability", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(LocationRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[LocationRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table location_TEMP (like production.location) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy location_TEMP("locationid", "name", "costrate", "availability", "modifieddate") from stdin""", batchSize, unsaved)(LocationRow.text, c): @nowarn
+    SQL"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
+          select * from location_TEMP
+          on conflict ("locationid")
+          do update set
+            "name" = EXCLUDED."name",
+            "costrate" = EXCLUDED."costrate",
+            "availability" = EXCLUDED."availability",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table location_TEMP;""".executeUpdate()
   }
 }

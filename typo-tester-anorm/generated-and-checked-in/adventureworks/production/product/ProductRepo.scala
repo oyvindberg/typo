@@ -29,4 +29,7 @@ trait ProductRepo {
   def update: UpdateBuilder[ProductFields, ProductRow]
   def update(row: ProductRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ProductRow)(implicit c: Connection): ProductRow
+  def upsertBatch(unsaved: Iterable[ProductRow])(implicit c: Connection): List[ProductRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[ProductRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

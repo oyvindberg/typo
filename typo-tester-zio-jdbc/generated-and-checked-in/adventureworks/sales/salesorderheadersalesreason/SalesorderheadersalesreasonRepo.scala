@@ -32,4 +32,7 @@ trait SalesorderheadersalesreasonRepo {
   def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow]
   def update(row: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderheadersalesreasonRow]]
+  // Not implementable for zio-jdbc: upsertBatch
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderheadersalesreasonRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

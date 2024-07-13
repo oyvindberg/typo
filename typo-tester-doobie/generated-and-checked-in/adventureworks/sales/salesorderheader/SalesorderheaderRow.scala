@@ -24,6 +24,7 @@ import adventureworks.userdefined.CustomCreditcardId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.DecodingFailure
@@ -289,4 +290,86 @@ object SalesorderheaderRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[SalesorderheaderRow] = new Write[SalesorderheaderRow](
+    puts = List((SalesorderheaderId.put, Nullability.NoNulls),
+                (TypoShort.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.Nullable),
+                (TypoShort.put, Nullability.NoNulls),
+                (Flag.put, Nullability.NoNulls),
+                (OrderNumber.put, Nullability.Nullable),
+                (AccountNumber.put, Nullability.Nullable),
+                (CustomerId.put, Nullability.NoNulls),
+                (BusinessentityId.put, Nullability.Nullable),
+                (SalesterritoryId.put, Nullability.Nullable),
+                (AddressId.put, Nullability.NoNulls),
+                (AddressId.put, Nullability.NoNulls),
+                (ShipmethodId.put, Nullability.NoNulls),
+                (/* user-picked */ CustomCreditcardId.put, Nullability.Nullable),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (CurrencyrateId.put, Nullability.Nullable),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.salesorderid, x.revisionnumber, x.orderdate, x.duedate, x.shipdate, x.status, x.onlineorderflag, x.purchaseordernumber, x.accountnumber, x.customerid, x.salespersonid, x.territoryid, x.billtoaddressid, x.shiptoaddressid, x.shipmethodid, x.creditcardid, x.creditcardapprovalcode, x.currencyrateid, x.subtotal, x.taxamt, x.freight, x.totaldue, x.comment, x.rowguid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  SalesorderheaderId.put.unsafeSetNonNullable(rs, i + 0, a.salesorderid)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 1, a.revisionnumber)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.orderdate)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.duedate)
+                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 4, a.shipdate)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 5, a.status)
+                  Flag.put.unsafeSetNonNullable(rs, i + 6, a.onlineorderflag)
+                  OrderNumber.put.unsafeSetNullable(rs, i + 7, a.purchaseordernumber)
+                  AccountNumber.put.unsafeSetNullable(rs, i + 8, a.accountnumber)
+                  CustomerId.put.unsafeSetNonNullable(rs, i + 9, a.customerid)
+                  BusinessentityId.put.unsafeSetNullable(rs, i + 10, a.salespersonid)
+                  SalesterritoryId.put.unsafeSetNullable(rs, i + 11, a.territoryid)
+                  AddressId.put.unsafeSetNonNullable(rs, i + 12, a.billtoaddressid)
+                  AddressId.put.unsafeSetNonNullable(rs, i + 13, a.shiptoaddressid)
+                  ShipmethodId.put.unsafeSetNonNullable(rs, i + 14, a.shipmethodid)
+                  /* user-picked */ CustomCreditcardId.put.unsafeSetNullable(rs, i + 15, a.creditcardid)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 16, a.creditcardapprovalcode)
+                  CurrencyrateId.put.unsafeSetNullable(rs, i + 17, a.currencyrateid)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 18, a.subtotal)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 19, a.taxamt)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 20, a.freight)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 21, a.totaldue)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 22, a.comment)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 23, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 24, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     SalesorderheaderId.put.unsafeUpdateNonNullable(ps, i + 0, a.salesorderid)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 1, a.revisionnumber)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.orderdate)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.duedate)
+                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 4, a.shipdate)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 5, a.status)
+                     Flag.put.unsafeUpdateNonNullable(ps, i + 6, a.onlineorderflag)
+                     OrderNumber.put.unsafeUpdateNullable(ps, i + 7, a.purchaseordernumber)
+                     AccountNumber.put.unsafeUpdateNullable(ps, i + 8, a.accountnumber)
+                     CustomerId.put.unsafeUpdateNonNullable(ps, i + 9, a.customerid)
+                     BusinessentityId.put.unsafeUpdateNullable(ps, i + 10, a.salespersonid)
+                     SalesterritoryId.put.unsafeUpdateNullable(ps, i + 11, a.territoryid)
+                     AddressId.put.unsafeUpdateNonNullable(ps, i + 12, a.billtoaddressid)
+                     AddressId.put.unsafeUpdateNonNullable(ps, i + 13, a.shiptoaddressid)
+                     ShipmethodId.put.unsafeUpdateNonNullable(ps, i + 14, a.shipmethodid)
+                     /* user-picked */ CustomCreditcardId.put.unsafeUpdateNullable(ps, i + 15, a.creditcardid)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 16, a.creditcardapprovalcode)
+                     CurrencyrateId.put.unsafeUpdateNullable(ps, i + 17, a.currencyrateid)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 18, a.subtotal)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 19, a.taxamt)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 20, a.freight)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 21, a.totaldue)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 22, a.comment)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 23, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 24, a.modifieddate)
+                   }
+  )
 }

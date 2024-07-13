@@ -32,4 +32,7 @@ trait UsersRepo {
   def update: UpdateBuilder[UsersFields, UsersRow]
   def update(row: UsersRow): ConnectionIO[Boolean]
   def upsert(unsaved: UsersRow): ConnectionIO[UsersRow]
+  def upsertBatch(unsaved: List[UsersRow]): Stream[ConnectionIO, UsersRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

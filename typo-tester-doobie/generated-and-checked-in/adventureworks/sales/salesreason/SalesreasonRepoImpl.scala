@@ -10,12 +10,14 @@ package salesreason
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -120,5 +122,34 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "salesreasonid", "name", "reasontype", "modifieddate"::text
        """.query(using SalesreasonRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[SalesreasonRow]): Stream[ConnectionIO, SalesreasonRow] = {
+    Update[SalesreasonRow](
+      s"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
+          values (?::int4,?::varchar,?::varchar,?::timestamp)
+          on conflict ("salesreasonid")
+          do update set
+            "name" = EXCLUDED."name",
+            "reasontype" = EXCLUDED."reasontype",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "salesreasonid", "name", "reasontype", "modifieddate"::text"""
+    )(using SalesreasonRow.write)
+    .updateManyWithGeneratedKeys[SalesreasonRow]("salesreasonid", "name", "reasontype", "modifieddate")(unsaved)(using catsStdInstancesForList, SalesreasonRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, SalesreasonRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table salesreason_TEMP (like sales.salesreason) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy salesreason_TEMP("salesreasonid", "name", "reasontype", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SalesreasonRow.text)
+      res <- sql"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
+                   select * from salesreason_TEMP
+                   on conflict ("salesreasonid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "reasontype" = EXCLUDED."reasontype",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table salesreason_TEMP;""".update.run
+    } yield res
   }
 }

@@ -137,4 +137,22 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text""".insertReturning(using SalestaxrateRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table salestaxrate_TEMP (like sales.salestaxrate) on commit drop".execute
+    val copied = streamingInsert(s"""copy salestaxrate_TEMP("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalestaxrateRow.text)
+    val merged = sql"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+                       select * from salestaxrate_TEMP
+                       on conflict ("salestaxrateid")
+                       do update set
+                         "stateprovinceid" = EXCLUDED."stateprovinceid",
+                         "taxtype" = EXCLUDED."taxtype",
+                         "taxrate" = EXCLUDED."taxrate",
+                         "name" = EXCLUDED."name",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table salestaxrate_TEMP;""".update
+    created *> copied *> merged
+  }
 }

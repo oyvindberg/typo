@@ -10,6 +10,7 @@ package illustration
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -18,6 +19,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -131,5 +133,43 @@ class IllustrationRepoImpl extends IllustrationRepo {
        """
       .executeInsert(IllustrationRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[IllustrationRow])(implicit c: Connection): List[IllustrationRow] = {
+    def toNamedParameter(row: IllustrationRow): List[NamedParameter] = List(
+      NamedParameter("illustrationid", ParameterValue(row.illustrationid, null, IllustrationId.toStatement)),
+      NamedParameter("diagram", ParameterValue(row.diagram, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+                values ({illustrationid}::int4, {diagram}::xml, {modifieddate}::timestamp)
+                on conflict ("illustrationid")
+                do update set
+                  "diagram" = EXCLUDED."diagram",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "illustrationid", "diagram", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(IllustrationRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[IllustrationRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table illustration_TEMP (like production.illustration) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy illustration_TEMP("illustrationid", "diagram", "modifieddate") from stdin""", batchSize, unsaved)(IllustrationRow.text, c): @nowarn
+    SQL"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+          select * from illustration_TEMP
+          on conflict ("illustrationid")
+          do update set
+            "diagram" = EXCLUDED."diagram",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table illustration_TEMP;""".executeUpdate()
   }
 }

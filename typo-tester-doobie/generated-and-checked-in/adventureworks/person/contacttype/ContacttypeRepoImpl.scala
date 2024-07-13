@@ -10,12 +10,14 @@ package contacttype
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -116,5 +118,32 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "contacttypeid", "name", "modifieddate"::text
        """.query(using ContacttypeRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ContacttypeRow]): Stream[ConnectionIO, ContacttypeRow] = {
+    Update[ContacttypeRow](
+      s"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+          values (?::int4,?::varchar,?::timestamp)
+          on conflict ("contacttypeid")
+          do update set
+            "name" = EXCLUDED."name",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "contacttypeid", "name", "modifieddate"::text"""
+    )(using ContacttypeRow.write)
+    .updateManyWithGeneratedKeys[ContacttypeRow]("contacttypeid", "name", "modifieddate")(unsaved)(using catsStdInstancesForList, ContacttypeRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table contacttype_TEMP (like person.contacttype) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy contacttype_TEMP("contacttypeid", "name", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ContacttypeRow.text)
+      res <- sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+                   select * from contacttype_TEMP
+                   on conflict ("contacttypeid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table contacttype_TEMP;""".update.run
+    } yield res
   }
 }

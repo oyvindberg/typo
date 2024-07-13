@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -23,6 +24,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -192,5 +194,73 @@ class DocumentRepoImpl extends DocumentRepo {
        """
       .executeInsert(DocumentRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[DocumentRow])(implicit c: Connection): List[DocumentRow] = {
+    def toNamedParameter(row: DocumentRow): List[NamedParameter] = List(
+      NamedParameter("title", ParameterValue(row.title, null, ToStatement.stringToStatement)),
+      NamedParameter("owner", ParameterValue(row.owner, null, BusinessentityId.toStatement)),
+      NamedParameter("folderflag", ParameterValue(row.folderflag, null, Flag.toStatement)),
+      NamedParameter("filename", ParameterValue(row.filename, null, ToStatement.stringToStatement)),
+      NamedParameter("fileextension", ParameterValue(row.fileextension, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("revision", ParameterValue(row.revision, null, ToStatement.stringToStatement)),
+      NamedParameter("changenumber", ParameterValue(row.changenumber, null, ToStatement.intToStatement)),
+      NamedParameter("status", ParameterValue(row.status, null, TypoShort.toStatement)),
+      NamedParameter("documentsummary", ParameterValue(row.documentsummary, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("document", ParameterValue(row.document, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("documentnode", ParameterValue(row.documentnode, null, DocumentId.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
+                values ({title}, {owner}::int4, {folderflag}::bool, {filename}, {fileextension}, {revision}::bpchar, {changenumber}::int4, {status}::int2, {documentsummary}, {document}::bytea, {rowguid}::uuid, {modifieddate}::timestamp, {documentnode})
+                on conflict ("documentnode")
+                do update set
+                  "title" = EXCLUDED."title",
+                  "owner" = EXCLUDED."owner",
+                  "folderflag" = EXCLUDED."folderflag",
+                  "filename" = EXCLUDED."filename",
+                  "fileextension" = EXCLUDED."fileextension",
+                  "revision" = EXCLUDED."revision",
+                  "changenumber" = EXCLUDED."changenumber",
+                  "status" = EXCLUDED."status",
+                  "documentsummary" = EXCLUDED."documentsummary",
+                  "document" = EXCLUDED."document",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(DocumentRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[DocumentRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table document_TEMP (like production.document) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy document_TEMP("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") from stdin""", batchSize, unsaved)(DocumentRow.text, c): @nowarn
+    SQL"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
+          select * from document_TEMP
+          on conflict ("documentnode")
+          do update set
+            "title" = EXCLUDED."title",
+            "owner" = EXCLUDED."owner",
+            "folderflag" = EXCLUDED."folderflag",
+            "filename" = EXCLUDED."filename",
+            "fileextension" = EXCLUDED."fileextension",
+            "revision" = EXCLUDED."revision",
+            "changenumber" = EXCLUDED."changenumber",
+            "status" = EXCLUDED."status",
+            "documentsummary" = EXCLUDED."documentsummary",
+            "document" = EXCLUDED."document",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table document_TEMP;""".executeUpdate()
   }
 }

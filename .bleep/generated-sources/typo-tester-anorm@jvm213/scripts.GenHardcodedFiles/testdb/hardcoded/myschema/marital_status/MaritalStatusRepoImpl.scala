@@ -8,6 +8,7 @@ package hardcoded
 package myschema
 package marital_status
 
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -15,6 +16,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -96,11 +98,42 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
             ${ParameterValue(unsaved.id, null, MaritalStatusId.toStatement)}::int8
           )
           on conflict ("id")
-          do update set
-            
+          do nothing
           returning "id"
        """
       .executeInsert(MaritalStatusRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[MaritalStatusRow])(implicit c: Connection): List[MaritalStatusRow] = {
+    def toNamedParameter(row: MaritalStatusRow): List[NamedParameter] = List(
+      NamedParameter("id", ParameterValue(row.id, null, MaritalStatusId.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.testdb.hardcoded.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into myschema.marital_status("id")
+                values ({id}::int8)
+                on conflict ("id")
+                do nothing
+                returning "id"
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(MaritalStatusRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[MaritalStatusRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table marital_status_TEMP (like myschema.marital_status) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy marital_status_TEMP("id") from stdin""", batchSize, unsaved)(MaritalStatusRow.text, c): @nowarn
+    SQL"""insert into myschema.marital_status("id")
+          select * from marital_status_TEMP
+          on conflict ("id")
+          do nothing
+          ;
+          drop table marital_status_TEMP;""".executeUpdate()
   }
 }

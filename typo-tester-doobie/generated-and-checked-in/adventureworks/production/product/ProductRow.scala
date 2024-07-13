@@ -19,6 +19,7 @@ import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.DecodingFailure
@@ -278,4 +279,86 @@ object ProductRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[ProductRow] = new Write[ProductRow](
+    puts = List((ProductId.put, Nullability.NoNulls),
+                (Name.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Flag.put, Nullability.NoNulls),
+                (Flag.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (TypoShort.put, Nullability.NoNulls),
+                (TypoShort.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (UnitmeasureId.put, Nullability.Nullable),
+                (UnitmeasureId.put, Nullability.Nullable),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (ProductsubcategoryId.put, Nullability.Nullable),
+                (ProductmodelId.put, Nullability.Nullable),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.Nullable),
+                (TypoLocalDateTime.put, Nullability.Nullable),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.productid, x.name, x.productnumber, x.makeflag, x.finishedgoodsflag, x.color, x.safetystocklevel, x.reorderpoint, x.standardcost, x.listprice, x.size, x.sizeunitmeasurecode, x.weightunitmeasurecode, x.weight, x.daystomanufacture, x.productline, x.`class`, x.style, x.productsubcategoryid, x.productmodelid, x.sellstartdate, x.sellenddate, x.discontinueddate, x.rowguid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  ProductId.put.unsafeSetNonNullable(rs, i + 0, a.productid)
+                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 2, a.productnumber)
+                  Flag.put.unsafeSetNonNullable(rs, i + 3, a.makeflag)
+                  Flag.put.unsafeSetNonNullable(rs, i + 4, a.finishedgoodsflag)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 5, a.color)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 6, a.safetystocklevel)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 7, a.reorderpoint)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 8, a.standardcost)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 9, a.listprice)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 10, a.size)
+                  UnitmeasureId.put.unsafeSetNullable(rs, i + 11, a.sizeunitmeasurecode)
+                  UnitmeasureId.put.unsafeSetNullable(rs, i + 12, a.weightunitmeasurecode)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 13, a.weight)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 14, a.daystomanufacture)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 15, a.productline)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 16, a.`class`)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 17, a.style)
+                  ProductsubcategoryId.put.unsafeSetNullable(rs, i + 18, a.productsubcategoryid)
+                  ProductmodelId.put.unsafeSetNullable(rs, i + 19, a.productmodelid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 20, a.sellstartdate)
+                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 21, a.sellenddate)
+                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 22, a.discontinueddate)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 23, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 24, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     ProductId.put.unsafeUpdateNonNullable(ps, i + 0, a.productid)
+                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.productnumber)
+                     Flag.put.unsafeUpdateNonNullable(ps, i + 3, a.makeflag)
+                     Flag.put.unsafeUpdateNonNullable(ps, i + 4, a.finishedgoodsflag)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 5, a.color)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 6, a.safetystocklevel)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 7, a.reorderpoint)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 8, a.standardcost)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 9, a.listprice)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 10, a.size)
+                     UnitmeasureId.put.unsafeUpdateNullable(ps, i + 11, a.sizeunitmeasurecode)
+                     UnitmeasureId.put.unsafeUpdateNullable(ps, i + 12, a.weightunitmeasurecode)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 13, a.weight)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 14, a.daystomanufacture)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 15, a.productline)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 16, a.`class`)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 17, a.style)
+                     ProductsubcategoryId.put.unsafeUpdateNullable(ps, i + 18, a.productsubcategoryid)
+                     ProductmodelId.put.unsafeUpdateNullable(ps, i + 19, a.productmodelid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 20, a.sellstartdate)
+                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 21, a.sellenddate)
+                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 22, a.discontinueddate)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 23, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 24, a.modifieddate)
+                   }
+  )
 }

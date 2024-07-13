@@ -130,4 +130,19 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text""".insertReturning(using EmployeepayhistoryRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, EmployeepayhistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table employeepayhistory_TEMP (like humanresources.employeepayhistory) on commit drop".execute
+    val copied = streamingInsert(s"""copy employeepayhistory_TEMP("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") from stdin""", batchSize, unsaved)(EmployeepayhistoryRow.text)
+    val merged = sql"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
+                       select * from employeepayhistory_TEMP
+                       on conflict ("businessentityid", "ratechangedate")
+                       do update set
+                         "rate" = EXCLUDED."rate",
+                         "payfrequency" = EXCLUDED."payfrequency",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table employeepayhistory_TEMP;""".update
+    created *> copied *> merged
+  }
 }

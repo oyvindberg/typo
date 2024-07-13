@@ -104,4 +104,13 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
       UpdateResult(1, Chunk.single(unsaved))
     }
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ScrapreasonRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    unsaved.scanZIO(0L) { case (acc, row) =>
+      ZIO.succeed {
+        map += (row.scrapreasonid -> row)
+        acc + 1
+      }
+    }.runLast.map(_.getOrElse(0L))
+  }
 }

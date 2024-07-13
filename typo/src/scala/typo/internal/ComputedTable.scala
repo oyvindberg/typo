@@ -176,6 +176,12 @@ case class ComputedTable(
           RepoMethod.Insert(dbTable.name, cols, unsavedParam, names.RowName)
         },
         if (options.enableStreamingInserts) Some(RepoMethod.InsertStreaming(dbTable.name, cols, names.RowName)) else None,
+        maybeId.collect {
+          case id if options.enableStreamingInserts => RepoMethod.UpsertStreaming(dbTable.name, cols, id, names.RowName)
+        },
+        maybeId.collect { case id =>
+          RepoMethod.UpsertBatch(dbTable.name, cols, id, names.RowName)
+        },
         maybeUnsavedRow.map { unsavedRow =>
           val unsavedParam = sc.Param(sc.Ident("unsaved"), unsavedRow.tpe, None)
           RepoMethod.InsertUnsaved(dbTable.name, cols, unsavedRow, unsavedParam, default, names.RowName)

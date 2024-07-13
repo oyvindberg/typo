@@ -32,4 +32,7 @@ trait CurrencyRepo {
   def update: UpdateBuilder[CurrencyFields, CurrencyRow]
   def update(row: CurrencyRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyRow]]
+  // Not implementable for zio-jdbc: upsertBatch
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

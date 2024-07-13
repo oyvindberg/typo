@@ -9,6 +9,7 @@ package compositepk
 package person
 
 import cats.data.NonEmptyList
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.free.connection.pure
 import doobie.postgres.syntax.FragmentOps
@@ -18,6 +19,7 @@ import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import testdb.hardcoded.customtypes.Defaulted
 import typo.dsl.DeleteBuilder
@@ -129,5 +131,30 @@ class PersonRepoImpl extends PersonRepo {
             "name" = EXCLUDED."name"
           returning "one", "two", "name"
        """.query(using PersonRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[PersonRow]): Stream[ConnectionIO, PersonRow] = {
+    Update[PersonRow](
+      s"""insert into compositepk.person("one", "two", "name")
+          values (?::int8,?,?)
+          on conflict ("one", "two")
+          do update set
+            "name" = EXCLUDED."name"
+          returning "one", "two", "name""""
+    )(using PersonRow.write)
+    .updateManyWithGeneratedKeys[PersonRow]("one", "two", "name")(unsaved)(using catsStdInstancesForList, PersonRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table person_TEMP (like compositepk.person) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy person_TEMP("one", "two", "name") from stdin""").copyIn(unsaved, batchSize)(using PersonRow.text)
+      res <- sql"""insert into compositepk.person("one", "two", "name")
+                   select * from person_TEMP
+                   on conflict ("one", "two")
+                   do update set
+                     "name" = EXCLUDED."name"
+                   ;
+                   drop table person_TEMP;""".update.run
+    } yield res
   }
 }

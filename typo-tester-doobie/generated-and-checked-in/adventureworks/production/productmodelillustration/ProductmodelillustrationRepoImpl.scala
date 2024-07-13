@@ -11,12 +11,14 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.productmodel.ProductmodelId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -126,5 +128,30 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productmodelid", "illustrationid", "modifieddate"::text
        """.query(using ProductmodelillustrationRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ProductmodelillustrationRow]): Stream[ConnectionIO, ProductmodelillustrationRow] = {
+    Update[ProductmodelillustrationRow](
+      s"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")
+          values (?::int4,?::int4,?::timestamp)
+          on conflict ("productmodelid", "illustrationid")
+          do update set
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productmodelid", "illustrationid", "modifieddate"::text"""
+    )(using ProductmodelillustrationRow.write)
+    .updateManyWithGeneratedKeys[ProductmodelillustrationRow]("productmodelid", "illustrationid", "modifieddate")(unsaved)(using catsStdInstancesForList, ProductmodelillustrationRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductmodelillustrationRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productmodelillustration_TEMP (like production.productmodelillustration) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productmodelillustration_TEMP("productmodelid", "illustrationid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductmodelillustrationRow.text)
+      res <- sql"""insert into production.productmodelillustration("productmodelid", "illustrationid", "modifieddate")
+                   select * from productmodelillustration_TEMP
+                   on conflict ("productmodelid", "illustrationid")
+                   do update set
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productmodelillustration_TEMP;""".update.run
+    } yield res
   }
 }

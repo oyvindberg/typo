@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -18,6 +19,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -139,5 +141,38 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
        """.query(using ShipmethodRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ShipmethodRow]): Stream[ConnectionIO, ShipmethodRow] = {
+    Update[ShipmethodRow](
+      s"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
+          values (?::int4,?::varchar,?::numeric,?::numeric,?::uuid,?::timestamp)
+          on conflict ("shipmethodid")
+          do update set
+            "name" = EXCLUDED."name",
+            "shipbase" = EXCLUDED."shipbase",
+            "shiprate" = EXCLUDED."shiprate",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text"""
+    )(using ShipmethodRow.write)
+    .updateManyWithGeneratedKeys[ShipmethodRow]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, ShipmethodRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ShipmethodRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table shipmethod_TEMP (like purchasing.shipmethod) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy shipmethod_TEMP("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ShipmethodRow.text)
+      res <- sql"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
+                   select * from shipmethod_TEMP
+                   on conflict ("shipmethodid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "shipbase" = EXCLUDED."shipbase",
+                     "shiprate" = EXCLUDED."shiprate",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table shipmethod_TEMP;""".update.run
+    } yield res
   }
 }

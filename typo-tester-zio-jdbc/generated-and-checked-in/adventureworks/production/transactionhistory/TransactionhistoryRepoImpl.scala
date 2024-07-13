@@ -142,4 +142,24 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text""".insertReturning(using TransactionhistoryRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, TransactionhistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table transactionhistory_TEMP (like production.transactionhistory) on commit drop".execute
+    val copied = streamingInsert(s"""copy transactionhistory_TEMP("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") from stdin""", batchSize, unsaved)(TransactionhistoryRow.text)
+    val merged = sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
+                       select * from transactionhistory_TEMP
+                       on conflict ("transactionid")
+                       do update set
+                         "productid" = EXCLUDED."productid",
+                         "referenceorderid" = EXCLUDED."referenceorderid",
+                         "referenceorderlineid" = EXCLUDED."referenceorderlineid",
+                         "transactiondate" = EXCLUDED."transactiondate",
+                         "transactiontype" = EXCLUDED."transactiontype",
+                         "quantity" = EXCLUDED."quantity",
+                         "actualcost" = EXCLUDED."actualcost",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table transactionhistory_TEMP;""".update
+    created *> copied *> merged
+  }
 }

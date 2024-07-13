@@ -32,4 +32,7 @@ trait DocumentRepo {
   def update: UpdateBuilder[DocumentFields, DocumentRow]
   def update(row: DocumentRow): ConnectionIO[Boolean]
   def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow]
+  def upsertBatch(unsaved: List[DocumentRow]): Stream[ConnectionIO, DocumentRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

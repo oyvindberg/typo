@@ -11,6 +11,7 @@ package person
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -104,4 +105,47 @@ object PersonRow {
     sb.append(Text.DELIMETER)
     Number.text.unsafeEncode(row.favoriteNumber, sb)
   }
+  implicit lazy val write: Write[PersonRow] = new Write[PersonRow](
+    puts = List((PersonId.put, Nullability.NoNulls),
+                (FootballClubId.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.BooleanMeta.put, Nullability.NoNulls),
+                (MaritalStatusId.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (Sector.put, Nullability.NoNulls),
+                (Number.put, Nullability.NoNulls)),
+    toList = x => List(x.id, x.favouriteFootballClubId, x.name, x.nickName, x.blogUrl, x.email, x.phone, x.likesPizza, x.maritalStatusId, x.workEmail, x.sector, x.favoriteNumber),
+    unsafeSet = (rs, i, a) => {
+                  PersonId.put.unsafeSetNonNullable(rs, i + 0, a.id)
+                  FootballClubId.put.unsafeSetNonNullable(rs, i + 1, a.favouriteFootballClubId)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 2, a.name)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 3, a.nickName)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 4, a.blogUrl)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 5, a.email)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 6, a.phone)
+                  Meta.BooleanMeta.put.unsafeSetNonNullable(rs, i + 7, a.likesPizza)
+                  MaritalStatusId.put.unsafeSetNonNullable(rs, i + 8, a.maritalStatusId)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 9, a.workEmail)
+                  Sector.put.unsafeSetNonNullable(rs, i + 10, a.sector)
+                  Number.put.unsafeSetNonNullable(rs, i + 11, a.favoriteNumber)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     PersonId.put.unsafeUpdateNonNullable(ps, i + 0, a.id)
+                     FootballClubId.put.unsafeUpdateNonNullable(ps, i + 1, a.favouriteFootballClubId)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.name)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 3, a.nickName)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 4, a.blogUrl)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.email)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.phone)
+                     Meta.BooleanMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.likesPizza)
+                     MaritalStatusId.put.unsafeUpdateNonNullable(ps, i + 8, a.maritalStatusId)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 9, a.workEmail)
+                     Sector.put.unsafeUpdateNonNullable(ps, i + 10, a.sector)
+                     Number.put.unsafeUpdateNonNullable(ps, i + 11, a.favoriteNumber)
+                   }
+  )
 }

@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -20,6 +21,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -163,5 +165,61 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
        """
       .executeInsert(BillofmaterialsRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[BillofmaterialsRow])(implicit c: Connection): List[BillofmaterialsRow] = {
+    def toNamedParameter(row: BillofmaterialsRow): List[NamedParameter] = List(
+      NamedParameter("billofmaterialsid", ParameterValue(row.billofmaterialsid, null, ToStatement.intToStatement)),
+      NamedParameter("productassemblyid", ParameterValue(row.productassemblyid, null, ToStatement.optionToStatement(ProductId.toStatement, ProductId.parameterMetadata))),
+      NamedParameter("componentid", ParameterValue(row.componentid, null, ProductId.toStatement)),
+      NamedParameter("startdate", ParameterValue(row.startdate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("enddate", ParameterValue(row.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))),
+      NamedParameter("unitmeasurecode", ParameterValue(row.unitmeasurecode, null, UnitmeasureId.toStatement)),
+      NamedParameter("bomlevel", ParameterValue(row.bomlevel, null, TypoShort.toStatement)),
+      NamedParameter("perassemblyqty", ParameterValue(row.perassemblyqty, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
+                values ({billofmaterialsid}::int4, {productassemblyid}::int4, {componentid}::int4, {startdate}::timestamp, {enddate}::timestamp, {unitmeasurecode}::bpchar, {bomlevel}::int2, {perassemblyqty}::numeric, {modifieddate}::timestamp)
+                on conflict ("billofmaterialsid")
+                do update set
+                  "productassemblyid" = EXCLUDED."productassemblyid",
+                  "componentid" = EXCLUDED."componentid",
+                  "startdate" = EXCLUDED."startdate",
+                  "enddate" = EXCLUDED."enddate",
+                  "unitmeasurecode" = EXCLUDED."unitmeasurecode",
+                  "bomlevel" = EXCLUDED."bomlevel",
+                  "perassemblyqty" = EXCLUDED."perassemblyqty",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(BillofmaterialsRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[BillofmaterialsRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table billofmaterials_TEMP (like production.billofmaterials) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy billofmaterials_TEMP("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate") from stdin""", batchSize, unsaved)(BillofmaterialsRow.text, c): @nowarn
+    SQL"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
+          select * from billofmaterials_TEMP
+          on conflict ("billofmaterialsid")
+          do update set
+            "productassemblyid" = EXCLUDED."productassemblyid",
+            "componentid" = EXCLUDED."componentid",
+            "startdate" = EXCLUDED."startdate",
+            "enddate" = EXCLUDED."enddate",
+            "unitmeasurecode" = EXCLUDED."unitmeasurecode",
+            "bomlevel" = EXCLUDED."bomlevel",
+            "perassemblyqty" = EXCLUDED."perassemblyqty",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table billofmaterials_TEMP;""".executeUpdate()
   }
 }

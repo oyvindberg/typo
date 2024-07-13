@@ -9,6 +9,7 @@ package transactionhistoryarchive
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -16,6 +17,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -143,5 +145,44 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
        """.query(using TransactionhistoryarchiveRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[TransactionhistoryarchiveRow]): Stream[ConnectionIO, TransactionhistoryarchiveRow] = {
+    Update[TransactionhistoryarchiveRow](
+      s"""insert into production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
+          values (?::int4,?::int4,?::int4,?::int4,?::timestamp,?::bpchar,?::int4,?::numeric,?::timestamp)
+          on conflict ("transactionid")
+          do update set
+            "productid" = EXCLUDED."productid",
+            "referenceorderid" = EXCLUDED."referenceorderid",
+            "referenceorderlineid" = EXCLUDED."referenceorderlineid",
+            "transactiondate" = EXCLUDED."transactiondate",
+            "transactiontype" = EXCLUDED."transactiontype",
+            "quantity" = EXCLUDED."quantity",
+            "actualcost" = EXCLUDED."actualcost",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text"""
+    )(using TransactionhistoryarchiveRow.write)
+    .updateManyWithGeneratedKeys[TransactionhistoryarchiveRow]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(unsaved)(using catsStdInstancesForList, TransactionhistoryarchiveRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryarchiveRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table transactionhistoryarchive_TEMP (like production.transactionhistoryarchive) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy transactionhistoryarchive_TEMP("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using TransactionhistoryarchiveRow.text)
+      res <- sql"""insert into production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
+                   select * from transactionhistoryarchive_TEMP
+                   on conflict ("transactionid")
+                   do update set
+                     "productid" = EXCLUDED."productid",
+                     "referenceorderid" = EXCLUDED."referenceorderid",
+                     "referenceorderlineid" = EXCLUDED."referenceorderlineid",
+                     "transactiondate" = EXCLUDED."transactiondate",
+                     "transactiontype" = EXCLUDED."transactiontype",
+                     "quantity" = EXCLUDED."quantity",
+                     "actualcost" = EXCLUDED."actualcost",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table transactionhistoryarchive_TEMP;""".update.run
+    } yield res
   }
 }

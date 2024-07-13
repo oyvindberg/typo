@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -20,6 +21,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -151,5 +153,38 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
        """.query(using ProductinventoryRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ProductinventoryRow]): Stream[ConnectionIO, ProductinventoryRow] = {
+    Update[ProductinventoryRow](
+      s"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
+          values (?::int4,?::int2,?,?::int2,?::int2,?::uuid,?::timestamp)
+          on conflict ("productid", "locationid")
+          do update set
+            "shelf" = EXCLUDED."shelf",
+            "bin" = EXCLUDED."bin",
+            "quantity" = EXCLUDED."quantity",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text"""
+    )(using ProductinventoryRow.write)
+    .updateManyWithGeneratedKeys[ProductinventoryRow]("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, ProductinventoryRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productinventory_TEMP (like production.productinventory) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productinventory_TEMP("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductinventoryRow.text)
+      res <- sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
+                   select * from productinventory_TEMP
+                   on conflict ("productid", "locationid")
+                   do update set
+                     "shelf" = EXCLUDED."shelf",
+                     "bin" = EXCLUDED."bin",
+                     "quantity" = EXCLUDED."quantity",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productinventory_TEMP;""".update.run
+    } yield res
   }
 }

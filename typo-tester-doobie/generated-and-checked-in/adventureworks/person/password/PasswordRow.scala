@@ -14,6 +14,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -69,4 +70,26 @@ object PasswordRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[PasswordRow] = new Write[PasswordRow](
+    puts = List((BusinessentityId.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.businessentityid, x.passwordhash, x.passwordsalt, x.rowguid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.passwordhash)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 2, a.passwordsalt)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 3, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.passwordhash)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.passwordsalt)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 3, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
+                   }
+  )
 }

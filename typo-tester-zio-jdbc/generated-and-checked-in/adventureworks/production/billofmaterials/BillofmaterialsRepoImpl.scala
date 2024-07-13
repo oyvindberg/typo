@@ -144,4 +144,24 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text""".insertReturning(using BillofmaterialsRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, BillofmaterialsRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table billofmaterials_TEMP (like production.billofmaterials) on commit drop".execute
+    val copied = streamingInsert(s"""copy billofmaterials_TEMP("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate") from stdin""", batchSize, unsaved)(BillofmaterialsRow.text)
+    val merged = sql"""insert into production.billofmaterials("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
+                       select * from billofmaterials_TEMP
+                       on conflict ("billofmaterialsid")
+                       do update set
+                         "productassemblyid" = EXCLUDED."productassemblyid",
+                         "componentid" = EXCLUDED."componentid",
+                         "startdate" = EXCLUDED."startdate",
+                         "enddate" = EXCLUDED."enddate",
+                         "unitmeasurecode" = EXCLUDED."unitmeasurecode",
+                         "bomlevel" = EXCLUDED."bomlevel",
+                         "perassemblyqty" = EXCLUDED."perassemblyqty",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table billofmaterials_TEMP;""".update
+    created *> copied *> merged
+  }
 }

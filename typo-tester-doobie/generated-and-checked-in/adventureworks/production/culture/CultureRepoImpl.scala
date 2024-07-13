@@ -10,12 +10,14 @@ package culture
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -113,5 +115,32 @@ class CultureRepoImpl extends CultureRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "cultureid", "name", "modifieddate"::text
        """.query(using CultureRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[CultureRow]): Stream[ConnectionIO, CultureRow] = {
+    Update[CultureRow](
+      s"""insert into production.culture("cultureid", "name", "modifieddate")
+          values (?::bpchar,?::varchar,?::timestamp)
+          on conflict ("cultureid")
+          do update set
+            "name" = EXCLUDED."name",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "cultureid", "name", "modifieddate"::text"""
+    )(using CultureRow.write)
+    .updateManyWithGeneratedKeys[CultureRow]("cultureid", "name", "modifieddate")(unsaved)(using catsStdInstancesForList, CultureRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, CultureRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table culture_TEMP (like production.culture) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy culture_TEMP("cultureid", "name", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using CultureRow.text)
+      res <- sql"""insert into production.culture("cultureid", "name", "modifieddate")
+                   select * from culture_TEMP
+                   on conflict ("cultureid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table culture_TEMP;""".update.run
+    } yield res
   }
 }

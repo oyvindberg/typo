@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -18,6 +19,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -138,5 +140,34 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
        """.query(using SalespersonquotahistoryRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[SalespersonquotahistoryRow]): Stream[ConnectionIO, SalespersonquotahistoryRow] = {
+    Update[SalespersonquotahistoryRow](
+      s"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
+          values (?::int4,?::timestamp,?::numeric,?::uuid,?::timestamp)
+          on conflict ("businessentityid", "quotadate")
+          do update set
+            "salesquota" = EXCLUDED."salesquota",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text"""
+    )(using SalespersonquotahistoryRow.write)
+    .updateManyWithGeneratedKeys[SalespersonquotahistoryRow]("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, SalespersonquotahistoryRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, SalespersonquotahistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table salespersonquotahistory_TEMP (like sales.salespersonquotahistory) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy salespersonquotahistory_TEMP("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SalespersonquotahistoryRow.text)
+      res <- sql"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
+                   select * from salespersonquotahistory_TEMP
+                   on conflict ("businessentityid", "quotadate")
+                   do update set
+                     "salesquota" = EXCLUDED."salesquota",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table salespersonquotahistory_TEMP;""".update.run
+    } yield res
   }
 }

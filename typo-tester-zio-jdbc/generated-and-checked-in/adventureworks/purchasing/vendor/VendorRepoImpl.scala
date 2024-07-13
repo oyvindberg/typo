@@ -139,4 +139,23 @@ class VendorRepoImpl extends VendorRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text""".insertReturning(using VendorRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, VendorRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table vendor_TEMP (like purchasing.vendor) on commit drop".execute
+    val copied = streamingInsert(s"""copy vendor_TEMP("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") from stdin""", batchSize, unsaved)(VendorRow.text)
+    val merged = sql"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
+                       select * from vendor_TEMP
+                       on conflict ("businessentityid")
+                       do update set
+                         "accountnumber" = EXCLUDED."accountnumber",
+                         "name" = EXCLUDED."name",
+                         "creditrating" = EXCLUDED."creditrating",
+                         "preferredvendorstatus" = EXCLUDED."preferredvendorstatus",
+                         "activeflag" = EXCLUDED."activeflag",
+                         "purchasingwebserviceurl" = EXCLUDED."purchasingwebserviceurl",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table vendor_TEMP;""".update
+    created *> copied *> merged
+  }
 }

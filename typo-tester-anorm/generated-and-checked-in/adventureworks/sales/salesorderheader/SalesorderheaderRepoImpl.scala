@@ -21,6 +21,7 @@ import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import adventureworks.userdefined.CustomCreditcardId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -30,6 +31,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -255,5 +257,109 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
        """
       .executeInsert(SalesorderheaderRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[SalesorderheaderRow])(implicit c: Connection): List[SalesorderheaderRow] = {
+    def toNamedParameter(row: SalesorderheaderRow): List[NamedParameter] = List(
+      NamedParameter("salesorderid", ParameterValue(row.salesorderid, null, SalesorderheaderId.toStatement)),
+      NamedParameter("revisionnumber", ParameterValue(row.revisionnumber, null, TypoShort.toStatement)),
+      NamedParameter("orderdate", ParameterValue(row.orderdate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("duedate", ParameterValue(row.duedate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("shipdate", ParameterValue(row.shipdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))),
+      NamedParameter("status", ParameterValue(row.status, null, TypoShort.toStatement)),
+      NamedParameter("onlineorderflag", ParameterValue(row.onlineorderflag, null, Flag.toStatement)),
+      NamedParameter("purchaseordernumber", ParameterValue(row.purchaseordernumber, null, ToStatement.optionToStatement(OrderNumber.toStatement, OrderNumber.parameterMetadata))),
+      NamedParameter("accountnumber", ParameterValue(row.accountnumber, null, ToStatement.optionToStatement(AccountNumber.toStatement, AccountNumber.parameterMetadata))),
+      NamedParameter("customerid", ParameterValue(row.customerid, null, CustomerId.toStatement)),
+      NamedParameter("salespersonid", ParameterValue(row.salespersonid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))),
+      NamedParameter("territoryid", ParameterValue(row.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))),
+      NamedParameter("billtoaddressid", ParameterValue(row.billtoaddressid, null, AddressId.toStatement)),
+      NamedParameter("shiptoaddressid", ParameterValue(row.shiptoaddressid, null, AddressId.toStatement)),
+      NamedParameter("shipmethodid", ParameterValue(row.shipmethodid, null, ShipmethodId.toStatement)),
+      NamedParameter("creditcardid", ParameterValue(row.creditcardid, null, ToStatement.optionToStatement(CustomCreditcardId.toStatement, CustomCreditcardId.parameterMetadata))),
+      NamedParameter("creditcardapprovalcode", ParameterValue(row.creditcardapprovalcode, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("currencyrateid", ParameterValue(row.currencyrateid, null, ToStatement.optionToStatement(CurrencyrateId.toStatement, CurrencyrateId.parameterMetadata))),
+      NamedParameter("subtotal", ParameterValue(row.subtotal, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("taxamt", ParameterValue(row.taxamt, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("freight", ParameterValue(row.freight, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("totaldue", ParameterValue(row.totaldue, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))),
+      NamedParameter("comment", ParameterValue(row.comment, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
+                values ({salesorderid}::int4, {revisionnumber}::int2, {orderdate}::timestamp, {duedate}::timestamp, {shipdate}::timestamp, {status}::int2, {onlineorderflag}::bool, {purchaseordernumber}::varchar, {accountnumber}::varchar, {customerid}::int4, {salespersonid}::int4, {territoryid}::int4, {billtoaddressid}::int4, {shiptoaddressid}::int4, {shipmethodid}::int4, {creditcardid}::int4, {creditcardapprovalcode}, {currencyrateid}::int4, {subtotal}::numeric, {taxamt}::numeric, {freight}::numeric, {totaldue}::numeric, {comment}, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("salesorderid")
+                do update set
+                  "revisionnumber" = EXCLUDED."revisionnumber",
+                  "orderdate" = EXCLUDED."orderdate",
+                  "duedate" = EXCLUDED."duedate",
+                  "shipdate" = EXCLUDED."shipdate",
+                  "status" = EXCLUDED."status",
+                  "onlineorderflag" = EXCLUDED."onlineorderflag",
+                  "purchaseordernumber" = EXCLUDED."purchaseordernumber",
+                  "accountnumber" = EXCLUDED."accountnumber",
+                  "customerid" = EXCLUDED."customerid",
+                  "salespersonid" = EXCLUDED."salespersonid",
+                  "territoryid" = EXCLUDED."territoryid",
+                  "billtoaddressid" = EXCLUDED."billtoaddressid",
+                  "shiptoaddressid" = EXCLUDED."shiptoaddressid",
+                  "shipmethodid" = EXCLUDED."shipmethodid",
+                  "creditcardid" = EXCLUDED."creditcardid",
+                  "creditcardapprovalcode" = EXCLUDED."creditcardapprovalcode",
+                  "currencyrateid" = EXCLUDED."currencyrateid",
+                  "subtotal" = EXCLUDED."subtotal",
+                  "taxamt" = EXCLUDED."taxamt",
+                  "freight" = EXCLUDED."freight",
+                  "totaldue" = EXCLUDED."totaldue",
+                  "comment" = EXCLUDED."comment",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(SalesorderheaderRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SalesorderheaderRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table salesorderheader_TEMP (like sales.salesorderheader) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy salesorderheader_TEMP("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalesorderheaderRow.text, c): @nowarn
+    SQL"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
+          select * from salesorderheader_TEMP
+          on conflict ("salesorderid")
+          do update set
+            "revisionnumber" = EXCLUDED."revisionnumber",
+            "orderdate" = EXCLUDED."orderdate",
+            "duedate" = EXCLUDED."duedate",
+            "shipdate" = EXCLUDED."shipdate",
+            "status" = EXCLUDED."status",
+            "onlineorderflag" = EXCLUDED."onlineorderflag",
+            "purchaseordernumber" = EXCLUDED."purchaseordernumber",
+            "accountnumber" = EXCLUDED."accountnumber",
+            "customerid" = EXCLUDED."customerid",
+            "salespersonid" = EXCLUDED."salespersonid",
+            "territoryid" = EXCLUDED."territoryid",
+            "billtoaddressid" = EXCLUDED."billtoaddressid",
+            "shiptoaddressid" = EXCLUDED."shiptoaddressid",
+            "shipmethodid" = EXCLUDED."shipmethodid",
+            "creditcardid" = EXCLUDED."creditcardid",
+            "creditcardapprovalcode" = EXCLUDED."creditcardapprovalcode",
+            "currencyrateid" = EXCLUDED."currencyrateid",
+            "subtotal" = EXCLUDED."subtotal",
+            "taxamt" = EXCLUDED."taxamt",
+            "freight" = EXCLUDED."freight",
+            "totaldue" = EXCLUDED."totaldue",
+            "comment" = EXCLUDED."comment",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table salesorderheader_TEMP;""".executeUpdate()
   }
 }

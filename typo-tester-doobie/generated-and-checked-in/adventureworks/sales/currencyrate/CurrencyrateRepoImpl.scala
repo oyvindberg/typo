@@ -10,6 +10,7 @@ package currencyrate
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -17,6 +18,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -133,5 +135,40 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
        """.query(using CurrencyrateRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[CurrencyrateRow]): Stream[ConnectionIO, CurrencyrateRow] = {
+    Update[CurrencyrateRow](
+      s"""insert into sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")
+          values (?::int4,?::timestamp,?::bpchar,?::bpchar,?::numeric,?::numeric,?::timestamp)
+          on conflict ("currencyrateid")
+          do update set
+            "currencyratedate" = EXCLUDED."currencyratedate",
+            "fromcurrencycode" = EXCLUDED."fromcurrencycode",
+            "tocurrencycode" = EXCLUDED."tocurrencycode",
+            "averagerate" = EXCLUDED."averagerate",
+            "endofdayrate" = EXCLUDED."endofdayrate",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text"""
+    )(using CurrencyrateRow.write)
+    .updateManyWithGeneratedKeys[CurrencyrateRow]("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")(unsaved)(using catsStdInstancesForList, CurrencyrateRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, CurrencyrateRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table currencyrate_TEMP (like sales.currencyrate) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy currencyrate_TEMP("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using CurrencyrateRow.text)
+      res <- sql"""insert into sales.currencyrate("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")
+                   select * from currencyrate_TEMP
+                   on conflict ("currencyrateid")
+                   do update set
+                     "currencyratedate" = EXCLUDED."currencyratedate",
+                     "fromcurrencycode" = EXCLUDED."fromcurrencycode",
+                     "tocurrencycode" = EXCLUDED."tocurrencycode",
+                     "averagerate" = EXCLUDED."averagerate",
+                     "endofdayrate" = EXCLUDED."endofdayrate",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table currencyrate_TEMP;""".update.run
+    } yield res
   }
 }

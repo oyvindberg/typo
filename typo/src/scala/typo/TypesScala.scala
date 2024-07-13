@@ -14,6 +14,7 @@ object TypesScala {
   val Float = sc.Type.Qualified("scala.Float")
   val Function1 = sc.Type.Qualified("scala.Function1")
   val Int = sc.Type.Qualified("scala.Int")
+  val Iterable = sc.Type.Qualified("scala.collection.Iterable")
   val Iterator = sc.Type.Qualified("scala.collection.Iterator")
   val Left = sc.Type.Qualified("scala.Left")
   val List = sc.Type.Qualified("scala.List")

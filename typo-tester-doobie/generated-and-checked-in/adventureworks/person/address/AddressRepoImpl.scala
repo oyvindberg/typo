@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -19,6 +20,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -146,5 +148,44 @@ class AddressRepoImpl extends AddressRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
        """.query(using AddressRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[AddressRow]): Stream[ConnectionIO, AddressRow] = {
+    Update[AddressRow](
+      s"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
+          values (?::int4,?,?,?,?::int4,?,?::bytea,?::uuid,?::timestamp)
+          on conflict ("addressid")
+          do update set
+            "addressline1" = EXCLUDED."addressline1",
+            "addressline2" = EXCLUDED."addressline2",
+            "city" = EXCLUDED."city",
+            "stateprovinceid" = EXCLUDED."stateprovinceid",
+            "postalcode" = EXCLUDED."postalcode",
+            "spatiallocation" = EXCLUDED."spatiallocation",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text"""
+    )(using AddressRow.write)
+    .updateManyWithGeneratedKeys[AddressRow]("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, AddressRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, AddressRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table address_TEMP (like person.address) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy address_TEMP("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using AddressRow.text)
+      res <- sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
+                   select * from address_TEMP
+                   on conflict ("addressid")
+                   do update set
+                     "addressline1" = EXCLUDED."addressline1",
+                     "addressline2" = EXCLUDED."addressline2",
+                     "city" = EXCLUDED."city",
+                     "stateprovinceid" = EXCLUDED."stateprovinceid",
+                     "postalcode" = EXCLUDED."postalcode",
+                     "spatiallocation" = EXCLUDED."spatiallocation",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table address_TEMP;""".update.run
+    } yield res
   }
 }

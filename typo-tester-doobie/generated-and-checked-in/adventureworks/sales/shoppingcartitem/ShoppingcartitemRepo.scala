@@ -30,4 +30,7 @@ trait ShoppingcartitemRepo {
   def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
   def update(row: ShoppingcartitemRow): ConnectionIO[Boolean]
   def upsert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow]
+  def upsertBatch(unsaved: List[ShoppingcartitemRow]): Stream[ConnectionIO, ShoppingcartitemRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

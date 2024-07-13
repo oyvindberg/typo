@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -21,6 +22,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -157,5 +159,53 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
        """
       .executeInsert(ProductinventoryRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ProductinventoryRow])(implicit c: Connection): List[ProductinventoryRow] = {
+    def toNamedParameter(row: ProductinventoryRow): List[NamedParameter] = List(
+      NamedParameter("productid", ParameterValue(row.productid, null, ProductId.toStatement)),
+      NamedParameter("locationid", ParameterValue(row.locationid, null, LocationId.toStatement)),
+      NamedParameter("shelf", ParameterValue(row.shelf, null, ToStatement.stringToStatement)),
+      NamedParameter("bin", ParameterValue(row.bin, null, TypoShort.toStatement)),
+      NamedParameter("quantity", ParameterValue(row.quantity, null, TypoShort.toStatement)),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
+                values ({productid}::int4, {locationid}::int2, {shelf}, {bin}::int2, {quantity}::int2, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("productid", "locationid")
+                do update set
+                  "shelf" = EXCLUDED."shelf",
+                  "bin" = EXCLUDED."bin",
+                  "quantity" = EXCLUDED."quantity",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ProductinventoryRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ProductinventoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table productinventory_TEMP (like production.productinventory) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy productinventory_TEMP("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(ProductinventoryRow.text, c): @nowarn
+    SQL"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
+          select * from productinventory_TEMP
+          on conflict ("productid", "locationid")
+          do update set
+            "shelf" = EXCLUDED."shelf",
+            "bin" = EXCLUDED."bin",
+            "quantity" = EXCLUDED."quantity",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table productinventory_TEMP;""".executeUpdate()
   }
 }

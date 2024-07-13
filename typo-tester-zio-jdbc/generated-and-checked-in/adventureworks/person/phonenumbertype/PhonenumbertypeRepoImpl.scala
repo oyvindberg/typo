@@ -111,4 +111,18 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "phonenumbertypeid", "name", "modifieddate"::text""".insertReturning(using PhonenumbertypeRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, PhonenumbertypeRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table phonenumbertype_TEMP (like person.phonenumbertype) on commit drop".execute
+    val copied = streamingInsert(s"""copy phonenumbertype_TEMP("phonenumbertypeid", "name", "modifieddate") from stdin""", batchSize, unsaved)(PhonenumbertypeRow.text)
+    val merged = sql"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
+                       select * from phonenumbertype_TEMP
+                       on conflict ("phonenumbertypeid")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table phonenumbertype_TEMP;""".update
+    created *> copied *> merged
+  }
 }

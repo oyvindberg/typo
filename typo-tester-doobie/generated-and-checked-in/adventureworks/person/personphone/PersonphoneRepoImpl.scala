@@ -12,12 +12,14 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -131,5 +133,30 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
        """.query(using PersonphoneRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[PersonphoneRow]): Stream[ConnectionIO, PersonphoneRow] = {
+    Update[PersonphoneRow](
+      s"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
+          values (?::int4,?::varchar,?::int4,?::timestamp)
+          on conflict ("businessentityid", "phonenumber", "phonenumbertypeid")
+          do update set
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text"""
+    )(using PersonphoneRow.write)
+    .updateManyWithGeneratedKeys[PersonphoneRow]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(unsaved)(using catsStdInstancesForList, PersonphoneRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, PersonphoneRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table personphone_TEMP (like person.personphone) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy personphone_TEMP("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using PersonphoneRow.text)
+      res <- sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
+                   select * from personphone_TEMP
+                   on conflict ("businessentityid", "phonenumber", "phonenumbertypeid")
+                   do update set
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table personphone_TEMP;""".update.run
+    } yield res
   }
 }

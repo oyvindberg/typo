@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -21,6 +22,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -167,5 +169,44 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
        """.query(using SalesorderdetailRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[SalesorderdetailRow]): Stream[ConnectionIO, SalesorderdetailRow] = {
+    Update[SalesorderdetailRow](
+      s"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+          values (?::int4,?::int4,?,?::int2,?::int4,?::int4,?::numeric,?::numeric,?::uuid,?::timestamp)
+          on conflict ("salesorderid", "salesorderdetailid")
+          do update set
+            "carriertrackingnumber" = EXCLUDED."carriertrackingnumber",
+            "orderqty" = EXCLUDED."orderqty",
+            "productid" = EXCLUDED."productid",
+            "specialofferid" = EXCLUDED."specialofferid",
+            "unitprice" = EXCLUDED."unitprice",
+            "unitpricediscount" = EXCLUDED."unitpricediscount",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text"""
+    )(using SalesorderdetailRow.write)
+    .updateManyWithGeneratedKeys[SalesorderdetailRow]("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, SalesorderdetailRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, SalesorderdetailRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table salesorderdetail_TEMP (like sales.salesorderdetail) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy salesorderdetail_TEMP("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SalesorderdetailRow.text)
+      res <- sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+                   select * from salesorderdetail_TEMP
+                   on conflict ("salesorderid", "salesorderdetailid")
+                   do update set
+                     "carriertrackingnumber" = EXCLUDED."carriertrackingnumber",
+                     "orderqty" = EXCLUDED."orderqty",
+                     "productid" = EXCLUDED."productid",
+                     "specialofferid" = EXCLUDED."specialofferid",
+                     "unitprice" = EXCLUDED."unitprice",
+                     "unitpricediscount" = EXCLUDED."unitpricediscount",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table salesorderdetail_TEMP;""".update.run
+    } yield res
   }
 }

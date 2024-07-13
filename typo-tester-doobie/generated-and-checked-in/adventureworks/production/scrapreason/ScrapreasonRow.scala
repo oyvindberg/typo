@@ -13,6 +13,7 @@ import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -56,4 +57,20 @@ object ScrapreasonRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[ScrapreasonRow] = new Write[ScrapreasonRow](
+    puts = List((ScrapreasonId.put, Nullability.NoNulls),
+                (Name.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.scrapreasonid, x.name, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  ScrapreasonId.put.unsafeSetNonNullable(rs, i + 0, a.scrapreasonid)
+                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     ScrapreasonId.put.unsafeUpdateNonNullable(ps, i + 0, a.scrapreasonid)
+                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
+                   }
+  )
 }

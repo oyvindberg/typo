@@ -10,6 +10,7 @@ package productcosthistory
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -17,6 +18,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -134,5 +136,34 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
        """.query(using ProductcosthistoryRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ProductcosthistoryRow]): Stream[ConnectionIO, ProductcosthistoryRow] = {
+    Update[ProductcosthistoryRow](
+      s"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
+          values (?::int4,?::timestamp,?::timestamp,?::numeric,?::timestamp)
+          on conflict ("productid", "startdate")
+          do update set
+            "enddate" = EXCLUDED."enddate",
+            "standardcost" = EXCLUDED."standardcost",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text"""
+    )(using ProductcosthistoryRow.write)
+    .updateManyWithGeneratedKeys[ProductcosthistoryRow]("productid", "startdate", "enddate", "standardcost", "modifieddate")(unsaved)(using catsStdInstancesForList, ProductcosthistoryRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductcosthistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productcosthistory_TEMP (like production.productcosthistory) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productcosthistory_TEMP("productid", "startdate", "enddate", "standardcost", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductcosthistoryRow.text)
+      res <- sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
+                   select * from productcosthistory_TEMP
+                   on conflict ("productid", "startdate")
+                   do update set
+                     "enddate" = EXCLUDED."enddate",
+                     "standardcost" = EXCLUDED."standardcost",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productcosthistory_TEMP;""".update.run
+    } yield res
   }
 }

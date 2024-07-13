@@ -78,6 +78,19 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
             ${Segment.paramSegment(unsaved.id)(MaritalStatusId.setter)}::int8
           )
           on conflict ("id")
+          do nothing
           returning "id"""".insertReturning(using MaritalStatusRow.jdbcDecoder)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, MaritalStatusRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table marital_status_TEMP (like myschema.marital_status) on commit drop".execute
+    val copied = streamingInsert(s"""copy marital_status_TEMP("id") from stdin""", batchSize, unsaved)(MaritalStatusRow.text)
+    val merged = sql"""insert into myschema.marital_status("id")
+                       select * from marital_status_TEMP
+                       on conflict ("id")
+                       do nothing
+                       ;
+                       drop table marital_status_TEMP;""".update
+    created *> copied *> merged
   }
 }

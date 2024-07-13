@@ -86,4 +86,23 @@ class MaritalStatusRepoMock(map: scala.collection.mutable.Map[MaritalStatusId, M
       unsaved
     }
   }
+  override def upsertBatch(unsaved: List[MaritalStatusRow]): Stream[ConnectionIO, MaritalStatusRow] = {
+    Stream.emits {
+      unsaved.map { row =>
+        map += (row.id -> row)
+        row
+      }
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, MaritalStatusRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    unsaved.compile.toList.map { rows =>
+      var num = 0
+      rows.foreach { row =>
+        map += (row.id -> row)
+        num += 1
+      }
+      num
+    }
+  }
 }

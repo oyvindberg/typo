@@ -14,6 +14,7 @@ import adventureworks.userdefined.CustomCreditcardId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -61,4 +62,20 @@ object PersoncreditcardRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[PersoncreditcardRow] = new Write[PersoncreditcardRow](
+    puts = List((BusinessentityId.put, Nullability.NoNulls),
+                (/* user-picked */ CustomCreditcardId.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.businessentityid, x.creditcardid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
+                  /* user-picked */ CustomCreditcardId.put.unsafeSetNonNullable(rs, i + 1, a.creditcardid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
+                     /* user-picked */ CustomCreditcardId.put.unsafeUpdateNonNullable(ps, i + 1, a.creditcardid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
+                   }
+  )
 }

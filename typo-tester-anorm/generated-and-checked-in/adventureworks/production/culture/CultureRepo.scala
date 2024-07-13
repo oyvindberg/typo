@@ -29,4 +29,7 @@ trait CultureRepo {
   def update: UpdateBuilder[CultureFields, CultureRow]
   def update(row: CultureRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow
+  def upsertBatch(unsaved: Iterable[CultureRow])(implicit c: Connection): List[CultureRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[CultureRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

@@ -29,4 +29,7 @@ trait CountryregioncurrencyRepo {
   def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow
+  def upsertBatch(unsaved: Iterable[CountryregioncurrencyRow])(implicit c: Connection): List[CountryregioncurrencyRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[CountryregioncurrencyRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

@@ -11,6 +11,7 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -18,6 +19,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -135,5 +137,41 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
        """
       .executeInsert(ProductdocumentRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ProductdocumentRow])(implicit c: Connection): List[ProductdocumentRow] = {
+    def toNamedParameter(row: ProductdocumentRow): List[NamedParameter] = List(
+      NamedParameter("productid", ParameterValue(row.productid, null, ProductId.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("documentnode", ParameterValue(row.documentnode, null, DocumentId.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.productdocument("productid", "modifieddate", "documentnode")
+                values ({productid}::int4, {modifieddate}::timestamp, {documentnode})
+                on conflict ("productid", "documentnode")
+                do update set
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "productid", "modifieddate"::text, "documentnode"
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ProductdocumentRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ProductdocumentRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table productdocument_TEMP (like production.productdocument) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy productdocument_TEMP("productid", "modifieddate", "documentnode") from stdin""", batchSize, unsaved)(ProductdocumentRow.text, c): @nowarn
+    SQL"""insert into production.productdocument("productid", "modifieddate", "documentnode")
+          select * from productdocument_TEMP
+          on conflict ("productid", "documentnode")
+          do update set
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table productdocument_TEMP;""".executeUpdate()
   }
 }

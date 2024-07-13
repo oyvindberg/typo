@@ -13,6 +13,7 @@ import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -55,4 +56,20 @@ object UnitmeasureRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[UnitmeasureRow] = new Write[UnitmeasureRow](
+    puts = List((UnitmeasureId.put, Nullability.NoNulls),
+                (Name.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.unitmeasurecode, x.name, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  UnitmeasureId.put.unsafeSetNonNullable(rs, i + 0, a.unitmeasurecode)
+                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     UnitmeasureId.put.unsafeUpdateNonNullable(ps, i + 0, a.unitmeasurecode)
+                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
+                   }
+  )
 }

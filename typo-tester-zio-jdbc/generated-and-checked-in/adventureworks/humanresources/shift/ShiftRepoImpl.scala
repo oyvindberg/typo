@@ -120,4 +120,20 @@ class ShiftRepoImpl extends ShiftRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text""".insertReturning(using ShiftRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table shift_TEMP (like humanresources.shift) on commit drop".execute
+    val copied = streamingInsert(s"""copy shift_TEMP("shiftid", "name", "starttime", "endtime", "modifieddate") from stdin""", batchSize, unsaved)(ShiftRow.text)
+    val merged = sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
+                       select * from shift_TEMP
+                       on conflict ("shiftid")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "starttime" = EXCLUDED."starttime",
+                         "endtime" = EXCLUDED."endtime",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table shift_TEMP;""".update
+    created *> copied *> merged
+  }
 }

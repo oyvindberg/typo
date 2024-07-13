@@ -88,4 +88,17 @@ class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
     map.put(unsaved.businessentityid, unsaved): @nowarn
     unsaved
   }
+  override def upsertBatch(unsaved: Iterable[EmployeeRow])(implicit c: Connection): List[EmployeeRow] = {
+    unsaved.map { row =>
+      map += (row.businessentityid -> row)
+      row
+    }.toList
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[EmployeeRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    unsaved.foreach { row =>
+      map += (row.businessentityid -> row)
+    }
+    unsaved.size
+  }
 }

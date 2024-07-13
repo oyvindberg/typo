@@ -32,4 +32,7 @@ trait TransactionhistoryRepo {
   def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow]
   def update(row: TransactionhistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: TransactionhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[TransactionhistoryRow]]
+  // Not implementable for zio-jdbc: upsertBatch
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, TransactionhistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

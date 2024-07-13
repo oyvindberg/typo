@@ -121,4 +121,17 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "countryregioncode", "currencycode", "modifieddate"::text""".insertReturning(using CountryregioncurrencyRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregioncurrencyRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table countryregioncurrency_TEMP (like sales.countryregioncurrency) on commit drop".execute
+    val copied = streamingInsert(s"""copy countryregioncurrency_TEMP("countryregioncode", "currencycode", "modifieddate") from stdin""", batchSize, unsaved)(CountryregioncurrencyRow.text)
+    val merged = sql"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")
+                       select * from countryregioncurrency_TEMP
+                       on conflict ("countryregioncode", "currencycode")
+                       do update set
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table countryregioncurrency_TEMP;""".update
+    created *> copied *> merged
+  }
 }

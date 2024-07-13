@@ -15,6 +15,7 @@ import adventureworks.sales.salesterritory.SalesterritoryId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
@@ -82,4 +83,29 @@ object SalesterritoryhistoryRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[SalesterritoryhistoryRow] = new Write[SalesterritoryhistoryRow](
+    puts = List((BusinessentityId.put, Nullability.NoNulls),
+                (SalesterritoryId.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.Nullable),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.businessentityid, x.territoryid, x.startdate, x.enddate, x.rowguid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
+                  SalesterritoryId.put.unsafeSetNonNullable(rs, i + 1, a.territoryid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.startdate)
+                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 3, a.enddate)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 4, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
+                     SalesterritoryId.put.unsafeUpdateNonNullable(ps, i + 1, a.territoryid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.startdate)
+                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 3, a.enddate)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 4, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
+                   }
+  )
 }

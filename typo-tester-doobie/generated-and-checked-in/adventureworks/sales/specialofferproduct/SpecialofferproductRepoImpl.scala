@@ -12,12 +12,14 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -134,5 +136,32 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "specialofferid", "productid", "rowguid", "modifieddate"::text
        """.query(using SpecialofferproductRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[SpecialofferproductRow]): Stream[ConnectionIO, SpecialofferproductRow] = {
+    Update[SpecialofferproductRow](
+      s"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")
+          values (?::int4,?::int4,?::uuid,?::timestamp)
+          on conflict ("specialofferid", "productid")
+          do update set
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "specialofferid", "productid", "rowguid", "modifieddate"::text"""
+    )(using SpecialofferproductRow.write)
+    .updateManyWithGeneratedKeys[SpecialofferproductRow]("specialofferid", "productid", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, SpecialofferproductRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, SpecialofferproductRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table specialofferproduct_TEMP (like sales.specialofferproduct) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy specialofferproduct_TEMP("specialofferid", "productid", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SpecialofferproductRow.text)
+      res <- sql"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")
+                   select * from specialofferproduct_TEMP
+                   on conflict ("specialofferid", "productid")
+                   do update set
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table specialofferproduct_TEMP;""".update.run
+    } yield res
   }
 }

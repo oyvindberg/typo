@@ -14,6 +14,7 @@ import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -91,4 +92,35 @@ object ProductreviewRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[ProductreviewRow] = new Write[ProductreviewRow](
+    puts = List((ProductreviewId.put, Nullability.NoNulls),
+                (ProductId.put, Nullability.NoNulls),
+                (Name.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.productreviewid, x.productid, x.reviewername, x.reviewdate, x.emailaddress, x.rating, x.comments, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  ProductreviewId.put.unsafeSetNonNullable(rs, i + 0, a.productreviewid)
+                  ProductId.put.unsafeSetNonNullable(rs, i + 1, a.productid)
+                  Name.put.unsafeSetNonNullable(rs, i + 2, a.reviewername)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.reviewdate)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 4, a.emailaddress)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 5, a.rating)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 6, a.comments)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 7, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     ProductreviewId.put.unsafeUpdateNonNullable(ps, i + 0, a.productreviewid)
+                     ProductId.put.unsafeUpdateNonNullable(ps, i + 1, a.productid)
+                     Name.put.unsafeUpdateNonNullable(ps, i + 2, a.reviewername)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.reviewdate)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 4, a.emailaddress)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.rating)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 6, a.comments)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 7, a.modifieddate)
+                   }
+  )
 }

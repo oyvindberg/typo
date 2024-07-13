@@ -123,4 +123,17 @@ class PersonRepoImpl extends PersonRepo {
             "name" = EXCLUDED."name"
           returning "one", "two", "name"""".insertReturning(using PersonRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table person_TEMP (like compositepk.person) on commit drop".execute
+    val copied = streamingInsert(s"""copy person_TEMP("one", "two", "name") from stdin""", batchSize, unsaved)(PersonRow.text)
+    val merged = sql"""insert into compositepk.person("one", "two", "name")
+                       select * from person_TEMP
+                       on conflict ("one", "two")
+                       do update set
+                         "name" = EXCLUDED."name"
+                       ;
+                       drop table person_TEMP;""".update
+    created *> copied *> merged
+  }
 }

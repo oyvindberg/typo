@@ -14,6 +14,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.specialoffer.SpecialofferId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -23,6 +24,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -174,5 +176,62 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
        """
       .executeInsert(SalesorderdetailRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[SalesorderdetailRow])(implicit c: Connection): List[SalesorderdetailRow] = {
+    def toNamedParameter(row: SalesorderdetailRow): List[NamedParameter] = List(
+      NamedParameter("salesorderid", ParameterValue(row.salesorderid, null, SalesorderheaderId.toStatement)),
+      NamedParameter("salesorderdetailid", ParameterValue(row.salesorderdetailid, null, ToStatement.intToStatement)),
+      NamedParameter("carriertrackingnumber", ParameterValue(row.carriertrackingnumber, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("orderqty", ParameterValue(row.orderqty, null, TypoShort.toStatement)),
+      NamedParameter("productid", ParameterValue(row.productid, null, ProductId.toStatement)),
+      NamedParameter("specialofferid", ParameterValue(row.specialofferid, null, SpecialofferId.toStatement)),
+      NamedParameter("unitprice", ParameterValue(row.unitprice, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("unitpricediscount", ParameterValue(row.unitpricediscount, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+                values ({salesorderid}::int4, {salesorderdetailid}::int4, {carriertrackingnumber}, {orderqty}::int2, {productid}::int4, {specialofferid}::int4, {unitprice}::numeric, {unitpricediscount}::numeric, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("salesorderid", "salesorderdetailid")
+                do update set
+                  "carriertrackingnumber" = EXCLUDED."carriertrackingnumber",
+                  "orderqty" = EXCLUDED."orderqty",
+                  "productid" = EXCLUDED."productid",
+                  "specialofferid" = EXCLUDED."specialofferid",
+                  "unitprice" = EXCLUDED."unitprice",
+                  "unitpricediscount" = EXCLUDED."unitpricediscount",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(SalesorderdetailRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SalesorderdetailRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table salesorderdetail_TEMP (like sales.salesorderdetail) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy salesorderdetail_TEMP("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalesorderdetailRow.text, c): @nowarn
+    SQL"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+          select * from salesorderdetail_TEMP
+          on conflict ("salesorderid", "salesorderdetailid")
+          do update set
+            "carriertrackingnumber" = EXCLUDED."carriertrackingnumber",
+            "orderqty" = EXCLUDED."orderqty",
+            "productid" = EXCLUDED."productid",
+            "specialofferid" = EXCLUDED."specialofferid",
+            "unitprice" = EXCLUDED."unitprice",
+            "unitpricediscount" = EXCLUDED."unitpricediscount",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table salesorderdetail_TEMP;""".executeUpdate()
   }
 }

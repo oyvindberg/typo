@@ -29,4 +29,7 @@ trait ContacttypeRepo {
   def update: UpdateBuilder[ContacttypeFields, ContacttypeRow]
   def update(row: ContacttypeRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow
+  def upsertBatch(unsaved: Iterable[ContacttypeRow])(implicit c: Connection): List[ContacttypeRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[ContacttypeRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

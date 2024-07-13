@@ -133,4 +133,19 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text""".insertReturning(using SalespersonquotahistoryRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table salespersonquotahistory_TEMP (like sales.salespersonquotahistory) on commit drop".execute
+    val copied = streamingInsert(s"""copy salespersonquotahistory_TEMP("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalespersonquotahistoryRow.text)
+    val merged = sql"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
+                       select * from salespersonquotahistory_TEMP
+                       on conflict ("businessentityid", "quotadate")
+                       do update set
+                         "salesquota" = EXCLUDED."salesquota",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table salespersonquotahistory_TEMP;""".update
+    created *> copied *> merged
+  }
 }

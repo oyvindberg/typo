@@ -13,6 +13,7 @@ import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -97,4 +98,38 @@ object TransactionhistoryRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[TransactionhistoryRow] = new Write[TransactionhistoryRow](
+    puts = List((TransactionhistoryId.put, Nullability.NoNulls),
+                (ProductId.put, Nullability.NoNulls),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.IntMeta.put, Nullability.NoNulls),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.transactionid, x.productid, x.referenceorderid, x.referenceorderlineid, x.transactiondate, x.transactiontype, x.quantity, x.actualcost, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  TransactionhistoryId.put.unsafeSetNonNullable(rs, i + 0, a.transactionid)
+                  ProductId.put.unsafeSetNonNullable(rs, i + 1, a.productid)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 2, a.referenceorderid)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 3, a.referenceorderlineid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.transactiondate)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 5, a.transactiontype)
+                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 6, a.quantity)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 7, a.actualcost)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 8, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     TransactionhistoryId.put.unsafeUpdateNonNullable(ps, i + 0, a.transactionid)
+                     ProductId.put.unsafeUpdateNonNullable(ps, i + 1, a.productid)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.referenceorderid)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.referenceorderlineid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.transactiondate)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.transactiontype)
+                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.quantity)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.actualcost)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 8, a.modifieddate)
+                   }
+  )
 }

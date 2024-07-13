@@ -32,4 +32,7 @@ trait SalesterritoryhistoryRepo {
   def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow]
   def update(row: SalesterritoryhistoryRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: SalesterritoryhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[SalesterritoryhistoryRow]]
+  // Not implementable for zio-jdbc: upsertBatch
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesterritoryhistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

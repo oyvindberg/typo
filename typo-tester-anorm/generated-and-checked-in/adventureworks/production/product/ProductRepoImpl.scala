@@ -16,6 +16,7 @@ import adventureworks.production.productsubcategory.ProductsubcategoryId
 import adventureworks.production.unitmeasure.UnitmeasureId
 import adventureworks.public.Flag
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -25,6 +26,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -235,5 +237,109 @@ class ProductRepoImpl extends ProductRepo {
        """
       .executeInsert(ProductRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[ProductRow])(implicit c: Connection): List[ProductRow] = {
+    def toNamedParameter(row: ProductRow): List[NamedParameter] = List(
+      NamedParameter("productid", ParameterValue(row.productid, null, ProductId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("productnumber", ParameterValue(row.productnumber, null, ToStatement.stringToStatement)),
+      NamedParameter("makeflag", ParameterValue(row.makeflag, null, Flag.toStatement)),
+      NamedParameter("finishedgoodsflag", ParameterValue(row.finishedgoodsflag, null, Flag.toStatement)),
+      NamedParameter("color", ParameterValue(row.color, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("safetystocklevel", ParameterValue(row.safetystocklevel, null, TypoShort.toStatement)),
+      NamedParameter("reorderpoint", ParameterValue(row.reorderpoint, null, TypoShort.toStatement)),
+      NamedParameter("standardcost", ParameterValue(row.standardcost, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("listprice", ParameterValue(row.listprice, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("size", ParameterValue(row.size, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("sizeunitmeasurecode", ParameterValue(row.sizeunitmeasurecode, null, ToStatement.optionToStatement(UnitmeasureId.toStatement, UnitmeasureId.parameterMetadata))),
+      NamedParameter("weightunitmeasurecode", ParameterValue(row.weightunitmeasurecode, null, ToStatement.optionToStatement(UnitmeasureId.toStatement, UnitmeasureId.parameterMetadata))),
+      NamedParameter("weight", ParameterValue(row.weight, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))),
+      NamedParameter("daystomanufacture", ParameterValue(row.daystomanufacture, null, ToStatement.intToStatement)),
+      NamedParameter("productline", ParameterValue(row.productline, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("class", ParameterValue(row.`class`, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("style", ParameterValue(row.style, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
+      NamedParameter("productsubcategoryid", ParameterValue(row.productsubcategoryid, null, ToStatement.optionToStatement(ProductsubcategoryId.toStatement, ProductsubcategoryId.parameterMetadata))),
+      NamedParameter("productmodelid", ParameterValue(row.productmodelid, null, ToStatement.optionToStatement(ProductmodelId.toStatement, ProductmodelId.parameterMetadata))),
+      NamedParameter("sellstartdate", ParameterValue(row.sellstartdate, null, TypoLocalDateTime.toStatement)),
+      NamedParameter("sellenddate", ParameterValue(row.sellenddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))),
+      NamedParameter("discontinueddate", ParameterValue(row.discontinueddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
+                values ({productid}::int4, {name}::varchar, {productnumber}, {makeflag}::bool, {finishedgoodsflag}::bool, {color}, {safetystocklevel}::int2, {reorderpoint}::int2, {standardcost}::numeric, {listprice}::numeric, {size}, {sizeunitmeasurecode}::bpchar, {weightunitmeasurecode}::bpchar, {weight}::numeric, {daystomanufacture}::int4, {productline}::bpchar, {class}::bpchar, {style}::bpchar, {productsubcategoryid}::int4, {productmodelid}::int4, {sellstartdate}::timestamp, {sellenddate}::timestamp, {discontinueddate}::timestamp, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("productid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "productnumber" = EXCLUDED."productnumber",
+                  "makeflag" = EXCLUDED."makeflag",
+                  "finishedgoodsflag" = EXCLUDED."finishedgoodsflag",
+                  "color" = EXCLUDED."color",
+                  "safetystocklevel" = EXCLUDED."safetystocklevel",
+                  "reorderpoint" = EXCLUDED."reorderpoint",
+                  "standardcost" = EXCLUDED."standardcost",
+                  "listprice" = EXCLUDED."listprice",
+                  "size" = EXCLUDED."size",
+                  "sizeunitmeasurecode" = EXCLUDED."sizeunitmeasurecode",
+                  "weightunitmeasurecode" = EXCLUDED."weightunitmeasurecode",
+                  "weight" = EXCLUDED."weight",
+                  "daystomanufacture" = EXCLUDED."daystomanufacture",
+                  "productline" = EXCLUDED."productline",
+                  "class" = EXCLUDED."class",
+                  "style" = EXCLUDED."style",
+                  "productsubcategoryid" = EXCLUDED."productsubcategoryid",
+                  "productmodelid" = EXCLUDED."productmodelid",
+                  "sellstartdate" = EXCLUDED."sellstartdate",
+                  "sellenddate" = EXCLUDED."sellenddate",
+                  "discontinueddate" = EXCLUDED."discontinueddate",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(ProductRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[ProductRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table product_TEMP (like production.product) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy product_TEMP("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(ProductRow.text, c): @nowarn
+    SQL"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
+          select * from product_TEMP
+          on conflict ("productid")
+          do update set
+            "name" = EXCLUDED."name",
+            "productnumber" = EXCLUDED."productnumber",
+            "makeflag" = EXCLUDED."makeflag",
+            "finishedgoodsflag" = EXCLUDED."finishedgoodsflag",
+            "color" = EXCLUDED."color",
+            "safetystocklevel" = EXCLUDED."safetystocklevel",
+            "reorderpoint" = EXCLUDED."reorderpoint",
+            "standardcost" = EXCLUDED."standardcost",
+            "listprice" = EXCLUDED."listprice",
+            "size" = EXCLUDED."size",
+            "sizeunitmeasurecode" = EXCLUDED."sizeunitmeasurecode",
+            "weightunitmeasurecode" = EXCLUDED."weightunitmeasurecode",
+            "weight" = EXCLUDED."weight",
+            "daystomanufacture" = EXCLUDED."daystomanufacture",
+            "productline" = EXCLUDED."productline",
+            "class" = EXCLUDED."class",
+            "style" = EXCLUDED."style",
+            "productsubcategoryid" = EXCLUDED."productsubcategoryid",
+            "productmodelid" = EXCLUDED."productmodelid",
+            "sellstartdate" = EXCLUDED."sellstartdate",
+            "sellenddate" = EXCLUDED."sellenddate",
+            "discontinueddate" = EXCLUDED."discontinueddate",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table product_TEMP;""".executeUpdate()
   }
 }

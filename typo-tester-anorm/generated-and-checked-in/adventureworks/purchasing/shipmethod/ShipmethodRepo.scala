@@ -29,4 +29,7 @@ trait ShipmethodRepo {
   def update: UpdateBuilder[ShipmethodFields, ShipmethodRow]
   def update(row: ShipmethodRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow
+  def upsertBatch(unsaved: Iterable[ShipmethodRow])(implicit c: Connection): List[ShipmethodRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[ShipmethodRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

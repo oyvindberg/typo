@@ -15,6 +15,7 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import adventureworks.userdefined.FirstName
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -22,6 +23,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -168,5 +170,52 @@ class PersonRepoImpl extends PersonRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
        """.query(using PersonRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[PersonRow]): Stream[ConnectionIO, PersonRow] = {
+    Update[PersonRow](
+      s"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
+          values (?::int4,?::bpchar,?::bool,?,?::varchar,?::varchar,?::varchar,?,?::int4,?::xml,?::xml,?::uuid,?::timestamp)
+          on conflict ("businessentityid")
+          do update set
+            "persontype" = EXCLUDED."persontype",
+            "namestyle" = EXCLUDED."namestyle",
+            "title" = EXCLUDED."title",
+            "firstname" = EXCLUDED."firstname",
+            "middlename" = EXCLUDED."middlename",
+            "lastname" = EXCLUDED."lastname",
+            "suffix" = EXCLUDED."suffix",
+            "emailpromotion" = EXCLUDED."emailpromotion",
+            "additionalcontactinfo" = EXCLUDED."additionalcontactinfo",
+            "demographics" = EXCLUDED."demographics",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text"""
+    )(using PersonRow.write)
+    .updateManyWithGeneratedKeys[PersonRow]("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, PersonRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table person_TEMP (like person.person) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy person_TEMP("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using PersonRow.text)
+      res <- sql"""insert into person.person("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
+                   select * from person_TEMP
+                   on conflict ("businessentityid")
+                   do update set
+                     "persontype" = EXCLUDED."persontype",
+                     "namestyle" = EXCLUDED."namestyle",
+                     "title" = EXCLUDED."title",
+                     "firstname" = EXCLUDED."firstname",
+                     "middlename" = EXCLUDED."middlename",
+                     "lastname" = EXCLUDED."lastname",
+                     "suffix" = EXCLUDED."suffix",
+                     "emailpromotion" = EXCLUDED."emailpromotion",
+                     "additionalcontactinfo" = EXCLUDED."additionalcontactinfo",
+                     "demographics" = EXCLUDED."demographics",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table person_TEMP;""".update.run
+    } yield res
   }
 }

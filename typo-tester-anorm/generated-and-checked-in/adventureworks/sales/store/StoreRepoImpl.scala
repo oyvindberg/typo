@@ -13,6 +13,7 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -21,6 +22,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -146,5 +148,52 @@ class StoreRepoImpl extends StoreRepo {
        """
       .executeInsert(StoreRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[StoreRow])(implicit c: Connection): List[StoreRow] = {
+    def toNamedParameter(row: StoreRow): List[NamedParameter] = List(
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, BusinessentityId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("salespersonid", ParameterValue(row.salespersonid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))),
+      NamedParameter("demographics", ParameterValue(row.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
+                values ({businessentityid}::int4, {name}::varchar, {salespersonid}::int4, {demographics}::xml, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("businessentityid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "salespersonid" = EXCLUDED."salespersonid",
+                  "demographics" = EXCLUDED."demographics",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(StoreRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[StoreRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table store_TEMP (like sales.store) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy store_TEMP("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(StoreRow.text, c): @nowarn
+    SQL"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
+          select * from store_TEMP
+          on conflict ("businessentityid")
+          do update set
+            "name" = EXCLUDED."name",
+            "salespersonid" = EXCLUDED."salespersonid",
+            "demographics" = EXCLUDED."demographics",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table store_TEMP;""".executeUpdate()
   }
 }

@@ -87,4 +87,17 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
     map.put(unsaved.workorderid, unsaved): @nowarn
     unsaved
   }
+  override def upsertBatch(unsaved: Iterable[WorkorderRow])(implicit c: Connection): List[WorkorderRow] = {
+    unsaved.map { row =>
+      map += (row.workorderid -> row)
+      row
+    }.toList
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[WorkorderRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    unsaved.foreach { row =>
+      map += (row.workorderid -> row)
+    }
+    unsaved.size
+  }
 }

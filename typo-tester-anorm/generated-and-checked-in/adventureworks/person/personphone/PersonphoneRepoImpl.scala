@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -19,6 +20,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -137,5 +139,42 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
        """
       .executeInsert(PersonphoneRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[PersonphoneRow])(implicit c: Connection): List[PersonphoneRow] = {
+    def toNamedParameter(row: PersonphoneRow): List[NamedParameter] = List(
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, BusinessentityId.toStatement)),
+      NamedParameter("phonenumber", ParameterValue(row.phonenumber, null, Phone.toStatement)),
+      NamedParameter("phonenumbertypeid", ParameterValue(row.phonenumbertypeid, null, PhonenumbertypeId.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
+                values ({businessentityid}::int4, {phonenumber}::varchar, {phonenumbertypeid}::int4, {modifieddate}::timestamp)
+                on conflict ("businessentityid", "phonenumber", "phonenumbertypeid")
+                do update set
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(PersonphoneRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[PersonphoneRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table personphone_TEMP (like person.personphone) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy personphone_TEMP("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") from stdin""", batchSize, unsaved)(PersonphoneRow.text, c): @nowarn
+    SQL"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
+          select * from personphone_TEMP
+          on conflict ("businessentityid", "phonenumber", "phonenumbertypeid")
+          do update set
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table personphone_TEMP;""".executeUpdate()
   }
 }

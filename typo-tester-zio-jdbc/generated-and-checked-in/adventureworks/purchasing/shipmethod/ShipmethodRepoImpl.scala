@@ -134,4 +134,21 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text""".insertReturning(using ShipmethodRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table shipmethod_TEMP (like purchasing.shipmethod) on commit drop".execute
+    val copied = streamingInsert(s"""copy shipmethod_TEMP("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(ShipmethodRow.text)
+    val merged = sql"""insert into purchasing.shipmethod("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
+                       select * from shipmethod_TEMP
+                       on conflict ("shipmethodid")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "shipbase" = EXCLUDED."shipbase",
+                         "shiprate" = EXCLUDED."shiprate",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table shipmethod_TEMP;""".update
+    created *> copied *> merged
+  }
 }

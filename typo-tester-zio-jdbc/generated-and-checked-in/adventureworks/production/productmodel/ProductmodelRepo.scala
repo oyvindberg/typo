@@ -32,4 +32,7 @@ trait ProductmodelRepo {
   def update: UpdateBuilder[ProductmodelFields, ProductmodelRow]
   def update(row: ProductmodelRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ProductmodelRow): ZIO[ZConnection, Throwable, UpdateResult[ProductmodelRow]]
+  // Not implementable for zio-jdbc: upsertBatch
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductmodelRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

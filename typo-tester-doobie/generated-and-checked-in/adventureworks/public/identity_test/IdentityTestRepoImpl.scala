@@ -8,6 +8,7 @@ package public
 package identity_test
 
 import adventureworks.customtypes.Defaulted
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -15,6 +16,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -111,5 +113,32 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
             "default_generated" = EXCLUDED."default_generated"
           returning "always_generated", "default_generated", "name"
        """.query(using IdentityTestRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[IdentityTestRow]): Stream[ConnectionIO, IdentityTestRow] = {
+    Update[IdentityTestRow](
+      s"""insert into public.identity-test("always_generated", "default_generated", "name")
+          values (?::int4,?::int4,?)
+          on conflict ("name")
+          do update set
+            "always_generated" = EXCLUDED."always_generated",
+            "default_generated" = EXCLUDED."default_generated"
+          returning "always_generated", "default_generated", "name""""
+    )(using IdentityTestRow.write)
+    .updateManyWithGeneratedKeys[IdentityTestRow]("always_generated", "default_generated", "name")(unsaved)(using catsStdInstancesForList, IdentityTestRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, IdentityTestRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table identity-test_TEMP (like public.identity-test) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy identity-test_TEMP("always_generated", "default_generated", "name") from stdin""").copyIn(unsaved, batchSize)(using IdentityTestRow.text)
+      res <- sql"""insert into public.identity-test("always_generated", "default_generated", "name")
+                   select * from identity-test_TEMP
+                   on conflict ("name")
+                   do update set
+                     "always_generated" = EXCLUDED."always_generated",
+                     "default_generated" = EXCLUDED."default_generated"
+                   ;
+                   drop table identity-test_TEMP;""".update.run
+    } yield res
   }
 }

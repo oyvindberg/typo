@@ -10,6 +10,7 @@ package productphoto
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
@@ -17,6 +18,7 @@ import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
 import doobie.util.meta.Meta
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -129,5 +131,38 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
        """.query(using ProductphotoRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[ProductphotoRow]): Stream[ConnectionIO, ProductphotoRow] = {
+    Update[ProductphotoRow](
+      s"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+          values (?::int4,?::bytea,?,?::bytea,?,?::timestamp)
+          on conflict ("productphotoid")
+          do update set
+            "thumbnailphoto" = EXCLUDED."thumbnailphoto",
+            "thumbnailphotofilename" = EXCLUDED."thumbnailphotofilename",
+            "largephoto" = EXCLUDED."largephoto",
+            "largephotofilename" = EXCLUDED."largephotofilename",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text"""
+    )(using ProductphotoRow.write)
+    .updateManyWithGeneratedKeys[ProductphotoRow]("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(unsaved)(using catsStdInstancesForList, ProductphotoRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductphotoRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table productphoto_TEMP (like production.productphoto) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy productphoto_TEMP("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductphotoRow.text)
+      res <- sql"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+                   select * from productphoto_TEMP
+                   on conflict ("productphotoid")
+                   do update set
+                     "thumbnailphoto" = EXCLUDED."thumbnailphoto",
+                     "thumbnailphotofilename" = EXCLUDED."thumbnailphotofilename",
+                     "largephoto" = EXCLUDED."largephoto",
+                     "largephotofilename" = EXCLUDED."largephotofilename",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table productphoto_TEMP;""".update.run
+    } yield res
   }
 }

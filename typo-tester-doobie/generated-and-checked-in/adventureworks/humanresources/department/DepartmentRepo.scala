@@ -30,4 +30,7 @@ trait DepartmentRepo {
   def update: UpdateBuilder[DepartmentFields, DepartmentRow]
   def update(row: DepartmentRow): ConnectionIO[Boolean]
   def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow]
+  def upsertBatch(unsaved: List[DepartmentRow]): Stream[ConnectionIO, DepartmentRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, DepartmentRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

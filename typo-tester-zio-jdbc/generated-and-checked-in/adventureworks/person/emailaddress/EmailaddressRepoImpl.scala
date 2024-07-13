@@ -136,4 +136,19 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text""".insertReturning(using EmailaddressRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, EmailaddressRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table emailaddress_TEMP (like person.emailaddress) on commit drop".execute
+    val copied = streamingInsert(s"""copy emailaddress_TEMP("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(EmailaddressRow.text)
+    val merged = sql"""insert into person.emailaddress("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")
+                       select * from emailaddress_TEMP
+                       on conflict ("businessentityid", "emailaddressid")
+                       do update set
+                         "emailaddress" = EXCLUDED."emailaddress",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table emailaddress_TEMP;""".update
+    created *> copied *> merged
+  }
 }

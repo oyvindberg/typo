@@ -15,6 +15,7 @@ import adventureworks.person.stateprovince.StateprovinceId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -96,4 +97,38 @@ object AddressRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[AddressRow] = new Write[AddressRow](
+    puts = List((AddressId.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (StateprovinceId.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls),
+                (TypoBytea.put, Nullability.Nullable),
+                (TypoUUID.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.addressid, x.addressline1, x.addressline2, x.city, x.stateprovinceid, x.postalcode, x.spatiallocation, x.rowguid, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  AddressId.put.unsafeSetNonNullable(rs, i + 0, a.addressid)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.addressline1)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 2, a.addressline2)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 3, a.city)
+                  StateprovinceId.put.unsafeSetNonNullable(rs, i + 4, a.stateprovinceid)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 5, a.postalcode)
+                  TypoBytea.put.unsafeSetNullable(rs, i + 6, a.spatiallocation)
+                  TypoUUID.put.unsafeSetNonNullable(rs, i + 7, a.rowguid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 8, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     AddressId.put.unsafeUpdateNonNullable(ps, i + 0, a.addressid)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.addressline1)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 2, a.addressline2)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.city)
+                     StateprovinceId.put.unsafeUpdateNonNullable(ps, i + 4, a.stateprovinceid)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.postalcode)
+                     TypoBytea.put.unsafeUpdateNullable(ps, i + 6, a.spatiallocation)
+                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 7, a.rowguid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 8, a.modifieddate)
+                   }
+  )
 }

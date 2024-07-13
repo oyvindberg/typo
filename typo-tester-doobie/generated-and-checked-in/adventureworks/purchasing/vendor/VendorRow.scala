@@ -17,6 +17,7 @@ import adventureworks.public.Name
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -94,4 +95,35 @@ object VendorRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[VendorRow] = new Write[VendorRow](
+    puts = List((BusinessentityId.put, Nullability.NoNulls),
+                (AccountNumber.put, Nullability.NoNulls),
+                (Name.put, Nullability.NoNulls),
+                (TypoShort.put, Nullability.NoNulls),
+                (Flag.put, Nullability.NoNulls),
+                (Flag.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.Nullable),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.businessentityid, x.accountnumber, x.name, x.creditrating, x.preferredvendorstatus, x.activeflag, x.purchasingwebserviceurl, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
+                  AccountNumber.put.unsafeSetNonNullable(rs, i + 1, a.accountnumber)
+                  Name.put.unsafeSetNonNullable(rs, i + 2, a.name)
+                  TypoShort.put.unsafeSetNonNullable(rs, i + 3, a.creditrating)
+                  Flag.put.unsafeSetNonNullable(rs, i + 4, a.preferredvendorstatus)
+                  Flag.put.unsafeSetNonNullable(rs, i + 5, a.activeflag)
+                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 6, a.purchasingwebserviceurl)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 7, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
+                     AccountNumber.put.unsafeUpdateNonNullable(ps, i + 1, a.accountnumber)
+                     Name.put.unsafeUpdateNonNullable(ps, i + 2, a.name)
+                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 3, a.creditrating)
+                     Flag.put.unsafeUpdateNonNullable(ps, i + 4, a.preferredvendorstatus)
+                     Flag.put.unsafeUpdateNonNullable(ps, i + 5, a.activeflag)
+                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 6, a.purchasingwebserviceurl)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 7, a.modifieddate)
+                   }
+  )
 }

@@ -32,4 +32,7 @@ trait WorkorderroutingRepo {
   def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def update(row: WorkorderroutingRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: WorkorderroutingRow): ZIO[ZConnection, Throwable, UpdateResult[WorkorderroutingRow]]
+  // Not implementable for zio-jdbc: upsertBatch
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, WorkorderroutingRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

@@ -12,6 +12,7 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterMetaData
 import anorm.ParameterValue
@@ -21,6 +22,7 @@ import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import anorm.ToStatement
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -170,5 +172,61 @@ class SalespersonRepoImpl extends SalespersonRepo {
        """
       .executeInsert(SalespersonRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[SalespersonRow])(implicit c: Connection): List[SalespersonRow] = {
+    def toNamedParameter(row: SalespersonRow): List[NamedParameter] = List(
+      NamedParameter("businessentityid", ParameterValue(row.businessentityid, null, BusinessentityId.toStatement)),
+      NamedParameter("territoryid", ParameterValue(row.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))),
+      NamedParameter("salesquota", ParameterValue(row.salesquota, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))),
+      NamedParameter("bonus", ParameterValue(row.bonus, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("commissionpct", ParameterValue(row.commissionpct, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("salesytd", ParameterValue(row.salesytd, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("saleslastyear", ParameterValue(row.saleslastyear, null, ToStatement.scalaBigDecimalToStatement)),
+      NamedParameter("rowguid", ParameterValue(row.rowguid, null, TypoUUID.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")
+                values ({businessentityid}::int4, {territoryid}::int4, {salesquota}::numeric, {bonus}::numeric, {commissionpct}::numeric, {salesytd}::numeric, {saleslastyear}::numeric, {rowguid}::uuid, {modifieddate}::timestamp)
+                on conflict ("businessentityid")
+                do update set
+                  "territoryid" = EXCLUDED."territoryid",
+                  "salesquota" = EXCLUDED."salesquota",
+                  "bonus" = EXCLUDED."bonus",
+                  "commissionpct" = EXCLUDED."commissionpct",
+                  "salesytd" = EXCLUDED."salesytd",
+                  "saleslastyear" = EXCLUDED."saleslastyear",
+                  "rowguid" = EXCLUDED."rowguid",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(SalespersonRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SalespersonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table salesperson_TEMP (like sales.salesperson) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy salesperson_TEMP("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalespersonRow.text, c): @nowarn
+    SQL"""insert into sales.salesperson("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")
+          select * from salesperson_TEMP
+          on conflict ("businessentityid")
+          do update set
+            "territoryid" = EXCLUDED."territoryid",
+            "salesquota" = EXCLUDED."salesquota",
+            "bonus" = EXCLUDED."bonus",
+            "commissionpct" = EXCLUDED."commissionpct",
+            "salesytd" = EXCLUDED."salesytd",
+            "saleslastyear" = EXCLUDED."saleslastyear",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table salesperson_TEMP;""".executeUpdate()
   }
 }

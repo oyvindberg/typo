@@ -11,12 +11,14 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
+import cats.instances.list.catsStdInstancesForList
 import doobie.free.connection.ConnectionIO
 import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
 import doobie.util.fragment.Fragment
+import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
@@ -124,5 +126,34 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "addresstypeid", "name", "rowguid", "modifieddate"::text
        """.query(using AddresstypeRow.read).unique
+  }
+  override def upsertBatch(unsaved: List[AddresstypeRow]): Stream[ConnectionIO, AddresstypeRow] = {
+    Update[AddresstypeRow](
+      s"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
+          values (?::int4,?::varchar,?::uuid,?::timestamp)
+          on conflict ("addresstypeid")
+          do update set
+            "name" = EXCLUDED."name",
+            "rowguid" = EXCLUDED."rowguid",
+            "modifieddate" = EXCLUDED."modifieddate"
+          returning "addresstypeid", "name", "rowguid", "modifieddate"::text"""
+    )(using AddresstypeRow.write)
+    .updateManyWithGeneratedKeys[AddresstypeRow]("addresstypeid", "name", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, AddresstypeRow.read)
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Stream[ConnectionIO, AddresstypeRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+    for {
+      _ <- sql"create temporary table addresstype_TEMP (like person.addresstype) on commit drop".update.run
+      _ <- new FragmentOps(sql"""copy addresstype_TEMP("addresstypeid", "name", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using AddresstypeRow.text)
+      res <- sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
+                   select * from addresstype_TEMP
+                   on conflict ("addresstypeid")
+                   do update set
+                     "name" = EXCLUDED."name",
+                     "rowguid" = EXCLUDED."rowguid",
+                     "modifieddate" = EXCLUDED."modifieddate"
+                   ;
+                   drop table addresstype_TEMP;""".update.run
+    } yield res
   }
 }

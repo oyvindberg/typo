@@ -129,4 +129,19 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text""".insertReturning(using ProductlistpricehistoryRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductlistpricehistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table productlistpricehistory_TEMP (like production.productlistpricehistory) on commit drop".execute
+    val copied = streamingInsert(s"""copy productlistpricehistory_TEMP("productid", "startdate", "enddate", "listprice", "modifieddate") from stdin""", batchSize, unsaved)(ProductlistpricehistoryRow.text)
+    val merged = sql"""insert into production.productlistpricehistory("productid", "startdate", "enddate", "listprice", "modifieddate")
+                       select * from productlistpricehistory_TEMP
+                       on conflict ("productid", "startdate")
+                       do update set
+                         "enddate" = EXCLUDED."enddate",
+                         "listprice" = EXCLUDED."listprice",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table productlistpricehistory_TEMP;""".update
+    created *> copied *> merged
+  }
 }

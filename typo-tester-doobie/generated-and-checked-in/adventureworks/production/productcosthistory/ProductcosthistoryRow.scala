@@ -13,6 +13,7 @@ import adventureworks.production.product.ProductId
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -75,4 +76,26 @@ object ProductcosthistoryRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
+  implicit lazy val write: Write[ProductcosthistoryRow] = new Write[ProductcosthistoryRow](
+    puts = List((ProductId.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.Nullable),
+                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                (TypoLocalDateTime.put, Nullability.NoNulls)),
+    toList = x => List(x.productid, x.startdate, x.enddate, x.standardcost, x.modifieddate),
+    unsafeSet = (rs, i, a) => {
+                  ProductId.put.unsafeSetNonNullable(rs, i + 0, a.productid)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 1, a.startdate)
+                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 2, a.enddate)
+                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 3, a.standardcost)
+                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     ProductId.put.unsafeUpdateNonNullable(ps, i + 0, a.productid)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 1, a.startdate)
+                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 2, a.enddate)
+                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.standardcost)
+                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
+                   }
+  )
 }

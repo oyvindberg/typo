@@ -29,4 +29,7 @@ trait TransactionhistoryarchiveRepo {
   def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow]
   def update(row: TransactionhistoryarchiveRow)(implicit c: Connection): Boolean
   def upsert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow
+  def upsertBatch(unsaved: Iterable[TransactionhistoryarchiveRow])(implicit c: Connection): List[TransactionhistoryarchiveRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[TransactionhistoryarchiveRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

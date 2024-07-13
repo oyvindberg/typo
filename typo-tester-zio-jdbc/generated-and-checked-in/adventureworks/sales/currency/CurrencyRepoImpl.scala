@@ -108,4 +108,18 @@ class CurrencyRepoImpl extends CurrencyRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "currencycode", "name", "modifieddate"::text""".insertReturning(using CurrencyRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table currency_TEMP (like sales.currency) on commit drop".execute
+    val copied = streamingInsert(s"""copy currency_TEMP("currencycode", "name", "modifieddate") from stdin""", batchSize, unsaved)(CurrencyRow.text)
+    val merged = sql"""insert into sales.currency("currencycode", "name", "modifieddate")
+                       select * from currency_TEMP
+                       on conflict ("currencycode")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table currency_TEMP;""".update
+    created *> copied *> merged
+  }
 }

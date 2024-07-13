@@ -142,4 +142,23 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text""".insertReturning(using StateprovinceRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table stateprovince_TEMP (like person.stateprovince) on commit drop".execute
+    val copied = streamingInsert(s"""copy stateprovince_TEMP("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(StateprovinceRow.text)
+    val merged = sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
+                       select * from stateprovince_TEMP
+                       on conflict ("stateprovinceid")
+                       do update set
+                         "stateprovincecode" = EXCLUDED."stateprovincecode",
+                         "countryregioncode" = EXCLUDED."countryregioncode",
+                         "isonlystateprovinceflag" = EXCLUDED."isonlystateprovinceflag",
+                         "name" = EXCLUDED."name",
+                         "territoryid" = EXCLUDED."territoryid",
+                         "rowguid" = EXCLUDED."rowguid",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table stateprovince_TEMP;""".update
+    created *> copied *> merged
+  }
 }

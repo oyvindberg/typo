@@ -11,6 +11,7 @@ package football_club
 import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
+import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
@@ -42,4 +43,17 @@ object FootballClubRow {
     sb.append(Text.DELIMETER)
     Text.stringInstance.unsafeEncode(row.name, sb)
   }
+  implicit lazy val write: Write[FootballClubRow] = new Write[FootballClubRow](
+    puts = List((FootballClubId.put, Nullability.NoNulls),
+                (Meta.StringMeta.put, Nullability.NoNulls)),
+    toList = x => List(x.id, x.name),
+    unsafeSet = (rs, i, a) => {
+                  FootballClubId.put.unsafeSetNonNullable(rs, i + 0, a.id)
+                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                },
+    unsafeUpdate = (ps, i, a) => {
+                     FootballClubId.put.unsafeUpdateNonNullable(ps, i + 0, a.id)
+                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                   }
+  )
 }

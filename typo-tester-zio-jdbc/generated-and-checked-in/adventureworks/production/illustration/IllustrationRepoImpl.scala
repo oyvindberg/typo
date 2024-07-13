@@ -112,4 +112,18 @@ class IllustrationRepoImpl extends IllustrationRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "illustrationid", "diagram", "modifieddate"::text""".insertReturning(using IllustrationRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, IllustrationRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table illustration_TEMP (like production.illustration) on commit drop".execute
+    val copied = streamingInsert(s"""copy illustration_TEMP("illustrationid", "diagram", "modifieddate") from stdin""", batchSize, unsaved)(IllustrationRow.text)
+    val merged = sql"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+                       select * from illustration_TEMP
+                       on conflict ("illustrationid")
+                       do update set
+                         "diagram" = EXCLUDED."diagram",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table illustration_TEMP;""".update
+    created *> copied *> merged
+  }
 }

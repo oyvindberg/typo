@@ -136,4 +136,23 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text""".insertReturning(using ProductreviewRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductreviewRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table productreview_TEMP (like production.productreview) on commit drop".execute
+    val copied = streamingInsert(s"""copy productreview_TEMP("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") from stdin""", batchSize, unsaved)(ProductreviewRow.text)
+    val merged = sql"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+                       select * from productreview_TEMP
+                       on conflict ("productreviewid")
+                       do update set
+                         "productid" = EXCLUDED."productid",
+                         "reviewername" = EXCLUDED."reviewername",
+                         "reviewdate" = EXCLUDED."reviewdate",
+                         "emailaddress" = EXCLUDED."emailaddress",
+                         "rating" = EXCLUDED."rating",
+                         "comments" = EXCLUDED."comments",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table productreview_TEMP;""".update
+    created *> copied *> merged
+  }
 }

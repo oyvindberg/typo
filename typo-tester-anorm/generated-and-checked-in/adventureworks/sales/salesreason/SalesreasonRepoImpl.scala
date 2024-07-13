@@ -10,6 +10,7 @@ package salesreason
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
+import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
 import anorm.RowParser
@@ -17,6 +18,7 @@ import anorm.SQL
 import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
+import scala.annotation.nowarn
 import typo.dsl.DeleteBuilder
 import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
@@ -134,5 +136,46 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
        """
       .executeInsert(SalesreasonRow.rowParser(1).single)
     
+  }
+  override def upsertBatch(unsaved: Iterable[SalesreasonRow])(implicit c: Connection): List[SalesreasonRow] = {
+    def toNamedParameter(row: SalesreasonRow): List[NamedParameter] = List(
+      NamedParameter("salesreasonid", ParameterValue(row.salesreasonid, null, SalesreasonId.toStatement)),
+      NamedParameter("name", ParameterValue(row.name, null, Name.toStatement)),
+      NamedParameter("reasontype", ParameterValue(row.reasontype, null, Name.toStatement)),
+      NamedParameter("modifieddate", ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement))
+    )
+    unsaved.toList match {
+      case Nil => Nil
+      case head :: rest =>
+        new anorm.adventureworks.ExecuteReturningSyntax.Ops(
+          BatchSql(
+            s"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
+                values ({salesreasonid}::int4, {name}::varchar, {reasontype}::varchar, {modifieddate}::timestamp)
+                on conflict ("salesreasonid")
+                do update set
+                  "name" = EXCLUDED."name",
+                  "reasontype" = EXCLUDED."reasontype",
+                  "modifieddate" = EXCLUDED."modifieddate"
+                returning "salesreasonid", "name", "reasontype", "modifieddate"::text
+             """,
+            toNamedParameter(head),
+            rest.map(toNamedParameter)*
+          )
+        ).executeReturning(SalesreasonRow.rowParser(1).*)
+    }
+  }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: Iterator[SalesreasonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+    SQL"create temporary table salesreason_TEMP (like sales.salesreason) on commit drop".execute(): @nowarn
+    streamingInsert(s"""copy salesreason_TEMP("salesreasonid", "name", "reasontype", "modifieddate") from stdin""", batchSize, unsaved)(SalesreasonRow.text, c): @nowarn
+    SQL"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
+          select * from salesreason_TEMP
+          on conflict ("salesreasonid")
+          do update set
+            "name" = EXCLUDED."name",
+            "reasontype" = EXCLUDED."reasontype",
+            "modifieddate" = EXCLUDED."modifieddate"
+          ;
+          drop table salesreason_TEMP;""".executeUpdate()
   }
 }

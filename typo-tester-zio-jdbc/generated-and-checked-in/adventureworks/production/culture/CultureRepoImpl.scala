@@ -108,4 +108,18 @@ class CultureRepoImpl extends CultureRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "cultureid", "name", "modifieddate"::text""".insertReturning(using CultureRow.jdbcDecoder)
   }
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    val created = sql"create temporary table culture_TEMP (like production.culture) on commit drop".execute
+    val copied = streamingInsert(s"""copy culture_TEMP("cultureid", "name", "modifieddate") from stdin""", batchSize, unsaved)(CultureRow.text)
+    val merged = sql"""insert into production.culture("cultureid", "name", "modifieddate")
+                       select * from culture_TEMP
+                       on conflict ("cultureid")
+                       do update set
+                         "name" = EXCLUDED."name",
+                         "modifieddate" = EXCLUDED."modifieddate"
+                       ;
+                       drop table culture_TEMP;""".update
+    created *> copied *> merged
+  }
 }

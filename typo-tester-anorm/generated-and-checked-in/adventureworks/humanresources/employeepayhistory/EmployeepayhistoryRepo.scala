@@ -29,4 +29,7 @@ trait EmployeepayhistoryRepo {
   def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
   def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean
   def upsert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow
+  def upsertBatch(unsaved: Iterable[EmployeepayhistoryRow])(implicit c: Connection): List[EmployeepayhistoryRow]
+  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[EmployeepayhistoryRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }
