@@ -126,5 +126,5 @@ templates:
   template-nocross:
     extends: template-common
     scala:
-      options: -source 3.4
-      version: 3.4.1
+      options: -source 3.3
+      version: 3.3.3
