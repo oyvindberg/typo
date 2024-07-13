@@ -35,7 +35,7 @@ put it in `gen-db.sc` and run `scala-cli gen-db.sc`
 // remember to give the project a github star if you like it <3
 //
 //> using dep "com.olvind.typo::typo:@VERSION@"
-//> using scala "3.4.0"
+//> using scala "3.4.2"
 
 import typo.*
 
@@ -87,7 +87,7 @@ generateFromDb(
 ## Compiling the generated code
 
 For **Scala 2** you need to set add `-Xsource:3` to `scalacOptions`, with a recent version of Scala 2.13.
-For **Scala 3** you'll need 3.4.0 or later.
+For **Scala 3** you'll need 3.3.0 or later.
 
 ## `selector`
 You can customize which relations you generate code for, see [customize selected relations](customization/customize-selected-relations.md)

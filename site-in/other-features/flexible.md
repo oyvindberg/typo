@@ -9,7 +9,7 @@ of integrating Typo piece-by-piece into your code base.
 
 ## Developed in the Scala 2/3 shared subset
 
-Everything works on Scala 2.13 and 3.4. 
+Everything works on Scala 2.13 and 3.3. 
 
 For *2.13* you need to set add `-Xsource:3` to `scalacOptions`. The shared subsets shrinks in size for every Scala 3 release, unfortunately.
 
