@@ -23,9 +23,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: production.document
-    Product maintenance documents.
-    Primary key: documentnode */
+/**
+ *Table: production.document
+ *
+ * Product maintenance documents.
+ *
+ * Primary key: documentnode */
 case class DocumentRow(
   /** Title of the document. */
   title: /* max 50 chars */ String,

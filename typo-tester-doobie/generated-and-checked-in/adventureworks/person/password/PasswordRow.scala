@@ -20,9 +20,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: person.password
-    One way hashed authentication information
-    Primary key: businessentityid */
+/**
+ *Table: person.password
+ *
+ * One way hashed authentication information
+ *
+ * Primary key: businessentityid */
 case class PasswordRow(
   /** Points to [[person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,

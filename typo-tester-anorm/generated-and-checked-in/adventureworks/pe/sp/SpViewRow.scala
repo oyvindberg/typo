@@ -26,7 +26,8 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: pe.sp */
+/**
+ *View: pe.sp */
 case class SpViewRow(
   /** Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
   id: StateprovinceId,

@@ -20,7 +20,8 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: pr.c */
+/**
+ *View: pr.c */
 case class CViewRow(
   /** Points to [[production.culture.CultureRow.cultureid]] */
   id: CultureId,

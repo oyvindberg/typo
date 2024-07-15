@@ -19,9 +19,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: sales.currencyrate
-    Currency exchange rates.
-    Primary key: currencyrateid */
+/**
+ *Table: sales.currencyrate
+ *
+ * Currency exchange rates.
+ *
+ * Primary key: currencyrateid */
 case class CurrencyrateRow(
   /** Primary key for CurrencyRate records.
       Default: nextval('sales.currencyrate_currencyrateid_seq'::regclass) */

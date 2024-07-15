@@ -18,7 +18,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: pu.pod */
+/**
+ *View: pu.pod */
 case class PodViewRow(
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.purchaseorderdetailid]] */
   id: Int,

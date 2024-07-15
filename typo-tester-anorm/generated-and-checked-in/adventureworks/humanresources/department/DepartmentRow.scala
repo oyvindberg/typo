@@ -20,9 +20,12 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: humanresources.department
-    Lookup table containing the departments within the Adventure Works Cycles company.
-    Primary key: departmentid */
+/**
+ *Table: humanresources.department
+ *
+ * Lookup table containing the departments within the Adventure Works Cycles company.
+ *
+ * Primary key: departmentid */
 case class DepartmentRow(
   /** Primary key for Department records.
       Default: nextval('humanresources.department_departmentid_seq'::regclass) */

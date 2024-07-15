@@ -18,8 +18,11 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: myschema.marital_status
-    Primary key: id */
+/**
+  * Table: myschema.marital_status
+  *
+  * Primary key: id
+  */
 case class MaritalStatusRow(
   id: MaritalStatusId
 )

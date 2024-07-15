@@ -18,9 +18,12 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** Table: humanresources.employeepayhistory
-    Employee pay history.
-    Composite primary key: businessentityid, ratechangedate */
+/**
+ *Table: humanresources.employeepayhistory
+ *
+ * Employee pay history.
+ *
+ * Composite primary key: businessentityid, ratechangedate */
 case class EmployeepayhistoryRow(
   /** Employee identification number. Foreign key to Employee.BusinessEntityID.
       Points to [[employee.EmployeeRow.businessentityid]] */

@@ -21,7 +21,8 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: pe.at */
+/**
+ *View: pe.at */
 case class AtViewRow(
   /** Points to [[person.addresstype.AddresstypeRow.addresstypeid]] */
   id: AddresstypeId,

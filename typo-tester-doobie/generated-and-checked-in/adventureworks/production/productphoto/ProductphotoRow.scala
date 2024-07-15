@@ -19,9 +19,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: production.productphoto
-    Product images.
-    Primary key: productphotoid */
+/**
+ *Table: production.productphoto
+ *
+ * Product images.
+ *
+ * Primary key: productphotoid */
 case class ProductphotoRow(
   /** Primary key for ProductPhoto records.
       Default: nextval('production.productphoto_productphotoid_seq'::regclass) */

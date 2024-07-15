@@ -19,7 +19,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: hr.edh */
+/**
+ *View: hr.edh */
 case class EdhViewRow(
   /** Points to [[humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow.businessentityid]] */
   id: BusinessentityId,

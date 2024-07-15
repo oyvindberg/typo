@@ -17,7 +17,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: humanresources.vjobcandidate */
+/**
+ *View: humanresources.vjobcandidate */
 case class VjobcandidateViewRow(
   /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]] */
   jobcandidateid: JobcandidateId,

@@ -18,7 +18,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: pr.bom */
+/**
+ *View: pr.bom */
 case class BomViewRow(
   /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
   id: Int,

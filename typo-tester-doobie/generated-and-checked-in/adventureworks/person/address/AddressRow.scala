@@ -21,9 +21,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: person.address
-    Street address information for customers, employees, and vendors.
-    Primary key: addressid */
+/**
+ *Table: person.address
+ *
+ * Street address information for customers, employees, and vendors.
+ *
+ * Primary key: addressid */
 case class AddressRow(
   /** Primary key for Address records.
       Default: nextval('person.address_addressid_seq'::regclass) */

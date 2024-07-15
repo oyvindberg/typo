@@ -19,8 +19,10 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: public.users
-    Primary key: user_id */
+/**
+ *Table: public.users
+ *
+ * Primary key: user_id */
 case class UsersRow(
   userId: UsersId,
   name: String,

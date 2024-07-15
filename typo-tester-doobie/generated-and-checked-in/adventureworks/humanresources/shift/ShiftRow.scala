@@ -19,9 +19,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: humanresources.shift
-    Work shift lookup table.
-    Primary key: shiftid */
+/**
+ *Table: humanresources.shift
+ *
+ * Work shift lookup table.
+ *
+ * Primary key: shiftid */
 case class ShiftRow(
   /** Primary key for Shift records.
       Default: nextval('humanresources.shift_shiftid_seq'::regclass) */

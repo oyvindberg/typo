@@ -16,7 +16,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: pr.pmi */
+/**
+ *View: pr.pmi */
 case class PmiViewRow(
   /** Points to [[production.productmodelillustration.ProductmodelillustrationRow.productmodelid]] */
   productmodelid: ProductmodelId,

@@ -17,7 +17,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: pr.th */
+/**
+ *View: pr.th */
 case class ThViewRow(
   /** Points to [[production.transactionhistory.TransactionhistoryRow.transactionid]] */
   id: TransactionhistoryId,

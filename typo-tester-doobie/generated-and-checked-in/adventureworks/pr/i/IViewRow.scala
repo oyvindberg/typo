@@ -16,7 +16,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: pr.i */
+/**
+ *View: pr.i */
 case class IViewRow(
   /** Points to [[production.illustration.IllustrationRow.illustrationid]] */
   id: IllustrationId,

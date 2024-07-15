@@ -21,9 +21,12 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: person.addresstype
-    Types of addresses stored in the Address table.
-    Primary key: addresstypeid */
+/**
+ *Table: person.addresstype
+ *
+ * Types of addresses stored in the Address table.
+ *
+ * Primary key: addresstypeid */
 case class AddresstypeRow(
   /** Primary key for AddressType records.
       Default: nextval('person.addresstype_addresstypeid_seq'::regclass) */

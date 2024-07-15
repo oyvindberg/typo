@@ -19,8 +19,10 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: public.flaff
-    Composite primary key: code, another_code, some_number, specifier */
+/**
+ *Table: public.flaff
+ *
+ * Composite primary key: code, another_code, some_number, specifier */
 case class FlaffRow(
   /** Points to [[FlaffRow.code]] */
   code: ShortText,

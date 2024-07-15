@@ -17,9 +17,12 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** Table: sales.salesreason
-    Lookup table of customer purchase reasons.
-    Primary key: salesreasonid */
+/**
+ *Table: sales.salesreason
+ *
+ * Lookup table of customer purchase reasons.
+ *
+ * Primary key: salesreasonid */
 case class SalesreasonRow(
   /** Primary key for SalesReason records.
       Default: nextval('sales.salesreason_salesreasonid_seq'::regclass) */

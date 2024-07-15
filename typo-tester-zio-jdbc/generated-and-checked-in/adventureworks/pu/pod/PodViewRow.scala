@@ -18,7 +18,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: pu.pod */
+/**
+ *View: pu.pod */
 case class PodViewRow(
   /** Points to [[purchasing.purchaseorderdetail.PurchaseorderdetailRow.purchaseorderdetailid]] */
   id: Int,

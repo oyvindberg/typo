@@ -20,7 +20,8 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: sa.crc */
+/**
+ *View: sa.crc */
 case class CrcViewRow(
   /** Points to [[sales.countryregioncurrency.CountryregioncurrencyRow.countryregioncode]] */
   countryregioncode: CountryregionId,

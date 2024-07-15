@@ -20,7 +20,8 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: pr.um */
+/**
+ *View: pr.um */
 case class UmViewRow(
   /** Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   id: UnitmeasureId,

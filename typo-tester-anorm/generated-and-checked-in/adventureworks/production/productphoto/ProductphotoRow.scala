@@ -22,9 +22,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: production.productphoto
-    Product images.
-    Primary key: productphotoid */
+/**
+ *Table: production.productphoto
+ *
+ * Product images.
+ *
+ * Primary key: productphotoid */
 case class ProductphotoRow(
   /** Primary key for ProductPhoto records.
       Default: nextval('production.productphoto_productphotoid_seq'::regclass) */

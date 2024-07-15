@@ -21,7 +21,8 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: sales.vsalespersonsalesbyfiscalyearsdata */
+/**
+ *View: sales.vsalespersonsalesbyfiscalyearsdata */
 case class VsalespersonsalesbyfiscalyearsdataViewRow(
   /** Points to [[salesorderheader.SalesorderheaderRow.salespersonid]] */
   salespersonid: Option[BusinessentityId],

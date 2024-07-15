@@ -17,9 +17,12 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** Table: production.culture
-    Lookup table containing the languages in which some AdventureWorks data is stored.
-    Primary key: cultureid */
+/**
+ *Table: production.culture
+ *
+ * Lookup table containing the languages in which some AdventureWorks data is stored.
+ *
+ * Primary key: cultureid */
 case class CultureRow(
   /** Primary key for Culture records. */
   cultureid: CultureId,

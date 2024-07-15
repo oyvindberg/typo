@@ -26,7 +26,8 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: pr.d */
+/**
+ *View: pr.d */
 case class DViewRow(
   /** Points to [[production.document.DocumentRow.title]] */
   title: /* max 50 chars */ String,

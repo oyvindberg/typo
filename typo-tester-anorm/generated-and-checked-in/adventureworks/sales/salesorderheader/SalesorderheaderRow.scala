@@ -33,9 +33,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: sales.salesorderheader
-    General sales order information.
-    Primary key: salesorderid */
+/**
+ *Table: sales.salesorderheader
+ *
+ * General sales order information.
+ *
+ * Primary key: salesorderid */
 case class SalesorderheaderRow(
   /** Primary key.
       Default: nextval('sales.salesorderheader_salesorderid_seq'::regclass) */

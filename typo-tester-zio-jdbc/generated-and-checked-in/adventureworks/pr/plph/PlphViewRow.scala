@@ -16,7 +16,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: pr.plph */
+/**
+ *View: pr.plph */
 case class PlphViewRow(
   /** Points to [[production.productlistpricehistory.ProductlistpricehistoryRow.productid]] */
   id: ProductId,

@@ -16,8 +16,11 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** Table: compositepk.person
-    Composite primary key: one, two */
+/**
+  * Table: compositepk.person
+  *
+  * Composite primary key: one, two
+  */
 case class PersonRow(
   /** Default: auto-increment */
   one: Long,

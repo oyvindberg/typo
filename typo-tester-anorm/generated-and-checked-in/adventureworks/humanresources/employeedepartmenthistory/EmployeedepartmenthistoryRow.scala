@@ -25,9 +25,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: humanresources.employeedepartmenthistory
-    Employee department transfers.
-    Composite primary key: businessentityid, startdate, departmentid, shiftid */
+/**
+ *Table: humanresources.employeedepartmenthistory
+ *
+ * Employee department transfers.
+ *
+ * Composite primary key: businessentityid, startdate, departmentid, shiftid */
 case class EmployeedepartmenthistoryRow(
   /** Employee identification number. Foreign key to Employee.BusinessEntityID.
       Points to [[employee.EmployeeRow.businessentityid]] */

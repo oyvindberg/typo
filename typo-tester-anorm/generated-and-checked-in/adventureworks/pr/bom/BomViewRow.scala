@@ -23,7 +23,8 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: pr.bom */
+/**
+ *View: pr.bom */
 case class BomViewRow(
   /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
   id: Int,

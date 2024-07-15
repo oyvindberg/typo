@@ -20,9 +20,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: sales.creditcard
-    Customer credit card information.
-    Primary key: creditcardid */
+/**
+ *Table: sales.creditcard
+ *
+ * Customer credit card information.
+ *
+ * Primary key: creditcardid */
 case class CreditcardRow(
   /** Primary key for CreditCard records.
       Default: nextval('sales.creditcard_creditcardid_seq'::regclass) */

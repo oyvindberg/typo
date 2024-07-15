@@ -24,9 +24,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: sales.salesterritoryhistory
-    Sales representative transfers to other sales territories.
-    Composite primary key: businessentityid, startdate, territoryid */
+/**
+ *Table: sales.salesterritoryhistory
+ *
+ * Sales representative transfers to other sales territories.
+ *
+ * Composite primary key: businessentityid, startdate, territoryid */
 case class SalesterritoryhistoryRow(
   /** Primary key. The sales rep.  Foreign key to SalesPerson.BusinessEntityID.
       Points to [[salesperson.SalespersonRow.businessentityid]] */

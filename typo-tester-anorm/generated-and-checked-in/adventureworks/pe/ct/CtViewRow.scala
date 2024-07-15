@@ -20,7 +20,8 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: pe.ct */
+/**
+ *View: pe.ct */
 case class CtViewRow(
   /** Points to [[person.contacttype.ContacttypeRow.contacttypeid]] */
   id: ContacttypeId,

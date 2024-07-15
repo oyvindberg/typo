@@ -19,9 +19,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: production.productdescription
-    Product descriptions in several languages.
-    Primary key: productdescriptionid */
+/**
+ *Table: production.productdescription
+ *
+ * Product descriptions in several languages.
+ *
+ * Primary key: productdescriptionid */
 case class ProductdescriptionRow(
   /** Primary key for ProductDescription records.
       Default: nextval('production.productdescription_productdescriptionid_seq'::regclass) */

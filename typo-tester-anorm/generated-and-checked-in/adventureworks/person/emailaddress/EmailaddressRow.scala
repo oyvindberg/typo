@@ -23,9 +23,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: person.emailaddress
-    Where to send a person email.
-    Composite primary key: businessentityid, emailaddressid */
+/**
+ *Table: person.emailaddress
+ *
+ * Where to send a person email.
+ *
+ * Composite primary key: businessentityid, emailaddressid */
 case class EmailaddressRow(
   /** Primary key. Person associated with this email address.  Foreign key to Person.BusinessEntityID
       Points to [[person.PersonRow.businessentityid]] */

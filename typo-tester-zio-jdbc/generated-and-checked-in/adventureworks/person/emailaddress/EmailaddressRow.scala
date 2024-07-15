@@ -18,9 +18,12 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** Table: person.emailaddress
-    Where to send a person email.
-    Composite primary key: businessentityid, emailaddressid */
+/**
+ *Table: person.emailaddress
+ *
+ * Where to send a person email.
+ *
+ * Composite primary key: businessentityid, emailaddressid */
 case class EmailaddressRow(
   /** Primary key. Person associated with this email address.  Foreign key to Person.BusinessEntityID
       Points to [[person.PersonRow.businessentityid]] */

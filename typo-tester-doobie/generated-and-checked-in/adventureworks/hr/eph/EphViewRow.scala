@@ -17,7 +17,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: hr.eph */
+/**
+ *View: hr.eph */
 case class EphViewRow(
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.businessentityid]] */
   id: BusinessentityId,

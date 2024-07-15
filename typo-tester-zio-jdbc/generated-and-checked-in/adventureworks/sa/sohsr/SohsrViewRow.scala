@@ -17,7 +17,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: sa.sohsr */
+/**
+ *View: sa.sohsr */
 case class SohsrViewRow(
   /** Points to [[sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.salesorderid]] */
   salesorderid: SalesorderheaderId,

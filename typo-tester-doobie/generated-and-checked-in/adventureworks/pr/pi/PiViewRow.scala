@@ -19,7 +19,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: pr.pi */
+/**
+ *View: pr.pi */
 case class PiViewRow(
   /** Points to [[production.productinventory.ProductinventoryRow.productid]] */
   id: ProductId,

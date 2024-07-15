@@ -21,7 +21,8 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: sa.sop */
+/**
+ *View: sa.sop */
 case class SopViewRow(
   /** Points to [[sales.specialofferproduct.SpecialofferproductRow.specialofferid]] */
   id: SpecialofferId,

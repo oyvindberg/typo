@@ -23,9 +23,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: production.productreview
-    Customer reviews of products they have purchased.
-    Primary key: productreviewid */
+/**
+ *Table: production.productreview
+ *
+ * Customer reviews of products they have purchased.
+ *
+ * Primary key: productreviewid */
 case class ProductreviewRow(
   /** Primary key for ProductReview records.
       Default: nextval('production.productreview_productreviewid_seq'::regclass) */

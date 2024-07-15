@@ -14,7 +14,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** SQL file: update_person_returning.sql */
+/**
+ *SQL file: update_person_returning.sql */
 case class UpdatePersonReturningSqlRow(
   /** Points to [[person.person.PersonRow.firstname]] */
   firstname: /* user-picked */ FirstName,

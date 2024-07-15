@@ -17,9 +17,12 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** Table: production.illustration
-    Bicycle assembly diagrams.
-    Primary key: illustrationid */
+/**
+ *Table: production.illustration
+ *
+ * Bicycle assembly diagrams.
+ *
+ * Primary key: illustrationid */
 case class IllustrationRow(
   /** Primary key for Illustration records.
       Default: nextval('production.illustration_illustrationid_seq'::regclass) */

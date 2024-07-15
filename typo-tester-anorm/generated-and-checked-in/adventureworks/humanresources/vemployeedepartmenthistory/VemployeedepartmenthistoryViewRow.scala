@@ -23,7 +23,8 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: humanresources.vemployeedepartmenthistory */
+/**
+ *View: humanresources.vemployeedepartmenthistory */
 case class VemployeedepartmenthistoryViewRow(
   /** Points to [[employee.EmployeeRow.businessentityid]] */
   businessentityid: BusinessentityId,

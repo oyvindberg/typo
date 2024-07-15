@@ -18,7 +18,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: hr.jc */
+/**
+ *View: hr.jc */
 case class JcViewRow(
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.jobcandidateid]] */
   id: JobcandidateId,

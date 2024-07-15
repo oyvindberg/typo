@@ -22,9 +22,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: production.productdescription
-    Product descriptions in several languages.
-    Primary key: productdescriptionid */
+/**
+ *Table: production.productdescription
+ *
+ * Product descriptions in several languages.
+ *
+ * Primary key: productdescriptionid */
 case class ProductdescriptionRow(
   /** Primary key for ProductDescription records.
       Default: nextval('production.productdescription_productdescriptionid_seq'::regclass) */

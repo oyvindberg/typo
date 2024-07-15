@@ -14,7 +14,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: sales.vsalespersonsalesbyfiscalyears */
+/**
+ *View: sales.vsalespersonsalesbyfiscalyears */
 case class VsalespersonsalesbyfiscalyearsViewRow(
   salesPersonID: /* nullability unknown */ Option[Int],
   fullName: /* nullability unknown */ Option[String],

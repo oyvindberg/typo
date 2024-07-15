@@ -20,7 +20,8 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: hr.d */
+/**
+ *View: hr.d */
 case class DViewRow(
   /** Points to [[humanresources.department.DepartmentRow.departmentid]] */
   id: DepartmentId,

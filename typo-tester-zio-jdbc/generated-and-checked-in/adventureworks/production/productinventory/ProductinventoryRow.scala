@@ -20,9 +20,12 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** Table: production.productinventory
-    Product inventory information.
-    Composite primary key: productid, locationid */
+/**
+ *Table: production.productinventory
+ *
+ * Product inventory information.
+ *
+ * Composite primary key: productid, locationid */
 case class ProductinventoryRow(
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */

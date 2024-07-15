@@ -14,8 +14,11 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** Table: myschema.marital_status
-    Primary key: id */
+/**
+  * Table: myschema.marital_status
+  *
+  * Primary key: id
+  */
 case class MaritalStatusRow(
   id: MaritalStatusId
 )

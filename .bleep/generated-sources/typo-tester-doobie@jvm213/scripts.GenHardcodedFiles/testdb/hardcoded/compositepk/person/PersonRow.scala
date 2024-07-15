@@ -18,8 +18,11 @@ import io.circe.Encoder
 import java.sql.ResultSet
 import testdb.hardcoded.customtypes.Defaulted
 
-/** Table: compositepk.person
-    Composite primary key: one, two */
+/**
+  * Table: compositepk.person
+  *
+  * Composite primary key: one, two
+  */
 case class PersonRow(
   /** Default: auto-increment */
   one: Long,

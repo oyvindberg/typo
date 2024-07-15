@@ -21,8 +21,11 @@ import scala.collection.immutable.ListMap
 import scala.util.Try
 import testdb.hardcoded.customtypes.Defaulted
 
-/** Table: compositepk.person
-    Composite primary key: one, two */
+/**
+  * Table: compositepk.person
+  *
+  * Composite primary key: one, two
+  */
 case class PersonRow(
   /** Default: auto-increment */
   one: Long,

@@ -23,9 +23,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: person.stateprovince
-    State and province lookup table.
-    Primary key: stateprovinceid */
+/**
+ *Table: person.stateprovince
+ *
+ * State and province lookup table.
+ *
+ * Primary key: stateprovinceid */
 case class StateprovinceRow(
   /** Primary key for StateProvince records.
       Default: nextval('person.stateprovince_stateprovinceid_seq'::regclass) */

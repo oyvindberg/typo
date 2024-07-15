@@ -23,9 +23,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: person.password
-    One way hashed authentication information
-    Primary key: businessentityid */
+/**
+ *Table: person.password
+ *
+ * One way hashed authentication information
+ *
+ * Primary key: businessentityid */
 case class PasswordRow(
   /** Points to [[person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,

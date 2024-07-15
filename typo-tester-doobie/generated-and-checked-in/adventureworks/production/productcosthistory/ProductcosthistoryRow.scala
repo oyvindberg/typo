@@ -19,9 +19,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: production.productcosthistory
-    Changes in the cost of a product over time.
-    Composite primary key: productid, startdate */
+/**
+ *Table: production.productcosthistory
+ *
+ * Changes in the cost of a product over time.
+ *
+ * Composite primary key: productid, startdate */
 case class ProductcosthistoryRow(
   /** Product identification number. Foreign key to Product.ProductID
       Points to [[product.ProductRow.productid]] */

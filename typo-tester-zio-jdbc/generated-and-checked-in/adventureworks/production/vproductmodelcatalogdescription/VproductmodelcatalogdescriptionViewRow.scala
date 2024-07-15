@@ -18,7 +18,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: production.vproductmodelcatalogdescription */
+/**
+ *View: production.vproductmodelcatalogdescription */
 case class VproductmodelcatalogdescriptionViewRow(
   /** Points to [[productmodel.ProductmodelRow.productmodelid]] */
   productmodelid: ProductmodelId,

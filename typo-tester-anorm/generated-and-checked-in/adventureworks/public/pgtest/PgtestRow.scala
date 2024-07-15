@@ -43,7 +43,8 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: public.pgtest */
+/**
+ *Table: public.pgtest */
 case class PgtestRow(
   bool: Boolean,
   box: TypoBox,

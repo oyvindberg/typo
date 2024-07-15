@@ -20,7 +20,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: sa.sod */
+/**
+ *View: sa.sod */
 case class SodViewRow(
   /** Points to [[sales.salesorderdetail.SalesorderdetailRow.salesorderdetailid]] */
   id: Int,

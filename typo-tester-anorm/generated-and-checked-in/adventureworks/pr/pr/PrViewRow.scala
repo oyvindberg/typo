@@ -23,7 +23,8 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: pr.pr */
+/**
+ *View: pr.pr */
 case class PrViewRow(
   /** Points to [[production.productreview.ProductreviewRow.productreviewid]] */
   id: ProductreviewId,

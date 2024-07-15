@@ -21,9 +21,12 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** Table: person.stateprovince
-    State and province lookup table.
-    Primary key: stateprovinceid */
+/**
+ *Table: person.stateprovince
+ *
+ * State and province lookup table.
+ *
+ * Primary key: stateprovinceid */
 case class StateprovinceRow(
   /** Primary key for StateProvince records.
       Default: nextval('person.stateprovince_stateprovinceid_seq'::regclass) */

@@ -17,7 +17,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: pr.th */
+/**
+ *View: pr.th */
 case class ThViewRow(
   /** Points to [[production.transactionhistory.TransactionhistoryRow.transactionid]] */
   id: TransactionhistoryId,

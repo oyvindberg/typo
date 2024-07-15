@@ -20,9 +20,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: production.productmodel
-    Product model classification.
-    Primary key: productmodelid */
+/**
+ *Table: production.productmodel
+ *
+ * Product model classification.
+ *
+ * Primary key: productmodelid */
 case class ProductmodelRow(
   /** Primary key for ProductModel records.
       Default: nextval('production.productmodel_productmodelid_seq'::regclass) */

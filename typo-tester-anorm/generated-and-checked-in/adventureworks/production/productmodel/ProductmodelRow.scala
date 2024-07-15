@@ -24,9 +24,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: production.productmodel
-    Product model classification.
-    Primary key: productmodelid */
+/**
+ *Table: production.productmodel
+ *
+ * Product model classification.
+ *
+ * Primary key: productmodelid */
 case class ProductmodelRow(
   /** Primary key for ProductModel records.
       Default: nextval('production.productmodel_productmodelid_seq'::regclass) */

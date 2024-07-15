@@ -17,9 +17,12 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** Table: production.unitmeasure
-    Unit of measure lookup table.
-    Primary key: unitmeasurecode */
+/**
+ *Table: production.unitmeasure
+ *
+ * Unit of measure lookup table.
+ *
+ * Primary key: unitmeasurecode */
 case class UnitmeasureRow(
   /** Primary key. */
   unitmeasurecode: UnitmeasureId,

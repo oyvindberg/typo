@@ -17,8 +17,10 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** Table: public.users
-    Primary key: user_id */
+/**
+ *Table: public.users
+ *
+ * Primary key: user_id */
 case class UsersRow(
   userId: UsersId,
   name: String,

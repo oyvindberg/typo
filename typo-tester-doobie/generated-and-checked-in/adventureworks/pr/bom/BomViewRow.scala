@@ -18,7 +18,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: pr.bom */
+/**
+ *View: pr.bom */
 case class BomViewRow(
   /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
   id: Int,

@@ -26,9 +26,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: purchasing.vendor
-    Companies from whom Adventure Works Cycles purchases parts or other goods.
-    Primary key: businessentityid */
+/**
+ *Table: purchasing.vendor
+ *
+ * Companies from whom Adventure Works Cycles purchases parts or other goods.
+ *
+ * Primary key: businessentityid */
 case class VendorRow(
   /** Primary key for Vendor records.  Foreign key to BusinessEntity.BusinessEntityID
       Points to [[person.businessentity.BusinessentityRow.businessentityid]] */

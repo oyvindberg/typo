@@ -23,7 +23,8 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: hr.jc */
+/**
+ *View: hr.jc */
 case class JcViewRow(
   /** Points to [[humanresources.jobcandidate.JobcandidateRow.jobcandidateid]] */
   id: JobcandidateId,

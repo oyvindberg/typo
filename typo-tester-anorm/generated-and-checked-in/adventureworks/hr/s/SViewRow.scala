@@ -21,7 +21,8 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: hr.s */
+/**
+ *View: hr.s */
 case class SViewRow(
   /** Points to [[humanresources.shift.ShiftRow.shiftid]] */
   id: ShiftId,

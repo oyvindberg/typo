@@ -20,9 +20,12 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: production.unitmeasure
-    Unit of measure lookup table.
-    Primary key: unitmeasurecode */
+/**
+ *Table: production.unitmeasure
+ *
+ * Unit of measure lookup table.
+ *
+ * Primary key: unitmeasurecode */
 case class UnitmeasureRow(
   /** Primary key. */
   unitmeasurecode: UnitmeasureId,

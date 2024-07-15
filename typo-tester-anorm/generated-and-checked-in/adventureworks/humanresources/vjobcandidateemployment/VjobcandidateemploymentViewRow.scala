@@ -21,7 +21,8 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: humanresources.vjobcandidateemployment */
+/**
+ *View: humanresources.vjobcandidateemployment */
 case class VjobcandidateemploymentViewRow(
   /** Points to [[jobcandidate.JobcandidateRow.jobcandidateid]] */
   jobcandidateid: JobcandidateId,

@@ -18,7 +18,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: purchasing.vvendorwithcontacts */
+/**
+ *View: purchasing.vvendorwithcontacts */
 case class VvendorwithcontactsViewRow(
   /** Points to [[vendor.VendorRow.businessentityid]] */
   businessentityid: BusinessentityId,

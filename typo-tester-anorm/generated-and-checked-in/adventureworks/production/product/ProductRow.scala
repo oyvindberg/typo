@@ -28,9 +28,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: production.product
-    Products sold or used in the manfacturing of sold products.
-    Primary key: productid */
+/**
+ *Table: production.product
+ *
+ * Products sold or used in the manfacturing of sold products.
+ *
+ * Primary key: productid */
 case class ProductRow(
   /** Primary key for Product records.
       Default: nextval('production.product_productid_seq'::regclass) */

@@ -24,9 +24,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: person.person
-    Human beings involved with AdventureWorks: employees, customer contacts, and vendor contacts.
-    Primary key: businessentityid */
+/**
+ *Table: person.person
+ *
+ * Human beings involved with AdventureWorks: employees, customer contacts, and vendor contacts.
+ *
+ * Primary key: businessentityid */
 case class PersonRow(
   /** Primary key for Person records.
       Points to [[businessentity.BusinessentityRow.businessentityid]] */

@@ -98,8 +98,8 @@ case class FilesRelation(
             case x: IdComputed.Composite => s"Composite primary key: ${x.cols.map(_.dbName.value).mkString(", ")}"
           }
         ).flatten
-        code"""|/** ${lines.mkString("\n")} */
-             |""".stripMargin
+        lines.mkString("/**\n  * ", "\n  *\n  * ", "\n  */\n")
+
       }
 
       val maybeExtraApply: Option[sc.Code] =

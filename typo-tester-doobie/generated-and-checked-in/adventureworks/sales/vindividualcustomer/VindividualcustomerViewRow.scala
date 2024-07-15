@@ -19,7 +19,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: sales.vindividualcustomer */
+/**
+ *View: sales.vindividualcustomer */
 case class VindividualcustomerViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,

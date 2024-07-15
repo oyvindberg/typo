@@ -17,8 +17,10 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: public.identity-test
-    Primary key: name */
+/**
+ *Table: public.identity-test
+ *
+ * Primary key: name */
 case class IdentityTestRow(
   /** Identity ALWAYS, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
   alwaysGenerated: Int,

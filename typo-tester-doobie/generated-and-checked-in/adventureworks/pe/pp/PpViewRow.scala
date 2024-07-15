@@ -17,7 +17,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: pe.pp */
+/**
+ *View: pe.pp */
 case class PpViewRow(
   /** Points to [[person.personphone.PersonphoneRow.businessentityid]] */
   id: BusinessentityId,

@@ -17,7 +17,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: pe.ct */
+/**
+ *View: pe.ct */
 case class CtViewRow(
   /** Points to [[person.contacttype.ContacttypeRow.contacttypeid]] */
   id: ContacttypeId,

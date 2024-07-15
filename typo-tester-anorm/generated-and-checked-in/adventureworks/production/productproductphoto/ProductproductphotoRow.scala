@@ -22,9 +22,12 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: production.productproductphoto
-    Cross-reference table mapping products and product photos.
-    Composite primary key: productid, productphotoid */
+/**
+ *Table: production.productproductphoto
+ *
+ * Cross-reference table mapping products and product photos.
+ *
+ * Composite primary key: productid, productphotoid */
 case class ProductproductphotoRow(
   /** Product identification number. Foreign key to Product.ProductID.
       Points to [[product.ProductRow.productid]] */

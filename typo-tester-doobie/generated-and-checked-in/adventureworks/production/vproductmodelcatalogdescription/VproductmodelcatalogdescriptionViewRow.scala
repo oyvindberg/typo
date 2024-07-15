@@ -22,7 +22,8 @@ import io.circe.Json
 import java.sql.ResultSet
 import scala.util.Try
 
-/** View: production.vproductmodelcatalogdescription */
+/**
+ *View: production.vproductmodelcatalogdescription */
 case class VproductmodelcatalogdescriptionViewRow(
   /** Points to [[productmodel.ProductmodelRow.productmodelid]] */
   productmodelid: ProductmodelId,

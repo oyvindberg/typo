@@ -23,9 +23,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: humanresources.jobcandidate
-    RÃ©sumÃ©s submitted to Human Resources by job applicants.
-    Primary key: jobcandidateid */
+/**
+ *Table: humanresources.jobcandidate
+ *
+ * RÃ©sumÃ©s submitted to Human Resources by job applicants.
+ *
+ * Primary key: jobcandidateid */
 case class JobcandidateRow(
   /** Primary key for JobCandidate records.
       Default: nextval('humanresources.jobcandidate_jobcandidateid_seq'::regclass) */

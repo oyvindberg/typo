@@ -17,7 +17,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: pr.l */
+/**
+ *View: pr.l */
 case class LViewRow(
   /** Points to [[production.location.LocationRow.locationid]] */
   id: LocationId,

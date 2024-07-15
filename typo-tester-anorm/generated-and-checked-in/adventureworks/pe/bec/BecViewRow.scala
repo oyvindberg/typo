@@ -21,7 +21,8 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: pe.bec */
+/**
+ *View: pe.bec */
 case class BecViewRow(
   /** Points to [[person.businessentitycontact.BusinessentitycontactRow.businessentityid]] */
   id: BusinessentityId,

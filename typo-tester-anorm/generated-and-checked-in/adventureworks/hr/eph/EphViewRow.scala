@@ -22,7 +22,8 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: hr.eph */
+/**
+ *View: hr.eph */
 case class EphViewRow(
   /** Points to [[humanresources.employeepayhistory.EmployeepayhistoryRow.businessentityid]] */
   id: BusinessentityId,

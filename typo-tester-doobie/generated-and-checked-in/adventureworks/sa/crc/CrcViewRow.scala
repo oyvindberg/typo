@@ -16,7 +16,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: sa.crc */
+/**
+ *View: sa.crc */
 case class CrcViewRow(
   /** Points to [[sales.countryregioncurrency.CountryregioncurrencyRow.countryregioncode]] */
   countryregioncode: CountryregionId,

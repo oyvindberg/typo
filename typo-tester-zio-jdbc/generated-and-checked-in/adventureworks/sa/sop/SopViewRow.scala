@@ -18,7 +18,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: sa.sop */
+/**
+ *View: sa.sop */
 case class SopViewRow(
   /** Points to [[sales.specialofferproduct.SpecialofferproductRow.specialofferid]] */
   id: SpecialofferId,

@@ -20,7 +20,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: person.vadditionalcontactinfo */
+/**
+ *View: person.vadditionalcontactinfo */
 case class VadditionalcontactinfoViewRow(
   /** Points to [[person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,

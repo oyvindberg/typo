@@ -19,9 +19,12 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** Table: person.personphone
-    Telephone number and type of a person.
-    Composite primary key: businessentityid, phonenumber, phonenumbertypeid */
+/**
+ *Table: person.personphone
+ *
+ * Telephone number and type of a person.
+ *
+ * Composite primary key: businessentityid, phonenumber, phonenumbertypeid */
 case class PersonphoneRow(
   /** Business entity identification number. Foreign key to Person.BusinessEntityID.
       Points to [[person.PersonRow.businessentityid]] */

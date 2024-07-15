@@ -16,7 +16,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: pr.sr */
+/**
+ *View: pr.sr */
 case class SrViewRow(
   /** Points to [[production.scrapreason.ScrapreasonRow.scrapreasonid]] */
   id: ScrapreasonId,

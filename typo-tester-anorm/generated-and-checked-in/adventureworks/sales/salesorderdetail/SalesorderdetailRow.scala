@@ -27,9 +27,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: sales.salesorderdetail
-    Individual products associated with a specific sales order. See SalesOrderHeader.
-    Composite primary key: salesorderid, salesorderdetailid */
+/**
+ *Table: sales.salesorderdetail
+ *
+ * Individual products associated with a specific sales order. See SalesOrderHeader.
+ *
+ * Composite primary key: salesorderid, salesorderdetailid */
 case class SalesorderdetailRow(
   /** Primary key. Foreign key to SalesOrderHeader.SalesOrderID.
       Points to [[salesorderheader.SalesorderheaderRow.salesorderid]] */

@@ -21,9 +21,12 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: production.productcategory
-    High-level product categorization.
-    Primary key: productcategoryid */
+/**
+ *Table: production.productcategory
+ *
+ * High-level product categorization.
+ *
+ * Primary key: productcategoryid */
 case class ProductcategoryRow(
   /** Primary key for ProductCategory records.
       Default: nextval('production.productcategory_productcategoryid_seq'::regclass) */

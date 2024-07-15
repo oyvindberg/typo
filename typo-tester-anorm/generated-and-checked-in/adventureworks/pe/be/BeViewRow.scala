@@ -20,7 +20,8 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: pe.be */
+/**
+ *View: pe.be */
 case class BeViewRow(
   /** Points to [[person.businessentity.BusinessentityRow.businessentityid]] */
   id: BusinessentityId,

@@ -14,7 +14,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: sales.vsalespersonsalesbyfiscalyears */
+/**
+ *View: sales.vsalespersonsalesbyfiscalyears */
 case class VsalespersonsalesbyfiscalyearsViewRow(
   salesPersonID: /* nullability unknown */ Option[Int],
   fullName: /* nullability unknown */ Option[String],

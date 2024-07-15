@@ -17,7 +17,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: sa.crc */
+/**
+ *View: sa.crc */
 case class CrcViewRow(
   /** Points to [[sales.countryregioncurrency.CountryregioncurrencyRow.countryregioncode]] */
   countryregioncode: CountryregionId,

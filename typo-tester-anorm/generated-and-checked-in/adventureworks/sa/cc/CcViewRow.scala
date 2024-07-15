@@ -22,7 +22,8 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: sa.cc */
+/**
+ *View: sa.cc */
 case class CcViewRow(
   /** Points to [[sales.creditcard.CreditcardRow.creditcardid]] */
   id: /* user-picked */ CustomCreditcardId,

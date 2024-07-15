@@ -21,7 +21,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: pe.p */
+/**
+ *View: pe.p */
 case class PViewRow(
   /** Points to [[person.person.PersonRow.businessentityid]] */
   id: BusinessentityId,

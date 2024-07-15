@@ -20,9 +20,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: sales.salespersonquotahistory
-    Sales performance tracking.
-    Composite primary key: businessentityid, quotadate */
+/**
+ *Table: sales.salespersonquotahistory
+ *
+ * Sales performance tracking.
+ *
+ * Composite primary key: businessentityid, quotadate */
 case class SalespersonquotahistoryRow(
   /** Sales person identification number. Foreign key to SalesPerson.BusinessEntityID.
       Points to [[salesperson.SalespersonRow.businessentityid]] */

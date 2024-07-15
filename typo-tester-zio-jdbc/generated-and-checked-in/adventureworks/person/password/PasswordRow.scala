@@ -18,9 +18,12 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** Table: person.password
-    One way hashed authentication information
-    Primary key: businessentityid */
+/**
+ *Table: person.password
+ *
+ * One way hashed authentication information
+ *
+ * Primary key: businessentityid */
 case class PasswordRow(
   /** Points to [[person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,

@@ -21,9 +21,12 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** Table: sales.store
-    Customers (resellers) of Adventure Works products.
-    Primary key: businessentityid */
+/**
+ *Table: sales.store
+ *
+ * Customers (resellers) of Adventure Works products.
+ *
+ * Primary key: businessentityid */
 case class StoreRow(
   /** Primary key. Foreign key to Customer.BusinessEntityID.
       Points to [[person.businessentity.BusinessentityRow.businessentityid]] */

@@ -21,7 +21,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: pe.sp */
+/**
+ *View: pe.sp */
 case class SpViewRow(
   /** Points to [[person.stateprovince.StateprovinceRow.stateprovinceid]] */
   id: StateprovinceId,

@@ -24,7 +24,8 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: sa.st */
+/**
+ *View: sa.st */
 case class StViewRow(
   /** Points to [[sales.salesterritory.SalesterritoryRow.territoryid]] */
   id: SalesterritoryId,

@@ -20,7 +20,8 @@ import play.api.libs.json.Reads
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** View: sa.cu */
+/**
+ *View: sa.cu */
 case class CuViewRow(
   /** Points to [[sales.currency.CurrencyRow.currencycode]] */
   id: CurrencyId,

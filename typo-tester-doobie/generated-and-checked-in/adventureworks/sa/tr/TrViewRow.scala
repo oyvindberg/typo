@@ -20,7 +20,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: sa.tr */
+/**
+ *View: sa.tr */
 case class TrViewRow(
   /** Points to [[sales.salestaxrate.SalestaxrateRow.salestaxrateid]] */
   id: SalestaxrateId,

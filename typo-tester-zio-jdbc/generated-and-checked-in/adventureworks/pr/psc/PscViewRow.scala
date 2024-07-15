@@ -19,7 +19,8 @@ import zio.json.JsonEncoder
 import zio.json.ast.Json
 import zio.json.internal.Write
 
-/** View: pr.psc */
+/**
+ *View: pr.psc */
 case class PscViewRow(
   /** Points to [[production.productsubcategory.ProductsubcategoryRow.productsubcategoryid]] */
   id: ProductsubcategoryId,

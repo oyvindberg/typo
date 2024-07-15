@@ -17,7 +17,8 @@ import io.circe.Decoder
 import io.circe.Encoder
 import java.sql.ResultSet
 
-/** View: sa.sci */
+/**
+ *View: sa.sci */
 case class SciViewRow(
   /** Points to [[sales.shoppingcartitem.ShoppingcartitemRow.shoppingcartitemid]] */
   id: ShoppingcartitemId,

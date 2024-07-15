@@ -23,9 +23,12 @@ import play.api.libs.json.Writes
 import scala.collection.immutable.ListMap
 import scala.util.Try
 
-/** Table: sales.salespersonquotahistory
-    Sales performance tracking.
-    Composite primary key: businessentityid, quotadate */
+/**
+ *Table: sales.salespersonquotahistory
+ *
+ * Sales performance tracking.
+ *
+ * Composite primary key: businessentityid, quotadate */
 case class SalespersonquotahistoryRow(
   /** Sales person identification number. Foreign key to SalesPerson.BusinessEntityID.
       Points to [[salesperson.SalespersonRow.businessentityid]] */
