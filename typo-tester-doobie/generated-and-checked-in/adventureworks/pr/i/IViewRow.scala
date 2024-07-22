@@ -3,9 +3,7 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package i
+package adventureworks.pr.i
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
@@ -18,13 +16,13 @@ import java.sql.ResultSet
 
 /** View: pr.i */
 case class IViewRow(
-  /** Points to [[production.illustration.IllustrationRow.illustrationid]] */
+  /** Points to [[adventureworks.production.illustration.IllustrationRow.illustrationid]] */
   id: IllustrationId,
-  /** Points to [[production.illustration.IllustrationRow.illustrationid]] */
+  /** Points to [[adventureworks.production.illustration.IllustrationRow.illustrationid]] */
   illustrationid: IllustrationId,
-  /** Points to [[production.illustration.IllustrationRow.diagram]] */
+  /** Points to [[adventureworks.production.illustration.IllustrationRow.diagram]] */
   diagram: Option[TypoXml],
-  /** Points to [[production.illustration.IllustrationRow.modifieddate]] */
+  /** Points to [[adventureworks.production.illustration.IllustrationRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 

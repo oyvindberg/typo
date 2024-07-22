@@ -3,9 +3,7 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package um
+package adventureworks.pr.um
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.unitmeasure.UnitmeasureId
@@ -18,13 +16,13 @@ import java.sql.ResultSet
 
 /** View: pr.um */
 case class UmViewRow(
-  /** Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
+  /** Points to [[adventureworks.production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   id: UnitmeasureId,
-  /** Points to [[production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
+  /** Points to [[adventureworks.production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
-  /** Points to [[production.unitmeasure.UnitmeasureRow.name]] */
+  /** Points to [[adventureworks.production.unitmeasure.UnitmeasureRow.name]] */
   name: Name,
-  /** Points to [[production.unitmeasure.UnitmeasureRow.modifieddate]] */
+  /** Points to [[adventureworks.production.unitmeasure.UnitmeasureRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 

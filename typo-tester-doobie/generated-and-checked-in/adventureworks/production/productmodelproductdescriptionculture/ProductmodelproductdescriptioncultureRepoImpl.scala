@@ -3,9 +3,7 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package production
-package productmodelproductdescriptionculture
+package adventureworks.production.productmodelproductdescriptionculture
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
@@ -40,7 +38,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     sql"""delete
           from production.productmodelproductdescriptionculture
           where ("productmodelid", "productdescriptionid", "cultureid")
-          in (select unnest(${productmodelid}), unnest(${productdescriptionid}), unnest(${cultureid}))
+          in (select unnest(${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.arrayPut))}), unnest(${fromWrite(productdescriptionid)(Write.fromPut(ProductdescriptionId.arrayPut))}), unnest(${fromWrite(cultureid)(Write.fromPut(CultureId.arrayPut))}))
        """.update.run
     
   }
@@ -98,7 +96,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
           from production.productmodelproductdescriptionculture
           where ("productmodelid", "productdescriptionid", "cultureid") 
-          in (select unnest(${productmodelid}), unnest(${productdescriptionid}), unnest(${cultureid}))
+          in (select unnest(${fromWrite(productmodelid)(Write.fromPut(ProductmodelId.arrayPut))}), unnest(${fromWrite(productdescriptionid)(Write.fromPut(ProductdescriptionId.arrayPut))}), unnest(${fromWrite(cultureid)(Write.fromPut(CultureId.arrayPut))}))
        """.query(using ProductmodelproductdescriptioncultureRow.read).stream
     
   }

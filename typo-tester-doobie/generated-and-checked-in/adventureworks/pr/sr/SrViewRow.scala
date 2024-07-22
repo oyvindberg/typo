@@ -3,9 +3,7 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package sr
+package adventureworks.pr.sr
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.scrapreason.ScrapreasonId
@@ -18,13 +16,13 @@ import java.sql.ResultSet
 
 /** View: pr.sr */
 case class SrViewRow(
-  /** Points to [[production.scrapreason.ScrapreasonRow.scrapreasonid]] */
+  /** Points to [[adventureworks.production.scrapreason.ScrapreasonRow.scrapreasonid]] */
   id: ScrapreasonId,
-  /** Points to [[production.scrapreason.ScrapreasonRow.scrapreasonid]] */
+  /** Points to [[adventureworks.production.scrapreason.ScrapreasonRow.scrapreasonid]] */
   scrapreasonid: ScrapreasonId,
-  /** Points to [[production.scrapreason.ScrapreasonRow.name]] */
+  /** Points to [[adventureworks.production.scrapreason.ScrapreasonRow.name]] */
   name: Name,
-  /** Points to [[production.scrapreason.ScrapreasonRow.modifieddate]] */
+  /** Points to [[adventureworks.production.scrapreason.ScrapreasonRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 

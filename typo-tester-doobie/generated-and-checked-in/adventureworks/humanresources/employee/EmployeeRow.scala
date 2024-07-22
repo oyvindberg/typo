@@ -3,9 +3,7 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package humanresources
-package employee
+package adventureworks.humanresources.employee
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDate
@@ -28,7 +26,7 @@ import java.sql.ResultSet
     Primary key: businessentityid */
 case class EmployeeRow(
   /** Primary key for Employee records.  Foreign key to BusinessEntity.BusinessEntityID.
-      Points to [[person.person.PersonRow.businessentityid]] */
+      Points to [[adventureworks.person.person.PersonRow.businessentityid]] */
   businessentityid: BusinessentityId,
   /** Unique national identification number such as a social security number. */
   nationalidnumber: /* max 15 chars */ String,

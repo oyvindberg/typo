@@ -3,9 +3,7 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sales
-package specialofferproduct
+package adventureworks.sales.specialofferproduct
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
@@ -39,7 +37,7 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     sql"""delete
           from sales.specialofferproduct
           where ("specialofferid", "productid")
-          in (select unnest(${specialofferid}), unnest(${productid}))
+          in (select unnest(${fromWrite(specialofferid)(Write.fromPut(SpecialofferId.arrayPut))}), unnest(${fromWrite(productid)(Write.fromPut(ProductId.arrayPut))}))
        """.update.run
     
   }
@@ -99,7 +97,7 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text
           from sales.specialofferproduct
           where ("specialofferid", "productid") 
-          in (select unnest(${specialofferid}), unnest(${productid}))
+          in (select unnest(${fromWrite(specialofferid)(Write.fromPut(SpecialofferId.arrayPut))}), unnest(${fromWrite(productid)(Write.fromPut(ProductId.arrayPut))}))
        """.query(using SpecialofferproductRow.read).stream
     
   }

@@ -3,9 +3,7 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package hr
-package d
+package adventureworks.hr.d
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
@@ -18,15 +16,15 @@ import java.sql.ResultSet
 
 /** View: hr.d */
 case class DViewRow(
-  /** Points to [[humanresources.department.DepartmentRow.departmentid]] */
+  /** Points to [[adventureworks.humanresources.department.DepartmentRow.departmentid]] */
   id: DepartmentId,
-  /** Points to [[humanresources.department.DepartmentRow.departmentid]] */
+  /** Points to [[adventureworks.humanresources.department.DepartmentRow.departmentid]] */
   departmentid: DepartmentId,
-  /** Points to [[humanresources.department.DepartmentRow.name]] */
+  /** Points to [[adventureworks.humanresources.department.DepartmentRow.name]] */
   name: Name,
-  /** Points to [[humanresources.department.DepartmentRow.groupname]] */
+  /** Points to [[adventureworks.humanresources.department.DepartmentRow.groupname]] */
   groupname: Name,
-  /** Points to [[humanresources.department.DepartmentRow.modifieddate]] */
+  /** Points to [[adventureworks.humanresources.department.DepartmentRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 

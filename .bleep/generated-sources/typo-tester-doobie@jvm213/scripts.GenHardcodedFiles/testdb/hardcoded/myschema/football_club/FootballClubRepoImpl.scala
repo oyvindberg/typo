@@ -3,10 +3,7 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb
-package hardcoded
-package myschema
-package football_club
+package testdb.hardcoded.myschema.football_club
 
 import cats.data.NonEmptyList
 import cats.instances.list.catsStdInstancesForList
@@ -33,7 +30,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
     sql"""delete from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(ids: Array[FootballClubId]): ConnectionIO[Int] = {
-    sql"""delete from myschema.football_club where "id" = ANY(${ids})""".update.run
+    sql"""delete from myschema.football_club where "id" = ANY(${fromWrite(ids)(Write.fromPut(FootballClubId.arrayPut))})""".update.run
   }
   override def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")
@@ -63,7 +60,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
     sql"""select "id", "name" from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".query(using FootballClubRow.read).option
   }
   override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${ids})""".query(using FootballClubRow.read).stream
+    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${fromWrite(ids)(Write.fromPut(FootballClubId.arrayPut))})""".query(using FootballClubRow.read).stream
   }
   override def selectByIdsTracked(ids: Array[FootballClubId]): ConnectionIO[Map[FootballClubId, FootballClubRow]] = {
     selectByIds(ids).compile.toList.map { rows =>

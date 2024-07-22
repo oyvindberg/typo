@@ -3,9 +3,7 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package humanresources
-package employeedepartmenthistory
+package adventureworks.humanresources.employeedepartmenthistory
 
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDate
@@ -42,7 +40,7 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     sql"""delete
           from humanresources.employeedepartmenthistory
           where ("businessentityid", "startdate", "departmentid", "shiftid")
-          in (select unnest(${businessentityid}), unnest(${startdate}), unnest(${departmentid}), unnest(${shiftid}))
+          in (select unnest(${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.arrayPut))}), unnest(${fromWrite(startdate)(Write.fromPut(TypoLocalDate.arrayPut))}), unnest(${fromWrite(departmentid)(Write.fromPut(DepartmentId.arrayPut))}), unnest(${fromWrite(shiftid)(Write.fromPut(ShiftId.arrayPut))}))
        """.update.run
     
   }
@@ -103,7 +101,7 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
           from humanresources.employeedepartmenthistory
           where ("businessentityid", "startdate", "departmentid", "shiftid") 
-          in (select unnest(${businessentityid}), unnest(${startdate}), unnest(${departmentid}), unnest(${shiftid}))
+          in (select unnest(${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.arrayPut))}), unnest(${fromWrite(startdate)(Write.fromPut(TypoLocalDate.arrayPut))}), unnest(${fromWrite(departmentid)(Write.fromPut(DepartmentId.arrayPut))}), unnest(${fromWrite(shiftid)(Write.fromPut(ShiftId.arrayPut))}))
        """.query(using EmployeedepartmenthistoryRow.read).stream
     
   }
