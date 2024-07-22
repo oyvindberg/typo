@@ -26,7 +26,7 @@ case class IdentityTestRow(
 ){
    val id = name
    def toUnsavedRow(defaultGenerated: Defaulted[Int] = Defaulted.Provided(this.defaultGenerated)): IdentityTestRowUnsaved =
-     IdentityTestRowUnsaved(name, defaultGenerated)
+     IdentityTestRowUnsaved(name, alwaysGenerated, defaultGenerated)
  }
 
 object IdentityTestRow {

@@ -631,7 +631,10 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                   specifier: ShortText = domainInsert.publicShortText(random),
                   parentspecifier: Option[ShortText] = None
                  ): ZIO[ZConnection, Throwable, FlaffRow] = (new FlaffRepoImpl).insert(new FlaffRow(code = code, anotherCode = anotherCode, someNumber = someNumber, specifier = specifier, parentspecifier = parentspecifier))
-  def publicIdentityTest(name: IdentityTestId, defaultGenerated: Defaulted[Int] = Defaulted.UseDefault): ZIO[ZConnection, Throwable, IdentityTestRow] = (new IdentityTestRepoImpl).insert(new IdentityTestRowUnsaved(name = name, defaultGenerated = defaultGenerated))
+  def publicIdentityTest(name: IdentityTestId,
+                         alwaysGenerated: Int = random.nextInt(),
+                         defaultGenerated: Defaulted[Int] = Defaulted.UseDefault
+                        ): ZIO[ZConnection, Throwable, IdentityTestRow] = (new IdentityTestRepoImpl).insert(new IdentityTestRowUnsaved(name = name, alwaysGenerated = alwaysGenerated, defaultGenerated = defaultGenerated))
   def publicPgtest(box: TypoBox,
                    bytea: TypoBytea,
                    circle: TypoCircle,

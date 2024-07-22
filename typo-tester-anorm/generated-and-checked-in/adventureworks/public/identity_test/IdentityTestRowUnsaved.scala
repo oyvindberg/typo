@@ -19,17 +19,19 @@ import scala.util.Try
 /** This class corresponds to a row in table `public.identity-test` which has not been persisted yet */
 case class IdentityTestRowUnsaved(
   name: IdentityTestId,
+  /** Identity ALWAYS, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
+  alwaysGenerated: Int,
   /** Identity BY DEFAULT, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
   defaultGenerated: Defaulted[Int]
 ) {
   def toRow(defaultGeneratedDefault: => Int, alwaysGeneratedDefault: => Int): IdentityTestRow =
     IdentityTestRow(
-      name = name,
+      alwaysGenerated = alwaysGeneratedDefault,
       defaultGenerated = defaultGenerated match {
                            case Defaulted.UseDefault => defaultGeneratedDefault
                            case Defaulted.Provided(value) => value
                          },
-      alwaysGenerated = alwaysGeneratedDefault
+      name = name
     )
 }
 object IdentityTestRowUnsaved {
@@ -37,6 +39,7 @@ object IdentityTestRowUnsaved {
       Try(
         IdentityTestRowUnsaved(
           name = json.\("name").as(IdentityTestId.reads),
+          alwaysGenerated = json.\("always_generated").as(Reads.IntReads),
           defaultGenerated = json.\("default_generated").as(Defaulted.reads(Reads.IntReads))
         )
       )
@@ -45,11 +48,14 @@ object IdentityTestRowUnsaved {
   implicit lazy val text: Text[IdentityTestRowUnsaved] = Text.instance[IdentityTestRowUnsaved]{ (row, sb) =>
     IdentityTestId.text.unsafeEncode(row.name, sb)
     sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.alwaysGenerated, sb)
+    sb.append(Text.DELIMETER)
     Defaulted.text(Text.intInstance).unsafeEncode(row.defaultGenerated, sb)
   }
   implicit lazy val writes: OWrites[IdentityTestRowUnsaved] = OWrites[IdentityTestRowUnsaved](o =>
     new JsObject(ListMap[String, JsValue](
       "name" -> IdentityTestId.writes.writes(o.name),
+      "always_generated" -> Writes.IntWrites.writes(o.alwaysGenerated),
       "default_generated" -> Defaulted.writes(Writes.IntWrites).writes(o.defaultGenerated)
     ))
   )

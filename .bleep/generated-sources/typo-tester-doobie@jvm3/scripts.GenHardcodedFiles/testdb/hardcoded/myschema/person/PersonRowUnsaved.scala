@@ -37,6 +37,10 @@ case class PersonRowUnsaved(
 ) {
   def toRow(idDefault: => PersonId, maritalStatusIdDefault: => MaritalStatusId, sectorDefault: => Sector, favoriteNumberDefault: => Number): PersonRow =
     PersonRow(
+      id = id match {
+             case Defaulted.UseDefault => idDefault
+             case Defaulted.Provided(value) => value
+           },
       favouriteFootballClubId = favouriteFootballClubId,
       name = name,
       nickName = nickName,
@@ -44,15 +48,11 @@ case class PersonRowUnsaved(
       email = email,
       phone = phone,
       likesPizza = likesPizza,
-      workEmail = workEmail,
-      id = id match {
-             case Defaulted.UseDefault => idDefault
-             case Defaulted.Provided(value) => value
-           },
       maritalStatusId = maritalStatusId match {
                           case Defaulted.UseDefault => maritalStatusIdDefault
                           case Defaulted.Provided(value) => value
                         },
+      workEmail = workEmail,
       sector = sector match {
                  case Defaulted.UseDefault => sectorDefault
                  case Defaulted.Provided(value) => value

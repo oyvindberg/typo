@@ -13,24 +13,28 @@ import io.circe.Encoder
 /** This class corresponds to a row in table `public.identity-test` which has not been persisted yet */
 case class IdentityTestRowUnsaved(
   name: IdentityTestId,
+  /** Identity ALWAYS, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
+  alwaysGenerated: Int,
   /** Identity BY DEFAULT, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
   defaultGenerated: Defaulted[Int]
 ) {
   def toRow(defaultGeneratedDefault: => Int, alwaysGeneratedDefault: => Int): IdentityTestRow =
     IdentityTestRow(
-      name = name,
+      alwaysGenerated = alwaysGeneratedDefault,
       defaultGenerated = defaultGenerated match {
                            case Defaulted.UseDefault => defaultGeneratedDefault
                            case Defaulted.Provided(value) => value
                          },
-      alwaysGenerated = alwaysGeneratedDefault
+      name = name
     )
 }
 object IdentityTestRowUnsaved {
-  implicit lazy val decoder: Decoder[IdentityTestRowUnsaved] = Decoder.forProduct2[IdentityTestRowUnsaved, IdentityTestId, Defaulted[Int]]("name", "default_generated")(IdentityTestRowUnsaved.apply)(IdentityTestId.decoder, Defaulted.decoder(Decoder.decodeInt))
-  implicit lazy val encoder: Encoder[IdentityTestRowUnsaved] = Encoder.forProduct2[IdentityTestRowUnsaved, IdentityTestId, Defaulted[Int]]("name", "default_generated")(x => (x.name, x.defaultGenerated))(IdentityTestId.encoder, Defaulted.encoder(Encoder.encodeInt))
+  implicit lazy val decoder: Decoder[IdentityTestRowUnsaved] = Decoder.forProduct3[IdentityTestRowUnsaved, IdentityTestId, Int, Defaulted[Int]]("name", "always_generated", "default_generated")(IdentityTestRowUnsaved.apply)(IdentityTestId.decoder, Decoder.decodeInt, Defaulted.decoder(Decoder.decodeInt))
+  implicit lazy val encoder: Encoder[IdentityTestRowUnsaved] = Encoder.forProduct3[IdentityTestRowUnsaved, IdentityTestId, Int, Defaulted[Int]]("name", "always_generated", "default_generated")(x => (x.name, x.alwaysGenerated, x.defaultGenerated))(IdentityTestId.encoder, Encoder.encodeInt, Defaulted.encoder(Encoder.encodeInt))
   implicit lazy val text: Text[IdentityTestRowUnsaved] = Text.instance[IdentityTestRowUnsaved]{ (row, sb) =>
     IdentityTestId.text.unsafeEncode(row.name, sb)
+    sb.append(Text.DELIMETER)
+    Text.intInstance.unsafeEncode(row.alwaysGenerated, sb)
     sb.append(Text.DELIMETER)
     Defaulted.text(Text.intInstance).unsafeEncode(row.defaultGenerated, sb)
   }

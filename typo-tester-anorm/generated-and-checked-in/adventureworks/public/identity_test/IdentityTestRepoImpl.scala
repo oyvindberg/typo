@@ -73,7 +73,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[IdentityTestRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY public.identity-test("name", "default_generated") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(IdentityTestRowUnsaved.text, c)
+    streamingInsert(s"""COPY public.identity-test("name", "always_generated", "default_generated") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(IdentityTestRowUnsaved.text, c)
   }
   override def select: SelectBuilder[IdentityTestFields, IdentityTestRow] = {
     SelectBuilderSql("public.identity-test", IdentityTestFields.structure, IdentityTestRow.rowParser)
