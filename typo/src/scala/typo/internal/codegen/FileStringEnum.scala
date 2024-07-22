@@ -3,7 +3,7 @@ package internal
 package codegen
 
 object FileStringEnum {
-  def apply(options: InternalOptions, enm: ComputedStringEnum, genOrdering: GenOrdering): sc.File = {
+  def apply(options: InternalOptions, enm: ComputedStringEnum): sc.File = {
 
     val comments = scaladoc(s"Enum `${enm.name.value}`")(enm.members.map { case (_, v) => " - " + v })
 
@@ -15,9 +15,6 @@ object FileStringEnum {
     val instances = List(
       options.dbLib.toList.flatMap(_.stringEnumInstances(enm.tpe, TypesJava.String, enm.dbEnum)),
       options.jsonLibs.flatMap(_.stringEnumInstances(enm.tpe, TypesJava.String)),
-      List(
-        genOrdering.ordering(enm.tpe, NonEmptyList(sc.Param(sc.Ident("value"), TypesJava.String, None)))
-      )
     ).flatten
 
     val obj = genObject.withBody(enm.tpe.value, instances)(

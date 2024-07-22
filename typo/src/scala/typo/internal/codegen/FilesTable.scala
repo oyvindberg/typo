@@ -5,7 +5,7 @@ package codegen
 import play.api.libs.json.Json
 import typo.internal.codegen.DbLib.RowType
 
-case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: InternalOptions, genOrdering: GenOrdering, domainsByName: Map[db.RelationName, ComputedDomain]) {
+case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: InternalOptions, domainsByName: Map[db.RelationName, ComputedDomain]) {
   val relation = FilesRelation(table.naming, table.names, Some(table.cols), Some(fkAnalysis), options, table.dbTable.foreignKeys)
   val RowFile = relation.RowFile(RowType.ReadWriteable, table.dbTable.comment, maybeUnsavedRow = table.maybeUnsavedRow.map(u => (u, table.default)))
 
@@ -128,9 +128,6 @@ case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: Int
           }
 
         val instances = List(
-          List(
-            genOrdering.ordering(id.tpe, NonEmptyList(sc.Param(value, id.underlying, None)))
-          ),
           bijection.toList,
           options.jsonLibs.flatMap(_.wrapperTypeInstances(wrapperType = id.tpe, fieldName = value, underlying = id.underlying)),
           options.dbLib.toList.flatMap(_.wrapperTypeInstances(wrapperType = id.tpe, underlying = id.underlying, overrideDbType = None))
@@ -178,10 +175,7 @@ case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: Int
         }
 
         val comments = scaladoc(s"Type for the composite primary key of table `${table.dbTable.name.value}`")(Nil)
-        val instances = List(
-          List(genOrdering.ordering(id.tpe, cols.map(cc => sc.Param(cc.param.name, cc.tpe, None)))),
-          options.jsonLibs.flatMap(_.instances(tpe = id.tpe, cols = cols))
-        ).flatten
+        val instances = options.jsonLibs.flatMap(_.instances(tpe = id.tpe, cols = cols))
         Some(
           sc.File(
             id.tpe,
