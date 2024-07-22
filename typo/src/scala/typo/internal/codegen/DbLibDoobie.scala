@@ -64,13 +64,12 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
     }
   override def resolveConstAs(tpe: sc.Type): sc.Code = {
     val put = lookupPutFor(tpe)
-    val (write, optionality) = tpe match {
+    tpe match {
       case TypesScala.Optional(underlying) =>
-        (code"$Write.fromPutOption(${lookupPutFor(underlying)})", TypesScala.Option)
-      case other =>
-        (code"$Write.fromPut(${lookupPutFor(other)})", sc.Type.dsl.Required)
+        code"${sc.Type.dsl.ConstAsAsOpt}[$underlying]($put)"
+      case _ =>
+        code"${sc.Type.dsl.ConstAsAs}[$tpe]($put)"
     }
-    code"${sc.Type.dsl.ConstAsAs}[$tpe, $optionality]($put, $write)"
   }
 
   override def repoSig(repoMethod: RepoMethod): Right[Nothing, sc.Code] = {
