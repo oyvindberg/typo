@@ -66,6 +66,7 @@ public sealed interface Either<L, R> permits Either.Left, Either.Right {
         public L value() {
             return value;
         }
+
         public String toString() {
             return "Left(" + value + ")";
         }
@@ -81,6 +82,7 @@ public sealed interface Either<L, R> permits Either.Left, Either.Right {
         public R value() {
             return value;
         }
+
         public String toString() {
             return "Right(" + value + ")";
         }

@@ -5,7 +5,6 @@ import org.postgresql.geometric.PGcircle;
 import org.postgresql.util.PGInterval;
 import org.postgresql.util.PGobject;
 import typo.data.Inet;
-import typo.data.Range;
 
 import java.time.*;
 import java.util.Arrays;
@@ -43,7 +42,7 @@ public interface PgTypes {
     PgType<Short> int2 = PgType.of("int2", PgRead.readShort, PgWrite.writeShort, PgText.textShort);
     PgType<Short> smallint = int2.withTypename(PgTypename.of("smallint"));
     PgType<Short[]> int2Array = int2.array(PgRead.readShortArray);
-//    PgType<Int2Vector> int2vector = int2Array.<Int2Vector>bimap(x -> new Int2Vector(x), Int2Vector::values);
+    //    PgType<Int2Vector> int2vector = int2Array.<Int2Vector>bimap(x -> new Int2Vector(x), Int2Vector::values);
     PgType<Short[]> smallintArray = int2Array.renamed("smallint");
     PgType<String> bpchar = PgType.of("bpchar", PgRead.readString, PgWrite.writeString, PgText.textString);
     PgType<String> text = PgType.of("text", PgRead.readString, PgWrite.writeString, PgText.textString);

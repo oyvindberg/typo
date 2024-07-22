@@ -3,6 +3,7 @@ package typo.anormruntime
 import java.sql.ResultSet
 import scala.collection.IterableFactory
 
+@FunctionalInterface
 trait ResultSetParser[R] {
   def apply(resultSet: ResultSet): R
 }

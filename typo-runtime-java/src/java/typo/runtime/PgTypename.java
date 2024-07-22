@@ -4,6 +4,7 @@ import java.util.Optional;
 
 public sealed interface PgTypename<A> {
     String sqlType();
+
     String sqlTypeNoPrecision();
 
     PgTypename<A[]> array();

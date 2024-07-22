@@ -17,6 +17,7 @@ public class Arr<A> {
     public Arr(Object[] data, int[] extent) {
         this(data, extent, _offsets(extent));
     }
+
     private Arr(Object[] data, int[] extent, int[] _offsets) {
         this.data = data;
         this.extent = extent;

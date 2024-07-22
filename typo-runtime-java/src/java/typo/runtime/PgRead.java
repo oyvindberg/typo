@@ -73,6 +73,7 @@ public sealed interface PgRead<A> permits PgRead.NonNullable, PgRead.Nullable {
             return Arrays.copyOf(array, array.length, arrayCls);
         });
     }
+
     static PgRead<double[]> doubleArray() {
         return readPgArray.map(sqlArray -> {
             Object arrayObj = sqlArray.getArray();

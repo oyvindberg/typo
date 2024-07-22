@@ -74,13 +74,16 @@ public record RowParser<Row>(PgType<?>[] columns, Function<Object[], Row> decode
     public interface Function7<T1, T2, T3, T4, T5, T6, T7, R> {
         R apply(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7);
     }
+
     @SuppressWarnings("unchecked")
     public static <T1, T2, T3, T4, T5, T6, T7, Row> RowParser<Row> of(PgType<T1> type1, PgType<T2> type2, PgType<T3> type3, PgType<T4> type4, PgType<T5> type5, PgType<T6> type6, PgType<T7> type7, Function7<T1, T2, T3, T4, T5, T6, T7, Row> decode) {
         return new RowParser<>(new PgType[]{type1, type2, type3, type4, type5, type6, type7}, (objects) -> decode.apply((T1) objects[0], (T2) objects[1], (T3) objects[2], (T4) objects[3], (T5) objects[4], (T6) objects[5], (T7) objects[6]));
     }
+
     public interface Function8<T1, T2, T3, T4, T5, T6, T7, T8, R> {
         R apply(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6, T7 t7, T8 t8);
     }
+
     @SuppressWarnings("unchecked")
     public static <T1, T2, T3, T4, T5, T6, T7, T8, Row> RowParser<Row> of(PgType<T1> type1, PgType<T2> type2, PgType<T3> type3, PgType<T4> type4, PgType<T5> type5, PgType<T6> type6, PgType<T7> type7, PgType<T8> type8, Function8<T1, T2, T3, T4, T5, T6, T7, T8, Row> decode) {
         return new RowParser<>(new PgType[]{type1, type2, type3, type4, type5, type6, type7, type8}, (objects) -> decode.apply((T1) objects[0], (T2) objects[1], (T3) objects[2], (T4) objects[3], (T5) objects[4], (T6) objects[5], (T7) objects[6], (T8) objects[7]));

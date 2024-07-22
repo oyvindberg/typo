@@ -80,9 +80,9 @@ public interface tester {
 
     // main
     static void main(String[] args) {
-        System.out.println(Arr.of(0, 1,2,3).reshape(2,2));
-        System.out.println(Arr.of("a","b","c","d \",d").reshape(2,2));
-        System.out.println(ArrParser.parse(Arr.of(1,2,3,4).encode(Object::toString)));
+        System.out.println(Arr.of(0, 1, 2, 3).reshape(2, 2));
+        System.out.println(Arr.of("a", "b", "c", "d \",d").reshape(2, 2));
+        System.out.println(ArrParser.parse(Arr.of(1, 2, 3, 4).encode(Object::toString)));
         System.out.println(ArrParser.parse("{{\"a\",\"b\"},{\"c\",\"d \\\",d\"}}"));
         withConnection(conn -> {
             for (PgTypeAndExample<?> t : All) {

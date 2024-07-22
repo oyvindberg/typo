@@ -1,9 +1,9 @@
 package typo.runtime;
 
+import org.postgresql.util.PGobject;
+
 import java.util.Optional;
 import java.util.function.Function;
-
-import org.postgresql.util.PGobject;
 
 public record PgType<A>(
         PgTypename<A> typename,
@@ -11,6 +11,9 @@ public record PgType<A>(
         PgWrite<A> write,
         PgText<A> text
 ) {
+    public Fragment.Value<A> encode(A value) {
+        return new Fragment.Value<>(value, this);
+    }
 
     public PgType<A> withTypename(PgTypename<A> typename) {
         return new PgType<>(typename, read, write, text);

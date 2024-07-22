@@ -2,9 +2,9 @@ package typo.anormruntime
 
 import scala.collection.IterableFactory
 
-final case class RowParser[Row](rows: Array[PgType[?]], decode: Array[?] => Row) {
+final case class RowParser[Row](cols: Array[PgType[?]], decode: Array[?] => Row) {
   val colsWithIndex: Array[(PgType[?], Int)] =
-    rows.zipWithIndex
+    cols.zipWithIndex
   def single: ResultSetParser[Either[String, Row]] =
     new ResultSetParser.ExactlyOne(this)
   def toList : ResultSetParser[List[Row]] =
