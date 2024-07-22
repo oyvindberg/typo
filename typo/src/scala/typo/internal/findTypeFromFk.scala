@@ -1,6 +1,7 @@
 package typo
 package internal
 
+import typo.internal.codegen.LangScala
 import typo.internal.rewriteDependentData.EvalMaybe
 
 // we let types flow through constraints down to this column, the point is to reuse id types downstream
@@ -31,7 +32,7 @@ object findTypeFromFk {
       case all =>
         val fromSelf = all.collectFirst { case Left(tpe) => tpe }
         val fromOthers = all.collectFirst { case Right(tpe) => tpe }
-        val renderedTypes = all.map { e => sc.renderTree(e.merge) }
+        val renderedTypes = all.map { e => LangScala.renderTree(e.merge) }
         typoLogger.warn(s"Multiple distinct types inherited for column ${colName.value} in $source: ${renderedTypes.mkString(", ")}")
         fromOthers.orElse(fromSelf)
     }

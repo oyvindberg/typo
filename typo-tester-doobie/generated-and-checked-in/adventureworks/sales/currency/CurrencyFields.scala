@@ -3,17 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sales
-package currency
+package adventureworks.sales.currency;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait CurrencyFields {
   def currencycode: IdField[CurrencyId, CurrencyRow]
@@ -24,7 +22,7 @@ trait CurrencyFields {
 object CurrencyFields {
   lazy val structure: Relation[CurrencyFields, CurrencyRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[CurrencyFields, CurrencyRow] {
   
@@ -34,8 +32,8 @@ object CurrencyFields {
       override def modifieddate = Field[TypoLocalDateTime, CurrencyRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, CurrencyRow]] =
-      List[FieldLikeNoHkt[?, CurrencyRow]](fields.currencycode, fields.name, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, CurrencyRow]] =
+      List[FieldLike[?, CurrencyRow]](fields.currencycode, fields.name, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

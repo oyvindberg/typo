@@ -3,27 +3,26 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sales
-package personcreditcard
+package adventureworks.sales.personcreditcard;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.person.person.PersonFields
-import adventureworks.person.person.PersonRow
-import adventureworks.sales.creditcard.CreditcardFields
-import adventureworks.sales.creditcard.CreditcardRow
-import adventureworks.userdefined.CustomCreditcardId
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.Required
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.person.person.PersonFields;
+import adventureworks.person.person.PersonRow;
+import adventureworks.sales.creditcard.CreditcardFields;
+import adventureworks.sales.creditcard.CreditcardRow;
+import adventureworks.userdefined.CustomCreditcardId;
+import typo.dsl.ForeignKey;
+import typo.dsl.PGType;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait PersoncreditcardFields {
   def businessentityid: IdField[BusinessentityId, PersoncreditcardRow]
@@ -35,17 +34,17 @@ trait PersoncreditcardFields {
   def fkPersonPerson: ForeignKey[PersonFields, PersonRow] =
     ForeignKey[PersonFields, PersonRow]("sales.FK_PersonCreditCard_Person_BusinessEntityID", Nil)
       .withColumnPair(businessentityid, _.businessentityid)
-  def compositeIdIs(compositeId: PersoncreditcardId): SqlExpr[Boolean, Required] =
+  def compositeIdIs(compositeId: PersoncreditcardId): SqlExpr[Boolean] =
     businessentityid.isEqual(compositeId.businessentityid).and(creditcardid.isEqual(compositeId.creditcardid))
-  def compositeIdIn(compositeIds: Array[PersoncreditcardId]): SqlExpr[Boolean, Required] =
-    new CompositeIn(compositeIds)(TuplePart(businessentityid)(_.businessentityid), TuplePart(creditcardid)(_.creditcardid))
+  def compositeIdIn(compositeIds: Array[PersoncreditcardId]): SqlExpr[Boolean] =
+    new CompositeIn(compositeIds)(TuplePart[PersoncreditcardId](businessentityid)(_.businessentityid)(using as[Array[BusinessentityId]](BusinessentityId.arrayJdbcEncoder, PGType.forArray(BusinessentityId.pgType)), implicitly), TuplePart[PersoncreditcardId](creditcardid)(_.creditcardid)(using as[Array[/* user-picked */ CustomCreditcardId]](CustomCreditcardId.arrayJdbcEncoder, PGType.forArray(CustomCreditcardId.pgType)), implicitly))
   
 }
 
 object PersoncreditcardFields {
   lazy val structure: Relation[PersoncreditcardFields, PersoncreditcardRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[PersoncreditcardFields, PersoncreditcardRow] {
   
@@ -55,8 +54,8 @@ object PersoncreditcardFields {
       override def modifieddate = Field[TypoLocalDateTime, PersoncreditcardRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, PersoncreditcardRow]] =
-      List[FieldLikeNoHkt[?, PersoncreditcardRow]](fields.businessentityid, fields.creditcardid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, PersoncreditcardRow]] =
+      List[FieldLike[?, PersoncreditcardRow]](fields.businessentityid, fields.creditcardid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

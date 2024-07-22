@@ -3,20 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sales
-package salesorderheader
+package adventureworks.sales.salesorderheader;
 
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `sales.salesorderheader` */
-case class SalesorderheaderId(value: Int) extends AnyVal
+case class SalesorderheaderId(value: Int) extends scala.AnyVal
+
 object SalesorderheaderId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[SalesorderheaderId]] = adventureworks.IntArrayDecoder.map(_.map(SalesorderheaderId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[SalesorderheaderId]] = adventureworks.IntArrayEncoder.contramap(_.map(_.value))
@@ -26,11 +26,12 @@ object SalesorderheaderId {
   implicit lazy val jdbcEncoder: JdbcEncoder[SalesorderheaderId] = JdbcEncoder.intEncoder.contramap(_.value)
   implicit lazy val jsonDecoder: JsonDecoder[SalesorderheaderId] = JsonDecoder.int.map(SalesorderheaderId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[SalesorderheaderId] = JsonEncoder.int.contramap(_.value)
-  implicit lazy val ordering: Ordering[SalesorderheaderId] = Ordering.by(_.value)
   implicit lazy val pgType: PGType[SalesorderheaderId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[SalesorderheaderId] = Setter.intSetter.contramap(_.value)
-  implicit lazy val text: Text[SalesorderheaderId] = new Text[SalesorderheaderId] {
-    override def unsafeEncode(v: SalesorderheaderId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: SalesorderheaderId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[SalesorderheaderId] = {
+    new Text[SalesorderheaderId] {
+      override def unsafeEncode(v: SalesorderheaderId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: SalesorderheaderId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

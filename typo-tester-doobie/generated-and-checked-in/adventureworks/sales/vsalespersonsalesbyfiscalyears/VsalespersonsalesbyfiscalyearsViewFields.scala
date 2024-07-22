@@ -3,14 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sales
-package vsalespersonsalesbyfiscalyears
+package adventureworks.sales.vsalespersonsalesbyfiscalyears;
 
-import typo.dsl.Path
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait VsalespersonsalesbyfiscalyearsViewFields {
   def salesPersonID: OptField[Int, VsalespersonsalesbyfiscalyearsViewRow]
@@ -25,7 +23,7 @@ trait VsalespersonsalesbyfiscalyearsViewFields {
 object VsalespersonsalesbyfiscalyearsViewFields {
   lazy val structure: Relation[VsalespersonsalesbyfiscalyearsViewFields, VsalespersonsalesbyfiscalyearsViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[VsalespersonsalesbyfiscalyearsViewFields, VsalespersonsalesbyfiscalyearsViewRow] {
   
@@ -39,8 +37,8 @@ object VsalespersonsalesbyfiscalyearsViewFields {
       override def `2014` = OptField[BigDecimal, VsalespersonsalesbyfiscalyearsViewRow](_path, "2014", None, None, x => x.`2014`, (row, value) => row.copy(`2014` = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, VsalespersonsalesbyfiscalyearsViewRow]] =
-      List[FieldLikeNoHkt[?, VsalespersonsalesbyfiscalyearsViewRow]](fields.salesPersonID, fields.fullName, fields.jobTitle, fields.salesTerritory, fields.`2012`, fields.`2013`, fields.`2014`)
+    override lazy val columns: List[FieldLike[?, VsalespersonsalesbyfiscalyearsViewRow]] =
+      List[FieldLike[?, VsalespersonsalesbyfiscalyearsViewRow]](fields.salesPersonID, fields.fullName, fields.jobTitle, fields.salesTerritory, fields.`2012`, fields.`2013`, fields.`2014`)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

@@ -3,20 +3,18 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sa
-package c
+package adventureworks.sa.c;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.customer.CustomerId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.sales.customer.CustomerId;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait CViewFields {
   def id: Field[CustomerId, CViewRow]
@@ -31,7 +29,7 @@ trait CViewFields {
 object CViewFields {
   lazy val structure: Relation[CViewFields, CViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[CViewFields, CViewRow] {
   
@@ -45,8 +43,8 @@ object CViewFields {
       override def modifieddate = Field[TypoLocalDateTime, CViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, CViewRow]] =
-      List[FieldLikeNoHkt[?, CViewRow]](fields.id, fields.customerid, fields.personid, fields.storeid, fields.territoryid, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, CViewRow]] =
+      List[FieldLike[?, CViewRow]](fields.id, fields.customerid, fields.personid, fields.storeid, fields.territoryid, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

@@ -3,55 +3,56 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pe
-package bec
+package adventureworks.pe.bec;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.person.contacttype.ContacttypeId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.person.contacttype.ContacttypeId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: pe.bec */
 case class BecViewRow(
-  /** Points to [[person.businessentitycontact.BusinessentitycontactRow.businessentityid]] */
+  /** Points to [[adventureworks.person.businessentitycontact.BusinessentitycontactRow.businessentityid]] */
   id: BusinessentityId,
-  /** Points to [[person.businessentitycontact.BusinessentitycontactRow.businessentityid]] */
+  /** Points to [[adventureworks.person.businessentitycontact.BusinessentitycontactRow.businessentityid]] */
   businessentityid: BusinessentityId,
-  /** Points to [[person.businessentitycontact.BusinessentitycontactRow.personid]] */
+  /** Points to [[adventureworks.person.businessentitycontact.BusinessentitycontactRow.personid]] */
   personid: BusinessentityId,
-  /** Points to [[person.businessentitycontact.BusinessentitycontactRow.contacttypeid]] */
+  /** Points to [[adventureworks.person.businessentitycontact.BusinessentitycontactRow.contacttypeid]] */
   contacttypeid: ContacttypeId,
-  /** Points to [[person.businessentitycontact.BusinessentitycontactRow.rowguid]] */
+  /** Points to [[adventureworks.person.businessentitycontact.BusinessentitycontactRow.rowguid]] */
   rowguid: TypoUUID,
-  /** Points to [[person.businessentitycontact.BusinessentitycontactRow.modifieddate]] */
+  /** Points to [[adventureworks.person.businessentitycontact.BusinessentitycontactRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object BecViewRow {
   implicit lazy val decoder: Decoder[BecViewRow] = Decoder.forProduct6[BecViewRow, BusinessentityId, BusinessentityId, BusinessentityId, ContacttypeId, TypoUUID, TypoLocalDateTime]("id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(BecViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, BusinessentityId.decoder, ContacttypeId.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[BecViewRow] = Encoder.forProduct6[BecViewRow, BusinessentityId, BusinessentityId, BusinessentityId, ContacttypeId, TypoUUID, TypoLocalDateTime]("id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.personid, x.contacttypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, BusinessentityId.encoder, ContacttypeId.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[BecViewRow] = new Read[BecViewRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (ContacttypeId.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => BecViewRow(
-      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      personid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 2),
-      contacttypeid = ContacttypeId.get.unsafeGetNonNullable(rs, i + 3),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[BecViewRow] = {
+    new Read[BecViewRow](
+      gets = List(
+        (BusinessentityId.get, Nullability.NoNulls),
+        (BusinessentityId.get, Nullability.NoNulls),
+        (BusinessentityId.get, Nullability.NoNulls),
+        (ContacttypeId.get, Nullability.NoNulls),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => BecViewRow(
+        id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+        businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+        personid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 2),
+        contacttypeid = ContacttypeId.get.unsafeGetNonNullable(rs, i + 3),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+      )
     )
-  )
+  
+  }
 }

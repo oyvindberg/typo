@@ -3,60 +3,61 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package pm
+package adventureworks.pr.pm;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.customtypes.TypoXml
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.public.Name
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.production.productmodel.ProductmodelId;
+import adventureworks.public.Name;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: pr.pm */
 case class PmViewRow(
-  /** Points to [[production.productmodel.ProductmodelRow.productmodelid]] */
+  /** Points to [[adventureworks.production.productmodel.ProductmodelRow.productmodelid]] */
   id: ProductmodelId,
-  /** Points to [[production.productmodel.ProductmodelRow.productmodelid]] */
+  /** Points to [[adventureworks.production.productmodel.ProductmodelRow.productmodelid]] */
   productmodelid: ProductmodelId,
-  /** Points to [[production.productmodel.ProductmodelRow.name]] */
+  /** Points to [[adventureworks.production.productmodel.ProductmodelRow.name]] */
   name: Name,
-  /** Points to [[production.productmodel.ProductmodelRow.catalogdescription]] */
+  /** Points to [[adventureworks.production.productmodel.ProductmodelRow.catalogdescription]] */
   catalogdescription: Option[TypoXml],
-  /** Points to [[production.productmodel.ProductmodelRow.instructions]] */
+  /** Points to [[adventureworks.production.productmodel.ProductmodelRow.instructions]] */
   instructions: Option[TypoXml],
-  /** Points to [[production.productmodel.ProductmodelRow.rowguid]] */
+  /** Points to [[adventureworks.production.productmodel.ProductmodelRow.rowguid]] */
   rowguid: TypoUUID,
-  /** Points to [[production.productmodel.ProductmodelRow.modifieddate]] */
+  /** Points to [[adventureworks.production.productmodel.ProductmodelRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object PmViewRow {
   implicit lazy val decoder: Decoder[PmViewRow] = Decoder.forProduct7[PmViewRow, ProductmodelId, ProductmodelId, Name, Option[TypoXml], Option[TypoXml], TypoUUID, TypoLocalDateTime]("id", "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(PmViewRow.apply)(ProductmodelId.decoder, ProductmodelId.decoder, Name.decoder, Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PmViewRow] = Encoder.forProduct7[PmViewRow, ProductmodelId, ProductmodelId, Name, Option[TypoXml], Option[TypoXml], TypoUUID, TypoLocalDateTime]("id", "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(x => (x.id, x.productmodelid, x.name, x.catalogdescription, x.instructions, x.rowguid, x.modifieddate))(ProductmodelId.encoder, ProductmodelId.encoder, Name.encoder, Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PmViewRow] = new Read[PmViewRow](
-    gets = List(
-      (ProductmodelId.get, Nullability.NoNulls),
-      (ProductmodelId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PmViewRow(
-      id = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
-      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 1),
-      name = Name.get.unsafeGetNonNullable(rs, i + 2),
-      catalogdescription = TypoXml.get.unsafeGetNullable(rs, i + 3),
-      instructions = TypoXml.get.unsafeGetNullable(rs, i + 4),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+  implicit lazy val read: Read[PmViewRow] = {
+    new Read[PmViewRow](
+      gets = List(
+        (ProductmodelId.get, Nullability.NoNulls),
+        (ProductmodelId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (TypoXml.get, Nullability.Nullable),
+        (TypoXml.get, Nullability.Nullable),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PmViewRow(
+        id = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
+        productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 1),
+        name = Name.get.unsafeGetNonNullable(rs, i + 2),
+        catalogdescription = TypoXml.get.unsafeGetNullable(rs, i + 3),
+        instructions = TypoXml.get.unsafeGetNullable(rs, i + 4),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 5),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+      )
     )
-  )
+  
+  }
 }

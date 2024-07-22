@@ -71,7 +71,6 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
   }
   test("can query pgtestnull with DSL") {
     withConnection {
-      implicit def ordering[T]: Ordering[T] = null
       for {
         row <- pgtestnullRepo.insert(ArrayTestData.pgtestnullRowWithValues)
         _ <- pgtestnullRepo.select.where(_.bool === row.bool).toChunk.map(x => assertJsonEquals(row.bool, x.head.bool))
@@ -150,7 +149,6 @@ class ArrayTest extends AnyFunSuite with TypeCheckedTripleEquals {
 
   test("can update pgtest with DSL") {
     withConnection {
-      implicit def ordering[T]: Ordering[T] = null
       for {
         row <- pgtestRepo.insert(ArrayTestData.pgTestRow)
         _ <- pgtestRepo.update.setValue(_.bool)(row.bool).where(_.uuid === row.uuid).execute

@@ -3,22 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package production
-package productsubcategory
+package adventureworks.production.productsubcategory;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.production.productcategory.ProductcategoryFields
-import adventureworks.production.productcategory.ProductcategoryId
-import adventureworks.production.productcategory.ProductcategoryRow
-import adventureworks.public.Name
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.production.productcategory.ProductcategoryFields;
+import adventureworks.production.productcategory.ProductcategoryId;
+import adventureworks.production.productcategory.ProductcategoryRow;
+import adventureworks.public.Name;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait ProductsubcategoryFields {
   def productsubcategoryid: IdField[ProductsubcategoryId, ProductsubcategoryRow]
@@ -34,7 +32,7 @@ trait ProductsubcategoryFields {
 object ProductsubcategoryFields {
   lazy val structure: Relation[ProductsubcategoryFields, ProductsubcategoryRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[ProductsubcategoryFields, ProductsubcategoryRow] {
   
@@ -46,8 +44,8 @@ object ProductsubcategoryFields {
       override def modifieddate = Field[TypoLocalDateTime, ProductsubcategoryRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, ProductsubcategoryRow]] =
-      List[FieldLikeNoHkt[?, ProductsubcategoryRow]](fields.productsubcategoryid, fields.productcategoryid, fields.name, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, ProductsubcategoryRow]] =
+      List[FieldLike[?, ProductsubcategoryRow]](fields.productsubcategoryid, fields.productcategoryid, fields.name, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

@@ -3,13 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sa
-package sop
+package adventureworks.sa.sop;
 
-import typo.dsl.SelectBuilder
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
 trait SopViewRepo {
   def select: SelectBuilder[SopViewFields, SopViewRow]

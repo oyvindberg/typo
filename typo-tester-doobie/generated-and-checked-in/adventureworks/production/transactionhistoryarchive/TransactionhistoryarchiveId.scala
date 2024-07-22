@@ -3,20 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package production
-package transactionhistoryarchive
+package adventureworks.production.transactionhistoryarchive;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `production.transactionhistoryarchive` */
-case class TransactionhistoryarchiveId(value: Int) extends AnyVal
+case class TransactionhistoryarchiveId(value: Int) extends scala.AnyVal
+
 object TransactionhistoryarchiveId {
   implicit lazy val arrayGet: Get[Array[TransactionhistoryarchiveId]] = adventureworks.IntegerArrayMeta.get.map(_.map(TransactionhistoryarchiveId.apply))
   implicit lazy val arrayPut: Put[Array[TransactionhistoryarchiveId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
@@ -24,10 +23,11 @@ object TransactionhistoryarchiveId {
   implicit lazy val decoder: Decoder[TransactionhistoryarchiveId] = Decoder.decodeInt.map(TransactionhistoryarchiveId.apply)
   implicit lazy val encoder: Encoder[TransactionhistoryarchiveId] = Encoder.encodeInt.contramap(_.value)
   implicit lazy val get: Get[TransactionhistoryarchiveId] = Meta.IntMeta.get.map(TransactionhistoryarchiveId.apply)
-  implicit lazy val ordering: Ordering[TransactionhistoryarchiveId] = Ordering.by(_.value)
   implicit lazy val put: Put[TransactionhistoryarchiveId] = Meta.IntMeta.put.contramap(_.value)
-  implicit lazy val text: Text[TransactionhistoryarchiveId] = new Text[TransactionhistoryarchiveId] {
-    override def unsafeEncode(v: TransactionhistoryarchiveId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: TransactionhistoryarchiveId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[TransactionhistoryarchiveId] = {
+    new Text[TransactionhistoryarchiveId] {
+      override def unsafeEncode(v: TransactionhistoryarchiveId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: TransactionhistoryarchiveId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

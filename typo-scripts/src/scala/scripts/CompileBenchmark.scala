@@ -4,11 +4,11 @@ import bleep.*
 import bleep.commands.SourceGen
 import bleep.model.{CrossProjectName, ProjectName}
 import typo.*
+import typo.internal.codegen.LangScala
 import typo.internal.generate
 import typo.internal.sqlfiles.readSqlFileDirectories
 
 import java.nio.file.Path
-import scala.annotation.nowarn
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
@@ -57,12 +57,13 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
             Options(
               pkg = "adventureworks",
               dbLib,
+              lang = LangScala,
               jsonLib,
-              enableDsl = dbLib.nonEmpty,
               enableTestInserts = Selector.All,
+              enableStreamingInserts = false,
+              enableDsl = dbLib.nonEmpty,
               inlineImplicits = inlineImplicits,
-              fixVerySlowImplicit = fixVerySlowImplicit,
-              enableStreamingInserts = false
+              fixVerySlowImplicit = fixVerySlowImplicit
             ),
             metadb,
             ProjectGraph(
@@ -86,7 +87,7 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
             val times = 0.to(2).map { _ =>
               val crossProjectName = model.CrossProjectName(model.ProjectName(projectName), Some(crossId))
               commands.clean(List(crossProjectName))
-              SourceGen(false, Array(crossProjectName)).run(started): @nowarn
+              SourceGen(false, Array(crossProjectName)).run(started).orThrow
               time(commands.compile(List(crossProjectName)))
             }
             val avgtime = times.sum / times.length

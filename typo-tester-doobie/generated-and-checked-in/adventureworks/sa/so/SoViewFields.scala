@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sa
-package so
+package adventureworks.sa.so;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.sales.specialoffer.SpecialofferId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.sales.specialoffer.SpecialofferId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait SoViewFields {
   def id: Field[SpecialofferId, SoViewRow]
@@ -34,7 +32,7 @@ trait SoViewFields {
 object SoViewFields {
   lazy val structure: Relation[SoViewFields, SoViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[SoViewFields, SoViewRow] {
   
@@ -53,8 +51,8 @@ object SoViewFields {
       override def modifieddate = Field[TypoLocalDateTime, SoViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, SoViewRow]] =
-      List[FieldLikeNoHkt[?, SoViewRow]](fields.id, fields.specialofferid, fields.description, fields.discountpct, fields.`type`, fields.category, fields.startdate, fields.enddate, fields.minqty, fields.maxqty, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, SoViewRow]] =
+      List[FieldLike[?, SoViewRow]](fields.id, fields.specialofferid, fields.description, fields.discountpct, fields.`type`, fields.category, fields.startdate, fields.enddate, fields.minqty, fields.maxqty, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

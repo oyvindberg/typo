@@ -3,12 +3,15 @@ package internal
 package codegen
 
 object FileDomain {
-  def apply(domain: ComputedDomain, options: InternalOptions, genOrdering: GenOrdering): sc.File = {
-    val comments = scaladoc(s"Domain `${domain.underlying.name.value}`")(
-      domain.underlying.constraintDefinition match {
-        case Some(definition) => List(s"Constraint: $definition")
-        case None             => List("No constraint")
-      }
+  def apply(domain: ComputedDomain, options: InternalOptions): sc.File = {
+    val comments = scaladoc(
+      List(
+        s"Domain `${domain.underlying.name.value}`",
+        domain.underlying.constraintDefinition match {
+          case Some(definition) => s"Constraint: $definition"
+          case None             => "No constraint"
+        }
+      )
     )
     val value = sc.Ident("value")
 
@@ -20,19 +23,24 @@ object FileDomain {
         }
       else None
     val instances = List(
-      List(
-        genOrdering.ordering(domain.tpe, NonEmptyList(sc.Param(value, domain.underlyingType, None)))
-      ),
       bijection.toList,
       options.jsonLibs.flatMap(_.wrapperTypeInstances(wrapperType = domain.tpe, fieldName = value, underlying = domain.underlyingType)),
       options.dbLib.toList.flatMap(_.wrapperTypeInstances(wrapperType = domain.tpe, underlying = domain.underlyingType, overrideDbType = Some(domain.underlying.name.quotedValue)))
     ).flatten
 
-    val str =
-      code"""|$comments
-             |case class ${domain.tpe.name}($value: ${domain.underlyingType})
-             |${genObject(domain.tpe.value, instances)}""".stripMargin
+    val cls = sc.Adt.Record(
+      isWrapper = false,
+      comments = comments,
+      name = domain.tpe,
+      tparams = Nil,
+      params = List(sc.Param(value, domain.underlyingType)),
+      implicitParams = Nil,
+      `extends` = None,
+      implements = Nil,
+      members = Nil,
+      staticMembers = instances
+    )
 
-    sc.File(domain.tpe, str, secondaryTypes = Nil, scope = Scope.Main)
+    sc.File(domain.tpe, cls, secondaryTypes = Nil, scope = Scope.Main)
   }
 }

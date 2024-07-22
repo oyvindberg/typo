@@ -3,60 +3,61 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sa
-package s
+package adventureworks.sa.s;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.customtypes.TypoXml
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.Name;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: sa.s */
 case class SViewRow(
-  /** Points to [[sales.store.StoreRow.businessentityid]] */
+  /** Points to [[adventureworks.sales.store.StoreRow.businessentityid]] */
   id: BusinessentityId,
-  /** Points to [[sales.store.StoreRow.businessentityid]] */
+  /** Points to [[adventureworks.sales.store.StoreRow.businessentityid]] */
   businessentityid: BusinessentityId,
-  /** Points to [[sales.store.StoreRow.name]] */
+  /** Points to [[adventureworks.sales.store.StoreRow.name]] */
   name: Name,
-  /** Points to [[sales.store.StoreRow.salespersonid]] */
+  /** Points to [[adventureworks.sales.store.StoreRow.salespersonid]] */
   salespersonid: Option[BusinessentityId],
-  /** Points to [[sales.store.StoreRow.demographics]] */
+  /** Points to [[adventureworks.sales.store.StoreRow.demographics]] */
   demographics: Option[TypoXml],
-  /** Points to [[sales.store.StoreRow.rowguid]] */
+  /** Points to [[adventureworks.sales.store.StoreRow.rowguid]] */
   rowguid: TypoUUID,
-  /** Points to [[sales.store.StoreRow.modifieddate]] */
+  /** Points to [[adventureworks.sales.store.StoreRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object SViewRow {
   implicit lazy val decoder: Decoder[SViewRow] = Decoder.forProduct7[SViewRow, BusinessentityId, BusinessentityId, Name, Option[BusinessentityId], Option[TypoXml], TypoUUID, TypoLocalDateTime]("id", "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")(SViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, Name.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoXml.decoder), TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SViewRow] = Encoder.forProduct7[SViewRow, BusinessentityId, BusinessentityId, Name, Option[BusinessentityId], Option[TypoXml], TypoUUID, TypoLocalDateTime]("id", "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.name, x.salespersonid, x.demographics, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, Name.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoXml.encoder), TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SViewRow] = new Read[SViewRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SViewRow(
-      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      name = Name.get.unsafeGetNonNullable(rs, i + 2),
-      salespersonid = BusinessentityId.get.unsafeGetNullable(rs, i + 3),
-      demographics = TypoXml.get.unsafeGetNullable(rs, i + 4),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+  implicit lazy val read: Read[SViewRow] = {
+    new Read[SViewRow](
+      gets = List(
+        (BusinessentityId.get, Nullability.NoNulls),
+        (BusinessentityId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (BusinessentityId.get, Nullability.Nullable),
+        (TypoXml.get, Nullability.Nullable),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SViewRow(
+        id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+        businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+        name = Name.get.unsafeGetNonNullable(rs, i + 2),
+        salespersonid = BusinessentityId.get.unsafeGetNullable(rs, i + 3),
+        demographics = TypoXml.get.unsafeGetNullable(rs, i + 4),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 5),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+      )
     )
-  )
+  
+  }
 }

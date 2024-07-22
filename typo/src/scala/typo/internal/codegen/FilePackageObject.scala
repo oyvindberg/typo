@@ -10,9 +10,11 @@ object FilePackageObject {
     else {
       val content =
         code"""|${parentPkg.fold(sc.Code.Empty)(nonEmpty => code"package ${nonEmpty.map(_.code).mkCode(".")}")}
-             |
-             |${code"package " ++ genObject(options.pkg, instances)}
-             |""".stripMargin
+               |
+               |package object ${options.pkg.name} {
+               |  ${instances.sortBy(_.name).map(_.code).mkCode("\n")}
+               |}
+               |""".stripMargin
 
       Some(sc.File(sc.Type.Qualified(options.pkg / sc.Ident("package")), content, secondaryTypes = Nil, scope = Scope.Main))
     }

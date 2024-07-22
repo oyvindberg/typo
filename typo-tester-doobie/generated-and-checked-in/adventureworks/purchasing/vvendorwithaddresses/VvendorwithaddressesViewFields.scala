@@ -3,17 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package purchasing
-package vvendorwithaddresses
+package adventureworks.purchasing.vvendorwithaddresses;
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.Name;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait VvendorwithaddressesViewFields {
   def businessentityid: Field[BusinessentityId, VvendorwithaddressesViewRow]
@@ -30,7 +28,7 @@ trait VvendorwithaddressesViewFields {
 object VvendorwithaddressesViewFields {
   lazy val structure: Relation[VvendorwithaddressesViewFields, VvendorwithaddressesViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[VvendorwithaddressesViewFields, VvendorwithaddressesViewRow] {
   
@@ -46,8 +44,8 @@ object VvendorwithaddressesViewFields {
       override def countryregionname = Field[Name, VvendorwithaddressesViewRow](_path, "countryregionname", None, None, x => x.countryregionname, (row, value) => row.copy(countryregionname = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, VvendorwithaddressesViewRow]] =
-      List[FieldLikeNoHkt[?, VvendorwithaddressesViewRow]](fields.businessentityid, fields.name, fields.addresstype, fields.addressline1, fields.addressline2, fields.city, fields.stateprovincename, fields.postalcode, fields.countryregionname)
+    override lazy val columns: List[FieldLike[?, VvendorwithaddressesViewRow]] =
+      List[FieldLike[?, VvendorwithaddressesViewRow]](fields.businessentityid, fields.name, fields.addresstype, fields.addressline1, fields.addressline2, fields.city, fields.stateprovincename, fields.postalcode, fields.countryregionname)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

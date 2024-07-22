@@ -3,12 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sales
-package vsalesperson
+package adventureworks.sales.vsalesperson;
 
-import java.sql.Connection
-import typo.dsl.SelectBuilder
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
 
 trait VsalespersonViewRepo {
   def select: SelectBuilder[VsalespersonViewFields, VsalespersonViewRow]

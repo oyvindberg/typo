@@ -68,7 +68,6 @@ class ProductTest extends SnapshotTest {
           sellstartdate = TypoLocalDateTime(LocalDateTime.now().plusDays(1).withNano(0)),
           sellenddate = Some(TypoLocalDateTime(LocalDateTime.now().plusDays(10).withNano(0))),
           discontinueddate = Some(TypoLocalDateTime(LocalDateTime.now().plusDays(100).withNano(0))),
-          productid = Defaulted.UseDefault,
           makeflag = Defaulted.Provided(Flag(true)),
           finishedgoodsflag = Defaulted.Provided(Flag(true)),
           rowguid = Defaulted.Provided(TypoUUID.randomUUID),
@@ -103,9 +102,9 @@ class ProductTest extends SnapshotTest {
           .on { case (p, um) => p.sizeunitmeasurecode === um.unitmeasurecode }
           .join(projectModelRepo.select)
           .leftOn { case ((product, _), productModel) => product.productmodelid === productModel.productmodelid }
-          .where { case ((product, _), productModel) => product.productmodelid === productModel(_.productmodelid) }
+          .where { case ((product, _), productModel) => product.productmodelid === productModel.productmodelid }
           .orderBy { case ((product, _), _) => product.productmodelid.asc }
-          .orderBy { case ((_, _), productModel) => productModel(_.name).desc.withNullsFirst }
+          .orderBy { case ((_, _), productModel) => productModel.name.desc.withNullsFirst }
 
         _ <- delay(compareFragment("query")(query.sql))
         _ <- query.toList.map(println(_))
@@ -149,7 +148,7 @@ class ProductTest extends SnapshotTest {
             // and compare result
             .where(p => !(p.name.underlying || p.color).like("foo%"))
             // tracks nullability
-            .whereStrict(p => p.color.strLength.coalesce(1) > 0)
+            .where(p => p.color.strLength.coalesce(1) > 0)
             // compare dates
             .where(p => p.modifieddate < TypoLocalDateTime.now)
             // join, filter table we join with as well
@@ -163,7 +162,7 @@ class ProductTest extends SnapshotTest {
             // order by
             .orderBy { case ((p, _), _) => p.name.asc }
             .orderBy { case ((_, pm), _) => pm.rowguid.desc.withNullsFirst }
-            .orderBy { case ((_, _), pm2) => pm2(_.rowguid).asc }
+            .orderBy { case ((_, _), pm2) => pm2.rowguid.asc }
 
           compareFragment("q2")(q2.sql)
           q2.toList.map {

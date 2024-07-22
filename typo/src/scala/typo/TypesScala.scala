@@ -25,7 +25,6 @@ object TypesScala {
   val None = sc.Type.Qualified("scala.None")
   val Numeric = sc.Type.Qualified("scala.math.Numeric")
   val Option = sc.Type.Qualified("scala.Option")
-  val Ordering = sc.Type.Qualified("scala.math.Ordering")
   val Random = sc.Type.Qualified("scala.util.Random")
   val Right = sc.Type.Qualified("scala.Right")
   val Short = sc.Type.Qualified("scala.Short")
@@ -35,20 +34,6 @@ object TypesScala {
   val Unit = sc.Type.Qualified("scala.Unit")
   val mutableMap = sc.Type.Qualified("scala.collection.mutable.Map")
   val nowarn = sc.Type.Qualified("scala.annotation.nowarn")
-
-  object Optional {
-    def unapply(tpe: sc.Type): Option[sc.Type] = tpe match {
-      case sc.Type.ArrayOf(_)                      => scala.None
-      case sc.Type.Wildcard                        => scala.None
-      case sc.Type.TApply(Option, scala.List(one)) => scala.Some(one)
-      case sc.Type.TApply(underlying, _)           => unapply(underlying)
-      case sc.Type.Qualified(_)                    => scala.None
-      case sc.Type.Abstract(_)                     => scala.None
-      case sc.Type.Commented(underlying, _)        => unapply(underlying)
-      case sc.Type.ByName(underlying)              => unapply(underlying)
-      case sc.Type.UserDefined(underlying)         => unapply(underlying)
-    }
-  }
 
   val HasOrdering: Set[sc.Type] =
     Set(

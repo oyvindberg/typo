@@ -3,65 +3,66 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package pi
+package adventureworks.pr.pi;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.production.location.LocationId
-import adventureworks.production.product.ProductId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.production.location.LocationId;
+import adventureworks.production.product.ProductId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: pr.pi */
 case class PiViewRow(
-  /** Points to [[production.productinventory.ProductinventoryRow.productid]] */
+  /** Points to [[adventureworks.production.productinventory.ProductinventoryRow.productid]] */
   id: ProductId,
-  /** Points to [[production.productinventory.ProductinventoryRow.productid]] */
+  /** Points to [[adventureworks.production.productinventory.ProductinventoryRow.productid]] */
   productid: ProductId,
-  /** Points to [[production.productinventory.ProductinventoryRow.locationid]] */
+  /** Points to [[adventureworks.production.productinventory.ProductinventoryRow.locationid]] */
   locationid: LocationId,
-  /** Points to [[production.productinventory.ProductinventoryRow.shelf]] */
+  /** Points to [[adventureworks.production.productinventory.ProductinventoryRow.shelf]] */
   shelf: /* max 10 chars */ String,
-  /** Points to [[production.productinventory.ProductinventoryRow.bin]] */
+  /** Points to [[adventureworks.production.productinventory.ProductinventoryRow.bin]] */
   bin: TypoShort,
-  /** Points to [[production.productinventory.ProductinventoryRow.quantity]] */
+  /** Points to [[adventureworks.production.productinventory.ProductinventoryRow.quantity]] */
   quantity: TypoShort,
-  /** Points to [[production.productinventory.ProductinventoryRow.rowguid]] */
+  /** Points to [[adventureworks.production.productinventory.ProductinventoryRow.rowguid]] */
   rowguid: TypoUUID,
-  /** Points to [[production.productinventory.ProductinventoryRow.modifieddate]] */
+  /** Points to [[adventureworks.production.productinventory.ProductinventoryRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object PiViewRow {
   implicit lazy val decoder: Decoder[PiViewRow] = Decoder.forProduct8[PiViewRow, ProductId, ProductId, LocationId, /* max 10 chars */ String, TypoShort, TypoShort, TypoUUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(PiViewRow.apply)(ProductId.decoder, ProductId.decoder, LocationId.decoder, Decoder.decodeString, TypoShort.decoder, TypoShort.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PiViewRow] = Encoder.forProduct8[PiViewRow, ProductId, ProductId, LocationId, /* max 10 chars */ String, TypoShort, TypoShort, TypoUUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.id, x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(ProductId.encoder, ProductId.encoder, LocationId.encoder, Encoder.encodeString, TypoShort.encoder, TypoShort.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PiViewRow] = new Read[PiViewRow](
-    gets = List(
-      (ProductId.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (LocationId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PiViewRow(
-      id = ProductId.get.unsafeGetNonNullable(rs, i + 0),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
-      locationid = LocationId.get.unsafeGetNonNullable(rs, i + 2),
-      shelf = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      bin = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
-      quantity = TypoShort.get.unsafeGetNonNullable(rs, i + 5),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 6),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7)
+  implicit lazy val read: Read[PiViewRow] = {
+    new Read[PiViewRow](
+      gets = List(
+        (ProductId.get, Nullability.NoNulls),
+        (ProductId.get, Nullability.NoNulls),
+        (LocationId.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PiViewRow(
+        id = ProductId.get.unsafeGetNonNullable(rs, i + 0),
+        productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
+        locationid = LocationId.get.unsafeGetNonNullable(rs, i + 2),
+        shelf = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+        bin = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
+        quantity = TypoShort.get.unsafeGetNonNullable(rs, i + 5),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 6),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7)
+      )
     )
-  )
+  
+  }
 }

@@ -3,13 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package production
-package vproductmodelcatalogdescription
+package adventureworks.production.vproductmodelcatalogdescription;
 
-import typo.dsl.SelectBuilder
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
 trait VproductmodelcatalogdescriptionViewRepo {
   def select: SelectBuilder[VproductmodelcatalogdescriptionViewFields, VproductmodelcatalogdescriptionViewRow]

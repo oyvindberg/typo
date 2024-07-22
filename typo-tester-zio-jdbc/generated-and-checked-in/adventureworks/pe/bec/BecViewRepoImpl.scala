@@ -3,21 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pe
-package bec
+package adventureworks.pe.bec;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class BecViewRepoImpl extends BecViewRepo {
-  override def select: SelectBuilder[BecViewFields, BecViewRow] = {
-    SelectBuilderSql("pe.bec", BecViewFields.structure, BecViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, BecViewRow] = {
-    sql"""select "id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from pe.bec""".query(using BecViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[BecViewFields, BecViewRow] = SelectBuilderSql("pe.bec", BecViewFields.structure, BecViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, BecViewRow] = sql"""select "id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from pe.bec""".query(using BecViewRow.jdbcDecoder).selectStream()
 }

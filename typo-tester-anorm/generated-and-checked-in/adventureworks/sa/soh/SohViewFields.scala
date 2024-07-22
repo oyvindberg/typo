@@ -3,29 +3,27 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sa
-package soh
+package adventureworks.sa.soh;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.address.AddressId
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.AccountNumber
-import adventureworks.public.Flag
-import adventureworks.public.OrderNumber
-import adventureworks.purchasing.shipmethod.ShipmethodId
-import adventureworks.sales.currencyrate.CurrencyrateId
-import adventureworks.sales.customer.CustomerId
-import adventureworks.sales.salesorderheader.SalesorderheaderId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import adventureworks.userdefined.CustomCreditcardId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.address.AddressId;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.AccountNumber;
+import adventureworks.public.Flag;
+import adventureworks.public.OrderNumber;
+import adventureworks.purchasing.shipmethod.ShipmethodId;
+import adventureworks.sales.currencyrate.CurrencyrateId;
+import adventureworks.sales.customer.CustomerId;
+import adventureworks.sales.salesorderheader.SalesorderheaderId;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import adventureworks.userdefined.CustomCreditcardId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait SohViewFields {
   def id: Field[SalesorderheaderId, SohViewRow]
@@ -59,7 +57,7 @@ trait SohViewFields {
 object SohViewFields {
   lazy val structure: Relation[SohViewFields, SohViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[SohViewFields, SohViewRow] {
   
@@ -92,8 +90,8 @@ object SohViewFields {
       override def modifieddate = Field[TypoLocalDateTime, SohViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, SohViewRow]] =
-      List[FieldLikeNoHkt[?, SohViewRow]](fields.id, fields.salesorderid, fields.revisionnumber, fields.orderdate, fields.duedate, fields.shipdate, fields.status, fields.onlineorderflag, fields.purchaseordernumber, fields.accountnumber, fields.customerid, fields.salespersonid, fields.territoryid, fields.billtoaddressid, fields.shiptoaddressid, fields.shipmethodid, fields.creditcardid, fields.creditcardapprovalcode, fields.currencyrateid, fields.subtotal, fields.taxamt, fields.freight, fields.totaldue, fields.comment, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, SohViewRow]] =
+      List[FieldLike[?, SohViewRow]](fields.id, fields.salesorderid, fields.revisionnumber, fields.orderdate, fields.duedate, fields.shipdate, fields.status, fields.onlineorderflag, fields.purchaseordernumber, fields.accountnumber, fields.customerid, fields.salespersonid, fields.territoryid, fields.billtoaddressid, fields.shiptoaddressid, fields.shipmethodid, fields.creditcardid, fields.creditcardapprovalcode, fields.currencyrateid, fields.subtotal, fields.taxamt, fields.freight, fields.totaldue, fields.comment, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

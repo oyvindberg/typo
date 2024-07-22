@@ -3,17 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sa
-package cc
+package adventureworks.sa.cc;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.userdefined.CustomCreditcardId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.userdefined.CustomCreditcardId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait CcViewFields {
   def id: Field[/* user-picked */ CustomCreditcardId, CcViewRow]
@@ -28,7 +26,7 @@ trait CcViewFields {
 object CcViewFields {
   lazy val structure: Relation[CcViewFields, CcViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[CcViewFields, CcViewRow] {
   
@@ -42,8 +40,8 @@ object CcViewFields {
       override def modifieddate = Field[TypoLocalDateTime, CcViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, CcViewRow]] =
-      List[FieldLikeNoHkt[?, CcViewRow]](fields.id, fields.creditcardid, fields.cardtype, fields.cardnumber, fields.expmonth, fields.expyear, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, CcViewRow]] =
+      List[FieldLike[?, CcViewRow]](fields.id, fields.creditcardid, fields.cardtype, fields.cardnumber, fields.expmonth, fields.expyear, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

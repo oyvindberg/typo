@@ -3,20 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package person
-package contacttype
+package adventureworks.person.contacttype;
 
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `person.contacttype` */
-case class ContacttypeId(value: Int) extends AnyVal
+case class ContacttypeId(value: Int) extends scala.AnyVal
+
 object ContacttypeId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[ContacttypeId]] = adventureworks.IntArrayDecoder.map(_.map(ContacttypeId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[ContacttypeId]] = adventureworks.IntArrayEncoder.contramap(_.map(_.value))
@@ -26,11 +26,12 @@ object ContacttypeId {
   implicit lazy val jdbcEncoder: JdbcEncoder[ContacttypeId] = JdbcEncoder.intEncoder.contramap(_.value)
   implicit lazy val jsonDecoder: JsonDecoder[ContacttypeId] = JsonDecoder.int.map(ContacttypeId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[ContacttypeId] = JsonEncoder.int.contramap(_.value)
-  implicit lazy val ordering: Ordering[ContacttypeId] = Ordering.by(_.value)
   implicit lazy val pgType: PGType[ContacttypeId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[ContacttypeId] = Setter.intSetter.contramap(_.value)
-  implicit lazy val text: Text[ContacttypeId] = new Text[ContacttypeId] {
-    override def unsafeEncode(v: ContacttypeId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: ContacttypeId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[ContacttypeId] = {
+    new Text[ContacttypeId] {
+      override def unsafeEncode(v: ContacttypeId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: ContacttypeId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

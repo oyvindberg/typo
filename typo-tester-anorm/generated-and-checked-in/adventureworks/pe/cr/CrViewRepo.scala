@@ -3,12 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pe
-package cr
+package adventureworks.pe.cr;
 
-import java.sql.Connection
-import typo.dsl.SelectBuilder
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
 
 trait CrViewRepo {
   def select: SelectBuilder[CrViewFields, CrViewRow]

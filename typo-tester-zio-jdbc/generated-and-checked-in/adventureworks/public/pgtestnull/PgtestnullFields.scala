@@ -3,38 +3,38 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package public
-package pgtestnull
+package adventureworks.public.pgtestnull;
 
-import adventureworks.customtypes.TypoBox
-import adventureworks.customtypes.TypoBytea
-import adventureworks.customtypes.TypoCircle
-import adventureworks.customtypes.TypoHStore
-import adventureworks.customtypes.TypoInet
-import adventureworks.customtypes.TypoInstant
-import adventureworks.customtypes.TypoInt2Vector
-import adventureworks.customtypes.TypoInterval
-import adventureworks.customtypes.TypoJson
-import adventureworks.customtypes.TypoJsonb
-import adventureworks.customtypes.TypoLine
-import adventureworks.customtypes.TypoLineSegment
-import adventureworks.customtypes.TypoLocalDate
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoLocalTime
-import adventureworks.customtypes.TypoMoney
-import adventureworks.customtypes.TypoOffsetTime
-import adventureworks.customtypes.TypoPath
-import adventureworks.customtypes.TypoPoint
-import adventureworks.customtypes.TypoPolygon
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.customtypes.TypoVector
-import adventureworks.customtypes.TypoXml
-import typo.dsl.Path
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoBox;
+import adventureworks.customtypes.TypoBytea;
+import adventureworks.customtypes.TypoCircle;
+import adventureworks.customtypes.TypoHStore;
+import adventureworks.customtypes.TypoInet;
+import adventureworks.customtypes.TypoInstant;
+import adventureworks.customtypes.TypoInt2Vector;
+import adventureworks.customtypes.TypoInterval;
+import adventureworks.customtypes.TypoJson;
+import adventureworks.customtypes.TypoJsonb;
+import adventureworks.customtypes.TypoLine;
+import adventureworks.customtypes.TypoLineSegment;
+import adventureworks.customtypes.TypoLocalDate;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoLocalTime;
+import adventureworks.customtypes.TypoMoney;
+import adventureworks.customtypes.TypoOffsetTime;
+import adventureworks.customtypes.TypoPath;
+import adventureworks.customtypes.TypoPoint;
+import adventureworks.customtypes.TypoPolygon;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.customtypes.TypoVector;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.public.Mydomain;
+import adventureworks.public.Myenum;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait PgtestnullFields {
   def bool: OptField[Boolean, PgtestnullRow]
@@ -112,7 +112,7 @@ trait PgtestnullFields {
 object PgtestnullFields {
   lazy val structure: Relation[PgtestnullFields, PgtestnullRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[PgtestnullFields, PgtestnullRow] {
   
@@ -189,8 +189,8 @@ object PgtestnullFields {
       override def xmles = OptField[Array[TypoXml], PgtestnullRow](_path, "xmles", None, Some("xml[]"), x => x.xmles, (row, value) => row.copy(xmles = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, PgtestnullRow]] =
-      List[FieldLikeNoHkt[?, PgtestnullRow]](fields.bool, fields.box, fields.bpchar, fields.bytea, fields.char, fields.circle, fields.date, fields.float4, fields.float8, fields.hstore, fields.inet, fields.int2, fields.int2vector, fields.int4, fields.int8, fields.interval, fields.json, fields.jsonb, fields.line, fields.lseg, fields.money, fields.mydomain, fields.myenum, fields.name, fields.numeric, fields.path, fields.point, fields.polygon, fields.text, fields.time, fields.timestamp, fields.timestampz, fields.timez, fields.uuid, fields.varchar, fields.vector, fields.xml, fields.boxes, fields.bpchares, fields.chares, fields.circlees, fields.datees, fields.float4es, fields.float8es, fields.inetes, fields.int2es, fields.int2vectores, fields.int4es, fields.int8es, fields.intervales, fields.jsones, fields.jsonbes, fields.linees, fields.lseges, fields.moneyes, fields.mydomaines, fields.myenumes, fields.namees, fields.numerices, fields.pathes, fields.pointes, fields.polygones, fields.textes, fields.timees, fields.timestampes, fields.timestampzes, fields.timezes, fields.uuides, fields.varchares, fields.xmles)
+    override lazy val columns: List[FieldLike[?, PgtestnullRow]] =
+      List[FieldLike[?, PgtestnullRow]](fields.bool, fields.box, fields.bpchar, fields.bytea, fields.char, fields.circle, fields.date, fields.float4, fields.float8, fields.hstore, fields.inet, fields.int2, fields.int2vector, fields.int4, fields.int8, fields.interval, fields.json, fields.jsonb, fields.line, fields.lseg, fields.money, fields.mydomain, fields.myenum, fields.name, fields.numeric, fields.path, fields.point, fields.polygon, fields.text, fields.time, fields.timestamp, fields.timestampz, fields.timez, fields.uuid, fields.varchar, fields.vector, fields.xml, fields.boxes, fields.bpchares, fields.chares, fields.circlees, fields.datees, fields.float4es, fields.float8es, fields.inetes, fields.int2es, fields.int2vectores, fields.int4es, fields.int8es, fields.intervales, fields.jsones, fields.jsonbes, fields.linees, fields.lseges, fields.moneyes, fields.mydomaines, fields.myenumes, fields.namees, fields.numerices, fields.pathes, fields.pointes, fields.polygones, fields.textes, fields.timees, fields.timestampes, fields.timestampzes, fields.timezes, fields.uuides, fields.varchares, fields.xmles)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

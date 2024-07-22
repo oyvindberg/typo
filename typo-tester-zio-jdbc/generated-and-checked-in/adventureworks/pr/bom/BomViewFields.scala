@@ -3,19 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package bom
+package adventureworks.pr.bom;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.production.product.ProductId
-import adventureworks.production.unitmeasure.UnitmeasureId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.unitmeasure.UnitmeasureId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait BomViewFields {
   def id: Field[Int, BomViewRow]
@@ -33,7 +31,7 @@ trait BomViewFields {
 object BomViewFields {
   lazy val structure: Relation[BomViewFields, BomViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[BomViewFields, BomViewRow] {
   
@@ -50,8 +48,8 @@ object BomViewFields {
       override def modifieddate = Field[TypoLocalDateTime, BomViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, BomViewRow]] =
-      List[FieldLikeNoHkt[?, BomViewRow]](fields.id, fields.billofmaterialsid, fields.productassemblyid, fields.componentid, fields.startdate, fields.enddate, fields.unitmeasurecode, fields.bomlevel, fields.perassemblyqty, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, BomViewRow]] =
+      List[FieldLike[?, BomViewRow]](fields.id, fields.billofmaterialsid, fields.productassemblyid, fields.componentid, fields.startdate, fields.enddate, fields.unitmeasurecode, fields.bomlevel, fields.perassemblyqty, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

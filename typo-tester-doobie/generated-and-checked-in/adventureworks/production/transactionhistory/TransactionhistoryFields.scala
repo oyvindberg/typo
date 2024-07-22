@@ -3,20 +3,18 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package production
-package transactionhistory
+package adventureworks.production.transactionhistory;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.product.ProductFields
-import adventureworks.production.product.ProductId
-import adventureworks.production.product.ProductRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.product.ProductFields;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.product.ProductRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait TransactionhistoryFields {
   def transactionid: IdField[TransactionhistoryId, TransactionhistoryRow]
@@ -36,7 +34,7 @@ trait TransactionhistoryFields {
 object TransactionhistoryFields {
   lazy val structure: Relation[TransactionhistoryFields, TransactionhistoryRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[TransactionhistoryFields, TransactionhistoryRow] {
   
@@ -52,8 +50,8 @@ object TransactionhistoryFields {
       override def modifieddate = Field[TypoLocalDateTime, TransactionhistoryRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, TransactionhistoryRow]] =
-      List[FieldLikeNoHkt[?, TransactionhistoryRow]](fields.transactionid, fields.productid, fields.referenceorderid, fields.referenceorderlineid, fields.transactiondate, fields.transactiontype, fields.quantity, fields.actualcost, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, TransactionhistoryRow]] =
+      List[FieldLike[?, TransactionhistoryRow]](fields.transactionid, fields.productid, fields.referenceorderid, fields.referenceorderlineid, fields.transactiondate, fields.transactiontype, fields.quantity, fields.actualcost, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

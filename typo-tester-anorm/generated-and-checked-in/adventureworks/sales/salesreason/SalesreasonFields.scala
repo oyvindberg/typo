@@ -3,17 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sales
-package salesreason
+package adventureworks.sales.salesreason;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait SalesreasonFields {
   def salesreasonid: IdField[SalesreasonId, SalesreasonRow]
@@ -25,7 +23,7 @@ trait SalesreasonFields {
 object SalesreasonFields {
   lazy val structure: Relation[SalesreasonFields, SalesreasonRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[SalesreasonFields, SalesreasonRow] {
   
@@ -36,8 +34,8 @@ object SalesreasonFields {
       override def modifieddate = Field[TypoLocalDateTime, SalesreasonRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, SalesreasonRow]] =
-      List[FieldLikeNoHkt[?, SalesreasonRow]](fields.salesreasonid, fields.name, fields.reasontype, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, SalesreasonRow]] =
+      List[FieldLike[?, SalesreasonRow]](fields.salesreasonid, fields.name, fields.reasontype, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

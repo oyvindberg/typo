@@ -3,13 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package person
-package vstateprovincecountryregion
+package adventureworks.person.vstateprovincecountryregion;
 
-import typo.dsl.SelectBuilder
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
 trait VstateprovincecountryregionMVRepo {
   def select: SelectBuilder[VstateprovincecountryregionMVFields, VstateprovincecountryregionMVRow]

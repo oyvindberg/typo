@@ -3,21 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package production
-package vproductanddescription
+package adventureworks.production.vproductanddescription;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class VproductanddescriptionMVRepoImpl extends VproductanddescriptionMVRepo {
-  override def select: SelectBuilder[VproductanddescriptionMVFields, VproductanddescriptionMVRow] = {
-    SelectBuilderSql("production.vproductanddescription", VproductanddescriptionMVFields.structure, VproductanddescriptionMVRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, VproductanddescriptionMVRow] = {
-    sql"""select "productid", "name", "productmodel", "cultureid", "description" from production.vproductanddescription""".query(using VproductanddescriptionMVRow.read).stream
-  }
+  def select: SelectBuilder[VproductanddescriptionMVFields, VproductanddescriptionMVRow] = SelectBuilderSql("production.vproductanddescription", VproductanddescriptionMVFields.structure, VproductanddescriptionMVRow.read)
+  def selectAll: Stream[ConnectionIO, VproductanddescriptionMVRow] = sql"""select "productid", "name", "productmodel", "cultureid", "description" from production.vproductanddescription""".query(using VproductanddescriptionMVRow.read).stream
 }

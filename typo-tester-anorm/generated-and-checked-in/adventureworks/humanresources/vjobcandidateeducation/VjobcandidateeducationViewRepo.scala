@@ -3,12 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package humanresources
-package vjobcandidateeducation
+package adventureworks.humanresources.vjobcandidateeducation;
 
-import java.sql.Connection
-import typo.dsl.SelectBuilder
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
 
 trait VjobcandidateeducationViewRepo {
   def select: SelectBuilder[VjobcandidateeducationViewFields, VjobcandidateeducationViewRow]

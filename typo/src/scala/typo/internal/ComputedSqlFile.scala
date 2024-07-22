@@ -12,7 +12,7 @@ case class ComputedSqlFile(
     pkg0: sc.QIdent,
     naming: Naming,
     typeMapperDb: TypeMapperDb,
-    scalaTypeMapper: TypeMapperScala,
+    scalaTypeMapper: TypeMapperJvm,
     eval: EvalMaybe[db.RelationName, HasSource]
 ) {
   val source: Source.SqlFile = Source.SqlFile(sqlFile.relPath)

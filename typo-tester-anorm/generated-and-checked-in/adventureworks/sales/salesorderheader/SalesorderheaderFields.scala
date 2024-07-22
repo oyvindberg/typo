@@ -3,44 +3,42 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sales
-package salesorderheader
+package adventureworks.sales.salesorderheader;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.address.AddressFields
-import adventureworks.person.address.AddressId
-import adventureworks.person.address.AddressRow
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.AccountNumber
-import adventureworks.public.Flag
-import adventureworks.public.OrderNumber
-import adventureworks.purchasing.shipmethod.ShipmethodFields
-import adventureworks.purchasing.shipmethod.ShipmethodId
-import adventureworks.purchasing.shipmethod.ShipmethodRow
-import adventureworks.sales.creditcard.CreditcardFields
-import adventureworks.sales.creditcard.CreditcardRow
-import adventureworks.sales.currencyrate.CurrencyrateFields
-import adventureworks.sales.currencyrate.CurrencyrateId
-import adventureworks.sales.currencyrate.CurrencyrateRow
-import adventureworks.sales.customer.CustomerFields
-import adventureworks.sales.customer.CustomerId
-import adventureworks.sales.customer.CustomerRow
-import adventureworks.sales.salesperson.SalespersonFields
-import adventureworks.sales.salesperson.SalespersonRow
-import adventureworks.sales.salesterritory.SalesterritoryFields
-import adventureworks.sales.salesterritory.SalesterritoryId
-import adventureworks.sales.salesterritory.SalesterritoryRow
-import adventureworks.userdefined.CustomCreditcardId
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.address.AddressFields;
+import adventureworks.person.address.AddressId;
+import adventureworks.person.address.AddressRow;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.AccountNumber;
+import adventureworks.public.Flag;
+import adventureworks.public.OrderNumber;
+import adventureworks.purchasing.shipmethod.ShipmethodFields;
+import adventureworks.purchasing.shipmethod.ShipmethodId;
+import adventureworks.purchasing.shipmethod.ShipmethodRow;
+import adventureworks.sales.creditcard.CreditcardFields;
+import adventureworks.sales.creditcard.CreditcardRow;
+import adventureworks.sales.currencyrate.CurrencyrateFields;
+import adventureworks.sales.currencyrate.CurrencyrateId;
+import adventureworks.sales.currencyrate.CurrencyrateRow;
+import adventureworks.sales.customer.CustomerFields;
+import adventureworks.sales.customer.CustomerId;
+import adventureworks.sales.customer.CustomerRow;
+import adventureworks.sales.salesperson.SalespersonFields;
+import adventureworks.sales.salesperson.SalespersonRow;
+import adventureworks.sales.salesterritory.SalesterritoryFields;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import adventureworks.sales.salesterritory.SalesterritoryRow;
+import adventureworks.userdefined.CustomCreditcardId;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait SalesorderheaderFields {
   def salesorderid: IdField[SalesorderheaderId, SalesorderheaderRow]
@@ -97,7 +95,7 @@ trait SalesorderheaderFields {
 object SalesorderheaderFields {
   lazy val structure: Relation[SalesorderheaderFields, SalesorderheaderRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[SalesorderheaderFields, SalesorderheaderRow] {
   
@@ -129,8 +127,8 @@ object SalesorderheaderFields {
       override def modifieddate = Field[TypoLocalDateTime, SalesorderheaderRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, SalesorderheaderRow]] =
-      List[FieldLikeNoHkt[?, SalesorderheaderRow]](fields.salesorderid, fields.revisionnumber, fields.orderdate, fields.duedate, fields.shipdate, fields.status, fields.onlineorderflag, fields.purchaseordernumber, fields.accountnumber, fields.customerid, fields.salespersonid, fields.territoryid, fields.billtoaddressid, fields.shiptoaddressid, fields.shipmethodid, fields.creditcardid, fields.creditcardapprovalcode, fields.currencyrateid, fields.subtotal, fields.taxamt, fields.freight, fields.totaldue, fields.comment, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, SalesorderheaderRow]] =
+      List[FieldLike[?, SalesorderheaderRow]](fields.salesorderid, fields.revisionnumber, fields.orderdate, fields.duedate, fields.shipdate, fields.status, fields.onlineorderflag, fields.purchaseordernumber, fields.accountnumber, fields.customerid, fields.salespersonid, fields.territoryid, fields.billtoaddressid, fields.shiptoaddressid, fields.shipmethodid, fields.creditcardid, fields.creditcardapprovalcode, fields.currencyrateid, fields.subtotal, fields.taxamt, fields.freight, fields.totaldue, fields.comment, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

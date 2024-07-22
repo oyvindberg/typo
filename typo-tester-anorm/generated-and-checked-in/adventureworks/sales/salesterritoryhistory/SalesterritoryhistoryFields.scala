@@ -3,29 +3,28 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sales
-package salesterritoryhistory
+package adventureworks.sales.salesterritoryhistory;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.salesperson.SalespersonFields
-import adventureworks.sales.salesperson.SalespersonRow
-import adventureworks.sales.salesterritory.SalesterritoryFields
-import adventureworks.sales.salesterritory.SalesterritoryId
-import adventureworks.sales.salesterritory.SalesterritoryRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.Required
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.sales.salesperson.SalespersonFields;
+import adventureworks.sales.salesperson.SalespersonRow;
+import adventureworks.sales.salesterritory.SalesterritoryFields;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import adventureworks.sales.salesterritory.SalesterritoryRow;
+import anorm.ToParameterValue;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait SalesterritoryhistoryFields {
   def businessentityid: IdField[BusinessentityId, SalesterritoryhistoryRow]
@@ -40,17 +39,17 @@ trait SalesterritoryhistoryFields {
   def fkSalesterritory: ForeignKey[SalesterritoryFields, SalesterritoryRow] =
     ForeignKey[SalesterritoryFields, SalesterritoryRow]("sales.FK_SalesTerritoryHistory_SalesTerritory_TerritoryID", Nil)
       .withColumnPair(territoryid, _.territoryid)
-  def compositeIdIs(compositeId: SalesterritoryhistoryId): SqlExpr[Boolean, Required] =
+  def compositeIdIs(compositeId: SalesterritoryhistoryId): SqlExpr[Boolean] =
     businessentityid.isEqual(compositeId.businessentityid).and(startdate.isEqual(compositeId.startdate)).and(territoryid.isEqual(compositeId.territoryid))
-  def compositeIdIn(compositeIds: Array[SalesterritoryhistoryId]): SqlExpr[Boolean, Required] =
-    new CompositeIn(compositeIds)(TuplePart(businessentityid)(_.businessentityid), TuplePart(startdate)(_.startdate), TuplePart(territoryid)(_.territoryid))
+  def compositeIdIn(compositeIds: Array[SalesterritoryhistoryId]): SqlExpr[Boolean] =
+    new CompositeIn(compositeIds)(TuplePart[SalesterritoryhistoryId](businessentityid)(_.businessentityid)(using as[Array[BusinessentityId]](ToParameterValue(null, BusinessentityId.arrayToStatement), adventureworks.arrayParameterMetaData(BusinessentityId.parameterMetadata)), implicitly), TuplePart[SalesterritoryhistoryId](startdate)(_.startdate)(using as[Array[TypoLocalDateTime]](ToParameterValue(null, TypoLocalDateTime.arrayToStatement), adventureworks.arrayParameterMetaData(TypoLocalDateTime.parameterMetadata)), implicitly), TuplePart[SalesterritoryhistoryId](territoryid)(_.territoryid)(using as[Array[SalesterritoryId]](ToParameterValue(null, SalesterritoryId.arrayToStatement), adventureworks.arrayParameterMetaData(SalesterritoryId.parameterMetadata)), implicitly))
   
 }
 
 object SalesterritoryhistoryFields {
   lazy val structure: Relation[SalesterritoryhistoryFields, SalesterritoryhistoryRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[SalesterritoryhistoryFields, SalesterritoryhistoryRow] {
   
@@ -63,8 +62,8 @@ object SalesterritoryhistoryFields {
       override def modifieddate = Field[TypoLocalDateTime, SalesterritoryhistoryRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, SalesterritoryhistoryRow]] =
-      List[FieldLikeNoHkt[?, SalesterritoryhistoryRow]](fields.businessentityid, fields.territoryid, fields.startdate, fields.enddate, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, SalesterritoryhistoryRow]] =
+      List[FieldLike[?, SalesterritoryhistoryRow]](fields.businessentityid, fields.territoryid, fields.startdate, fields.enddate, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

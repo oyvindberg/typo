@@ -3,19 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pu
-package pv
+package adventureworks.pu.pv;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.production.product.ProductId
-import adventureworks.production.unitmeasure.UnitmeasureId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.unitmeasure.UnitmeasureId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait PvViewFields {
   def id: Field[ProductId, PvViewRow]
@@ -35,7 +33,7 @@ trait PvViewFields {
 object PvViewFields {
   lazy val structure: Relation[PvViewFields, PvViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[PvViewFields, PvViewRow] {
   
@@ -54,8 +52,8 @@ object PvViewFields {
       override def modifieddate = Field[TypoLocalDateTime, PvViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, PvViewRow]] =
-      List[FieldLikeNoHkt[?, PvViewRow]](fields.id, fields.productid, fields.businessentityid, fields.averageleadtime, fields.standardprice, fields.lastreceiptcost, fields.lastreceiptdate, fields.minorderqty, fields.maxorderqty, fields.onorderqty, fields.unitmeasurecode, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, PvViewRow]] =
+      List[FieldLike[?, PvViewRow]](fields.id, fields.productid, fields.businessentityid, fields.averageleadtime, fields.standardprice, fields.lastreceiptcost, fields.lastreceiptdate, fields.minorderqty, fields.maxorderqty, fields.onorderqty, fields.unitmeasurecode, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

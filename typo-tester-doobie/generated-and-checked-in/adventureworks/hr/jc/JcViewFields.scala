@@ -3,19 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package hr
-package jc
+package adventureworks.hr.jc;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoXml
-import adventureworks.humanresources.jobcandidate.JobcandidateId
-import adventureworks.person.businessentity.BusinessentityId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.humanresources.jobcandidate.JobcandidateId;
+import adventureworks.person.businessentity.BusinessentityId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait JcViewFields {
   def id: Field[JobcandidateId, JcViewRow]
@@ -28,7 +26,7 @@ trait JcViewFields {
 object JcViewFields {
   lazy val structure: Relation[JcViewFields, JcViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[JcViewFields, JcViewRow] {
   
@@ -40,8 +38,8 @@ object JcViewFields {
       override def modifieddate = Field[TypoLocalDateTime, JcViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, JcViewRow]] =
-      List[FieldLikeNoHkt[?, JcViewRow]](fields.id, fields.jobcandidateid, fields.businessentityid, fields.resume, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, JcViewRow]] =
+      List[FieldLike[?, JcViewRow]](fields.id, fields.jobcandidateid, fields.businessentityid, fields.resume, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

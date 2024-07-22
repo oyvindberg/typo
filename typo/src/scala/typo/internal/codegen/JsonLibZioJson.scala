@@ -35,7 +35,7 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
         case TypesJava.UUID                                                => code"$JsonDecoder.uuid"
         case sc.Type.ArrayOf(targ)                                         => code"$JsonDecoder.array[$targ](using ${go(targ)}, implicitly)"
         case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$decoderName(${go(targ)})"
-        case TypesScala.Optional(targ)                                     => code"$JsonDecoder.option(using ${go(targ)})"
+        case LangScala.Optional(targ)                                      => code"$JsonDecoder.option(using ${go(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) => code"$tpe.$decoderName"
         case other                                                         => code"${JsonDecoder.of(other)}"
       }
@@ -64,7 +64,7 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
         case TypesJava.UUID                                                => code"$JsonEncoder.uuid"
         case sc.Type.ArrayOf(targ)                                         => code"$JsonEncoder.array[$targ](using ${go(targ)}, implicitly)"
         case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$encoderName(${go(targ)})"
-        case TypesScala.Optional(targ)                                     => code"$JsonEncoder.option(using ${go(targ)})"
+        case LangScala.Optional(targ)                                      => code"$JsonEncoder.option(using ${go(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) => code"$tpe.$encoderName"
         case other                                                         => code"${JsonEncoder.of(other)}"
       }
@@ -78,20 +78,20 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
       sc.Given(
         tparams = List(T),
         name = decoderName,
-        implicitParams = List(sc.Param(sc.Ident("T"), JsonDecoder.of(T), None)),
+        implicitParams = List(sc.Param(sc.Ident("T"), JsonDecoder.of(T))),
         tpe = JsonDecoder.of(d.Defaulted.of(T)),
         body = code"""|new ${JsonDecoder.of(d.Defaulted.of(T))} {
                       |  override def unsafeDecode(trace: ${TypesScala.List.of(JsonError)}, in: $RetractReader): ${d.Defaulted.of(T)} =
                       |    ${TypesScala.Try}($JsonDecoder.string.unsafeDecode(trace, in)) match {
-                      |      case $Success("defaulted") => UseDefault
-                      |      case _ => Provided(T.unsafeDecode(trace, in))
+                      |      case $Success("defaulted") => ${d.UseDefault}()
+                      |      case _ => ${d.Provided}(T.unsafeDecode(trace, in))
                       |    }
                       |  }""".stripMargin
       ),
       sc.Given(
         tparams = List(T),
         name = encoderName,
-        implicitParams = List(sc.Param(sc.Ident("T"), JsonEncoder.of(T), None)),
+        implicitParams = List(sc.Param(sc.Ident("T"), JsonEncoder.of(T))),
         tpe = JsonEncoder.of(d.Defaulted.of(T)),
         body = code"""|new ${JsonEncoder.of(d.Defaulted.of(T))} {
                  |  override def unsafeEncode(a: ${d.Defaulted.of(T)}, indent: ${TypesScala.Option.of(TypesScala.Int)}, out: $Write): Unit =
@@ -101,7 +101,7 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
                  |        out.write("\\"provided\\":")
                  |        ${sc.Ident("T")}.unsafeEncode(value, None, out)
                  |        out.write("}")
-                 |      case ${d.UseDefault} => out.write("\\"defaulted\\"")
+                 |      case ${d.UseDefault}() => out.write("\\"defaulted\\"")
                  |    }
                  |}""".stripMargin
       )
@@ -155,7 +155,7 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
           val vals =
             fields.map(f =>
               f.tpe match {
-                case TypesScala.Optional(targ) =>
+                case LangScala.Optional(targ) =>
                   val either = TypesScala.Either.of(TypesJava.String, TypesScala.Option.of(sc.Type.base(targ)))
                   code"""val ${f.scalaName} = jsonObj.get(${f.jsonName}).fold[$either](${TypesScala.Right}(${TypesScala.None}))(_.as(${lookupDecoderFor(f.tpe)}))"""
                 case _ =>

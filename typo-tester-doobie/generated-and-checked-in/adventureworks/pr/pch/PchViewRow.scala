@@ -3,54 +3,55 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package pch
+package adventureworks.pr.pch;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.product.ProductId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.product.ProductId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: pr.pch */
 case class PchViewRow(
-  /** Points to [[production.productcosthistory.ProductcosthistoryRow.productid]] */
+  /** Points to [[adventureworks.production.productcosthistory.ProductcosthistoryRow.productid]] */
   id: ProductId,
-  /** Points to [[production.productcosthistory.ProductcosthistoryRow.productid]] */
+  /** Points to [[adventureworks.production.productcosthistory.ProductcosthistoryRow.productid]] */
   productid: ProductId,
-  /** Points to [[production.productcosthistory.ProductcosthistoryRow.startdate]] */
+  /** Points to [[adventureworks.production.productcosthistory.ProductcosthistoryRow.startdate]] */
   startdate: TypoLocalDateTime,
-  /** Points to [[production.productcosthistory.ProductcosthistoryRow.enddate]] */
+  /** Points to [[adventureworks.production.productcosthistory.ProductcosthistoryRow.enddate]] */
   enddate: Option[TypoLocalDateTime],
-  /** Points to [[production.productcosthistory.ProductcosthistoryRow.standardcost]] */
+  /** Points to [[adventureworks.production.productcosthistory.ProductcosthistoryRow.standardcost]] */
   standardcost: BigDecimal,
-  /** Points to [[production.productcosthistory.ProductcosthistoryRow.modifieddate]] */
+  /** Points to [[adventureworks.production.productcosthistory.ProductcosthistoryRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object PchViewRow {
   implicit lazy val decoder: Decoder[PchViewRow] = Decoder.forProduct6[PchViewRow, ProductId, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, TypoLocalDateTime]("id", "productid", "startdate", "enddate", "standardcost", "modifieddate")(PchViewRow.apply)(ProductId.decoder, ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PchViewRow] = Encoder.forProduct6[PchViewRow, ProductId, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, TypoLocalDateTime]("id", "productid", "startdate", "enddate", "standardcost", "modifieddate")(x => (x.id, x.productid, x.startdate, x.enddate, x.standardcost, x.modifieddate))(ProductId.encoder, ProductId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PchViewRow] = new Read[PchViewRow](
-    gets = List(
-      (ProductId.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PchViewRow(
-      id = ProductId.get.unsafeGetNonNullable(rs, i + 0),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
-      startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2),
-      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3),
-      standardcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[PchViewRow] = {
+    new Read[PchViewRow](
+      gets = List(
+        (ProductId.get, Nullability.NoNulls),
+        (ProductId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.Nullable),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PchViewRow(
+        id = ProductId.get.unsafeGetNonNullable(rs, i + 0),
+        productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
+        startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2),
+        enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 3),
+        standardcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 4),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+      )
     )
-  )
+  
+  }
 }

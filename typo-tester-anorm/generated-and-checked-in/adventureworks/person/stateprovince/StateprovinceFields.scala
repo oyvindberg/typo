@@ -3,26 +3,24 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package person
-package stateprovince
+package adventureworks.person.stateprovince;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.countryregion.CountryregionFields
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.person.countryregion.CountryregionRow
-import adventureworks.public.Flag
-import adventureworks.public.Name
-import adventureworks.sales.salesterritory.SalesterritoryFields
-import adventureworks.sales.salesterritory.SalesterritoryId
-import adventureworks.sales.salesterritory.SalesterritoryRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.countryregion.CountryregionFields;
+import adventureworks.person.countryregion.CountryregionId;
+import adventureworks.person.countryregion.CountryregionRow;
+import adventureworks.public.Flag;
+import adventureworks.public.Name;
+import adventureworks.sales.salesterritory.SalesterritoryFields;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import adventureworks.sales.salesterritory.SalesterritoryRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait StateprovinceFields {
   def stateprovinceid: IdField[StateprovinceId, StateprovinceRow]
@@ -44,7 +42,7 @@ trait StateprovinceFields {
 object StateprovinceFields {
   lazy val structure: Relation[StateprovinceFields, StateprovinceRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[StateprovinceFields, StateprovinceRow] {
   
@@ -59,8 +57,8 @@ object StateprovinceFields {
       override def modifieddate = Field[TypoLocalDateTime, StateprovinceRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, StateprovinceRow]] =
-      List[FieldLikeNoHkt[?, StateprovinceRow]](fields.stateprovinceid, fields.stateprovincecode, fields.countryregioncode, fields.isonlystateprovinceflag, fields.name, fields.territoryid, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, StateprovinceRow]] =
+      List[FieldLike[?, StateprovinceRow]](fields.stateprovinceid, fields.stateprovincecode, fields.countryregioncode, fields.isonlystateprovinceflag, fields.name, fields.territoryid, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

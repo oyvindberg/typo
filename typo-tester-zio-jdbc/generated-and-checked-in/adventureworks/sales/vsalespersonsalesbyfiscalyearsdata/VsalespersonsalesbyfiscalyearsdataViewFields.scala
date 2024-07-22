@@ -3,17 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sales
-package vsalespersonsalesbyfiscalyearsdata
+package adventureworks.sales.vsalespersonsalesbyfiscalyearsdata;
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.Name;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait VsalespersonsalesbyfiscalyearsdataViewFields {
   def salespersonid: OptField[BusinessentityId, VsalespersonsalesbyfiscalyearsdataViewRow]
@@ -27,7 +25,7 @@ trait VsalespersonsalesbyfiscalyearsdataViewFields {
 object VsalespersonsalesbyfiscalyearsdataViewFields {
   lazy val structure: Relation[VsalespersonsalesbyfiscalyearsdataViewFields, VsalespersonsalesbyfiscalyearsdataViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[VsalespersonsalesbyfiscalyearsdataViewFields, VsalespersonsalesbyfiscalyearsdataViewRow] {
   
@@ -40,8 +38,8 @@ object VsalespersonsalesbyfiscalyearsdataViewFields {
       override def fiscalyear = OptField[BigDecimal, VsalespersonsalesbyfiscalyearsdataViewRow](_path, "fiscalyear", None, None, x => x.fiscalyear, (row, value) => row.copy(fiscalyear = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, VsalespersonsalesbyfiscalyearsdataViewRow]] =
-      List[FieldLikeNoHkt[?, VsalespersonsalesbyfiscalyearsdataViewRow]](fields.salespersonid, fields.fullname, fields.jobtitle, fields.salesterritory, fields.salestotal, fields.fiscalyear)
+    override lazy val columns: List[FieldLike[?, VsalespersonsalesbyfiscalyearsdataViewRow]] =
+      List[FieldLike[?, VsalespersonsalesbyfiscalyearsdataViewRow]](fields.salespersonid, fields.fullname, fields.jobtitle, fields.salesterritory, fields.salestotal, fields.fiscalyear)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

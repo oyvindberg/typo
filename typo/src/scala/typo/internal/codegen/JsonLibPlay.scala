@@ -23,24 +23,24 @@ case class JsonLibPlay(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits
   def lookupReadsFor(tpe: sc.Type): sc.Code = {
     def go(tpe: sc.Type): sc.Code =
       tpe match {
-        case TypesScala.BigDecimal                                              => code"$Reads.bigDecReads"
-        case TypesScala.Boolean                                                 => code"$Reads.BooleanReads"
-        case TypesScala.Byte                                                    => code"$Reads.ByteReads"
-        case TypesScala.Double                                                  => code"$Reads.DoubleReads"
-        case TypesScala.Float                                                   => code"$Reads.FloatReads"
-        case TypesJava.Instant                                                  => code"$Reads.DefaultInstantReads"
-        case TypesScala.Int                                                     => code"$Reads.IntReads"
-        case TypesJava.LocalDate                                                => code"$Reads.DefaultLocalDateReads"
-        case TypesJava.LocalDateTime                                            => code"$Reads.DefaultLocalDateTimeReads"
-        case TypesJava.LocalTime                                                => code"$Reads.DefaultLocalTimeReads"
-        case TypesScala.Long                                                    => code"$Reads.LongReads"
-        case TypesJava.OffsetDateTime                                           => code"$Reads.DefaultOffsetDateTimeReads"
-        case TypesJava.String                                                   => code"$Reads.StringReads"
-        case TypesJava.UUID                                                     => code"$Reads.uuidReads"
-        case sc.Type.ArrayOf(targ)                                              => code"$Reads.ArrayReads[$targ](using ${go(targ)}, implicitly)"
-        case sc.Type.TApply(default.Defaulted, List(TypesScala.Optional(targ))) => code"${default.Defaulted}.$readsOptName(${go(targ)})"
-        case sc.Type.TApply(default.Defaulted, List(targ))                      => code"${default.Defaulted}.$readsName(${go(targ)})"
-        case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents)      => code"$tpe.$readsName"
+        case TypesScala.BigDecimal                                             => code"$Reads.bigDecReads"
+        case TypesScala.Boolean                                                => code"$Reads.BooleanReads"
+        case TypesScala.Byte                                                   => code"$Reads.ByteReads"
+        case TypesScala.Double                                                 => code"$Reads.DoubleReads"
+        case TypesScala.Float                                                  => code"$Reads.FloatReads"
+        case TypesJava.Instant                                                 => code"$Reads.DefaultInstantReads"
+        case TypesScala.Int                                                    => code"$Reads.IntReads"
+        case TypesJava.LocalDate                                               => code"$Reads.DefaultLocalDateReads"
+        case TypesJava.LocalDateTime                                           => code"$Reads.DefaultLocalDateTimeReads"
+        case TypesJava.LocalTime                                               => code"$Reads.DefaultLocalTimeReads"
+        case TypesScala.Long                                                   => code"$Reads.LongReads"
+        case TypesJava.OffsetDateTime                                          => code"$Reads.DefaultOffsetDateTimeReads"
+        case TypesJava.String                                                  => code"$Reads.StringReads"
+        case TypesJava.UUID                                                    => code"$Reads.uuidReads"
+        case sc.Type.ArrayOf(targ)                                             => code"$Reads.ArrayReads[$targ](using ${go(targ)}, implicitly)"
+        case sc.Type.TApply(default.Defaulted, List(LangScala.Optional(targ))) => code"${default.Defaulted}.$readsOptName(${go(targ)})"
+        case sc.Type.TApply(default.Defaulted, List(targ))                     => code"${default.Defaulted}.$readsName(${go(targ)})"
+        case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents)     => code"$tpe.$readsName"
         case x if missingInstancesByType.contains(Reads.of(x)) =>
           code"${missingInstancesByType(Reads.of(x))}"
         case other => sc.Summon(Reads.of(other)).code
@@ -69,7 +69,7 @@ case class JsonLibPlay(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits
         case TypesJava.UUID                                                => code"$Writes.UuidWrites"
         case sc.Type.ArrayOf(targ)                                         => code"$Writes.arrayWrites[$targ](using implicitly, ${go(targ)})"
         case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$writesName(${go(targ)})"
-        case TypesScala.Optional(targ)                                     => code"$Writes.OptionWrites(${go(targ)})"
+        case LangScala.Optional(targ)                                      => code"$Writes.OptionWrites(${go(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) => code"$tpe.$writesName"
         case x if missingInstancesByType.contains(Writes.of(x)) =>
           code"${missingInstancesByType(Writes.of(x))}"
@@ -84,11 +84,11 @@ case class JsonLibPlay(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits
     val reader = sc.Given(
       tparams = List(T),
       name = readsName,
-      implicitParams = List(sc.Param(sc.Ident("T"), Reads.of(T), None)),
+      implicitParams = List(sc.Param(sc.Ident("T"), Reads.of(T))),
       tpe = Reads.of(d.Defaulted.of(T)),
       body = code"""|{
                     |  case $JsString("defaulted") =>
-                    |    $JsSuccess(${d.Defaulted}.${d.UseDefault})
+                    |    $JsSuccess(${d.Defaulted}.${d.UseDefault}())
                     |  case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
                     |    $Json.fromJson[T](providedJson).map(${d.Defaulted}.${d.Provided}.apply)
                     |  case _ =>
@@ -99,11 +99,11 @@ case class JsonLibPlay(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits
     val readerOpt = sc.Given(
       tparams = List(T),
       name = readsOptName,
-      implicitParams = List(sc.Param(sc.Ident("T"), Reads.of(T), None)),
+      implicitParams = List(sc.Param(sc.Ident("T"), Reads.of(T))),
       tpe = Reads.of(d.Defaulted.of(TypesScala.Option.of(T))),
       body = code"""|{
                     |  case $JsString("defaulted") =>
-                    |    $JsSuccess(${d.Defaulted}.${d.UseDefault})
+                    |    $JsSuccess(${d.Defaulted}.${d.UseDefault}())
                     |  case $JsObject(Seq(("provided", $JsNull))) =>
                     |    $JsSuccess(${d.Defaulted}.${d.Provided}(${TypesScala.None}))
                     |  case $JsObject(Seq(("provided", providedJson: $JsValue))) =>
@@ -117,11 +117,11 @@ case class JsonLibPlay(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits
     val writer = sc.Given(
       tparams = List(T),
       name = writesName,
-      implicitParams = List(sc.Param(sc.Ident("T"), Writes.of(T), None)),
+      implicitParams = List(sc.Param(sc.Ident("T"), Writes.of(T))),
       tpe = Writes.of(d.Defaulted.of(T)),
       body = code"""|{
                     |  case ${d.Defaulted}.${d.Provided}(value) => $Json.obj("provided" -> $T.writes(value))
-                    |  case ${d.Defaulted}.${d.UseDefault}      => $JsString("defaulted")
+                    |  case ${d.Defaulted}.${d.UseDefault}()    => $JsString("defaulted")
                     |}""".stripMargin
     )
 
@@ -156,8 +156,8 @@ case class JsonLibPlay(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits
         body = {
           val newFields = fields.map { f =>
             val value = f.tpe match {
-              case TypesScala.Optional(of) => code"""json.\\(${f.jsonName}).toOption.map(_.as(${lookupReadsFor(of)}))"""
-              case _                       => code"""json.\\(${f.jsonName}).as(${lookupReadsFor(f.tpe)})"""
+              case LangScala.Optional(of) => code"""json.\\(${f.jsonName}).toOption.map(_.as(${lookupReadsFor(of)}))"""
+              case _                      => code"""json.\\(${f.jsonName}).as(${lookupReadsFor(f.tpe)})"""
             }
 
             code"""${f.scalaName} = $value"""

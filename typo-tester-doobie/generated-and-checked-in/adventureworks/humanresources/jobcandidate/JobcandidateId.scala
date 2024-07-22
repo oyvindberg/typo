@@ -3,20 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package humanresources
-package jobcandidate
+package adventureworks.humanresources.jobcandidate;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `humanresources.jobcandidate` */
-case class JobcandidateId(value: Int) extends AnyVal
+case class JobcandidateId(value: Int) extends scala.AnyVal
+
 object JobcandidateId {
   implicit lazy val arrayGet: Get[Array[JobcandidateId]] = adventureworks.IntegerArrayMeta.get.map(_.map(JobcandidateId.apply))
   implicit lazy val arrayPut: Put[Array[JobcandidateId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
@@ -24,10 +23,11 @@ object JobcandidateId {
   implicit lazy val decoder: Decoder[JobcandidateId] = Decoder.decodeInt.map(JobcandidateId.apply)
   implicit lazy val encoder: Encoder[JobcandidateId] = Encoder.encodeInt.contramap(_.value)
   implicit lazy val get: Get[JobcandidateId] = Meta.IntMeta.get.map(JobcandidateId.apply)
-  implicit lazy val ordering: Ordering[JobcandidateId] = Ordering.by(_.value)
   implicit lazy val put: Put[JobcandidateId] = Meta.IntMeta.put.contramap(_.value)
-  implicit lazy val text: Text[JobcandidateId] = new Text[JobcandidateId] {
-    override def unsafeEncode(v: JobcandidateId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: JobcandidateId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[JobcandidateId] = {
+    new Text[JobcandidateId] {
+      override def unsafeEncode(v: JobcandidateId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: JobcandidateId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

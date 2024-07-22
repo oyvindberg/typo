@@ -3,25 +3,24 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package humanresources
-package employeepayhistory
+package adventureworks.humanresources.employeepayhistory;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.humanresources.employee.EmployeeFields
-import adventureworks.humanresources.employee.EmployeeRow
-import adventureworks.person.businessentity.BusinessentityId
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.Required
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.humanresources.employee.EmployeeFields;
+import adventureworks.humanresources.employee.EmployeeRow;
+import adventureworks.person.businessentity.BusinessentityId;
+import anorm.ToParameterValue;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait EmployeepayhistoryFields {
   def businessentityid: IdField[BusinessentityId, EmployeepayhistoryRow]
@@ -32,17 +31,17 @@ trait EmployeepayhistoryFields {
   def fkEmployee: ForeignKey[EmployeeFields, EmployeeRow] =
     ForeignKey[EmployeeFields, EmployeeRow]("humanresources.FK_EmployeePayHistory_Employee_BusinessEntityID", Nil)
       .withColumnPair(businessentityid, _.businessentityid)
-  def compositeIdIs(compositeId: EmployeepayhistoryId): SqlExpr[Boolean, Required] =
+  def compositeIdIs(compositeId: EmployeepayhistoryId): SqlExpr[Boolean] =
     businessentityid.isEqual(compositeId.businessentityid).and(ratechangedate.isEqual(compositeId.ratechangedate))
-  def compositeIdIn(compositeIds: Array[EmployeepayhistoryId]): SqlExpr[Boolean, Required] =
-    new CompositeIn(compositeIds)(TuplePart(businessentityid)(_.businessentityid), TuplePart(ratechangedate)(_.ratechangedate))
+  def compositeIdIn(compositeIds: Array[EmployeepayhistoryId]): SqlExpr[Boolean] =
+    new CompositeIn(compositeIds)(TuplePart[EmployeepayhistoryId](businessentityid)(_.businessentityid)(using as[Array[BusinessentityId]](ToParameterValue(null, BusinessentityId.arrayToStatement), adventureworks.arrayParameterMetaData(BusinessentityId.parameterMetadata)), implicitly), TuplePart[EmployeepayhistoryId](ratechangedate)(_.ratechangedate)(using as[Array[TypoLocalDateTime]](ToParameterValue(null, TypoLocalDateTime.arrayToStatement), adventureworks.arrayParameterMetaData(TypoLocalDateTime.parameterMetadata)), implicitly))
   
 }
 
 object EmployeepayhistoryFields {
   lazy val structure: Relation[EmployeepayhistoryFields, EmployeepayhistoryRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[EmployeepayhistoryFields, EmployeepayhistoryRow] {
   
@@ -54,8 +53,8 @@ object EmployeepayhistoryFields {
       override def modifieddate = Field[TypoLocalDateTime, EmployeepayhistoryRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, EmployeepayhistoryRow]] =
-      List[FieldLikeNoHkt[?, EmployeepayhistoryRow]](fields.businessentityid, fields.ratechangedate, fields.rate, fields.payfrequency, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, EmployeepayhistoryRow]] =
+      List[FieldLike[?, EmployeepayhistoryRow]](fields.businessentityid, fields.ratechangedate, fields.rate, fields.payfrequency, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

@@ -3,25 +3,23 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package production
-package billofmaterials
+package adventureworks.production.billofmaterials;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.production.product.ProductFields
-import adventureworks.production.product.ProductId
-import adventureworks.production.product.ProductRow
-import adventureworks.production.unitmeasure.UnitmeasureFields
-import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.production.unitmeasure.UnitmeasureRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.production.product.ProductFields;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.product.ProductRow;
+import adventureworks.production.unitmeasure.UnitmeasureFields;
+import adventureworks.production.unitmeasure.UnitmeasureId;
+import adventureworks.production.unitmeasure.UnitmeasureRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait BillofmaterialsFields {
   def billofmaterialsid: IdField[Int, BillofmaterialsRow]
@@ -47,7 +45,7 @@ trait BillofmaterialsFields {
 object BillofmaterialsFields {
   lazy val structure: Relation[BillofmaterialsFields, BillofmaterialsRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[BillofmaterialsFields, BillofmaterialsRow] {
   
@@ -63,8 +61,8 @@ object BillofmaterialsFields {
       override def modifieddate = Field[TypoLocalDateTime, BillofmaterialsRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, BillofmaterialsRow]] =
-      List[FieldLikeNoHkt[?, BillofmaterialsRow]](fields.billofmaterialsid, fields.productassemblyid, fields.componentid, fields.startdate, fields.enddate, fields.unitmeasurecode, fields.bomlevel, fields.perassemblyqty, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, BillofmaterialsRow]] =
+      List[FieldLike[?, BillofmaterialsRow]](fields.billofmaterialsid, fields.productassemblyid, fields.componentid, fields.startdate, fields.enddate, fields.unitmeasurecode, fields.bomlevel, fields.perassemblyqty, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

@@ -3,98 +3,99 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package hr
-package e
+package adventureworks.hr.e;
 
-import adventureworks.customtypes.TypoLocalDate
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Flag
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDate;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.Flag;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: hr.e */
 case class EViewRow(
-  /** Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]] */
   id: BusinessentityId,
-  /** Points to [[humanresources.employee.EmployeeRow.businessentityid]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]] */
   businessentityid: BusinessentityId,
-  /** Points to [[humanresources.employee.EmployeeRow.nationalidnumber]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.nationalidnumber]] */
   nationalidnumber: /* max 15 chars */ String,
-  /** Points to [[humanresources.employee.EmployeeRow.loginid]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.loginid]] */
   loginid: /* max 256 chars */ String,
-  /** Points to [[humanresources.employee.EmployeeRow.jobtitle]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.jobtitle]] */
   jobtitle: /* max 50 chars */ String,
-  /** Points to [[humanresources.employee.EmployeeRow.birthdate]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.birthdate]] */
   birthdate: TypoLocalDate,
-  /** Points to [[humanresources.employee.EmployeeRow.maritalstatus]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.maritalstatus]] */
   maritalstatus: /* bpchar, max 1 chars */ String,
-  /** Points to [[humanresources.employee.EmployeeRow.gender]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.gender]] */
   gender: /* bpchar, max 1 chars */ String,
-  /** Points to [[humanresources.employee.EmployeeRow.hiredate]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.hiredate]] */
   hiredate: TypoLocalDate,
-  /** Points to [[humanresources.employee.EmployeeRow.salariedflag]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.salariedflag]] */
   salariedflag: Flag,
-  /** Points to [[humanresources.employee.EmployeeRow.vacationhours]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.vacationhours]] */
   vacationhours: TypoShort,
-  /** Points to [[humanresources.employee.EmployeeRow.sickleavehours]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.sickleavehours]] */
   sickleavehours: TypoShort,
-  /** Points to [[humanresources.employee.EmployeeRow.currentflag]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.currentflag]] */
   currentflag: Flag,
-  /** Points to [[humanresources.employee.EmployeeRow.rowguid]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.rowguid]] */
   rowguid: TypoUUID,
-  /** Points to [[humanresources.employee.EmployeeRow.modifieddate]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.modifieddate]] */
   modifieddate: TypoLocalDateTime,
-  /** Points to [[humanresources.employee.EmployeeRow.organizationnode]] */
+  /** Points to [[adventureworks.humanresources.employee.EmployeeRow.organizationnode]] */
   organizationnode: Option[String]
 )
 
 object EViewRow {
   implicit lazy val decoder: Decoder[EViewRow] = Decoder.forProduct16[EViewRow, BusinessentityId, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Flag, TypoShort, TypoShort, Flag, TypoUUID, TypoLocalDateTime, Option[String]]("id", "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(EViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Flag.decoder, TypoShort.decoder, TypoShort.decoder, Flag.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(Decoder.decodeString))
   implicit lazy val encoder: Encoder[EViewRow] = Encoder.forProduct16[EViewRow, BusinessentityId, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Flag, TypoShort, TypoShort, Flag, TypoUUID, TypoLocalDateTime, Option[String]]("id", "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(x => (x.id, x.businessentityid, x.nationalidnumber, x.loginid, x.jobtitle, x.birthdate, x.maritalstatus, x.gender, x.hiredate, x.salariedflag, x.vacationhours, x.sickleavehours, x.currentflag, x.rowguid, x.modifieddate, x.organizationnode))(BusinessentityId.encoder, BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Flag.encoder, TypoShort.encoder, TypoShort.encoder, Flag.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(Encoder.encodeString))
-  implicit lazy val read: Read[EViewRow] = new Read[EViewRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoLocalDate.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoLocalDate.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => EViewRow(
-      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      nationalidnumber = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      loginid = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      jobtitle = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
-      birthdate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 5),
-      maritalstatus = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
-      gender = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 7),
-      hiredate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 8),
-      salariedflag = Flag.get.unsafeGetNonNullable(rs, i + 9),
-      vacationhours = TypoShort.get.unsafeGetNonNullable(rs, i + 10),
-      sickleavehours = TypoShort.get.unsafeGetNonNullable(rs, i + 11),
-      currentflag = Flag.get.unsafeGetNonNullable(rs, i + 12),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 13),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 14),
-      organizationnode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 15)
+  implicit lazy val read: Read[EViewRow] = {
+    new Read[EViewRow](
+      gets = List(
+        (BusinessentityId.get, Nullability.NoNulls),
+        (BusinessentityId.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (TypoLocalDate.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (TypoLocalDate.get, Nullability.NoNulls),
+        (Flag.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (Flag.get, Nullability.NoNulls),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => EViewRow(
+        id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+        businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+        nationalidnumber = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+        loginid = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+        jobtitle = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+        birthdate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 5),
+        maritalstatus = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
+        gender = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 7),
+        hiredate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 8),
+        salariedflag = Flag.get.unsafeGetNonNullable(rs, i + 9),
+        vacationhours = TypoShort.get.unsafeGetNonNullable(rs, i + 10),
+        sickleavehours = TypoShort.get.unsafeGetNonNullable(rs, i + 11),
+        currentflag = Flag.get.unsafeGetNonNullable(rs, i + 12),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 13),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 14),
+        organizationnode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 15)
+      )
     )
-  )
+  
+  }
 }

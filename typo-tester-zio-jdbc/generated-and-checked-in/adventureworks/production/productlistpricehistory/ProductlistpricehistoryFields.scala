@@ -3,25 +3,24 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package production
-package productlistpricehistory
+package adventureworks.production.productlistpricehistory;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.product.ProductFields
-import adventureworks.production.product.ProductId
-import adventureworks.production.product.ProductRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.Required
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.product.ProductFields;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.product.ProductRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.PGType;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait ProductlistpricehistoryFields {
   def productid: IdField[ProductId, ProductlistpricehistoryRow]
@@ -32,17 +31,17 @@ trait ProductlistpricehistoryFields {
   def fkProduct: ForeignKey[ProductFields, ProductRow] =
     ForeignKey[ProductFields, ProductRow]("production.FK_ProductListPriceHistory_Product_ProductID", Nil)
       .withColumnPair(productid, _.productid)
-  def compositeIdIs(compositeId: ProductlistpricehistoryId): SqlExpr[Boolean, Required] =
+  def compositeIdIs(compositeId: ProductlistpricehistoryId): SqlExpr[Boolean] =
     productid.isEqual(compositeId.productid).and(startdate.isEqual(compositeId.startdate))
-  def compositeIdIn(compositeIds: Array[ProductlistpricehistoryId]): SqlExpr[Boolean, Required] =
-    new CompositeIn(compositeIds)(TuplePart(productid)(_.productid), TuplePart(startdate)(_.startdate))
+  def compositeIdIn(compositeIds: Array[ProductlistpricehistoryId]): SqlExpr[Boolean] =
+    new CompositeIn(compositeIds)(TuplePart[ProductlistpricehistoryId](productid)(_.productid)(using as[Array[ProductId]](ProductId.arrayJdbcEncoder, PGType.forArray(ProductId.pgType)), implicitly), TuplePart[ProductlistpricehistoryId](startdate)(_.startdate)(using as[Array[TypoLocalDateTime]](TypoLocalDateTime.arrayJdbcEncoder, PGType.forArray(TypoLocalDateTime.pgType)), implicitly))
   
 }
 
 object ProductlistpricehistoryFields {
   lazy val structure: Relation[ProductlistpricehistoryFields, ProductlistpricehistoryRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[ProductlistpricehistoryFields, ProductlistpricehistoryRow] {
   
@@ -54,8 +53,8 @@ object ProductlistpricehistoryFields {
       override def modifieddate = Field[TypoLocalDateTime, ProductlistpricehistoryRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, ProductlistpricehistoryRow]] =
-      List[FieldLikeNoHkt[?, ProductlistpricehistoryRow]](fields.productid, fields.startdate, fields.enddate, fields.listprice, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, ProductlistpricehistoryRow]] =
+      List[FieldLike[?, ProductlistpricehistoryRow]](fields.productid, fields.startdate, fields.enddate, fields.listprice, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

@@ -3,13 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package ppp
+package adventureworks.pr.ppp;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.SelectBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
 
 trait PppViewRepo {
   def select: SelectBuilder[PppViewFields, PppViewRow]

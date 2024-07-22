@@ -3,12 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package d
+package adventureworks.pr.d;
 
-import java.sql.Connection
-import typo.dsl.SelectBuilder
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
 
 trait DViewRepo {
   def select: SelectBuilder[DViewFields, DViewRow]

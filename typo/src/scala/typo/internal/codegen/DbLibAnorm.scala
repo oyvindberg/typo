@@ -12,6 +12,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
   val ToSql = sc.Type.Qualified("anorm.ToSql")
   val NamedParameter = sc.Type.Qualified("anorm.NamedParameter")
   val ParameterValue = sc.Type.Qualified("anorm.ParameterValue")
+  val ToParameterValue = sc.Type.Qualified("anorm.ToParameterValue")
   val RowParser = sc.Type.Qualified("anorm.RowParser")
   val Success = sc.Type.Qualified("anorm.Success")
   val SqlMappingError = sc.Type.Qualified("anorm.SqlMappingError")
@@ -48,16 +49,16 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
             // drop structured imports from anorm.*, as the auto-import thing would need to be more clever to handle this
             code"""|object ${ExecuteReturningSyntax.name} {
                    |  /* add executeReturning to anorm. it needs to be inside the package, because everything is hidden */
-                   |  implicit class Ops(batchSql: BatchSql) {
-                   |    def executeReturning[T](parser: ResultSetParser[T])(implicit c: ${TypesJava.Connection}): T =
-                   |      $managed(batchSql.getFilledStatement(c, getGeneratedKeys = true))(using StatementResource, statementClassTag).acquireAndGet { ps =>
+                   |  implicit class Ops(batchSql: anorm.BatchSql) {
+                   |    def executeReturning[T](parser: anorm.ResultSetParser[T])(implicit c: ${TypesJava.Connection}): T =
+                   |      $managed(batchSql.getFilledStatement(c, getGeneratedKeys = true))(using anorm.StatementResource, anorm.statementClassTag).acquireAndGet { ps =>
                    |        ps.executeBatch()
-                   |        Sql
+                   |        anorm.Sql
                    |          .asTry(
                    |            parser,
-                   |            $managed(ps.getGeneratedKeys)(using ResultSetResource, resultSetClassTag),
+                   |            $managed(ps.getGeneratedKeys)(using anorm.ResultSetResource, anorm.resultSetClassTag),
                    |            onFirstRow = false,
-                   |            ColumnAliaser.empty
+                   |            anorm.ColumnAliaser.empty
                    |          )
                    |          .get
                    |      }
@@ -80,8 +81,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
     ).flatten
   }
 
-  def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type, forbidInline: Boolean = false): sc.Code =
-    if (inlineImplicits && !forbidInline)
+  def runtimeInterpolateValue(name: sc.Code, tpe: sc.Type): sc.Code =
+    if (inlineImplicits)
       code"$${$ParameterValue($name, null, ${lookupToStatementFor(tpe)})}"
     else code"$${$name}"
 
@@ -103,16 +104,16 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
     if (!inlineImplicits) sc.Summon(Column.of(tpe)).code
     else
       sc.Type.base(tpe) match {
-        case TypesScala.BigDecimal     => code"$Column.columnToScalaBigDecimal"
-        case TypesScala.Boolean        => code"$Column.columnToBoolean"
-        case TypesScala.Byte           => code"$Column.columnToByte"
-        case TypesScala.Double         => code"$Column.columnToDouble"
-        case TypesScala.Float          => code"$Column.columnToFloat"
-        case TypesScala.Int            => code"$Column.columnToInt"
-        case TypesScala.Long           => code"$Column.columnToLong"
-        case TypesJava.String          => code"$Column.columnToString"
-        case TypesJava.UUID            => code"$Column.columnToUUID"
-        case TypesScala.Optional(targ) => code"$Column.columnToOption(${lookupColumnFor(targ)})"
+        case TypesScala.BigDecimal    => code"$Column.columnToScalaBigDecimal"
+        case TypesScala.Boolean       => code"$Column.columnToBoolean"
+        case TypesScala.Byte          => code"$Column.columnToByte"
+        case TypesScala.Double        => code"$Column.columnToDouble"
+        case TypesScala.Float         => code"$Column.columnToFloat"
+        case TypesScala.Int           => code"$Column.columnToInt"
+        case TypesScala.Long          => code"$Column.columnToLong"
+        case TypesJava.String         => code"$Column.columnToString"
+        case TypesJava.UUID           => code"$Column.columnToUUID"
+        case LangScala.Optional(targ) => code"$Column.columnToOption(${lookupColumnFor(targ)})"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
           code"$tpe.$columnName"
@@ -163,16 +164,16 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
     if (!inlineImplicits) sc.Summon(ToStatement.of(tpe)).code
     else
       sc.Type.base(tpe) match {
-        case TypesScala.BigDecimal     => code"$ToStatement.scalaBigDecimalToStatement"
-        case TypesScala.Boolean        => code"$ToStatement.booleanToStatement"
-        case TypesScala.Byte           => code"$ToStatement.byteToStatement"
-        case TypesScala.Double         => code"$ToStatement.doubleToStatement"
-        case TypesScala.Float          => code"$ToStatement.floatToStatement"
-        case TypesScala.Int            => code"$ToStatement.intToStatement"
-        case TypesScala.Long           => code"$ToStatement.longToStatement"
-        case TypesJava.String          => code"$ToStatement.stringToStatement"
-        case TypesJava.UUID            => code"$ToStatement.uuidToStatement"
-        case TypesScala.Optional(targ) => code"$ToStatement.optionToStatement(${lookupToStatementFor(targ)}, ${lookupParameterMetaDataFor(targ)})"
+        case TypesScala.BigDecimal    => code"$ToStatement.scalaBigDecimalToStatement"
+        case TypesScala.Boolean       => code"$ToStatement.booleanToStatement"
+        case TypesScala.Byte          => code"$ToStatement.byteToStatement"
+        case TypesScala.Double        => code"$ToStatement.doubleToStatement"
+        case TypesScala.Float         => code"$ToStatement.floatToStatement"
+        case TypesScala.Int           => code"$ToStatement.intToStatement"
+        case TypesScala.Long          => code"$ToStatement.longToStatement"
+        case TypesJava.String         => code"$ToStatement.stringToStatement"
+        case TypesJava.UUID           => code"$ToStatement.uuidToStatement"
+        case LangScala.Optional(targ) => code"$ToStatement.optionToStatement(${lookupToStatementFor(targ)}, ${lookupParameterMetaDataFor(targ)})"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
           code"$tpe.$toStatementName"
@@ -192,62 +193,88 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         case other => sc.Summon(ToStatement.of(other)).code
       }
 
-  override def repoSig(repoMethod: RepoMethod): Right[Nothing, sc.Code] = {
-    val name = repoMethod.methodName
+  override def resolveConstAs(tpe: sc.Type): sc.Code =
+    tpe match {
+      case LangScala.Optional(underlying) =>
+        code"${sc.Type.dsl.ConstAsAsOpt}[$underlying]($ToParameterValue(null, ${lookupToStatementFor(tpe)}), ${lookupParameterMetaDataFor(tpe)})"
+      case _ =>
+        code"${sc.Type.dsl.ConstAsAs}[$tpe]($ToParameterValue(null, ${lookupToStatementFor(tpe)}), ${lookupParameterMetaDataFor(tpe)})"
+    }
+
+  val c: sc.Param = sc.Param(sc.Ident("c"), TypesJava.Connection)
+
+  override def repoSig(repoMethod: RepoMethod): Right[Nothing, sc.Method] = {
+    def sig(
+        params: List[sc.Param],
+        implicitParams: List[sc.Param],
+        returnType: sc.Type
+    ) = Right(
+      sc.Method(
+        comments = repoMethod.comment,
+        tparams = Nil,
+        name = sc.Ident(repoMethod.methodName),
+        params = params,
+        implicitParams = implicitParams,
+        tpe = returnType,
+        body = None
+      )
+    )
+
     repoMethod match {
       case RepoMethod.SelectBuilder(_, fieldsType, rowType) =>
-        Right(code"def $name: ${sc.Type.dsl.SelectBuilder.of(fieldsType, rowType)}")
+        sig(params = Nil, implicitParams = Nil, returnType = sc.Type.dsl.SelectBuilder.of(fieldsType, rowType))
       case RepoMethod.SelectAll(_, _, rowType) =>
-        Right(code"def $name(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}")
+        sig(params = Nil, implicitParams = List(c), returnType = TypesScala.List.of(rowType))
       case RepoMethod.SelectById(_, _, id, rowType) =>
-        Right(code"def $name(${id.param})(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}")
-      case RepoMethod.SelectByIds(_, _, idComputed, idsParam, rowType) =>
-        val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(colType)), None) }
-        val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
-        Right(code"def $name($idsParam)(implicit ${params.map(_.code).mkCode(", ")}): ${TypesScala.List.of(rowType)}")
+        sig(params = List(id.param), implicitParams = List(c), returnType = TypesScala.Option.of(rowType))
+      case RepoMethod.SelectByIds(_, _, _, idsParam, rowType) =>
+        sig(params = List(idsParam), implicitParams = List(c), returnType = TypesScala.List.of(rowType))
       case RepoMethod.SelectByIdsTracked(x) =>
-        val usedDefineds = x.idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(colType)), None) }
-        val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
-        Right(code"def $name(${x.idsParam})(implicit ${params.map(_.code).mkCode(", ")}): ${TypesScala.Map.of(x.idComputed.tpe, x.rowType)}")
+        sig(params = List(x.idsParam), implicitParams = List(c), returnType = TypesScala.Map.of(x.idComputed.tpe, x.rowType))
       case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
-        Right(code"def $name(${keyColumns.map(_.param.code).mkCode(", ")})(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}")
+        sig(params = keyColumns.toList.map(_.param), implicitParams = List(c), returnType = TypesScala.Option.of(rowType))
       case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
-        Right(code"def $name($fieldValueOrIdsParam)(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}")
+        sig(params = List(fieldValueOrIdsParam), implicitParams = List(c), returnType = TypesScala.List.of(rowType))
       case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
-        Right(code"def $name: ${sc.Type.dsl.UpdateBuilder.of(fieldsType, rowType)}")
+        sig(params = Nil, implicitParams = Nil, returnType = sc.Type.dsl.UpdateBuilder.of(fieldsType, rowType))
       case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
-        Right(code"def $name(${id.param}, $varargs)(implicit c: ${TypesJava.Connection}): ${TypesScala.Boolean}")
+        sig(params = List(id.param, varargs), implicitParams = List(c), returnType = TypesScala.Boolean)
       case RepoMethod.Update(_, _, _, param, _) =>
-        Right(code"def $name($param)(implicit c: ${TypesJava.Connection}): ${TypesScala.Boolean}")
+        sig(params = List(param), implicitParams = List(c), returnType = TypesScala.Boolean)
       case RepoMethod.Insert(_, _, unsavedParam, rowType) =>
-        Right(code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType")
+        sig(params = List(unsavedParam), implicitParams = List(c), returnType = rowType)
       case RepoMethod.InsertStreaming(_, _, rowType) =>
-        Right(code"def $name(unsaved: ${TypesScala.Iterator.of(rowType)}, batchSize: ${TypesScala.Int} = 10000)(implicit c: ${TypesJava.Connection}): ${TypesScala.Long}")
+        val unsaved = sc.Param(sc.Ident("unsaved"), TypesScala.Iterator.of(rowType))
+        val batchSize = sc.Param(sc.Comments.Empty, sc.Ident("batchSize"), TypesScala.Int, Some(code"10000"))
+        sig(params = List(unsaved, batchSize), implicitParams = List(c), returnType = TypesScala.Long)
       case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
-        Right(code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType")
+        sig(params = List(unsavedParam), implicitParams = List(c), returnType = rowType)
       case RepoMethod.UpsertBatch(_, _, _, rowType) =>
-        Right(code"def $name(unsaved: ${TypesScala.Iterable.of(rowType)})(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}")
+        val unsaved = sc.Param(sc.Ident("unsaved"), TypesScala.Iterable.of(rowType))
+        sig(params = List(unsaved), implicitParams = List(c), returnType = TypesScala.List.of(rowType))
       case RepoMethod.UpsertStreaming(_, _, _, rowType) =>
-        Right(code"def $name(unsaved: ${TypesScala.Iterator.of(rowType)}, batchSize: ${TypesScala.Int} = 10000)(implicit c: ${TypesJava.Connection}): ${TypesScala.Int}")
+        val unsaved = sc.Param(sc.Ident("unsaved"), TypesScala.Iterator.of(rowType))
+        val batchSize = sc.Param(sc.Comments.Empty, sc.Ident("batchSize"), TypesScala.Int, Some(code"10000"))
+        sig(params = List(unsaved, batchSize), implicitParams = List(c), returnType = TypesScala.Int)
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
-        Right(code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType")
+        sig(params = List(unsavedParam), implicitParams = List(c), returnType = rowType)
       case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
-        Right(code"def $name(unsaved: ${TypesScala.Iterator.of(unsaved.tpe)}, batchSize: ${TypesScala.Int} = 10000)(implicit c: ${TypesJava.Connection}): ${TypesScala.Long}")
+        val unsavedParam = sc.Param(sc.Ident("unsaved"), TypesScala.Iterator.of(unsaved.tpe))
+        val batchSize = sc.Param(sc.Comments.Empty, sc.Ident("batchSize"), TypesScala.Int, Some(code"10000"))
+        sig(params = List(unsavedParam, batchSize), implicitParams = List(c), returnType = TypesScala.Long)
       case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
-        Right(code"def $name: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}")
+        sig(params = Nil, implicitParams = Nil, returnType = sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType))
       case RepoMethod.Delete(_, id) =>
-        Right(code"def $name(${id.param})(implicit c: ${TypesJava.Connection}): ${TypesScala.Boolean}")
-      case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
-        val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(colType)), None) }
-        val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
-        Right(code"def $name($idsParam)(implicit ${params.map(_.code).mkCode(", ")}): ${TypesScala.Int}")
+        sig(params = List(id.param), implicitParams = List(c), returnType = TypesScala.Boolean)
+      case RepoMethod.DeleteByIds(_, _, idsParam) =>
+        sig(params = List(idsParam), implicitParams = List(c), returnType = TypesScala.Int)
       case RepoMethod.SqlFile(sqlScript) =>
-        val params = sc.Params(sqlScript.params.map(p => sc.Param(p.name, p.tpe, None)))
+        val params = sqlScript.params.map(p => sc.Param(p.name, p.tpe))
         val retType = sqlScript.maybeRowName match {
           case MaybeReturnsRows.Query(rowName) => TypesScala.List.of(rowName)
           case MaybeReturnsRows.Update         => TypesScala.Int
         }
-        Right(code"def $name$params(implicit c: ${TypesJava.Connection}): $retType")
+        sig(params = params, implicitParams = List(c), returnType = retType)
     }
   }
 
@@ -280,8 +307,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
             val sql = SQL {
               code"""|select ${joinedColNames}
                      |from $relName
-                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")}) 
-                     |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, col.tpe, forbidInline = true)})").mkCode(", ")})
+                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")})
+                     |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, sc.Type.ArrayOf(col.tpe))})").mkCode(", ")})
                      |""".stripMargin
             }
             code"""|$vals
@@ -292,7 +319,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
             val sql = SQL {
               code"""|select ${joinedColNames}
                      |from $relName
-                     |where ${x.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe, forbidInline = true)})
+                     |where ${x.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, idsParam.tpe)})
                      |""".stripMargin
             }
 
@@ -490,16 +517,16 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                |$mergeSql.executeUpdate()""".stripMargin
 
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
-        val cases0 = unsaved.restCols.map { col =>
+        val cases0 = unsaved.normalColumns.map { col =>
           val colCast = sc.StrLit(SqlCast.toPg(col.dbCol).fold("")(_.withColons))
           code"""Some(($NamedParameter(${sc.StrLit(col.dbName.value)}, $ParameterValue(${unsavedParam.name}.${col.name}, null, ${lookupToStatementFor(col.tpe)})), $colCast))"""
         }
-        val cases1 = unsaved.defaultCols.map { case (col @ ComputedColumn(_, ident, _, dbCol), origType) =>
+        val cases1 = unsaved.defaultCols.map { case ComputedRowUnsaved.DefaultedCol(col @ ComputedColumn(_, ident, _, dbCol), origType) =>
           val dbName = sc.StrLit(dbCol.name.value)
           val colCast = sc.StrLit(SqlCast.toPg(col.dbCol).fold("")(_.withColons))
 
           code"""|${unsavedParam.name}.$ident match {
-                   |  case ${default.Defaulted}.${default.UseDefault} => None
+                   |  case ${default.Defaulted}.${default.UseDefault}() => None
                    |  case ${default.Defaulted}.${default.Provided}(value) => Some(($NamedParameter($dbName, $ParameterValue(value, null, ${lookupToStatementFor(origType)})), $colCast))
                    |}"""
         }
@@ -552,7 +579,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
               code"""|delete
                      |from $relName
                      |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")})
-                     |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, col.tpe, forbidInline = true)})").mkCode(", ")})
+                     |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, sc.Type.ArrayOf(col.tpe))})").mkCode(", ")})
                      |""".stripMargin
             }
             code"""|$vals
@@ -563,7 +590,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
             val sql = SQL {
               code"""|delete
                      |from $relName
-                     |where ${x.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, x.tpe, forbidInline = true)})
+                     |where ${x.col.dbName.code} = ANY(${runtimeInterpolateValue(idsParam.name, sc.Type.ArrayOf(x.tpe))})
                      |""".stripMargin
             }
 
@@ -700,14 +727,15 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         code"???"
     }
   }
-  override def testInsertMethod(x: ComputedTestInserts.InsertMethod): sc.Value =
-    sc.Value(
+  override def testInsertMethod(x: ComputedTestInserts.InsertMethod): sc.Method =
+    sc.Method(
+      comments = sc.Comments.Empty,
       tparams = Nil,
       name = x.name,
       params = x.params,
-      implicitParams = List(sc.Param(sc.Ident("c"), TypesJava.Connection, None)),
+      implicitParams = List(c),
       tpe = x.table.names.RowName,
-      body = code"(new ${x.table.names.RepoImplName}).insert(new ${x.cls}(${x.values.map { case (p, expr) => code"$p = $expr" }.mkCode(", ")}))"
+      body = Some(code"(new ${x.table.names.RepoImplName}).insert(new ${x.cls}(${x.values.map { case (p, expr) => code"$p = $expr" }.mkCode(", ")}))")
     )
 
   override val defaultedInstance: List[sc.Given] =
@@ -865,7 +893,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       sc.Given(
         List(T),
         arrayParameterMetaDataName,
-        List(sc.Param(T.value, ParameterMetaData.of(T), None)),
+        List(sc.Param(T.value, ParameterMetaData.of(T))),
         ParameterMetaData.of(sc.Type.ArrayOf(T)),
         code"""|new ${ParameterMetaData.of(sc.Type.ArrayOf(T))} {
                |  override def sqlType: ${TypesJava.String} =
@@ -877,7 +905,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                |      case "VARCHAR" => "text[]"
                |      case other => s"$${other}[]"
                |    }
-               |  
+               |
                |  override def jdbcType: ${TypesScala.Int} = ${TypesJava.SqlTypes}.ARRAY
                |}""".stripMargin
       )
@@ -893,19 +921,22 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
     val text = textSupport.map(_.rowInstance(tpe, cols))
     val rowParser = {
       val mappedValues = cols.zipWithIndex.map { case (x, num) => code"${x.name} = row(idx + $num)(${lookupColumnFor(x.tpe)})" }
-      sc.Value(
+      sc.Method(
+        comments = sc.Comments.Empty,
         Nil,
         rowParserName,
-        params = List(sc.Param(sc.Ident("idx"), TypesScala.Int, None)),
+        params = List(sc.Param(sc.Ident("idx"), TypesScala.Int)),
         Nil,
         RowParser.of(tpe),
-        code"""|${RowParser.of(tpe)} { row =>
-               |  $Success(
-               |    $tpe(
-               |      ${mappedValues.mkCode(",\n")}
-               |    )
-               |  )
-               |}""".stripMargin
+        Some {
+          code"""|${RowParser.of(tpe)} { row =>
+                 |  $Success(
+                 |    $tpe(
+                 |      ${mappedValues.mkCode(",\n")}
+                 |    )
+                 |  )
+                 |}""".stripMargin
+        }
       )
     }
     rowType match {
@@ -949,7 +980,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           code"""|$Column.nonNull[$tpe]((v1: ${TypesScala.Any}, _) =>
                |  v1 match {
                |    case $v: ${ct.toTypo.jdbcType} => ${TypesScala.Right}(${ct.toTypo0(v)})
-               |    case other => ${TypesScala.Left}($TypeDoesNotMatch(s"Expected instance of ${ct.toTypo.jdbcType.render.asString}, got $${other.getClass.getName}"))
+               |    case other => ${TypesScala.Left}($TypeDoesNotMatch(s"Expected instance of ${ct.toTypo.jdbcType.render(LangScala).asString}, got $${other.getClass.getName}"))
                |  }
                |)""".stripMargin
         )
@@ -984,7 +1015,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                  |           ${TypesScala.Right}($v.map($v => ${toTypo.toTypo(code"$v.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)}))
                  |         case other => ${TypesScala.Left}($TypeDoesNotMatch(s"Expected one-dimensional array from JDBC to produce an array of ${ct.typoType}, got $${other.getClass.getName}"))
                  |       }
-                 |    case other => ${TypesScala.Left}($TypeDoesNotMatch(s"Expected instance of ${TypesJava.PgArray.render.asString}, got $${other.getClass.getName}"))
+                 |    case other => ${TypesScala.Left}($TypeDoesNotMatch(s"Expected instance of ${TypesJava.PgArray.render(LangScala).asString}, got $${other.getClass.getName}"))
                  |  }
                  |)""".stripMargin
           )

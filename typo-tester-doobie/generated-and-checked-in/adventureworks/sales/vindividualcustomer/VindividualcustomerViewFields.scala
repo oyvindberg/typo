@@ -3,20 +3,18 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sales
-package vindividualcustomer
+package adventureworks.sales.vindividualcustomer;
 
-import adventureworks.customtypes.TypoXml
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import adventureworks.public.Phone
-import adventureworks.userdefined.FirstName
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoXml;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.Name;
+import adventureworks.public.Phone;
+import adventureworks.userdefined.FirstName;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait VindividualcustomerViewFields {
   def businessentityid: Field[BusinessentityId, VindividualcustomerViewRow]
@@ -42,7 +40,7 @@ trait VindividualcustomerViewFields {
 object VindividualcustomerViewFields {
   lazy val structure: Relation[VindividualcustomerViewFields, VindividualcustomerViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[VindividualcustomerViewFields, VindividualcustomerViewRow] {
   
@@ -67,8 +65,8 @@ object VindividualcustomerViewFields {
       override def demographics = OptField[TypoXml, VindividualcustomerViewRow](_path, "demographics", None, None, x => x.demographics, (row, value) => row.copy(demographics = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, VindividualcustomerViewRow]] =
-      List[FieldLikeNoHkt[?, VindividualcustomerViewRow]](fields.businessentityid, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.phonenumber, fields.phonenumbertype, fields.emailaddress, fields.emailpromotion, fields.addresstype, fields.addressline1, fields.addressline2, fields.city, fields.stateprovincename, fields.postalcode, fields.countryregionname, fields.demographics)
+    override lazy val columns: List[FieldLike[?, VindividualcustomerViewRow]] =
+      List[FieldLike[?, VindividualcustomerViewRow]](fields.businessentityid, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.phonenumber, fields.phonenumbertype, fields.emailaddress, fields.emailpromotion, fields.addresstype, fields.addressline1, fields.addressline2, fields.city, fields.stateprovincename, fields.postalcode, fields.countryregionname, fields.demographics)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

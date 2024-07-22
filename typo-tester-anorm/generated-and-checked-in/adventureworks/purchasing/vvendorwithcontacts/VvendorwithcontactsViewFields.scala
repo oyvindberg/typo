@@ -3,19 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package purchasing
-package vvendorwithcontacts
+package adventureworks.purchasing.vvendorwithcontacts;
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import adventureworks.public.Phone
-import adventureworks.userdefined.FirstName
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.Name;
+import adventureworks.public.Phone;
+import adventureworks.userdefined.FirstName;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait VvendorwithcontactsViewFields {
   def businessentityid: Field[BusinessentityId, VvendorwithcontactsViewRow]
@@ -35,7 +33,7 @@ trait VvendorwithcontactsViewFields {
 object VvendorwithcontactsViewFields {
   lazy val structure: Relation[VvendorwithcontactsViewFields, VvendorwithcontactsViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[VvendorwithcontactsViewFields, VvendorwithcontactsViewRow] {
   
@@ -54,8 +52,8 @@ object VvendorwithcontactsViewFields {
       override def emailpromotion = Field[Int, VvendorwithcontactsViewRow](_path, "emailpromotion", None, None, x => x.emailpromotion, (row, value) => row.copy(emailpromotion = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, VvendorwithcontactsViewRow]] =
-      List[FieldLikeNoHkt[?, VvendorwithcontactsViewRow]](fields.businessentityid, fields.name, fields.contacttype, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.phonenumber, fields.phonenumbertype, fields.emailaddress, fields.emailpromotion)
+    override lazy val columns: List[FieldLike[?, VvendorwithcontactsViewRow]] =
+      List[FieldLike[?, VvendorwithcontactsViewRow]](fields.businessentityid, fields.name, fields.contacttype, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.phonenumber, fields.phonenumbertype, fields.emailaddress, fields.emailpromotion)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

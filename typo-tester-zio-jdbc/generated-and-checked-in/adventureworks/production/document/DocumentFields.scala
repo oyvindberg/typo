@@ -3,25 +3,23 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package production
-package document
+package adventureworks.production.document;
 
-import adventureworks.customtypes.TypoBytea
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.humanresources.employee.EmployeeFields
-import adventureworks.humanresources.employee.EmployeeRow
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Flag
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoBytea;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.humanresources.employee.EmployeeFields;
+import adventureworks.humanresources.employee.EmployeeRow;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.Flag;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait DocumentFields {
   def title: Field[/* max 50 chars */ String, DocumentRow]
@@ -45,7 +43,7 @@ trait DocumentFields {
 object DocumentFields {
   lazy val structure: Relation[DocumentFields, DocumentRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[DocumentFields, DocumentRow] {
   
@@ -65,8 +63,8 @@ object DocumentFields {
       override def documentnode = IdField[DocumentId, DocumentRow](_path, "documentnode", None, None, x => x.documentnode, (row, value) => row.copy(documentnode = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, DocumentRow]] =
-      List[FieldLikeNoHkt[?, DocumentRow]](fields.title, fields.owner, fields.folderflag, fields.filename, fields.fileextension, fields.revision, fields.changenumber, fields.status, fields.documentsummary, fields.document, fields.rowguid, fields.modifieddate, fields.documentnode)
+    override lazy val columns: List[FieldLike[?, DocumentRow]] =
+      List[FieldLike[?, DocumentRow]](fields.title, fields.owner, fields.folderflag, fields.filename, fields.fileextension, fields.revision, fields.changenumber, fields.status, fields.documentsummary, fields.document, fields.rowguid, fields.modifieddate, fields.documentnode)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

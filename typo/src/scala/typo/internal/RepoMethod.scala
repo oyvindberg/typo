@@ -1,8 +1,10 @@
 package typo
 package internal
 
+import typo.sc.Comments
+
 sealed abstract class RepoMethod(val methodName: String, val tiebreaker: Int) {
-  val comment: Option[String] = None
+  val comment: sc.Comments = sc.Comments.Empty
 }
 
 object RepoMethod {
@@ -99,7 +101,7 @@ object RepoMethod {
       id: IdComputed,
       rowType: sc.Type
   ) extends Mutator("upsertStreaming") {
-    override val comment: Option[String] = Some("/* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */")
+    override val comment = Comments(List("NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements"))
   }
 
   case class Insert(
@@ -128,7 +130,7 @@ object RepoMethod {
       relName: db.RelationName,
       unsaved: ComputedRowUnsaved
   ) extends Mutator("insertUnsavedStreaming") {
-    override val comment: Option[String] = Some("/* NOTE: this functionality requires PostgreSQL 16 or later! */")
+    override val comment = Comments(List("NOTE: this functionality requires PostgreSQL 16 or later!"))
   }
 
   case class Delete(

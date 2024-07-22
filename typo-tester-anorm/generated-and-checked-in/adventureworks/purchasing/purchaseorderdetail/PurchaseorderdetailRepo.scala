@@ -3,12 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package purchasing
-package purchaseorderdetail
+package adventureworks.purchasing.purchaseorderdetail;
 
-import java.sql.Connection
-import typo.dsl.SelectBuilder
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
 
 trait PurchaseorderdetailRepo {
   def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow]

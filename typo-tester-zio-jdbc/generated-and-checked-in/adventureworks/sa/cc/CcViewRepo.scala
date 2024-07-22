@@ -3,13 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sa
-package cc
+package adventureworks.sa.cc;
 
-import typo.dsl.SelectBuilder
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
 trait CcViewRepo {
   def select: SelectBuilder[CcViewFields, CcViewRow]

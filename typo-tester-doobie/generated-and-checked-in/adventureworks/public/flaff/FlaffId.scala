@@ -3,12 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package public
-package flaff
+package adventureworks.public.flaff;
 
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.public.ShortText;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** Type for the composite primary key of table `public.flaff` */
 case class FlaffId(
@@ -17,8 +16,8 @@ case class FlaffId(
   someNumber: Int,
   specifier: ShortText
 )
+
 object FlaffId {
   implicit lazy val decoder: Decoder[FlaffId] = Decoder.forProduct4[FlaffId, ShortText, /* max 20 chars */ String, Int, ShortText]("code", "another_code", "some_number", "specifier")(FlaffId.apply)(ShortText.decoder, Decoder.decodeString, Decoder.decodeInt, ShortText.decoder)
   implicit lazy val encoder: Encoder[FlaffId] = Encoder.forProduct4[FlaffId, ShortText, /* max 20 chars */ String, Int, ShortText]("code", "another_code", "some_number", "specifier")(x => (x.code, x.anotherCode, x.someNumber, x.specifier))(ShortText.encoder, Encoder.encodeString, Encoder.encodeInt, ShortText.encoder)
-  implicit lazy val ordering: Ordering[FlaffId] = Ordering.by(x => (x.code, x.anotherCode, x.someNumber, x.specifier))
 }

@@ -3,17 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package um
+package adventureworks.pr.um;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.public.Name
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.unitmeasure.UnitmeasureId;
+import adventureworks.public.Name;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait UmViewFields {
   def id: Field[UnitmeasureId, UmViewRow]
@@ -25,7 +23,7 @@ trait UmViewFields {
 object UmViewFields {
   lazy val structure: Relation[UmViewFields, UmViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[UmViewFields, UmViewRow] {
   
@@ -36,8 +34,8 @@ object UmViewFields {
       override def modifieddate = Field[TypoLocalDateTime, UmViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, UmViewRow]] =
-      List[FieldLikeNoHkt[?, UmViewRow]](fields.id, fields.unitmeasurecode, fields.name, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, UmViewRow]] =
+      List[FieldLike[?, UmViewRow]](fields.id, fields.unitmeasurecode, fields.name, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

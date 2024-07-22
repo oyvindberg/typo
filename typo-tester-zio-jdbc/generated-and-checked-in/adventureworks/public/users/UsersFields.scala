@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package public
-package users
+package adventureworks.public.users;
 
-import adventureworks.customtypes.TypoInstant
-import adventureworks.customtypes.TypoUnknownCitext
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoInstant;
+import adventureworks.customtypes.TypoUnknownCitext;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait UsersFields {
   def userId: IdField[UsersId, UsersRow]
@@ -29,7 +27,7 @@ trait UsersFields {
 object UsersFields {
   lazy val structure: Relation[UsersFields, UsersRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[UsersFields, UsersRow] {
   
@@ -43,8 +41,8 @@ object UsersFields {
       override def verifiedOn = OptField[TypoInstant, UsersRow](_path, "verified_on", Some("text"), Some("timestamptz"), x => x.verifiedOn, (row, value) => row.copy(verifiedOn = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, UsersRow]] =
-      List[FieldLikeNoHkt[?, UsersRow]](fields.userId, fields.name, fields.lastName, fields.email, fields.password, fields.createdAt, fields.verifiedOn)
+    override lazy val columns: List[FieldLike[?, UsersRow]] =
+      List[FieldLike[?, UsersRow]](fields.userId, fields.name, fields.lastName, fields.email, fields.password, fields.createdAt, fields.verifiedOn)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

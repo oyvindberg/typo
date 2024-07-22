@@ -3,23 +3,21 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package person
-package address
+package adventureworks.person.address;
 
-import adventureworks.customtypes.TypoBytea
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.stateprovince.StateprovinceFields
-import adventureworks.person.stateprovince.StateprovinceId
-import adventureworks.person.stateprovince.StateprovinceRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoBytea;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.stateprovince.StateprovinceFields;
+import adventureworks.person.stateprovince.StateprovinceId;
+import adventureworks.person.stateprovince.StateprovinceRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait AddressFields {
   def addressid: IdField[AddressId, AddressRow]
@@ -39,7 +37,7 @@ trait AddressFields {
 object AddressFields {
   lazy val structure: Relation[AddressFields, AddressRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[AddressFields, AddressRow] {
   
@@ -55,8 +53,8 @@ object AddressFields {
       override def modifieddate = Field[TypoLocalDateTime, AddressRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, AddressRow]] =
-      List[FieldLikeNoHkt[?, AddressRow]](fields.addressid, fields.addressline1, fields.addressline2, fields.city, fields.stateprovinceid, fields.postalcode, fields.spatiallocation, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, AddressRow]] =
+      List[FieldLike[?, AddressRow]](fields.addressid, fields.addressline1, fields.addressline2, fields.city, fields.stateprovinceid, fields.postalcode, fields.spatiallocation, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

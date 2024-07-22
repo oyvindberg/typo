@@ -13,6 +13,7 @@ object ComputedTestInserts {
   def apply(
       projectName: String,
       options: InternalOptions,
+      lang: Lang,
       // global data
       customTypes: CustomTypes,
       domains: List[ComputedDomain],
@@ -71,7 +72,7 @@ object ComputedTestInserts {
           case TypesScala.Double     => Some(code"$random.nextDouble()")
           case TypesScala.BigDecimal => Some(code"${TypesScala.BigDecimal}.decimal($random.nextDouble())")
           case TypesJava.UUID        => Some(code"${TypesJava.UUID}.nameUUIDFromBytes{val bs = ${TypesScala.Array}.ofDim[${TypesScala.Byte}](16); $random.nextBytes(bs); bs}")
-          case TypesScala.Optional(underlying) =>
+          case lang.Optional(underlying) =>
             go(underlying, dbType, tableUnaryId) match {
               case None          => Some(TypesScala.None.code)
               case Some(default) => Some(code"if ($random.nextBoolean()) ${TypesScala.None} else ${TypesScala.Some}($default)")
@@ -101,7 +102,7 @@ object ComputedTestInserts {
             // 2001-09-09T01:46:40Z -> 2033-05-18T03:33:20Z
             Some(code"${customTypes.TypoInstant.typoType}(${TypesJava.Instant}.ofEpochMilli(1000000000000L + $random.nextLong(1000000000000L)))")
           case sc.Type.TApply(table.default.Defaulted, _) =>
-            Some(code"${table.default.Defaulted}.${table.default.UseDefault}")
+            Some(code"${table.default.Defaulted}.${table.default.UseDefault}()")
           case tpe if maybeDomainMethods.exists(_.domainMethodByType.contains(tpe)) =>
             val method = maybeDomainMethods.get.domainMethodByType(tpe)
             Some(code"$domainInsert.${method.name}($random)")
@@ -131,7 +132,7 @@ object ComputedTestInserts {
               val default = if (isMeaningful && !col.dbCol.isDefaulted) {
                 if (col.dbCol.nullability == Nullability.NoNulls) None else Some(TypesScala.None.code)
               } else defaultFor(table, col.tpe, col.dbCol.tpe)
-              sc.Param(col.name, col.tpe, default)
+              sc.Param(col.name, col.tpe).copy(default = default)
             }
 
             // keep order but pull all required parameters first
@@ -147,11 +148,11 @@ object ComputedTestInserts {
                     colsFromFks.exprForColumn.get(col.name) match {
                       case Some(expr) =>
                         if (col.dbCol.isDefaulted && col.dbCol.nullability != Nullability.NoNulls)
-                          code"${table.default.Defaulted}.${table.default.Provided}(${TypesScala.Option}($expr))"
+                          code"${table.default.Defaulted}.${table.default.Provided}(${lang.Optional.tpe}($expr))"
                         else if (col.dbCol.isDefaulted)
                           code"${table.default.Defaulted}.${table.default.Provided}($expr)"
                         else if (col.dbCol.nullability != Nullability.NoNulls)
-                          code"${TypesScala.Option}(${expr})"
+                          code"${lang.Optional.tpe}(${expr})"
                         else
                           expr
 

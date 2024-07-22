@@ -3,19 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package humanresources
-package vemployeedepartmenthistory
+package adventureworks.humanresources.vemployeedepartmenthistory;
 
-import adventureworks.customtypes.TypoLocalDate
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import adventureworks.userdefined.FirstName
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDate;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.Name;
+import adventureworks.userdefined.FirstName;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait VemployeedepartmenthistoryViewFields {
   def businessentityid: Field[BusinessentityId, VemployeedepartmenthistoryViewRow]
@@ -34,7 +32,7 @@ trait VemployeedepartmenthistoryViewFields {
 object VemployeedepartmenthistoryViewFields {
   lazy val structure: Relation[VemployeedepartmenthistoryViewFields, VemployeedepartmenthistoryViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[VemployeedepartmenthistoryViewFields, VemployeedepartmenthistoryViewRow] {
   
@@ -52,8 +50,8 @@ object VemployeedepartmenthistoryViewFields {
       override def enddate = OptField[TypoLocalDate, VemployeedepartmenthistoryViewRow](_path, "enddate", Some("text"), None, x => x.enddate, (row, value) => row.copy(enddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, VemployeedepartmenthistoryViewRow]] =
-      List[FieldLikeNoHkt[?, VemployeedepartmenthistoryViewRow]](fields.businessentityid, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.shift, fields.department, fields.groupname, fields.startdate, fields.enddate)
+    override lazy val columns: List[FieldLike[?, VemployeedepartmenthistoryViewRow]] =
+      List[FieldLike[?, VemployeedepartmenthistoryViewRow]](fields.businessentityid, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.shift, fields.department, fields.groupname, fields.startdate, fields.enddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

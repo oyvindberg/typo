@@ -3,29 +3,29 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package production
-package workorderrouting
+package adventureworks.production.workorderrouting;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.production.location.LocationFields
-import adventureworks.production.location.LocationId
-import adventureworks.production.location.LocationRow
-import adventureworks.production.workorder.WorkorderFields
-import adventureworks.production.workorder.WorkorderId
-import adventureworks.production.workorder.WorkorderRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.Required
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.production.location.LocationFields;
+import adventureworks.production.location.LocationId;
+import adventureworks.production.location.LocationRow;
+import adventureworks.production.workorder.WorkorderFields;
+import adventureworks.production.workorder.WorkorderId;
+import adventureworks.production.workorder.WorkorderRow;
+import anorm.ParameterMetaData;
+import anorm.ToParameterValue;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait WorkorderroutingFields {
   def workorderid: IdField[WorkorderId, WorkorderroutingRow]
@@ -46,17 +46,17 @@ trait WorkorderroutingFields {
   def fkWorkorder: ForeignKey[WorkorderFields, WorkorderRow] =
     ForeignKey[WorkorderFields, WorkorderRow]("production.FK_WorkOrderRouting_WorkOrder_WorkOrderID", Nil)
       .withColumnPair(workorderid, _.workorderid)
-  def compositeIdIs(compositeId: WorkorderroutingId): SqlExpr[Boolean, Required] =
+  def compositeIdIs(compositeId: WorkorderroutingId): SqlExpr[Boolean] =
     workorderid.isEqual(compositeId.workorderid).and(productid.isEqual(compositeId.productid)).and(operationsequence.isEqual(compositeId.operationsequence))
-  def compositeIdIn(compositeIds: Array[WorkorderroutingId]): SqlExpr[Boolean, Required] =
-    new CompositeIn(compositeIds)(TuplePart(workorderid)(_.workorderid), TuplePart(productid)(_.productid), TuplePart(operationsequence)(_.operationsequence))
+  def compositeIdIn(compositeIds: Array[WorkorderroutingId]): SqlExpr[Boolean] =
+    new CompositeIn(compositeIds)(TuplePart[WorkorderroutingId](workorderid)(_.workorderid)(using as[Array[WorkorderId]](ToParameterValue(null, WorkorderId.arrayToStatement), adventureworks.arrayParameterMetaData(WorkorderId.parameterMetadata)), implicitly), TuplePart[WorkorderroutingId](productid)(_.productid)(using as[Array[Int]](ToParameterValue(null, adventureworks.IntArrayToStatement), adventureworks.arrayParameterMetaData(ParameterMetaData.IntParameterMetaData)), implicitly), TuplePart[WorkorderroutingId](operationsequence)(_.operationsequence)(using as[Array[TypoShort]](ToParameterValue(null, TypoShort.arrayToStatement), adventureworks.arrayParameterMetaData(TypoShort.parameterMetadata)), implicitly))
   
 }
 
 object WorkorderroutingFields {
   lazy val structure: Relation[WorkorderroutingFields, WorkorderroutingRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[WorkorderroutingFields, WorkorderroutingRow] {
   
@@ -75,8 +75,8 @@ object WorkorderroutingFields {
       override def modifieddate = Field[TypoLocalDateTime, WorkorderroutingRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, WorkorderroutingRow]] =
-      List[FieldLikeNoHkt[?, WorkorderroutingRow]](fields.workorderid, fields.productid, fields.operationsequence, fields.locationid, fields.scheduledstartdate, fields.scheduledenddate, fields.actualstartdate, fields.actualenddate, fields.actualresourcehrs, fields.plannedcost, fields.actualcost, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, WorkorderroutingRow]] =
+      List[FieldLike[?, WorkorderroutingRow]](fields.workorderid, fields.productid, fields.operationsequence, fields.locationid, fields.scheduledstartdate, fields.scheduledenddate, fields.actualstartdate, fields.actualenddate, fields.actualresourcehrs, fields.plannedcost, fields.actualcost, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

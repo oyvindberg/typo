@@ -3,16 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb
-package hardcoded
-package compositepk
-package person
+package testdb.hardcoded.compositepk.person;
 
-import typo.dsl.Path
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait PersonFields {
   def one: IdField[Long, PersonRow]
@@ -23,7 +20,7 @@ trait PersonFields {
 object PersonFields {
   lazy val structure: Relation[PersonFields, PersonRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[PersonFields, PersonRow] {
   
@@ -33,8 +30,8 @@ object PersonFields {
       override def name = OptField[String, PersonRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, PersonRow]] =
-      List[FieldLikeNoHkt[?, PersonRow]](fields.one, fields.two, fields.name)
+    override lazy val columns: List[FieldLike[?, PersonRow]] =
+      List[FieldLike[?, PersonRow]](fields.one, fields.two, fields.name)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

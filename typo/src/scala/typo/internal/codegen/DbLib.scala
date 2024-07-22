@@ -3,11 +3,12 @@ package internal
 package codegen
 
 trait DbLib {
+  def resolveConstAs(tpe: sc.Type): sc.Code
   def defaultedInstance: List[sc.Given]
-  def repoSig(repoMethod: RepoMethod): Either[DbLib.NotImplementedFor, sc.Code]
+  def repoSig(repoMethod: RepoMethod): Either[DbLib.NotImplementedFor, sc.Method]
   def repoImpl(repoMethod: RepoMethod): sc.Code
   def mockRepoImpl(id: IdComputed, repoMethod: RepoMethod, maybeToRow: Option[sc.Param]): sc.Code
-  def testInsertMethod(x: ComputedTestInserts.InsertMethod): sc.Value
+  def testInsertMethod(x: ComputedTestInserts.InsertMethod): sc.Method
   def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, enm: db.StringEnum): List[sc.ClassMember]
   def wrapperTypeInstances(wrapperType: sc.Type.Qualified, underlying: sc.Type, overrideDbType: Option[String]): List[sc.ClassMember]
   def missingInstances: List[sc.ClassMember]
@@ -17,7 +18,7 @@ trait DbLib {
 }
 
 object DbLib {
-  case class NotImplementedFor(library: String)
+  case class NotImplementedFor(repoMethod: RepoMethod, library: String)
 
   sealed trait RowType
   object RowType {

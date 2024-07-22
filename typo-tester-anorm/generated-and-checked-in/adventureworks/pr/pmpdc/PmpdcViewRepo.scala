@@ -3,12 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package pmpdc
+package adventureworks.pr.pmpdc;
 
-import java.sql.Connection
-import typo.dsl.SelectBuilder
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
 
 trait PmpdcViewRepo {
   def select: SelectBuilder[PmpdcViewFields, PmpdcViewRow]

@@ -3,13 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package tha
+package adventureworks.pr.tha;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.SelectBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
 
 trait ThaViewRepo {
   def select: SelectBuilder[ThaViewFields, ThaViewRow]

@@ -3,26 +3,24 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package person
-package person
+package adventureworks.person.person;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.customtypes.TypoXml
-import adventureworks.person.businessentity.BusinessentityFields
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.person.businessentity.BusinessentityRow
-import adventureworks.public.Name
-import adventureworks.public.NameStyle
-import adventureworks.userdefined.FirstName
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.person.businessentity.BusinessentityFields;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.person.businessentity.BusinessentityRow;
+import adventureworks.public.Name;
+import adventureworks.public.NameStyle;
+import adventureworks.userdefined.FirstName;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait PersonFields {
   def businessentityid: IdField[BusinessentityId, PersonRow]
@@ -46,7 +44,7 @@ trait PersonFields {
 object PersonFields {
   lazy val structure: Relation[PersonFields, PersonRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[PersonFields, PersonRow] {
   
@@ -66,8 +64,8 @@ object PersonFields {
       override def modifieddate = Field[TypoLocalDateTime, PersonRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, PersonRow]] =
-      List[FieldLikeNoHkt[?, PersonRow]](fields.businessentityid, fields.persontype, fields.namestyle, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.emailpromotion, fields.additionalcontactinfo, fields.demographics, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, PersonRow]] =
+      List[FieldLike[?, PersonRow]](fields.businessentityid, fields.persontype, fields.namestyle, fields.title, fields.firstname, fields.middlename, fields.lastname, fields.suffix, fields.emailpromotion, fields.additionalcontactinfo, fields.demographics, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

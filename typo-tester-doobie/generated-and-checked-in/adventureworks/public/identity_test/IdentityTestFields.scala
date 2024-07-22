@@ -3,15 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package public
-package identity_test
+package adventureworks.public.identity_test;
 
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait IdentityTestFields {
   def alwaysGenerated: Field[Int, IdentityTestRow]
@@ -22,7 +20,7 @@ trait IdentityTestFields {
 object IdentityTestFields {
   lazy val structure: Relation[IdentityTestFields, IdentityTestRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[IdentityTestFields, IdentityTestRow] {
   
@@ -32,8 +30,8 @@ object IdentityTestFields {
       override def name = IdField[IdentityTestId, IdentityTestRow](_path, "name", None, None, x => x.name, (row, value) => row.copy(name = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, IdentityTestRow]] =
-      List[FieldLikeNoHkt[?, IdentityTestRow]](fields.alwaysGenerated, fields.defaultGenerated, fields.name)
+    override lazy val columns: List[FieldLike[?, IdentityTestRow]] =
+      List[FieldLike[?, IdentityTestRow]](fields.alwaysGenerated, fields.defaultGenerated, fields.name)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

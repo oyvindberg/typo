@@ -3,46 +3,47 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pe
-package ct
+package adventureworks.pe.ct;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.contacttype.ContacttypeId
-import adventureworks.public.Name
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.contacttype.ContacttypeId;
+import adventureworks.public.Name;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: pe.ct */
 case class CtViewRow(
-  /** Points to [[person.contacttype.ContacttypeRow.contacttypeid]] */
+  /** Points to [[adventureworks.person.contacttype.ContacttypeRow.contacttypeid]] */
   id: ContacttypeId,
-  /** Points to [[person.contacttype.ContacttypeRow.contacttypeid]] */
+  /** Points to [[adventureworks.person.contacttype.ContacttypeRow.contacttypeid]] */
   contacttypeid: ContacttypeId,
-  /** Points to [[person.contacttype.ContacttypeRow.name]] */
+  /** Points to [[adventureworks.person.contacttype.ContacttypeRow.name]] */
   name: Name,
-  /** Points to [[person.contacttype.ContacttypeRow.modifieddate]] */
+  /** Points to [[adventureworks.person.contacttype.ContacttypeRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object CtViewRow {
   implicit lazy val decoder: Decoder[CtViewRow] = Decoder.forProduct4[CtViewRow, ContacttypeId, ContacttypeId, Name, TypoLocalDateTime]("id", "contacttypeid", "name", "modifieddate")(CtViewRow.apply)(ContacttypeId.decoder, ContacttypeId.decoder, Name.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[CtViewRow] = Encoder.forProduct4[CtViewRow, ContacttypeId, ContacttypeId, Name, TypoLocalDateTime]("id", "contacttypeid", "name", "modifieddate")(x => (x.id, x.contacttypeid, x.name, x.modifieddate))(ContacttypeId.encoder, ContacttypeId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[CtViewRow] = new Read[CtViewRow](
-    gets = List(
-      (ContacttypeId.get, Nullability.NoNulls),
-      (ContacttypeId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => CtViewRow(
-      id = ContacttypeId.get.unsafeGetNonNullable(rs, i + 0),
-      contacttypeid = ContacttypeId.get.unsafeGetNonNullable(rs, i + 1),
-      name = Name.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[CtViewRow] = {
+    new Read[CtViewRow](
+      gets = List(
+        (ContacttypeId.get, Nullability.NoNulls),
+        (ContacttypeId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => CtViewRow(
+        id = ContacttypeId.get.unsafeGetNonNullable(rs, i + 0),
+        contacttypeid = ContacttypeId.get.unsafeGetNonNullable(rs, i + 1),
+        name = Name.get.unsafeGetNonNullable(rs, i + 2),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+      )
     )
-  )
+  
+  }
 }

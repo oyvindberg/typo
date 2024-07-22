@@ -3,51 +3,52 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package hr
-package jc
+package adventureworks.hr.jc;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoXml
-import adventureworks.humanresources.jobcandidate.JobcandidateId
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.humanresources.jobcandidate.JobcandidateId;
+import adventureworks.person.businessentity.BusinessentityId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: hr.jc */
 case class JcViewRow(
-  /** Points to [[humanresources.jobcandidate.JobcandidateRow.jobcandidateid]] */
+  /** Points to [[adventureworks.humanresources.jobcandidate.JobcandidateRow.jobcandidateid]] */
   id: JobcandidateId,
-  /** Points to [[humanresources.jobcandidate.JobcandidateRow.jobcandidateid]] */
+  /** Points to [[adventureworks.humanresources.jobcandidate.JobcandidateRow.jobcandidateid]] */
   jobcandidateid: JobcandidateId,
-  /** Points to [[humanresources.jobcandidate.JobcandidateRow.businessentityid]] */
+  /** Points to [[adventureworks.humanresources.jobcandidate.JobcandidateRow.businessentityid]] */
   businessentityid: Option[BusinessentityId],
-  /** Points to [[humanresources.jobcandidate.JobcandidateRow.resume]] */
+  /** Points to [[adventureworks.humanresources.jobcandidate.JobcandidateRow.resume]] */
   resume: Option[TypoXml],
-  /** Points to [[humanresources.jobcandidate.JobcandidateRow.modifieddate]] */
+  /** Points to [[adventureworks.humanresources.jobcandidate.JobcandidateRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object JcViewRow {
   implicit lazy val decoder: Decoder[JcViewRow] = Decoder.forProduct5[JcViewRow, JobcandidateId, JobcandidateId, Option[BusinessentityId], Option[TypoXml], TypoLocalDateTime]("id", "jobcandidateid", "businessentityid", "resume", "modifieddate")(JcViewRow.apply)(JobcandidateId.decoder, JobcandidateId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoXml.decoder), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[JcViewRow] = Encoder.forProduct5[JcViewRow, JobcandidateId, JobcandidateId, Option[BusinessentityId], Option[TypoXml], TypoLocalDateTime]("id", "jobcandidateid", "businessentityid", "resume", "modifieddate")(x => (x.id, x.jobcandidateid, x.businessentityid, x.resume, x.modifieddate))(JobcandidateId.encoder, JobcandidateId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoXml.encoder), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[JcViewRow] = new Read[JcViewRow](
-    gets = List(
-      (JobcandidateId.get, Nullability.NoNulls),
-      (JobcandidateId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => JcViewRow(
-      id = JobcandidateId.get.unsafeGetNonNullable(rs, i + 0),
-      jobcandidateid = JobcandidateId.get.unsafeGetNonNullable(rs, i + 1),
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 2),
-      resume = TypoXml.get.unsafeGetNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+  implicit lazy val read: Read[JcViewRow] = {
+    new Read[JcViewRow](
+      gets = List(
+        (JobcandidateId.get, Nullability.NoNulls),
+        (JobcandidateId.get, Nullability.NoNulls),
+        (BusinessentityId.get, Nullability.Nullable),
+        (TypoXml.get, Nullability.Nullable),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => JcViewRow(
+        id = JobcandidateId.get.unsafeGetNonNullable(rs, i + 0),
+        jobcandidateid = JobcandidateId.get.unsafeGetNonNullable(rs, i + 1),
+        businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 2),
+        resume = TypoXml.get.unsafeGetNullable(rs, i + 3),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+      )
     )
-  )
+  
+  }
 }

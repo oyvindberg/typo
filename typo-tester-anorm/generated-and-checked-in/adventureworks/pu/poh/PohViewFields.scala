@@ -3,20 +3,18 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pu
-package poh
+package adventureworks.pu.poh;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import adventureworks.purchasing.shipmethod.ShipmethodId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId;
+import adventureworks.purchasing.shipmethod.ShipmethodId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait PohViewFields {
   def id: Field[PurchaseorderheaderId, PohViewRow]
@@ -37,7 +35,7 @@ trait PohViewFields {
 object PohViewFields {
   lazy val structure: Relation[PohViewFields, PohViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[PohViewFields, PohViewRow] {
   
@@ -57,8 +55,8 @@ object PohViewFields {
       override def modifieddate = Field[TypoLocalDateTime, PohViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, PohViewRow]] =
-      List[FieldLikeNoHkt[?, PohViewRow]](fields.id, fields.purchaseorderid, fields.revisionnumber, fields.status, fields.employeeid, fields.vendorid, fields.shipmethodid, fields.orderdate, fields.shipdate, fields.subtotal, fields.taxamt, fields.freight, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, PohViewRow]] =
+      List[FieldLike[?, PohViewRow]](fields.id, fields.purchaseorderid, fields.revisionnumber, fields.status, fields.employeeid, fields.vendorid, fields.shipmethodid, fields.orderdate, fields.shipdate, fields.subtotal, fields.taxamt, fields.freight, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

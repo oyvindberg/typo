@@ -3,31 +3,29 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package production
-package product
+package adventureworks.production.product;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.production.productmodel.ProductmodelFields
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.production.productmodel.ProductmodelRow
-import adventureworks.production.productsubcategory.ProductsubcategoryFields
-import adventureworks.production.productsubcategory.ProductsubcategoryId
-import adventureworks.production.productsubcategory.ProductsubcategoryRow
-import adventureworks.production.unitmeasure.UnitmeasureFields
-import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.production.unitmeasure.UnitmeasureRow
-import adventureworks.public.Flag
-import adventureworks.public.Name
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.production.productmodel.ProductmodelFields;
+import adventureworks.production.productmodel.ProductmodelId;
+import adventureworks.production.productmodel.ProductmodelRow;
+import adventureworks.production.productsubcategory.ProductsubcategoryFields;
+import adventureworks.production.productsubcategory.ProductsubcategoryId;
+import adventureworks.production.productsubcategory.ProductsubcategoryRow;
+import adventureworks.production.unitmeasure.UnitmeasureFields;
+import adventureworks.production.unitmeasure.UnitmeasureId;
+import adventureworks.production.unitmeasure.UnitmeasureRow;
+import adventureworks.public.Flag;
+import adventureworks.public.Name;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait ProductFields {
   def productid: IdField[ProductId, ProductRow]
@@ -72,7 +70,7 @@ trait ProductFields {
 object ProductFields {
   lazy val structure: Relation[ProductFields, ProductRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[ProductFields, ProductRow] {
   
@@ -104,8 +102,8 @@ object ProductFields {
       override def modifieddate = Field[TypoLocalDateTime, ProductRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, ProductRow]] =
-      List[FieldLikeNoHkt[?, ProductRow]](fields.productid, fields.name, fields.productnumber, fields.makeflag, fields.finishedgoodsflag, fields.color, fields.safetystocklevel, fields.reorderpoint, fields.standardcost, fields.listprice, fields.size, fields.sizeunitmeasurecode, fields.weightunitmeasurecode, fields.weight, fields.daystomanufacture, fields.productline, fields.`class`, fields.style, fields.productsubcategoryid, fields.productmodelid, fields.sellstartdate, fields.sellenddate, fields.discontinueddate, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, ProductRow]] =
+      List[FieldLike[?, ProductRow]](fields.productid, fields.name, fields.productnumber, fields.makeflag, fields.finishedgoodsflag, fields.color, fields.safetystocklevel, fields.reorderpoint, fields.standardcost, fields.listprice, fields.size, fields.sizeunitmeasurecode, fields.weightunitmeasurecode, fields.weight, fields.daystomanufacture, fields.productline, fields.`class`, fields.style, fields.productsubcategoryid, fields.productmodelid, fields.sellstartdate, fields.sellenddate, fields.discontinueddate, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

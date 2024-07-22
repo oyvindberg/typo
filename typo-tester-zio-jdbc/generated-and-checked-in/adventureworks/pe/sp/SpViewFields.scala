@@ -3,21 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pe
-package sp
+package adventureworks.pe.sp;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.person.stateprovince.StateprovinceId
-import adventureworks.public.Flag
-import adventureworks.public.Name
-import adventureworks.sales.salesterritory.SalesterritoryId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.countryregion.CountryregionId;
+import adventureworks.person.stateprovince.StateprovinceId;
+import adventureworks.public.Flag;
+import adventureworks.public.Name;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait SpViewFields {
   def id: Field[StateprovinceId, SpViewRow]
@@ -34,7 +32,7 @@ trait SpViewFields {
 object SpViewFields {
   lazy val structure: Relation[SpViewFields, SpViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[SpViewFields, SpViewRow] {
   
@@ -50,8 +48,8 @@ object SpViewFields {
       override def modifieddate = Field[TypoLocalDateTime, SpViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, SpViewRow]] =
-      List[FieldLikeNoHkt[?, SpViewRow]](fields.id, fields.stateprovinceid, fields.stateprovincecode, fields.countryregioncode, fields.isonlystateprovinceflag, fields.name, fields.territoryid, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, SpViewRow]] =
+      List[FieldLike[?, SpViewRow]](fields.id, fields.stateprovinceid, fields.stateprovincecode, fields.countryregioncode, fields.isonlystateprovinceflag, fields.name, fields.territoryid, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

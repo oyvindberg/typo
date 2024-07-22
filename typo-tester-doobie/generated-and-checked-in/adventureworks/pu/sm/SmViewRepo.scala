@@ -3,13 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pu
-package sm
+package adventureworks.pu.sm;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.SelectBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
 
 trait SmViewRepo {
   def select: SelectBuilder[SmViewFields, SmViewRow]

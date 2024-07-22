@@ -3,12 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package humanresources
-package vemployee
+package adventureworks.humanresources.vemployee;
 
-import java.sql.Connection
-import typo.dsl.SelectBuilder
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
 
 trait VemployeeViewRepo {
   def select: SelectBuilder[VemployeeViewFields, VemployeeViewRow]

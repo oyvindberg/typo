@@ -3,72 +3,73 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package bom
+package adventureworks.pr.bom;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.production.product.ProductId
-import adventureworks.production.unitmeasure.UnitmeasureId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.unitmeasure.UnitmeasureId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: pr.bom */
 case class BomViewRow(
-  /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
+  /** Points to [[adventureworks.production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
   id: Int,
-  /** Points to [[production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
+  /** Points to [[adventureworks.production.billofmaterials.BillofmaterialsRow.billofmaterialsid]] */
   billofmaterialsid: Int,
-  /** Points to [[production.billofmaterials.BillofmaterialsRow.productassemblyid]] */
+  /** Points to [[adventureworks.production.billofmaterials.BillofmaterialsRow.productassemblyid]] */
   productassemblyid: Option[ProductId],
-  /** Points to [[production.billofmaterials.BillofmaterialsRow.componentid]] */
+  /** Points to [[adventureworks.production.billofmaterials.BillofmaterialsRow.componentid]] */
   componentid: ProductId,
-  /** Points to [[production.billofmaterials.BillofmaterialsRow.startdate]] */
+  /** Points to [[adventureworks.production.billofmaterials.BillofmaterialsRow.startdate]] */
   startdate: TypoLocalDateTime,
-  /** Points to [[production.billofmaterials.BillofmaterialsRow.enddate]] */
+  /** Points to [[adventureworks.production.billofmaterials.BillofmaterialsRow.enddate]] */
   enddate: Option[TypoLocalDateTime],
-  /** Points to [[production.billofmaterials.BillofmaterialsRow.unitmeasurecode]] */
+  /** Points to [[adventureworks.production.billofmaterials.BillofmaterialsRow.unitmeasurecode]] */
   unitmeasurecode: UnitmeasureId,
-  /** Points to [[production.billofmaterials.BillofmaterialsRow.bomlevel]] */
+  /** Points to [[adventureworks.production.billofmaterials.BillofmaterialsRow.bomlevel]] */
   bomlevel: TypoShort,
-  /** Points to [[production.billofmaterials.BillofmaterialsRow.perassemblyqty]] */
+  /** Points to [[adventureworks.production.billofmaterials.BillofmaterialsRow.perassemblyqty]] */
   perassemblyqty: BigDecimal,
-  /** Points to [[production.billofmaterials.BillofmaterialsRow.modifieddate]] */
+  /** Points to [[adventureworks.production.billofmaterials.BillofmaterialsRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object BomViewRow {
   implicit lazy val decoder: Decoder[BomViewRow] = Decoder.forProduct10[BomViewRow, Int, Int, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, BigDecimal, TypoLocalDateTime]("id", "billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(BomViewRow.apply)(Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeOption(ProductId.decoder), ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), UnitmeasureId.decoder, TypoShort.decoder, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[BomViewRow] = Encoder.forProduct10[BomViewRow, Int, Int, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, BigDecimal, TypoLocalDateTime]("id", "billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(x => (x.id, x.billofmaterialsid, x.productassemblyid, x.componentid, x.startdate, x.enddate, x.unitmeasurecode, x.bomlevel, x.perassemblyqty, x.modifieddate))(Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeOption(ProductId.encoder), ProductId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), UnitmeasureId.encoder, TypoShort.encoder, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[BomViewRow] = new Read[BomViewRow](
-    gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.Nullable),
-      (ProductId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (UnitmeasureId.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => BomViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
-      billofmaterialsid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
-      productassemblyid = ProductId.get.unsafeGetNullable(rs, i + 2),
-      componentid = ProductId.get.unsafeGetNonNullable(rs, i + 3),
-      startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
-      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5),
-      unitmeasurecode = UnitmeasureId.get.unsafeGetNonNullable(rs, i + 6),
-      bomlevel = TypoShort.get.unsafeGetNonNullable(rs, i + 7),
-      perassemblyqty = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 8),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 9)
+  implicit lazy val read: Read[BomViewRow] = {
+    new Read[BomViewRow](
+      gets = List(
+        (Meta.IntMeta.get, Nullability.NoNulls),
+        (Meta.IntMeta.get, Nullability.NoNulls),
+        (ProductId.get, Nullability.Nullable),
+        (ProductId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.Nullable),
+        (UnitmeasureId.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => BomViewRow(
+        id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+        billofmaterialsid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
+        productassemblyid = ProductId.get.unsafeGetNullable(rs, i + 2),
+        componentid = ProductId.get.unsafeGetNonNullable(rs, i + 3),
+        startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
+        enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5),
+        unitmeasurecode = UnitmeasureId.get.unsafeGetNonNullable(rs, i + 6),
+        bomlevel = TypoShort.get.unsafeGetNonNullable(rs, i + 7),
+        perassemblyqty = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 8),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 9)
+      )
     )
-  )
+  
+  }
 }

@@ -3,27 +3,25 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package purchasing
-package purchaseorderheader
+package adventureworks.purchasing.purchaseorderheader;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.humanresources.employee.EmployeeFields
-import adventureworks.humanresources.employee.EmployeeRow
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.purchasing.shipmethod.ShipmethodFields
-import adventureworks.purchasing.shipmethod.ShipmethodId
-import adventureworks.purchasing.shipmethod.ShipmethodRow
-import adventureworks.purchasing.vendor.VendorFields
-import adventureworks.purchasing.vendor.VendorRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.humanresources.employee.EmployeeFields;
+import adventureworks.humanresources.employee.EmployeeRow;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.purchasing.shipmethod.ShipmethodFields;
+import adventureworks.purchasing.shipmethod.ShipmethodId;
+import adventureworks.purchasing.shipmethod.ShipmethodRow;
+import adventureworks.purchasing.vendor.VendorFields;
+import adventureworks.purchasing.vendor.VendorRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait PurchaseorderheaderFields {
   def purchaseorderid: IdField[PurchaseorderheaderId, PurchaseorderheaderRow]
@@ -52,7 +50,7 @@ trait PurchaseorderheaderFields {
 object PurchaseorderheaderFields {
   lazy val structure: Relation[PurchaseorderheaderFields, PurchaseorderheaderRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[PurchaseorderheaderFields, PurchaseorderheaderRow] {
   
@@ -71,8 +69,8 @@ object PurchaseorderheaderFields {
       override def modifieddate = Field[TypoLocalDateTime, PurchaseorderheaderRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, PurchaseorderheaderRow]] =
-      List[FieldLikeNoHkt[?, PurchaseorderheaderRow]](fields.purchaseorderid, fields.revisionnumber, fields.status, fields.employeeid, fields.vendorid, fields.shipmethodid, fields.orderdate, fields.shipdate, fields.subtotal, fields.taxamt, fields.freight, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, PurchaseorderheaderRow]] =
+      List[FieldLike[?, PurchaseorderheaderRow]](fields.purchaseorderid, fields.revisionnumber, fields.status, fields.employeeid, fields.vendorid, fields.shipmethodid, fields.orderdate, fields.shipdate, fields.subtotal, fields.taxamt, fields.freight, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

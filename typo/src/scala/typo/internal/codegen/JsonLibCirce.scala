@@ -33,7 +33,7 @@ case class JsonLibCirce(pkg: sc.QIdent, default: ComputedDefault, inlineImplicit
         case TypesJava.UUID                                                => code"$Decoder.decodeUUID"
         case sc.Type.ArrayOf(targ)                                         => code"$Decoder.decodeArray[$targ](${go(targ)}, implicitly)"
         case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$decoderName(${go(targ)})"
-        case TypesScala.Optional(targ)                                     => code"$Decoder.decodeOption(${go(targ)})"
+        case LangScala.Optional(targ)                                      => code"$Decoder.decodeOption(${go(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) => code"$tpe.$decoderName"
         case other                                                         => code"${Decoder.of(other)}"
       }
@@ -62,7 +62,7 @@ case class JsonLibCirce(pkg: sc.QIdent, default: ComputedDefault, inlineImplicit
         case TypesJava.UUID                                                => code"$Encoder.encodeUUID"
         case sc.Type.ArrayOf(targ)                                         => code"$Encoder.encodeIterable[$targ, ${TypesScala.Array}](${go(targ)}, implicitly)"
         case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$encoderName(${go(targ)})"
-        case TypesScala.Optional(targ)                                     => code"$Encoder.encodeOption(${go(targ)})"
+        case LangScala.Optional(targ)                                      => code"$Encoder.encodeOption(${go(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) => code"$tpe.$encoderName"
         case other                                                         => code"${Encoder.of(other)}"
       }
@@ -94,21 +94,21 @@ case class JsonLibCirce(pkg: sc.QIdent, default: ComputedDefault, inlineImplicit
       sc.Given(
         tparams = List(T),
         name = decoderName,
-        implicitParams = List(sc.Param(sc.Ident("T"), Decoder.of(T), None)),
+        implicitParams = List(sc.Param(sc.Ident("T"), Decoder.of(T))),
         tpe = Decoder.of(d.Defaulted.of(T)),
         body = code"""|c => c.as[${TypesJava.String}].flatMap {
-                 |    case "defaulted" => ${TypesScala.Right}(${d.UseDefault})
+                 |    case "defaulted" => ${TypesScala.Right}(${d.UseDefault}())
                  |    case _           => c.downField("provided").as[$T].map(${d.Provided}.apply)
                  |  }""".stripMargin
       ),
       sc.Given(
         tparams = List(T),
         name = encoderName,
-        implicitParams = List(sc.Param(sc.Ident("T"), Encoder.of(T), None)),
+        implicitParams = List(sc.Param(sc.Ident("T"), Encoder.of(T))),
         tpe = Encoder.of(d.Defaulted.of(T)),
         body = code"""|$Encoder.instance {
                  |  case ${d.Provided}(value) => $Json.obj("provided" -> ${Encoder.of(T)}.apply(value))
-                 |  case ${d.UseDefault}      => $Json.fromString("defaulted")
+                 |  case ${d.UseDefault}()      => $Json.fromString("defaulted")
                  |}""".stripMargin
       )
     )

@@ -3,21 +3,21 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package information_schema
+package adventureworks.information_schema;
 
-import adventureworks.customtypes.TypoInstant
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import adventureworks.customtypes.TypoInstant;
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Domain `information_schema.time_stamp`
   * No constraint
   */
 case class TimeStamp(value: TypoInstant)
+
 object TimeStamp {
   implicit lazy val arrayGet: Get[Array[TimeStamp]] = TypoInstant.arrayGet.map(_.map(TimeStamp.apply))
   implicit lazy val arrayPut: Put[Array[TimeStamp]] = TypoInstant.arrayPut.contramap(_.map(_.value))
@@ -25,10 +25,11 @@ object TimeStamp {
   implicit lazy val decoder: Decoder[TimeStamp] = TypoInstant.decoder.map(TimeStamp.apply)
   implicit lazy val encoder: Encoder[TimeStamp] = TypoInstant.encoder.contramap(_.value)
   implicit lazy val get: Get[TimeStamp] = TypoInstant.get.map(TimeStamp.apply)
-  implicit def ordering(implicit O0: Ordering[TypoInstant]): Ordering[TimeStamp] = Ordering.by(_.value)
   implicit lazy val put: Put[TimeStamp] = TypoInstant.put.contramap(_.value)
-  implicit lazy val text: Text[TimeStamp] = new Text[TimeStamp] {
-    override def unsafeEncode(v: TimeStamp, sb: StringBuilder) = TypoInstant.text.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: TimeStamp, sb: StringBuilder) = TypoInstant.text.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[TimeStamp] = {
+    new Text[TimeStamp] {
+      override def unsafeEncode(v: TimeStamp, sb: StringBuilder) = TypoInstant.text.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: TimeStamp, sb: StringBuilder) = TypoInstant.text.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

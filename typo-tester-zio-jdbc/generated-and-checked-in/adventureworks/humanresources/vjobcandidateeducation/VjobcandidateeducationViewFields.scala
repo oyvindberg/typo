@@ -3,17 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package humanresources
-package vjobcandidateeducation
+package adventureworks.humanresources.vjobcandidateeducation;
 
-import adventureworks.customtypes.TypoLocalDate
-import adventureworks.humanresources.jobcandidate.JobcandidateId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDate;
+import adventureworks.humanresources.jobcandidate.JobcandidateId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait VjobcandidateeducationViewFields {
   def jobcandidateid: Field[JobcandidateId, VjobcandidateeducationViewRow]
@@ -34,7 +32,7 @@ trait VjobcandidateeducationViewFields {
 object VjobcandidateeducationViewFields {
   lazy val structure: Relation[VjobcandidateeducationViewFields, VjobcandidateeducationViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[VjobcandidateeducationViewFields, VjobcandidateeducationViewRow] {
   
@@ -54,8 +52,8 @@ object VjobcandidateeducationViewFields {
       override def eduLocCity = OptField[/* max 100 chars */ String, VjobcandidateeducationViewRow](_path, "Edu.Loc.City", None, None, x => x.eduLocCity, (row, value) => row.copy(eduLocCity = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, VjobcandidateeducationViewRow]] =
-      List[FieldLikeNoHkt[?, VjobcandidateeducationViewRow]](fields.jobcandidateid, fields.eduLevel, fields.eduStartDate, fields.eduEndDate, fields.eduDegree, fields.eduMajor, fields.eduMinor, fields.eduGPA, fields.eduGPAScale, fields.eduSchool, fields.eduLocCountryRegion, fields.eduLocState, fields.eduLocCity)
+    override lazy val columns: List[FieldLike[?, VjobcandidateeducationViewRow]] =
+      List[FieldLike[?, VjobcandidateeducationViewRow]](fields.jobcandidateid, fields.eduLevel, fields.eduStartDate, fields.eduEndDate, fields.eduDegree, fields.eduMajor, fields.eduMinor, fields.eduGPA, fields.eduGPAScale, fields.eduSchool, fields.eduLocCountryRegion, fields.eduLocState, fields.eduLocCity)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

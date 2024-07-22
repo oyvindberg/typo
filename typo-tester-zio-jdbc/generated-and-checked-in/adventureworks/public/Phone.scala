@@ -3,22 +3,23 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package public
+package adventureworks.public;
 
-import java.sql.Types
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import java.sql.Types;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Domain `public.Phone`
   * No constraint
   */
 case class Phone(value: String)
+
 object Phone {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[Phone]] = adventureworks.StringArrayDecoder.map(_.map(Phone.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[Phone]] = adventureworks.StringArrayEncoder.contramap(_.map(_.value))
@@ -28,11 +29,12 @@ object Phone {
   implicit lazy val jdbcEncoder: JdbcEncoder[Phone] = JdbcEncoder.stringEncoder.contramap(_.value)
   implicit lazy val jsonDecoder: JsonDecoder[Phone] = JsonDecoder.string.map(Phone.apply)
   implicit lazy val jsonEncoder: JsonEncoder[Phone] = JsonEncoder.string.contramap(_.value)
-  implicit lazy val ordering: Ordering[Phone] = Ordering.by(_.value)
   implicit lazy val pgType: PGType[Phone] = PGType.instance(""""public"."Phone"""", Types.OTHER)
   implicit lazy val setter: Setter[Phone] = Setter.stringSetter.contramap(_.value)
-  implicit lazy val text: Text[Phone] = new Text[Phone] {
-    override def unsafeEncode(v: Phone, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: Phone, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[Phone] = {
+    new Text[Phone] {
+      override def unsafeEncode(v: Phone, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: Phone, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

@@ -3,19 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pe
-package bea
+package adventureworks.pe.bea;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.address.AddressId
-import adventureworks.person.addresstype.AddresstypeId
-import adventureworks.person.businessentity.BusinessentityId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.address.AddressId;
+import adventureworks.person.addresstype.AddresstypeId;
+import adventureworks.person.businessentity.BusinessentityId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait BeaViewFields {
   def id: Field[BusinessentityId, BeaViewRow]
@@ -29,7 +27,7 @@ trait BeaViewFields {
 object BeaViewFields {
   lazy val structure: Relation[BeaViewFields, BeaViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[BeaViewFields, BeaViewRow] {
   
@@ -42,8 +40,8 @@ object BeaViewFields {
       override def modifieddate = Field[TypoLocalDateTime, BeaViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, BeaViewRow]] =
-      List[FieldLikeNoHkt[?, BeaViewRow]](fields.id, fields.businessentityid, fields.addressid, fields.addresstypeid, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, BeaViewRow]] =
+      List[FieldLike[?, BeaViewRow]](fields.id, fields.businessentityid, fields.addressid, fields.addresstypeid, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

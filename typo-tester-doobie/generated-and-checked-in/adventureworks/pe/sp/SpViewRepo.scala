@@ -3,13 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pe
-package sp
+package adventureworks.pe.sp;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.SelectBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
 
 trait SpViewRepo {
   def select: SelectBuilder[SpViewFields, SpViewRow]

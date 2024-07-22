@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package pmpdc
+package adventureworks.pr.pmpdc;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.culture.CultureId
-import adventureworks.production.productdescription.ProductdescriptionId
-import adventureworks.production.productmodel.ProductmodelId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.culture.CultureId;
+import adventureworks.production.productdescription.ProductdescriptionId;
+import adventureworks.production.productmodel.ProductmodelId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait PmpdcViewFields {
   def productmodelid: Field[ProductmodelId, PmpdcViewRow]
@@ -26,7 +24,7 @@ trait PmpdcViewFields {
 object PmpdcViewFields {
   lazy val structure: Relation[PmpdcViewFields, PmpdcViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[PmpdcViewFields, PmpdcViewRow] {
   
@@ -37,8 +35,8 @@ object PmpdcViewFields {
       override def modifieddate = Field[TypoLocalDateTime, PmpdcViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, PmpdcViewRow]] =
-      List[FieldLikeNoHkt[?, PmpdcViewRow]](fields.productmodelid, fields.productdescriptionid, fields.cultureid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, PmpdcViewRow]] =
+      List[FieldLike[?, PmpdcViewRow]](fields.productmodelid, fields.productdescriptionid, fields.cultureid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

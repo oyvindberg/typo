@@ -3,20 +3,18 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sales
-package shoppingcartitem
+package adventureworks.sales.shoppingcartitem;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.product.ProductFields
-import adventureworks.production.product.ProductId
-import adventureworks.production.product.ProductRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.product.ProductFields;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.product.ProductRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait ShoppingcartitemFields {
   def shoppingcartitemid: IdField[ShoppingcartitemId, ShoppingcartitemRow]
@@ -33,7 +31,7 @@ trait ShoppingcartitemFields {
 object ShoppingcartitemFields {
   lazy val structure: Relation[ShoppingcartitemFields, ShoppingcartitemRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[ShoppingcartitemFields, ShoppingcartitemRow] {
   
@@ -46,8 +44,8 @@ object ShoppingcartitemFields {
       override def modifieddate = Field[TypoLocalDateTime, ShoppingcartitemRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, ShoppingcartitemRow]] =
-      List[FieldLikeNoHkt[?, ShoppingcartitemRow]](fields.shoppingcartitemid, fields.shoppingcartid, fields.quantity, fields.productid, fields.datecreated, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, ShoppingcartitemRow]] =
+      List[FieldLike[?, ShoppingcartitemRow]](fields.shoppingcartitemid, fields.shoppingcartid, fields.quantity, fields.productid, fields.datecreated, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

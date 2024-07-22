@@ -3,55 +3,56 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sa
-package spqh
+package adventureworks.sa.spqh;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: sa.spqh */
 case class SpqhViewRow(
-  /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.businessentityid]] */
+  /** Points to [[adventureworks.sales.salespersonquotahistory.SalespersonquotahistoryRow.businessentityid]] */
   id: BusinessentityId,
-  /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.businessentityid]] */
+  /** Points to [[adventureworks.sales.salespersonquotahistory.SalespersonquotahistoryRow.businessentityid]] */
   businessentityid: BusinessentityId,
-  /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.quotadate]] */
+  /** Points to [[adventureworks.sales.salespersonquotahistory.SalespersonquotahistoryRow.quotadate]] */
   quotadate: TypoLocalDateTime,
-  /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.salesquota]] */
+  /** Points to [[adventureworks.sales.salespersonquotahistory.SalespersonquotahistoryRow.salesquota]] */
   salesquota: BigDecimal,
-  /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.rowguid]] */
+  /** Points to [[adventureworks.sales.salespersonquotahistory.SalespersonquotahistoryRow.rowguid]] */
   rowguid: TypoUUID,
-  /** Points to [[sales.salespersonquotahistory.SalespersonquotahistoryRow.modifieddate]] */
+  /** Points to [[adventureworks.sales.salespersonquotahistory.SalespersonquotahistoryRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object SpqhViewRow {
   implicit lazy val decoder: Decoder[SpqhViewRow] = Decoder.forProduct6[SpqhViewRow, BusinessentityId, BusinessentityId, TypoLocalDateTime, BigDecimal, TypoUUID, TypoLocalDateTime]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(SpqhViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SpqhViewRow] = Encoder.forProduct6[SpqhViewRow, BusinessentityId, BusinessentityId, TypoLocalDateTime, BigDecimal, TypoUUID, TypoLocalDateTime]("id", "businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.quotadate, x.salesquota, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SpqhViewRow] = new Read[SpqhViewRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SpqhViewRow(
-      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      quotadate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2),
-      salesquota = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[SpqhViewRow] = {
+    new Read[SpqhViewRow](
+      gets = List(
+        (BusinessentityId.get, Nullability.NoNulls),
+        (BusinessentityId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SpqhViewRow(
+        id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+        businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+        quotadate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2),
+        salesquota = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+      )
     )
-  )
+  
+  }
 }

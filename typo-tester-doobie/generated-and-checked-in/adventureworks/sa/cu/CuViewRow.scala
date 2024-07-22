@@ -3,46 +3,47 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sa
-package cu
+package adventureworks.sa.cu;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import adventureworks.sales.currency.CurrencyId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import adventureworks.sales.currency.CurrencyId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: sa.cu */
 case class CuViewRow(
-  /** Points to [[sales.currency.CurrencyRow.currencycode]] */
+  /** Points to [[adventureworks.sales.currency.CurrencyRow.currencycode]] */
   id: CurrencyId,
-  /** Points to [[sales.currency.CurrencyRow.currencycode]] */
+  /** Points to [[adventureworks.sales.currency.CurrencyRow.currencycode]] */
   currencycode: CurrencyId,
-  /** Points to [[sales.currency.CurrencyRow.name]] */
+  /** Points to [[adventureworks.sales.currency.CurrencyRow.name]] */
   name: Name,
-  /** Points to [[sales.currency.CurrencyRow.modifieddate]] */
+  /** Points to [[adventureworks.sales.currency.CurrencyRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object CuViewRow {
   implicit lazy val decoder: Decoder[CuViewRow] = Decoder.forProduct4[CuViewRow, CurrencyId, CurrencyId, Name, TypoLocalDateTime]("id", "currencycode", "name", "modifieddate")(CuViewRow.apply)(CurrencyId.decoder, CurrencyId.decoder, Name.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[CuViewRow] = Encoder.forProduct4[CuViewRow, CurrencyId, CurrencyId, Name, TypoLocalDateTime]("id", "currencycode", "name", "modifieddate")(x => (x.id, x.currencycode, x.name, x.modifieddate))(CurrencyId.encoder, CurrencyId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[CuViewRow] = new Read[CuViewRow](
-    gets = List(
-      (CurrencyId.get, Nullability.NoNulls),
-      (CurrencyId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => CuViewRow(
-      id = CurrencyId.get.unsafeGetNonNullable(rs, i + 0),
-      currencycode = CurrencyId.get.unsafeGetNonNullable(rs, i + 1),
-      name = Name.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[CuViewRow] = {
+    new Read[CuViewRow](
+      gets = List(
+        (CurrencyId.get, Nullability.NoNulls),
+        (CurrencyId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => CuViewRow(
+        id = CurrencyId.get.unsafeGetNonNullable(rs, i + 0),
+        currencycode = CurrencyId.get.unsafeGetNonNullable(rs, i + 1),
+        name = Name.get.unsafeGetNonNullable(rs, i + 2),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+      )
     )
-  )
+  
+  }
 }

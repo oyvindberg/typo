@@ -35,14 +35,9 @@ package object codegen {
     }
   }
 
-  def scaladoc(title: String)(lines: List[String]): sc.Code = {
+  def scaladoc(lines: List[String]): sc.Comments =
     lines match {
-      case Nil =>
-        code"""|/** $title */""".stripMargin
-      case nonEmpty =>
-        code"""|/** $title
-               |${nonEmpty.flatMap(_.linesIterator).map(line => code"  * $line").mkCode("\n")}
-               |  */""".stripMargin
+      case Nil      => sc.Comments.Empty
+      case nonEmpty => sc.Comments(nonEmpty)
     }
-  }
 }

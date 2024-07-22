@@ -3,21 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package person
-package vadditionalcontactinfo
+package adventureworks.person.vadditionalcontactinfo;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.customtypes.TypoXml
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import adventureworks.userdefined.FirstName
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.Name;
+import adventureworks.userdefined.FirstName;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait VadditionalcontactinfoViewFields {
   def businessentityid: Field[BusinessentityId, VadditionalcontactinfoViewRow]
@@ -42,7 +40,7 @@ trait VadditionalcontactinfoViewFields {
 object VadditionalcontactinfoViewFields {
   lazy val structure: Relation[VadditionalcontactinfoViewFields, VadditionalcontactinfoViewRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[VadditionalcontactinfoViewFields, VadditionalcontactinfoViewRow] {
   
@@ -66,8 +64,8 @@ object VadditionalcontactinfoViewFields {
       override def modifieddate = Field[TypoLocalDateTime, VadditionalcontactinfoViewRow](_path, "modifieddate", Some("text"), None, x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, VadditionalcontactinfoViewRow]] =
-      List[FieldLikeNoHkt[?, VadditionalcontactinfoViewRow]](fields.businessentityid, fields.firstname, fields.middlename, fields.lastname, fields.telephonenumber, fields.telephonespecialinstructions, fields.street, fields.city, fields.stateprovince, fields.postalcode, fields.countryregion, fields.homeaddressspecialinstructions, fields.emailaddress, fields.emailspecialinstructions, fields.emailtelephonenumber, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, VadditionalcontactinfoViewRow]] =
+      List[FieldLike[?, VadditionalcontactinfoViewRow]](fields.businessentityid, fields.firstname, fields.middlename, fields.lastname, fields.telephonenumber, fields.telephonespecialinstructions, fields.street, fields.city, fields.stateprovince, fields.postalcode, fields.countryregion, fields.homeaddressspecialinstructions, fields.emailaddress, fields.emailspecialinstructions, fields.emailtelephonenumber, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

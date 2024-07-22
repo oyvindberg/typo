@@ -3,13 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package sales
-package vstorewithdemographics
+package adventureworks.sales.vstorewithdemographics;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.SelectBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
 
 trait VstorewithdemographicsViewRepo {
   def select: SelectBuilder[VstorewithdemographicsViewFields, VstorewithdemographicsViewRow]

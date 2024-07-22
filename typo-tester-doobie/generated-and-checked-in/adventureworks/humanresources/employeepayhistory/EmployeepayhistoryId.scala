@@ -3,22 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package humanresources
-package employeepayhistory
+package adventureworks.humanresources.employeepayhistory;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.businessentity.BusinessentityId
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.businessentity.BusinessentityId;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** Type for the composite primary key of table `humanresources.employeepayhistory` */
-case class EmployeepayhistoryId(
-  businessentityid: BusinessentityId,
-  ratechangedate: TypoLocalDateTime
-)
+case class EmployeepayhistoryId(businessentityid: BusinessentityId, ratechangedate: TypoLocalDateTime)
+
 object EmployeepayhistoryId {
   implicit lazy val decoder: Decoder[EmployeepayhistoryId] = Decoder.forProduct2[EmployeepayhistoryId, BusinessentityId, TypoLocalDateTime]("businessentityid", "ratechangedate")(EmployeepayhistoryId.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[EmployeepayhistoryId] = Encoder.forProduct2[EmployeepayhistoryId, BusinessentityId, TypoLocalDateTime]("businessentityid", "ratechangedate")(x => (x.businessentityid, x.ratechangedate))(BusinessentityId.encoder, TypoLocalDateTime.encoder)
-  implicit def ordering(implicit O0: Ordering[TypoLocalDateTime]): Ordering[EmployeepayhistoryId] = Ordering.by(x => (x.businessentityid, x.ratechangedate))
 }

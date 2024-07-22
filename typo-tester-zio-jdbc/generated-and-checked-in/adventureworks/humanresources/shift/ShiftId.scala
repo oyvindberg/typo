@@ -3,20 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package humanresources
-package shift
+package adventureworks.humanresources.shift;
 
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `humanresources.shift` */
-case class ShiftId(value: Int) extends AnyVal
+case class ShiftId(value: Int) extends scala.AnyVal
+
 object ShiftId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[ShiftId]] = adventureworks.IntArrayDecoder.map(_.map(ShiftId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[ShiftId]] = adventureworks.IntArrayEncoder.contramap(_.map(_.value))
@@ -26,11 +26,12 @@ object ShiftId {
   implicit lazy val jdbcEncoder: JdbcEncoder[ShiftId] = JdbcEncoder.intEncoder.contramap(_.value)
   implicit lazy val jsonDecoder: JsonDecoder[ShiftId] = JsonDecoder.int.map(ShiftId.apply)
   implicit lazy val jsonEncoder: JsonEncoder[ShiftId] = JsonEncoder.int.contramap(_.value)
-  implicit lazy val ordering: Ordering[ShiftId] = Ordering.by(_.value)
   implicit lazy val pgType: PGType[ShiftId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[ShiftId] = Setter.intSetter.contramap(_.value)
-  implicit lazy val text: Text[ShiftId] = new Text[ShiftId] {
-    override def unsafeEncode(v: ShiftId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: ShiftId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[ShiftId] = {
+    new Text[ShiftId] {
+      override def unsafeEncode(v: ShiftId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: ShiftId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

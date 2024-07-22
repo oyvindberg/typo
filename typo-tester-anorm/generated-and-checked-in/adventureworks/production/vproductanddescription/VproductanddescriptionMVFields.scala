@@ -3,17 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package production
-package vproductanddescription
+package adventureworks.production.vproductanddescription;
 
-import adventureworks.production.culture.CultureId
-import adventureworks.production.product.ProductId
-import adventureworks.public.Name
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.Structure.Relation
+import adventureworks.production.culture.CultureId;
+import adventureworks.production.product.ProductId;
+import adventureworks.public.Name;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait VproductanddescriptionMVFields {
   def productid: Field[ProductId, VproductanddescriptionMVRow]
@@ -26,7 +24,7 @@ trait VproductanddescriptionMVFields {
 object VproductanddescriptionMVFields {
   lazy val structure: Relation[VproductanddescriptionMVFields, VproductanddescriptionMVRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[VproductanddescriptionMVFields, VproductanddescriptionMVRow] {
   
@@ -38,8 +36,8 @@ object VproductanddescriptionMVFields {
       override def description = Field[/* max 400 chars */ String, VproductanddescriptionMVRow](_path, "description", None, None, x => x.description, (row, value) => row.copy(description = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, VproductanddescriptionMVRow]] =
-      List[FieldLikeNoHkt[?, VproductanddescriptionMVRow]](fields.productid, fields.name, fields.productmodel, fields.cultureid, fields.description)
+    override lazy val columns: List[FieldLike[?, VproductanddescriptionMVRow]] =
+      List[FieldLike[?, VproductanddescriptionMVRow]](fields.productid, fields.name, fields.productmodel, fields.cultureid, fields.description)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

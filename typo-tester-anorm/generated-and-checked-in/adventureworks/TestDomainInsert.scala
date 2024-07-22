@@ -3,18 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
+package adventureworks;
 
-import adventureworks.public.AccountNumber
-import adventureworks.public.Flag
-import adventureworks.public.Mydomain
-import adventureworks.public.Name
-import adventureworks.public.NameStyle
-import adventureworks.public.OrderNumber
-import adventureworks.public.Phone
-import adventureworks.public.ShortText
-import scala.util.Random
+import adventureworks.public.AccountNumber;
+import adventureworks.public.Flag;
+import adventureworks.public.Mydomain;
+import adventureworks.public.Name;
+import adventureworks.public.NameStyle;
+import adventureworks.public.OrderNumber;
+import adventureworks.public.Phone;
+import adventureworks.public.ShortText;
+import scala.util.Random;
 
+/** Methods to generate random data for domain types */
 trait TestDomainInsert {
   /** Domain `public.AccountNumber`
     * No constraint

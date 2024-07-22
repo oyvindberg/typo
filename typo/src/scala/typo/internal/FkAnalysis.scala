@@ -53,7 +53,7 @@ object FkAnalysis {
           case Nil        => sys.error("unexpected")
           case List(expr) => (colName, expr)
           case expr :: exprs =>
-            val requires = exprs.map(e => code"""require($expr == $e, "${expr.render.lines.mkString("\n")} != ${e.render.lines.mkString("\n")}")""")
+            val requires = exprs.map(e => code"""require($expr == $e, "${expr.render(LangScala).lines.mkString("\n")} != ${e.render(LangScala).lines.mkString("\n")}")""")
             val finalExpr = code"""|{
                                  |  ${requires.mkCode("\n")}
                                  |  $expr

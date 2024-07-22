@@ -3,29 +3,27 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package production
-package productinventory
+package adventureworks.production.productinventory;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.production.location.LocationFields
-import adventureworks.production.location.LocationId
-import adventureworks.production.location.LocationRow
-import adventureworks.production.product.ProductFields
-import adventureworks.production.product.ProductId
-import adventureworks.production.product.ProductRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.Required
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLikeNoHkt
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.production.location.LocationFields;
+import adventureworks.production.location.LocationId;
+import adventureworks.production.location.LocationRow;
+import adventureworks.production.product.ProductFields;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.product.ProductRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait ProductinventoryFields {
   def productid: IdField[ProductId, ProductinventoryRow]
@@ -41,17 +39,17 @@ trait ProductinventoryFields {
   def fkProduct: ForeignKey[ProductFields, ProductRow] =
     ForeignKey[ProductFields, ProductRow]("production.FK_ProductInventory_Product_ProductID", Nil)
       .withColumnPair(productid, _.productid)
-  def compositeIdIs(compositeId: ProductinventoryId): SqlExpr[Boolean, Required] =
+  def compositeIdIs(compositeId: ProductinventoryId): SqlExpr[Boolean] =
     productid.isEqual(compositeId.productid).and(locationid.isEqual(compositeId.locationid))
-  def compositeIdIn(compositeIds: Array[ProductinventoryId]): SqlExpr[Boolean, Required] =
-    new CompositeIn(compositeIds)(TuplePart(productid)(_.productid), TuplePart(locationid)(_.locationid))
+  def compositeIdIn(compositeIds: Array[ProductinventoryId]): SqlExpr[Boolean] =
+    new CompositeIn(compositeIds)(TuplePart[ProductinventoryId](productid)(_.productid)(using as[Array[ProductId]](ProductId.arrayPut), implicitly), TuplePart[ProductinventoryId](locationid)(_.locationid)(using as[Array[LocationId]](LocationId.arrayPut), implicitly))
   
 }
 
 object ProductinventoryFields {
   lazy val structure: Relation[ProductinventoryFields, ProductinventoryRow] =
     new Impl(Nil)
-    
+
   private final class Impl(val _path: List[Path])
     extends Relation[ProductinventoryFields, ProductinventoryRow] {
   
@@ -65,8 +63,8 @@ object ProductinventoryFields {
       override def modifieddate = Field[TypoLocalDateTime, ProductinventoryRow](_path, "modifieddate", Some("text"), Some("timestamp"), x => x.modifieddate, (row, value) => row.copy(modifieddate = value))
     }
   
-    override lazy val columns: List[FieldLikeNoHkt[?, ProductinventoryRow]] =
-      List[FieldLikeNoHkt[?, ProductinventoryRow]](fields.productid, fields.locationid, fields.shelf, fields.bin, fields.quantity, fields.rowguid, fields.modifieddate)
+    override lazy val columns: List[FieldLike[?, ProductinventoryRow]] =
+      List[FieldLike[?, ProductinventoryRow]](fields.productid, fields.locationid, fields.shelf, fields.bin, fields.quantity, fields.rowguid, fields.modifieddate)
   
     override def copy(path: List[Path]): Impl =
       new Impl(path)

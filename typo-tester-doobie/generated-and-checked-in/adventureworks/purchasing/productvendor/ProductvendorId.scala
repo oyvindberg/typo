@@ -3,22 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package purchasing
-package productvendor
+package adventureworks.purchasing.productvendor;
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.production.product.ProductId
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.production.product.ProductId;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** Type for the composite primary key of table `purchasing.productvendor` */
-case class ProductvendorId(
-  productid: ProductId,
-  businessentityid: BusinessentityId
-)
+case class ProductvendorId(productid: ProductId, businessentityid: BusinessentityId)
+
 object ProductvendorId {
   implicit lazy val decoder: Decoder[ProductvendorId] = Decoder.forProduct2[ProductvendorId, ProductId, BusinessentityId]("productid", "businessentityid")(ProductvendorId.apply)(ProductId.decoder, BusinessentityId.decoder)
   implicit lazy val encoder: Encoder[ProductvendorId] = Encoder.forProduct2[ProductvendorId, ProductId, BusinessentityId]("productid", "businessentityid")(x => (x.productid, x.businessentityid))(ProductId.encoder, BusinessentityId.encoder)
-  implicit lazy val ordering: Ordering[ProductvendorId] = Ordering.by(x => (x.productid, x.businessentityid))
 }

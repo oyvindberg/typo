@@ -3,7 +3,7 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
+package adventureworks;
 
 
 

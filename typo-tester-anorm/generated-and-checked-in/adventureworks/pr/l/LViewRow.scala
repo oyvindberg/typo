@@ -3,75 +3,79 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks
-package pr
-package l
+package adventureworks.pr.l;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.location.LocationId
-import adventureworks.public.Name
-import anorm.Column
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.location.LocationId;
+import adventureworks.public.Name;
+import anorm.Column;
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** View: pr.l */
 case class LViewRow(
-  /** Points to [[production.location.LocationRow.locationid]] */
+  /** Points to [[adventureworks.production.location.LocationRow.locationid]] */
   id: LocationId,
-  /** Points to [[production.location.LocationRow.locationid]] */
+  /** Points to [[adventureworks.production.location.LocationRow.locationid]] */
   locationid: LocationId,
-  /** Points to [[production.location.LocationRow.name]] */
+  /** Points to [[adventureworks.production.location.LocationRow.name]] */
   name: Name,
-  /** Points to [[production.location.LocationRow.costrate]] */
+  /** Points to [[adventureworks.production.location.LocationRow.costrate]] */
   costrate: BigDecimal,
-  /** Points to [[production.location.LocationRow.availability]] */
+  /** Points to [[adventureworks.production.location.LocationRow.availability]] */
   availability: BigDecimal,
-  /** Points to [[production.location.LocationRow.modifieddate]] */
+  /** Points to [[adventureworks.production.location.LocationRow.modifieddate]] */
   modifieddate: TypoLocalDateTime
 )
 
 object LViewRow {
-  implicit lazy val reads: Reads[LViewRow] = Reads[LViewRow](json => JsResult.fromTry(
-      Try(
-        LViewRow(
-          id = json.\("id").as(LocationId.reads),
-          locationid = json.\("locationid").as(LocationId.reads),
-          name = json.\("name").as(Name.reads),
-          costrate = json.\("costrate").as(Reads.bigDecReads),
-          availability = json.\("availability").as(Reads.bigDecReads),
-          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+  implicit lazy val reads: Reads[LViewRow] = {
+    Reads[LViewRow](json => JsResult.fromTry(
+        Try(
+          LViewRow(
+            id = json.\("id").as(LocationId.reads),
+            locationid = json.\("locationid").as(LocationId.reads),
+            name = json.\("name").as(Name.reads),
+            costrate = json.\("costrate").as(Reads.bigDecReads),
+            availability = json.\("availability").as(Reads.bigDecReads),
+            modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+          )
         )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[LViewRow] = RowParser[LViewRow] { row =>
-    Success(
-      LViewRow(
-        id = row(idx + 0)(LocationId.column),
-        locationid = row(idx + 1)(LocationId.column),
-        name = row(idx + 2)(Name.column),
-        costrate = row(idx + 3)(Column.columnToScalaBigDecimal),
-        availability = row(idx + 4)(Column.columnToScalaBigDecimal),
-        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
-      )
+      ),
     )
   }
-  implicit lazy val writes: OWrites[LViewRow] = OWrites[LViewRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "id" -> LocationId.writes.writes(o.id),
-      "locationid" -> LocationId.writes.writes(o.locationid),
-      "name" -> Name.writes.writes(o.name),
-      "costrate" -> Writes.BigDecimalWrites.writes(o.costrate),
-      "availability" -> Writes.BigDecimalWrites.writes(o.availability),
-      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
-    ))
-  )
+  def rowParser(idx: Int): RowParser[LViewRow] = {
+    RowParser[LViewRow] { row =>
+      Success(
+        LViewRow(
+          id = row(idx + 0)(LocationId.column),
+          locationid = row(idx + 1)(LocationId.column),
+          name = row(idx + 2)(Name.column),
+          costrate = row(idx + 3)(Column.columnToScalaBigDecimal),
+          availability = row(idx + 4)(Column.columnToScalaBigDecimal),
+          modifieddate = row(idx + 5)(TypoLocalDateTime.column)
+        )
+      )
+    }
+  }
+  implicit lazy val writes: OWrites[LViewRow] = {
+    OWrites[LViewRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "id" -> LocationId.writes.writes(o.id),
+        "locationid" -> LocationId.writes.writes(o.locationid),
+        "name" -> Name.writes.writes(o.name),
+        "costrate" -> Writes.BigDecimalWrites.writes(o.costrate),
+        "availability" -> Writes.BigDecimalWrites.writes(o.availability),
+        "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
+      ))
+    )
+  }
 }
