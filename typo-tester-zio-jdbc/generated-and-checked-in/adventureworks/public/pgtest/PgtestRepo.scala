@@ -3,14 +3,14 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.pgtest
+package adventureworks.public.pgtest;
 
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
 trait PgtestRepo {
   def delete: DeleteBuilder[PgtestFields, PgtestRow]

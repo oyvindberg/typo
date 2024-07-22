@@ -3,72 +3,77 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.illustration
+package adventureworks.production.illustration;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoXml
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoXml;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: production.illustration
-    Bicycle assembly diagrams.
-    Primary key: illustrationid */
-case class IllustrationRow(
-  /** Primary key for Illustration records.
-      Default: nextval('production.illustration_illustrationid_seq'::regclass) */
-  illustrationid: IllustrationId,
-  /** Illustrations used in manufacturing instructions. Stored as XML. */
-  diagram: Option[TypoXml],
-  /** Default: now() */
-  modifieddate: TypoLocalDateTime
-){
-   val id = illustrationid
-   def toUnsavedRow(illustrationid: Defaulted[IllustrationId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): IllustrationRowUnsaved =
-     IllustrationRowUnsaved(diagram, illustrationid, modifieddate)
- }
+  * Bicycle assembly diagrams.
+  * Primary key: illustrationid
+  */
+case class IllustrationRow(/** Primary key for Illustration records.
+                             * Default: nextval('production.illustration_illustrationid_seq'::regclass)
+                             */
+                           illustrationid: IllustrationId, /** Illustrations used in manufacturing instructions. Stored as XML. */
+                           diagram: Option[TypoXml], /** Default: now() */
+                           modifieddate: TypoLocalDateTime) {
+  def id: IllustrationId = illustrationid
+  def toUnsavedRow(illustrationid: Defaulted[IllustrationId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): IllustrationRowUnsaved = new IllustrationRowUnsaved(diagram, illustrationid, modifieddate)
+}
 
 object IllustrationRow {
   implicit lazy val decoder: Decoder[IllustrationRow] = Decoder.forProduct3[IllustrationRow, IllustrationId, Option[TypoXml], TypoLocalDateTime]("illustrationid", "diagram", "modifieddate")(IllustrationRow.apply)(IllustrationId.decoder, Decoder.decodeOption(TypoXml.decoder), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[IllustrationRow] = Encoder.forProduct3[IllustrationRow, IllustrationId, Option[TypoXml], TypoLocalDateTime]("illustrationid", "diagram", "modifieddate")(x => (x.illustrationid, x.diagram, x.modifieddate))(IllustrationId.encoder, Encoder.encodeOption(TypoXml.encoder), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[IllustrationRow] = new Read[IllustrationRow](
-    gets = List(
-      (IllustrationId.get, Nullability.NoNulls),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => IllustrationRow(
-      illustrationid = IllustrationId.get.unsafeGetNonNullable(rs, i + 0),
-      diagram = TypoXml.get.unsafeGetNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[IllustrationRow] = {
+    new Read[IllustrationRow](
+      gets = List(
+        (IllustrationId.get, Nullability.NoNulls),
+        (TypoXml.get, Nullability.Nullable),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => IllustrationRow(
+        illustrationid = IllustrationId.get.unsafeGetNonNullable(rs, i + 0),
+        diagram = TypoXml.get.unsafeGetNullable(rs, i + 1),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+      )
     )
-  )
-  implicit lazy val text: Text[IllustrationRow] = Text.instance[IllustrationRow]{ (row, sb) =>
-    IllustrationId.text.unsafeEncode(row.illustrationid, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoXml.text).unsafeEncode(row.diagram, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[IllustrationRow] = new Write[IllustrationRow](
-    puts = List((IllustrationId.put, Nullability.NoNulls),
-                (TypoXml.put, Nullability.Nullable),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.illustrationid, x.diagram, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  IllustrationId.put.unsafeSetNonNullable(rs, i + 0, a.illustrationid)
-                  TypoXml.put.unsafeSetNullable(rs, i + 1, a.diagram)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     IllustrationId.put.unsafeUpdateNonNullable(ps, i + 0, a.illustrationid)
-                     TypoXml.put.unsafeUpdateNullable(ps, i + 1, a.diagram)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[IllustrationRow] = {
+    Text.instance[IllustrationRow]{ (row, sb) =>
+      IllustrationId.text.unsafeEncode(row.illustrationid, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoXml.text).unsafeEncode(row.diagram, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[IllustrationRow] = {
+    new Write[IllustrationRow](
+      puts = List((IllustrationId.put, Nullability.NoNulls),
+                  (TypoXml.put, Nullability.Nullable),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.illustrationid, x.diagram, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    IllustrationId.put.unsafeSetNonNullable(rs, i + 0, a.illustrationid)
+                    TypoXml.put.unsafeSetNullable(rs, i + 1, a.diagram)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       IllustrationId.put.unsafeUpdateNonNullable(ps, i + 0, a.illustrationid)
+                       TypoXml.put.unsafeUpdateNullable(ps, i + 1, a.diagram)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
+                     }
+    )
+  
+  }
 }

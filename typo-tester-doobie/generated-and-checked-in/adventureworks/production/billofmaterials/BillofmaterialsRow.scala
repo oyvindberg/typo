@@ -3,142 +3,175 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.billofmaterials
+package adventureworks.production.billofmaterials;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.production.product.ProductId
-import adventureworks.production.unitmeasure.UnitmeasureId
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.unitmeasure.UnitmeasureId;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: production.billofmaterials
-    Items required to make bicycles and bicycle subassemblies. It identifies the heirarchical relationship between a parent product and its components.
-    Primary key: billofmaterialsid */
+  * Items required to make bicycles and bicycle subassemblies. It identifies the heirarchical relationship between a parent product and its components.
+  * Primary key: billofmaterialsid
+  */
 case class BillofmaterialsRow(
   /** Primary key for BillOfMaterials records.
-      Default: nextval('production.billofmaterials_billofmaterialsid_seq'::regclass) */
+    * Default: nextval('production.billofmaterials_billofmaterialsid_seq'::regclass)
+    */
   billofmaterialsid: Int,
   /** Parent product identification number. Foreign key to Product.ProductID.
-      Points to [[adventureworks.production.product.ProductRow.productid]]
-      Constraint CK_BillOfMaterials_BOMLevel affecting columns bomlevel, perassemblyqty, productassemblyid: ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1))))
-      Constraint CK_BillOfMaterials_ProductAssemblyID affecting columns componentid, productassemblyid: ((productassemblyid <> componentid)) */
+    * Points to [[adventureworks.production.product.ProductRow.productid]]
+    * Constraint CK_BillOfMaterials_BOMLevel affecting columns bomlevel, perassemblyqty, productassemblyid: ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1))))
+    * Constraint CK_BillOfMaterials_ProductAssemblyID affecting columns componentid, productassemblyid: ((productassemblyid <> componentid))
+    */
   productassemblyid: Option[ProductId],
   /** Component identification number. Foreign key to Product.ProductID.
-      Points to [[adventureworks.production.product.ProductRow.productid]]
-      Constraint CK_BillOfMaterials_ProductAssemblyID affecting columns componentid, productassemblyid: ((productassemblyid <> componentid)) */
+    * Points to [[adventureworks.production.product.ProductRow.productid]]
+    * Constraint CK_BillOfMaterials_ProductAssemblyID affecting columns componentid, productassemblyid: ((productassemblyid <> componentid))
+    */
   componentid: ProductId,
   /** Date the component started being used in the assembly item.
-      Default: now()
-      Constraint CK_BillOfMaterials_EndDate affecting columns enddate, startdate: (((enddate > startdate) OR (enddate IS NULL))) */
+    * Default: now()
+    * Constraint CK_BillOfMaterials_EndDate affecting columns enddate, startdate: (((enddate > startdate) OR (enddate IS NULL)))
+    */
   startdate: TypoLocalDateTime,
   /** Date the component stopped being used in the assembly item.
-      Constraint CK_BillOfMaterials_EndDate affecting columns enddate, startdate: (((enddate > startdate) OR (enddate IS NULL))) */
+    * Constraint CK_BillOfMaterials_EndDate affecting columns enddate, startdate: (((enddate > startdate) OR (enddate IS NULL)))
+    */
   enddate: Option[TypoLocalDateTime],
   /** Standard code identifying the unit of measure for the quantity.
-      Points to [[adventureworks.production.unitmeasure.UnitmeasureRow.unitmeasurecode]] */
+    * Points to [[adventureworks.production.unitmeasure.UnitmeasureRow.unitmeasurecode]]
+    */
   unitmeasurecode: UnitmeasureId,
   /** Indicates the depth the component is from its parent (AssemblyID).
-      Constraint CK_BillOfMaterials_BOMLevel affecting columns bomlevel, perassemblyqty, productassemblyid: ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1)))) */
+    * Constraint CK_BillOfMaterials_BOMLevel affecting columns bomlevel, perassemblyqty, productassemblyid: ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1))))
+    */
   bomlevel: TypoShort,
   /** Quantity of the component needed to create the assembly.
-      Default: 1.00
-      Constraint CK_BillOfMaterials_BOMLevel affecting columns bomlevel, perassemblyqty, productassemblyid: ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1))))
-      Constraint CK_BillOfMaterials_PerAssemblyQty affecting columns perassemblyqty: ((perassemblyqty >= 1.00)) */
+    * Default: 1.00
+    * Constraint CK_BillOfMaterials_BOMLevel affecting columns bomlevel, perassemblyqty, productassemblyid: ((((productassemblyid IS NULL) AND (bomlevel = 0) AND (perassemblyqty = 1.00)) OR ((productassemblyid IS NOT NULL) AND (bomlevel >= 1))))
+    * Constraint CK_BillOfMaterials_PerAssemblyQty affecting columns perassemblyqty: ((perassemblyqty >= 1.00))
+    */
   perassemblyqty: BigDecimal,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val id = billofmaterialsid
-   def toUnsavedRow(billofmaterialsid: Defaulted[Int], startdate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.startdate), perassemblyqty: Defaulted[BigDecimal] = Defaulted.Provided(this.perassemblyqty), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): BillofmaterialsRowUnsaved =
-     BillofmaterialsRowUnsaved(productassemblyid, componentid, enddate, unitmeasurecode, bomlevel, billofmaterialsid, startdate, perassemblyqty, modifieddate)
- }
+) {
+  def id: Int = billofmaterialsid
+  def toUnsavedRow(
+    billofmaterialsid: Defaulted[Int],
+    startdate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.startdate),
+    perassemblyqty: Defaulted[BigDecimal] = Defaulted.Provided(this.perassemblyqty),
+    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)
+  ): BillofmaterialsRowUnsaved = {
+    new BillofmaterialsRowUnsaved(
+      productassemblyid,
+      componentid,
+      enddate,
+      unitmeasurecode,
+      bomlevel,
+      billofmaterialsid,
+      startdate,
+      perassemblyqty,
+      modifieddate
+    )
+  }
+}
 
 object BillofmaterialsRow {
   implicit lazy val decoder: Decoder[BillofmaterialsRow] = Decoder.forProduct9[BillofmaterialsRow, Int, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, BigDecimal, TypoLocalDateTime]("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(BillofmaterialsRow.apply)(Decoder.decodeInt, Decoder.decodeOption(ProductId.decoder), ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), UnitmeasureId.decoder, TypoShort.decoder, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[BillofmaterialsRow] = Encoder.forProduct9[BillofmaterialsRow, Int, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, BigDecimal, TypoLocalDateTime]("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(x => (x.billofmaterialsid, x.productassemblyid, x.componentid, x.startdate, x.enddate, x.unitmeasurecode, x.bomlevel, x.perassemblyqty, x.modifieddate))(Encoder.encodeInt, Encoder.encodeOption(ProductId.encoder), ProductId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), UnitmeasureId.encoder, TypoShort.encoder, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[BillofmaterialsRow] = new Read[BillofmaterialsRow](
-    gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.Nullable),
-      (ProductId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (UnitmeasureId.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => BillofmaterialsRow(
-      billofmaterialsid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
-      productassemblyid = ProductId.get.unsafeGetNullable(rs, i + 1),
-      componentid = ProductId.get.unsafeGetNonNullable(rs, i + 2),
-      startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3),
-      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4),
-      unitmeasurecode = UnitmeasureId.get.unsafeGetNonNullable(rs, i + 5),
-      bomlevel = TypoShort.get.unsafeGetNonNullable(rs, i + 6),
-      perassemblyqty = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 7),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
+  implicit lazy val read: Read[BillofmaterialsRow] = {
+    new Read[BillofmaterialsRow](
+      gets = List(
+        (Meta.IntMeta.get, Nullability.NoNulls),
+        (ProductId.get, Nullability.Nullable),
+        (ProductId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.Nullable),
+        (UnitmeasureId.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => BillofmaterialsRow(
+        billofmaterialsid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
+        productassemblyid = ProductId.get.unsafeGetNullable(rs, i + 1),
+        componentid = ProductId.get.unsafeGetNonNullable(rs, i + 2),
+        startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3),
+        enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4),
+        unitmeasurecode = UnitmeasureId.get.unsafeGetNonNullable(rs, i + 5),
+        bomlevel = TypoShort.get.unsafeGetNonNullable(rs, i + 6),
+        perassemblyqty = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 7),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
+      )
     )
-  )
-  implicit lazy val text: Text[BillofmaterialsRow] = Text.instance[BillofmaterialsRow]{ (row, sb) =>
-    Text.intInstance.unsafeEncode(row.billofmaterialsid, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(ProductId.text).unsafeEncode(row.productassemblyid, sb)
-    sb.append(Text.DELIMETER)
-    ProductId.text.unsafeEncode(row.componentid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.startdate, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoLocalDateTime.text).unsafeEncode(row.enddate, sb)
-    sb.append(Text.DELIMETER)
-    UnitmeasureId.text.unsafeEncode(row.unitmeasurecode, sb)
-    sb.append(Text.DELIMETER)
-    TypoShort.text.unsafeEncode(row.bomlevel, sb)
-    sb.append(Text.DELIMETER)
-    Text.bigDecimalInstance.unsafeEncode(row.perassemblyqty, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[BillofmaterialsRow] = new Write[BillofmaterialsRow](
-    puts = List((Meta.IntMeta.put, Nullability.NoNulls),
-                (ProductId.put, Nullability.Nullable),
-                (ProductId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.Nullable),
-                (UnitmeasureId.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.billofmaterialsid, x.productassemblyid, x.componentid, x.startdate, x.enddate, x.unitmeasurecode, x.bomlevel, x.perassemblyqty, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 0, a.billofmaterialsid)
-                  ProductId.put.unsafeSetNullable(rs, i + 1, a.productassemblyid)
-                  ProductId.put.unsafeSetNonNullable(rs, i + 2, a.componentid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.startdate)
-                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 4, a.enddate)
-                  UnitmeasureId.put.unsafeSetNonNullable(rs, i + 5, a.unitmeasurecode)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 6, a.bomlevel)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 7, a.perassemblyqty)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 8, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 0, a.billofmaterialsid)
-                     ProductId.put.unsafeUpdateNullable(ps, i + 1, a.productassemblyid)
-                     ProductId.put.unsafeUpdateNonNullable(ps, i + 2, a.componentid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.startdate)
-                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 4, a.enddate)
-                     UnitmeasureId.put.unsafeUpdateNonNullable(ps, i + 5, a.unitmeasurecode)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 6, a.bomlevel)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.perassemblyqty)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 8, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[BillofmaterialsRow] = {
+    Text.instance[BillofmaterialsRow]{ (row, sb) =>
+      Text.intInstance.unsafeEncode(row.billofmaterialsid, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(ProductId.text).unsafeEncode(row.productassemblyid, sb)
+      sb.append(Text.DELIMETER)
+      ProductId.text.unsafeEncode(row.componentid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.startdate, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoLocalDateTime.text).unsafeEncode(row.enddate, sb)
+      sb.append(Text.DELIMETER)
+      UnitmeasureId.text.unsafeEncode(row.unitmeasurecode, sb)
+      sb.append(Text.DELIMETER)
+      TypoShort.text.unsafeEncode(row.bomlevel, sb)
+      sb.append(Text.DELIMETER)
+      Text.bigDecimalInstance.unsafeEncode(row.perassemblyqty, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[BillofmaterialsRow] = {
+    new Write[BillofmaterialsRow](
+      puts = List((Meta.IntMeta.put, Nullability.NoNulls),
+                  (ProductId.put, Nullability.Nullable),
+                  (ProductId.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.Nullable),
+                  (UnitmeasureId.put, Nullability.NoNulls),
+                  (TypoShort.put, Nullability.NoNulls),
+                  (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.billofmaterialsid, x.productassemblyid, x.componentid, x.startdate, x.enddate, x.unitmeasurecode, x.bomlevel, x.perassemblyqty, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 0, a.billofmaterialsid)
+                    ProductId.put.unsafeSetNullable(rs, i + 1, a.productassemblyid)
+                    ProductId.put.unsafeSetNonNullable(rs, i + 2, a.componentid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.startdate)
+                    TypoLocalDateTime.put.unsafeSetNullable(rs, i + 4, a.enddate)
+                    UnitmeasureId.put.unsafeSetNonNullable(rs, i + 5, a.unitmeasurecode)
+                    TypoShort.put.unsafeSetNonNullable(rs, i + 6, a.bomlevel)
+                    Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 7, a.perassemblyqty)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 8, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 0, a.billofmaterialsid)
+                       ProductId.put.unsafeUpdateNullable(ps, i + 1, a.productassemblyid)
+                       ProductId.put.unsafeUpdateNonNullable(ps, i + 2, a.componentid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.startdate)
+                       TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 4, a.enddate)
+                       UnitmeasureId.put.unsafeUpdateNonNullable(ps, i + 5, a.unitmeasurecode)
+                       TypoShort.put.unsafeUpdateNonNullable(ps, i + 6, a.bomlevel)
+                       Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.perassemblyqty)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 8, a.modifieddate)
+                     }
+    )
+  
+  }
 }

@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.pmi
+package adventureworks.pr.pmi;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class PmiViewRepoImpl extends PmiViewRepo {
-  override def select: SelectBuilder[PmiViewFields, PmiViewRow] = {
-    SelectBuilderSql("pr.pmi", PmiViewFields.structure, PmiViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, PmiViewRow] = {
-    sql"""select "productmodelid", "illustrationid", "modifieddate"::text from pr.pmi""".query(using PmiViewRow.read).stream
-  }
+  def select: SelectBuilder[PmiViewFields, PmiViewRow] = SelectBuilderSql("pr.pmi", PmiViewFields.structure, PmiViewRow.read)
+  def selectAll: Stream[ConnectionIO, PmiViewRow] = sql"""select "productmodelid", "illustrationid", "modifieddate"::text from pr.pmi""".query(using PmiViewRow.read).stream
 }

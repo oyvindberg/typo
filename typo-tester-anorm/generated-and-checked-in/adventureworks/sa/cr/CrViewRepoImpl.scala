@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.cr
+package adventureworks.sa.cr;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class CrViewRepoImpl extends CrViewRepo {
-  override def select: SelectBuilder[CrViewFields, CrViewRow] = {
-    SelectBuilderSql("sa.cr", CrViewFields.structure, CrViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[CrViewRow] = {
+  def select: SelectBuilder[CrViewFields, CrViewRow] = SelectBuilderSql("sa.cr", CrViewFields.structure, CrViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[CrViewRow] = {
     SQL"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
           from sa.cr
        """.as(CrViewRow.rowParser(1).*)

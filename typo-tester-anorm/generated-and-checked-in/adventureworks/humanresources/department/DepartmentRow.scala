@@ -3,28 +3,30 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.department
+package adventureworks.humanresources.department;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** Table: humanresources.department
-    Lookup table containing the departments within the Adventure Works Cycles company.
-    Primary key: departmentid */
+  * Lookup table containing the departments within the Adventure Works Cycles company.
+  * Primary key: departmentid
+  */
 case class DepartmentRow(
   /** Primary key for Department records.
-      Default: nextval('humanresources.department_departmentid_seq'::regclass) */
+    * Default: nextval('humanresources.department_departmentid_seq'::regclass)
+    */
   departmentid: DepartmentId,
   /** Name of the department. */
   name: Name,
@@ -32,49 +34,63 @@ case class DepartmentRow(
   groupname: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val id = departmentid
-   def toUnsavedRow(departmentid: Defaulted[DepartmentId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): DepartmentRowUnsaved =
-     DepartmentRowUnsaved(name, groupname, departmentid, modifieddate)
- }
-
-object DepartmentRow {
-  implicit lazy val reads: Reads[DepartmentRow] = Reads[DepartmentRow](json => JsResult.fromTry(
-      Try(
-        DepartmentRow(
-          departmentid = json.\("departmentid").as(DepartmentId.reads),
-          name = json.\("name").as(Name.reads),
-          groupname = json.\("groupname").as(Name.reads),
-          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
-        )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[DepartmentRow] = RowParser[DepartmentRow] { row =>
-    Success(
-      DepartmentRow(
-        departmentid = row(idx + 0)(DepartmentId.column),
-        name = row(idx + 1)(Name.column),
-        groupname = row(idx + 2)(Name.column),
-        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
-      )
+) {
+  def id: DepartmentId = departmentid
+  def toUnsavedRow(departmentid: Defaulted[DepartmentId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): DepartmentRowUnsaved = {
+    new DepartmentRowUnsaved(
+      name,
+      groupname,
+      departmentid,
+      modifieddate
     )
   }
-  implicit lazy val text: Text[DepartmentRow] = Text.instance[DepartmentRow]{ (row, sb) =>
-    DepartmentId.text.unsafeEncode(row.departmentid, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.groupname, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+}
+
+object DepartmentRow {
+  implicit lazy val reads: Reads[DepartmentRow] = {
+    Reads[DepartmentRow](json => JsResult.fromTry(
+        Try(
+          DepartmentRow(
+            departmentid = json.\("departmentid").as(DepartmentId.reads),
+            name = json.\("name").as(Name.reads),
+            groupname = json.\("groupname").as(Name.reads),
+            modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+          )
+        )
+      ),
+    )
   }
-  implicit lazy val writes: OWrites[DepartmentRow] = OWrites[DepartmentRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "departmentid" -> DepartmentId.writes.writes(o.departmentid),
-      "name" -> Name.writes.writes(o.name),
-      "groupname" -> Name.writes.writes(o.groupname),
-      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
-    ))
-  )
+  def rowParser(idx: Int): RowParser[DepartmentRow] = {
+    RowParser[DepartmentRow] { row =>
+      Success(
+        DepartmentRow(
+          departmentid = row(idx + 0)(DepartmentId.column),
+          name = row(idx + 1)(Name.column),
+          groupname = row(idx + 2)(Name.column),
+          modifieddate = row(idx + 3)(TypoLocalDateTime.column)
+        )
+      )
+    }
+  }
+  implicit lazy val text: Text[DepartmentRow] = {
+    Text.instance[DepartmentRow]{ (row, sb) =>
+      DepartmentId.text.unsafeEncode(row.departmentid, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.groupname, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[DepartmentRow] = {
+    OWrites[DepartmentRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "departmentid" -> DepartmentId.writes.writes(o.departmentid),
+        "name" -> Name.writes.writes(o.name),
+        "groupname" -> Name.writes.writes(o.groupname),
+        "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
+      ))
+    )
+  }
 }

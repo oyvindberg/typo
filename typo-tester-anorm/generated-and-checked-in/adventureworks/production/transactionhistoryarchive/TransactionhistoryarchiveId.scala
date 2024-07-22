@@ -3,31 +3,36 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.transactionhistoryarchive
+package adventureworks.production.transactionhistoryarchive;
 
-import adventureworks.Text
-import anorm.Column
-import anorm.ParameterMetaData
-import anorm.ToStatement
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import typo.dsl.Bijection
+import adventureworks.Text;
+import anorm.Column;
+import anorm.ParameterMetaData;
+import anorm.ToStatement;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `production.transactionhistoryarchive` */
-case class TransactionhistoryarchiveId(value: Int) extends AnyVal
+case class TransactionhistoryarchiveId(value: Int) extends scala.AnyVal
+
 object TransactionhistoryarchiveId {
   implicit lazy val arrayColumn: Column[Array[TransactionhistoryarchiveId]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[TransactionhistoryarchiveId]] = adventureworks.IntArrayToStatement.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[TransactionhistoryarchiveId, Int] = Bijection[TransactionhistoryarchiveId, Int](_.value)(TransactionhistoryarchiveId.apply)
   implicit lazy val column: Column[TransactionhistoryarchiveId] = Column.columnToInt.map(TransactionhistoryarchiveId.apply)
-  implicit lazy val parameterMetadata: ParameterMetaData[TransactionhistoryarchiveId] = new ParameterMetaData[TransactionhistoryarchiveId] {
-    override def sqlType: String = ParameterMetaData.IntParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
+  implicit lazy val parameterMetadata: ParameterMetaData[TransactionhistoryarchiveId] = {
+    new ParameterMetaData[TransactionhistoryarchiveId] {
+      override def sqlType: String = ParameterMetaData.IntParameterMetaData.sqlType
+      override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
+    }
   }
   implicit lazy val reads: Reads[TransactionhistoryarchiveId] = Reads.IntReads.map(TransactionhistoryarchiveId.apply)
-  implicit lazy val text: Text[TransactionhistoryarchiveId] = new Text[TransactionhistoryarchiveId] {
-    override def unsafeEncode(v: TransactionhistoryarchiveId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: TransactionhistoryarchiveId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[TransactionhistoryarchiveId] = {
+    new Text[TransactionhistoryarchiveId] {
+      override def unsafeEncode(v: TransactionhistoryarchiveId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: TransactionhistoryarchiveId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
   implicit lazy val toStatement: ToStatement[TransactionhistoryarchiveId] = ToStatement.intToStatement.contramap(_.value)
   implicit lazy val writes: Writes[TransactionhistoryarchiveId] = Writes.IntWrites.contramap(_.value)

@@ -94,6 +94,9 @@ projects:
     platform:
       name: jvm
     sources: ./generated-and-checked-in
+    sourcegen:
+      main: scripts.GenHardcodedFiles
+      project: typo-scripts
   typo-tester-none:
     extends: template-cross
     sources: ./generated-and-checked-in

@@ -3,35 +3,31 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesterritoryhistory
+package adventureworks.sales.salesterritoryhistory;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import cats.instances.list.catsStdInstancesForList
-import doobie.free.connection.ConnectionIO
-import doobie.postgres.syntax.FragmentOps
-import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
-import doobie.syntax.string.toSqlInterpolator
-import doobie.util.Write
-import doobie.util.fragment.Fragment
-import doobie.util.update.Update
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import typo.dsl.UpdateBuilder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import cats.instances.list.catsStdInstancesForList;
+import doobie.free.connection.ConnectionIO;
+import doobie.postgres.syntax.FragmentOps;
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite;
+import doobie.syntax.string.toSqlInterpolator;
+import doobie.util.Write;
+import doobie.util.fragment.Fragment;
+import doobie.util.update.Update;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import typo.dsl.UpdateBuilder;
 
 class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
-  override def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
-    DeleteBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure)
-  }
-  override def deleteById(compositeId: SalesterritoryhistoryId): ConnectionIO[Boolean] = {
-    sql"""delete from sales.salesterritoryhistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))} AND "territoryid" = ${fromWrite(compositeId.territoryid)(Write.fromPut(SalesterritoryId.put))}""".update.run.map(_ > 0)
-  }
-  override def deleteByIds(compositeIds: Array[SalesterritoryhistoryId]): ConnectionIO[Int] = {
+  def delete: DeleteBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = DeleteBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure)
+  def deleteById(compositeId: SalesterritoryhistoryId): ConnectionIO[Boolean] = sql"""delete from sales.salesterritoryhistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))} AND "territoryid" = ${fromWrite(compositeId.territoryid)(Write.fromPut(SalesterritoryId.put))}""".update.run.map(_ > 0)
+  def deleteByIds(compositeIds: Array[SalesterritoryhistoryId]): ConnectionIO[Int] = {
     val businessentityid = compositeIds.map(_.businessentityid)
     val startdate = compositeIds.map(_.startdate)
     val territoryid = compositeIds.map(_.territoryid)
@@ -40,92 +36,80 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           where ("businessentityid", "startdate", "territoryid")
           in (select unnest(${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.arrayPut))}), unnest(${fromWrite(startdate)(Write.fromPut(TypoLocalDateTime.arrayPut))}), unnest(${fromWrite(territoryid)(Write.fromPut(SalesterritoryId.arrayPut))}))
        """.update.run
-    
+  
   }
-  override def insert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow] = {
+  def insert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow] = {
     sql"""insert into sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
        """.query(using SalesterritoryhistoryRow.read).unique
   }
-  override def insert(unsaved: SalesterritoryhistoryRowUnsaved): ConnectionIO[SalesterritoryhistoryRow] = {
+  def insert(unsaved: SalesterritoryhistoryRowUnsaved): ConnectionIO[SalesterritoryhistoryRow] = {
     val fs = List(
       Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const0(s""""territoryid""""), fr"${fromWrite(unsaved.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4")),
-      Some((Fragment.const0(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const0(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
-      unsaved.rowguid match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
-      },
-      unsaved.modifieddate match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
-      }
+                      Some((Fragment.const0(s""""territoryid""""), fr"${fromWrite(unsaved.territoryid)(Write.fromPut(SalesterritoryId.put))}::int4")),
+                      Some((Fragment.const0(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
+                      Some((Fragment.const0(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
+    unsaved.rowguid match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+    },
+    unsaved.modifieddate match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+    }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.salesterritoryhistory default values
-            returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
-         """
+                            returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
+                         """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
       sql"""insert into sales.salesterritoryhistory(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
-            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
-            returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
-         """
+                            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
+                            returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
+                         """
     }
     q.query(using SalesterritoryhistoryRow.read).unique
-    
+  
   }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalesterritoryhistoryRow.text)
-  }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalesterritoryhistoryRowUnsaved.text)
-  }
-  override def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
-    SelectBuilderSql("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure, SalesterritoryhistoryRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, SalesterritoryhistoryRow] = {
-    sql"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sales.salesterritoryhistory""".query(using SalesterritoryhistoryRow.read).stream
-  }
-  override def selectById(compositeId: SalesterritoryhistoryId): ConnectionIO[Option[SalesterritoryhistoryRow]] = {
-    sql"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sales.salesterritoryhistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))} AND "territoryid" = ${fromWrite(compositeId.territoryid)(Write.fromPut(SalesterritoryId.put))}""".query(using SalesterritoryhistoryRow.read).option
-  }
-  override def selectByIds(compositeIds: Array[SalesterritoryhistoryId]): Stream[ConnectionIO, SalesterritoryhistoryRow] = {
+  def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRow], batchSize: Int = 10000): ConnectionIO[Long] = new FragmentOps(sql"""COPY sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalesterritoryhistoryRow.text)
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = new FragmentOps(sql"""COPY sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalesterritoryhistoryRowUnsaved.text)
+  def select: SelectBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = SelectBuilderSql("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure, SalesterritoryhistoryRow.read)
+  def selectAll: Stream[ConnectionIO, SalesterritoryhistoryRow] = sql"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sales.salesterritoryhistory""".query(using SalesterritoryhistoryRow.read).stream
+  def selectById(compositeId: SalesterritoryhistoryId): ConnectionIO[Option[SalesterritoryhistoryRow]] = sql"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sales.salesterritoryhistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))} AND "territoryid" = ${fromWrite(compositeId.territoryid)(Write.fromPut(SalesterritoryId.put))}""".query(using SalesterritoryhistoryRow.read).option
+  def selectByIds(compositeIds: Array[SalesterritoryhistoryId]): Stream[ConnectionIO, SalesterritoryhistoryRow] = {
     val businessentityid = compositeIds.map(_.businessentityid)
     val startdate = compositeIds.map(_.startdate)
     val territoryid = compositeIds.map(_.territoryid)
     sql"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
           from sales.salesterritoryhistory
-          where ("businessentityid", "startdate", "territoryid") 
+          where ("businessentityid", "startdate", "territoryid")
           in (select unnest(${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.arrayPut))}), unnest(${fromWrite(startdate)(Write.fromPut(TypoLocalDateTime.arrayPut))}), unnest(${fromWrite(territoryid)(Write.fromPut(SalesterritoryId.arrayPut))}))
        """.query(using SalesterritoryhistoryRow.read).stream
-    
+  
   }
-  override def selectByIdsTracked(compositeIds: Array[SalesterritoryhistoryId]): ConnectionIO[Map[SalesterritoryhistoryId, SalesterritoryhistoryRow]] = {
+  def selectByIdsTracked(compositeIds: Array[SalesterritoryhistoryId]): ConnectionIO[Map[SalesterritoryhistoryId, SalesterritoryhistoryRow]] = {
     selectByIds(compositeIds).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
       compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
-    UpdateBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure, SalesterritoryhistoryRow.read)
-  }
-  override def update(row: SalesterritoryhistoryRow): ConnectionIO[Boolean] = {
+  def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = UpdateBuilder("sales.salesterritoryhistory", SalesterritoryhistoryFields.structure, SalesterritoryhistoryRow.read)
+  def update(row: SalesterritoryhistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.salesterritoryhistory
-          set "enddate" = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))} AND "territoryid" = ${fromWrite(compositeId.territoryid)(Write.fromPut(SalesterritoryId.put))}"""
+                          set "enddate" = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
+                              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
+                              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+                          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))} AND "territoryid" = ${fromWrite(compositeId.territoryid)(Write.fromPut(SalesterritoryId.put))}"""
       .update
       .run
       .map(_ > 0)
   }
-  override def upsert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow] = {
+  def upsert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow] = {
     sql"""insert into sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")
           values (
             ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
@@ -143,7 +127,7 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
           returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
        """.query(using SalesterritoryhistoryRow.read).unique
   }
-  override def upsertBatch(unsaved: List[SalesterritoryhistoryRow]): Stream[ConnectionIO, SalesterritoryhistoryRow] = {
+  def upsertBatch(unsaved: List[SalesterritoryhistoryRow]): Stream[ConnectionIO, SalesterritoryhistoryRow] = {
     Update[SalesterritoryhistoryRow](
       s"""insert into sales.salesterritoryhistory("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")
           values (?::int4,?::int4,?::timestamp,?::timestamp,?::uuid,?::timestamp)
@@ -156,8 +140,8 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     )(using SalesterritoryhistoryRow.write)
     .updateManyWithGeneratedKeys[SalesterritoryhistoryRow]("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(unsaved)(using catsStdInstancesForList, SalesterritoryhistoryRow.read)
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryhistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
       _ <- sql"create temporary table salesterritoryhistory_TEMP (like sales.salesterritoryhistory) on commit drop".update.run
       _ <- new FragmentOps(sql"""copy salesterritoryhistory_TEMP("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SalesterritoryhistoryRow.text)

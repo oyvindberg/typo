@@ -3,20 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.jobcandidate
+package adventureworks.humanresources.jobcandidate;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoXml
-import adventureworks.humanresources.employee.EmployeeFields
-import adventureworks.humanresources.employee.EmployeeRow
-import adventureworks.person.businessentity.BusinessentityId
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.humanresources.employee.EmployeeFields;
+import adventureworks.humanresources.employee.EmployeeRow;
+import adventureworks.person.businessentity.BusinessentityId;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait JobcandidateFields {
   def jobcandidateid: IdField[JobcandidateId, JobcandidateRow]

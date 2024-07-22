@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.pmpdc
+package adventureworks.pr.pmpdc;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class PmpdcViewRepoImpl extends PmpdcViewRepo {
-  override def select: SelectBuilder[PmpdcViewFields, PmpdcViewRow] = {
-    SelectBuilderSql("pr.pmpdc", PmpdcViewFields.structure, PmpdcViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[PmpdcViewRow] = {
+  def select: SelectBuilder[PmpdcViewFields, PmpdcViewRow] = SelectBuilderSql("pr.pmpdc", PmpdcViewFields.structure, PmpdcViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[PmpdcViewRow] = {
     SQL"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
           from pr.pmpdc
        """.as(PmpdcViewRow.rowParser(1).*)

@@ -3,19 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productcategory
+package adventureworks.production.productcategory;
 
-import adventureworks.Text
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `production.productcategory` */
-case class ProductcategoryId(value: Int) extends AnyVal
+case class ProductcategoryId(value: Int) extends scala.AnyVal
+
 object ProductcategoryId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[ProductcategoryId]] = adventureworks.IntArrayDecoder.map(_.map(ProductcategoryId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[ProductcategoryId]] = adventureworks.IntArrayEncoder.contramap(_.map(_.value))
@@ -27,8 +28,10 @@ object ProductcategoryId {
   implicit lazy val jsonEncoder: JsonEncoder[ProductcategoryId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val pgType: PGType[ProductcategoryId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[ProductcategoryId] = Setter.intSetter.contramap(_.value)
-  implicit lazy val text: Text[ProductcategoryId] = new Text[ProductcategoryId] {
-    override def unsafeEncode(v: ProductcategoryId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: ProductcategoryId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[ProductcategoryId] = {
+    new Text[ProductcategoryId] {
+      override def unsafeEncode(v: ProductcategoryId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: ProductcategoryId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

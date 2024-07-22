@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.sod
+package adventureworks.sa.sod;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class SodViewRepoImpl extends SodViewRepo {
-  override def select: SelectBuilder[SodViewFields, SodViewRow] = {
-    SelectBuilderSql("sa.sod", SodViewFields.structure, SodViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, SodViewRow] = {
-    sql"""select "id", "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sa.sod""".query(using SodViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[SodViewFields, SodViewRow] = SelectBuilderSql("sa.sod", SodViewFields.structure, SodViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, SodViewRow] = sql"""select "id", "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sa.sod""".query(using SodViewRow.jdbcDecoder).selectStream()
 }

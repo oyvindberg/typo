@@ -6,7 +6,6 @@ case class ComputedNames(naming: Naming, source: Source, maybeId: Option[IdCompu
   val RepoImplName: sc.Type.Qualified = sc.Type.Qualified(naming.repoImplName(source))
   val RepoMockName: sc.Type.Qualified = sc.Type.Qualified(naming.repoMockName(source))
   val RowName: sc.Type.Qualified = sc.Type.Qualified(naming.rowName(source))
-  val FieldValueName: Option[sc.Type.Qualified] = if (enableFieldValue) Some(sc.Type.Qualified(naming.fieldValueName(source))) else None
   val FieldOrIdValueName: Option[sc.Type.Qualified] = if (enableFieldValue) Some(sc.Type.Qualified(naming.fieldOrIdValueName(source))) else None
   val FieldsName: Option[sc.Type.Qualified] = if (enableDsl) Some(sc.Type.Qualified(naming.fieldsName(source))) else None
 

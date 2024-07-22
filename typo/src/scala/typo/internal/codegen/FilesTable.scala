@@ -5,99 +5,90 @@ package codegen
 import play.api.libs.json.Json
 import typo.internal.codegen.DbLib.RowType
 
-case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: InternalOptions, domainsByName: Map[db.RelationName, ComputedDomain]) {
-  val relation = FilesRelation(table.naming, table.names, Some(table.cols), Some(fkAnalysis), options, table.dbTable.foreignKeys)
+case class FilesTable(lang: Lang, table: ComputedTable, fkAnalysis: FkAnalysis, options: InternalOptions, domainsByName: Map[db.RelationName, ComputedDomain]) {
+  val relation = FilesRelation(lang, table.naming, table.names, Some(table.cols), Some(fkAnalysis), options, table.dbTable.foreignKeys)
   val RowFile = relation.RowFile(RowType.ReadWriteable, table.dbTable.comment, maybeUnsavedRow = table.maybeUnsavedRow.map(u => (u, table.default)))
 
   val UnsavedRowFile: Option[sc.File] =
     for {
       unsaved <- table.maybeUnsavedRow
     } yield {
-      val comments = scaladoc(s"This class corresponds to a row in table `${table.dbTable.name.value}` which has not been persisted yet")(Nil)
+      val comments = scaladoc(List(s"This class corresponds to a row in table `${table.dbTable.name.value}` which has not been persisted yet"))
 
-      val toRow: sc.Code = {
+      val toRow: sc.Method = {
         def mkDefaultParamName(col: ComputedColumn): sc.Ident =
           sc.Ident(col.name.value).appended("Default")
 
         val params: NonEmptyList[sc.Param] =
-          unsaved.defaultCols.map { case ComputedRowUnsaved.DefaultedCol(col, originalType) => sc.Param(mkDefaultParamName(col), sc.Type.ByName(originalType), None) } ++
-            unsaved.alwaysGeneratedCols.map(col => sc.Param(mkDefaultParamName(col), sc.Type.ByName(col.tpe), None))
+          unsaved.defaultCols.map { case ComputedRowUnsaved.DefaultedCol(col, originalType) => sc.Param(mkDefaultParamName(col), sc.Type.ByName(originalType)) } ++
+            unsaved.alwaysGeneratedCols.map(col => sc.Param(mkDefaultParamName(col), sc.Type.ByName(col.tpe)))
 
         val keyValues = unsaved.categorizedColumnsOriginalOrder.map {
-          case ComputedRowUnsaved.DefaultedCol(col, defaultType) =>
+          case ComputedRowUnsaved.DefaultedCol(col, _) =>
             val defaultParamName = mkDefaultParamName(col)
-            val impl = code"""|${col.name} match {
-                   |  case ${table.default.Defaulted}.${table.default.UseDefault} => $defaultParamName
-                   |  case ${table.default.Defaulted}.${table.default.Provided}(value) => value
-                   |}""".stripMargin
-            (col.name, impl)
+            val impl = code"${col.name}.getOrElse($defaultParamName)"
+            sc.Arg.Named(col.name, impl)
           case ComputedRowUnsaved.AlwaysGeneratedCol(col) =>
             val defaultParamName = mkDefaultParamName(col)
-            (col.name, defaultParamName.code)
+            sc.Arg.Named(col.name, sc.ApplyByName(defaultParamName))
           case ComputedRowUnsaved.NormalCol(col) =>
-            (col.name, sc.QIdent.of(col.name).code)
+            sc.Arg.Named(col.name, sc.QIdent.of(col.name).code)
         }
 
-        code"""|def toRow(${params.map(_.code).mkCode(", ")}): ${table.names.RowName} =
-             |  ${table.names.RowName}(
-             |    ${keyValues.map { case (k, v) => code"$k = $v" }.mkCode(",\n")}
-             |  )""".stripMargin
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("toRow"),
+          params = params.toList,
+          implicitParams = Nil,
+          tpe = table.names.RowName,
+          body = Some(sc.New(table.names.RowName, keyValues.toList))
+        )
       }
 
-      val formattedCols = unsaved.allCols.map { col =>
-        val commentPieces = List[Iterable[String]](
-          col.dbCol.columnDefault.map(x => s"Default: $x"),
-          col.dbCol.identity.map(_.asString),
-          col.dbCol.comment,
-          col.pointsTo map { case (relationName, columnName) =>
-            val rowName = table.naming.rowName(relationName)
-            s"Points to [[${rowName.dotName}.${table.naming.field(columnName).value}]]"
-          },
-          col.dbCol.constraints.map(c => s"Constraint ${c.name} affecting columns ${c.columns.map(_.value).mkString(", ")}:  ${c.checkClause}"),
-          if (options.debugTypes)
-            col.dbCol.jsonDescription.maybeJson.map(other => s"debug: ${Json.stringify(other)}")
-          else None
-        ).flatten
-
-        val comment = commentPieces match {
-          case Nil => sc.Code.Empty
-          case nonEmpty =>
-            val lines = nonEmpty.flatMap(_.linesIterator).map(_.code)
-            code"""|/** ${lines.mkCode("\n")} */
-                 |""".stripMargin
-        }
-
-        val default = col.dbCol.columnDefault match {
-          case Some(_) => code" = ${table.default.Defaulted}.${table.default.UseDefault}"
-          case None    => sc.Code.Empty
-        }
-        code"$comment${col.param.code}$default"
+      val colParams = unsaved.allCols.map { col =>
+        col.param.copy(
+          comments = scaladoc(
+            List[Iterable[String]](
+              col.dbCol.columnDefault.map(x => s"Default: $x"),
+              col.dbCol.identity.map(_.asString),
+              col.dbCol.comment,
+              col.pointsTo map { case (relationName, columnName) => lang.docLink(table.naming.rowName(relationName), table.naming.field(columnName)) },
+              col.dbCol.constraints.map(c => s"Constraint ${c.name} affecting columns ${c.columns.map(_.value).mkString(", ")}:  ${c.checkClause}"),
+              if (options.debugTypes)
+                col.dbCol.jsonDescription.maybeJson.map(other => s"debug: ${Json.stringify(other)}")
+              else None
+            ).flatten
+          ),
+          default = col.dbCol.columnDefault.map { _ => code"${table.default.Defaulted}.${table.default.UseDefault}()" }
+        )
       }
 
       val instances =
         options.jsonLibs.flatMap(_.instances(unsaved.tpe, unsaved.allCols)) ++
           options.dbLib.toList.flatMap(_.rowInstances(unsaved.tpe, unsaved.allCols, rowType = DbLib.RowType.Writable))
 
-      sc.File(
-        unsaved.tpe,
-        code"""|$comments
-             |case class ${unsaved.tpe.name}(
-             |  ${formattedCols.mkCode(",\n")}
-             |) {
-             |  $toRow
-             |}
-             |${genObject(unsaved.tpe.value, instances)}
-             |""".stripMargin,
-        secondaryTypes = Nil,
-        scope = Scope.Main
+      val cls = sc.Adt.Record(
+        isWrapper = false,
+        comments = comments,
+        name = unsaved.tpe,
+        tparams = Nil,
+        params = colParams.toList,
+        implicitParams = Nil,
+        `extends` = None,
+        implements = Nil,
+        members = List(toRow),
+        staticMembers = instances
       )
+
+      sc.File(unsaved.tpe, cls.code, secondaryTypes = Nil, scope = Scope.Main)
     }
 
   val IdFile: Option[sc.File] = {
     table.maybeId.flatMap {
       case id: IdComputed.UnaryNormal =>
         val value = sc.Ident("value")
-        val comments = scaladoc(s"Type for the primary key of table `${table.dbTable.name.value}`")(Nil)
+        val comments = scaladoc(List(s"Type for the primary key of table `${table.dbTable.name.value}`"))
         val bijection =
           if (options.enableDsl)
             Some {
@@ -107,7 +98,7 @@ case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: Int
           else None
 
         // shortcut for id files wrapping a domain
-        val maybeFromString: Option[sc.Value] =
+        val maybeFromString: Option[sc.Method] =
           id.col.dbCol.tpe match {
             case db.Type.DomainRef(name, _, _) =>
               domainsByName.get(name).map { domain =>
@@ -115,7 +106,15 @@ case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: Int
                   case Some(_) => domain.tpe.name.map(Naming.camelCase)
                   case None    => sc.Ident("apply")
                 }
-                sc.Value(Nil, name, List(sc.Param(value, domain.underlyingType, None)), Nil, id.tpe, code"${id.tpe}(${domain.tpe}($value))")
+                sc.Method(
+                  comments = sc.Comments.Empty,
+                  tparams = Nil,
+                  name = name,
+                  params = List(sc.Param(value, domain.underlyingType)),
+                  implicitParams = Nil,
+                  tpe = id.tpe,
+                  body = Some(sc.New(id.tpe, List(sc.Arg.Pos(sc.New(domain.tpe, List(sc.Arg.Pos(value)))))))
+                )
               }
             case _ => None
           }
@@ -128,10 +127,18 @@ case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: Int
         Some(
           sc.File(
             id.tpe,
-            code"""|$comments
-                   |case class ${id.tpe.name}($value: ${id.underlying}) extends AnyVal
-                   |${genObject(id.tpe.value, instances ++ maybeFromString)}
-                   |""".stripMargin,
+            sc.Adt.Record(
+              isWrapper = true,
+              comments = comments,
+              name = id.tpe,
+              tparams = Nil,
+              params = List(sc.Param(value, id.underlying)),
+              implicitParams = Nil,
+              `extends` = None,
+              implements = Nil,
+              members = Nil,
+              staticMembers = instances ++ maybeFromString
+            ),
             secondaryTypes = Nil,
             scope = Scope.Main
           )
@@ -140,44 +147,50 @@ case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: Int
       case _: IdComputed.UnaryUserSpecified | _: IdComputed.UnaryNoIdType | _: IdComputed.UnaryInherited =>
         None
       case id @ IdComputed.Composite(cols, tpe, _) =>
-        val constructorMethod = fkAnalysis.createWithFkIdsId.map { colsFromFks =>
-          val body =
-            code"""|${tpe.name}(
-                   |  ${colsFromFks.allExpr.map { case (colName, expr) => code"$colName = $expr" }.mkCode(",\n")}
-                   |)""".stripMargin
-
-          sc.Value(Nil, sc.Ident("from"), colsFromFks.allParams, Nil, tpe, body)
-        }
-        val instanceMethods: List[sc.Value] =
-          fkAnalysis.extractFksIdsFromId.map { colsToFk =>
-            val args = colsToFk.colPairs.map { case (inComposite, inId) => code"${inComposite.name} = ${inId.name}" }
-
-            val body =
-              code"""|${colsToFk.otherCompositeIdType}(
-                       |  ${args.mkCode(",\n")}
-                      |)""".stripMargin
-
-            sc.Value(Nil, colsToFk.name.prepended("extract"), Nil, Nil, colsToFk.otherCompositeIdType, body)
+        val constructorMethod: Option[sc.Method] =
+          fkAnalysis.createWithFkIdsId.map { colsFromFks =>
+            sc.Method(
+              comments = sc.Comments.Empty,
+              tparams = Nil,
+              name = sc.Ident("from"),
+              params = colsFromFks.allParams,
+              implicitParams = Nil,
+              tpe = tpe,
+              Some(sc.New(tpe, colsFromFks.allExpr.map { case (colName, expr) => sc.Arg.Named(colName, expr) }))
+            )
           }
-        val renderedInstanceMethods = instanceMethods match {
-          case Nil => sc.Code.Empty
-          case nonEmpty =>
-            code"""|{
-                   |${nonEmpty.map(_.code).mkCode("\n")}
-                   |}""".stripMargin
-        }
 
-        val comments = scaladoc(s"Type for the composite primary key of table `${table.dbTable.name.value}`")(Nil)
-        val instances = options.jsonLibs.flatMap(_.instances(tpe = id.tpe, cols = cols))
+        val instanceMethods: List[sc.Method] =
+          fkAnalysis.extractFksIdsFromId.map { colsToFk =>
+            sc.Method(
+              comments = sc.Comments.Empty,
+              tparams = Nil,
+              name = colsToFk.name.prepended("extract"),
+              params = Nil,
+              implicitParams = Nil,
+              tpe = colsToFk.otherCompositeIdType,
+              body = Some(sc.New(colsToFk.otherCompositeIdType, colsToFk.colPairs.map { case (inComposite, inId) => sc.Arg.Named(inComposite.name, inId.name) }))
+            )
+          }
+
+        val instances: List[sc.Given] =
+          options.jsonLibs.flatMap(_.instances(tpe = id.tpe, cols = cols))
+
         Some(
           sc.File(
             id.tpe,
-            code"""|$comments
-                   |case class ${tpe.name}(
-                   |  ${cols.map(_.param.code).mkCode(",\n")}
-                   |)$renderedInstanceMethods
-                   |${genObject(tpe.value, instances ++ constructorMethod)}
-                   |""".stripMargin,
+            sc.Adt.Record(
+              isWrapper = false,
+              comments = scaladoc(List(s"Type for the composite primary key of table `${table.dbTable.name.value}`")),
+              name = tpe,
+              tparams = Nil,
+              params = cols.map(_.param).toList,
+              implicitParams = Nil,
+              `extends` = None,
+              implements = Nil,
+              members = instanceMethods,
+              staticMembers = instances ++ constructorMethod.toList
+            ),
             secondaryTypes = Nil,
             scope = Scope.Main
           )

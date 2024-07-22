@@ -3,16 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.shipmethod
+package adventureworks.purchasing.shipmethod;
 
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
+/** upsertBatch: Not implementable for zio-jdbc */
 trait ShipmethodRepo {
   def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow]
   def deleteById(shipmethodid: ShipmethodId): ZIO[ZConnection, Throwable, Boolean]
@@ -20,7 +21,7 @@ trait ShipmethodRepo {
   def insert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, ShipmethodRow]
   def insert(unsaved: ShipmethodRowUnsaved): ZIO[ZConnection, Throwable, ShipmethodRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[ShipmethodFields, ShipmethodRow]
   def selectAll: ZStream[ZConnection, Throwable, ShipmethodRow]
@@ -30,7 +31,6 @@ trait ShipmethodRepo {
   def update: UpdateBuilder[ShipmethodFields, ShipmethodRow]
   def update(row: ShipmethodRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, UpdateResult[ShipmethodRow]]
-  // Not implementable for zio-jdbc: upsertBatch
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ShipmethodRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

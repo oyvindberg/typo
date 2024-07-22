@@ -3,16 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.pmpdc
+package adventureworks.pr.pmpdc;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.culture.CultureId
-import adventureworks.production.productdescription.ProductdescriptionId
-import adventureworks.production.productmodel.ProductmodelId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.culture.CultureId;
+import adventureworks.production.productdescription.ProductdescriptionId;
+import adventureworks.production.productmodel.ProductmodelId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait PmpdcViewFields {
   def productmodelid: Field[ProductmodelId, PmpdcViewRow]

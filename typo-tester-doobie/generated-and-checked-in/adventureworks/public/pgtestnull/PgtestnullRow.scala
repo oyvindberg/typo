@@ -3,46 +3,46 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.pgtestnull
+package adventureworks.public.pgtestnull;
 
-import adventureworks.customtypes.TypoBox
-import adventureworks.customtypes.TypoBytea
-import adventureworks.customtypes.TypoCircle
-import adventureworks.customtypes.TypoHStore
-import adventureworks.customtypes.TypoInet
-import adventureworks.customtypes.TypoInstant
-import adventureworks.customtypes.TypoInt2Vector
-import adventureworks.customtypes.TypoInterval
-import adventureworks.customtypes.TypoJson
-import adventureworks.customtypes.TypoJsonb
-import adventureworks.customtypes.TypoLine
-import adventureworks.customtypes.TypoLineSegment
-import adventureworks.customtypes.TypoLocalDate
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoLocalTime
-import adventureworks.customtypes.TypoMoney
-import adventureworks.customtypes.TypoOffsetTime
-import adventureworks.customtypes.TypoPath
-import adventureworks.customtypes.TypoPoint
-import adventureworks.customtypes.TypoPolygon
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.customtypes.TypoVector
-import adventureworks.customtypes.TypoXml
-import adventureworks.public.Mydomain
-import adventureworks.public.Myenum
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.DecodingFailure
-import io.circe.Encoder
-import io.circe.HCursor
-import io.circe.Json
-import java.sql.ResultSet
-import scala.util.Try
+import adventureworks.customtypes.TypoBox;
+import adventureworks.customtypes.TypoBytea;
+import adventureworks.customtypes.TypoCircle;
+import adventureworks.customtypes.TypoHStore;
+import adventureworks.customtypes.TypoInet;
+import adventureworks.customtypes.TypoInstant;
+import adventureworks.customtypes.TypoInt2Vector;
+import adventureworks.customtypes.TypoInterval;
+import adventureworks.customtypes.TypoJson;
+import adventureworks.customtypes.TypoJsonb;
+import adventureworks.customtypes.TypoLine;
+import adventureworks.customtypes.TypoLineSegment;
+import adventureworks.customtypes.TypoLocalDate;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoLocalTime;
+import adventureworks.customtypes.TypoMoney;
+import adventureworks.customtypes.TypoOffsetTime;
+import adventureworks.customtypes.TypoPath;
+import adventureworks.customtypes.TypoPoint;
+import adventureworks.customtypes.TypoPolygon;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.customtypes.TypoVector;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.public.Mydomain;
+import adventureworks.public.Myenum;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.DecodingFailure;
+import io.circe.Encoder;
+import io.circe.HCursor;
+import io.circe.Json;
+import java.sql.ResultSet;
+import scala.util.Try;
 
 /** Table: public.pgtestnull */
 case class PgtestnullRow(
@@ -119,662 +119,674 @@ case class PgtestnullRow(
 )
 
 object PgtestnullRow {
-  implicit lazy val decoder: Decoder[PgtestnullRow] = Decoder.instanceTry[PgtestnullRow]((c: HCursor) =>
-    Try {
-      def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
-        case Left(err) => throw err
-        case Right(r)  => r
+  implicit lazy val decoder: Decoder[PgtestnullRow] = {
+    Decoder.instanceTry[PgtestnullRow]((c: HCursor) =>
+      Try {
+        def orThrow[R](either: Either[DecodingFailure, R]): R = either match {
+          case Left(err) => throw err
+          case Right(r)  => r
+        }
+        PgtestnullRow(
+          bool = orThrow(c.get("bool")(Decoder.decodeOption(Decoder.decodeBoolean))),
+          box = orThrow(c.get("box")(Decoder.decodeOption(TypoBox.decoder))),
+          bpchar = orThrow(c.get("bpchar")(Decoder.decodeOption(Decoder.decodeString))),
+          bytea = orThrow(c.get("bytea")(Decoder.decodeOption(TypoBytea.decoder))),
+          char = orThrow(c.get("char")(Decoder.decodeOption(Decoder.decodeString))),
+          circle = orThrow(c.get("circle")(Decoder.decodeOption(TypoCircle.decoder))),
+          date = orThrow(c.get("date")(Decoder.decodeOption(TypoLocalDate.decoder))),
+          float4 = orThrow(c.get("float4")(Decoder.decodeOption(Decoder.decodeFloat))),
+          float8 = orThrow(c.get("float8")(Decoder.decodeOption(Decoder.decodeDouble))),
+          hstore = orThrow(c.get("hstore")(Decoder.decodeOption(TypoHStore.decoder))),
+          inet = orThrow(c.get("inet")(Decoder.decodeOption(TypoInet.decoder))),
+          int2 = orThrow(c.get("int2")(Decoder.decodeOption(TypoShort.decoder))),
+          int2vector = orThrow(c.get("int2vector")(Decoder.decodeOption(TypoInt2Vector.decoder))),
+          int4 = orThrow(c.get("int4")(Decoder.decodeOption(Decoder.decodeInt))),
+          int8 = orThrow(c.get("int8")(Decoder.decodeOption(Decoder.decodeLong))),
+          interval = orThrow(c.get("interval")(Decoder.decodeOption(TypoInterval.decoder))),
+          json = orThrow(c.get("json")(Decoder.decodeOption(TypoJson.decoder))),
+          jsonb = orThrow(c.get("jsonb")(Decoder.decodeOption(TypoJsonb.decoder))),
+          line = orThrow(c.get("line")(Decoder.decodeOption(TypoLine.decoder))),
+          lseg = orThrow(c.get("lseg")(Decoder.decodeOption(TypoLineSegment.decoder))),
+          money = orThrow(c.get("money")(Decoder.decodeOption(TypoMoney.decoder))),
+          mydomain = orThrow(c.get("mydomain")(Decoder.decodeOption(Mydomain.decoder))),
+          myenum = orThrow(c.get("myenum")(Decoder.decodeOption(Myenum.decoder))),
+          name = orThrow(c.get("name")(Decoder.decodeOption(Decoder.decodeString))),
+          numeric = orThrow(c.get("numeric")(Decoder.decodeOption(Decoder.decodeBigDecimal))),
+          path = orThrow(c.get("path")(Decoder.decodeOption(TypoPath.decoder))),
+          point = orThrow(c.get("point")(Decoder.decodeOption(TypoPoint.decoder))),
+          polygon = orThrow(c.get("polygon")(Decoder.decodeOption(TypoPolygon.decoder))),
+          text = orThrow(c.get("text")(Decoder.decodeOption(Decoder.decodeString))),
+          time = orThrow(c.get("time")(Decoder.decodeOption(TypoLocalTime.decoder))),
+          timestamp = orThrow(c.get("timestamp")(Decoder.decodeOption(TypoLocalDateTime.decoder))),
+          timestampz = orThrow(c.get("timestampz")(Decoder.decodeOption(TypoInstant.decoder))),
+          timez = orThrow(c.get("timez")(Decoder.decodeOption(TypoOffsetTime.decoder))),
+          uuid = orThrow(c.get("uuid")(Decoder.decodeOption(TypoUUID.decoder))),
+          varchar = orThrow(c.get("varchar")(Decoder.decodeOption(Decoder.decodeString))),
+          vector = orThrow(c.get("vector")(Decoder.decodeOption(TypoVector.decoder))),
+          xml = orThrow(c.get("xml")(Decoder.decodeOption(TypoXml.decoder))),
+          boxes = orThrow(c.get("boxes")(Decoder.decodeOption(Decoder.decodeArray[TypoBox](TypoBox.decoder, implicitly)))),
+          bpchares = orThrow(c.get("bpchares")(Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))),
+          chares = orThrow(c.get("chares")(Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))),
+          circlees = orThrow(c.get("circlees")(Decoder.decodeOption(Decoder.decodeArray[TypoCircle](TypoCircle.decoder, implicitly)))),
+          datees = orThrow(c.get("datees")(Decoder.decodeOption(Decoder.decodeArray[TypoLocalDate](TypoLocalDate.decoder, implicitly)))),
+          float4es = orThrow(c.get("float4es")(Decoder.decodeOption(Decoder.decodeArray[Float](Decoder.decodeFloat, implicitly)))),
+          float8es = orThrow(c.get("float8es")(Decoder.decodeOption(Decoder.decodeArray[Double](Decoder.decodeDouble, implicitly)))),
+          inetes = orThrow(c.get("inetes")(Decoder.decodeOption(Decoder.decodeArray[TypoInet](TypoInet.decoder, implicitly)))),
+          int2es = orThrow(c.get("int2es")(Decoder.decodeOption(Decoder.decodeArray[TypoShort](TypoShort.decoder, implicitly)))),
+          int2vectores = orThrow(c.get("int2vectores")(Decoder.decodeOption(Decoder.decodeArray[TypoInt2Vector](TypoInt2Vector.decoder, implicitly)))),
+          int4es = orThrow(c.get("int4es")(Decoder.decodeOption(Decoder.decodeArray[Int](Decoder.decodeInt, implicitly)))),
+          int8es = orThrow(c.get("int8es")(Decoder.decodeOption(Decoder.decodeArray[Long](Decoder.decodeLong, implicitly)))),
+          intervales = orThrow(c.get("intervales")(Decoder.decodeOption(Decoder.decodeArray[TypoInterval](TypoInterval.decoder, implicitly)))),
+          jsones = orThrow(c.get("jsones")(Decoder.decodeOption(Decoder.decodeArray[TypoJson](TypoJson.decoder, implicitly)))),
+          jsonbes = orThrow(c.get("jsonbes")(Decoder.decodeOption(Decoder.decodeArray[TypoJsonb](TypoJsonb.decoder, implicitly)))),
+          linees = orThrow(c.get("linees")(Decoder.decodeOption(Decoder.decodeArray[TypoLine](TypoLine.decoder, implicitly)))),
+          lseges = orThrow(c.get("lseges")(Decoder.decodeOption(Decoder.decodeArray[TypoLineSegment](TypoLineSegment.decoder, implicitly)))),
+          moneyes = orThrow(c.get("moneyes")(Decoder.decodeOption(Decoder.decodeArray[TypoMoney](TypoMoney.decoder, implicitly)))),
+          mydomaines = orThrow(c.get("mydomaines")(Decoder.decodeOption(Decoder.decodeArray[Mydomain](Mydomain.decoder, implicitly)))),
+          myenumes = orThrow(c.get("myenumes")(Decoder.decodeOption(Decoder.decodeArray[Myenum](Myenum.decoder, implicitly)))),
+          namees = orThrow(c.get("namees")(Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))),
+          numerices = orThrow(c.get("numerices")(Decoder.decodeOption(Decoder.decodeArray[BigDecimal](Decoder.decodeBigDecimal, implicitly)))),
+          pathes = orThrow(c.get("pathes")(Decoder.decodeOption(Decoder.decodeArray[TypoPath](TypoPath.decoder, implicitly)))),
+          pointes = orThrow(c.get("pointes")(Decoder.decodeOption(Decoder.decodeArray[TypoPoint](TypoPoint.decoder, implicitly)))),
+          polygones = orThrow(c.get("polygones")(Decoder.decodeOption(Decoder.decodeArray[TypoPolygon](TypoPolygon.decoder, implicitly)))),
+          textes = orThrow(c.get("textes")(Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))),
+          timees = orThrow(c.get("timees")(Decoder.decodeOption(Decoder.decodeArray[TypoLocalTime](TypoLocalTime.decoder, implicitly)))),
+          timestampes = orThrow(c.get("timestampes")(Decoder.decodeOption(Decoder.decodeArray[TypoLocalDateTime](TypoLocalDateTime.decoder, implicitly)))),
+          timestampzes = orThrow(c.get("timestampzes")(Decoder.decodeOption(Decoder.decodeArray[TypoInstant](TypoInstant.decoder, implicitly)))),
+          timezes = orThrow(c.get("timezes")(Decoder.decodeOption(Decoder.decodeArray[TypoOffsetTime](TypoOffsetTime.decoder, implicitly)))),
+          uuides = orThrow(c.get("uuides")(Decoder.decodeOption(Decoder.decodeArray[TypoUUID](TypoUUID.decoder, implicitly)))),
+          varchares = orThrow(c.get("varchares")(Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))),
+          xmles = orThrow(c.get("xmles")(Decoder.decodeOption(Decoder.decodeArray[TypoXml](TypoXml.decoder, implicitly))))
+        )
       }
-      PgtestnullRow(
-        bool = orThrow(c.get("bool")(Decoder.decodeOption(Decoder.decodeBoolean))),
-        box = orThrow(c.get("box")(Decoder.decodeOption(TypoBox.decoder))),
-        bpchar = orThrow(c.get("bpchar")(Decoder.decodeOption(Decoder.decodeString))),
-        bytea = orThrow(c.get("bytea")(Decoder.decodeOption(TypoBytea.decoder))),
-        char = orThrow(c.get("char")(Decoder.decodeOption(Decoder.decodeString))),
-        circle = orThrow(c.get("circle")(Decoder.decodeOption(TypoCircle.decoder))),
-        date = orThrow(c.get("date")(Decoder.decodeOption(TypoLocalDate.decoder))),
-        float4 = orThrow(c.get("float4")(Decoder.decodeOption(Decoder.decodeFloat))),
-        float8 = orThrow(c.get("float8")(Decoder.decodeOption(Decoder.decodeDouble))),
-        hstore = orThrow(c.get("hstore")(Decoder.decodeOption(TypoHStore.decoder))),
-        inet = orThrow(c.get("inet")(Decoder.decodeOption(TypoInet.decoder))),
-        int2 = orThrow(c.get("int2")(Decoder.decodeOption(TypoShort.decoder))),
-        int2vector = orThrow(c.get("int2vector")(Decoder.decodeOption(TypoInt2Vector.decoder))),
-        int4 = orThrow(c.get("int4")(Decoder.decodeOption(Decoder.decodeInt))),
-        int8 = orThrow(c.get("int8")(Decoder.decodeOption(Decoder.decodeLong))),
-        interval = orThrow(c.get("interval")(Decoder.decodeOption(TypoInterval.decoder))),
-        json = orThrow(c.get("json")(Decoder.decodeOption(TypoJson.decoder))),
-        jsonb = orThrow(c.get("jsonb")(Decoder.decodeOption(TypoJsonb.decoder))),
-        line = orThrow(c.get("line")(Decoder.decodeOption(TypoLine.decoder))),
-        lseg = orThrow(c.get("lseg")(Decoder.decodeOption(TypoLineSegment.decoder))),
-        money = orThrow(c.get("money")(Decoder.decodeOption(TypoMoney.decoder))),
-        mydomain = orThrow(c.get("mydomain")(Decoder.decodeOption(Mydomain.decoder))),
-        myenum = orThrow(c.get("myenum")(Decoder.decodeOption(Myenum.decoder))),
-        name = orThrow(c.get("name")(Decoder.decodeOption(Decoder.decodeString))),
-        numeric = orThrow(c.get("numeric")(Decoder.decodeOption(Decoder.decodeBigDecimal))),
-        path = orThrow(c.get("path")(Decoder.decodeOption(TypoPath.decoder))),
-        point = orThrow(c.get("point")(Decoder.decodeOption(TypoPoint.decoder))),
-        polygon = orThrow(c.get("polygon")(Decoder.decodeOption(TypoPolygon.decoder))),
-        text = orThrow(c.get("text")(Decoder.decodeOption(Decoder.decodeString))),
-        time = orThrow(c.get("time")(Decoder.decodeOption(TypoLocalTime.decoder))),
-        timestamp = orThrow(c.get("timestamp")(Decoder.decodeOption(TypoLocalDateTime.decoder))),
-        timestampz = orThrow(c.get("timestampz")(Decoder.decodeOption(TypoInstant.decoder))),
-        timez = orThrow(c.get("timez")(Decoder.decodeOption(TypoOffsetTime.decoder))),
-        uuid = orThrow(c.get("uuid")(Decoder.decodeOption(TypoUUID.decoder))),
-        varchar = orThrow(c.get("varchar")(Decoder.decodeOption(Decoder.decodeString))),
-        vector = orThrow(c.get("vector")(Decoder.decodeOption(TypoVector.decoder))),
-        xml = orThrow(c.get("xml")(Decoder.decodeOption(TypoXml.decoder))),
-        boxes = orThrow(c.get("boxes")(Decoder.decodeOption(Decoder.decodeArray[TypoBox](TypoBox.decoder, implicitly)))),
-        bpchares = orThrow(c.get("bpchares")(Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))),
-        chares = orThrow(c.get("chares")(Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))),
-        circlees = orThrow(c.get("circlees")(Decoder.decodeOption(Decoder.decodeArray[TypoCircle](TypoCircle.decoder, implicitly)))),
-        datees = orThrow(c.get("datees")(Decoder.decodeOption(Decoder.decodeArray[TypoLocalDate](TypoLocalDate.decoder, implicitly)))),
-        float4es = orThrow(c.get("float4es")(Decoder.decodeOption(Decoder.decodeArray[Float](Decoder.decodeFloat, implicitly)))),
-        float8es = orThrow(c.get("float8es")(Decoder.decodeOption(Decoder.decodeArray[Double](Decoder.decodeDouble, implicitly)))),
-        inetes = orThrow(c.get("inetes")(Decoder.decodeOption(Decoder.decodeArray[TypoInet](TypoInet.decoder, implicitly)))),
-        int2es = orThrow(c.get("int2es")(Decoder.decodeOption(Decoder.decodeArray[TypoShort](TypoShort.decoder, implicitly)))),
-        int2vectores = orThrow(c.get("int2vectores")(Decoder.decodeOption(Decoder.decodeArray[TypoInt2Vector](TypoInt2Vector.decoder, implicitly)))),
-        int4es = orThrow(c.get("int4es")(Decoder.decodeOption(Decoder.decodeArray[Int](Decoder.decodeInt, implicitly)))),
-        int8es = orThrow(c.get("int8es")(Decoder.decodeOption(Decoder.decodeArray[Long](Decoder.decodeLong, implicitly)))),
-        intervales = orThrow(c.get("intervales")(Decoder.decodeOption(Decoder.decodeArray[TypoInterval](TypoInterval.decoder, implicitly)))),
-        jsones = orThrow(c.get("jsones")(Decoder.decodeOption(Decoder.decodeArray[TypoJson](TypoJson.decoder, implicitly)))),
-        jsonbes = orThrow(c.get("jsonbes")(Decoder.decodeOption(Decoder.decodeArray[TypoJsonb](TypoJsonb.decoder, implicitly)))),
-        linees = orThrow(c.get("linees")(Decoder.decodeOption(Decoder.decodeArray[TypoLine](TypoLine.decoder, implicitly)))),
-        lseges = orThrow(c.get("lseges")(Decoder.decodeOption(Decoder.decodeArray[TypoLineSegment](TypoLineSegment.decoder, implicitly)))),
-        moneyes = orThrow(c.get("moneyes")(Decoder.decodeOption(Decoder.decodeArray[TypoMoney](TypoMoney.decoder, implicitly)))),
-        mydomaines = orThrow(c.get("mydomaines")(Decoder.decodeOption(Decoder.decodeArray[Mydomain](Mydomain.decoder, implicitly)))),
-        myenumes = orThrow(c.get("myenumes")(Decoder.decodeOption(Decoder.decodeArray[Myenum](Myenum.decoder, implicitly)))),
-        namees = orThrow(c.get("namees")(Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))),
-        numerices = orThrow(c.get("numerices")(Decoder.decodeOption(Decoder.decodeArray[BigDecimal](Decoder.decodeBigDecimal, implicitly)))),
-        pathes = orThrow(c.get("pathes")(Decoder.decodeOption(Decoder.decodeArray[TypoPath](TypoPath.decoder, implicitly)))),
-        pointes = orThrow(c.get("pointes")(Decoder.decodeOption(Decoder.decodeArray[TypoPoint](TypoPoint.decoder, implicitly)))),
-        polygones = orThrow(c.get("polygones")(Decoder.decodeOption(Decoder.decodeArray[TypoPolygon](TypoPolygon.decoder, implicitly)))),
-        textes = orThrow(c.get("textes")(Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))),
-        timees = orThrow(c.get("timees")(Decoder.decodeOption(Decoder.decodeArray[TypoLocalTime](TypoLocalTime.decoder, implicitly)))),
-        timestampes = orThrow(c.get("timestampes")(Decoder.decodeOption(Decoder.decodeArray[TypoLocalDateTime](TypoLocalDateTime.decoder, implicitly)))),
-        timestampzes = orThrow(c.get("timestampzes")(Decoder.decodeOption(Decoder.decodeArray[TypoInstant](TypoInstant.decoder, implicitly)))),
-        timezes = orThrow(c.get("timezes")(Decoder.decodeOption(Decoder.decodeArray[TypoOffsetTime](TypoOffsetTime.decoder, implicitly)))),
-        uuides = orThrow(c.get("uuides")(Decoder.decodeOption(Decoder.decodeArray[TypoUUID](TypoUUID.decoder, implicitly)))),
-        varchares = orThrow(c.get("varchares")(Decoder.decodeOption(Decoder.decodeArray[String](Decoder.decodeString, implicitly)))),
-        xmles = orThrow(c.get("xmles")(Decoder.decodeOption(Decoder.decodeArray[TypoXml](TypoXml.decoder, implicitly))))
-      )
-    }
-  )
-  implicit lazy val encoder: Encoder[PgtestnullRow] = Encoder[PgtestnullRow](row =>
-    Json.obj(
-      "bool" -> Encoder.encodeOption(Encoder.encodeBoolean).apply(row.bool),
-      "box" -> Encoder.encodeOption(TypoBox.encoder).apply(row.box),
-      "bpchar" -> Encoder.encodeOption(Encoder.encodeString).apply(row.bpchar),
-      "bytea" -> Encoder.encodeOption(TypoBytea.encoder).apply(row.bytea),
-      "char" -> Encoder.encodeOption(Encoder.encodeString).apply(row.char),
-      "circle" -> Encoder.encodeOption(TypoCircle.encoder).apply(row.circle),
-      "date" -> Encoder.encodeOption(TypoLocalDate.encoder).apply(row.date),
-      "float4" -> Encoder.encodeOption(Encoder.encodeFloat).apply(row.float4),
-      "float8" -> Encoder.encodeOption(Encoder.encodeDouble).apply(row.float8),
-      "hstore" -> Encoder.encodeOption(TypoHStore.encoder).apply(row.hstore),
-      "inet" -> Encoder.encodeOption(TypoInet.encoder).apply(row.inet),
-      "int2" -> Encoder.encodeOption(TypoShort.encoder).apply(row.int2),
-      "int2vector" -> Encoder.encodeOption(TypoInt2Vector.encoder).apply(row.int2vector),
-      "int4" -> Encoder.encodeOption(Encoder.encodeInt).apply(row.int4),
-      "int8" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.int8),
-      "interval" -> Encoder.encodeOption(TypoInterval.encoder).apply(row.interval),
-      "json" -> Encoder.encodeOption(TypoJson.encoder).apply(row.json),
-      "jsonb" -> Encoder.encodeOption(TypoJsonb.encoder).apply(row.jsonb),
-      "line" -> Encoder.encodeOption(TypoLine.encoder).apply(row.line),
-      "lseg" -> Encoder.encodeOption(TypoLineSegment.encoder).apply(row.lseg),
-      "money" -> Encoder.encodeOption(TypoMoney.encoder).apply(row.money),
-      "mydomain" -> Encoder.encodeOption(Mydomain.encoder).apply(row.mydomain),
-      "myenum" -> Encoder.encodeOption(Myenum.encoder).apply(row.myenum),
-      "name" -> Encoder.encodeOption(Encoder.encodeString).apply(row.name),
-      "numeric" -> Encoder.encodeOption(Encoder.encodeBigDecimal).apply(row.numeric),
-      "path" -> Encoder.encodeOption(TypoPath.encoder).apply(row.path),
-      "point" -> Encoder.encodeOption(TypoPoint.encoder).apply(row.point),
-      "polygon" -> Encoder.encodeOption(TypoPolygon.encoder).apply(row.polygon),
-      "text" -> Encoder.encodeOption(Encoder.encodeString).apply(row.text),
-      "time" -> Encoder.encodeOption(TypoLocalTime.encoder).apply(row.time),
-      "timestamp" -> Encoder.encodeOption(TypoLocalDateTime.encoder).apply(row.timestamp),
-      "timestampz" -> Encoder.encodeOption(TypoInstant.encoder).apply(row.timestampz),
-      "timez" -> Encoder.encodeOption(TypoOffsetTime.encoder).apply(row.timez),
-      "uuid" -> Encoder.encodeOption(TypoUUID.encoder).apply(row.uuid),
-      "varchar" -> Encoder.encodeOption(Encoder.encodeString).apply(row.varchar),
-      "vector" -> Encoder.encodeOption(TypoVector.encoder).apply(row.vector),
-      "xml" -> Encoder.encodeOption(TypoXml.encoder).apply(row.xml),
-      "boxes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoBox, Array](TypoBox.encoder, implicitly)).apply(row.boxes),
-      "bpchares" -> Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)).apply(row.bpchares),
-      "chares" -> Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)).apply(row.chares),
-      "circlees" -> Encoder.encodeOption(Encoder.encodeIterable[TypoCircle, Array](TypoCircle.encoder, implicitly)).apply(row.circlees),
-      "datees" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLocalDate, Array](TypoLocalDate.encoder, implicitly)).apply(row.datees),
-      "float4es" -> Encoder.encodeOption(Encoder.encodeIterable[Float, Array](Encoder.encodeFloat, implicitly)).apply(row.float4es),
-      "float8es" -> Encoder.encodeOption(Encoder.encodeIterable[Double, Array](Encoder.encodeDouble, implicitly)).apply(row.float8es),
-      "inetes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoInet, Array](TypoInet.encoder, implicitly)).apply(row.inetes),
-      "int2es" -> Encoder.encodeOption(Encoder.encodeIterable[TypoShort, Array](TypoShort.encoder, implicitly)).apply(row.int2es),
-      "int2vectores" -> Encoder.encodeOption(Encoder.encodeIterable[TypoInt2Vector, Array](TypoInt2Vector.encoder, implicitly)).apply(row.int2vectores),
-      "int4es" -> Encoder.encodeOption(Encoder.encodeIterable[Int, Array](Encoder.encodeInt, implicitly)).apply(row.int4es),
-      "int8es" -> Encoder.encodeOption(Encoder.encodeIterable[Long, Array](Encoder.encodeLong, implicitly)).apply(row.int8es),
-      "intervales" -> Encoder.encodeOption(Encoder.encodeIterable[TypoInterval, Array](TypoInterval.encoder, implicitly)).apply(row.intervales),
-      "jsones" -> Encoder.encodeOption(Encoder.encodeIterable[TypoJson, Array](TypoJson.encoder, implicitly)).apply(row.jsones),
-      "jsonbes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoJsonb, Array](TypoJsonb.encoder, implicitly)).apply(row.jsonbes),
-      "linees" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLine, Array](TypoLine.encoder, implicitly)).apply(row.linees),
-      "lseges" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLineSegment, Array](TypoLineSegment.encoder, implicitly)).apply(row.lseges),
-      "moneyes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoMoney, Array](TypoMoney.encoder, implicitly)).apply(row.moneyes),
-      "mydomaines" -> Encoder.encodeOption(Encoder.encodeIterable[Mydomain, Array](Mydomain.encoder, implicitly)).apply(row.mydomaines),
-      "myenumes" -> Encoder.encodeOption(Encoder.encodeIterable[Myenum, Array](Myenum.encoder, implicitly)).apply(row.myenumes),
-      "namees" -> Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)).apply(row.namees),
-      "numerices" -> Encoder.encodeOption(Encoder.encodeIterable[BigDecimal, Array](Encoder.encodeBigDecimal, implicitly)).apply(row.numerices),
-      "pathes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoPath, Array](TypoPath.encoder, implicitly)).apply(row.pathes),
-      "pointes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoPoint, Array](TypoPoint.encoder, implicitly)).apply(row.pointes),
-      "polygones" -> Encoder.encodeOption(Encoder.encodeIterable[TypoPolygon, Array](TypoPolygon.encoder, implicitly)).apply(row.polygones),
-      "textes" -> Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)).apply(row.textes),
-      "timees" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLocalTime, Array](TypoLocalTime.encoder, implicitly)).apply(row.timees),
-      "timestampes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLocalDateTime, Array](TypoLocalDateTime.encoder, implicitly)).apply(row.timestampes),
-      "timestampzes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoInstant, Array](TypoInstant.encoder, implicitly)).apply(row.timestampzes),
-      "timezes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoOffsetTime, Array](TypoOffsetTime.encoder, implicitly)).apply(row.timezes),
-      "uuides" -> Encoder.encodeOption(Encoder.encodeIterable[TypoUUID, Array](TypoUUID.encoder, implicitly)).apply(row.uuides),
-      "varchares" -> Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)).apply(row.varchares),
-      "xmles" -> Encoder.encodeOption(Encoder.encodeIterable[TypoXml, Array](TypoXml.encoder, implicitly)).apply(row.xmles)
     )
-  )
-  implicit lazy val read: Read[PgtestnullRow] = new Read[PgtestnullRow](
-    gets = List(
-      (Meta.BooleanMeta.get, Nullability.Nullable),
-      (TypoBox.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoBytea.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoCircle.get, Nullability.Nullable),
-      (TypoLocalDate.get, Nullability.Nullable),
-      (Meta.FloatMeta.get, Nullability.Nullable),
-      (Meta.DoubleMeta.get, Nullability.Nullable),
-      (TypoHStore.get, Nullability.Nullable),
-      (TypoInet.get, Nullability.Nullable),
-      (TypoShort.get, Nullability.Nullable),
-      (TypoInt2Vector.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.LongMeta.get, Nullability.Nullable),
-      (TypoInterval.get, Nullability.Nullable),
-      (TypoJson.get, Nullability.Nullable),
-      (TypoJsonb.get, Nullability.Nullable),
-      (TypoLine.get, Nullability.Nullable),
-      (TypoLineSegment.get, Nullability.Nullable),
-      (TypoMoney.get, Nullability.Nullable),
-      (Mydomain.get, Nullability.Nullable),
-      (Myenum.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (TypoPath.get, Nullability.Nullable),
-      (TypoPoint.get, Nullability.Nullable),
-      (TypoPolygon.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoLocalTime.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoInstant.get, Nullability.Nullable),
-      (TypoOffsetTime.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoVector.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoBox.arrayGet, Nullability.Nullable),
-      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
-      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
-      (TypoCircle.arrayGet, Nullability.Nullable),
-      (TypoLocalDate.arrayGet, Nullability.Nullable),
-      (adventureworks.FloatArrayMeta.get, Nullability.Nullable),
-      (adventureworks.DoubleArrayMeta.get, Nullability.Nullable),
-      (TypoInet.arrayGet, Nullability.Nullable),
-      (TypoShort.arrayGet, Nullability.Nullable),
-      (TypoInt2Vector.arrayGet, Nullability.Nullable),
-      (adventureworks.IntegerArrayMeta.get, Nullability.Nullable),
-      (adventureworks.LongArrayMeta.get, Nullability.Nullable),
-      (TypoInterval.arrayGet, Nullability.Nullable),
-      (TypoJson.arrayGet, Nullability.Nullable),
-      (TypoJsonb.arrayGet, Nullability.Nullable),
-      (TypoLine.arrayGet, Nullability.Nullable),
-      (TypoLineSegment.arrayGet, Nullability.Nullable),
-      (TypoMoney.arrayGet, Nullability.Nullable),
-      (Mydomain.arrayGet, Nullability.Nullable),
-      (Myenum.arrayGet, Nullability.Nullable),
-      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
-      (adventureworks.BigDecimalMeta.get, Nullability.Nullable),
-      (TypoPath.arrayGet, Nullability.Nullable),
-      (TypoPoint.arrayGet, Nullability.Nullable),
-      (TypoPolygon.arrayGet, Nullability.Nullable),
-      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
-      (TypoLocalTime.arrayGet, Nullability.Nullable),
-      (TypoLocalDateTime.arrayGet, Nullability.Nullable),
-      (TypoInstant.arrayGet, Nullability.Nullable),
-      (TypoOffsetTime.arrayGet, Nullability.Nullable),
-      (TypoUUID.arrayGet, Nullability.Nullable),
-      (adventureworks.StringArrayMeta.get, Nullability.Nullable),
-      (TypoXml.arrayGet, Nullability.Nullable)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PgtestnullRow(
-      bool = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 0),
-      box = TypoBox.get.unsafeGetNullable(rs, i + 1),
-      bpchar = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      bytea = TypoBytea.get.unsafeGetNullable(rs, i + 3),
-      char = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      circle = TypoCircle.get.unsafeGetNullable(rs, i + 5),
-      date = TypoLocalDate.get.unsafeGetNullable(rs, i + 6),
-      float4 = Meta.FloatMeta.get.unsafeGetNullable(rs, i + 7),
-      float8 = Meta.DoubleMeta.get.unsafeGetNullable(rs, i + 8),
-      hstore = TypoHStore.get.unsafeGetNullable(rs, i + 9),
-      inet = TypoInet.get.unsafeGetNullable(rs, i + 10),
-      int2 = TypoShort.get.unsafeGetNullable(rs, i + 11),
-      int2vector = TypoInt2Vector.get.unsafeGetNullable(rs, i + 12),
-      int4 = Meta.IntMeta.get.unsafeGetNullable(rs, i + 13),
-      int8 = Meta.LongMeta.get.unsafeGetNullable(rs, i + 14),
-      interval = TypoInterval.get.unsafeGetNullable(rs, i + 15),
-      json = TypoJson.get.unsafeGetNullable(rs, i + 16),
-      jsonb = TypoJsonb.get.unsafeGetNullable(rs, i + 17),
-      line = TypoLine.get.unsafeGetNullable(rs, i + 18),
-      lseg = TypoLineSegment.get.unsafeGetNullable(rs, i + 19),
-      money = TypoMoney.get.unsafeGetNullable(rs, i + 20),
-      mydomain = Mydomain.get.unsafeGetNullable(rs, i + 21),
-      myenum = Myenum.get.unsafeGetNullable(rs, i + 22),
-      name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 23),
-      numeric = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 24),
-      path = TypoPath.get.unsafeGetNullable(rs, i + 25),
-      point = TypoPoint.get.unsafeGetNullable(rs, i + 26),
-      polygon = TypoPolygon.get.unsafeGetNullable(rs, i + 27),
-      text = Meta.StringMeta.get.unsafeGetNullable(rs, i + 28),
-      time = TypoLocalTime.get.unsafeGetNullable(rs, i + 29),
-      timestamp = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 30),
-      timestampz = TypoInstant.get.unsafeGetNullable(rs, i + 31),
-      timez = TypoOffsetTime.get.unsafeGetNullable(rs, i + 32),
-      uuid = TypoUUID.get.unsafeGetNullable(rs, i + 33),
-      varchar = Meta.StringMeta.get.unsafeGetNullable(rs, i + 34),
-      vector = TypoVector.get.unsafeGetNullable(rs, i + 35),
-      xml = TypoXml.get.unsafeGetNullable(rs, i + 36),
-      boxes = TypoBox.arrayGet.unsafeGetNullable(rs, i + 37),
-      bpchares = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 38),
-      chares = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 39),
-      circlees = TypoCircle.arrayGet.unsafeGetNullable(rs, i + 40),
-      datees = TypoLocalDate.arrayGet.unsafeGetNullable(rs, i + 41),
-      float4es = adventureworks.FloatArrayMeta.get.unsafeGetNullable(rs, i + 42),
-      float8es = adventureworks.DoubleArrayMeta.get.unsafeGetNullable(rs, i + 43),
-      inetes = TypoInet.arrayGet.unsafeGetNullable(rs, i + 44),
-      int2es = TypoShort.arrayGet.unsafeGetNullable(rs, i + 45),
-      int2vectores = TypoInt2Vector.arrayGet.unsafeGetNullable(rs, i + 46),
-      int4es = adventureworks.IntegerArrayMeta.get.unsafeGetNullable(rs, i + 47),
-      int8es = adventureworks.LongArrayMeta.get.unsafeGetNullable(rs, i + 48),
-      intervales = TypoInterval.arrayGet.unsafeGetNullable(rs, i + 49),
-      jsones = TypoJson.arrayGet.unsafeGetNullable(rs, i + 50),
-      jsonbes = TypoJsonb.arrayGet.unsafeGetNullable(rs, i + 51),
-      linees = TypoLine.arrayGet.unsafeGetNullable(rs, i + 52),
-      lseges = TypoLineSegment.arrayGet.unsafeGetNullable(rs, i + 53),
-      moneyes = TypoMoney.arrayGet.unsafeGetNullable(rs, i + 54),
-      mydomaines = Mydomain.arrayGet.unsafeGetNullable(rs, i + 55),
-      myenumes = Myenum.arrayGet.unsafeGetNullable(rs, i + 56),
-      namees = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 57),
-      numerices = adventureworks.BigDecimalMeta.get.unsafeGetNullable(rs, i + 58),
-      pathes = TypoPath.arrayGet.unsafeGetNullable(rs, i + 59),
-      pointes = TypoPoint.arrayGet.unsafeGetNullable(rs, i + 60),
-      polygones = TypoPolygon.arrayGet.unsafeGetNullable(rs, i + 61),
-      textes = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 62),
-      timees = TypoLocalTime.arrayGet.unsafeGetNullable(rs, i + 63),
-      timestampes = TypoLocalDateTime.arrayGet.unsafeGetNullable(rs, i + 64),
-      timestampzes = TypoInstant.arrayGet.unsafeGetNullable(rs, i + 65),
-      timezes = TypoOffsetTime.arrayGet.unsafeGetNullable(rs, i + 66),
-      uuides = TypoUUID.arrayGet.unsafeGetNullable(rs, i + 67),
-      varchares = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 68),
-      xmles = TypoXml.arrayGet.unsafeGetNullable(rs, i + 69)
-    )
-  )
-  implicit lazy val text: Text[PgtestnullRow] = Text.instance[PgtestnullRow]{ (row, sb) =>
-    Text.option(Text.booleanInstance).unsafeEncode(row.bool, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoBox.text).unsafeEncode(row.box, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.stringInstance).unsafeEncode(row.bpchar, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoBytea.text).unsafeEncode(row.bytea, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.stringInstance).unsafeEncode(row.char, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoCircle.text).unsafeEncode(row.circle, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoLocalDate.text).unsafeEncode(row.date, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.floatInstance).unsafeEncode(row.float4, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.doubleInstance).unsafeEncode(row.float8, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoHStore.text).unsafeEncode(row.hstore, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoInet.text).unsafeEncode(row.inet, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoShort.text).unsafeEncode(row.int2, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoInt2Vector.text).unsafeEncode(row.int2vector, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.intInstance).unsafeEncode(row.int4, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.longInstance).unsafeEncode(row.int8, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoInterval.text).unsafeEncode(row.interval, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoJson.text).unsafeEncode(row.json, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoJsonb.text).unsafeEncode(row.jsonb, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoLine.text).unsafeEncode(row.line, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoLineSegment.text).unsafeEncode(row.lseg, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoMoney.text).unsafeEncode(row.money, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Mydomain.text).unsafeEncode(row.mydomain, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Myenum.text).unsafeEncode(row.myenum, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.stringInstance).unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.bigDecimalInstance).unsafeEncode(row.numeric, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoPath.text).unsafeEncode(row.path, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoPoint.text).unsafeEncode(row.point, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoPolygon.text).unsafeEncode(row.polygon, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.stringInstance).unsafeEncode(row.text, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoLocalTime.text).unsafeEncode(row.time, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoLocalDateTime.text).unsafeEncode(row.timestamp, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoInstant.text).unsafeEncode(row.timestampz, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoOffsetTime.text).unsafeEncode(row.timez, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoUUID.text).unsafeEncode(row.uuid, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.stringInstance).unsafeEncode(row.varchar, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoVector.text).unsafeEncode(row.vector, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoXml.text).unsafeEncode(row.xml, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoBox](TypoBox.text, implicitly)).unsafeEncode(row.boxes, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text[Array[String]]).unsafeEncode(row.bpchares, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text[Array[String]]).unsafeEncode(row.chares, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoCircle](TypoCircle.text, implicitly)).unsafeEncode(row.circlees, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoLocalDate](TypoLocalDate.text, implicitly)).unsafeEncode(row.datees, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text[Array[Float]]).unsafeEncode(row.float4es, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text[Array[Double]]).unsafeEncode(row.float8es, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoInet](TypoInet.text, implicitly)).unsafeEncode(row.inetes, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoShort](TypoShort.text, implicitly)).unsafeEncode(row.int2es, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoInt2Vector](TypoInt2Vector.text, implicitly)).unsafeEncode(row.int2vectores, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text[Array[Int]]).unsafeEncode(row.int4es, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text[Array[Long]]).unsafeEncode(row.int8es, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoInterval](TypoInterval.text, implicitly)).unsafeEncode(row.intervales, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoJson](TypoJson.text, implicitly)).unsafeEncode(row.jsones, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoJsonb](TypoJsonb.text, implicitly)).unsafeEncode(row.jsonbes, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoLine](TypoLine.text, implicitly)).unsafeEncode(row.linees, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoLineSegment](TypoLineSegment.text, implicitly)).unsafeEncode(row.lseges, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoMoney](TypoMoney.text, implicitly)).unsafeEncode(row.moneyes, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, Mydomain](Mydomain.text, implicitly)).unsafeEncode(row.mydomaines, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, Myenum](Myenum.text, implicitly)).unsafeEncode(row.myenumes, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text[Array[String]]).unsafeEncode(row.namees, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text[Array[BigDecimal]]).unsafeEncode(row.numerices, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoPath](TypoPath.text, implicitly)).unsafeEncode(row.pathes, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoPoint](TypoPoint.text, implicitly)).unsafeEncode(row.pointes, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoPolygon](TypoPolygon.text, implicitly)).unsafeEncode(row.polygones, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text[Array[String]]).unsafeEncode(row.textes, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoLocalTime](TypoLocalTime.text, implicitly)).unsafeEncode(row.timees, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoLocalDateTime](TypoLocalDateTime.text, implicitly)).unsafeEncode(row.timestampes, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoInstant](TypoInstant.text, implicitly)).unsafeEncode(row.timestampzes, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoOffsetTime](TypoOffsetTime.text, implicitly)).unsafeEncode(row.timezes, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoUUID](TypoUUID.text, implicitly)).unsafeEncode(row.uuides, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text[Array[String]]).unsafeEncode(row.varchares, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.iterableInstance[Array, TypoXml](TypoXml.text, implicitly)).unsafeEncode(row.xmles, sb)
   }
-  implicit lazy val write: Write[PgtestnullRow] = new Write[PgtestnullRow](
-    puts = List((Meta.BooleanMeta.put, Nullability.Nullable),
-                (TypoBox.put, Nullability.Nullable),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (TypoBytea.put, Nullability.Nullable),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (TypoCircle.put, Nullability.Nullable),
-                (TypoLocalDate.put, Nullability.Nullable),
-                (Meta.FloatMeta.put, Nullability.Nullable),
-                (Meta.DoubleMeta.put, Nullability.Nullable),
-                (TypoHStore.put, Nullability.Nullable),
-                (TypoInet.put, Nullability.Nullable),
-                (TypoShort.put, Nullability.Nullable),
-                (TypoInt2Vector.put, Nullability.Nullable),
-                (Meta.IntMeta.put, Nullability.Nullable),
-                (Meta.LongMeta.put, Nullability.Nullable),
-                (TypoInterval.put, Nullability.Nullable),
-                (TypoJson.put, Nullability.Nullable),
-                (TypoJsonb.put, Nullability.Nullable),
-                (TypoLine.put, Nullability.Nullable),
-                (TypoLineSegment.put, Nullability.Nullable),
-                (TypoMoney.put, Nullability.Nullable),
-                (Mydomain.put, Nullability.Nullable),
-                (Myenum.put, Nullability.Nullable),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
-                (TypoPath.put, Nullability.Nullable),
-                (TypoPoint.put, Nullability.Nullable),
-                (TypoPolygon.put, Nullability.Nullable),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (TypoLocalTime.put, Nullability.Nullable),
-                (TypoLocalDateTime.put, Nullability.Nullable),
-                (TypoInstant.put, Nullability.Nullable),
-                (TypoOffsetTime.put, Nullability.Nullable),
-                (TypoUUID.put, Nullability.Nullable),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (TypoVector.put, Nullability.Nullable),
-                (TypoXml.put, Nullability.Nullable),
-                (TypoBox.arrayPut, Nullability.Nullable),
-                (adventureworks.StringArrayMeta.put, Nullability.Nullable),
-                (adventureworks.StringArrayMeta.put, Nullability.Nullable),
-                (TypoCircle.arrayPut, Nullability.Nullable),
-                (TypoLocalDate.arrayPut, Nullability.Nullable),
-                (adventureworks.FloatArrayMeta.put, Nullability.Nullable),
-                (adventureworks.DoubleArrayMeta.put, Nullability.Nullable),
-                (TypoInet.arrayPut, Nullability.Nullable),
-                (TypoShort.arrayPut, Nullability.Nullable),
-                (TypoInt2Vector.arrayPut, Nullability.Nullable),
-                (adventureworks.IntegerArrayMeta.put, Nullability.Nullable),
-                (adventureworks.LongArrayMeta.put, Nullability.Nullable),
-                (TypoInterval.arrayPut, Nullability.Nullable),
-                (TypoJson.arrayPut, Nullability.Nullable),
-                (TypoJsonb.arrayPut, Nullability.Nullable),
-                (TypoLine.arrayPut, Nullability.Nullable),
-                (TypoLineSegment.arrayPut, Nullability.Nullable),
-                (TypoMoney.arrayPut, Nullability.Nullable),
-                (Mydomain.arrayPut, Nullability.Nullable),
-                (Myenum.arrayPut, Nullability.Nullable),
-                (adventureworks.StringArrayMeta.put, Nullability.Nullable),
-                (adventureworks.BigDecimalMeta.put, Nullability.Nullable),
-                (TypoPath.arrayPut, Nullability.Nullable),
-                (TypoPoint.arrayPut, Nullability.Nullable),
-                (TypoPolygon.arrayPut, Nullability.Nullable),
-                (adventureworks.StringArrayMeta.put, Nullability.Nullable),
-                (TypoLocalTime.arrayPut, Nullability.Nullable),
-                (TypoLocalDateTime.arrayPut, Nullability.Nullable),
-                (TypoInstant.arrayPut, Nullability.Nullable),
-                (TypoOffsetTime.arrayPut, Nullability.Nullable),
-                (TypoUUID.arrayPut, Nullability.Nullable),
-                (adventureworks.StringArrayMeta.put, Nullability.Nullable),
-                (TypoXml.arrayPut, Nullability.Nullable)),
-    toList = x => List(x.bool, x.box, x.bpchar, x.bytea, x.char, x.circle, x.date, x.float4, x.float8, x.hstore, x.inet, x.int2, x.int2vector, x.int4, x.int8, x.interval, x.json, x.jsonb, x.line, x.lseg, x.money, x.mydomain, x.myenum, x.name, x.numeric, x.path, x.point, x.polygon, x.text, x.time, x.timestamp, x.timestampz, x.timez, x.uuid, x.varchar, x.vector, x.xml, x.boxes, x.bpchares, x.chares, x.circlees, x.datees, x.float4es, x.float8es, x.inetes, x.int2es, x.int2vectores, x.int4es, x.int8es, x.intervales, x.jsones, x.jsonbes, x.linees, x.lseges, x.moneyes, x.mydomaines, x.myenumes, x.namees, x.numerices, x.pathes, x.pointes, x.polygones, x.textes, x.timees, x.timestampes, x.timestampzes, x.timezes, x.uuides, x.varchares, x.xmles),
-    unsafeSet = (rs, i, a) => {
-                  Meta.BooleanMeta.put.unsafeSetNullable(rs, i + 0, a.bool)
-                  TypoBox.put.unsafeSetNullable(rs, i + 1, a.box)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 2, a.bpchar)
-                  TypoBytea.put.unsafeSetNullable(rs, i + 3, a.bytea)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 4, a.char)
-                  TypoCircle.put.unsafeSetNullable(rs, i + 5, a.circle)
-                  TypoLocalDate.put.unsafeSetNullable(rs, i + 6, a.date)
-                  Meta.FloatMeta.put.unsafeSetNullable(rs, i + 7, a.float4)
-                  Meta.DoubleMeta.put.unsafeSetNullable(rs, i + 8, a.float8)
-                  TypoHStore.put.unsafeSetNullable(rs, i + 9, a.hstore)
-                  TypoInet.put.unsafeSetNullable(rs, i + 10, a.inet)
-                  TypoShort.put.unsafeSetNullable(rs, i + 11, a.int2)
-                  TypoInt2Vector.put.unsafeSetNullable(rs, i + 12, a.int2vector)
-                  Meta.IntMeta.put.unsafeSetNullable(rs, i + 13, a.int4)
-                  Meta.LongMeta.put.unsafeSetNullable(rs, i + 14, a.int8)
-                  TypoInterval.put.unsafeSetNullable(rs, i + 15, a.interval)
-                  TypoJson.put.unsafeSetNullable(rs, i + 16, a.json)
-                  TypoJsonb.put.unsafeSetNullable(rs, i + 17, a.jsonb)
-                  TypoLine.put.unsafeSetNullable(rs, i + 18, a.line)
-                  TypoLineSegment.put.unsafeSetNullable(rs, i + 19, a.lseg)
-                  TypoMoney.put.unsafeSetNullable(rs, i + 20, a.money)
-                  Mydomain.put.unsafeSetNullable(rs, i + 21, a.mydomain)
-                  Myenum.put.unsafeSetNullable(rs, i + 22, a.myenum)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 23, a.name)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 24, a.numeric)
-                  TypoPath.put.unsafeSetNullable(rs, i + 25, a.path)
-                  TypoPoint.put.unsafeSetNullable(rs, i + 26, a.point)
-                  TypoPolygon.put.unsafeSetNullable(rs, i + 27, a.polygon)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 28, a.text)
-                  TypoLocalTime.put.unsafeSetNullable(rs, i + 29, a.time)
-                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 30, a.timestamp)
-                  TypoInstant.put.unsafeSetNullable(rs, i + 31, a.timestampz)
-                  TypoOffsetTime.put.unsafeSetNullable(rs, i + 32, a.timez)
-                  TypoUUID.put.unsafeSetNullable(rs, i + 33, a.uuid)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 34, a.varchar)
-                  TypoVector.put.unsafeSetNullable(rs, i + 35, a.vector)
-                  TypoXml.put.unsafeSetNullable(rs, i + 36, a.xml)
-                  TypoBox.arrayPut.unsafeSetNullable(rs, i + 37, a.boxes)
-                  adventureworks.StringArrayMeta.put.unsafeSetNullable(rs, i + 38, a.bpchares)
-                  adventureworks.StringArrayMeta.put.unsafeSetNullable(rs, i + 39, a.chares)
-                  TypoCircle.arrayPut.unsafeSetNullable(rs, i + 40, a.circlees)
-                  TypoLocalDate.arrayPut.unsafeSetNullable(rs, i + 41, a.datees)
-                  adventureworks.FloatArrayMeta.put.unsafeSetNullable(rs, i + 42, a.float4es)
-                  adventureworks.DoubleArrayMeta.put.unsafeSetNullable(rs, i + 43, a.float8es)
-                  TypoInet.arrayPut.unsafeSetNullable(rs, i + 44, a.inetes)
-                  TypoShort.arrayPut.unsafeSetNullable(rs, i + 45, a.int2es)
-                  TypoInt2Vector.arrayPut.unsafeSetNullable(rs, i + 46, a.int2vectores)
-                  adventureworks.IntegerArrayMeta.put.unsafeSetNullable(rs, i + 47, a.int4es)
-                  adventureworks.LongArrayMeta.put.unsafeSetNullable(rs, i + 48, a.int8es)
-                  TypoInterval.arrayPut.unsafeSetNullable(rs, i + 49, a.intervales)
-                  TypoJson.arrayPut.unsafeSetNullable(rs, i + 50, a.jsones)
-                  TypoJsonb.arrayPut.unsafeSetNullable(rs, i + 51, a.jsonbes)
-                  TypoLine.arrayPut.unsafeSetNullable(rs, i + 52, a.linees)
-                  TypoLineSegment.arrayPut.unsafeSetNullable(rs, i + 53, a.lseges)
-                  TypoMoney.arrayPut.unsafeSetNullable(rs, i + 54, a.moneyes)
-                  Mydomain.arrayPut.unsafeSetNullable(rs, i + 55, a.mydomaines)
-                  Myenum.arrayPut.unsafeSetNullable(rs, i + 56, a.myenumes)
-                  adventureworks.StringArrayMeta.put.unsafeSetNullable(rs, i + 57, a.namees)
-                  adventureworks.BigDecimalMeta.put.unsafeSetNullable(rs, i + 58, a.numerices)
-                  TypoPath.arrayPut.unsafeSetNullable(rs, i + 59, a.pathes)
-                  TypoPoint.arrayPut.unsafeSetNullable(rs, i + 60, a.pointes)
-                  TypoPolygon.arrayPut.unsafeSetNullable(rs, i + 61, a.polygones)
-                  adventureworks.StringArrayMeta.put.unsafeSetNullable(rs, i + 62, a.textes)
-                  TypoLocalTime.arrayPut.unsafeSetNullable(rs, i + 63, a.timees)
-                  TypoLocalDateTime.arrayPut.unsafeSetNullable(rs, i + 64, a.timestampes)
-                  TypoInstant.arrayPut.unsafeSetNullable(rs, i + 65, a.timestampzes)
-                  TypoOffsetTime.arrayPut.unsafeSetNullable(rs, i + 66, a.timezes)
-                  TypoUUID.arrayPut.unsafeSetNullable(rs, i + 67, a.uuides)
-                  adventureworks.StringArrayMeta.put.unsafeSetNullable(rs, i + 68, a.varchares)
-                  TypoXml.arrayPut.unsafeSetNullable(rs, i + 69, a.xmles)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     Meta.BooleanMeta.put.unsafeUpdateNullable(ps, i + 0, a.bool)
-                     TypoBox.put.unsafeUpdateNullable(ps, i + 1, a.box)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 2, a.bpchar)
-                     TypoBytea.put.unsafeUpdateNullable(ps, i + 3, a.bytea)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 4, a.char)
-                     TypoCircle.put.unsafeUpdateNullable(ps, i + 5, a.circle)
-                     TypoLocalDate.put.unsafeUpdateNullable(ps, i + 6, a.date)
-                     Meta.FloatMeta.put.unsafeUpdateNullable(ps, i + 7, a.float4)
-                     Meta.DoubleMeta.put.unsafeUpdateNullable(ps, i + 8, a.float8)
-                     TypoHStore.put.unsafeUpdateNullable(ps, i + 9, a.hstore)
-                     TypoInet.put.unsafeUpdateNullable(ps, i + 10, a.inet)
-                     TypoShort.put.unsafeUpdateNullable(ps, i + 11, a.int2)
-                     TypoInt2Vector.put.unsafeUpdateNullable(ps, i + 12, a.int2vector)
-                     Meta.IntMeta.put.unsafeUpdateNullable(ps, i + 13, a.int4)
-                     Meta.LongMeta.put.unsafeUpdateNullable(ps, i + 14, a.int8)
-                     TypoInterval.put.unsafeUpdateNullable(ps, i + 15, a.interval)
-                     TypoJson.put.unsafeUpdateNullable(ps, i + 16, a.json)
-                     TypoJsonb.put.unsafeUpdateNullable(ps, i + 17, a.jsonb)
-                     TypoLine.put.unsafeUpdateNullable(ps, i + 18, a.line)
-                     TypoLineSegment.put.unsafeUpdateNullable(ps, i + 19, a.lseg)
-                     TypoMoney.put.unsafeUpdateNullable(ps, i + 20, a.money)
-                     Mydomain.put.unsafeUpdateNullable(ps, i + 21, a.mydomain)
-                     Myenum.put.unsafeUpdateNullable(ps, i + 22, a.myenum)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 23, a.name)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 24, a.numeric)
-                     TypoPath.put.unsafeUpdateNullable(ps, i + 25, a.path)
-                     TypoPoint.put.unsafeUpdateNullable(ps, i + 26, a.point)
-                     TypoPolygon.put.unsafeUpdateNullable(ps, i + 27, a.polygon)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 28, a.text)
-                     TypoLocalTime.put.unsafeUpdateNullable(ps, i + 29, a.time)
-                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 30, a.timestamp)
-                     TypoInstant.put.unsafeUpdateNullable(ps, i + 31, a.timestampz)
-                     TypoOffsetTime.put.unsafeUpdateNullable(ps, i + 32, a.timez)
-                     TypoUUID.put.unsafeUpdateNullable(ps, i + 33, a.uuid)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 34, a.varchar)
-                     TypoVector.put.unsafeUpdateNullable(ps, i + 35, a.vector)
-                     TypoXml.put.unsafeUpdateNullable(ps, i + 36, a.xml)
-                     TypoBox.arrayPut.unsafeUpdateNullable(ps, i + 37, a.boxes)
-                     adventureworks.StringArrayMeta.put.unsafeUpdateNullable(ps, i + 38, a.bpchares)
-                     adventureworks.StringArrayMeta.put.unsafeUpdateNullable(ps, i + 39, a.chares)
-                     TypoCircle.arrayPut.unsafeUpdateNullable(ps, i + 40, a.circlees)
-                     TypoLocalDate.arrayPut.unsafeUpdateNullable(ps, i + 41, a.datees)
-                     adventureworks.FloatArrayMeta.put.unsafeUpdateNullable(ps, i + 42, a.float4es)
-                     adventureworks.DoubleArrayMeta.put.unsafeUpdateNullable(ps, i + 43, a.float8es)
-                     TypoInet.arrayPut.unsafeUpdateNullable(ps, i + 44, a.inetes)
-                     TypoShort.arrayPut.unsafeUpdateNullable(ps, i + 45, a.int2es)
-                     TypoInt2Vector.arrayPut.unsafeUpdateNullable(ps, i + 46, a.int2vectores)
-                     adventureworks.IntegerArrayMeta.put.unsafeUpdateNullable(ps, i + 47, a.int4es)
-                     adventureworks.LongArrayMeta.put.unsafeUpdateNullable(ps, i + 48, a.int8es)
-                     TypoInterval.arrayPut.unsafeUpdateNullable(ps, i + 49, a.intervales)
-                     TypoJson.arrayPut.unsafeUpdateNullable(ps, i + 50, a.jsones)
-                     TypoJsonb.arrayPut.unsafeUpdateNullable(ps, i + 51, a.jsonbes)
-                     TypoLine.arrayPut.unsafeUpdateNullable(ps, i + 52, a.linees)
-                     TypoLineSegment.arrayPut.unsafeUpdateNullable(ps, i + 53, a.lseges)
-                     TypoMoney.arrayPut.unsafeUpdateNullable(ps, i + 54, a.moneyes)
-                     Mydomain.arrayPut.unsafeUpdateNullable(ps, i + 55, a.mydomaines)
-                     Myenum.arrayPut.unsafeUpdateNullable(ps, i + 56, a.myenumes)
-                     adventureworks.StringArrayMeta.put.unsafeUpdateNullable(ps, i + 57, a.namees)
-                     adventureworks.BigDecimalMeta.put.unsafeUpdateNullable(ps, i + 58, a.numerices)
-                     TypoPath.arrayPut.unsafeUpdateNullable(ps, i + 59, a.pathes)
-                     TypoPoint.arrayPut.unsafeUpdateNullable(ps, i + 60, a.pointes)
-                     TypoPolygon.arrayPut.unsafeUpdateNullable(ps, i + 61, a.polygones)
-                     adventureworks.StringArrayMeta.put.unsafeUpdateNullable(ps, i + 62, a.textes)
-                     TypoLocalTime.arrayPut.unsafeUpdateNullable(ps, i + 63, a.timees)
-                     TypoLocalDateTime.arrayPut.unsafeUpdateNullable(ps, i + 64, a.timestampes)
-                     TypoInstant.arrayPut.unsafeUpdateNullable(ps, i + 65, a.timestampzes)
-                     TypoOffsetTime.arrayPut.unsafeUpdateNullable(ps, i + 66, a.timezes)
-                     TypoUUID.arrayPut.unsafeUpdateNullable(ps, i + 67, a.uuides)
-                     adventureworks.StringArrayMeta.put.unsafeUpdateNullable(ps, i + 68, a.varchares)
-                     TypoXml.arrayPut.unsafeUpdateNullable(ps, i + 69, a.xmles)
-                   }
-  )
+  implicit lazy val encoder: Encoder[PgtestnullRow] = {
+    Encoder[PgtestnullRow](row =>
+      Json.obj(
+        "bool" -> Encoder.encodeOption(Encoder.encodeBoolean).apply(row.bool),
+        "box" -> Encoder.encodeOption(TypoBox.encoder).apply(row.box),
+        "bpchar" -> Encoder.encodeOption(Encoder.encodeString).apply(row.bpchar),
+        "bytea" -> Encoder.encodeOption(TypoBytea.encoder).apply(row.bytea),
+        "char" -> Encoder.encodeOption(Encoder.encodeString).apply(row.char),
+        "circle" -> Encoder.encodeOption(TypoCircle.encoder).apply(row.circle),
+        "date" -> Encoder.encodeOption(TypoLocalDate.encoder).apply(row.date),
+        "float4" -> Encoder.encodeOption(Encoder.encodeFloat).apply(row.float4),
+        "float8" -> Encoder.encodeOption(Encoder.encodeDouble).apply(row.float8),
+        "hstore" -> Encoder.encodeOption(TypoHStore.encoder).apply(row.hstore),
+        "inet" -> Encoder.encodeOption(TypoInet.encoder).apply(row.inet),
+        "int2" -> Encoder.encodeOption(TypoShort.encoder).apply(row.int2),
+        "int2vector" -> Encoder.encodeOption(TypoInt2Vector.encoder).apply(row.int2vector),
+        "int4" -> Encoder.encodeOption(Encoder.encodeInt).apply(row.int4),
+        "int8" -> Encoder.encodeOption(Encoder.encodeLong).apply(row.int8),
+        "interval" -> Encoder.encodeOption(TypoInterval.encoder).apply(row.interval),
+        "json" -> Encoder.encodeOption(TypoJson.encoder).apply(row.json),
+        "jsonb" -> Encoder.encodeOption(TypoJsonb.encoder).apply(row.jsonb),
+        "line" -> Encoder.encodeOption(TypoLine.encoder).apply(row.line),
+        "lseg" -> Encoder.encodeOption(TypoLineSegment.encoder).apply(row.lseg),
+        "money" -> Encoder.encodeOption(TypoMoney.encoder).apply(row.money),
+        "mydomain" -> Encoder.encodeOption(Mydomain.encoder).apply(row.mydomain),
+        "myenum" -> Encoder.encodeOption(Myenum.encoder).apply(row.myenum),
+        "name" -> Encoder.encodeOption(Encoder.encodeString).apply(row.name),
+        "numeric" -> Encoder.encodeOption(Encoder.encodeBigDecimal).apply(row.numeric),
+        "path" -> Encoder.encodeOption(TypoPath.encoder).apply(row.path),
+        "point" -> Encoder.encodeOption(TypoPoint.encoder).apply(row.point),
+        "polygon" -> Encoder.encodeOption(TypoPolygon.encoder).apply(row.polygon),
+        "text" -> Encoder.encodeOption(Encoder.encodeString).apply(row.text),
+        "time" -> Encoder.encodeOption(TypoLocalTime.encoder).apply(row.time),
+        "timestamp" -> Encoder.encodeOption(TypoLocalDateTime.encoder).apply(row.timestamp),
+        "timestampz" -> Encoder.encodeOption(TypoInstant.encoder).apply(row.timestampz),
+        "timez" -> Encoder.encodeOption(TypoOffsetTime.encoder).apply(row.timez),
+        "uuid" -> Encoder.encodeOption(TypoUUID.encoder).apply(row.uuid),
+        "varchar" -> Encoder.encodeOption(Encoder.encodeString).apply(row.varchar),
+        "vector" -> Encoder.encodeOption(TypoVector.encoder).apply(row.vector),
+        "xml" -> Encoder.encodeOption(TypoXml.encoder).apply(row.xml),
+        "boxes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoBox, Array](TypoBox.encoder, implicitly)).apply(row.boxes),
+        "bpchares" -> Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)).apply(row.bpchares),
+        "chares" -> Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)).apply(row.chares),
+        "circlees" -> Encoder.encodeOption(Encoder.encodeIterable[TypoCircle, Array](TypoCircle.encoder, implicitly)).apply(row.circlees),
+        "datees" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLocalDate, Array](TypoLocalDate.encoder, implicitly)).apply(row.datees),
+        "float4es" -> Encoder.encodeOption(Encoder.encodeIterable[Float, Array](Encoder.encodeFloat, implicitly)).apply(row.float4es),
+        "float8es" -> Encoder.encodeOption(Encoder.encodeIterable[Double, Array](Encoder.encodeDouble, implicitly)).apply(row.float8es),
+        "inetes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoInet, Array](TypoInet.encoder, implicitly)).apply(row.inetes),
+        "int2es" -> Encoder.encodeOption(Encoder.encodeIterable[TypoShort, Array](TypoShort.encoder, implicitly)).apply(row.int2es),
+        "int2vectores" -> Encoder.encodeOption(Encoder.encodeIterable[TypoInt2Vector, Array](TypoInt2Vector.encoder, implicitly)).apply(row.int2vectores),
+        "int4es" -> Encoder.encodeOption(Encoder.encodeIterable[Int, Array](Encoder.encodeInt, implicitly)).apply(row.int4es),
+        "int8es" -> Encoder.encodeOption(Encoder.encodeIterable[Long, Array](Encoder.encodeLong, implicitly)).apply(row.int8es),
+        "intervales" -> Encoder.encodeOption(Encoder.encodeIterable[TypoInterval, Array](TypoInterval.encoder, implicitly)).apply(row.intervales),
+        "jsones" -> Encoder.encodeOption(Encoder.encodeIterable[TypoJson, Array](TypoJson.encoder, implicitly)).apply(row.jsones),
+        "jsonbes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoJsonb, Array](TypoJsonb.encoder, implicitly)).apply(row.jsonbes),
+        "linees" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLine, Array](TypoLine.encoder, implicitly)).apply(row.linees),
+        "lseges" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLineSegment, Array](TypoLineSegment.encoder, implicitly)).apply(row.lseges),
+        "moneyes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoMoney, Array](TypoMoney.encoder, implicitly)).apply(row.moneyes),
+        "mydomaines" -> Encoder.encodeOption(Encoder.encodeIterable[Mydomain, Array](Mydomain.encoder, implicitly)).apply(row.mydomaines),
+        "myenumes" -> Encoder.encodeOption(Encoder.encodeIterable[Myenum, Array](Myenum.encoder, implicitly)).apply(row.myenumes),
+        "namees" -> Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)).apply(row.namees),
+        "numerices" -> Encoder.encodeOption(Encoder.encodeIterable[BigDecimal, Array](Encoder.encodeBigDecimal, implicitly)).apply(row.numerices),
+        "pathes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoPath, Array](TypoPath.encoder, implicitly)).apply(row.pathes),
+        "pointes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoPoint, Array](TypoPoint.encoder, implicitly)).apply(row.pointes),
+        "polygones" -> Encoder.encodeOption(Encoder.encodeIterable[TypoPolygon, Array](TypoPolygon.encoder, implicitly)).apply(row.polygones),
+        "textes" -> Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)).apply(row.textes),
+        "timees" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLocalTime, Array](TypoLocalTime.encoder, implicitly)).apply(row.timees),
+        "timestampes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoLocalDateTime, Array](TypoLocalDateTime.encoder, implicitly)).apply(row.timestampes),
+        "timestampzes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoInstant, Array](TypoInstant.encoder, implicitly)).apply(row.timestampzes),
+        "timezes" -> Encoder.encodeOption(Encoder.encodeIterable[TypoOffsetTime, Array](TypoOffsetTime.encoder, implicitly)).apply(row.timezes),
+        "uuides" -> Encoder.encodeOption(Encoder.encodeIterable[TypoUUID, Array](TypoUUID.encoder, implicitly)).apply(row.uuides),
+        "varchares" -> Encoder.encodeOption(Encoder.encodeIterable[String, Array](Encoder.encodeString, implicitly)).apply(row.varchares),
+        "xmles" -> Encoder.encodeOption(Encoder.encodeIterable[TypoXml, Array](TypoXml.encoder, implicitly)).apply(row.xmles)
+      )
+    )
+  }
+  implicit lazy val read: Read[PgtestnullRow] = {
+    new Read[PgtestnullRow](
+      gets = List(
+        (Meta.BooleanMeta.get, Nullability.Nullable),
+        (TypoBox.get, Nullability.Nullable),
+        (Meta.StringMeta.get, Nullability.Nullable),
+        (TypoBytea.get, Nullability.Nullable),
+        (Meta.StringMeta.get, Nullability.Nullable),
+        (TypoCircle.get, Nullability.Nullable),
+        (TypoLocalDate.get, Nullability.Nullable),
+        (Meta.FloatMeta.get, Nullability.Nullable),
+        (Meta.DoubleMeta.get, Nullability.Nullable),
+        (TypoHStore.get, Nullability.Nullable),
+        (TypoInet.get, Nullability.Nullable),
+        (TypoShort.get, Nullability.Nullable),
+        (TypoInt2Vector.get, Nullability.Nullable),
+        (Meta.IntMeta.get, Nullability.Nullable),
+        (Meta.LongMeta.get, Nullability.Nullable),
+        (TypoInterval.get, Nullability.Nullable),
+        (TypoJson.get, Nullability.Nullable),
+        (TypoJsonb.get, Nullability.Nullable),
+        (TypoLine.get, Nullability.Nullable),
+        (TypoLineSegment.get, Nullability.Nullable),
+        (TypoMoney.get, Nullability.Nullable),
+        (Mydomain.get, Nullability.Nullable),
+        (Myenum.get, Nullability.Nullable),
+        (Meta.StringMeta.get, Nullability.Nullable),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+        (TypoPath.get, Nullability.Nullable),
+        (TypoPoint.get, Nullability.Nullable),
+        (TypoPolygon.get, Nullability.Nullable),
+        (Meta.StringMeta.get, Nullability.Nullable),
+        (TypoLocalTime.get, Nullability.Nullable),
+        (TypoLocalDateTime.get, Nullability.Nullable),
+        (TypoInstant.get, Nullability.Nullable),
+        (TypoOffsetTime.get, Nullability.Nullable),
+        (TypoUUID.get, Nullability.Nullable),
+        (Meta.StringMeta.get, Nullability.Nullable),
+        (TypoVector.get, Nullability.Nullable),
+        (TypoXml.get, Nullability.Nullable),
+        (TypoBox.arrayGet, Nullability.Nullable),
+        (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+        (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+        (TypoCircle.arrayGet, Nullability.Nullable),
+        (TypoLocalDate.arrayGet, Nullability.Nullable),
+        (adventureworks.FloatArrayMeta.get, Nullability.Nullable),
+        (adventureworks.DoubleArrayMeta.get, Nullability.Nullable),
+        (TypoInet.arrayGet, Nullability.Nullable),
+        (TypoShort.arrayGet, Nullability.Nullable),
+        (TypoInt2Vector.arrayGet, Nullability.Nullable),
+        (adventureworks.IntegerArrayMeta.get, Nullability.Nullable),
+        (adventureworks.LongArrayMeta.get, Nullability.Nullable),
+        (TypoInterval.arrayGet, Nullability.Nullable),
+        (TypoJson.arrayGet, Nullability.Nullable),
+        (TypoJsonb.arrayGet, Nullability.Nullable),
+        (TypoLine.arrayGet, Nullability.Nullable),
+        (TypoLineSegment.arrayGet, Nullability.Nullable),
+        (TypoMoney.arrayGet, Nullability.Nullable),
+        (Mydomain.arrayGet, Nullability.Nullable),
+        (Myenum.arrayGet, Nullability.Nullable),
+        (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+        (adventureworks.BigDecimalMeta.get, Nullability.Nullable),
+        (TypoPath.arrayGet, Nullability.Nullable),
+        (TypoPoint.arrayGet, Nullability.Nullable),
+        (TypoPolygon.arrayGet, Nullability.Nullable),
+        (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+        (TypoLocalTime.arrayGet, Nullability.Nullable),
+        (TypoLocalDateTime.arrayGet, Nullability.Nullable),
+        (TypoInstant.arrayGet, Nullability.Nullable),
+        (TypoOffsetTime.arrayGet, Nullability.Nullable),
+        (TypoUUID.arrayGet, Nullability.Nullable),
+        (adventureworks.StringArrayMeta.get, Nullability.Nullable),
+        (TypoXml.arrayGet, Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PgtestnullRow(
+        bool = Meta.BooleanMeta.get.unsafeGetNullable(rs, i + 0),
+        box = TypoBox.get.unsafeGetNullable(rs, i + 1),
+        bpchar = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+        bytea = TypoBytea.get.unsafeGetNullable(rs, i + 3),
+        char = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+        circle = TypoCircle.get.unsafeGetNullable(rs, i + 5),
+        date = TypoLocalDate.get.unsafeGetNullable(rs, i + 6),
+        float4 = Meta.FloatMeta.get.unsafeGetNullable(rs, i + 7),
+        float8 = Meta.DoubleMeta.get.unsafeGetNullable(rs, i + 8),
+        hstore = TypoHStore.get.unsafeGetNullable(rs, i + 9),
+        inet = TypoInet.get.unsafeGetNullable(rs, i + 10),
+        int2 = TypoShort.get.unsafeGetNullable(rs, i + 11),
+        int2vector = TypoInt2Vector.get.unsafeGetNullable(rs, i + 12),
+        int4 = Meta.IntMeta.get.unsafeGetNullable(rs, i + 13),
+        int8 = Meta.LongMeta.get.unsafeGetNullable(rs, i + 14),
+        interval = TypoInterval.get.unsafeGetNullable(rs, i + 15),
+        json = TypoJson.get.unsafeGetNullable(rs, i + 16),
+        jsonb = TypoJsonb.get.unsafeGetNullable(rs, i + 17),
+        line = TypoLine.get.unsafeGetNullable(rs, i + 18),
+        lseg = TypoLineSegment.get.unsafeGetNullable(rs, i + 19),
+        money = TypoMoney.get.unsafeGetNullable(rs, i + 20),
+        mydomain = Mydomain.get.unsafeGetNullable(rs, i + 21),
+        myenum = Myenum.get.unsafeGetNullable(rs, i + 22),
+        name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 23),
+        numeric = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 24),
+        path = TypoPath.get.unsafeGetNullable(rs, i + 25),
+        point = TypoPoint.get.unsafeGetNullable(rs, i + 26),
+        polygon = TypoPolygon.get.unsafeGetNullable(rs, i + 27),
+        text = Meta.StringMeta.get.unsafeGetNullable(rs, i + 28),
+        time = TypoLocalTime.get.unsafeGetNullable(rs, i + 29),
+        timestamp = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 30),
+        timestampz = TypoInstant.get.unsafeGetNullable(rs, i + 31),
+        timez = TypoOffsetTime.get.unsafeGetNullable(rs, i + 32),
+        uuid = TypoUUID.get.unsafeGetNullable(rs, i + 33),
+        varchar = Meta.StringMeta.get.unsafeGetNullable(rs, i + 34),
+        vector = TypoVector.get.unsafeGetNullable(rs, i + 35),
+        xml = TypoXml.get.unsafeGetNullable(rs, i + 36),
+        boxes = TypoBox.arrayGet.unsafeGetNullable(rs, i + 37),
+        bpchares = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 38),
+        chares = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 39),
+        circlees = TypoCircle.arrayGet.unsafeGetNullable(rs, i + 40),
+        datees = TypoLocalDate.arrayGet.unsafeGetNullable(rs, i + 41),
+        float4es = adventureworks.FloatArrayMeta.get.unsafeGetNullable(rs, i + 42),
+        float8es = adventureworks.DoubleArrayMeta.get.unsafeGetNullable(rs, i + 43),
+        inetes = TypoInet.arrayGet.unsafeGetNullable(rs, i + 44),
+        int2es = TypoShort.arrayGet.unsafeGetNullable(rs, i + 45),
+        int2vectores = TypoInt2Vector.arrayGet.unsafeGetNullable(rs, i + 46),
+        int4es = adventureworks.IntegerArrayMeta.get.unsafeGetNullable(rs, i + 47),
+        int8es = adventureworks.LongArrayMeta.get.unsafeGetNullable(rs, i + 48),
+        intervales = TypoInterval.arrayGet.unsafeGetNullable(rs, i + 49),
+        jsones = TypoJson.arrayGet.unsafeGetNullable(rs, i + 50),
+        jsonbes = TypoJsonb.arrayGet.unsafeGetNullable(rs, i + 51),
+        linees = TypoLine.arrayGet.unsafeGetNullable(rs, i + 52),
+        lseges = TypoLineSegment.arrayGet.unsafeGetNullable(rs, i + 53),
+        moneyes = TypoMoney.arrayGet.unsafeGetNullable(rs, i + 54),
+        mydomaines = Mydomain.arrayGet.unsafeGetNullable(rs, i + 55),
+        myenumes = Myenum.arrayGet.unsafeGetNullable(rs, i + 56),
+        namees = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 57),
+        numerices = adventureworks.BigDecimalMeta.get.unsafeGetNullable(rs, i + 58),
+        pathes = TypoPath.arrayGet.unsafeGetNullable(rs, i + 59),
+        pointes = TypoPoint.arrayGet.unsafeGetNullable(rs, i + 60),
+        polygones = TypoPolygon.arrayGet.unsafeGetNullable(rs, i + 61),
+        textes = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 62),
+        timees = TypoLocalTime.arrayGet.unsafeGetNullable(rs, i + 63),
+        timestampes = TypoLocalDateTime.arrayGet.unsafeGetNullable(rs, i + 64),
+        timestampzes = TypoInstant.arrayGet.unsafeGetNullable(rs, i + 65),
+        timezes = TypoOffsetTime.arrayGet.unsafeGetNullable(rs, i + 66),
+        uuides = TypoUUID.arrayGet.unsafeGetNullable(rs, i + 67),
+        varchares = adventureworks.StringArrayMeta.get.unsafeGetNullable(rs, i + 68),
+        xmles = TypoXml.arrayGet.unsafeGetNullable(rs, i + 69)
+      )
+    )
+  
+  }
+  implicit lazy val text: Text[PgtestnullRow] = {
+    Text.instance[PgtestnullRow]{ (row, sb) =>
+      Text.option(Text.booleanInstance).unsafeEncode(row.bool, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoBox.text).unsafeEncode(row.box, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.stringInstance).unsafeEncode(row.bpchar, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoBytea.text).unsafeEncode(row.bytea, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.stringInstance).unsafeEncode(row.char, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoCircle.text).unsafeEncode(row.circle, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoLocalDate.text).unsafeEncode(row.date, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.floatInstance).unsafeEncode(row.float4, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.doubleInstance).unsafeEncode(row.float8, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoHStore.text).unsafeEncode(row.hstore, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoInet.text).unsafeEncode(row.inet, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoShort.text).unsafeEncode(row.int2, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoInt2Vector.text).unsafeEncode(row.int2vector, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.intInstance).unsafeEncode(row.int4, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.longInstance).unsafeEncode(row.int8, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoInterval.text).unsafeEncode(row.interval, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoJson.text).unsafeEncode(row.json, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoJsonb.text).unsafeEncode(row.jsonb, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoLine.text).unsafeEncode(row.line, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoLineSegment.text).unsafeEncode(row.lseg, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoMoney.text).unsafeEncode(row.money, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Mydomain.text).unsafeEncode(row.mydomain, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Myenum.text).unsafeEncode(row.myenum, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.stringInstance).unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.bigDecimalInstance).unsafeEncode(row.numeric, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoPath.text).unsafeEncode(row.path, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoPoint.text).unsafeEncode(row.point, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoPolygon.text).unsafeEncode(row.polygon, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.stringInstance).unsafeEncode(row.text, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoLocalTime.text).unsafeEncode(row.time, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoLocalDateTime.text).unsafeEncode(row.timestamp, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoInstant.text).unsafeEncode(row.timestampz, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoOffsetTime.text).unsafeEncode(row.timez, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoUUID.text).unsafeEncode(row.uuid, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.stringInstance).unsafeEncode(row.varchar, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoVector.text).unsafeEncode(row.vector, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoXml.text).unsafeEncode(row.xml, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoBox](TypoBox.text, implicitly)).unsafeEncode(row.boxes, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text[Array[String]]).unsafeEncode(row.bpchares, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text[Array[String]]).unsafeEncode(row.chares, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoCircle](TypoCircle.text, implicitly)).unsafeEncode(row.circlees, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoLocalDate](TypoLocalDate.text, implicitly)).unsafeEncode(row.datees, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text[Array[Float]]).unsafeEncode(row.float4es, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text[Array[Double]]).unsafeEncode(row.float8es, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoInet](TypoInet.text, implicitly)).unsafeEncode(row.inetes, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoShort](TypoShort.text, implicitly)).unsafeEncode(row.int2es, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoInt2Vector](TypoInt2Vector.text, implicitly)).unsafeEncode(row.int2vectores, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text[Array[Int]]).unsafeEncode(row.int4es, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text[Array[Long]]).unsafeEncode(row.int8es, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoInterval](TypoInterval.text, implicitly)).unsafeEncode(row.intervales, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoJson](TypoJson.text, implicitly)).unsafeEncode(row.jsones, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoJsonb](TypoJsonb.text, implicitly)).unsafeEncode(row.jsonbes, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoLine](TypoLine.text, implicitly)).unsafeEncode(row.linees, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoLineSegment](TypoLineSegment.text, implicitly)).unsafeEncode(row.lseges, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoMoney](TypoMoney.text, implicitly)).unsafeEncode(row.moneyes, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, Mydomain](Mydomain.text, implicitly)).unsafeEncode(row.mydomaines, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, Myenum](Myenum.text, implicitly)).unsafeEncode(row.myenumes, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text[Array[String]]).unsafeEncode(row.namees, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text[Array[BigDecimal]]).unsafeEncode(row.numerices, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoPath](TypoPath.text, implicitly)).unsafeEncode(row.pathes, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoPoint](TypoPoint.text, implicitly)).unsafeEncode(row.pointes, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoPolygon](TypoPolygon.text, implicitly)).unsafeEncode(row.polygones, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text[Array[String]]).unsafeEncode(row.textes, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoLocalTime](TypoLocalTime.text, implicitly)).unsafeEncode(row.timees, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoLocalDateTime](TypoLocalDateTime.text, implicitly)).unsafeEncode(row.timestampes, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoInstant](TypoInstant.text, implicitly)).unsafeEncode(row.timestampzes, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoOffsetTime](TypoOffsetTime.text, implicitly)).unsafeEncode(row.timezes, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoUUID](TypoUUID.text, implicitly)).unsafeEncode(row.uuides, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text[Array[String]]).unsafeEncode(row.varchares, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.iterableInstance[Array, TypoXml](TypoXml.text, implicitly)).unsafeEncode(row.xmles, sb)
+    }
+  }
+  implicit lazy val write: Write[PgtestnullRow] = {
+    new Write[PgtestnullRow](
+      puts = List((Meta.BooleanMeta.put, Nullability.Nullable),
+                  (TypoBox.put, Nullability.Nullable),
+                  (Meta.StringMeta.put, Nullability.Nullable),
+                  (TypoBytea.put, Nullability.Nullable),
+                  (Meta.StringMeta.put, Nullability.Nullable),
+                  (TypoCircle.put, Nullability.Nullable),
+                  (TypoLocalDate.put, Nullability.Nullable),
+                  (Meta.FloatMeta.put, Nullability.Nullable),
+                  (Meta.DoubleMeta.put, Nullability.Nullable),
+                  (TypoHStore.put, Nullability.Nullable),
+                  (TypoInet.put, Nullability.Nullable),
+                  (TypoShort.put, Nullability.Nullable),
+                  (TypoInt2Vector.put, Nullability.Nullable),
+                  (Meta.IntMeta.put, Nullability.Nullable),
+                  (Meta.LongMeta.put, Nullability.Nullable),
+                  (TypoInterval.put, Nullability.Nullable),
+                  (TypoJson.put, Nullability.Nullable),
+                  (TypoJsonb.put, Nullability.Nullable),
+                  (TypoLine.put, Nullability.Nullable),
+                  (TypoLineSegment.put, Nullability.Nullable),
+                  (TypoMoney.put, Nullability.Nullable),
+                  (Mydomain.put, Nullability.Nullable),
+                  (Myenum.put, Nullability.Nullable),
+                  (Meta.StringMeta.put, Nullability.Nullable),
+                  (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
+                  (TypoPath.put, Nullability.Nullable),
+                  (TypoPoint.put, Nullability.Nullable),
+                  (TypoPolygon.put, Nullability.Nullable),
+                  (Meta.StringMeta.put, Nullability.Nullable),
+                  (TypoLocalTime.put, Nullability.Nullable),
+                  (TypoLocalDateTime.put, Nullability.Nullable),
+                  (TypoInstant.put, Nullability.Nullable),
+                  (TypoOffsetTime.put, Nullability.Nullable),
+                  (TypoUUID.put, Nullability.Nullable),
+                  (Meta.StringMeta.put, Nullability.Nullable),
+                  (TypoVector.put, Nullability.Nullable),
+                  (TypoXml.put, Nullability.Nullable),
+                  (TypoBox.arrayPut, Nullability.Nullable),
+                  (adventureworks.StringArrayMeta.put, Nullability.Nullable),
+                  (adventureworks.StringArrayMeta.put, Nullability.Nullable),
+                  (TypoCircle.arrayPut, Nullability.Nullable),
+                  (TypoLocalDate.arrayPut, Nullability.Nullable),
+                  (adventureworks.FloatArrayMeta.put, Nullability.Nullable),
+                  (adventureworks.DoubleArrayMeta.put, Nullability.Nullable),
+                  (TypoInet.arrayPut, Nullability.Nullable),
+                  (TypoShort.arrayPut, Nullability.Nullable),
+                  (TypoInt2Vector.arrayPut, Nullability.Nullable),
+                  (adventureworks.IntegerArrayMeta.put, Nullability.Nullable),
+                  (adventureworks.LongArrayMeta.put, Nullability.Nullable),
+                  (TypoInterval.arrayPut, Nullability.Nullable),
+                  (TypoJson.arrayPut, Nullability.Nullable),
+                  (TypoJsonb.arrayPut, Nullability.Nullable),
+                  (TypoLine.arrayPut, Nullability.Nullable),
+                  (TypoLineSegment.arrayPut, Nullability.Nullable),
+                  (TypoMoney.arrayPut, Nullability.Nullable),
+                  (Mydomain.arrayPut, Nullability.Nullable),
+                  (Myenum.arrayPut, Nullability.Nullable),
+                  (adventureworks.StringArrayMeta.put, Nullability.Nullable),
+                  (adventureworks.BigDecimalMeta.put, Nullability.Nullable),
+                  (TypoPath.arrayPut, Nullability.Nullable),
+                  (TypoPoint.arrayPut, Nullability.Nullable),
+                  (TypoPolygon.arrayPut, Nullability.Nullable),
+                  (adventureworks.StringArrayMeta.put, Nullability.Nullable),
+                  (TypoLocalTime.arrayPut, Nullability.Nullable),
+                  (TypoLocalDateTime.arrayPut, Nullability.Nullable),
+                  (TypoInstant.arrayPut, Nullability.Nullable),
+                  (TypoOffsetTime.arrayPut, Nullability.Nullable),
+                  (TypoUUID.arrayPut, Nullability.Nullable),
+                  (adventureworks.StringArrayMeta.put, Nullability.Nullable),
+                  (TypoXml.arrayPut, Nullability.Nullable)),
+      toList = x => List(x.bool, x.box, x.bpchar, x.bytea, x.char, x.circle, x.date, x.float4, x.float8, x.hstore, x.inet, x.int2, x.int2vector, x.int4, x.int8, x.interval, x.json, x.jsonb, x.line, x.lseg, x.money, x.mydomain, x.myenum, x.name, x.numeric, x.path, x.point, x.polygon, x.text, x.time, x.timestamp, x.timestampz, x.timez, x.uuid, x.varchar, x.vector, x.xml, x.boxes, x.bpchares, x.chares, x.circlees, x.datees, x.float4es, x.float8es, x.inetes, x.int2es, x.int2vectores, x.int4es, x.int8es, x.intervales, x.jsones, x.jsonbes, x.linees, x.lseges, x.moneyes, x.mydomaines, x.myenumes, x.namees, x.numerices, x.pathes, x.pointes, x.polygones, x.textes, x.timees, x.timestampes, x.timestampzes, x.timezes, x.uuides, x.varchares, x.xmles),
+      unsafeSet = (rs, i, a) => {
+                    Meta.BooleanMeta.put.unsafeSetNullable(rs, i + 0, a.bool)
+                    TypoBox.put.unsafeSetNullable(rs, i + 1, a.box)
+                    Meta.StringMeta.put.unsafeSetNullable(rs, i + 2, a.bpchar)
+                    TypoBytea.put.unsafeSetNullable(rs, i + 3, a.bytea)
+                    Meta.StringMeta.put.unsafeSetNullable(rs, i + 4, a.char)
+                    TypoCircle.put.unsafeSetNullable(rs, i + 5, a.circle)
+                    TypoLocalDate.put.unsafeSetNullable(rs, i + 6, a.date)
+                    Meta.FloatMeta.put.unsafeSetNullable(rs, i + 7, a.float4)
+                    Meta.DoubleMeta.put.unsafeSetNullable(rs, i + 8, a.float8)
+                    TypoHStore.put.unsafeSetNullable(rs, i + 9, a.hstore)
+                    TypoInet.put.unsafeSetNullable(rs, i + 10, a.inet)
+                    TypoShort.put.unsafeSetNullable(rs, i + 11, a.int2)
+                    TypoInt2Vector.put.unsafeSetNullable(rs, i + 12, a.int2vector)
+                    Meta.IntMeta.put.unsafeSetNullable(rs, i + 13, a.int4)
+                    Meta.LongMeta.put.unsafeSetNullable(rs, i + 14, a.int8)
+                    TypoInterval.put.unsafeSetNullable(rs, i + 15, a.interval)
+                    TypoJson.put.unsafeSetNullable(rs, i + 16, a.json)
+                    TypoJsonb.put.unsafeSetNullable(rs, i + 17, a.jsonb)
+                    TypoLine.put.unsafeSetNullable(rs, i + 18, a.line)
+                    TypoLineSegment.put.unsafeSetNullable(rs, i + 19, a.lseg)
+                    TypoMoney.put.unsafeSetNullable(rs, i + 20, a.money)
+                    Mydomain.put.unsafeSetNullable(rs, i + 21, a.mydomain)
+                    Myenum.put.unsafeSetNullable(rs, i + 22, a.myenum)
+                    Meta.StringMeta.put.unsafeSetNullable(rs, i + 23, a.name)
+                    Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 24, a.numeric)
+                    TypoPath.put.unsafeSetNullable(rs, i + 25, a.path)
+                    TypoPoint.put.unsafeSetNullable(rs, i + 26, a.point)
+                    TypoPolygon.put.unsafeSetNullable(rs, i + 27, a.polygon)
+                    Meta.StringMeta.put.unsafeSetNullable(rs, i + 28, a.text)
+                    TypoLocalTime.put.unsafeSetNullable(rs, i + 29, a.time)
+                    TypoLocalDateTime.put.unsafeSetNullable(rs, i + 30, a.timestamp)
+                    TypoInstant.put.unsafeSetNullable(rs, i + 31, a.timestampz)
+                    TypoOffsetTime.put.unsafeSetNullable(rs, i + 32, a.timez)
+                    TypoUUID.put.unsafeSetNullable(rs, i + 33, a.uuid)
+                    Meta.StringMeta.put.unsafeSetNullable(rs, i + 34, a.varchar)
+                    TypoVector.put.unsafeSetNullable(rs, i + 35, a.vector)
+                    TypoXml.put.unsafeSetNullable(rs, i + 36, a.xml)
+                    TypoBox.arrayPut.unsafeSetNullable(rs, i + 37, a.boxes)
+                    adventureworks.StringArrayMeta.put.unsafeSetNullable(rs, i + 38, a.bpchares)
+                    adventureworks.StringArrayMeta.put.unsafeSetNullable(rs, i + 39, a.chares)
+                    TypoCircle.arrayPut.unsafeSetNullable(rs, i + 40, a.circlees)
+                    TypoLocalDate.arrayPut.unsafeSetNullable(rs, i + 41, a.datees)
+                    adventureworks.FloatArrayMeta.put.unsafeSetNullable(rs, i + 42, a.float4es)
+                    adventureworks.DoubleArrayMeta.put.unsafeSetNullable(rs, i + 43, a.float8es)
+                    TypoInet.arrayPut.unsafeSetNullable(rs, i + 44, a.inetes)
+                    TypoShort.arrayPut.unsafeSetNullable(rs, i + 45, a.int2es)
+                    TypoInt2Vector.arrayPut.unsafeSetNullable(rs, i + 46, a.int2vectores)
+                    adventureworks.IntegerArrayMeta.put.unsafeSetNullable(rs, i + 47, a.int4es)
+                    adventureworks.LongArrayMeta.put.unsafeSetNullable(rs, i + 48, a.int8es)
+                    TypoInterval.arrayPut.unsafeSetNullable(rs, i + 49, a.intervales)
+                    TypoJson.arrayPut.unsafeSetNullable(rs, i + 50, a.jsones)
+                    TypoJsonb.arrayPut.unsafeSetNullable(rs, i + 51, a.jsonbes)
+                    TypoLine.arrayPut.unsafeSetNullable(rs, i + 52, a.linees)
+                    TypoLineSegment.arrayPut.unsafeSetNullable(rs, i + 53, a.lseges)
+                    TypoMoney.arrayPut.unsafeSetNullable(rs, i + 54, a.moneyes)
+                    Mydomain.arrayPut.unsafeSetNullable(rs, i + 55, a.mydomaines)
+                    Myenum.arrayPut.unsafeSetNullable(rs, i + 56, a.myenumes)
+                    adventureworks.StringArrayMeta.put.unsafeSetNullable(rs, i + 57, a.namees)
+                    adventureworks.BigDecimalMeta.put.unsafeSetNullable(rs, i + 58, a.numerices)
+                    TypoPath.arrayPut.unsafeSetNullable(rs, i + 59, a.pathes)
+                    TypoPoint.arrayPut.unsafeSetNullable(rs, i + 60, a.pointes)
+                    TypoPolygon.arrayPut.unsafeSetNullable(rs, i + 61, a.polygones)
+                    adventureworks.StringArrayMeta.put.unsafeSetNullable(rs, i + 62, a.textes)
+                    TypoLocalTime.arrayPut.unsafeSetNullable(rs, i + 63, a.timees)
+                    TypoLocalDateTime.arrayPut.unsafeSetNullable(rs, i + 64, a.timestampes)
+                    TypoInstant.arrayPut.unsafeSetNullable(rs, i + 65, a.timestampzes)
+                    TypoOffsetTime.arrayPut.unsafeSetNullable(rs, i + 66, a.timezes)
+                    TypoUUID.arrayPut.unsafeSetNullable(rs, i + 67, a.uuides)
+                    adventureworks.StringArrayMeta.put.unsafeSetNullable(rs, i + 68, a.varchares)
+                    TypoXml.arrayPut.unsafeSetNullable(rs, i + 69, a.xmles)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       Meta.BooleanMeta.put.unsafeUpdateNullable(ps, i + 0, a.bool)
+                       TypoBox.put.unsafeUpdateNullable(ps, i + 1, a.box)
+                       Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 2, a.bpchar)
+                       TypoBytea.put.unsafeUpdateNullable(ps, i + 3, a.bytea)
+                       Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 4, a.char)
+                       TypoCircle.put.unsafeUpdateNullable(ps, i + 5, a.circle)
+                       TypoLocalDate.put.unsafeUpdateNullable(ps, i + 6, a.date)
+                       Meta.FloatMeta.put.unsafeUpdateNullable(ps, i + 7, a.float4)
+                       Meta.DoubleMeta.put.unsafeUpdateNullable(ps, i + 8, a.float8)
+                       TypoHStore.put.unsafeUpdateNullable(ps, i + 9, a.hstore)
+                       TypoInet.put.unsafeUpdateNullable(ps, i + 10, a.inet)
+                       TypoShort.put.unsafeUpdateNullable(ps, i + 11, a.int2)
+                       TypoInt2Vector.put.unsafeUpdateNullable(ps, i + 12, a.int2vector)
+                       Meta.IntMeta.put.unsafeUpdateNullable(ps, i + 13, a.int4)
+                       Meta.LongMeta.put.unsafeUpdateNullable(ps, i + 14, a.int8)
+                       TypoInterval.put.unsafeUpdateNullable(ps, i + 15, a.interval)
+                       TypoJson.put.unsafeUpdateNullable(ps, i + 16, a.json)
+                       TypoJsonb.put.unsafeUpdateNullable(ps, i + 17, a.jsonb)
+                       TypoLine.put.unsafeUpdateNullable(ps, i + 18, a.line)
+                       TypoLineSegment.put.unsafeUpdateNullable(ps, i + 19, a.lseg)
+                       TypoMoney.put.unsafeUpdateNullable(ps, i + 20, a.money)
+                       Mydomain.put.unsafeUpdateNullable(ps, i + 21, a.mydomain)
+                       Myenum.put.unsafeUpdateNullable(ps, i + 22, a.myenum)
+                       Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 23, a.name)
+                       Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 24, a.numeric)
+                       TypoPath.put.unsafeUpdateNullable(ps, i + 25, a.path)
+                       TypoPoint.put.unsafeUpdateNullable(ps, i + 26, a.point)
+                       TypoPolygon.put.unsafeUpdateNullable(ps, i + 27, a.polygon)
+                       Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 28, a.text)
+                       TypoLocalTime.put.unsafeUpdateNullable(ps, i + 29, a.time)
+                       TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 30, a.timestamp)
+                       TypoInstant.put.unsafeUpdateNullable(ps, i + 31, a.timestampz)
+                       TypoOffsetTime.put.unsafeUpdateNullable(ps, i + 32, a.timez)
+                       TypoUUID.put.unsafeUpdateNullable(ps, i + 33, a.uuid)
+                       Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 34, a.varchar)
+                       TypoVector.put.unsafeUpdateNullable(ps, i + 35, a.vector)
+                       TypoXml.put.unsafeUpdateNullable(ps, i + 36, a.xml)
+                       TypoBox.arrayPut.unsafeUpdateNullable(ps, i + 37, a.boxes)
+                       adventureworks.StringArrayMeta.put.unsafeUpdateNullable(ps, i + 38, a.bpchares)
+                       adventureworks.StringArrayMeta.put.unsafeUpdateNullable(ps, i + 39, a.chares)
+                       TypoCircle.arrayPut.unsafeUpdateNullable(ps, i + 40, a.circlees)
+                       TypoLocalDate.arrayPut.unsafeUpdateNullable(ps, i + 41, a.datees)
+                       adventureworks.FloatArrayMeta.put.unsafeUpdateNullable(ps, i + 42, a.float4es)
+                       adventureworks.DoubleArrayMeta.put.unsafeUpdateNullable(ps, i + 43, a.float8es)
+                       TypoInet.arrayPut.unsafeUpdateNullable(ps, i + 44, a.inetes)
+                       TypoShort.arrayPut.unsafeUpdateNullable(ps, i + 45, a.int2es)
+                       TypoInt2Vector.arrayPut.unsafeUpdateNullable(ps, i + 46, a.int2vectores)
+                       adventureworks.IntegerArrayMeta.put.unsafeUpdateNullable(ps, i + 47, a.int4es)
+                       adventureworks.LongArrayMeta.put.unsafeUpdateNullable(ps, i + 48, a.int8es)
+                       TypoInterval.arrayPut.unsafeUpdateNullable(ps, i + 49, a.intervales)
+                       TypoJson.arrayPut.unsafeUpdateNullable(ps, i + 50, a.jsones)
+                       TypoJsonb.arrayPut.unsafeUpdateNullable(ps, i + 51, a.jsonbes)
+                       TypoLine.arrayPut.unsafeUpdateNullable(ps, i + 52, a.linees)
+                       TypoLineSegment.arrayPut.unsafeUpdateNullable(ps, i + 53, a.lseges)
+                       TypoMoney.arrayPut.unsafeUpdateNullable(ps, i + 54, a.moneyes)
+                       Mydomain.arrayPut.unsafeUpdateNullable(ps, i + 55, a.mydomaines)
+                       Myenum.arrayPut.unsafeUpdateNullable(ps, i + 56, a.myenumes)
+                       adventureworks.StringArrayMeta.put.unsafeUpdateNullable(ps, i + 57, a.namees)
+                       adventureworks.BigDecimalMeta.put.unsafeUpdateNullable(ps, i + 58, a.numerices)
+                       TypoPath.arrayPut.unsafeUpdateNullable(ps, i + 59, a.pathes)
+                       TypoPoint.arrayPut.unsafeUpdateNullable(ps, i + 60, a.pointes)
+                       TypoPolygon.arrayPut.unsafeUpdateNullable(ps, i + 61, a.polygones)
+                       adventureworks.StringArrayMeta.put.unsafeUpdateNullable(ps, i + 62, a.textes)
+                       TypoLocalTime.arrayPut.unsafeUpdateNullable(ps, i + 63, a.timees)
+                       TypoLocalDateTime.arrayPut.unsafeUpdateNullable(ps, i + 64, a.timestampes)
+                       TypoInstant.arrayPut.unsafeUpdateNullable(ps, i + 65, a.timestampzes)
+                       TypoOffsetTime.arrayPut.unsafeUpdateNullable(ps, i + 66, a.timezes)
+                       TypoUUID.arrayPut.unsafeUpdateNullable(ps, i + 67, a.uuides)
+                       adventureworks.StringArrayMeta.put.unsafeUpdateNullable(ps, i + 68, a.varchares)
+                       TypoXml.arrayPut.unsafeUpdateNullable(ps, i + 69, a.xmles)
+                     }
+    )
+  
+  }
 }

@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.workorder
+package adventureworks.production.workorder;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait WorkorderRepo {
   def delete: DeleteBuilder[WorkorderFields, WorkorderRow]
@@ -18,7 +18,7 @@ trait WorkorderRepo {
   def insert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow]
   def insert(unsaved: WorkorderRowUnsaved): ConnectionIO[WorkorderRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, WorkorderRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, WorkorderRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[WorkorderFields, WorkorderRow]
   def selectAll: Stream[ConnectionIO, WorkorderRow]
@@ -29,6 +29,6 @@ trait WorkorderRepo {
   def update(row: WorkorderRow): ConnectionIO[Boolean]
   def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow]
   def upsertBatch(unsaved: List[WorkorderRow]): Stream[ConnectionIO, WorkorderRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, WorkorderRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

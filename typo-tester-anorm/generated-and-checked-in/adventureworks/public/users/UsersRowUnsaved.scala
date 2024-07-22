@@ -3,20 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.users
+package adventureworks.public.users;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoInstant
-import adventureworks.customtypes.TypoUnknownCitext
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoInstant;
+import adventureworks.customtypes.TypoUnknownCitext;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** This class corresponds to a row in table `public.users` which has not been persisted yet */
 case class UsersRowUnsaved(
@@ -27,61 +27,66 @@ case class UsersRowUnsaved(
   password: String,
   verifiedOn: Option[TypoInstant],
   /** Default: now() */
-  createdAt: Defaulted[TypoInstant] = Defaulted.UseDefault
+  createdAt: Defaulted[TypoInstant] = Defaulted.UseDefault()
 ) {
-  def toRow(createdAtDefault: => TypoInstant): UsersRow =
-    UsersRow(
+  def toRow(createdAtDefault: => TypoInstant): UsersRow = {
+    new UsersRow(
       userId = userId,
       name = name,
       lastName = lastName,
       email = email,
       password = password,
-      createdAt = createdAt match {
-                    case Defaulted.UseDefault => createdAtDefault
-                    case Defaulted.Provided(value) => value
-                  },
+      createdAt = createdAt.getOrElse(createdAtDefault),
       verifiedOn = verifiedOn
     )
-}
-object UsersRowUnsaved {
-  implicit lazy val reads: Reads[UsersRowUnsaved] = Reads[UsersRowUnsaved](json => JsResult.fromTry(
-      Try(
-        UsersRowUnsaved(
-          userId = json.\("user_id").as(UsersId.reads),
-          name = json.\("name").as(Reads.StringReads),
-          lastName = json.\("last_name").toOption.map(_.as(Reads.StringReads)),
-          email = json.\("email").as(TypoUnknownCitext.reads),
-          password = json.\("password").as(Reads.StringReads),
-          verifiedOn = json.\("verified_on").toOption.map(_.as(TypoInstant.reads)),
-          createdAt = json.\("created_at").as(Defaulted.reads(TypoInstant.reads))
-        )
-      )
-    ),
-  )
-  implicit lazy val text: Text[UsersRowUnsaved] = Text.instance[UsersRowUnsaved]{ (row, sb) =>
-    UsersId.text.unsafeEncode(row.userId, sb)
-    sb.append(Text.DELIMETER)
-    Text.stringInstance.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.stringInstance).unsafeEncode(row.lastName, sb)
-    sb.append(Text.DELIMETER)
-    TypoUnknownCitext.text.unsafeEncode(row.email, sb)
-    sb.append(Text.DELIMETER)
-    Text.stringInstance.unsafeEncode(row.password, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoInstant.text).unsafeEncode(row.verifiedOn, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoInstant.text).unsafeEncode(row.createdAt, sb)
   }
-  implicit lazy val writes: OWrites[UsersRowUnsaved] = OWrites[UsersRowUnsaved](o =>
-    new JsObject(ListMap[String, JsValue](
-      "user_id" -> UsersId.writes.writes(o.userId),
-      "name" -> Writes.StringWrites.writes(o.name),
-      "last_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.lastName),
-      "email" -> TypoUnknownCitext.writes.writes(o.email),
-      "password" -> Writes.StringWrites.writes(o.password),
-      "verified_on" -> Writes.OptionWrites(TypoInstant.writes).writes(o.verifiedOn),
-      "created_at" -> Defaulted.writes(TypoInstant.writes).writes(o.createdAt)
-    ))
-  )
+}
+
+object UsersRowUnsaved {
+  implicit lazy val reads: Reads[UsersRowUnsaved] = {
+    Reads[UsersRowUnsaved](json => JsResult.fromTry(
+        Try(
+          UsersRowUnsaved(
+            userId = json.\("user_id").as(UsersId.reads),
+            name = json.\("name").as(Reads.StringReads),
+            lastName = json.\("last_name").toOption.map(_.as(Reads.StringReads)),
+            email = json.\("email").as(TypoUnknownCitext.reads),
+            password = json.\("password").as(Reads.StringReads),
+            verifiedOn = json.\("verified_on").toOption.map(_.as(TypoInstant.reads)),
+            createdAt = json.\("created_at").as(Defaulted.reads(TypoInstant.reads))
+          )
+        )
+      ),
+    )
+  }
+  implicit lazy val text: Text[UsersRowUnsaved] = {
+    Text.instance[UsersRowUnsaved]{ (row, sb) =>
+      UsersId.text.unsafeEncode(row.userId, sb)
+      sb.append(Text.DELIMETER)
+      Text.stringInstance.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.stringInstance).unsafeEncode(row.lastName, sb)
+      sb.append(Text.DELIMETER)
+      TypoUnknownCitext.text.unsafeEncode(row.email, sb)
+      sb.append(Text.DELIMETER)
+      Text.stringInstance.unsafeEncode(row.password, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoInstant.text).unsafeEncode(row.verifiedOn, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoInstant.text).unsafeEncode(row.createdAt, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[UsersRowUnsaved] = {
+    OWrites[UsersRowUnsaved](o =>
+      new JsObject(ListMap[String, JsValue](
+        "user_id" -> UsersId.writes.writes(o.userId),
+        "name" -> Writes.StringWrites.writes(o.name),
+        "last_name" -> Writes.OptionWrites(Writes.StringWrites).writes(o.lastName),
+        "email" -> TypoUnknownCitext.writes.writes(o.email),
+        "password" -> Writes.StringWrites.writes(o.password),
+        "verified_on" -> Writes.OptionWrites(TypoInstant.writes).writes(o.verifiedOn),
+        "created_at" -> Defaulted.writes(TypoInstant.writes).writes(o.createdAt)
+      ))
+    )
+  }
 }

@@ -5,10 +5,8 @@ package codegen
 object FileCustomType {
   def apply(options: InternalOptions)(ct: CustomType): sc.File = {
 
-    val comments = scaladoc(ct.comment)(Nil)
-
     val maybeBijection = ct.params match {
-      case NonEmptyList(sc.Param(name, underlying, _), Nil) if options.enableDsl =>
+      case NonEmptyList(sc.Param(_, name, underlying, _), Nil) if options.enableDsl =>
         val bijection = {
           val thisBijection = sc.Type.dsl.Bijection.of(ct.typoType, underlying)
           sc.Given(Nil, sc.Ident("bijection"), Nil, thisBijection, code"$thisBijection(_.$name)(${ct.typoType}.apply)")
@@ -22,13 +20,19 @@ object FileCustomType {
         options.jsonLibs.flatMap(_.customTypeInstances(ct)) ++
         options.dbLib.toList.flatMap(_.customTypeInstances(ct))
 
-    val str =
-      code"""$comments
-            |case class ${ct.typoType.name}(${ct.params.map(_.code).mkCode(", ")})
-            |
-            |${sc.Obj(ct.typoType.value, instances, ct.objBody0)}
-""".stripMargin
+    val cls = sc.Adt.Record(
+      isWrapper = false,
+      comments = scaladoc(List(ct.comment)),
+      name = ct.typoType,
+      tparams = Nil,
+      params = ct.params.toList,
+      implicitParams = Nil,
+      `extends` = None,
+      implements = Nil,
+      members = Nil,
+      staticMembers = instances ++ ct.objBody0
+    )
 
-    sc.File(ct.typoType, str, secondaryTypes = Nil, scope = Scope.Main)
+    sc.File(ct.typoType, cls, secondaryTypes = Nil, scope = Scope.Main)
   }
 }

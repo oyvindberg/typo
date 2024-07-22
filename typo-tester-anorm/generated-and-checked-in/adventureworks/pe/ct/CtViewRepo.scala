@@ -3,10 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pe.ct
+package adventureworks.pe.ct;
 
-import java.sql.Connection
-import typo.dsl.SelectBuilder
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
 
 trait CtViewRepo {
   def select: SelectBuilder[CtViewFields, CtViewRow]

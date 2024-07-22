@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.identity_test
+package adventureworks.public.identity_test;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait IdentityTestRepo {
   def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow]
@@ -17,7 +17,7 @@ trait IdentityTestRepo {
   def insert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow
   def insert(unsaved: IdentityTestRowUnsaved)(implicit c: Connection): IdentityTestRow
   def insertStreaming(unsaved: Iterator[IdentityTestRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[IdentityTestRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[IdentityTestFields, IdentityTestRow]
   def selectAll(implicit c: Connection): List[IdentityTestRow]
@@ -28,6 +28,6 @@ trait IdentityTestRepo {
   def update(row: IdentityTestRow)(implicit c: Connection): Boolean
   def upsert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow
   def upsertBatch(unsaved: Iterable[IdentityTestRow])(implicit c: Connection): List[IdentityTestRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[IdentityTestRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

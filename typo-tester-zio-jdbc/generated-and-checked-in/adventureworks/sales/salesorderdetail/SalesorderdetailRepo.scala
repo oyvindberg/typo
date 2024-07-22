@@ -3,16 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesorderdetail
+package adventureworks.sales.salesorderdetail;
 
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
+/** upsertBatch: Not implementable for zio-jdbc */
 trait SalesorderdetailRepo {
   def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def deleteById(compositeId: SalesorderdetailId): ZIO[ZConnection, Throwable, Boolean]
@@ -20,7 +21,7 @@ trait SalesorderdetailRepo {
   def insert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, SalesorderdetailRow]
   def insert(unsaved: SalesorderdetailRowUnsaved): ZIO[ZConnection, Throwable, SalesorderdetailRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderdetailRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderdetailRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def selectAll: ZStream[ZConnection, Throwable, SalesorderdetailRow]
@@ -30,7 +31,6 @@ trait SalesorderdetailRepo {
   def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow]
   def update(row: SalesorderdetailRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderdetailRow]]
-  // Not implementable for zio-jdbc: upsertBatch
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderdetailRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

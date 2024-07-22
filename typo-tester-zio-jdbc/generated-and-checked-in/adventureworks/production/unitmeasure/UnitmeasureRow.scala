@@ -3,72 +3,76 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.unitmeasure
+package adventureworks.production.unitmeasure;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import java.sql.ResultSet
-import zio.jdbc.JdbcDecoder
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
-import zio.json.ast.Json
-import zio.json.internal.Write
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import java.sql.ResultSet;
+import zio.jdbc.JdbcDecoder;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
+import zio.json.ast.Json;
+import zio.json.internal.Write;
 
 /** Table: production.unitmeasure
-    Unit of measure lookup table.
-    Primary key: unitmeasurecode */
-case class UnitmeasureRow(
-  /** Primary key. */
-  unitmeasurecode: UnitmeasureId,
-  /** Unit of measure description. */
-  name: Name,
-  /** Default: now() */
-  modifieddate: TypoLocalDateTime
-){
-   val id = unitmeasurecode
-   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): UnitmeasureRowUnsaved =
-     UnitmeasureRowUnsaved(unitmeasurecode, name, modifieddate)
- }
+  * Unit of measure lookup table.
+  * Primary key: unitmeasurecode
+  */
+case class UnitmeasureRow(/** Primary key. */
+                          unitmeasurecode: UnitmeasureId, /** Unit of measure description. */
+                          name: Name, /** Default: now() */
+                          modifieddate: TypoLocalDateTime) {
+  def id: UnitmeasureId = unitmeasurecode
+  def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): UnitmeasureRowUnsaved = new UnitmeasureRowUnsaved(unitmeasurecode, name, modifieddate)
+}
 
 object UnitmeasureRow {
-  implicit lazy val jdbcDecoder: JdbcDecoder[UnitmeasureRow] = new JdbcDecoder[UnitmeasureRow] {
-    override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, UnitmeasureRow) =
-      columIndex + 2 ->
-        UnitmeasureRow(
-          unitmeasurecode = UnitmeasureId.jdbcDecoder.unsafeDecode(columIndex + 0, rs)._2,
-          name = Name.jdbcDecoder.unsafeDecode(columIndex + 1, rs)._2,
-          modifieddate = TypoLocalDateTime.jdbcDecoder.unsafeDecode(columIndex + 2, rs)._2
-        )
-  }
-  implicit lazy val jsonDecoder: JsonDecoder[UnitmeasureRow] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
-    val unitmeasurecode = jsonObj.get("unitmeasurecode").toRight("Missing field 'unitmeasurecode'").flatMap(_.as(UnitmeasureId.jsonDecoder))
-    val name = jsonObj.get("name").toRight("Missing field 'name'").flatMap(_.as(Name.jsonDecoder))
-    val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(TypoLocalDateTime.jsonDecoder))
-    if (unitmeasurecode.isRight && name.isRight && modifieddate.isRight)
-      Right(UnitmeasureRow(unitmeasurecode = unitmeasurecode.toOption.get, name = name.toOption.get, modifieddate = modifieddate.toOption.get))
-    else Left(List[Either[String, Any]](unitmeasurecode, name, modifieddate).flatMap(_.left.toOption).mkString(", "))
-  }
-  implicit lazy val jsonEncoder: JsonEncoder[UnitmeasureRow] = new JsonEncoder[UnitmeasureRow] {
-    override def unsafeEncode(a: UnitmeasureRow, indent: Option[Int], out: Write): Unit = {
-      out.write("{")
-      out.write(""""unitmeasurecode":""")
-      UnitmeasureId.jsonEncoder.unsafeEncode(a.unitmeasurecode, indent, out)
-      out.write(",")
-      out.write(""""name":""")
-      Name.jsonEncoder.unsafeEncode(a.name, indent, out)
-      out.write(",")
-      out.write(""""modifieddate":""")
-      TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)
-      out.write("}")
+  implicit lazy val jdbcDecoder: JdbcDecoder[UnitmeasureRow] = {
+    new JdbcDecoder[UnitmeasureRow] {
+      override def unsafeDecode(columIndex: Int, rs: ResultSet): (Int, UnitmeasureRow) =
+        columIndex + 2 ->
+          UnitmeasureRow(
+            unitmeasurecode = UnitmeasureId.jdbcDecoder.unsafeDecode(columIndex + 0, rs)._2,
+            name = Name.jdbcDecoder.unsafeDecode(columIndex + 1, rs)._2,
+            modifieddate = TypoLocalDateTime.jdbcDecoder.unsafeDecode(columIndex + 2, rs)._2
+          )
     }
   }
-  implicit lazy val text: Text[UnitmeasureRow] = Text.instance[UnitmeasureRow]{ (row, sb) =>
-    UnitmeasureId.text.unsafeEncode(row.unitmeasurecode, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  implicit lazy val jsonDecoder: JsonDecoder[UnitmeasureRow] = {
+    JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
+      val unitmeasurecode = jsonObj.get("unitmeasurecode").toRight("Missing field 'unitmeasurecode'").flatMap(_.as(UnitmeasureId.jsonDecoder))
+      val name = jsonObj.get("name").toRight("Missing field 'name'").flatMap(_.as(Name.jsonDecoder))
+      val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(TypoLocalDateTime.jsonDecoder))
+      if (unitmeasurecode.isRight && name.isRight && modifieddate.isRight)
+        Right(UnitmeasureRow(unitmeasurecode = unitmeasurecode.toOption.get, name = name.toOption.get, modifieddate = modifieddate.toOption.get))
+      else Left(List[Either[String, Any]](unitmeasurecode, name, modifieddate).flatMap(_.left.toOption).mkString(", "))
+    }
+  }
+  implicit lazy val jsonEncoder: JsonEncoder[UnitmeasureRow] = {
+    new JsonEncoder[UnitmeasureRow] {
+      override def unsafeEncode(a: UnitmeasureRow, indent: Option[Int], out: Write): Unit = {
+        out.write("{")
+        out.write(""""unitmeasurecode":""")
+        UnitmeasureId.jsonEncoder.unsafeEncode(a.unitmeasurecode, indent, out)
+        out.write(",")
+        out.write(""""name":""")
+        Name.jsonEncoder.unsafeEncode(a.name, indent, out)
+        out.write(",")
+        out.write(""""modifieddate":""")
+        TypoLocalDateTime.jsonEncoder.unsafeEncode(a.modifieddate, indent, out)
+        out.write("}")
+      }
+    }
+  }
+  implicit lazy val text: Text[UnitmeasureRow] = {
+    Text.instance[UnitmeasureRow]{ (row, sb) =>
+      UnitmeasureId.text.unsafeEncode(row.unitmeasurecode, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
   }
 }

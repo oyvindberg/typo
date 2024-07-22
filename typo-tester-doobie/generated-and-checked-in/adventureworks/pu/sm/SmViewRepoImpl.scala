@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pu.sm
+package adventureworks.pu.sm;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class SmViewRepoImpl extends SmViewRepo {
-  override def select: SelectBuilder[SmViewFields, SmViewRow] = {
-    SelectBuilderSql("pu.sm", SmViewFields.structure, SmViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, SmViewRow] = {
-    sql"""select "id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from pu.sm""".query(using SmViewRow.read).stream
-  }
+  def select: SelectBuilder[SmViewFields, SmViewRow] = SelectBuilderSql("pu.sm", SmViewFields.structure, SmViewRow.read)
+  def selectAll: Stream[ConnectionIO, SmViewRow] = sql"""select "id", "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from pu.sm""".query(using SmViewRow.read).stream
 }

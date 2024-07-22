@@ -3,39 +3,30 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.identity_test
+package adventureworks.public.identity_test;
 
-import adventureworks.customtypes.Defaulted
-import doobie.postgres.Text
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.customtypes.Defaulted;
+import doobie.postgres.Text;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** This class corresponds to a row in table `public.identity-test` which has not been persisted yet */
-case class IdentityTestRowUnsaved(
-  name: IdentityTestId,
-  /** Identity ALWAYS, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
-  alwaysGenerated: Int,
-  /** Identity BY DEFAULT, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
-  defaultGenerated: Defaulted[Int]
-) {
-  def toRow(defaultGeneratedDefault: => Int, alwaysGeneratedDefault: => Int): IdentityTestRow =
-    IdentityTestRow(
-      alwaysGenerated = alwaysGeneratedDefault,
-      defaultGenerated = defaultGenerated match {
-                           case Defaulted.UseDefault => defaultGeneratedDefault
-                           case Defaulted.Provided(value) => value
-                         },
-      name = name
-    )
+case class IdentityTestRowUnsaved(name: IdentityTestId, /** Identity ALWAYS, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
+                                  alwaysGenerated: Int, /** Identity BY DEFAULT, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
+                                  defaultGenerated: Defaulted[Int]) {
+  def toRow(defaultGeneratedDefault: => Int, alwaysGeneratedDefault: => Int): IdentityTestRow = new IdentityTestRow(alwaysGenerated = alwaysGeneratedDefault, defaultGenerated = defaultGenerated.getOrElse(defaultGeneratedDefault), name = name)
 }
+
 object IdentityTestRowUnsaved {
   implicit lazy val decoder: Decoder[IdentityTestRowUnsaved] = Decoder.forProduct3[IdentityTestRowUnsaved, IdentityTestId, Int, Defaulted[Int]]("name", "always_generated", "default_generated")(IdentityTestRowUnsaved.apply)(IdentityTestId.decoder, Decoder.decodeInt, Defaulted.decoder(Decoder.decodeInt))
   implicit lazy val encoder: Encoder[IdentityTestRowUnsaved] = Encoder.forProduct3[IdentityTestRowUnsaved, IdentityTestId, Int, Defaulted[Int]]("name", "always_generated", "default_generated")(x => (x.name, x.alwaysGenerated, x.defaultGenerated))(IdentityTestId.encoder, Encoder.encodeInt, Defaulted.encoder(Encoder.encodeInt))
-  implicit lazy val text: Text[IdentityTestRowUnsaved] = Text.instance[IdentityTestRowUnsaved]{ (row, sb) =>
-    IdentityTestId.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Text.intInstance.unsafeEncode(row.alwaysGenerated, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(Text.intInstance).unsafeEncode(row.defaultGenerated, sb)
+  implicit lazy val text: Text[IdentityTestRowUnsaved] = {
+    Text.instance[IdentityTestRowUnsaved]{ (row, sb) =>
+      IdentityTestId.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Text.intInstance.unsafeEncode(row.alwaysGenerated, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(Text.intInstance).unsafeEncode(row.defaultGenerated, sb)
+    }
   }
 }

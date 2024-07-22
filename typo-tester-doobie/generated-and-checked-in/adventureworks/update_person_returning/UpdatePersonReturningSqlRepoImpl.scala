@@ -3,18 +3,18 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.update_person_returning
+package adventureworks.update_person_returning;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
-import doobie.syntax.string.toSqlInterpolator
-import doobie.util.Write
-import doobie.util.meta.Meta
-import fs2.Stream
+import adventureworks.customtypes.TypoLocalDateTime;
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite;
+import doobie.syntax.string.toSqlInterpolator;
+import doobie.util.Write;
+import doobie.util.meta.Meta;
+import fs2.Stream;
 
 class UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
-  override def apply(suffix: /* nullability unknown */ Option[String], cutoff: /* nullability unknown */ Option[TypoLocalDateTime]): Stream[ConnectionIO, UpdatePersonReturningSqlRow] = {
+  def apply(suffix: /* nullability unknown */ Option[String], cutoff: /* nullability unknown */ Option[TypoLocalDateTime]): Stream[ConnectionIO, UpdatePersonReturningSqlRow] = {
     val sql =
       sql"""with row as (
               update person.person

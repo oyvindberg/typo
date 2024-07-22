@@ -3,42 +3,43 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.workorderrouting
+package adventureworks.production.workorderrouting;
 
-import adventureworks.customtypes.TypoShort
-import adventureworks.production.workorder.WorkorderId
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
-import zio.json.ast.Json
-import zio.json.internal.Write
+import adventureworks.customtypes.TypoShort;
+import adventureworks.production.workorder.WorkorderId;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
+import zio.json.ast.Json;
+import zio.json.internal.Write;
 
 /** Type for the composite primary key of table `production.workorderrouting` */
-case class WorkorderroutingId(
-  workorderid: WorkorderId,
-  productid: Int,
-  operationsequence: TypoShort
-)
+case class WorkorderroutingId(workorderid: WorkorderId, productid: Int, operationsequence: TypoShort)
+
 object WorkorderroutingId {
-  implicit lazy val jsonDecoder: JsonDecoder[WorkorderroutingId] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
-    val workorderid = jsonObj.get("workorderid").toRight("Missing field 'workorderid'").flatMap(_.as(WorkorderId.jsonDecoder))
-    val productid = jsonObj.get("productid").toRight("Missing field 'productid'").flatMap(_.as(JsonDecoder.int))
-    val operationsequence = jsonObj.get("operationsequence").toRight("Missing field 'operationsequence'").flatMap(_.as(TypoShort.jsonDecoder))
-    if (workorderid.isRight && productid.isRight && operationsequence.isRight)
-      Right(WorkorderroutingId(workorderid = workorderid.toOption.get, productid = productid.toOption.get, operationsequence = operationsequence.toOption.get))
-    else Left(List[Either[String, Any]](workorderid, productid, operationsequence).flatMap(_.left.toOption).mkString(", "))
+  implicit lazy val jsonDecoder: JsonDecoder[WorkorderroutingId] = {
+    JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
+      val workorderid = jsonObj.get("workorderid").toRight("Missing field 'workorderid'").flatMap(_.as(WorkorderId.jsonDecoder))
+      val productid = jsonObj.get("productid").toRight("Missing field 'productid'").flatMap(_.as(JsonDecoder.int))
+      val operationsequence = jsonObj.get("operationsequence").toRight("Missing field 'operationsequence'").flatMap(_.as(TypoShort.jsonDecoder))
+      if (workorderid.isRight && productid.isRight && operationsequence.isRight)
+        Right(WorkorderroutingId(workorderid = workorderid.toOption.get, productid = productid.toOption.get, operationsequence = operationsequence.toOption.get))
+      else Left(List[Either[String, Any]](workorderid, productid, operationsequence).flatMap(_.left.toOption).mkString(", "))
+    }
   }
-  implicit lazy val jsonEncoder: JsonEncoder[WorkorderroutingId] = new JsonEncoder[WorkorderroutingId] {
-    override def unsafeEncode(a: WorkorderroutingId, indent: Option[Int], out: Write): Unit = {
-      out.write("{")
-      out.write(""""workorderid":""")
-      WorkorderId.jsonEncoder.unsafeEncode(a.workorderid, indent, out)
-      out.write(",")
-      out.write(""""productid":""")
-      JsonEncoder.int.unsafeEncode(a.productid, indent, out)
-      out.write(",")
-      out.write(""""operationsequence":""")
-      TypoShort.jsonEncoder.unsafeEncode(a.operationsequence, indent, out)
-      out.write("}")
+  implicit lazy val jsonEncoder: JsonEncoder[WorkorderroutingId] = {
+    new JsonEncoder[WorkorderroutingId] {
+      override def unsafeEncode(a: WorkorderroutingId, indent: Option[Int], out: Write): Unit = {
+        out.write("{")
+        out.write(""""workorderid":""")
+        WorkorderId.jsonEncoder.unsafeEncode(a.workorderid, indent, out)
+        out.write(",")
+        out.write(""""productid":""")
+        JsonEncoder.int.unsafeEncode(a.productid, indent, out)
+        out.write(",")
+        out.write(""""operationsequence":""")
+        TypoShort.jsonEncoder.unsafeEncode(a.operationsequence, indent, out)
+        out.write("}")
+      }
     }
   }
 }

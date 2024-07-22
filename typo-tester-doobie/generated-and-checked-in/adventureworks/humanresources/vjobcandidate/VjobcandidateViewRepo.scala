@@ -3,11 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.vjobcandidate
+package adventureworks.humanresources.vjobcandidate;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.SelectBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
 
 trait VjobcandidateViewRepo {
   def select: SelectBuilder[VjobcandidateViewFields, VjobcandidateViewRow]

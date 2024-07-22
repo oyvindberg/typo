@@ -3,98 +3,124 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.businessentityaddress
+package adventureworks.person.businessentityaddress;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.address.AddressId
-import adventureworks.person.addresstype.AddresstypeId
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.address.AddressId;
+import adventureworks.person.addresstype.AddresstypeId;
+import adventureworks.person.businessentity.BusinessentityId;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: person.businessentityaddress
-    Cross-reference table mapping customers, vendors, and employees to their addresses.
-    Composite primary key: businessentityid, addressid, addresstypeid */
+  * Cross-reference table mapping customers, vendors, and employees to their addresses.
+  * Composite primary key: businessentityid, addressid, addresstypeid
+  */
 case class BusinessentityaddressRow(
   /** Primary key. Foreign key to BusinessEntity.BusinessEntityID.
-      Points to [[adventureworks.person.businessentity.BusinessentityRow.businessentityid]] */
+    * Points to [[adventureworks.person.businessentity.BusinessentityRow.businessentityid]]
+    */
   businessentityid: BusinessentityId,
   /** Primary key. Foreign key to Address.AddressID.
-      Points to [[adventureworks.person.address.AddressRow.addressid]] */
+    * Points to [[adventureworks.person.address.AddressRow.addressid]]
+    */
   addressid: AddressId,
   /** Primary key. Foreign key to AddressType.AddressTypeID.
-      Points to [[adventureworks.person.addresstype.AddresstypeRow.addresstypeid]] */
+    * Points to [[adventureworks.person.addresstype.AddresstypeRow.addresstypeid]]
+    */
   addresstypeid: AddresstypeId,
   /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val compositeId: BusinessentityaddressId = BusinessentityaddressId(businessentityid, addressid, addresstypeid)
-   val id = compositeId
-   def toUnsavedRow(rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): BusinessentityaddressRowUnsaved =
-     BusinessentityaddressRowUnsaved(businessentityid, addressid, addresstypeid, rowguid, modifieddate)
- }
+) {
+  def compositeId: BusinessentityaddressId = new BusinessentityaddressId(businessentityid, addressid, addresstypeid)
+  def id: BusinessentityaddressId = compositeId
+  def toUnsavedRow(rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): BusinessentityaddressRowUnsaved = {
+    new BusinessentityaddressRowUnsaved(
+      businessentityid,
+      addressid,
+      addresstypeid,
+      rowguid,
+      modifieddate
+    )
+  }
+}
 
 object BusinessentityaddressRow {
-  def apply(compositeId: BusinessentityaddressId, rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
-    new BusinessentityaddressRow(compositeId.businessentityid, compositeId.addressid, compositeId.addresstypeid, rowguid, modifieddate)
+  def apply(compositeId: BusinessentityaddressId, rowguid: TypoUUID, modifieddate: TypoLocalDateTime): BusinessentityaddressRow = {
+    new BusinessentityaddressRow(
+      compositeId.businessentityid,
+      compositeId.addressid,
+      compositeId.addresstypeid,
+      rowguid,
+      modifieddate
+    )
+  }
   implicit lazy val decoder: Decoder[BusinessentityaddressRow] = Decoder.forProduct5[BusinessentityaddressRow, BusinessentityId, AddressId, AddresstypeId, TypoUUID, TypoLocalDateTime]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BusinessentityaddressRow.apply)(BusinessentityId.decoder, AddressId.decoder, AddresstypeId.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[BusinessentityaddressRow] = Encoder.forProduct5[BusinessentityaddressRow, BusinessentityId, AddressId, AddresstypeId, TypoUUID, TypoLocalDateTime]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, AddressId.encoder, AddresstypeId.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[BusinessentityaddressRow] = new Read[BusinessentityaddressRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (AddressId.get, Nullability.NoNulls),
-      (AddresstypeId.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => BusinessentityaddressRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      addressid = AddressId.get.unsafeGetNonNullable(rs, i + 1),
-      addresstypeid = AddresstypeId.get.unsafeGetNonNullable(rs, i + 2),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+  implicit lazy val read: Read[BusinessentityaddressRow] = {
+    new Read[BusinessentityaddressRow](
+      gets = List(
+        (BusinessentityId.get, Nullability.NoNulls),
+        (AddressId.get, Nullability.NoNulls),
+        (AddresstypeId.get, Nullability.NoNulls),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => BusinessentityaddressRow(
+        businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+        addressid = AddressId.get.unsafeGetNonNullable(rs, i + 1),
+        addresstypeid = AddresstypeId.get.unsafeGetNonNullable(rs, i + 2),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 3),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+      )
     )
-  )
-  implicit lazy val text: Text[BusinessentityaddressRow] = Text.instance[BusinessentityaddressRow]{ (row, sb) =>
-    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
-    sb.append(Text.DELIMETER)
-    AddressId.text.unsafeEncode(row.addressid, sb)
-    sb.append(Text.DELIMETER)
-    AddresstypeId.text.unsafeEncode(row.addresstypeid, sb)
-    sb.append(Text.DELIMETER)
-    TypoUUID.text.unsafeEncode(row.rowguid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[BusinessentityaddressRow] = new Write[BusinessentityaddressRow](
-    puts = List((BusinessentityId.put, Nullability.NoNulls),
-                (AddressId.put, Nullability.NoNulls),
-                (AddresstypeId.put, Nullability.NoNulls),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
-                  AddressId.put.unsafeSetNonNullable(rs, i + 1, a.addressid)
-                  AddresstypeId.put.unsafeSetNonNullable(rs, i + 2, a.addresstypeid)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 3, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
-                     AddressId.put.unsafeUpdateNonNullable(ps, i + 1, a.addressid)
-                     AddresstypeId.put.unsafeUpdateNonNullable(ps, i + 2, a.addresstypeid)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 3, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[BusinessentityaddressRow] = {
+    Text.instance[BusinessentityaddressRow]{ (row, sb) =>
+      BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+      sb.append(Text.DELIMETER)
+      AddressId.text.unsafeEncode(row.addressid, sb)
+      sb.append(Text.DELIMETER)
+      AddresstypeId.text.unsafeEncode(row.addresstypeid, sb)
+      sb.append(Text.DELIMETER)
+      TypoUUID.text.unsafeEncode(row.rowguid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[BusinessentityaddressRow] = {
+    new Write[BusinessentityaddressRow](
+      puts = List((BusinessentityId.put, Nullability.NoNulls),
+                  (AddressId.put, Nullability.NoNulls),
+                  (AddresstypeId.put, Nullability.NoNulls),
+                  (TypoUUID.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
+                    AddressId.put.unsafeSetNonNullable(rs, i + 1, a.addressid)
+                    AddresstypeId.put.unsafeSetNonNullable(rs, i + 2, a.addresstypeid)
+                    TypoUUID.put.unsafeSetNonNullable(rs, i + 3, a.rowguid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
+                       AddressId.put.unsafeUpdateNonNullable(ps, i + 1, a.addressid)
+                       AddresstypeId.put.unsafeUpdateNonNullable(ps, i + 2, a.addresstypeid)
+                       TypoUUID.put.unsafeUpdateNonNullable(ps, i + 3, a.rowguid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
+                     }
+    )
+  
+  }
 }

@@ -3,60 +3,55 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.identity_test
+package adventureworks.public.identity_test;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** This class corresponds to a row in table `public.identity-test` which has not been persisted yet */
-case class IdentityTestRowUnsaved(
-  name: IdentityTestId,
-  /** Identity ALWAYS, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
-  alwaysGenerated: Int,
-  /** Identity BY DEFAULT, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
-  defaultGenerated: Defaulted[Int]
-) {
-  def toRow(defaultGeneratedDefault: => Int, alwaysGeneratedDefault: => Int): IdentityTestRow =
-    IdentityTestRow(
-      alwaysGenerated = alwaysGeneratedDefault,
-      defaultGenerated = defaultGenerated match {
-                           case Defaulted.UseDefault => defaultGeneratedDefault
-                           case Defaulted.Provided(value) => value
-                         },
-      name = name
-    )
+case class IdentityTestRowUnsaved(name: IdentityTestId, /** Identity ALWAYS, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
+                                  alwaysGenerated: Int, /** Identity BY DEFAULT, identityStart: 1, identityIncrement: 1, identityMaximum: 2147483647, identityMinimum: 1 */
+                                  defaultGenerated: Defaulted[Int]) {
+  def toRow(defaultGeneratedDefault: => Int, alwaysGeneratedDefault: => Int): IdentityTestRow = new IdentityTestRow(alwaysGenerated = alwaysGeneratedDefault, defaultGenerated = defaultGenerated.getOrElse(defaultGeneratedDefault), name = name)
 }
+
 object IdentityTestRowUnsaved {
-  implicit lazy val reads: Reads[IdentityTestRowUnsaved] = Reads[IdentityTestRowUnsaved](json => JsResult.fromTry(
-      Try(
-        IdentityTestRowUnsaved(
-          name = json.\("name").as(IdentityTestId.reads),
-          alwaysGenerated = json.\("always_generated").as(Reads.IntReads),
-          defaultGenerated = json.\("default_generated").as(Defaulted.reads(Reads.IntReads))
+  implicit lazy val reads: Reads[IdentityTestRowUnsaved] = {
+    Reads[IdentityTestRowUnsaved](json => JsResult.fromTry(
+        Try(
+          IdentityTestRowUnsaved(
+            name = json.\("name").as(IdentityTestId.reads),
+            alwaysGenerated = json.\("always_generated").as(Reads.IntReads),
+            defaultGenerated = json.\("default_generated").as(Defaulted.reads(Reads.IntReads))
+          )
         )
-      )
-    ),
-  )
-  implicit lazy val text: Text[IdentityTestRowUnsaved] = Text.instance[IdentityTestRowUnsaved]{ (row, sb) =>
-    IdentityTestId.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Text.intInstance.unsafeEncode(row.alwaysGenerated, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(Text.intInstance).unsafeEncode(row.defaultGenerated, sb)
+      ),
+    )
   }
-  implicit lazy val writes: OWrites[IdentityTestRowUnsaved] = OWrites[IdentityTestRowUnsaved](o =>
-    new JsObject(ListMap[String, JsValue](
-      "name" -> IdentityTestId.writes.writes(o.name),
-      "always_generated" -> Writes.IntWrites.writes(o.alwaysGenerated),
-      "default_generated" -> Defaulted.writes(Writes.IntWrites).writes(o.defaultGenerated)
-    ))
-  )
+  implicit lazy val text: Text[IdentityTestRowUnsaved] = {
+    Text.instance[IdentityTestRowUnsaved]{ (row, sb) =>
+      IdentityTestId.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Text.intInstance.unsafeEncode(row.alwaysGenerated, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(Text.intInstance).unsafeEncode(row.defaultGenerated, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[IdentityTestRowUnsaved] = {
+    OWrites[IdentityTestRowUnsaved](o =>
+      new JsObject(ListMap[String, JsValue](
+        "name" -> IdentityTestId.writes.writes(o.name),
+        "always_generated" -> Writes.IntWrites.writes(o.alwaysGenerated),
+        "default_generated" -> Defaulted.writes(Writes.IntWrites).writes(o.defaultGenerated)
+      ))
+    )
+  }
 }

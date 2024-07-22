@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pu.poh
+package adventureworks.pu.poh;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class PohViewRepoImpl extends PohViewRepo {
-  override def select: SelectBuilder[PohViewFields, PohViewRow] = {
-    SelectBuilderSql("pu.poh", PohViewFields.structure, PohViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, PohViewRow] = {
-    sql"""select "id", "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from pu.poh""".query(using PohViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[PohViewFields, PohViewRow] = SelectBuilderSql("pu.poh", PohViewFields.structure, PohViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, PohViewRow] = sql"""select "id", "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from pu.poh""".query(using PohViewRow.jdbcDecoder).selectStream()
 }

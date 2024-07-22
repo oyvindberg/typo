@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pe.ct
+package adventureworks.pe.ct;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class CtViewRepoImpl extends CtViewRepo {
-  override def select: SelectBuilder[CtViewFields, CtViewRow] = {
-    SelectBuilderSql("pe.ct", CtViewFields.structure, CtViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, CtViewRow] = {
-    sql"""select "id", "contacttypeid", "name", "modifieddate"::text from pe.ct""".query(using CtViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[CtViewFields, CtViewRow] = SelectBuilderSql("pe.ct", CtViewFields.structure, CtViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, CtViewRow] = sql"""select "id", "contacttypeid", "name", "modifieddate"::text from pe.ct""".query(using CtViewRow.jdbcDecoder).selectStream()
 }

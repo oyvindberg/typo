@@ -3,37 +3,39 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesorderdetail
+package adventureworks.sales.salesorderdetail;
 
-import adventureworks.sales.salesorderheader.SalesorderheaderId
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.sales.salesorderheader.SalesorderheaderId;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** Type for the composite primary key of table `sales.salesorderdetail` */
-case class SalesorderdetailId(
-  salesorderid: SalesorderheaderId,
-  salesorderdetailid: Int
-)
+case class SalesorderdetailId(salesorderid: SalesorderheaderId, salesorderdetailid: Int)
+
 object SalesorderdetailId {
-  implicit lazy val reads: Reads[SalesorderdetailId] = Reads[SalesorderdetailId](json => JsResult.fromTry(
-      Try(
-        SalesorderdetailId(
-          salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
-          salesorderdetailid = json.\("salesorderdetailid").as(Reads.IntReads)
+  implicit lazy val reads: Reads[SalesorderdetailId] = {
+    Reads[SalesorderdetailId](json => JsResult.fromTry(
+        Try(
+          SalesorderdetailId(
+            salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
+            salesorderdetailid = json.\("salesorderdetailid").as(Reads.IntReads)
+          )
         )
-      )
-    ),
-  )
-  implicit lazy val writes: OWrites[SalesorderdetailId] = OWrites[SalesorderdetailId](o =>
-    new JsObject(ListMap[String, JsValue](
-      "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
-      "salesorderdetailid" -> Writes.IntWrites.writes(o.salesorderdetailid)
-    ))
-  )
+      ),
+    )
+  }
+  implicit lazy val writes: OWrites[SalesorderdetailId] = {
+    OWrites[SalesorderdetailId](o =>
+      new JsObject(ListMap[String, JsValue](
+        "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
+        "salesorderdetailid" -> Writes.IntWrites.writes(o.salesorderdetailid)
+      ))
+    )
+  }
 }

@@ -3,14 +3,14 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.users
+package adventureworks.public.users;
 
-import adventureworks.customtypes.TypoUnknownCitext
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import adventureworks.customtypes.TypoUnknownCitext;
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait UsersRepo {
   def delete: DeleteBuilder[UsersFields, UsersRow]
@@ -19,7 +19,7 @@ trait UsersRepo {
   def insert(unsaved: UsersRow): ConnectionIO[UsersRow]
   def insert(unsaved: UsersRowUnsaved): ConnectionIO[UsersRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UsersRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[UsersFields, UsersRow]
   def selectAll: Stream[ConnectionIO, UsersRow]
@@ -31,6 +31,6 @@ trait UsersRepo {
   def update(row: UsersRow): ConnectionIO[Boolean]
   def upsert(unsaved: UsersRow): ConnectionIO[UsersRow]
   def upsertBatch(unsaved: List[UsersRow]): Stream[ConnectionIO, UsersRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, UsersRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

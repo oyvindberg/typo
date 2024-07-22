@@ -3,118 +3,98 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.location
+package adventureworks.production.location;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import cats.instances.list.catsStdInstancesForList
-import doobie.free.connection.ConnectionIO
-import doobie.postgres.syntax.FragmentOps
-import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
-import doobie.syntax.string.toSqlInterpolator
-import doobie.util.Write
-import doobie.util.fragment.Fragment
-import doobie.util.meta.Meta
-import doobie.util.update.Update
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import typo.dsl.UpdateBuilder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import cats.instances.list.catsStdInstancesForList;
+import doobie.free.connection.ConnectionIO;
+import doobie.postgres.syntax.FragmentOps;
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite;
+import doobie.syntax.string.toSqlInterpolator;
+import doobie.util.Write;
+import doobie.util.fragment.Fragment;
+import doobie.util.meta.Meta;
+import doobie.util.update.Update;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import typo.dsl.UpdateBuilder;
 
 class LocationRepoImpl extends LocationRepo {
-  override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilder("production.location", LocationFields.structure)
-  }
-  override def deleteById(locationid: LocationId): ConnectionIO[Boolean] = {
-    sql"""delete from production.location where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
-  }
-  override def deleteByIds(locationids: Array[LocationId]): ConnectionIO[Int] = {
-    sql"""delete from production.location where "locationid" = ANY(${fromWrite(locationids)(Write.fromPut(LocationId.arrayPut))})""".update.run
-  }
-  override def insert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
+  def delete: DeleteBuilder[LocationFields, LocationRow] = DeleteBuilder("production.location", LocationFields.structure)
+  def deleteById(locationid: LocationId): ConnectionIO[Boolean] = sql"""delete from production.location where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
+  def deleteByIds(locationids: Array[LocationId]): ConnectionIO[Int] = sql"""delete from production.location where "locationid" = ANY(${fromWrite(locationids)(Write.fromPut(LocationId.arrayPut))})""".update.run
+  def insert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
           values (${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.costrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.availability)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "locationid", "name", "costrate", "availability", "modifieddate"::text
        """.query(using LocationRow.read).unique
   }
-  override def insert(unsaved: LocationRowUnsaved): ConnectionIO[LocationRow] = {
+  def insert(unsaved: LocationRowUnsaved): ConnectionIO[LocationRow] = {
     val fs = List(
       Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
-      unsaved.locationid match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""locationid""""), fr"${fromWrite(value: LocationId)(Write.fromPut(LocationId.put))}::int4"))
-      },
-      unsaved.costrate match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""costrate""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
-      },
-      unsaved.availability match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""availability""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
-      },
-      unsaved.modifieddate match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
-      }
+    unsaved.locationid match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((Fragment.const0(s""""locationid""""), fr"${fromWrite(value: LocationId)(Write.fromPut(LocationId.put))}::int4"))
+    },
+    unsaved.costrate match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((Fragment.const0(s""""costrate""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+    },
+    unsaved.availability match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((Fragment.const0(s""""availability""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+    },
+    unsaved.modifieddate match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+    }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.location default values
-            returning "locationid", "name", "costrate", "availability", "modifieddate"::text
-         """
+                            returning "locationid", "name", "costrate", "availability", "modifieddate"::text
+                         """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
       sql"""insert into production.location(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
-            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
-            returning "locationid", "name", "costrate", "availability", "modifieddate"::text
-         """
+                            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
+                            returning "locationid", "name", "costrate", "availability", "modifieddate"::text
+                         """
     }
     q.query(using LocationRow.read).unique
-    
+  
   }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using LocationRow.text)
-  }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, LocationRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using LocationRowUnsaved.text)
-  }
-  override def select: SelectBuilder[LocationFields, LocationRow] = {
-    SelectBuilderSql("production.location", LocationFields.structure, LocationRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, LocationRow] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location""".query(using LocationRow.read).stream
-  }
-  override def selectById(locationid: LocationId): ConnectionIO[Option[LocationRow]] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".query(using LocationRow.read).option
-  }
-  override def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ANY(${fromWrite(locationids)(Write.fromPut(LocationId.arrayPut))})""".query(using LocationRow.read).stream
-  }
-  override def selectByIdsTracked(locationids: Array[LocationId]): ConnectionIO[Map[LocationId, LocationRow]] = {
+  def insertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int = 10000): ConnectionIO[Long] = new FragmentOps(sql"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using LocationRow.text)
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, LocationRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = new FragmentOps(sql"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using LocationRowUnsaved.text)
+  def select: SelectBuilder[LocationFields, LocationRow] = SelectBuilderSql("production.location", LocationFields.structure, LocationRow.read)
+  def selectAll: Stream[ConnectionIO, LocationRow] = sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location""".query(using LocationRow.read).stream
+  def selectById(locationid: LocationId): ConnectionIO[Option[LocationRow]] = sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".query(using LocationRow.read).option
+  def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow] = sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ANY(${fromWrite(locationids)(Write.fromPut(LocationId.arrayPut))})""".query(using LocationRow.read).stream
+  def selectByIdsTracked(locationids: Array[LocationId]): ConnectionIO[Map[LocationId, LocationRow]] = {
     selectByIds(locationids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.locationid, x)).toMap
       locationids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilder("production.location", LocationFields.structure, LocationRow.read)
-  }
-  override def update(row: LocationRow): ConnectionIO[Boolean] = {
+  def update: UpdateBuilder[LocationFields, LocationRow] = UpdateBuilder("production.location", LocationFields.structure, LocationRow.read)
+  def update(row: LocationRow): ConnectionIO[Boolean] = {
     val locationid = row.locationid
     sql"""update production.location
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              "costrate" = ${fromWrite(row.costrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "availability" = ${fromWrite(row.availability)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}"""
+                          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
+                              "costrate" = ${fromWrite(row.costrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+                              "availability" = ${fromWrite(row.availability)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+                              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+                          where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}"""
       .update
       .run
       .map(_ > 0)
   }
-  override def upsert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
+  def upsert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
           values (
             ${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int4,
@@ -132,7 +112,7 @@ class LocationRepoImpl extends LocationRepo {
           returning "locationid", "name", "costrate", "availability", "modifieddate"::text
        """.query(using LocationRow.read).unique
   }
-  override def upsertBatch(unsaved: List[LocationRow]): Stream[ConnectionIO, LocationRow] = {
+  def upsertBatch(unsaved: List[LocationRow]): Stream[ConnectionIO, LocationRow] = {
     Update[LocationRow](
       s"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
           values (?::int4,?::varchar,?::numeric,?::numeric,?::timestamp)
@@ -146,8 +126,8 @@ class LocationRepoImpl extends LocationRepo {
     )(using LocationRow.write)
     .updateManyWithGeneratedKeys[LocationRow]("locationid", "name", "costrate", "availability", "modifieddate")(unsaved)(using catsStdInstancesForList, LocationRow.read)
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
       _ <- sql"create temporary table location_TEMP (like production.location) on commit drop".update.run
       _ <- new FragmentOps(sql"""copy location_TEMP("locationid", "name", "costrate", "availability", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using LocationRow.text)

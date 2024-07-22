@@ -3,49 +3,39 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productdocument
+package adventureworks.production.productdocument;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.document.DocumentId
-import adventureworks.production.product.ProductId
-import doobie.postgres.Text
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.document.DocumentId;
+import adventureworks.production.product.ProductId;
+import doobie.postgres.Text;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** This class corresponds to a row in table `production.productdocument` which has not been persisted yet */
-case class ProductdocumentRowUnsaved(
-  /** Product identification number. Foreign key to Product.ProductID.
-      Points to [[adventureworks.production.product.ProductRow.productid]] */
-  productid: ProductId,
-  /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
-  /** Default: '/'::character varying
-      Document identification number. Foreign key to Document.DocumentNode.
-      Points to [[adventureworks.production.document.DocumentRow.documentnode]] */
-  documentnode: Defaulted[DocumentId] = Defaulted.UseDefault
-) {
-  def toRow(modifieddateDefault: => TypoLocalDateTime, documentnodeDefault: => DocumentId): ProductdocumentRow =
-    ProductdocumentRow(
-      productid = productid,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     },
-      documentnode = documentnode match {
-                       case Defaulted.UseDefault => documentnodeDefault
-                       case Defaulted.Provided(value) => value
-                     }
-    )
+case class ProductdocumentRowUnsaved(/** Product identification number. Foreign key to Product.ProductID.
+                                       * Points to [[adventureworks.production.product.ProductRow.productid]]
+                                       */
+                                     productid: ProductId, /** Default: now() */
+                                     modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault(), /** Default: '/'::character varying
+                                       * Document identification number. Foreign key to Document.DocumentNode.
+                                       * Points to [[adventureworks.production.document.DocumentRow.documentnode]]
+                                       */
+                                     documentnode: Defaulted[DocumentId] = Defaulted.UseDefault()) {
+  def toRow(modifieddateDefault: => TypoLocalDateTime, documentnodeDefault: => DocumentId): ProductdocumentRow = new ProductdocumentRow(productid = productid, modifieddate = modifieddate.getOrElse(modifieddateDefault), documentnode = documentnode.getOrElse(documentnodeDefault))
 }
+
 object ProductdocumentRowUnsaved {
   implicit lazy val decoder: Decoder[ProductdocumentRowUnsaved] = Decoder.forProduct3[ProductdocumentRowUnsaved, ProductId, Defaulted[TypoLocalDateTime], Defaulted[DocumentId]]("productid", "modifieddate", "documentnode")(ProductdocumentRowUnsaved.apply)(ProductId.decoder, Defaulted.decoder(TypoLocalDateTime.decoder), Defaulted.decoder(DocumentId.decoder))
   implicit lazy val encoder: Encoder[ProductdocumentRowUnsaved] = Encoder.forProduct3[ProductdocumentRowUnsaved, ProductId, Defaulted[TypoLocalDateTime], Defaulted[DocumentId]]("productid", "modifieddate", "documentnode")(x => (x.productid, x.modifieddate, x.documentnode))(ProductId.encoder, Defaulted.encoder(TypoLocalDateTime.encoder), Defaulted.encoder(DocumentId.encoder))
-  implicit lazy val text: Text[ProductdocumentRowUnsaved] = Text.instance[ProductdocumentRowUnsaved]{ (row, sb) =>
-    ProductId.text.unsafeEncode(row.productid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(DocumentId.text).unsafeEncode(row.documentnode, sb)
+  implicit lazy val text: Text[ProductdocumentRowUnsaved] = {
+    Text.instance[ProductdocumentRowUnsaved]{ (row, sb) =>
+      ProductId.text.unsafeEncode(row.productid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(DocumentId.text).unsafeEncode(row.documentnode, sb)
+    }
   }
 }

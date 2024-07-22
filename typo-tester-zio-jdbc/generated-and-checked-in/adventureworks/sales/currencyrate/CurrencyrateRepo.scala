@@ -3,16 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.currencyrate
+package adventureworks.sales.currencyrate;
 
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
+/** upsertBatch: Not implementable for zio-jdbc */
 trait CurrencyrateRepo {
   def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow]
   def deleteById(currencyrateid: CurrencyrateId): ZIO[ZConnection, Throwable, Boolean]
@@ -20,7 +21,7 @@ trait CurrencyrateRepo {
   def insert(unsaved: CurrencyrateRow): ZIO[ZConnection, Throwable, CurrencyrateRow]
   def insert(unsaved: CurrencyrateRowUnsaved): ZIO[ZConnection, Throwable, CurrencyrateRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyrateRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyrateRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow]
   def selectAll: ZStream[ZConnection, Throwable, CurrencyrateRow]
@@ -30,7 +31,6 @@ trait CurrencyrateRepo {
   def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow]
   def update(row: CurrencyrateRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CurrencyrateRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyrateRow]]
-  // Not implementable for zio-jdbc: upsertBatch
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyrateRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

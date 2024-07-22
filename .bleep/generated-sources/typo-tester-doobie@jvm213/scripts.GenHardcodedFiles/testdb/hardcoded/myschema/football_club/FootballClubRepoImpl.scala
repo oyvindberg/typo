@@ -3,51 +3,39 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.myschema.football_club
+package testdb.hardcoded.myschema.football_club;
 
-import cats.data.NonEmptyList
-import cats.instances.list.catsStdInstancesForList
-import doobie.free.connection.ConnectionIO
-import doobie.free.connection.pure
-import doobie.postgres.syntax.FragmentOps
-import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
-import doobie.syntax.string.toSqlInterpolator
-import doobie.util.Write
-import doobie.util.fragments
-import doobie.util.meta.Meta
-import doobie.util.update.Update
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import typo.dsl.UpdateBuilder
+import cats.data.NonEmptyList;
+import cats.instances.list.catsStdInstancesForList;
+import doobie.free.connection.ConnectionIO;
+import doobie.free.connection.pure;
+import doobie.postgres.syntax.FragmentOps;
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite;
+import doobie.syntax.string.toSqlInterpolator;
+import doobie.util.Write;
+import doobie.util.fragments;
+import doobie.util.meta.Meta;
+import doobie.util.update.Update;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import typo.dsl.UpdateBuilder;
 
 class FootballClubRepoImpl extends FootballClubRepo {
-  override def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = {
-    DeleteBuilder("myschema.football_club", FootballClubFields.structure)
-  }
-  override def deleteById(id: FootballClubId): ConnectionIO[Boolean] = {
-    sql"""delete from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".update.run.map(_ > 0)
-  }
-  override def deleteByIds(ids: Array[FootballClubId]): ConnectionIO[Int] = {
-    sql"""delete from myschema.football_club where "id" = ANY(${fromWrite(ids)(Write.fromPut(FootballClubId.arrayPut))})""".update.run
-  }
-  override def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
+  def delete: DeleteBuilder[FootballClubFields, FootballClubRow] = DeleteBuilder("myschema.football_club", FootballClubFields.structure)
+  def deleteById(id: FootballClubId): ConnectionIO[Boolean] = sql"""delete from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".update.run.map(_ > 0)
+  def deleteByIds(ids: Array[FootballClubId]): ConnectionIO[Int] = sql"""delete from myschema.football_club where "id" = ANY(${fromWrite(ids)(Write.fromPut(FootballClubId.arrayPut))})""".update.run
+  def insert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")
           values (${fromWrite(unsaved.id)(Write.fromPut(FootballClubId.put))}::int8, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))})
           returning "id", "name"
        """.query(using FootballClubRow.read).unique
   }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY myschema.football_club("id", "name") FROM STDIN""").copyIn(unsaved, batchSize)(using FootballClubRow.text)
-  }
-  override def select: SelectBuilder[FootballClubFields, FootballClubRow] = {
-    SelectBuilderSql("myschema.football_club", FootballClubFields.structure, FootballClubRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club""".query(using FootballClubRow.read).stream
-  }
-  override def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): Stream[ConnectionIO, FootballClubRow] = {
+  def insertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int = 10000): ConnectionIO[Long] = new FragmentOps(sql"""COPY myschema.football_club("id", "name") FROM STDIN""").copyIn(unsaved, batchSize)(using FootballClubRow.text)
+  def select: SelectBuilder[FootballClubFields, FootballClubRow] = SelectBuilderSql("myschema.football_club", FootballClubFields.structure, FootballClubRow.read)
+  def selectAll: Stream[ConnectionIO, FootballClubRow] = sql"""select "id", "name" from myschema.football_club""".query(using FootballClubRow.read).stream
+  def selectByFieldValues(fieldValues: List[FootballClubFieldValue[?]]): Stream[ConnectionIO, FootballClubRow] = {
     val where = fragments.whereAndOpt(
       fieldValues.map {
         case FootballClubFieldValue.id(value) => fr""""id" = ${fromWrite(value)(Write.fromPut(FootballClubId.put))}"""
@@ -56,36 +44,31 @@ class FootballClubRepoImpl extends FootballClubRepo {
     )
     sql"""select "id", "name" from myschema.football_club $where""".query(using FootballClubRow.read).stream
   }
-  override def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".query(using FootballClubRow.read).option
-  }
-  override def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = {
-    sql"""select "id", "name" from myschema.football_club where "id" = ANY(${fromWrite(ids)(Write.fromPut(FootballClubId.arrayPut))})""".query(using FootballClubRow.read).stream
-  }
-  override def selectByIdsTracked(ids: Array[FootballClubId]): ConnectionIO[Map[FootballClubId, FootballClubRow]] = {
+  def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]] = sql"""select "id", "name" from myschema.football_club where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".query(using FootballClubRow.read).option
+  def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow] = sql"""select "id", "name" from myschema.football_club where "id" = ANY(${fromWrite(ids)(Write.fromPut(FootballClubId.arrayPut))})""".query(using FootballClubRow.read).stream
+  def selectByIdsTracked(ids: Array[FootballClubId]): ConnectionIO[Map[FootballClubId, FootballClubRow]] = {
     selectByIds(ids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.id, x)).toMap
       ids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
-    UpdateBuilder("myschema.football_club", FootballClubFields.structure, FootballClubRow.read)
-  }
-  override def update(row: FootballClubRow): ConnectionIO[Boolean] = {
+  def update: UpdateBuilder[FootballClubFields, FootballClubRow] = UpdateBuilder("myschema.football_club", FootballClubFields.structure, FootballClubRow.read)
+  def update(row: FootballClubRow): ConnectionIO[Boolean] = {
     val id = row.id
     sql"""update myschema.football_club
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Meta.StringMeta.put))}
-          where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}"""
+                          set "name" = ${fromWrite(row.name)(Write.fromPut(Meta.StringMeta.put))}
+                          where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}"""
       .update
       .run
       .map(_ > 0)
   }
-  override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ConnectionIO[Boolean] = {
+  def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ConnectionIO[Boolean] = {
     NonEmptyList.fromList(fieldValues) match {
       case None => pure(false)
       case Some(nonEmpty) =>
         val updates = fragments.set(
           nonEmpty.map {
+            case FootballClubFieldValue.id(value) => fr""""id" = ${fromWrite(value)(Write.fromPut(FootballClubId.put))}::int8"""
             case FootballClubFieldValue.name(value) => fr""""name" = ${fromWrite(value)(Write.fromPut(Meta.StringMeta.put))}"""
           }
         )
@@ -94,7 +77,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
               where "id" = ${fromWrite(id)(Write.fromPut(FootballClubId.put))}""".update.run.map(_ > 0)
     }
   }
-  override def upsert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
+  def upsert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow] = {
     sql"""insert into myschema.football_club("id", "name")
           values (
             ${fromWrite(unsaved.id)(Write.fromPut(FootballClubId.put))}::int8,
@@ -106,7 +89,7 @@ class FootballClubRepoImpl extends FootballClubRepo {
           returning "id", "name"
        """.query(using FootballClubRow.read).unique
   }
-  override def upsertBatch(unsaved: List[FootballClubRow]): Stream[ConnectionIO, FootballClubRow] = {
+  def upsertBatch(unsaved: List[FootballClubRow]): Stream[ConnectionIO, FootballClubRow] = {
     Update[FootballClubRow](
       s"""insert into myschema.football_club("id", "name")
           values (?::int8,?)
@@ -117,8 +100,8 @@ class FootballClubRepoImpl extends FootballClubRepo {
     )(using FootballClubRow.write)
     .updateManyWithGeneratedKeys[FootballClubRow]("id", "name")(unsaved)(using catsStdInstancesForList, FootballClubRow.read)
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
       _ <- sql"create temporary table football_club_TEMP (like myschema.football_club) on commit drop".update.run
       _ <- new FragmentOps(sql"""copy football_club_TEMP("id", "name") from stdin""").copyIn(unsaved, batchSize)(using FootballClubRow.text)

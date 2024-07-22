@@ -3,17 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.sth
+package adventureworks.sa.sth;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: sa.sth */
 case class SthViewRow(
@@ -36,24 +36,27 @@ case class SthViewRow(
 object SthViewRow {
   implicit lazy val decoder: Decoder[SthViewRow] = Decoder.forProduct7[SthViewRow, SalesterritoryId, BusinessentityId, SalesterritoryId, TypoLocalDateTime, Option[TypoLocalDateTime], TypoUUID, TypoLocalDateTime]("id", "businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(SthViewRow.apply)(SalesterritoryId.decoder, BusinessentityId.decoder, SalesterritoryId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SthViewRow] = Encoder.forProduct7[SthViewRow, SalesterritoryId, BusinessentityId, SalesterritoryId, TypoLocalDateTime, Option[TypoLocalDateTime], TypoUUID, TypoLocalDateTime]("id", "businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.territoryid, x.startdate, x.enddate, x.rowguid, x.modifieddate))(SalesterritoryId.encoder, BusinessentityId.encoder, SalesterritoryId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SthViewRow] = new Read[SthViewRow](
-    gets = List(
-      (SalesterritoryId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (SalesterritoryId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SthViewRow(
-      id = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 2),
-      startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3),
-      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+  implicit lazy val read: Read[SthViewRow] = {
+    new Read[SthViewRow](
+      gets = List(
+        (SalesterritoryId.get, Nullability.NoNulls),
+        (BusinessentityId.get, Nullability.NoNulls),
+        (SalesterritoryId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.Nullable),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SthViewRow(
+        id = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 0),
+        businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+        territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 2),
+        startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3),
+        enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 5),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+      )
     )
-  )
+  
+  }
 }

@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.myschema.marital_status
+package testdb.hardcoded.myschema.marital_status;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait MaritalStatusRepo {
   def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow]
@@ -19,13 +19,14 @@ trait MaritalStatusRepo {
   def insertStreaming(unsaved: Stream[ConnectionIO, MaritalStatusRow], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow]
   def selectAll: Stream[ConnectionIO, MaritalStatusRow]
-  def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): Stream[ConnectionIO, MaritalStatusRow]
+  def selectByFieldValues(fieldValues: List[MaritalStatusFieldValue[?]]): Stream[ConnectionIO, MaritalStatusRow]
   def selectById(id: MaritalStatusId): ConnectionIO[Option[MaritalStatusRow]]
   def selectByIds(ids: Array[MaritalStatusId]): Stream[ConnectionIO, MaritalStatusRow]
   def selectByIdsTracked(ids: Array[MaritalStatusId]): ConnectionIO[Map[MaritalStatusId, MaritalStatusRow]]
   def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow]
+  def updateFieldValues(id: MaritalStatusId, fieldValues: List[MaritalStatusFieldValue[?]]): ConnectionIO[Boolean]
   def upsert(unsaved: MaritalStatusRow): ConnectionIO[MaritalStatusRow]
   def upsertBatch(unsaved: List[MaritalStatusRow]): Stream[ConnectionIO, MaritalStatusRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, MaritalStatusRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

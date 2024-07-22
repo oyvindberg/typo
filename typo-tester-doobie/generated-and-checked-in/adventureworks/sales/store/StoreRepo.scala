@@ -3,14 +3,14 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.store
+package adventureworks.sales.store;
 
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import adventureworks.person.businessentity.BusinessentityId;
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait StoreRepo {
   def delete: DeleteBuilder[StoreFields, StoreRow]
@@ -19,7 +19,7 @@ trait StoreRepo {
   def insert(unsaved: StoreRow): ConnectionIO[StoreRow]
   def insert(unsaved: StoreRowUnsaved): ConnectionIO[StoreRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, StoreRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, StoreRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[StoreFields, StoreRow]
   def selectAll: Stream[ConnectionIO, StoreRow]
@@ -30,6 +30,6 @@ trait StoreRepo {
   def update(row: StoreRow): ConnectionIO[Boolean]
   def upsert(unsaved: StoreRow): ConnectionIO[StoreRow]
   def upsertBatch(unsaved: List[StoreRow]): Stream[ConnectionIO, StoreRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, StoreRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

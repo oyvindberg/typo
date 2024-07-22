@@ -3,20 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.sr
+package adventureworks.sa.sr;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import adventureworks.sales.salesreason.SalesreasonId
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import adventureworks.sales.salesreason.SalesreasonId;
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** View: sa.sr */
 case class SrViewRow(
@@ -33,36 +33,42 @@ case class SrViewRow(
 )
 
 object SrViewRow {
-  implicit lazy val reads: Reads[SrViewRow] = Reads[SrViewRow](json => JsResult.fromTry(
-      Try(
-        SrViewRow(
-          id = json.\("id").as(SalesreasonId.reads),
-          salesreasonid = json.\("salesreasonid").as(SalesreasonId.reads),
-          name = json.\("name").as(Name.reads),
-          reasontype = json.\("reasontype").as(Name.reads),
-          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+  implicit lazy val reads: Reads[SrViewRow] = {
+    Reads[SrViewRow](json => JsResult.fromTry(
+        Try(
+          SrViewRow(
+            id = json.\("id").as(SalesreasonId.reads),
+            salesreasonid = json.\("salesreasonid").as(SalesreasonId.reads),
+            name = json.\("name").as(Name.reads),
+            reasontype = json.\("reasontype").as(Name.reads),
+            modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+          )
         )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[SrViewRow] = RowParser[SrViewRow] { row =>
-    Success(
-      SrViewRow(
-        id = row(idx + 0)(SalesreasonId.column),
-        salesreasonid = row(idx + 1)(SalesreasonId.column),
-        name = row(idx + 2)(Name.column),
-        reasontype = row(idx + 3)(Name.column),
-        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
-      )
+      ),
     )
   }
-  implicit lazy val writes: OWrites[SrViewRow] = OWrites[SrViewRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "id" -> SalesreasonId.writes.writes(o.id),
-      "salesreasonid" -> SalesreasonId.writes.writes(o.salesreasonid),
-      "name" -> Name.writes.writes(o.name),
-      "reasontype" -> Name.writes.writes(o.reasontype),
-      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
-    ))
-  )
+  def rowParser(idx: Int): RowParser[SrViewRow] = {
+    RowParser[SrViewRow] { row =>
+      Success(
+        SrViewRow(
+          id = row(idx + 0)(SalesreasonId.column),
+          salesreasonid = row(idx + 1)(SalesreasonId.column),
+          name = row(idx + 2)(Name.column),
+          reasontype = row(idx + 3)(Name.column),
+          modifieddate = row(idx + 4)(TypoLocalDateTime.column)
+        )
+      )
+    }
+  }
+  implicit lazy val writes: OWrites[SrViewRow] = {
+    OWrites[SrViewRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "id" -> SalesreasonId.writes.writes(o.id),
+        "salesreasonid" -> SalesreasonId.writes.writes(o.salesreasonid),
+        "name" -> Name.writes.writes(o.name),
+        "reasontype" -> Name.writes.writes(o.reasontype),
+        "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
+      ))
+    )
+  }
 }

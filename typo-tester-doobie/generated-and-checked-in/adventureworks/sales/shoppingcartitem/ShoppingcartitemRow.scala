@@ -3,104 +3,130 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.shoppingcartitem
+package adventureworks.sales.shoppingcartitem;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.product.ProductId
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.product.ProductId;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: sales.shoppingcartitem
-    Contains online customer orders until the order is submitted or cancelled.
-    Primary key: shoppingcartitemid */
+  * Contains online customer orders until the order is submitted or cancelled.
+  * Primary key: shoppingcartitemid
+  */
 case class ShoppingcartitemRow(
   /** Primary key for ShoppingCartItem records.
-      Default: nextval('sales.shoppingcartitem_shoppingcartitemid_seq'::regclass) */
+    * Default: nextval('sales.shoppingcartitem_shoppingcartitemid_seq'::regclass)
+    */
   shoppingcartitemid: ShoppingcartitemId,
   /** Shopping cart identification number. */
   shoppingcartid: /* max 50 chars */ String,
   /** Product quantity ordered.
-      Default: 1
-      Constraint CK_ShoppingCartItem_Quantity affecting columns quantity: ((quantity >= 1)) */
+    * Default: 1
+    * Constraint CK_ShoppingCartItem_Quantity affecting columns quantity: ((quantity >= 1))
+    */
   quantity: Int,
   /** Product ordered. Foreign key to Product.ProductID.
-      Points to [[adventureworks.production.product.ProductRow.productid]] */
+    * Points to [[adventureworks.production.product.ProductRow.productid]]
+    */
   productid: ProductId,
   /** Date the time the record was created.
-      Default: now() */
+    * Default: now()
+    */
   datecreated: TypoLocalDateTime,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val id = shoppingcartitemid
-   def toUnsavedRow(shoppingcartitemid: Defaulted[ShoppingcartitemId], quantity: Defaulted[Int] = Defaulted.Provided(this.quantity), datecreated: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.datecreated), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ShoppingcartitemRowUnsaved =
-     ShoppingcartitemRowUnsaved(shoppingcartid, productid, shoppingcartitemid, quantity, datecreated, modifieddate)
- }
+) {
+  def id: ShoppingcartitemId = shoppingcartitemid
+  def toUnsavedRow(
+    shoppingcartitemid: Defaulted[ShoppingcartitemId],
+    quantity: Defaulted[Int] = Defaulted.Provided(this.quantity),
+    datecreated: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.datecreated),
+    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)
+  ): ShoppingcartitemRowUnsaved = {
+    new ShoppingcartitemRowUnsaved(
+      shoppingcartid,
+      productid,
+      shoppingcartitemid,
+      quantity,
+      datecreated,
+      modifieddate
+    )
+  }
+}
 
 object ShoppingcartitemRow {
   implicit lazy val decoder: Decoder[ShoppingcartitemRow] = Decoder.forProduct6[ShoppingcartitemRow, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(ShoppingcartitemRow.apply)(ShoppingcartitemId.decoder, Decoder.decodeString, Decoder.decodeInt, ProductId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ShoppingcartitemRow] = Encoder.forProduct6[ShoppingcartitemRow, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(x => (x.shoppingcartitemid, x.shoppingcartid, x.quantity, x.productid, x.datecreated, x.modifieddate))(ShoppingcartitemId.encoder, Encoder.encodeString, Encoder.encodeInt, ProductId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ShoppingcartitemRow] = new Read[ShoppingcartitemRow](
-    gets = List(
-      (ShoppingcartitemId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ShoppingcartitemRow(
-      shoppingcartitemid = ShoppingcartitemId.get.unsafeGetNonNullable(rs, i + 0),
-      shoppingcartid = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      quantity = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 3),
-      datecreated = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[ShoppingcartitemRow] = {
+    new Read[ShoppingcartitemRow](
+      gets = List(
+        (ShoppingcartitemId.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (Meta.IntMeta.get, Nullability.NoNulls),
+        (ProductId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ShoppingcartitemRow(
+        shoppingcartitemid = ShoppingcartitemId.get.unsafeGetNonNullable(rs, i + 0),
+        shoppingcartid = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+        quantity = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
+        productid = ProductId.get.unsafeGetNonNullable(rs, i + 3),
+        datecreated = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+      )
     )
-  )
-  implicit lazy val text: Text[ShoppingcartitemRow] = Text.instance[ShoppingcartitemRow]{ (row, sb) =>
-    ShoppingcartitemId.text.unsafeEncode(row.shoppingcartitemid, sb)
-    sb.append(Text.DELIMETER)
-    Text.stringInstance.unsafeEncode(row.shoppingcartid, sb)
-    sb.append(Text.DELIMETER)
-    Text.intInstance.unsafeEncode(row.quantity, sb)
-    sb.append(Text.DELIMETER)
-    ProductId.text.unsafeEncode(row.productid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.datecreated, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[ShoppingcartitemRow] = new Write[ShoppingcartitemRow](
-    puts = List((ShoppingcartitemId.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (ProductId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.shoppingcartitemid, x.shoppingcartid, x.quantity, x.productid, x.datecreated, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ShoppingcartitemId.put.unsafeSetNonNullable(rs, i + 0, a.shoppingcartitemid)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.shoppingcartid)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 2, a.quantity)
-                  ProductId.put.unsafeSetNonNullable(rs, i + 3, a.productid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.datecreated)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ShoppingcartitemId.put.unsafeUpdateNonNullable(ps, i + 0, a.shoppingcartitemid)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.shoppingcartid)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.quantity)
-                     ProductId.put.unsafeUpdateNonNullable(ps, i + 3, a.productid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.datecreated)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[ShoppingcartitemRow] = {
+    Text.instance[ShoppingcartitemRow]{ (row, sb) =>
+      ShoppingcartitemId.text.unsafeEncode(row.shoppingcartitemid, sb)
+      sb.append(Text.DELIMETER)
+      Text.stringInstance.unsafeEncode(row.shoppingcartid, sb)
+      sb.append(Text.DELIMETER)
+      Text.intInstance.unsafeEncode(row.quantity, sb)
+      sb.append(Text.DELIMETER)
+      ProductId.text.unsafeEncode(row.productid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.datecreated, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[ShoppingcartitemRow] = {
+    new Write[ShoppingcartitemRow](
+      puts = List((ShoppingcartitemId.put, Nullability.NoNulls),
+                  (Meta.StringMeta.put, Nullability.NoNulls),
+                  (Meta.IntMeta.put, Nullability.NoNulls),
+                  (ProductId.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.shoppingcartitemid, x.shoppingcartid, x.quantity, x.productid, x.datecreated, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    ShoppingcartitemId.put.unsafeSetNonNullable(rs, i + 0, a.shoppingcartitemid)
+                    Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.shoppingcartid)
+                    Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 2, a.quantity)
+                    ProductId.put.unsafeSetNonNullable(rs, i + 3, a.productid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.datecreated)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       ShoppingcartitemId.put.unsafeUpdateNonNullable(ps, i + 0, a.shoppingcartitemid)
+                       Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.shoppingcartid)
+                       Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.quantity)
+                       ProductId.put.unsafeUpdateNonNullable(ps, i + 3, a.productid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.datecreated)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
+                     }
+    )
+  
+  }
 }

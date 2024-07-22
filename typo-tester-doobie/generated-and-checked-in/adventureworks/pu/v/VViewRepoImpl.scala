@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pu.v
+package adventureworks.pu.v;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class VViewRepoImpl extends VViewRepo {
-  override def select: SelectBuilder[VViewFields, VViewRow] = {
-    SelectBuilderSql("pu.v", VViewFields.structure, VViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, VViewRow] = {
-    sql"""select "id", "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from pu.v""".query(using VViewRow.read).stream
-  }
+  def select: SelectBuilder[VViewFields, VViewRow] = SelectBuilderSql("pu.v", VViewFields.structure, VViewRow.read)
+  def selectAll: Stream[ConnectionIO, VViewRow] = sql"""select "id", "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from pu.v""".query(using VViewRow.read).stream
 }

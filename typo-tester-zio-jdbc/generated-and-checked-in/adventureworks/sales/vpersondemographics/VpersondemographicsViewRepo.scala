@@ -3,11 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.vpersondemographics
+package adventureworks.sales.vpersondemographics;
 
-import typo.dsl.SelectBuilder
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
 trait VpersondemographicsViewRepo {
   def select: SelectBuilder[VpersondemographicsViewFields, VpersondemographicsViewRow]

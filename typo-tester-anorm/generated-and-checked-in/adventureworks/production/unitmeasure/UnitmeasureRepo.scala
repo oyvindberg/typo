@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.unitmeasure
+package adventureworks.production.unitmeasure;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait UnitmeasureRepo {
   def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow]
@@ -17,7 +17,7 @@ trait UnitmeasureRepo {
   def insert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow
   def insert(unsaved: UnitmeasureRowUnsaved)(implicit c: Connection): UnitmeasureRow
   def insertStreaming(unsaved: Iterator[UnitmeasureRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[UnitmeasureRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow]
   def selectAll(implicit c: Connection): List[UnitmeasureRow]
@@ -28,6 +28,6 @@ trait UnitmeasureRepo {
   def update(row: UnitmeasureRow)(implicit c: Connection): Boolean
   def upsert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow
   def upsertBatch(unsaved: Iterable[UnitmeasureRow])(implicit c: Connection): List[UnitmeasureRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[UnitmeasureRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

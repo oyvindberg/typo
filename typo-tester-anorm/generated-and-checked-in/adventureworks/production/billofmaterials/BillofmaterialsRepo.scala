@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.billofmaterials
+package adventureworks.production.billofmaterials;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait BillofmaterialsRepo {
   def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow]
@@ -17,7 +17,7 @@ trait BillofmaterialsRepo {
   def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow
   def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow
   def insertStreaming(unsaved: Iterator[BillofmaterialsRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[BillofmaterialsRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow]
   def selectAll(implicit c: Connection): List[BillofmaterialsRow]
@@ -28,6 +28,6 @@ trait BillofmaterialsRepo {
   def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean
   def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow
   def upsertBatch(unsaved: Iterable[BillofmaterialsRow])(implicit c: Connection): List[BillofmaterialsRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[BillofmaterialsRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

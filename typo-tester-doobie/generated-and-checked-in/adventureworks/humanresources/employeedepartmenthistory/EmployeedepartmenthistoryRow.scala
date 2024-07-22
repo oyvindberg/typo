@@ -3,109 +3,139 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.employeedepartmenthistory
+package adventureworks.humanresources.employeedepartmenthistory;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDate
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.humanresources.department.DepartmentId
-import adventureworks.humanresources.shift.ShiftId
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDate;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.humanresources.department.DepartmentId;
+import adventureworks.humanresources.shift.ShiftId;
+import adventureworks.person.businessentity.BusinessentityId;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: humanresources.employeedepartmenthistory
-    Employee department transfers.
-    Composite primary key: businessentityid, startdate, departmentid, shiftid */
+  * Employee department transfers.
+  * Composite primary key: businessentityid, startdate, departmentid, shiftid
+  */
 case class EmployeedepartmenthistoryRow(
   /** Employee identification number. Foreign key to Employee.BusinessEntityID.
-      Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]] */
+    * Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]]
+    */
   businessentityid: BusinessentityId,
   /** Department in which the employee worked including currently. Foreign key to Department.DepartmentID.
-      Points to [[adventureworks.humanresources.department.DepartmentRow.departmentid]] */
+    * Points to [[adventureworks.humanresources.department.DepartmentRow.departmentid]]
+    */
   departmentid: DepartmentId,
   /** Identifies which 8-hour shift the employee works. Foreign key to Shift.Shift.ID.
-      Points to [[adventureworks.humanresources.shift.ShiftRow.shiftid]] */
+    * Points to [[adventureworks.humanresources.shift.ShiftRow.shiftid]]
+    */
   shiftid: ShiftId,
   /** Date the employee started work in the department.
-      Constraint CK_EmployeeDepartmentHistory_EndDate affecting columns enddate, startdate: (((enddate >= startdate) OR (enddate IS NULL))) */
+    * Constraint CK_EmployeeDepartmentHistory_EndDate affecting columns enddate, startdate: (((enddate >= startdate) OR (enddate IS NULL)))
+    */
   startdate: TypoLocalDate,
   /** Date the employee left the department. NULL = Current department.
-      Constraint CK_EmployeeDepartmentHistory_EndDate affecting columns enddate, startdate: (((enddate >= startdate) OR (enddate IS NULL))) */
+    * Constraint CK_EmployeeDepartmentHistory_EndDate affecting columns enddate, startdate: (((enddate >= startdate) OR (enddate IS NULL)))
+    */
   enddate: Option[TypoLocalDate],
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val compositeId: EmployeedepartmenthistoryId = EmployeedepartmenthistoryId(businessentityid, startdate, departmentid, shiftid)
-   val id = compositeId
-   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): EmployeedepartmenthistoryRowUnsaved =
-     EmployeedepartmenthistoryRowUnsaved(businessentityid, departmentid, shiftid, startdate, enddate, modifieddate)
- }
+) {
+  def compositeId: EmployeedepartmenthistoryId = new EmployeedepartmenthistoryId(businessentityid, startdate, departmentid, shiftid)
+  def id: EmployeedepartmenthistoryId = compositeId
+  def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): EmployeedepartmenthistoryRowUnsaved = {
+    new EmployeedepartmenthistoryRowUnsaved(
+      businessentityid,
+      departmentid,
+      shiftid,
+      startdate,
+      enddate,
+      modifieddate
+    )
+  }
+}
 
 object EmployeedepartmenthistoryRow {
-  def apply(compositeId: EmployeedepartmenthistoryId, enddate: Option[TypoLocalDate], modifieddate: TypoLocalDateTime) =
-    new EmployeedepartmenthistoryRow(compositeId.businessentityid, compositeId.departmentid, compositeId.shiftid, compositeId.startdate, enddate, modifieddate)
+  def apply(compositeId: EmployeedepartmenthistoryId, enddate: Option[TypoLocalDate], modifieddate: TypoLocalDateTime): EmployeedepartmenthistoryRow = {
+    new EmployeedepartmenthistoryRow(
+      compositeId.businessentityid,
+      compositeId.departmentid,
+      compositeId.shiftid,
+      compositeId.startdate,
+      enddate,
+      modifieddate
+    )
+  }
   implicit lazy val decoder: Decoder[EmployeedepartmenthistoryRow] = Decoder.forProduct6[EmployeedepartmenthistoryRow, BusinessentityId, DepartmentId, ShiftId, TypoLocalDate, Option[TypoLocalDate], TypoLocalDateTime]("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(EmployeedepartmenthistoryRow.apply)(BusinessentityId.decoder, DepartmentId.decoder, ShiftId.decoder, TypoLocalDate.decoder, Decoder.decodeOption(TypoLocalDate.decoder), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[EmployeedepartmenthistoryRow] = Encoder.forProduct6[EmployeedepartmenthistoryRow, BusinessentityId, DepartmentId, ShiftId, TypoLocalDate, Option[TypoLocalDate], TypoLocalDateTime]("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(x => (x.businessentityid, x.departmentid, x.shiftid, x.startdate, x.enddate, x.modifieddate))(BusinessentityId.encoder, DepartmentId.encoder, ShiftId.encoder, TypoLocalDate.encoder, Encoder.encodeOption(TypoLocalDate.encoder), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[EmployeedepartmenthistoryRow] = new Read[EmployeedepartmenthistoryRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (DepartmentId.get, Nullability.NoNulls),
-      (ShiftId.get, Nullability.NoNulls),
-      (TypoLocalDate.get, Nullability.NoNulls),
-      (TypoLocalDate.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => EmployeedepartmenthistoryRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      departmentid = DepartmentId.get.unsafeGetNonNullable(rs, i + 1),
-      shiftid = ShiftId.get.unsafeGetNonNullable(rs, i + 2),
-      startdate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 3),
-      enddate = TypoLocalDate.get.unsafeGetNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[EmployeedepartmenthistoryRow] = {
+    new Read[EmployeedepartmenthistoryRow](
+      gets = List(
+        (BusinessentityId.get, Nullability.NoNulls),
+        (DepartmentId.get, Nullability.NoNulls),
+        (ShiftId.get, Nullability.NoNulls),
+        (TypoLocalDate.get, Nullability.NoNulls),
+        (TypoLocalDate.get, Nullability.Nullable),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => EmployeedepartmenthistoryRow(
+        businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+        departmentid = DepartmentId.get.unsafeGetNonNullable(rs, i + 1),
+        shiftid = ShiftId.get.unsafeGetNonNullable(rs, i + 2),
+        startdate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 3),
+        enddate = TypoLocalDate.get.unsafeGetNullable(rs, i + 4),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+      )
     )
-  )
-  implicit lazy val text: Text[EmployeedepartmenthistoryRow] = Text.instance[EmployeedepartmenthistoryRow]{ (row, sb) =>
-    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
-    sb.append(Text.DELIMETER)
-    DepartmentId.text.unsafeEncode(row.departmentid, sb)
-    sb.append(Text.DELIMETER)
-    ShiftId.text.unsafeEncode(row.shiftid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDate.text.unsafeEncode(row.startdate, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoLocalDate.text).unsafeEncode(row.enddate, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[EmployeedepartmenthistoryRow] = new Write[EmployeedepartmenthistoryRow](
-    puts = List((BusinessentityId.put, Nullability.NoNulls),
-                (DepartmentId.put, Nullability.NoNulls),
-                (ShiftId.put, Nullability.NoNulls),
-                (TypoLocalDate.put, Nullability.NoNulls),
-                (TypoLocalDate.put, Nullability.Nullable),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.businessentityid, x.departmentid, x.shiftid, x.startdate, x.enddate, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
-                  DepartmentId.put.unsafeSetNonNullable(rs, i + 1, a.departmentid)
-                  ShiftId.put.unsafeSetNonNullable(rs, i + 2, a.shiftid)
-                  TypoLocalDate.put.unsafeSetNonNullable(rs, i + 3, a.startdate)
-                  TypoLocalDate.put.unsafeSetNullable(rs, i + 4, a.enddate)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
-                     DepartmentId.put.unsafeUpdateNonNullable(ps, i + 1, a.departmentid)
-                     ShiftId.put.unsafeUpdateNonNullable(ps, i + 2, a.shiftid)
-                     TypoLocalDate.put.unsafeUpdateNonNullable(ps, i + 3, a.startdate)
-                     TypoLocalDate.put.unsafeUpdateNullable(ps, i + 4, a.enddate)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[EmployeedepartmenthistoryRow] = {
+    Text.instance[EmployeedepartmenthistoryRow]{ (row, sb) =>
+      BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+      sb.append(Text.DELIMETER)
+      DepartmentId.text.unsafeEncode(row.departmentid, sb)
+      sb.append(Text.DELIMETER)
+      ShiftId.text.unsafeEncode(row.shiftid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDate.text.unsafeEncode(row.startdate, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoLocalDate.text).unsafeEncode(row.enddate, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[EmployeedepartmenthistoryRow] = {
+    new Write[EmployeedepartmenthistoryRow](
+      puts = List((BusinessentityId.put, Nullability.NoNulls),
+                  (DepartmentId.put, Nullability.NoNulls),
+                  (ShiftId.put, Nullability.NoNulls),
+                  (TypoLocalDate.put, Nullability.NoNulls),
+                  (TypoLocalDate.put, Nullability.Nullable),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.businessentityid, x.departmentid, x.shiftid, x.startdate, x.enddate, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
+                    DepartmentId.put.unsafeSetNonNullable(rs, i + 1, a.departmentid)
+                    ShiftId.put.unsafeSetNonNullable(rs, i + 2, a.shiftid)
+                    TypoLocalDate.put.unsafeSetNonNullable(rs, i + 3, a.startdate)
+                    TypoLocalDate.put.unsafeSetNullable(rs, i + 4, a.enddate)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
+                       DepartmentId.put.unsafeUpdateNonNullable(ps, i + 1, a.departmentid)
+                       ShiftId.put.unsafeUpdateNonNullable(ps, i + 2, a.shiftid)
+                       TypoLocalDate.put.unsafeUpdateNonNullable(ps, i + 3, a.startdate)
+                       TypoLocalDate.put.unsafeUpdateNullable(ps, i + 4, a.enddate)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
+                     }
+    )
+  
+  }
 }

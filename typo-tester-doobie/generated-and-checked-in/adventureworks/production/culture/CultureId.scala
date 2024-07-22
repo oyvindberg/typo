@@ -3,18 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.culture
+package adventureworks.production.culture;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `production.culture` */
-case class CultureId(value: /* bpchar, max 6 chars */ String) extends AnyVal
+case class CultureId(value: /* bpchar, max 6 chars */ String) extends scala.AnyVal
+
 object CultureId {
   implicit lazy val arrayGet: Get[Array[CultureId]] = adventureworks.StringArrayMeta.get.map(_.map(CultureId.apply))
   implicit lazy val arrayPut: Put[Array[CultureId]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
@@ -23,8 +24,10 @@ object CultureId {
   implicit lazy val encoder: Encoder[CultureId] = Encoder.encodeString.contramap(_.value)
   implicit lazy val get: Get[CultureId] = Meta.StringMeta.get.map(CultureId.apply)
   implicit lazy val put: Put[CultureId] = Meta.StringMeta.put.contramap(_.value)
-  implicit lazy val text: Text[CultureId] = new Text[CultureId] {
-    override def unsafeEncode(v: CultureId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: CultureId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[CultureId] = {
+    new Text[CultureId] {
+      override def unsafeEncode(v: CultureId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: CultureId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

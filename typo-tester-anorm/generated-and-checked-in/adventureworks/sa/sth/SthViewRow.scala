@@ -3,23 +3,23 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.sth
+package adventureworks.sa.sth;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import anorm.Column
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import anorm.Column;
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** View: sa.sth */
 case class SthViewRow(
@@ -40,42 +40,48 @@ case class SthViewRow(
 )
 
 object SthViewRow {
-  implicit lazy val reads: Reads[SthViewRow] = Reads[SthViewRow](json => JsResult.fromTry(
-      Try(
-        SthViewRow(
-          id = json.\("id").as(SalesterritoryId.reads),
-          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
-          territoryid = json.\("territoryid").as(SalesterritoryId.reads),
-          startdate = json.\("startdate").as(TypoLocalDateTime.reads),
-          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
-          rowguid = json.\("rowguid").as(TypoUUID.reads),
-          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+  implicit lazy val reads: Reads[SthViewRow] = {
+    Reads[SthViewRow](json => JsResult.fromTry(
+        Try(
+          SthViewRow(
+            id = json.\("id").as(SalesterritoryId.reads),
+            businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+            territoryid = json.\("territoryid").as(SalesterritoryId.reads),
+            startdate = json.\("startdate").as(TypoLocalDateTime.reads),
+            enddate = json.\("enddate").toOption.map(_.as(TypoLocalDateTime.reads)),
+            rowguid = json.\("rowguid").as(TypoUUID.reads),
+            modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+          )
         )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[SthViewRow] = RowParser[SthViewRow] { row =>
-    Success(
-      SthViewRow(
-        id = row(idx + 0)(SalesterritoryId.column),
-        businessentityid = row(idx + 1)(BusinessentityId.column),
-        territoryid = row(idx + 2)(SalesterritoryId.column),
-        startdate = row(idx + 3)(TypoLocalDateTime.column),
-        enddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column)),
-        rowguid = row(idx + 5)(TypoUUID.column),
-        modifieddate = row(idx + 6)(TypoLocalDateTime.column)
-      )
+      ),
     )
   }
-  implicit lazy val writes: OWrites[SthViewRow] = OWrites[SthViewRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "id" -> SalesterritoryId.writes.writes(o.id),
-      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
-      "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
-      "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
-      "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
-      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
-      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
-    ))
-  )
+  def rowParser(idx: Int): RowParser[SthViewRow] = {
+    RowParser[SthViewRow] { row =>
+      Success(
+        SthViewRow(
+          id = row(idx + 0)(SalesterritoryId.column),
+          businessentityid = row(idx + 1)(BusinessentityId.column),
+          territoryid = row(idx + 2)(SalesterritoryId.column),
+          startdate = row(idx + 3)(TypoLocalDateTime.column),
+          enddate = row(idx + 4)(Column.columnToOption(TypoLocalDateTime.column)),
+          rowguid = row(idx + 5)(TypoUUID.column),
+          modifieddate = row(idx + 6)(TypoLocalDateTime.column)
+        )
+      )
+    }
+  }
+  implicit lazy val writes: OWrites[SthViewRow] = {
+    OWrites[SthViewRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "id" -> SalesterritoryId.writes.writes(o.id),
+        "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+        "territoryid" -> SalesterritoryId.writes.writes(o.territoryid),
+        "startdate" -> TypoLocalDateTime.writes.writes(o.startdate),
+        "enddate" -> Writes.OptionWrites(TypoLocalDateTime.writes).writes(o.enddate),
+        "rowguid" -> TypoUUID.writes.writes(o.rowguid),
+        "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
+      ))
+    )
+  }
 }

@@ -3,16 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.myschema.football_club
+package testdb.hardcoded.myschema.football_club;
 
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
+/** upsertBatch: Not implementable for zio-jdbc */
 trait FootballClubRepo {
   def delete: DeleteBuilder[FootballClubFields, FootballClubRow]
   def deleteById(id: FootballClubId): ZIO[ZConnection, Throwable, Boolean]
@@ -21,7 +22,7 @@ trait FootballClubRepo {
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FootballClubRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[FootballClubFields, FootballClubRow]
   def selectAll: ZStream[ZConnection, Throwable, FootballClubRow]
-  def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, FootballClubRow]
+  def selectByFieldValues(fieldValues: List[FootballClubFieldValue[?]]): ZStream[ZConnection, Throwable, FootballClubRow]
   def selectById(id: FootballClubId): ZIO[ZConnection, Throwable, Option[FootballClubRow]]
   def selectByIds(ids: Array[FootballClubId]): ZStream[ZConnection, Throwable, FootballClubRow]
   def selectByIdsTracked(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Map[FootballClubId, FootballClubRow]]
@@ -29,7 +30,6 @@ trait FootballClubRepo {
   def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Boolean]
   def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: FootballClubRow): ZIO[ZConnection, Throwable, UpdateResult[FootballClubRow]]
-  // Not implementable for zio-jdbc: upsertBatch
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, FootballClubRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

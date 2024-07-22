@@ -3,87 +3,110 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.personphone
+package adventureworks.person.personphone;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.person.phonenumbertype.PhonenumbertypeId
-import adventureworks.public.Phone
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.person.phonenumbertype.PhonenumbertypeId;
+import adventureworks.public.Phone;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: person.personphone
-    Telephone number and type of a person.
-    Composite primary key: businessentityid, phonenumber, phonenumbertypeid */
+  * Telephone number and type of a person.
+  * Composite primary key: businessentityid, phonenumber, phonenumbertypeid
+  */
 case class PersonphoneRow(
   /** Business entity identification number. Foreign key to Person.BusinessEntityID.
-      Points to [[adventureworks.person.person.PersonRow.businessentityid]] */
+    * Points to [[adventureworks.person.person.PersonRow.businessentityid]]
+    */
   businessentityid: BusinessentityId,
   /** Telephone number identification number. */
   phonenumber: Phone,
   /** Kind of phone number. Foreign key to PhoneNumberType.PhoneNumberTypeID.
-      Points to [[adventureworks.person.phonenumbertype.PhonenumbertypeRow.phonenumbertypeid]] */
+    * Points to [[adventureworks.person.phonenumbertype.PhonenumbertypeRow.phonenumbertypeid]]
+    */
   phonenumbertypeid: PhonenumbertypeId,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val compositeId: PersonphoneId = PersonphoneId(businessentityid, phonenumber, phonenumbertypeid)
-   val id = compositeId
-   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PersonphoneRowUnsaved =
-     PersonphoneRowUnsaved(businessentityid, phonenumber, phonenumbertypeid, modifieddate)
- }
+) {
+  def compositeId: PersonphoneId = new PersonphoneId(businessentityid, phonenumber, phonenumbertypeid)
+  def id: PersonphoneId = compositeId
+  def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PersonphoneRowUnsaved = {
+    new PersonphoneRowUnsaved(
+      businessentityid,
+      phonenumber,
+      phonenumbertypeid,
+      modifieddate
+    )
+  }
+}
 
 object PersonphoneRow {
-  def apply(compositeId: PersonphoneId, modifieddate: TypoLocalDateTime) =
-    new PersonphoneRow(compositeId.businessentityid, compositeId.phonenumber, compositeId.phonenumbertypeid, modifieddate)
+  def apply(compositeId: PersonphoneId, modifieddate: TypoLocalDateTime): PersonphoneRow = {
+    new PersonphoneRow(
+      compositeId.businessentityid,
+      compositeId.phonenumber,
+      compositeId.phonenumbertypeid,
+      modifieddate
+    )
+  }
   implicit lazy val decoder: Decoder[PersonphoneRow] = Decoder.forProduct4[PersonphoneRow, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PersonphoneRow.apply)(BusinessentityId.decoder, Phone.decoder, PhonenumbertypeId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PersonphoneRow] = Encoder.forProduct4[PersonphoneRow, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))(BusinessentityId.encoder, Phone.encoder, PhonenumbertypeId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PersonphoneRow] = new Read[PersonphoneRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Phone.get, Nullability.NoNulls),
-      (PhonenumbertypeId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PersonphoneRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      phonenumber = Phone.get.unsafeGetNonNullable(rs, i + 1),
-      phonenumbertypeid = PhonenumbertypeId.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[PersonphoneRow] = {
+    new Read[PersonphoneRow](
+      gets = List(
+        (BusinessentityId.get, Nullability.NoNulls),
+        (Phone.get, Nullability.NoNulls),
+        (PhonenumbertypeId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PersonphoneRow(
+        businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+        phonenumber = Phone.get.unsafeGetNonNullable(rs, i + 1),
+        phonenumbertypeid = PhonenumbertypeId.get.unsafeGetNonNullable(rs, i + 2),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+      )
     )
-  )
-  implicit lazy val text: Text[PersonphoneRow] = Text.instance[PersonphoneRow]{ (row, sb) =>
-    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
-    sb.append(Text.DELIMETER)
-    Phone.text.unsafeEncode(row.phonenumber, sb)
-    sb.append(Text.DELIMETER)
-    PhonenumbertypeId.text.unsafeEncode(row.phonenumbertypeid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[PersonphoneRow] = new Write[PersonphoneRow](
-    puts = List((BusinessentityId.put, Nullability.NoNulls),
-                (Phone.put, Nullability.NoNulls),
-                (PhonenumbertypeId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
-                  Phone.put.unsafeSetNonNullable(rs, i + 1, a.phonenumber)
-                  PhonenumbertypeId.put.unsafeSetNonNullable(rs, i + 2, a.phonenumbertypeid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
-                     Phone.put.unsafeUpdateNonNullable(ps, i + 1, a.phonenumber)
-                     PhonenumbertypeId.put.unsafeUpdateNonNullable(ps, i + 2, a.phonenumbertypeid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[PersonphoneRow] = {
+    Text.instance[PersonphoneRow]{ (row, sb) =>
+      BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+      sb.append(Text.DELIMETER)
+      Phone.text.unsafeEncode(row.phonenumber, sb)
+      sb.append(Text.DELIMETER)
+      PhonenumbertypeId.text.unsafeEncode(row.phonenumbertypeid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[PersonphoneRow] = {
+    new Write[PersonphoneRow](
+      puts = List((BusinessentityId.put, Nullability.NoNulls),
+                  (Phone.put, Nullability.NoNulls),
+                  (PhonenumbertypeId.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
+                    Phone.put.unsafeSetNonNullable(rs, i + 1, a.phonenumber)
+                    PhonenumbertypeId.put.unsafeSetNonNullable(rs, i + 2, a.phonenumbertypeid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
+                       Phone.put.unsafeUpdateNonNullable(ps, i + 1, a.phonenumber)
+                       PhonenumbertypeId.put.unsafeUpdateNonNullable(ps, i + 2, a.phonenumbertypeid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
+                     }
+    )
+  
+  }
 }

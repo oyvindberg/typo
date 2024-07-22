@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.businessentity
+package adventureworks.person.businessentity;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait BusinessentityRepo {
   def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow]
@@ -18,7 +18,7 @@ trait BusinessentityRepo {
   def insert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow]
   def insert(unsaved: BusinessentityRowUnsaved): ConnectionIO[BusinessentityRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentityRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BusinessentityRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[BusinessentityFields, BusinessentityRow]
   def selectAll: Stream[ConnectionIO, BusinessentityRow]
@@ -29,6 +29,6 @@ trait BusinessentityRepo {
   def update(row: BusinessentityRow): ConnectionIO[Boolean]
   def upsert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow]
   def upsertBatch(unsaved: List[BusinessentityRow]): Stream[ConnectionIO, BusinessentityRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, BusinessentityRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

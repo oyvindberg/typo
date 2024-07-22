@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.countryregion
+package adventureworks.person.countryregion;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait CountryregionRepo {
   def delete: DeleteBuilder[CountryregionFields, CountryregionRow]
@@ -18,7 +18,7 @@ trait CountryregionRepo {
   def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow]
   def insert(unsaved: CountryregionRowUnsaved): ConnectionIO[CountryregionRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregionRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[CountryregionFields, CountryregionRow]
   def selectAll: Stream[ConnectionIO, CountryregionRow]
@@ -29,6 +29,6 @@ trait CountryregionRepo {
   def update(row: CountryregionRow): ConnectionIO[Boolean]
   def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow]
   def upsertBatch(unsaved: List[CountryregionRow]): Stream[ConnectionIO, CountryregionRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

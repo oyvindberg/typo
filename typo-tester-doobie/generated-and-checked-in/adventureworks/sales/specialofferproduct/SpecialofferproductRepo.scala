@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.specialofferproduct
+package adventureworks.sales.specialofferproduct;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait SpecialofferproductRepo {
   def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow]
@@ -18,7 +18,7 @@ trait SpecialofferproductRepo {
   def insert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow]
   def insert(unsaved: SpecialofferproductRowUnsaved): ConnectionIO[SpecialofferproductRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, SpecialofferproductRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SpecialofferproductRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[SpecialofferproductFields, SpecialofferproductRow]
   def selectAll: Stream[ConnectionIO, SpecialofferproductRow]
@@ -29,6 +29,6 @@ trait SpecialofferproductRepo {
   def update(row: SpecialofferproductRow): ConnectionIO[Boolean]
   def upsert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow]
   def upsertBatch(unsaved: List[SpecialofferproductRow]): Stream[ConnectionIO, SpecialofferproductRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, SpecialofferproductRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

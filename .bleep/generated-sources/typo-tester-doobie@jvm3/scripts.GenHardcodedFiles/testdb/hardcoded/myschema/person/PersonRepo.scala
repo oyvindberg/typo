@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.myschema.person
+package testdb.hardcoded.myschema.person;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait PersonRepo {
   def delete: DeleteBuilder[PersonFields, PersonRow]
@@ -18,11 +18,11 @@ trait PersonRepo {
   def insert(unsaved: PersonRow): ConnectionIO[PersonRow]
   def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[PersonFields, PersonRow]
   def selectAll: Stream[ConnectionIO, PersonRow]
-  def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): Stream[ConnectionIO, PersonRow]
+  def selectByFieldValues(fieldValues: List[PersonFieldValue[?]]): Stream[ConnectionIO, PersonRow]
   def selectById(id: PersonId): ConnectionIO[Option[PersonRow]]
   def selectByIds(ids: Array[PersonId]): Stream[ConnectionIO, PersonRow]
   def selectByIdsTracked(ids: Array[PersonId]): ConnectionIO[Map[PersonId, PersonRow]]
@@ -31,6 +31,6 @@ trait PersonRepo {
   def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]]): ConnectionIO[Boolean]
   def upsert(unsaved: PersonRow): ConnectionIO[PersonRow]
   def upsertBatch(unsaved: List[PersonRow]): Stream[ConnectionIO, PersonRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

@@ -3,10 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package anorm.adventureworks
+package anorm.adventureworks;
 
-import java.sql.Connection
-import resource.managed
+import java.sql.Connection;
+import resource.managed;
 
 object ExecuteReturningSyntax {
   /* add executeReturning to anorm. it needs to be inside the package, because everything is hidden */

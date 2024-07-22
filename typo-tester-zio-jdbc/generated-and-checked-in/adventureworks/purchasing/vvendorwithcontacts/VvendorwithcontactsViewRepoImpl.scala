@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.vvendorwithcontacts
+package adventureworks.purchasing.vvendorwithcontacts;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class VvendorwithcontactsViewRepoImpl extends VvendorwithcontactsViewRepo {
-  override def select: SelectBuilder[VvendorwithcontactsViewFields, VvendorwithcontactsViewRow] = {
-    SelectBuilderSql("purchasing.vvendorwithcontacts", VvendorwithcontactsViewFields.structure, VvendorwithcontactsViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, VvendorwithcontactsViewRow] = {
-    sql"""select "businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion" from purchasing.vvendorwithcontacts""".query(using VvendorwithcontactsViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[VvendorwithcontactsViewFields, VvendorwithcontactsViewRow] = SelectBuilderSql("purchasing.vvendorwithcontacts", VvendorwithcontactsViewFields.structure, VvendorwithcontactsViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, VvendorwithcontactsViewRow] = sql"""select "businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion" from purchasing.vvendorwithcontacts""".query(using VvendorwithcontactsViewRow.jdbcDecoder).selectStream()
 }

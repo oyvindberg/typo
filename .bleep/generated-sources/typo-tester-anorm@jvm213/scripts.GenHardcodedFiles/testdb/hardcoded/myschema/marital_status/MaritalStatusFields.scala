@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.myschema.marital_status
+package testdb.hardcoded.myschema.marital_status;
 
-import typo.dsl.Path
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait MaritalStatusFields {
   def id: IdField[MaritalStatusId, MaritalStatusRow]

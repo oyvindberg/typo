@@ -8,7 +8,7 @@ case class ComputedTable(
     default: ComputedDefault,
     dbTable: db.Table,
     naming: Naming,
-    scalaTypeMapper: TypeMapperScala,
+    scalaTypeMapper: TypeMapperJvm,
     eval: Eval[db.RelationName, HasSource]
 ) extends HasSource {
   override val source: Source.Table = Source.Table(dbTable.name)
@@ -132,47 +132,41 @@ case class ComputedTable(
         Some(RepoMethod.SelectAll(dbTable.name, cols, names.RowName)),
         maybeId.map(id => RepoMethod.SelectById(dbTable.name, cols, id, names.RowName)),
         maybeId.map { id =>
-          val unsavedParam = sc.Param(sc.Ident("unsaved"), names.RowName, None)
+          val unsavedParam = sc.Param(sc.Ident("unsaved"), names.RowName)
           RepoMethod.Upsert(dbTable.name, cols, id, unsavedParam, names.RowName)
         },
         maybeId
           .collect {
             case unary: IdComputed.Unary =>
-              RepoMethod.SelectByIds(dbTable.name, cols, unary, sc.Param(unary.paramName.appended("s"), sc.Type.ArrayOf(unary.tpe), None), names.RowName)
+              RepoMethod.SelectByIds(dbTable.name, cols, unary, sc.Param(unary.paramName.appended("s"), sc.Type.ArrayOf(unary.tpe)), names.RowName)
             case x: IdComputed.Composite if x.cols.forall(col => col.dbCol.nullability == Nullability.NoNulls) =>
-              RepoMethod.SelectByIds(dbTable.name, cols, x, sc.Param(x.paramName.appended("s"), sc.Type.ArrayOf(x.tpe), None), names.RowName)
+              RepoMethod.SelectByIds(dbTable.name, cols, x, sc.Param(x.paramName.appended("s"), sc.Type.ArrayOf(x.tpe)), names.RowName)
           }
           .toList
           .flatMap { x => List(x, RepoMethod.SelectByIdsTracked(x)) },
         for {
-          name <- names.FieldOrIdValueName
-          fieldValueName <- names.FieldValueName
+          fieldValueName <- names.FieldOrIdValueName
         } yield {
-          val fieldValueOrIdsParam = sc.Param(sc.Ident("fieldValues"), TypesScala.List.of(name.of(sc.Type.Wildcard)), None)
+          val fieldValueOrIdsParam = sc.Param(sc.Ident("fieldValues"), TypesScala.List.of(fieldValueName.of(sc.Type.Wildcard)))
           RepoMethod.SelectByFieldValues(dbTable.name, cols, fieldValueName, fieldValueOrIdsParam, names.RowName)
         },
         for {
           id <- maybeId
-          colsNotId <- colsNotId
-          fieldValueName <- names.FieldValueName
+          fieldValueName <- names.FieldOrIdValueName
         } yield RepoMethod.UpdateFieldValues(
           dbTable.name,
           id,
-          sc.Param(
-            sc.Ident("fieldValues"),
-            TypesScala.List.of(fieldValueName.of(sc.Type.Wildcard)),
-            None
-          ),
+          sc.Param(sc.Ident("fieldValues"), TypesScala.List.of(fieldValueName.of(sc.Type.Wildcard))),
           fieldValueName,
-          colsNotId,
+          cols,
           names.RowName
         ),
         for {
           id <- maybeId
           colsNotId <- colsNotId
-        } yield RepoMethod.Update(dbTable.name, cols, id, sc.Param(sc.Ident("row"), names.RowName, None), colsNotId),
+        } yield RepoMethod.Update(dbTable.name, cols, id, sc.Param(sc.Ident("row"), names.RowName), colsNotId),
         Some {
-          val unsavedParam = sc.Param(sc.Ident("unsaved"), names.RowName, None)
+          val unsavedParam = sc.Param(sc.Ident("unsaved"), names.RowName)
           RepoMethod.Insert(dbTable.name, cols, unsavedParam, names.RowName)
         },
         if (options.enableStreamingInserts) Some(RepoMethod.InsertStreaming(dbTable.name, cols, names.RowName)) else None,
@@ -183,7 +177,7 @@ case class ComputedTable(
           RepoMethod.UpsertBatch(dbTable.name, cols, id, names.RowName)
         },
         maybeUnsavedRow.map { unsavedRow =>
-          val unsavedParam = sc.Param(sc.Ident("unsaved"), unsavedRow.tpe, None)
+          val unsavedParam = sc.Param(sc.Ident("unsaved"), unsavedRow.tpe)
           RepoMethod.InsertUnsaved(dbTable.name, cols, unsavedRow, unsavedParam, default, names.RowName)
         },
         maybeUnsavedRow.collect {
@@ -193,9 +187,9 @@ case class ComputedTable(
         maybeId.map(id => RepoMethod.Delete(dbTable.name, id)),
         maybeId.collect {
           case unary: IdComputed.Unary =>
-            RepoMethod.DeleteByIds(dbTable.name, unary, sc.Param(unary.paramName.appended("s"), sc.Type.ArrayOf(unary.tpe), None))
+            RepoMethod.DeleteByIds(dbTable.name, unary, sc.Param(unary.paramName.appended("s"), sc.Type.ArrayOf(unary.tpe)))
           case x: IdComputed.Composite if x.cols.forall(col => col.dbCol.nullability == Nullability.NoNulls) =>
-            RepoMethod.DeleteByIds(dbTable.name, x, sc.Param(x.paramName.appended("s"), sc.Type.ArrayOf(x.tpe), None))
+            RepoMethod.DeleteByIds(dbTable.name, x, sc.Param(x.paramName.appended("s"), sc.Type.ArrayOf(x.tpe)))
         }
       ).flatten,
       dbTable.uniqueKeys

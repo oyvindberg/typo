@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.currencyrate
+package adventureworks.sales.currencyrate;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait CurrencyrateRepo {
   def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow]
@@ -18,7 +18,7 @@ trait CurrencyrateRepo {
   def insert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow]
   def insert(unsaved: CurrencyrateRowUnsaved): ConnectionIO[CurrencyrateRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, CurrencyrateRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CurrencyrateRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow]
   def selectAll: Stream[ConnectionIO, CurrencyrateRow]
@@ -29,6 +29,6 @@ trait CurrencyrateRepo {
   def update(row: CurrencyrateRow): ConnectionIO[Boolean]
   def upsert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow]
   def upsertBatch(unsaved: List[CurrencyrateRow]): Stream[ConnectionIO, CurrencyrateRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, CurrencyrateRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

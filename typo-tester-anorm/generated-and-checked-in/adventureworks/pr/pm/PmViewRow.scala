@@ -3,24 +3,24 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.pm
+package adventureworks.pr.pm;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.customtypes.TypoXml
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.public.Name
-import anorm.Column
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.production.productmodel.ProductmodelId;
+import adventureworks.public.Name;
+import anorm.Column;
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** View: pr.pm */
 case class PmViewRow(
@@ -41,42 +41,48 @@ case class PmViewRow(
 )
 
 object PmViewRow {
-  implicit lazy val reads: Reads[PmViewRow] = Reads[PmViewRow](json => JsResult.fromTry(
-      Try(
-        PmViewRow(
-          id = json.\("id").as(ProductmodelId.reads),
-          productmodelid = json.\("productmodelid").as(ProductmodelId.reads),
-          name = json.\("name").as(Name.reads),
-          catalogdescription = json.\("catalogdescription").toOption.map(_.as(TypoXml.reads)),
-          instructions = json.\("instructions").toOption.map(_.as(TypoXml.reads)),
-          rowguid = json.\("rowguid").as(TypoUUID.reads),
-          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+  implicit lazy val reads: Reads[PmViewRow] = {
+    Reads[PmViewRow](json => JsResult.fromTry(
+        Try(
+          PmViewRow(
+            id = json.\("id").as(ProductmodelId.reads),
+            productmodelid = json.\("productmodelid").as(ProductmodelId.reads),
+            name = json.\("name").as(Name.reads),
+            catalogdescription = json.\("catalogdescription").toOption.map(_.as(TypoXml.reads)),
+            instructions = json.\("instructions").toOption.map(_.as(TypoXml.reads)),
+            rowguid = json.\("rowguid").as(TypoUUID.reads),
+            modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+          )
         )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[PmViewRow] = RowParser[PmViewRow] { row =>
-    Success(
-      PmViewRow(
-        id = row(idx + 0)(ProductmodelId.column),
-        productmodelid = row(idx + 1)(ProductmodelId.column),
-        name = row(idx + 2)(Name.column),
-        catalogdescription = row(idx + 3)(Column.columnToOption(TypoXml.column)),
-        instructions = row(idx + 4)(Column.columnToOption(TypoXml.column)),
-        rowguid = row(idx + 5)(TypoUUID.column),
-        modifieddate = row(idx + 6)(TypoLocalDateTime.column)
-      )
+      ),
     )
   }
-  implicit lazy val writes: OWrites[PmViewRow] = OWrites[PmViewRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "id" -> ProductmodelId.writes.writes(o.id),
-      "productmodelid" -> ProductmodelId.writes.writes(o.productmodelid),
-      "name" -> Name.writes.writes(o.name),
-      "catalogdescription" -> Writes.OptionWrites(TypoXml.writes).writes(o.catalogdescription),
-      "instructions" -> Writes.OptionWrites(TypoXml.writes).writes(o.instructions),
-      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
-      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
-    ))
-  )
+  def rowParser(idx: Int): RowParser[PmViewRow] = {
+    RowParser[PmViewRow] { row =>
+      Success(
+        PmViewRow(
+          id = row(idx + 0)(ProductmodelId.column),
+          productmodelid = row(idx + 1)(ProductmodelId.column),
+          name = row(idx + 2)(Name.column),
+          catalogdescription = row(idx + 3)(Column.columnToOption(TypoXml.column)),
+          instructions = row(idx + 4)(Column.columnToOption(TypoXml.column)),
+          rowguid = row(idx + 5)(TypoUUID.column),
+          modifieddate = row(idx + 6)(TypoLocalDateTime.column)
+        )
+      )
+    }
+  }
+  implicit lazy val writes: OWrites[PmViewRow] = {
+    OWrites[PmViewRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "id" -> ProductmodelId.writes.writes(o.id),
+        "productmodelid" -> ProductmodelId.writes.writes(o.productmodelid),
+        "name" -> Name.writes.writes(o.name),
+        "catalogdescription" -> Writes.OptionWrites(TypoXml.writes).writes(o.catalogdescription),
+        "instructions" -> Writes.OptionWrites(TypoXml.writes).writes(o.instructions),
+        "rowguid" -> TypoUUID.writes.writes(o.rowguid),
+        "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
+      ))
+    )
+  }
 }

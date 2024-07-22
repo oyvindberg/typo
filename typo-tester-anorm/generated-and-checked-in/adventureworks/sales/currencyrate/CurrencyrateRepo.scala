@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.currencyrate
+package adventureworks.sales.currencyrate;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait CurrencyrateRepo {
   def delete: DeleteBuilder[CurrencyrateFields, CurrencyrateRow]
@@ -17,7 +17,7 @@ trait CurrencyrateRepo {
   def insert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow
   def insert(unsaved: CurrencyrateRowUnsaved)(implicit c: Connection): CurrencyrateRow
   def insertStreaming(unsaved: Iterator[CurrencyrateRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[CurrencyrateRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[CurrencyrateFields, CurrencyrateRow]
   def selectAll(implicit c: Connection): List[CurrencyrateRow]
@@ -28,6 +28,6 @@ trait CurrencyrateRepo {
   def update(row: CurrencyrateRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow
   def upsertBatch(unsaved: Iterable[CurrencyrateRow])(implicit c: Connection): List[CurrencyrateRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[CurrencyrateRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

@@ -3,37 +3,39 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.countryregioncurrency
+package adventureworks.sales.countryregioncurrency;
 
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.sales.currency.CurrencyId
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.person.countryregion.CountryregionId;
+import adventureworks.sales.currency.CurrencyId;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** Type for the composite primary key of table `sales.countryregioncurrency` */
-case class CountryregioncurrencyId(
-  countryregioncode: CountryregionId,
-  currencycode: CurrencyId
-)
+case class CountryregioncurrencyId(countryregioncode: CountryregionId, currencycode: CurrencyId)
+
 object CountryregioncurrencyId {
-  implicit lazy val reads: Reads[CountryregioncurrencyId] = Reads[CountryregioncurrencyId](json => JsResult.fromTry(
-      Try(
-        CountryregioncurrencyId(
-          countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
-          currencycode = json.\("currencycode").as(CurrencyId.reads)
+  implicit lazy val reads: Reads[CountryregioncurrencyId] = {
+    Reads[CountryregioncurrencyId](json => JsResult.fromTry(
+        Try(
+          CountryregioncurrencyId(
+            countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
+            currencycode = json.\("currencycode").as(CurrencyId.reads)
+          )
         )
-      )
-    ),
-  )
-  implicit lazy val writes: OWrites[CountryregioncurrencyId] = OWrites[CountryregioncurrencyId](o =>
-    new JsObject(ListMap[String, JsValue](
-      "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
-      "currencycode" -> CurrencyId.writes.writes(o.currencycode)
-    ))
-  )
+      ),
+    )
+  }
+  implicit lazy val writes: OWrites[CountryregioncurrencyId] = {
+    OWrites[CountryregioncurrencyId](o =>
+      new JsObject(ListMap[String, JsValue](
+        "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
+        "currencycode" -> CurrencyId.writes.writes(o.currencycode)
+      ))
+    )
+  }
 }

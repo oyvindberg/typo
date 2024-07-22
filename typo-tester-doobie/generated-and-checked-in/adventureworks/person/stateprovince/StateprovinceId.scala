@@ -3,18 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.stateprovince
+package adventureworks.person.stateprovince;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `person.stateprovince` */
-case class StateprovinceId(value: Int) extends AnyVal
+case class StateprovinceId(value: Int) extends scala.AnyVal
+
 object StateprovinceId {
   implicit lazy val arrayGet: Get[Array[StateprovinceId]] = adventureworks.IntegerArrayMeta.get.map(_.map(StateprovinceId.apply))
   implicit lazy val arrayPut: Put[Array[StateprovinceId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
@@ -23,8 +24,10 @@ object StateprovinceId {
   implicit lazy val encoder: Encoder[StateprovinceId] = Encoder.encodeInt.contramap(_.value)
   implicit lazy val get: Get[StateprovinceId] = Meta.IntMeta.get.map(StateprovinceId.apply)
   implicit lazy val put: Put[StateprovinceId] = Meta.IntMeta.put.contramap(_.value)
-  implicit lazy val text: Text[StateprovinceId] = new Text[StateprovinceId] {
-    override def unsafeEncode(v: StateprovinceId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: StateprovinceId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[StateprovinceId] = {
+    new Text[StateprovinceId] {
+      override def unsafeEncode(v: StateprovinceId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: StateprovinceId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

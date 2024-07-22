@@ -3,19 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.scrapreason
+package adventureworks.production.scrapreason;
 
-import adventureworks.Text
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `production.scrapreason` */
-case class ScrapreasonId(value: Int) extends AnyVal
+case class ScrapreasonId(value: Int) extends scala.AnyVal
+
 object ScrapreasonId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[ScrapreasonId]] = adventureworks.IntArrayDecoder.map(_.map(ScrapreasonId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[ScrapreasonId]] = adventureworks.IntArrayEncoder.contramap(_.map(_.value))
@@ -27,8 +28,10 @@ object ScrapreasonId {
   implicit lazy val jsonEncoder: JsonEncoder[ScrapreasonId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val pgType: PGType[ScrapreasonId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[ScrapreasonId] = Setter.intSetter.contramap(_.value)
-  implicit lazy val text: Text[ScrapreasonId] = new Text[ScrapreasonId] {
-    override def unsafeEncode(v: ScrapreasonId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: ScrapreasonId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[ScrapreasonId] = {
+    new Text[ScrapreasonId] {
+      override def unsafeEncode(v: ScrapreasonId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: ScrapreasonId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

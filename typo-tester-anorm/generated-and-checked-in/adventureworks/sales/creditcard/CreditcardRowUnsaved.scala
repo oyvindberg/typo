@@ -3,21 +3,21 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.creditcard
+package adventureworks.sales.creditcard;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.userdefined.CustomCreditcardId
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.userdefined.CustomCreditcardId;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** This class corresponds to a row in table `sales.creditcard` which has not been persisted yet */
 case class CreditcardRowUnsaved(
@@ -30,62 +30,65 @@ case class CreditcardRowUnsaved(
   /** Credit card expiration year. */
   expyear: TypoShort,
   /** Default: nextval('sales.creditcard_creditcardid_seq'::regclass)
-      Primary key for CreditCard records. */
-  creditcardid: Defaulted[/* user-picked */ CustomCreditcardId] = Defaulted.UseDefault,
+    * Primary key for CreditCard records.
+    */
+  creditcardid: Defaulted[/* user-picked */ CustomCreditcardId] = Defaulted.UseDefault(),
   /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()
 ) {
-  def toRow(creditcardidDefault: => /* user-picked */ CustomCreditcardId, modifieddateDefault: => TypoLocalDateTime): CreditcardRow =
-    CreditcardRow(
-      creditcardid = creditcardid match {
-                       case Defaulted.UseDefault => creditcardidDefault
-                       case Defaulted.Provided(value) => value
-                     },
+  def toRow(creditcardidDefault: => /* user-picked */ CustomCreditcardId, modifieddateDefault: => TypoLocalDateTime): CreditcardRow = {
+    new CreditcardRow(
+      creditcardid = creditcardid.getOrElse(creditcardidDefault),
       cardtype = cardtype,
       cardnumber = cardnumber,
       expmonth = expmonth,
       expyear = expyear,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
+      modifieddate = modifieddate.getOrElse(modifieddateDefault)
     )
-}
-object CreditcardRowUnsaved {
-  implicit lazy val reads: Reads[CreditcardRowUnsaved] = Reads[CreditcardRowUnsaved](json => JsResult.fromTry(
-      Try(
-        CreditcardRowUnsaved(
-          cardtype = json.\("cardtype").as(Reads.StringReads),
-          cardnumber = json.\("cardnumber").as(Reads.StringReads),
-          expmonth = json.\("expmonth").as(TypoShort.reads),
-          expyear = json.\("expyear").as(TypoShort.reads),
-          creditcardid = json.\("creditcardid").as(Defaulted.reads(CustomCreditcardId.reads)),
-          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
-        )
-      )
-    ),
-  )
-  implicit lazy val text: Text[CreditcardRowUnsaved] = Text.instance[CreditcardRowUnsaved]{ (row, sb) =>
-    Text.stringInstance.unsafeEncode(row.cardtype, sb)
-    sb.append(Text.DELIMETER)
-    Text.stringInstance.unsafeEncode(row.cardnumber, sb)
-    sb.append(Text.DELIMETER)
-    TypoShort.text.unsafeEncode(row.expmonth, sb)
-    sb.append(Text.DELIMETER)
-    TypoShort.text.unsafeEncode(row.expyear, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(CustomCreditcardId.text).unsafeEncode(row.creditcardid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val writes: OWrites[CreditcardRowUnsaved] = OWrites[CreditcardRowUnsaved](o =>
-    new JsObject(ListMap[String, JsValue](
-      "cardtype" -> Writes.StringWrites.writes(o.cardtype),
-      "cardnumber" -> Writes.StringWrites.writes(o.cardnumber),
-      "expmonth" -> TypoShort.writes.writes(o.expmonth),
-      "expyear" -> TypoShort.writes.writes(o.expyear),
-      "creditcardid" -> Defaulted.writes(CustomCreditcardId.writes).writes(o.creditcardid),
-      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
-    ))
-  )
+}
+
+object CreditcardRowUnsaved {
+  implicit lazy val reads: Reads[CreditcardRowUnsaved] = {
+    Reads[CreditcardRowUnsaved](json => JsResult.fromTry(
+        Try(
+          CreditcardRowUnsaved(
+            cardtype = json.\("cardtype").as(Reads.StringReads),
+            cardnumber = json.\("cardnumber").as(Reads.StringReads),
+            expmonth = json.\("expmonth").as(TypoShort.reads),
+            expyear = json.\("expyear").as(TypoShort.reads),
+            creditcardid = json.\("creditcardid").as(Defaulted.reads(CustomCreditcardId.reads)),
+            modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+          )
+        )
+      ),
+    )
+  }
+  implicit lazy val text: Text[CreditcardRowUnsaved] = {
+    Text.instance[CreditcardRowUnsaved]{ (row, sb) =>
+      Text.stringInstance.unsafeEncode(row.cardtype, sb)
+      sb.append(Text.DELIMETER)
+      Text.stringInstance.unsafeEncode(row.cardnumber, sb)
+      sb.append(Text.DELIMETER)
+      TypoShort.text.unsafeEncode(row.expmonth, sb)
+      sb.append(Text.DELIMETER)
+      TypoShort.text.unsafeEncode(row.expyear, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(CustomCreditcardId.text).unsafeEncode(row.creditcardid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[CreditcardRowUnsaved] = {
+    OWrites[CreditcardRowUnsaved](o =>
+      new JsObject(ListMap[String, JsValue](
+        "cardtype" -> Writes.StringWrites.writes(o.cardtype),
+        "cardnumber" -> Writes.StringWrites.writes(o.cardnumber),
+        "expmonth" -> TypoShort.writes.writes(o.expmonth),
+        "expyear" -> TypoShort.writes.writes(o.expyear),
+        "creditcardid" -> Defaulted.writes(CustomCreditcardId.writes).writes(o.creditcardid),
+        "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
+      ))
+    )
+  }
 }

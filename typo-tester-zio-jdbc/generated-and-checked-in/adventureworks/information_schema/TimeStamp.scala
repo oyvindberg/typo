@@ -3,23 +3,24 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.information_schema
+package adventureworks.information_schema;
 
-import adventureworks.Text
-import adventureworks.customtypes.TypoInstant
-import java.sql.Types
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import adventureworks.customtypes.TypoInstant;
+import java.sql.Types;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Domain `information_schema.time_stamp`
   * No constraint
   */
 case class TimeStamp(value: TypoInstant)
+
 object TimeStamp {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TimeStamp]] = TypoInstant.arrayJdbcDecoder.map(_.map(TimeStamp.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TimeStamp]] = TypoInstant.arrayJdbcEncoder.contramap(_.map(_.value))
@@ -31,8 +32,10 @@ object TimeStamp {
   implicit lazy val jsonEncoder: JsonEncoder[TimeStamp] = TypoInstant.jsonEncoder.contramap(_.value)
   implicit lazy val pgType: PGType[TimeStamp] = PGType.instance(""""information_schema"."time_stamp"""", Types.OTHER)
   implicit lazy val setter: Setter[TimeStamp] = TypoInstant.setter.contramap(_.value)
-  implicit lazy val text: Text[TimeStamp] = new Text[TimeStamp] {
-    override def unsafeEncode(v: TimeStamp, sb: StringBuilder) = TypoInstant.text.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: TimeStamp, sb: StringBuilder) = TypoInstant.text.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[TimeStamp] = {
+    new Text[TimeStamp] {
+      override def unsafeEncode(v: TimeStamp, sb: StringBuilder) = TypoInstant.text.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: TimeStamp, sb: StringBuilder) = TypoInstant.text.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

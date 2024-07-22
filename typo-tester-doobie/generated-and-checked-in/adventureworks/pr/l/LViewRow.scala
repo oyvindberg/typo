@@ -3,17 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.l
+package adventureworks.pr.l;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.location.LocationId
-import adventureworks.public.Name
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.location.LocationId;
+import adventureworks.public.Name;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: pr.l */
 case class LViewRow(
@@ -34,22 +34,25 @@ case class LViewRow(
 object LViewRow {
   implicit lazy val decoder: Decoder[LViewRow] = Decoder.forProduct6[LViewRow, LocationId, LocationId, Name, BigDecimal, BigDecimal, TypoLocalDateTime]("id", "locationid", "name", "costrate", "availability", "modifieddate")(LViewRow.apply)(LocationId.decoder, LocationId.decoder, Name.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[LViewRow] = Encoder.forProduct6[LViewRow, LocationId, LocationId, Name, BigDecimal, BigDecimal, TypoLocalDateTime]("id", "locationid", "name", "costrate", "availability", "modifieddate")(x => (x.id, x.locationid, x.name, x.costrate, x.availability, x.modifieddate))(LocationId.encoder, LocationId.encoder, Name.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[LViewRow] = new Read[LViewRow](
-    gets = List(
-      (LocationId.get, Nullability.NoNulls),
-      (LocationId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => LViewRow(
-      id = LocationId.get.unsafeGetNonNullable(rs, i + 0),
-      locationid = LocationId.get.unsafeGetNonNullable(rs, i + 1),
-      name = Name.get.unsafeGetNonNullable(rs, i + 2),
-      costrate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
-      availability = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[LViewRow] = {
+    new Read[LViewRow](
+      gets = List(
+        (LocationId.get, Nullability.NoNulls),
+        (LocationId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => LViewRow(
+        id = LocationId.get.unsafeGetNonNullable(rs, i + 0),
+        locationid = LocationId.get.unsafeGetNonNullable(rs, i + 1),
+        name = Name.get.unsafeGetNonNullable(rs, i + 2),
+        costrate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
+        availability = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 4),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+      )
     )
-  )
+  
+  }
 }

@@ -3,17 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person_dynamic
+package adventureworks.person_dynamic;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
-import doobie.syntax.string.toSqlInterpolator
-import doobie.util.Write
-import doobie.util.meta.Meta
-import fs2.Stream
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite;
+import doobie.syntax.string.toSqlInterpolator;
+import doobie.util.Write;
+import doobie.util.meta.Meta;
+import fs2.Stream;
 
 class PersonDynamicSqlRepoImpl extends PersonDynamicSqlRepo {
-  override def apply(firstName: Option[String]): Stream[ConnectionIO, PersonDynamicSqlRow] = {
+  def apply(firstName: Option[String]): Stream[ConnectionIO, PersonDynamicSqlRow] = {
     val sql =
       sql"""SELECT p.title, p.firstname, p.middlename, p.lastname
             FROM person.person p

@@ -3,18 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salestaxrate
+package adventureworks.sales.salestaxrate;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `sales.salestaxrate` */
-case class SalestaxrateId(value: Int) extends AnyVal
+case class SalestaxrateId(value: Int) extends scala.AnyVal
+
 object SalestaxrateId {
   implicit lazy val arrayGet: Get[Array[SalestaxrateId]] = adventureworks.IntegerArrayMeta.get.map(_.map(SalestaxrateId.apply))
   implicit lazy val arrayPut: Put[Array[SalestaxrateId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
@@ -23,8 +24,10 @@ object SalestaxrateId {
   implicit lazy val encoder: Encoder[SalestaxrateId] = Encoder.encodeInt.contramap(_.value)
   implicit lazy val get: Get[SalestaxrateId] = Meta.IntMeta.get.map(SalestaxrateId.apply)
   implicit lazy val put: Put[SalestaxrateId] = Meta.IntMeta.put.contramap(_.value)
-  implicit lazy val text: Text[SalestaxrateId] = new Text[SalestaxrateId] {
-    override def unsafeEncode(v: SalestaxrateId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: SalestaxrateId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[SalestaxrateId] = {
+    new Text[SalestaxrateId] {
+      override def unsafeEncode(v: SalestaxrateId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: SalestaxrateId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

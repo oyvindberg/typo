@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pe.a
+package adventureworks.pe.a;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class AViewRepoImpl extends AViewRepo {
-  override def select: SelectBuilder[AViewFields, AViewRow] = {
-    SelectBuilderSql("pe.a", AViewFields.structure, AViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[AViewRow] = {
+  def select: SelectBuilder[AViewFields, AViewRow] = SelectBuilderSql("pe.a", AViewFields.structure, AViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[AViewRow] = {
     SQL"""select "id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
           from pe.a
        """.as(AViewRow.rowParser(1).*)

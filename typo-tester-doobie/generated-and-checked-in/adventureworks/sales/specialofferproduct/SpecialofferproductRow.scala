@@ -3,87 +3,110 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.specialofferproduct
+package adventureworks.sales.specialofferproduct;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.production.product.ProductId
-import adventureworks.sales.specialoffer.SpecialofferId
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.production.product.ProductId;
+import adventureworks.sales.specialoffer.SpecialofferId;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: sales.specialofferproduct
-    Cross-reference table mapping products to special offer discounts.
-    Composite primary key: specialofferid, productid */
+  * Cross-reference table mapping products to special offer discounts.
+  * Composite primary key: specialofferid, productid
+  */
 case class SpecialofferproductRow(
   /** Primary key for SpecialOfferProduct records.
-      Points to [[adventureworks.sales.specialoffer.SpecialofferRow.specialofferid]] */
+    * Points to [[adventureworks.sales.specialoffer.SpecialofferRow.specialofferid]]
+    */
   specialofferid: SpecialofferId,
   /** Product identification number. Foreign key to Product.ProductID.
-      Points to [[adventureworks.production.product.ProductRow.productid]] */
+    * Points to [[adventureworks.production.product.ProductRow.productid]]
+    */
   productid: ProductId,
   /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val compositeId: SpecialofferproductId = SpecialofferproductId(specialofferid, productid)
-   val id = compositeId
-   def toUnsavedRow(rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SpecialofferproductRowUnsaved =
-     SpecialofferproductRowUnsaved(specialofferid, productid, rowguid, modifieddate)
- }
+) {
+  def compositeId: SpecialofferproductId = new SpecialofferproductId(specialofferid, productid)
+  def id: SpecialofferproductId = compositeId
+  def toUnsavedRow(rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SpecialofferproductRowUnsaved = {
+    new SpecialofferproductRowUnsaved(
+      specialofferid,
+      productid,
+      rowguid,
+      modifieddate
+    )
+  }
+}
 
 object SpecialofferproductRow {
-  def apply(compositeId: SpecialofferproductId, rowguid: TypoUUID, modifieddate: TypoLocalDateTime) =
-    new SpecialofferproductRow(compositeId.specialofferid, compositeId.productid, rowguid, modifieddate)
+  def apply(compositeId: SpecialofferproductId, rowguid: TypoUUID, modifieddate: TypoLocalDateTime): SpecialofferproductRow = {
+    new SpecialofferproductRow(
+      compositeId.specialofferid,
+      compositeId.productid,
+      rowguid,
+      modifieddate
+    )
+  }
   implicit lazy val decoder: Decoder[SpecialofferproductRow] = Decoder.forProduct4[SpecialofferproductRow, SpecialofferId, ProductId, TypoUUID, TypoLocalDateTime]("specialofferid", "productid", "rowguid", "modifieddate")(SpecialofferproductRow.apply)(SpecialofferId.decoder, ProductId.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SpecialofferproductRow] = Encoder.forProduct4[SpecialofferproductRow, SpecialofferId, ProductId, TypoUUID, TypoLocalDateTime]("specialofferid", "productid", "rowguid", "modifieddate")(x => (x.specialofferid, x.productid, x.rowguid, x.modifieddate))(SpecialofferId.encoder, ProductId.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SpecialofferproductRow] = new Read[SpecialofferproductRow](
-    gets = List(
-      (SpecialofferId.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SpecialofferproductRow(
-      specialofferid = SpecialofferId.get.unsafeGetNonNullable(rs, i + 0),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[SpecialofferproductRow] = {
+    new Read[SpecialofferproductRow](
+      gets = List(
+        (SpecialofferId.get, Nullability.NoNulls),
+        (ProductId.get, Nullability.NoNulls),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SpecialofferproductRow(
+        specialofferid = SpecialofferId.get.unsafeGetNonNullable(rs, i + 0),
+        productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 2),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+      )
     )
-  )
-  implicit lazy val text: Text[SpecialofferproductRow] = Text.instance[SpecialofferproductRow]{ (row, sb) =>
-    SpecialofferId.text.unsafeEncode(row.specialofferid, sb)
-    sb.append(Text.DELIMETER)
-    ProductId.text.unsafeEncode(row.productid, sb)
-    sb.append(Text.DELIMETER)
-    TypoUUID.text.unsafeEncode(row.rowguid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[SpecialofferproductRow] = new Write[SpecialofferproductRow](
-    puts = List((SpecialofferId.put, Nullability.NoNulls),
-                (ProductId.put, Nullability.NoNulls),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.specialofferid, x.productid, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  SpecialofferId.put.unsafeSetNonNullable(rs, i + 0, a.specialofferid)
-                  ProductId.put.unsafeSetNonNullable(rs, i + 1, a.productid)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 2, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     SpecialofferId.put.unsafeUpdateNonNullable(ps, i + 0, a.specialofferid)
-                     ProductId.put.unsafeUpdateNonNullable(ps, i + 1, a.productid)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 2, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[SpecialofferproductRow] = {
+    Text.instance[SpecialofferproductRow]{ (row, sb) =>
+      SpecialofferId.text.unsafeEncode(row.specialofferid, sb)
+      sb.append(Text.DELIMETER)
+      ProductId.text.unsafeEncode(row.productid, sb)
+      sb.append(Text.DELIMETER)
+      TypoUUID.text.unsafeEncode(row.rowguid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[SpecialofferproductRow] = {
+    new Write[SpecialofferproductRow](
+      puts = List((SpecialofferId.put, Nullability.NoNulls),
+                  (ProductId.put, Nullability.NoNulls),
+                  (TypoUUID.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.specialofferid, x.productid, x.rowguid, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    SpecialofferId.put.unsafeSetNonNullable(rs, i + 0, a.specialofferid)
+                    ProductId.put.unsafeSetNonNullable(rs, i + 1, a.productid)
+                    TypoUUID.put.unsafeSetNonNullable(rs, i + 2, a.rowguid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       SpecialofferId.put.unsafeUpdateNonNullable(ps, i + 0, a.specialofferid)
+                       ProductId.put.unsafeUpdateNonNullable(ps, i + 1, a.productid)
+                       TypoUUID.put.unsafeUpdateNonNullable(ps, i + 2, a.rowguid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
+                     }
+    )
+  
+  }
 }

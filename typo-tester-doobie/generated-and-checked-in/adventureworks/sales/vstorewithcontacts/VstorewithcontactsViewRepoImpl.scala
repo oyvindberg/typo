@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.vstorewithcontacts
+package adventureworks.sales.vstorewithcontacts;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class VstorewithcontactsViewRepoImpl extends VstorewithcontactsViewRepo {
-  override def select: SelectBuilder[VstorewithcontactsViewFields, VstorewithcontactsViewRow] = {
-    SelectBuilderSql("sales.vstorewithcontacts", VstorewithcontactsViewFields.structure, VstorewithcontactsViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, VstorewithcontactsViewRow] = {
-    sql"""select "businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion" from sales.vstorewithcontacts""".query(using VstorewithcontactsViewRow.read).stream
-  }
+  def select: SelectBuilder[VstorewithcontactsViewFields, VstorewithcontactsViewRow] = SelectBuilderSql("sales.vstorewithcontacts", VstorewithcontactsViewFields.structure, VstorewithcontactsViewRow.read)
+  def selectAll: Stream[ConnectionIO, VstorewithcontactsViewRow] = sql"""select "businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion" from sales.vstorewithcontacts""".query(using VstorewithcontactsViewRow.read).stream
 }

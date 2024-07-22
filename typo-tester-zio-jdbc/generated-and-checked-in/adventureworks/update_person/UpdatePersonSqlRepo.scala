@@ -3,11 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.update_person
+package adventureworks.update_person;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import zio.ZIO
-import zio.jdbc.ZConnection
+import adventureworks.customtypes.TypoLocalDateTime;
+import zio.ZIO;
+import zio.jdbc.ZConnection;
 
 trait UpdatePersonSqlRepo {
   def apply(suffix: String, cutoff: Option[TypoLocalDateTime]): ZIO[ZConnection, Throwable, Long]

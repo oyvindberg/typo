@@ -3,69 +3,59 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.businessentity
+package adventureworks.person.businessentity;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** This class corresponds to a row in table `person.businessentity` which has not been persisted yet */
-case class BusinessentityRowUnsaved(
-  /** Default: nextval('person.businessentity_businessentityid_seq'::regclass)
-      Primary key for all customers, vendors, and employees. */
-  businessentityid: Defaulted[BusinessentityId] = Defaulted.UseDefault,
-  /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
-  /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-) {
-  def toRow(businessentityidDefault: => BusinessentityId, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): BusinessentityRow =
-    BusinessentityRow(
-      businessentityid = businessentityid match {
-                           case Defaulted.UseDefault => businessentityidDefault
-                           case Defaulted.Provided(value) => value
-                         },
-      rowguid = rowguid match {
-                  case Defaulted.UseDefault => rowguidDefault
-                  case Defaulted.Provided(value) => value
-                },
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
-    )
+case class BusinessentityRowUnsaved(/** Default: nextval('person.businessentity_businessentityid_seq'::regclass)
+                                      * Primary key for all customers, vendors, and employees.
+                                      */
+                                    businessentityid: Defaulted[BusinessentityId] = Defaulted.UseDefault(), /** Default: uuid_generate_v1() */
+                                    rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault(), /** Default: now() */
+                                    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()) {
+  def toRow(businessentityidDefault: => BusinessentityId, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): BusinessentityRow = new BusinessentityRow(businessentityid = businessentityid.getOrElse(businessentityidDefault), rowguid = rowguid.getOrElse(rowguidDefault), modifieddate = modifieddate.getOrElse(modifieddateDefault))
 }
+
 object BusinessentityRowUnsaved {
-  implicit lazy val reads: Reads[BusinessentityRowUnsaved] = Reads[BusinessentityRowUnsaved](json => JsResult.fromTry(
-      Try(
-        BusinessentityRowUnsaved(
-          businessentityid = json.\("businessentityid").as(Defaulted.reads(BusinessentityId.reads)),
-          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
-          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+  implicit lazy val reads: Reads[BusinessentityRowUnsaved] = {
+    Reads[BusinessentityRowUnsaved](json => JsResult.fromTry(
+        Try(
+          BusinessentityRowUnsaved(
+            businessentityid = json.\("businessentityid").as(Defaulted.reads(BusinessentityId.reads)),
+            rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
+            modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+          )
         )
-      )
-    ),
-  )
-  implicit lazy val text: Text[BusinessentityRowUnsaved] = Text.instance[BusinessentityRowUnsaved]{ (row, sb) =>
-    Defaulted.text(BusinessentityId.text).unsafeEncode(row.businessentityid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+      ),
+    )
   }
-  implicit lazy val writes: OWrites[BusinessentityRowUnsaved] = OWrites[BusinessentityRowUnsaved](o =>
-    new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> Defaulted.writes(BusinessentityId.writes).writes(o.businessentityid),
-      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
-      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
-    ))
-  )
+  implicit lazy val text: Text[BusinessentityRowUnsaved] = {
+    Text.instance[BusinessentityRowUnsaved]{ (row, sb) =>
+      Defaulted.text(BusinessentityId.text).unsafeEncode(row.businessentityid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[BusinessentityRowUnsaved] = {
+    OWrites[BusinessentityRowUnsaved](o =>
+      new JsObject(ListMap[String, JsValue](
+        "businessentityid" -> Defaulted.writes(BusinessentityId.writes).writes(o.businessentityid),
+        "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
+        "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
+      ))
+    )
+  }
 }

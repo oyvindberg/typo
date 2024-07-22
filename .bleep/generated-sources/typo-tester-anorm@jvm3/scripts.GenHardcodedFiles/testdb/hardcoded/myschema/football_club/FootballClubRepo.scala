@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.myschema.football_club
+package testdb.hardcoded.myschema.football_club;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait FootballClubRepo {
   def delete: DeleteBuilder[FootballClubFields, FootballClubRow]
@@ -18,7 +18,7 @@ trait FootballClubRepo {
   def insertStreaming(unsaved: Iterator[FootballClubRow], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[FootballClubFields, FootballClubRow]
   def selectAll(implicit c: Connection): List[FootballClubRow]
-  def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]])(implicit c: Connection): List[FootballClubRow]
+  def selectByFieldValues(fieldValues: List[FootballClubFieldValue[?]])(implicit c: Connection): List[FootballClubRow]
   def selectById(id: FootballClubId)(implicit c: Connection): Option[FootballClubRow]
   def selectByIds(ids: Array[FootballClubId])(implicit c: Connection): List[FootballClubRow]
   def selectByIdsTracked(ids: Array[FootballClubId])(implicit c: Connection): Map[FootballClubId, FootballClubRow]
@@ -27,6 +27,6 @@ trait FootballClubRepo {
   def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]])(implicit c: Connection): Boolean
   def upsert(unsaved: FootballClubRow)(implicit c: Connection): FootballClubRow
   def upsertBatch(unsaved: Iterable[FootballClubRow])(implicit c: Connection): List[FootballClubRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[FootballClubRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

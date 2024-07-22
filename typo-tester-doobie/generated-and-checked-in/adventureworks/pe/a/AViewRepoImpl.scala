@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pe.a
+package adventureworks.pe.a;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class AViewRepoImpl extends AViewRepo {
-  override def select: SelectBuilder[AViewFields, AViewRow] = {
-    SelectBuilderSql("pe.a", AViewFields.structure, AViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, AViewRow] = {
-    sql"""select "id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from pe.a""".query(using AViewRow.read).stream
-  }
+  def select: SelectBuilder[AViewFields, AViewRow] = SelectBuilderSql("pe.a", AViewFields.structure, AViewRow.read)
+  def selectAll: Stream[ConnectionIO, AViewRow] = sql"""select "id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from pe.a""".query(using AViewRow.read).stream
 }

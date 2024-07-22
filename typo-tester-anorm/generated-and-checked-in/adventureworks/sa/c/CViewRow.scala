@@ -3,24 +3,24 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.c
+package adventureworks.sa.c;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.customer.CustomerId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import anorm.Column
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.sales.customer.CustomerId;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import anorm.Column;
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** View: sa.c */
 case class CViewRow(
@@ -41,42 +41,48 @@ case class CViewRow(
 )
 
 object CViewRow {
-  implicit lazy val reads: Reads[CViewRow] = Reads[CViewRow](json => JsResult.fromTry(
-      Try(
-        CViewRow(
-          id = json.\("id").as(CustomerId.reads),
-          customerid = json.\("customerid").as(CustomerId.reads),
-          personid = json.\("personid").toOption.map(_.as(BusinessentityId.reads)),
-          storeid = json.\("storeid").toOption.map(_.as(BusinessentityId.reads)),
-          territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
-          rowguid = json.\("rowguid").as(TypoUUID.reads),
-          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+  implicit lazy val reads: Reads[CViewRow] = {
+    Reads[CViewRow](json => JsResult.fromTry(
+        Try(
+          CViewRow(
+            id = json.\("id").as(CustomerId.reads),
+            customerid = json.\("customerid").as(CustomerId.reads),
+            personid = json.\("personid").toOption.map(_.as(BusinessentityId.reads)),
+            storeid = json.\("storeid").toOption.map(_.as(BusinessentityId.reads)),
+            territoryid = json.\("territoryid").toOption.map(_.as(SalesterritoryId.reads)),
+            rowguid = json.\("rowguid").as(TypoUUID.reads),
+            modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+          )
         )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[CViewRow] = RowParser[CViewRow] { row =>
-    Success(
-      CViewRow(
-        id = row(idx + 0)(CustomerId.column),
-        customerid = row(idx + 1)(CustomerId.column),
-        personid = row(idx + 2)(Column.columnToOption(BusinessentityId.column)),
-        storeid = row(idx + 3)(Column.columnToOption(BusinessentityId.column)),
-        territoryid = row(idx + 4)(Column.columnToOption(SalesterritoryId.column)),
-        rowguid = row(idx + 5)(TypoUUID.column),
-        modifieddate = row(idx + 6)(TypoLocalDateTime.column)
-      )
+      ),
     )
   }
-  implicit lazy val writes: OWrites[CViewRow] = OWrites[CViewRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "id" -> CustomerId.writes.writes(o.id),
-      "customerid" -> CustomerId.writes.writes(o.customerid),
-      "personid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.personid),
-      "storeid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.storeid),
-      "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
-      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
-      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
-    ))
-  )
+  def rowParser(idx: Int): RowParser[CViewRow] = {
+    RowParser[CViewRow] { row =>
+      Success(
+        CViewRow(
+          id = row(idx + 0)(CustomerId.column),
+          customerid = row(idx + 1)(CustomerId.column),
+          personid = row(idx + 2)(Column.columnToOption(BusinessentityId.column)),
+          storeid = row(idx + 3)(Column.columnToOption(BusinessentityId.column)),
+          territoryid = row(idx + 4)(Column.columnToOption(SalesterritoryId.column)),
+          rowguid = row(idx + 5)(TypoUUID.column),
+          modifieddate = row(idx + 6)(TypoLocalDateTime.column)
+        )
+      )
+    }
+  }
+  implicit lazy val writes: OWrites[CViewRow] = {
+    OWrites[CViewRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "id" -> CustomerId.writes.writes(o.id),
+        "customerid" -> CustomerId.writes.writes(o.customerid),
+        "personid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.personid),
+        "storeid" -> Writes.OptionWrites(BusinessentityId.writes).writes(o.storeid),
+        "territoryid" -> Writes.OptionWrites(SalesterritoryId.writes).writes(o.territoryid),
+        "rowguid" -> TypoUUID.writes.writes(o.rowguid),
+        "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
+      ))
+    )
+  }
 }

@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.jobcandidate
+package adventureworks.humanresources.jobcandidate;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait JobcandidateRepo {
   def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow]
@@ -17,7 +17,7 @@ trait JobcandidateRepo {
   def insert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow
   def insert(unsaved: JobcandidateRowUnsaved)(implicit c: Connection): JobcandidateRow
   def insertStreaming(unsaved: Iterator[JobcandidateRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[JobcandidateRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[JobcandidateFields, JobcandidateRow]
   def selectAll(implicit c: Connection): List[JobcandidateRow]
@@ -28,6 +28,6 @@ trait JobcandidateRepo {
   def update(row: JobcandidateRow)(implicit c: Connection): Boolean
   def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow
   def upsertBatch(unsaved: Iterable[JobcandidateRow])(implicit c: Connection): List[JobcandidateRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[JobcandidateRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

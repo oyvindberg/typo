@@ -3,26 +3,28 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productphoto
+package adventureworks.production.productphoto;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoBytea
-import adventureworks.customtypes.TypoLocalDateTime
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoBytea;
+import adventureworks.customtypes.TypoLocalDateTime;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: production.productphoto
-    Product images.
-    Primary key: productphotoid */
+  * Product images.
+  * Primary key: productphotoid
+  */
 case class ProductphotoRow(
   /** Primary key for ProductPhoto records.
-      Default: nextval('production.productphoto_productphotoid_seq'::regclass) */
+    * Default: nextval('production.productphoto_productphotoid_seq'::regclass)
+    */
   productphotoid: ProductphotoId,
   /** Small image of the product. */
   thumbnailphoto: Option[TypoBytea],
@@ -34,69 +36,85 @@ case class ProductphotoRow(
   largephotofilename: Option[/* max 50 chars */ String],
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val id = productphotoid
-   def toUnsavedRow(productphotoid: Defaulted[ProductphotoId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductphotoRowUnsaved =
-     ProductphotoRowUnsaved(thumbnailphoto, thumbnailphotofilename, largephoto, largephotofilename, productphotoid, modifieddate)
- }
+) {
+  def id: ProductphotoId = productphotoid
+  def toUnsavedRow(productphotoid: Defaulted[ProductphotoId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductphotoRowUnsaved = {
+    new ProductphotoRowUnsaved(
+      thumbnailphoto,
+      thumbnailphotofilename,
+      largephoto,
+      largephotofilename,
+      productphotoid,
+      modifieddate
+    )
+  }
+}
 
 object ProductphotoRow {
   implicit lazy val decoder: Decoder[ProductphotoRow] = Decoder.forProduct6[ProductphotoRow, ProductphotoId, Option[TypoBytea], Option[/* max 50 chars */ String], Option[TypoBytea], Option[/* max 50 chars */ String], TypoLocalDateTime]("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(ProductphotoRow.apply)(ProductphotoId.decoder, Decoder.decodeOption(TypoBytea.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoBytea.decoder), Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ProductphotoRow] = Encoder.forProduct6[ProductphotoRow, ProductphotoId, Option[TypoBytea], Option[/* max 50 chars */ String], Option[TypoBytea], Option[/* max 50 chars */ String], TypoLocalDateTime]("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(x => (x.productphotoid, x.thumbnailphoto, x.thumbnailphotofilename, x.largephoto, x.largephotofilename, x.modifieddate))(ProductphotoId.encoder, Encoder.encodeOption(TypoBytea.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoBytea.encoder), Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ProductphotoRow] = new Read[ProductphotoRow](
-    gets = List(
-      (ProductphotoId.get, Nullability.NoNulls),
-      (TypoBytea.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoBytea.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ProductphotoRow(
-      productphotoid = ProductphotoId.get.unsafeGetNonNullable(rs, i + 0),
-      thumbnailphoto = TypoBytea.get.unsafeGetNullable(rs, i + 1),
-      thumbnailphotofilename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      largephoto = TypoBytea.get.unsafeGetNullable(rs, i + 3),
-      largephotofilename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[ProductphotoRow] = {
+    new Read[ProductphotoRow](
+      gets = List(
+        (ProductphotoId.get, Nullability.NoNulls),
+        (TypoBytea.get, Nullability.Nullable),
+        (Meta.StringMeta.get, Nullability.Nullable),
+        (TypoBytea.get, Nullability.Nullable),
+        (Meta.StringMeta.get, Nullability.Nullable),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ProductphotoRow(
+        productphotoid = ProductphotoId.get.unsafeGetNonNullable(rs, i + 0),
+        thumbnailphoto = TypoBytea.get.unsafeGetNullable(rs, i + 1),
+        thumbnailphotofilename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+        largephoto = TypoBytea.get.unsafeGetNullable(rs, i + 3),
+        largephotofilename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+      )
     )
-  )
-  implicit lazy val text: Text[ProductphotoRow] = Text.instance[ProductphotoRow]{ (row, sb) =>
-    ProductphotoId.text.unsafeEncode(row.productphotoid, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoBytea.text).unsafeEncode(row.thumbnailphoto, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.stringInstance).unsafeEncode(row.thumbnailphotofilename, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoBytea.text).unsafeEncode(row.largephoto, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.stringInstance).unsafeEncode(row.largephotofilename, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[ProductphotoRow] = new Write[ProductphotoRow](
-    puts = List((ProductphotoId.put, Nullability.NoNulls),
-                (TypoBytea.put, Nullability.Nullable),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (TypoBytea.put, Nullability.Nullable),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.productphotoid, x.thumbnailphoto, x.thumbnailphotofilename, x.largephoto, x.largephotofilename, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ProductphotoId.put.unsafeSetNonNullable(rs, i + 0, a.productphotoid)
-                  TypoBytea.put.unsafeSetNullable(rs, i + 1, a.thumbnailphoto)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 2, a.thumbnailphotofilename)
-                  TypoBytea.put.unsafeSetNullable(rs, i + 3, a.largephoto)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 4, a.largephotofilename)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ProductphotoId.put.unsafeUpdateNonNullable(ps, i + 0, a.productphotoid)
-                     TypoBytea.put.unsafeUpdateNullable(ps, i + 1, a.thumbnailphoto)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 2, a.thumbnailphotofilename)
-                     TypoBytea.put.unsafeUpdateNullable(ps, i + 3, a.largephoto)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 4, a.largephotofilename)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[ProductphotoRow] = {
+    Text.instance[ProductphotoRow]{ (row, sb) =>
+      ProductphotoId.text.unsafeEncode(row.productphotoid, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoBytea.text).unsafeEncode(row.thumbnailphoto, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.stringInstance).unsafeEncode(row.thumbnailphotofilename, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoBytea.text).unsafeEncode(row.largephoto, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.stringInstance).unsafeEncode(row.largephotofilename, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[ProductphotoRow] = {
+    new Write[ProductphotoRow](
+      puts = List((ProductphotoId.put, Nullability.NoNulls),
+                  (TypoBytea.put, Nullability.Nullable),
+                  (Meta.StringMeta.put, Nullability.Nullable),
+                  (TypoBytea.put, Nullability.Nullable),
+                  (Meta.StringMeta.put, Nullability.Nullable),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.productphotoid, x.thumbnailphoto, x.thumbnailphotofilename, x.largephoto, x.largephotofilename, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    ProductphotoId.put.unsafeSetNonNullable(rs, i + 0, a.productphotoid)
+                    TypoBytea.put.unsafeSetNullable(rs, i + 1, a.thumbnailphoto)
+                    Meta.StringMeta.put.unsafeSetNullable(rs, i + 2, a.thumbnailphotofilename)
+                    TypoBytea.put.unsafeSetNullable(rs, i + 3, a.largephoto)
+                    Meta.StringMeta.put.unsafeSetNullable(rs, i + 4, a.largephotofilename)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       ProductphotoId.put.unsafeUpdateNonNullable(ps, i + 0, a.productphotoid)
+                       TypoBytea.put.unsafeUpdateNullable(ps, i + 1, a.thumbnailphoto)
+                       Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 2, a.thumbnailphotofilename)
+                       TypoBytea.put.unsafeUpdateNullable(ps, i + 3, a.largephoto)
+                       Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 4, a.largephotofilename)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
+                     }
+    )
+  
+  }
 }

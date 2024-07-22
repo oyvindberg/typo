@@ -1,10 +1,13 @@
 package typo
 
+import typo.internal.codegen.LangScala
+
 import scala.concurrent.ExecutionContext
 
 case class Options(
     pkg: String,
     dbLib: Option[DbLibName],
+    lang: Lang = LangScala,
     jsonLibs: List[JsonLibName] = Nil,
     silentBanner: Boolean = false,
     logger: TypoLogger = TypoLogger.Console,

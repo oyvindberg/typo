@@ -3,17 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.update_person
+package adventureworks.update_person;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
-import doobie.syntax.string.toSqlInterpolator
-import doobie.util.Write
-import doobie.util.meta.Meta
+import adventureworks.customtypes.TypoLocalDateTime;
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite;
+import doobie.syntax.string.toSqlInterpolator;
+import doobie.util.Write;
+import doobie.util.meta.Meta;
 
 class UpdatePersonSqlRepoImpl extends UpdatePersonSqlRepo {
-  override def apply(suffix: String, cutoff: Option[TypoLocalDateTime]): ConnectionIO[Int] = {
+  def apply(suffix: String, cutoff: Option[TypoLocalDateTime]): ConnectionIO[Int] = {
     sql"""update person.person
           set firstname = firstname || '-' || ${fromWrite(suffix)(Write.fromPut(Meta.StringMeta.put))}
           where modifieddate < ${fromWrite(cutoff)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp""".update.run

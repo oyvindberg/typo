@@ -3,17 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.sci
+package adventureworks.sa.sci;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.product.ProductId
-import adventureworks.sales.shoppingcartitem.ShoppingcartitemId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.product.ProductId;
+import adventureworks.sales.shoppingcartitem.ShoppingcartitemId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: sa.sci */
 case class SciViewRow(
@@ -36,24 +36,27 @@ case class SciViewRow(
 object SciViewRow {
   implicit lazy val decoder: Decoder[SciViewRow] = Decoder.forProduct7[SciViewRow, ShoppingcartitemId, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(SciViewRow.apply)(ShoppingcartitemId.decoder, ShoppingcartitemId.decoder, Decoder.decodeString, Decoder.decodeInt, ProductId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SciViewRow] = Encoder.forProduct7[SciViewRow, ShoppingcartitemId, ShoppingcartitemId, /* max 50 chars */ String, Int, ProductId, TypoLocalDateTime, TypoLocalDateTime]("id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")(x => (x.id, x.shoppingcartitemid, x.shoppingcartid, x.quantity, x.productid, x.datecreated, x.modifieddate))(ShoppingcartitemId.encoder, ShoppingcartitemId.encoder, Encoder.encodeString, Encoder.encodeInt, ProductId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SciViewRow] = new Read[SciViewRow](
-    gets = List(
-      (ShoppingcartitemId.get, Nullability.NoNulls),
-      (ShoppingcartitemId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SciViewRow(
-      id = ShoppingcartitemId.get.unsafeGetNonNullable(rs, i + 0),
-      shoppingcartitemid = ShoppingcartitemId.get.unsafeGetNonNullable(rs, i + 1),
-      shoppingcartid = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      quantity = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 4),
-      datecreated = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+  implicit lazy val read: Read[SciViewRow] = {
+    new Read[SciViewRow](
+      gets = List(
+        (ShoppingcartitemId.get, Nullability.NoNulls),
+        (ShoppingcartitemId.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (Meta.IntMeta.get, Nullability.NoNulls),
+        (ProductId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SciViewRow(
+        id = ShoppingcartitemId.get.unsafeGetNonNullable(rs, i + 0),
+        shoppingcartitemid = ShoppingcartitemId.get.unsafeGetNonNullable(rs, i + 1),
+        shoppingcartid = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+        quantity = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+        productid = ProductId.get.unsafeGetNonNullable(rs, i + 4),
+        datecreated = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+      )
     )
-  )
+  
+  }
 }

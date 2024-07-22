@@ -3,32 +3,25 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesterritory
+package adventureworks.sales.salesterritory;
 
-import java.sql.Connection
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.DeleteBuilder.DeleteBuilderMock
-import typo.dsl.DeleteParams
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderMock
-import typo.dsl.SelectParams
-import typo.dsl.UpdateBuilder
-import typo.dsl.UpdateBuilder.UpdateBuilderMock
-import typo.dsl.UpdateParams
+import java.sql.Connection;
+import scala.annotation.nowarn;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.DeleteBuilder.DeleteBuilderMock;
+import typo.dsl.DeleteParams;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderMock;
+import typo.dsl.SelectParams;
+import typo.dsl.UpdateBuilder;
+import typo.dsl.UpdateBuilder.UpdateBuilderMock;
+import typo.dsl.UpdateParams;
 
-class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, SalesterritoryRow],
-                             map: scala.collection.mutable.Map[SalesterritoryId, SalesterritoryRow] = scala.collection.mutable.Map.empty) extends SalesterritoryRepo {
-  override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields.structure, map)
-  }
-  override def deleteById(territoryid: SalesterritoryId)(implicit c: Connection): Boolean = {
-    map.remove(territoryid).isDefined
-  }
-  override def deleteByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): Int = {
-    territoryids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def insert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
+class SalesterritoryRepoMock(val toRow: Function1[SalesterritoryRowUnsaved, SalesterritoryRow], val map: scala.collection.mutable.Map[SalesterritoryId, SalesterritoryRow] = scala.collection.mutable.Map.empty) extends SalesterritoryRepo {
+  def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields.structure, map)
+  def deleteById(territoryid: SalesterritoryId)(implicit c: Connection): Boolean = map.remove(territoryid).isDefined
+  def deleteByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): Int = territoryids.map(id => map.remove(id)).count(_.isDefined)
+  def insert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
     val _ = if (map.contains(unsaved.territoryid))
       sys.error(s"id ${unsaved.territoryid} already exists")
     else
@@ -36,43 +29,31 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
     
     unsaved
   }
-  override def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryRow = {
-    insert(toRow(unsaved))
-  }
-  override def insertStreaming(unsaved: Iterator[SalesterritoryRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
+  def insert(unsaved: SalesterritoryRowUnsaved)(implicit c: Connection): SalesterritoryRow = insert(toRow(unsaved))
+  def insertStreaming(unsaved: Iterator[SalesterritoryRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.territoryid -> row)
     }
     unsaved.size.toLong
   }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Iterator[SalesterritoryRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[SalesterritoryRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { unsavedRow =>
       val row = toRow(unsavedRow)
       map += (row.territoryid -> row)
     }
     unsaved.size.toLong
   }
-  override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    SelectBuilderMock(SalesterritoryFields.structure, () => map.values.toList, SelectParams.empty)
-  }
-  override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {
-    map.values.toList
-  }
-  override def selectById(territoryid: SalesterritoryId)(implicit c: Connection): Option[SalesterritoryRow] = {
-    map.get(territoryid)
-  }
-  override def selectByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow] = {
-    territoryids.flatMap(map.get).toList
-  }
-  override def selectByIdsTracked(territoryids: Array[SalesterritoryId])(implicit c: Connection): Map[SalesterritoryId, SalesterritoryRow] = {
+  def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = SelectBuilderMock(SalesterritoryFields.structure, () => map.values.toList, SelectParams.empty)
+  def selectAll(implicit c: Connection): List[SalesterritoryRow] = map.values.toList
+  def selectById(territoryid: SalesterritoryId)(implicit c: Connection): Option[SalesterritoryRow] = map.get(territoryid)
+  def selectByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow] = territoryids.flatMap(map.get).toList
+  def selectByIdsTracked(territoryids: Array[SalesterritoryId])(implicit c: Connection): Map[SalesterritoryId, SalesterritoryRow] = {
     val byId = selectByIds(territoryids).view.map(x => (x.territoryid, x)).toMap
     territoryids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
-  override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields.structure, map)
-  }
-  override def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
+  def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields.structure, map)
+  def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
     map.get(row.territoryid) match {
       case Some(`row`) => false
       case Some(_) =>
@@ -81,18 +62,18 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
       case None => false
     }
   }
-  override def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
+  def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
     map.put(unsaved.territoryid, unsaved): @nowarn
     unsaved
   }
-  override def upsertBatch(unsaved: Iterable[SalesterritoryRow])(implicit c: Connection): List[SalesterritoryRow] = {
+  def upsertBatch(unsaved: Iterable[SalesterritoryRow])(implicit c: Connection): List[SalesterritoryRow] = {
     unsaved.map { row =>
       map += (row.territoryid -> row)
       row
     }.toList
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Iterator[SalesterritoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[SalesterritoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     unsaved.foreach { row =>
       map += (row.territoryid -> row)
     }

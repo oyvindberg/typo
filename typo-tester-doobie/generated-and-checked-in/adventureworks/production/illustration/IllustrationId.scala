@@ -3,18 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.illustration
+package adventureworks.production.illustration;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `production.illustration` */
-case class IllustrationId(value: Int) extends AnyVal
+case class IllustrationId(value: Int) extends scala.AnyVal
+
 object IllustrationId {
   implicit lazy val arrayGet: Get[Array[IllustrationId]] = adventureworks.IntegerArrayMeta.get.map(_.map(IllustrationId.apply))
   implicit lazy val arrayPut: Put[Array[IllustrationId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
@@ -23,8 +24,10 @@ object IllustrationId {
   implicit lazy val encoder: Encoder[IllustrationId] = Encoder.encodeInt.contramap(_.value)
   implicit lazy val get: Get[IllustrationId] = Meta.IntMeta.get.map(IllustrationId.apply)
   implicit lazy val put: Put[IllustrationId] = Meta.IntMeta.put.contramap(_.value)
-  implicit lazy val text: Text[IllustrationId] = new Text[IllustrationId] {
-    override def unsafeEncode(v: IllustrationId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: IllustrationId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[IllustrationId] = {
+    new Text[IllustrationId] {
+      override def unsafeEncode(v: IllustrationId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: IllustrationId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

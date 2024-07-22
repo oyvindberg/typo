@@ -3,15 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.vvendorwithaddresses
+package adventureworks.purchasing.vvendorwithaddresses;
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Name
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.Name;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait VvendorwithaddressesViewFields {
   def businessentityid: Field[BusinessentityId, VvendorwithaddressesViewRow]

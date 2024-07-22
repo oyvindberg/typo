@@ -3,22 +3,22 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pe.e
+package adventureworks.pe.e;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import anorm.Column
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import anorm.Column;
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** View: pe.e */
 case class EViewRow(
@@ -37,39 +37,45 @@ case class EViewRow(
 )
 
 object EViewRow {
-  implicit lazy val reads: Reads[EViewRow] = Reads[EViewRow](json => JsResult.fromTry(
-      Try(
-        EViewRow(
-          id = json.\("id").as(Reads.IntReads),
-          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
-          emailaddressid = json.\("emailaddressid").as(Reads.IntReads),
-          emailaddress = json.\("emailaddress").toOption.map(_.as(Reads.StringReads)),
-          rowguid = json.\("rowguid").as(TypoUUID.reads),
-          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+  implicit lazy val reads: Reads[EViewRow] = {
+    Reads[EViewRow](json => JsResult.fromTry(
+        Try(
+          EViewRow(
+            id = json.\("id").as(Reads.IntReads),
+            businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+            emailaddressid = json.\("emailaddressid").as(Reads.IntReads),
+            emailaddress = json.\("emailaddress").toOption.map(_.as(Reads.StringReads)),
+            rowguid = json.\("rowguid").as(TypoUUID.reads),
+            modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+          )
         )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[EViewRow] = RowParser[EViewRow] { row =>
-    Success(
-      EViewRow(
-        id = row(idx + 0)(Column.columnToInt),
-        businessentityid = row(idx + 1)(BusinessentityId.column),
-        emailaddressid = row(idx + 2)(Column.columnToInt),
-        emailaddress = row(idx + 3)(Column.columnToOption(Column.columnToString)),
-        rowguid = row(idx + 4)(TypoUUID.column),
-        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
-      )
+      ),
     )
   }
-  implicit lazy val writes: OWrites[EViewRow] = OWrites[EViewRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "id" -> Writes.IntWrites.writes(o.id),
-      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
-      "emailaddressid" -> Writes.IntWrites.writes(o.emailaddressid),
-      "emailaddress" -> Writes.OptionWrites(Writes.StringWrites).writes(o.emailaddress),
-      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
-      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
-    ))
-  )
+  def rowParser(idx: Int): RowParser[EViewRow] = {
+    RowParser[EViewRow] { row =>
+      Success(
+        EViewRow(
+          id = row(idx + 0)(Column.columnToInt),
+          businessentityid = row(idx + 1)(BusinessentityId.column),
+          emailaddressid = row(idx + 2)(Column.columnToInt),
+          emailaddress = row(idx + 3)(Column.columnToOption(Column.columnToString)),
+          rowguid = row(idx + 4)(TypoUUID.column),
+          modifieddate = row(idx + 5)(TypoLocalDateTime.column)
+        )
+      )
+    }
+  }
+  implicit lazy val writes: OWrites[EViewRow] = {
+    OWrites[EViewRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "id" -> Writes.IntWrites.writes(o.id),
+        "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+        "emailaddressid" -> Writes.IntWrites.writes(o.emailaddressid),
+        "emailaddress" -> Writes.OptionWrites(Writes.StringWrites).writes(o.emailaddress),
+        "rowguid" -> TypoUUID.writes.writes(o.rowguid),
+        "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
+      ))
+    )
+  }
 }

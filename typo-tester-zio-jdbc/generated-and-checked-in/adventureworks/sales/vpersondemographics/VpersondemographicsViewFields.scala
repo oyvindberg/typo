@@ -3,16 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.vpersondemographics
+package adventureworks.sales.vpersondemographics;
 
-import adventureworks.customtypes.TypoLocalDate
-import adventureworks.customtypes.TypoMoney
-import adventureworks.person.businessentity.BusinessentityId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDate;
+import adventureworks.customtypes.TypoMoney;
+import adventureworks.person.businessentity.BusinessentityId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait VpersondemographicsViewFields {
   def businessentityid: Field[BusinessentityId, VpersondemographicsViewRow]

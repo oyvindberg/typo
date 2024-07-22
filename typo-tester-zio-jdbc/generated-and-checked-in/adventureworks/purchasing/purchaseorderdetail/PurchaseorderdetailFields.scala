@@ -3,27 +3,27 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.purchaseorderdetail
+package adventureworks.purchasing.purchaseorderdetail;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.production.product.ProductFields
-import adventureworks.production.product.ProductId
-import adventureworks.production.product.ProductRow
-import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderFields
-import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderRow
-import typo.dsl.ForeignKey
-import typo.dsl.PGType
-import typo.dsl.Path
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Const.As.as
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.production.product.ProductFields;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.product.ProductRow;
+import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderFields;
+import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId;
+import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.PGType;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait PurchaseorderdetailFields {
   def purchaseorderid: IdField[PurchaseorderheaderId, PurchaseorderdetailRow]

@@ -3,16 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.ppp
+package adventureworks.pr.ppp;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.product.ProductId
-import adventureworks.production.productphoto.ProductphotoId
-import adventureworks.public.Flag
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.productphoto.ProductphotoId;
+import adventureworks.public.Flag;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait PppViewFields {
   def productid: Field[ProductId, PppViewRow]

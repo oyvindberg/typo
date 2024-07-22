@@ -3,36 +3,32 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.productvendor
+package adventureworks.purchasing.productvendor;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.production.product.ProductId
-import adventureworks.production.unitmeasure.UnitmeasureId
-import cats.instances.list.catsStdInstancesForList
-import doobie.free.connection.ConnectionIO
-import doobie.postgres.syntax.FragmentOps
-import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
-import doobie.syntax.string.toSqlInterpolator
-import doobie.util.Write
-import doobie.util.fragment.Fragment
-import doobie.util.meta.Meta
-import doobie.util.update.Update
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import typo.dsl.UpdateBuilder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.unitmeasure.UnitmeasureId;
+import cats.instances.list.catsStdInstancesForList;
+import doobie.free.connection.ConnectionIO;
+import doobie.postgres.syntax.FragmentOps;
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite;
+import doobie.syntax.string.toSqlInterpolator;
+import doobie.util.Write;
+import doobie.util.fragment.Fragment;
+import doobie.util.meta.Meta;
+import doobie.util.update.Update;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import typo.dsl.UpdateBuilder;
 
 class ProductvendorRepoImpl extends ProductvendorRepo {
-  override def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = {
-    DeleteBuilder("purchasing.productvendor", ProductvendorFields.structure)
-  }
-  override def deleteById(compositeId: ProductvendorId): ConnectionIO[Boolean] = {
-    sql"""delete from purchasing.productvendor where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
-  }
-  override def deleteByIds(compositeIds: Array[ProductvendorId]): ConnectionIO[Int] = {
+  def delete: DeleteBuilder[ProductvendorFields, ProductvendorRow] = DeleteBuilder("purchasing.productvendor", ProductvendorFields.structure)
+  def deleteById(compositeId: ProductvendorId): ConnectionIO[Boolean] = sql"""delete from purchasing.productvendor where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
+  def deleteByIds(compositeIds: Array[ProductvendorId]): ConnectionIO[Int] = {
     val productid = compositeIds.map(_.productid)
     val businessentityid = compositeIds.map(_.businessentityid)
     sql"""delete
@@ -40,99 +36,87 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
           where ("productid", "businessentityid")
           in (select unnest(${fromWrite(productid)(Write.fromPut(ProductId.arrayPut))}), unnest(${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.arrayPut))}))
        """.update.run
-    
+  
   }
-  override def insert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow] = {
+  def insert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow] = {
     sql"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.averageleadtime)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.standardprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.lastreceiptcost)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.lastreceiptdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.minorderqty)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.maxorderqty)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.onorderqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
        """.query(using ProductvendorRow.read).unique
   }
-  override def insert(unsaved: ProductvendorRowUnsaved): ConnectionIO[ProductvendorRow] = {
+  def insert(unsaved: ProductvendorRowUnsaved): ConnectionIO[ProductvendorRow] = {
     val fs = List(
       Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
-      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const0(s""""averageleadtime""""), fr"${fromWrite(unsaved.averageleadtime)(Write.fromPut(Meta.IntMeta.put))}::int4")),
-      Some((Fragment.const0(s""""standardprice""""), fr"${fromWrite(unsaved.standardprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
-      Some((Fragment.const0(s""""lastreceiptcost""""), fr"${fromWrite(unsaved.lastreceiptcost)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric")),
-      Some((Fragment.const0(s""""lastreceiptdate""""), fr"${fromWrite(unsaved.lastreceiptdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const0(s""""minorderqty""""), fr"${fromWrite(unsaved.minorderqty)(Write.fromPut(Meta.IntMeta.put))}::int4")),
-      Some((Fragment.const0(s""""maxorderqty""""), fr"${fromWrite(unsaved.maxorderqty)(Write.fromPut(Meta.IntMeta.put))}::int4")),
-      Some((Fragment.const0(s""""onorderqty""""), fr"${fromWrite(unsaved.onorderqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4")),
-      Some((Fragment.const0(s""""unitmeasurecode""""), fr"${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar")),
-      unsaved.modifieddate match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
-      }
+                      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
+                      Some((Fragment.const0(s""""averageleadtime""""), fr"${fromWrite(unsaved.averageleadtime)(Write.fromPut(Meta.IntMeta.put))}::int4")),
+                      Some((Fragment.const0(s""""standardprice""""), fr"${fromWrite(unsaved.standardprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+                      Some((Fragment.const0(s""""lastreceiptcost""""), fr"${fromWrite(unsaved.lastreceiptcost)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+                      Some((Fragment.const0(s""""lastreceiptdate""""), fr"${fromWrite(unsaved.lastreceiptdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
+                      Some((Fragment.const0(s""""minorderqty""""), fr"${fromWrite(unsaved.minorderqty)(Write.fromPut(Meta.IntMeta.put))}::int4")),
+                      Some((Fragment.const0(s""""maxorderqty""""), fr"${fromWrite(unsaved.maxorderqty)(Write.fromPut(Meta.IntMeta.put))}::int4")),
+                      Some((Fragment.const0(s""""onorderqty""""), fr"${fromWrite(unsaved.onorderqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4")),
+                      Some((Fragment.const0(s""""unitmeasurecode""""), fr"${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar")),
+    unsaved.modifieddate match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+    }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into purchasing.productvendor default values
-            returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
-         """
+                            returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
+                         """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
       sql"""insert into purchasing.productvendor(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
-            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
-            returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
-         """
+                            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
+                            returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
+                         """
     }
     q.query(using ProductvendorRow.read).unique
-    
+  
   }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ProductvendorRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductvendorRow.text)
-  }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductvendorRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductvendorRowUnsaved.text)
-  }
-  override def select: SelectBuilder[ProductvendorFields, ProductvendorRow] = {
-    SelectBuilderSql("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, ProductvendorRow] = {
-    sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor""".query(using ProductvendorRow.read).stream
-  }
-  override def selectById(compositeId: ProductvendorId): ConnectionIO[Option[ProductvendorRow]] = {
-    sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using ProductvendorRow.read).option
-  }
-  override def selectByIds(compositeIds: Array[ProductvendorId]): Stream[ConnectionIO, ProductvendorRow] = {
+  def insertStreaming(unsaved: Stream[ConnectionIO, ProductvendorRow], batchSize: Int = 10000): ConnectionIO[Long] = new FragmentOps(sql"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductvendorRow.text)
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductvendorRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = new FragmentOps(sql"""COPY purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductvendorRowUnsaved.text)
+  def select: SelectBuilder[ProductvendorFields, ProductvendorRow] = SelectBuilderSql("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.read)
+  def selectAll: Stream[ConnectionIO, ProductvendorRow] = sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor""".query(using ProductvendorRow.read).stream
+  def selectById(compositeId: ProductvendorId): ConnectionIO[Option[ProductvendorRow]] = sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from purchasing.productvendor where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using ProductvendorRow.read).option
+  def selectByIds(compositeIds: Array[ProductvendorId]): Stream[ConnectionIO, ProductvendorRow] = {
     val productid = compositeIds.map(_.productid)
     val businessentityid = compositeIds.map(_.businessentityid)
     sql"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
           from purchasing.productvendor
-          where ("productid", "businessentityid") 
+          where ("productid", "businessentityid")
           in (select unnest(${fromWrite(productid)(Write.fromPut(ProductId.arrayPut))}), unnest(${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.arrayPut))}))
        """.query(using ProductvendorRow.read).stream
-    
+  
   }
-  override def selectByIdsTracked(compositeIds: Array[ProductvendorId]): ConnectionIO[Map[ProductvendorId, ProductvendorRow]] = {
+  def selectByIdsTracked(compositeIds: Array[ProductvendorId]): ConnectionIO[Map[ProductvendorId, ProductvendorRow]] = {
     selectByIds(compositeIds).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
       compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
-    UpdateBuilder("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.read)
-  }
-  override def update(row: ProductvendorRow): ConnectionIO[Boolean] = {
+  def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = UpdateBuilder("purchasing.productvendor", ProductvendorFields.structure, ProductvendorRow.read)
+  def update(row: ProductvendorRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update purchasing.productvendor
-          set "averageleadtime" = ${fromWrite(row.averageleadtime)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "standardprice" = ${fromWrite(row.standardprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "lastreceiptcost" = ${fromWrite(row.lastreceiptcost)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "lastreceiptdate" = ${fromWrite(row.lastreceiptdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
-              "minorderqty" = ${fromWrite(row.minorderqty)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "maxorderqty" = ${fromWrite(row.maxorderqty)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "onorderqty" = ${fromWrite(row.onorderqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4,
-              "unitmeasurecode" = ${fromWrite(row.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}"""
+                          set "averageleadtime" = ${fromWrite(row.averageleadtime)(Write.fromPut(Meta.IntMeta.put))}::int4,
+                              "standardprice" = ${fromWrite(row.standardprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+                              "lastreceiptcost" = ${fromWrite(row.lastreceiptcost)(Write.fromPutOption(Meta.ScalaBigDecimalMeta.put))}::numeric,
+                              "lastreceiptdate" = ${fromWrite(row.lastreceiptdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
+                              "minorderqty" = ${fromWrite(row.minorderqty)(Write.fromPut(Meta.IntMeta.put))}::int4,
+                              "maxorderqty" = ${fromWrite(row.maxorderqty)(Write.fromPut(Meta.IntMeta.put))}::int4,
+                              "onorderqty" = ${fromWrite(row.onorderqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4,
+                              "unitmeasurecode" = ${fromWrite(row.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar,
+                              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+                          where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))}"""
       .update
       .run
       .map(_ > 0)
   }
-  override def upsert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow] = {
+  def upsert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow] = {
     sql"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
           values (
             ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
@@ -161,7 +145,7 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
           returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
        """.query(using ProductvendorRow.read).unique
   }
-  override def upsertBatch(unsaved: List[ProductvendorRow]): Stream[ConnectionIO, ProductvendorRow] = {
+  def upsertBatch(unsaved: List[ProductvendorRow]): Stream[ConnectionIO, ProductvendorRow] = {
     Update[ProductvendorRow](
       s"""insert into purchasing.productvendor("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")
           values (?::int4,?::int4,?::int4,?::numeric,?::numeric,?::timestamp,?::int4,?::int4,?::int4,?::bpchar,?::timestamp)
@@ -180,8 +164,8 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
     )(using ProductvendorRow.write)
     .updateManyWithGeneratedKeys[ProductvendorRow]("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")(unsaved)(using catsStdInstancesForList, ProductvendorRow.read)
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductvendorRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, ProductvendorRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
       _ <- sql"create temporary table productvendor_TEMP (like purchasing.productvendor) on commit drop".update.run
       _ <- new FragmentOps(sql"""copy productvendor_TEMP("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductvendorRow.text)

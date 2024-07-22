@@ -3,30 +3,30 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.employeedepartmenthistory
+package adventureworks.humanresources.employeedepartmenthistory;
 
-import adventureworks.customtypes.TypoLocalDate
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.humanresources.department.DepartmentFields
-import adventureworks.humanresources.department.DepartmentId
-import adventureworks.humanresources.department.DepartmentRow
-import adventureworks.humanresources.employee.EmployeeFields
-import adventureworks.humanresources.employee.EmployeeRow
-import adventureworks.humanresources.shift.ShiftFields
-import adventureworks.humanresources.shift.ShiftId
-import adventureworks.humanresources.shift.ShiftRow
-import adventureworks.person.businessentity.BusinessentityId
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Const.As.as
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDate;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.humanresources.department.DepartmentFields;
+import adventureworks.humanresources.department.DepartmentId;
+import adventureworks.humanresources.department.DepartmentRow;
+import adventureworks.humanresources.employee.EmployeeFields;
+import adventureworks.humanresources.employee.EmployeeRow;
+import adventureworks.humanresources.shift.ShiftFields;
+import adventureworks.humanresources.shift.ShiftId;
+import adventureworks.humanresources.shift.ShiftRow;
+import adventureworks.person.businessentity.BusinessentityId;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait EmployeedepartmenthistoryFields {
   def businessentityid: IdField[BusinessentityId, EmployeedepartmenthistoryRow]

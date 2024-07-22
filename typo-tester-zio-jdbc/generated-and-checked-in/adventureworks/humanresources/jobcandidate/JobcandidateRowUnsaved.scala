@@ -3,79 +3,83 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.jobcandidate
+package adventureworks.humanresources.jobcandidate;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoXml
-import adventureworks.person.businessentity.BusinessentityId
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
-import zio.json.ast.Json
-import zio.json.internal.Write
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.person.businessentity.BusinessentityId;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
+import zio.json.ast.Json;
+import zio.json.internal.Write;
 
 /** This class corresponds to a row in table `humanresources.jobcandidate` which has not been persisted yet */
 case class JobcandidateRowUnsaved(
   /** Employee identification number if applicant was hired. Foreign key to Employee.BusinessEntityID.
-      Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]] */
+    * Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]]
+    */
   businessentityid: Option[BusinessentityId],
   /** RÃ©sumÃ© in XML format. */
   resume: Option[TypoXml],
   /** Default: nextval('humanresources.jobcandidate_jobcandidateid_seq'::regclass)
-      Primary key for JobCandidate records. */
-  jobcandidateid: Defaulted[JobcandidateId] = Defaulted.UseDefault,
+    * Primary key for JobCandidate records.
+    */
+  jobcandidateid: Defaulted[JobcandidateId] = Defaulted.UseDefault(),
   /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()
 ) {
-  def toRow(jobcandidateidDefault: => JobcandidateId, modifieddateDefault: => TypoLocalDateTime): JobcandidateRow =
-    JobcandidateRow(
-      jobcandidateid = jobcandidateid match {
-                         case Defaulted.UseDefault => jobcandidateidDefault
-                         case Defaulted.Provided(value) => value
-                       },
+  def toRow(jobcandidateidDefault: => JobcandidateId, modifieddateDefault: => TypoLocalDateTime): JobcandidateRow = {
+    new JobcandidateRow(
+      jobcandidateid = jobcandidateid.getOrElse(jobcandidateidDefault),
       businessentityid = businessentityid,
       resume = resume,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
+      modifieddate = modifieddate.getOrElse(modifieddateDefault)
     )
-}
-object JobcandidateRowUnsaved {
-  implicit lazy val jsonDecoder: JsonDecoder[JobcandidateRowUnsaved] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
-    val businessentityid = jsonObj.get("businessentityid").fold[Either[String, Option[BusinessentityId]]](Right(None))(_.as(JsonDecoder.option(using BusinessentityId.jsonDecoder)))
-    val resume = jsonObj.get("resume").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(using TypoXml.jsonDecoder)))
-    val jobcandidateid = jsonObj.get("jobcandidateid").toRight("Missing field 'jobcandidateid'").flatMap(_.as(Defaulted.jsonDecoder(JobcandidateId.jsonDecoder)))
-    val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(Defaulted.jsonDecoder(TypoLocalDateTime.jsonDecoder)))
-    if (businessentityid.isRight && resume.isRight && jobcandidateid.isRight && modifieddate.isRight)
-      Right(JobcandidateRowUnsaved(businessentityid = businessentityid.toOption.get, resume = resume.toOption.get, jobcandidateid = jobcandidateid.toOption.get, modifieddate = modifieddate.toOption.get))
-    else Left(List[Either[String, Any]](businessentityid, resume, jobcandidateid, modifieddate).flatMap(_.left.toOption).mkString(", "))
   }
-  implicit lazy val jsonEncoder: JsonEncoder[JobcandidateRowUnsaved] = new JsonEncoder[JobcandidateRowUnsaved] {
-    override def unsafeEncode(a: JobcandidateRowUnsaved, indent: Option[Int], out: Write): Unit = {
-      out.write("{")
-      out.write(""""businessentityid":""")
-      JsonEncoder.option(using BusinessentityId.jsonEncoder).unsafeEncode(a.businessentityid, indent, out)
-      out.write(",")
-      out.write(""""resume":""")
-      JsonEncoder.option(using TypoXml.jsonEncoder).unsafeEncode(a.resume, indent, out)
-      out.write(",")
-      out.write(""""jobcandidateid":""")
-      Defaulted.jsonEncoder(JobcandidateId.jsonEncoder).unsafeEncode(a.jobcandidateid, indent, out)
-      out.write(",")
-      out.write(""""modifieddate":""")
-      Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
-      out.write("}")
+}
+
+object JobcandidateRowUnsaved {
+  implicit lazy val jsonDecoder: JsonDecoder[JobcandidateRowUnsaved] = {
+    JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
+      val businessentityid = jsonObj.get("businessentityid").fold[Either[String, Option[BusinessentityId]]](Right(None))(_.as(JsonDecoder.option(using BusinessentityId.jsonDecoder)))
+      val resume = jsonObj.get("resume").fold[Either[String, Option[TypoXml]]](Right(None))(_.as(JsonDecoder.option(using TypoXml.jsonDecoder)))
+      val jobcandidateid = jsonObj.get("jobcandidateid").toRight("Missing field 'jobcandidateid'").flatMap(_.as(Defaulted.jsonDecoder(JobcandidateId.jsonDecoder)))
+      val modifieddate = jsonObj.get("modifieddate").toRight("Missing field 'modifieddate'").flatMap(_.as(Defaulted.jsonDecoder(TypoLocalDateTime.jsonDecoder)))
+      if (businessentityid.isRight && resume.isRight && jobcandidateid.isRight && modifieddate.isRight)
+        Right(JobcandidateRowUnsaved(businessentityid = businessentityid.toOption.get, resume = resume.toOption.get, jobcandidateid = jobcandidateid.toOption.get, modifieddate = modifieddate.toOption.get))
+      else Left(List[Either[String, Any]](businessentityid, resume, jobcandidateid, modifieddate).flatMap(_.left.toOption).mkString(", "))
     }
   }
-  implicit lazy val text: Text[JobcandidateRowUnsaved] = Text.instance[JobcandidateRowUnsaved]{ (row, sb) =>
-    Text.option(BusinessentityId.text).unsafeEncode(row.businessentityid, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoXml.text).unsafeEncode(row.resume, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(JobcandidateId.text).unsafeEncode(row.jobcandidateid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  implicit lazy val jsonEncoder: JsonEncoder[JobcandidateRowUnsaved] = {
+    new JsonEncoder[JobcandidateRowUnsaved] {
+      override def unsafeEncode(a: JobcandidateRowUnsaved, indent: Option[Int], out: Write): Unit = {
+        out.write("{")
+        out.write(""""businessentityid":""")
+        JsonEncoder.option(using BusinessentityId.jsonEncoder).unsafeEncode(a.businessentityid, indent, out)
+        out.write(",")
+        out.write(""""resume":""")
+        JsonEncoder.option(using TypoXml.jsonEncoder).unsafeEncode(a.resume, indent, out)
+        out.write(",")
+        out.write(""""jobcandidateid":""")
+        Defaulted.jsonEncoder(JobcandidateId.jsonEncoder).unsafeEncode(a.jobcandidateid, indent, out)
+        out.write(",")
+        out.write(""""modifieddate":""")
+        Defaulted.jsonEncoder(TypoLocalDateTime.jsonEncoder).unsafeEncode(a.modifieddate, indent, out)
+        out.write("}")
+      }
+    }
+  }
+  implicit lazy val text: Text[JobcandidateRowUnsaved] = {
+    Text.instance[JobcandidateRowUnsaved]{ (row, sb) =>
+      Text.option(BusinessentityId.text).unsafeEncode(row.businessentityid, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoXml.text).unsafeEncode(row.resume, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(JobcandidateId.text).unsafeEncode(row.jobcandidateid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
   }
 }

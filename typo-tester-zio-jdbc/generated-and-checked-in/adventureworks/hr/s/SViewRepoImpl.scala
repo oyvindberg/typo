@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.hr.s
+package adventureworks.hr.s;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class SViewRepoImpl extends SViewRepo {
-  override def select: SelectBuilder[SViewFields, SViewRow] = {
-    SelectBuilderSql("hr.s", SViewFields.structure, SViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, SViewRow] = {
-    sql"""select "id", "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from hr.s""".query(using SViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[SViewFields, SViewRow] = SelectBuilderSql("hr.s", SViewFields.structure, SViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, SViewRow] = sql"""select "id", "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from hr.s""".query(using SViewRow.jdbcDecoder).selectStream()
 }

@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.purchaseorderdetail
+package adventureworks.purchasing.purchaseorderdetail;
 
-import typo.dsl.SelectBuilder
-import zio.ZIO
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import zio.ZIO;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
 trait PurchaseorderdetailRepo {
   def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow]

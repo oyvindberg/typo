@@ -3,11 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person_row_join
+package adventureworks.person_row_join;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
 
 trait PersonRowJoinSqlRepo {
-  def apply(): Stream[ConnectionIO, PersonRowJoinSqlRow]
+  def apply: Stream[ConnectionIO, PersonRowJoinSqlRow]
 }

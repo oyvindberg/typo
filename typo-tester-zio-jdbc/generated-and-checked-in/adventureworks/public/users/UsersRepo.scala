@@ -3,17 +3,18 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.users
+package adventureworks.public.users;
 
-import adventureworks.customtypes.TypoUnknownCitext
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import adventureworks.customtypes.TypoUnknownCitext;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
+/** upsertBatch: Not implementable for zio-jdbc */
 trait UsersRepo {
   def delete: DeleteBuilder[UsersFields, UsersRow]
   def deleteById(userId: UsersId): ZIO[ZConnection, Throwable, Boolean]
@@ -21,7 +22,7 @@ trait UsersRepo {
   def insert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UsersRow]
   def insert(unsaved: UsersRowUnsaved): ZIO[ZConnection, Throwable, UsersRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[UsersFields, UsersRow]
   def selectAll: ZStream[ZConnection, Throwable, UsersRow]
@@ -32,7 +33,6 @@ trait UsersRepo {
   def update: UpdateBuilder[UsersFields, UsersRow]
   def update(row: UsersRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UpdateResult[UsersRow]]
-  // Not implementable for zio-jdbc: upsertBatch
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

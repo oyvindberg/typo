@@ -3,18 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.location
+package adventureworks.production.location;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `production.location` */
-case class LocationId(value: Int) extends AnyVal
+case class LocationId(value: Int) extends scala.AnyVal
+
 object LocationId {
   implicit lazy val arrayGet: Get[Array[LocationId]] = adventureworks.IntegerArrayMeta.get.map(_.map(LocationId.apply))
   implicit lazy val arrayPut: Put[Array[LocationId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
@@ -23,8 +24,10 @@ object LocationId {
   implicit lazy val encoder: Encoder[LocationId] = Encoder.encodeInt.contramap(_.value)
   implicit lazy val get: Get[LocationId] = Meta.IntMeta.get.map(LocationId.apply)
   implicit lazy val put: Put[LocationId] = Meta.IntMeta.put.contramap(_.value)
-  implicit lazy val text: Text[LocationId] = new Text[LocationId] {
-    override def unsafeEncode(v: LocationId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: LocationId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[LocationId] = {
+    new Text[LocationId] {
+      override def unsafeEncode(v: LocationId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: LocationId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

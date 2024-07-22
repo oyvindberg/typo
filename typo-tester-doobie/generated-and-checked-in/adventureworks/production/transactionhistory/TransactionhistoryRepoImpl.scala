@@ -3,126 +3,106 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.transactionhistory
+package adventureworks.production.transactionhistory;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.product.ProductId
-import cats.instances.list.catsStdInstancesForList
-import doobie.free.connection.ConnectionIO
-import doobie.postgres.syntax.FragmentOps
-import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
-import doobie.syntax.string.toSqlInterpolator
-import doobie.util.Write
-import doobie.util.fragment.Fragment
-import doobie.util.meta.Meta
-import doobie.util.update.Update
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import typo.dsl.UpdateBuilder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.product.ProductId;
+import cats.instances.list.catsStdInstancesForList;
+import doobie.free.connection.ConnectionIO;
+import doobie.postgres.syntax.FragmentOps;
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite;
+import doobie.syntax.string.toSqlInterpolator;
+import doobie.util.Write;
+import doobie.util.fragment.Fragment;
+import doobie.util.meta.Meta;
+import doobie.util.update.Update;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import typo.dsl.UpdateBuilder;
 
 class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
-  override def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    DeleteBuilder("production.transactionhistory", TransactionhistoryFields.structure)
-  }
-  override def deleteById(transactionid: TransactionhistoryId): ConnectionIO[Boolean] = {
-    sql"""delete from production.transactionhistory where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}""".update.run.map(_ > 0)
-  }
-  override def deleteByIds(transactionids: Array[TransactionhistoryId]): ConnectionIO[Int] = {
-    sql"""delete from production.transactionhistory where "transactionid" = ANY(${fromWrite(transactionids)(Write.fromPut(TransactionhistoryId.arrayPut))})""".update.run
-  }
-  override def insert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
+  def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow] = DeleteBuilder("production.transactionhistory", TransactionhistoryFields.structure)
+  def deleteById(transactionid: TransactionhistoryId): ConnectionIO[Boolean] = sql"""delete from production.transactionhistory where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}""".update.run.map(_ > 0)
+  def deleteByIds(transactionids: Array[TransactionhistoryId]): ConnectionIO[Int] = sql"""delete from production.transactionhistory where "transactionid" = ANY(${fromWrite(transactionids)(Write.fromPut(TransactionhistoryId.arrayPut))})""".update.run
+  def insert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (${fromWrite(unsaved.transactionid)(Write.fromPut(TransactionhistoryId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.referenceorderid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.referenceorderlineid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.transactiondate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.transactiontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.actualcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
        """.query(using TransactionhistoryRow.read).unique
   }
-  override def insert(unsaved: TransactionhistoryRowUnsaved): ConnectionIO[TransactionhistoryRow] = {
+  def insert(unsaved: TransactionhistoryRowUnsaved): ConnectionIO[TransactionhistoryRow] = {
     val fs = List(
       Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
-      Some((Fragment.const0(s""""referenceorderid""""), fr"${fromWrite(unsaved.referenceorderid)(Write.fromPut(Meta.IntMeta.put))}::int4")),
-      Some((Fragment.const0(s""""transactiontype""""), fr"${fromWrite(unsaved.transactiontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
-      Some((Fragment.const0(s""""quantity""""), fr"${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4")),
-      Some((Fragment.const0(s""""actualcost""""), fr"${fromWrite(unsaved.actualcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
-      unsaved.transactionid match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""transactionid""""), fr"${fromWrite(value: TransactionhistoryId)(Write.fromPut(TransactionhistoryId.put))}::int4"))
-      },
-      unsaved.referenceorderlineid match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""referenceorderlineid""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
-      },
-      unsaved.transactiondate match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""transactiondate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
-      },
-      unsaved.modifieddate match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
-      }
+                      Some((Fragment.const0(s""""referenceorderid""""), fr"${fromWrite(unsaved.referenceorderid)(Write.fromPut(Meta.IntMeta.put))}::int4")),
+                      Some((Fragment.const0(s""""transactiontype""""), fr"${fromWrite(unsaved.transactiontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
+                      Some((Fragment.const0(s""""quantity""""), fr"${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4")),
+                      Some((Fragment.const0(s""""actualcost""""), fr"${fromWrite(unsaved.actualcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+    unsaved.transactionid match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((Fragment.const0(s""""transactionid""""), fr"${fromWrite(value: TransactionhistoryId)(Write.fromPut(TransactionhistoryId.put))}::int4"))
+    },
+    unsaved.referenceorderlineid match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((Fragment.const0(s""""referenceorderlineid""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+    },
+    unsaved.transactiondate match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((Fragment.const0(s""""transactiondate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+    },
+    unsaved.modifieddate match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+    }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into production.transactionhistory default values
-            returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
-         """
+                            returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
+                         """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
       sql"""insert into production.transactionhistory(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
-            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
-            returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
-         """
+                            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
+                            returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
+                         """
     }
     q.query(using TransactionhistoryRow.read).unique
-    
+  
   }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using TransactionhistoryRow.text)
-  }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.transactionhistory("productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "transactionid", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using TransactionhistoryRowUnsaved.text)
-  }
-  override def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    SelectBuilderSql("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, TransactionhistoryRow] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory""".query(using TransactionhistoryRow.read).stream
-  }
-  override def selectById(transactionid: TransactionhistoryId): ConnectionIO[Option[TransactionhistoryRow]] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}""".query(using TransactionhistoryRow.read).option
-  }
-  override def selectByIds(transactionids: Array[TransactionhistoryId]): Stream[ConnectionIO, TransactionhistoryRow] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ANY(${fromWrite(transactionids)(Write.fromPut(TransactionhistoryId.arrayPut))})""".query(using TransactionhistoryRow.read).stream
-  }
-  override def selectByIdsTracked(transactionids: Array[TransactionhistoryId]): ConnectionIO[Map[TransactionhistoryId, TransactionhistoryRow]] = {
+  def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int = 10000): ConnectionIO[Long] = new FragmentOps(sql"""COPY production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using TransactionhistoryRow.text)
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = new FragmentOps(sql"""COPY production.transactionhistory("productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "transactionid", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using TransactionhistoryRowUnsaved.text)
+  def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow] = SelectBuilderSql("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.read)
+  def selectAll: Stream[ConnectionIO, TransactionhistoryRow] = sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory""".query(using TransactionhistoryRow.read).stream
+  def selectById(transactionid: TransactionhistoryId): ConnectionIO[Option[TransactionhistoryRow]] = sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}""".query(using TransactionhistoryRow.read).option
+  def selectByIds(transactionids: Array[TransactionhistoryId]): Stream[ConnectionIO, TransactionhistoryRow] = sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistory where "transactionid" = ANY(${fromWrite(transactionids)(Write.fromPut(TransactionhistoryId.arrayPut))})""".query(using TransactionhistoryRow.read).stream
+  def selectByIdsTracked(transactionids: Array[TransactionhistoryId]): ConnectionIO[Map[TransactionhistoryId, TransactionhistoryRow]] = {
     selectByIds(transactionids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.transactionid, x)).toMap
       transactionids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
-    UpdateBuilder("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.read)
-  }
-  override def update(row: TransactionhistoryRow): ConnectionIO[Boolean] = {
+  def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = UpdateBuilder("production.transactionhistory", TransactionhistoryFields.structure, TransactionhistoryRow.read)
+  def update(row: TransactionhistoryRow): ConnectionIO[Boolean] = {
     val transactionid = row.transactionid
     sql"""update production.transactionhistory
-          set "productid" = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
-              "referenceorderid" = ${fromWrite(row.referenceorderid)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "referenceorderlineid" = ${fromWrite(row.referenceorderlineid)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "transactiondate" = ${fromWrite(row.transactiondate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-              "transactiontype" = ${fromWrite(row.transactiontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
-              "quantity" = ${fromWrite(row.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "actualcost" = ${fromWrite(row.actualcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}"""
+                          set "productid" = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
+                              "referenceorderid" = ${fromWrite(row.referenceorderid)(Write.fromPut(Meta.IntMeta.put))}::int4,
+                              "referenceorderlineid" = ${fromWrite(row.referenceorderlineid)(Write.fromPut(Meta.IntMeta.put))}::int4,
+                              "transactiondate" = ${fromWrite(row.transactiondate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
+                              "transactiontype" = ${fromWrite(row.transactiontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
+                              "quantity" = ${fromWrite(row.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4,
+                              "actualcost" = ${fromWrite(row.actualcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
+                              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+                          where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}"""
       .update
       .run
       .map(_ > 0)
   }
-  override def upsert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
+  def upsert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     sql"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (
             ${fromWrite(unsaved.transactionid)(Write.fromPut(TransactionhistoryId.put))}::int4,
@@ -148,7 +128,7 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
        """.query(using TransactionhistoryRow.read).unique
   }
-  override def upsertBatch(unsaved: List[TransactionhistoryRow]): Stream[ConnectionIO, TransactionhistoryRow] = {
+  def upsertBatch(unsaved: List[TransactionhistoryRow]): Stream[ConnectionIO, TransactionhistoryRow] = {
     Update[TransactionhistoryRow](
       s"""insert into production.transactionhistory("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (?::int4,?::int4,?::int4,?::int4,?::timestamp,?::bpchar,?::int4,?::numeric,?::timestamp)
@@ -166,8 +146,8 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     )(using TransactionhistoryRow.write)
     .updateManyWithGeneratedKeys[TransactionhistoryRow]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(unsaved)(using catsStdInstancesForList, TransactionhistoryRow.read)
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
       _ <- sql"create temporary table transactionhistory_TEMP (like production.transactionhistory) on commit drop".update.run
       _ <- new FragmentOps(sql"""copy transactionhistory_TEMP("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using TransactionhistoryRow.text)

@@ -3,56 +3,58 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.pmi
+package adventureworks.pr.pmi;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.illustration.IllustrationId
-import adventureworks.production.productmodel.ProductmodelId
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.illustration.IllustrationId;
+import adventureworks.production.productmodel.ProductmodelId;
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** View: pr.pmi */
-case class PmiViewRow(
-  /** Points to [[adventureworks.production.productmodelillustration.ProductmodelillustrationRow.productmodelid]] */
-  productmodelid: ProductmodelId,
-  /** Points to [[adventureworks.production.productmodelillustration.ProductmodelillustrationRow.illustrationid]] */
-  illustrationid: IllustrationId,
-  /** Points to [[adventureworks.production.productmodelillustration.ProductmodelillustrationRow.modifieddate]] */
-  modifieddate: TypoLocalDateTime
-)
+case class PmiViewRow(/** Points to [[adventureworks.production.productmodelillustration.ProductmodelillustrationRow.productmodelid]] */
+                      productmodelid: ProductmodelId, /** Points to [[adventureworks.production.productmodelillustration.ProductmodelillustrationRow.illustrationid]] */
+                      illustrationid: IllustrationId, /** Points to [[adventureworks.production.productmodelillustration.ProductmodelillustrationRow.modifieddate]] */
+                      modifieddate: TypoLocalDateTime)
 
 object PmiViewRow {
-  implicit lazy val reads: Reads[PmiViewRow] = Reads[PmiViewRow](json => JsResult.fromTry(
-      Try(
-        PmiViewRow(
-          productmodelid = json.\("productmodelid").as(ProductmodelId.reads),
-          illustrationid = json.\("illustrationid").as(IllustrationId.reads),
-          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+  implicit lazy val reads: Reads[PmiViewRow] = {
+    Reads[PmiViewRow](json => JsResult.fromTry(
+        Try(
+          PmiViewRow(
+            productmodelid = json.\("productmodelid").as(ProductmodelId.reads),
+            illustrationid = json.\("illustrationid").as(IllustrationId.reads),
+            modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+          )
         )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[PmiViewRow] = RowParser[PmiViewRow] { row =>
-    Success(
-      PmiViewRow(
-        productmodelid = row(idx + 0)(ProductmodelId.column),
-        illustrationid = row(idx + 1)(IllustrationId.column),
-        modifieddate = row(idx + 2)(TypoLocalDateTime.column)
-      )
+      ),
     )
   }
-  implicit lazy val writes: OWrites[PmiViewRow] = OWrites[PmiViewRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "productmodelid" -> ProductmodelId.writes.writes(o.productmodelid),
-      "illustrationid" -> IllustrationId.writes.writes(o.illustrationid),
-      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
-    ))
-  )
+  def rowParser(idx: Int): RowParser[PmiViewRow] = {
+    RowParser[PmiViewRow] { row =>
+      Success(
+        PmiViewRow(
+          productmodelid = row(idx + 0)(ProductmodelId.column),
+          illustrationid = row(idx + 1)(IllustrationId.column),
+          modifieddate = row(idx + 2)(TypoLocalDateTime.column)
+        )
+      )
+    }
+  }
+  implicit lazy val writes: OWrites[PmiViewRow] = {
+    OWrites[PmiViewRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "productmodelid" -> ProductmodelId.writes.writes(o.productmodelid),
+        "illustrationid" -> IllustrationId.writes.writes(o.illustrationid),
+        "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
+      ))
+    )
+  }
 }

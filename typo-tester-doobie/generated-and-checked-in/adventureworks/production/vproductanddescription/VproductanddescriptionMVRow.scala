@@ -3,17 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.vproductanddescription
+package adventureworks.production.vproductanddescription;
 
-import adventureworks.production.culture.CultureId
-import adventureworks.production.product.ProductId
-import adventureworks.public.Name
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.production.culture.CultureId;
+import adventureworks.production.product.ProductId;
+import adventureworks.public.Name;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Materialized View: production.vproductanddescription */
 case class VproductanddescriptionMVRow(
@@ -32,20 +32,23 @@ case class VproductanddescriptionMVRow(
 object VproductanddescriptionMVRow {
   implicit lazy val decoder: Decoder[VproductanddescriptionMVRow] = Decoder.forProduct5[VproductanddescriptionMVRow, ProductId, Name, Name, CultureId, /* max 400 chars */ String]("productid", "name", "productmodel", "cultureid", "description")(VproductanddescriptionMVRow.apply)(ProductId.decoder, Name.decoder, Name.decoder, CultureId.decoder, Decoder.decodeString)
   implicit lazy val encoder: Encoder[VproductanddescriptionMVRow] = Encoder.forProduct5[VproductanddescriptionMVRow, ProductId, Name, Name, CultureId, /* max 400 chars */ String]("productid", "name", "productmodel", "cultureid", "description")(x => (x.productid, x.name, x.productmodel, x.cultureid, x.description))(ProductId.encoder, Name.encoder, Name.encoder, CultureId.encoder, Encoder.encodeString)
-  implicit lazy val read: Read[VproductanddescriptionMVRow] = new Read[VproductanddescriptionMVRow](
-    gets = List(
-      (ProductId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (CultureId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => VproductanddescriptionMVRow(
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      productmodel = Name.get.unsafeGetNonNullable(rs, i + 2),
-      cultureid = CultureId.get.unsafeGetNonNullable(rs, i + 3),
-      description = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4)
+  implicit lazy val read: Read[VproductanddescriptionMVRow] = {
+    new Read[VproductanddescriptionMVRow](
+      gets = List(
+        (ProductId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (CultureId.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => VproductanddescriptionMVRow(
+        productid = ProductId.get.unsafeGetNonNullable(rs, i + 0),
+        name = Name.get.unsafeGetNonNullable(rs, i + 1),
+        productmodel = Name.get.unsafeGetNonNullable(rs, i + 2),
+        cultureid = CultureId.get.unsafeGetNonNullable(rs, i + 3),
+        description = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4)
+      )
     )
-  )
+  
+  }
 }

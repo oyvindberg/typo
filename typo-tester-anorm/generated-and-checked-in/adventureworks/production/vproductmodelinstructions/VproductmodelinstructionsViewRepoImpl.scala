@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.vproductmodelinstructions
+package adventureworks.production.vproductmodelinstructions;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsViewRepo {
-  override def select: SelectBuilder[VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow] = {
-    SelectBuilderSql("production.vproductmodelinstructions", VproductmodelinstructionsViewFields.structure, VproductmodelinstructionsViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[VproductmodelinstructionsViewRow] = {
+  def select: SelectBuilder[VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow] = SelectBuilderSql("production.vproductmodelinstructions", VproductmodelinstructionsViewFields.structure, VproductmodelinstructionsViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[VproductmodelinstructionsViewRow] = {
     SQL"""select "productmodelid", "name", "instructions", "LocationID", "SetupHours", "MachineHours", "LaborHours", "LotSize", "Step", "rowguid", "modifieddate"::text
           from production.vproductmodelinstructions
        """.as(VproductmodelinstructionsViewRow.rowParser(1).*)

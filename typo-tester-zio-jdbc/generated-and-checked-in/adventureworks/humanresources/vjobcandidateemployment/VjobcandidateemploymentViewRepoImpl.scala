@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.vjobcandidateemployment
+package adventureworks.humanresources.vjobcandidateemployment;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class VjobcandidateemploymentViewRepoImpl extends VjobcandidateemploymentViewRepo {
-  override def select: SelectBuilder[VjobcandidateemploymentViewFields, VjobcandidateemploymentViewRow] = {
-    SelectBuilderSql("humanresources.vjobcandidateemployment", VjobcandidateemploymentViewFields.structure, VjobcandidateemploymentViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, VjobcandidateemploymentViewRow] = {
-    sql"""select "jobcandidateid", "Emp.StartDate"::text, "Emp.EndDate"::text, "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City" from humanresources.vjobcandidateemployment""".query(using VjobcandidateemploymentViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[VjobcandidateemploymentViewFields, VjobcandidateemploymentViewRow] = SelectBuilderSql("humanresources.vjobcandidateemployment", VjobcandidateemploymentViewFields.structure, VjobcandidateemploymentViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, VjobcandidateemploymentViewRow] = sql"""select "jobcandidateid", "Emp.StartDate"::text, "Emp.EndDate"::text, "Emp.OrgName", "Emp.JobTitle", "Emp.Responsibility", "Emp.FunctionCategory", "Emp.IndustryCategory", "Emp.Loc.CountryRegion", "Emp.Loc.State", "Emp.Loc.City" from humanresources.vjobcandidateemployment""".query(using VjobcandidateemploymentViewRow.jdbcDecoder).selectStream()
 }

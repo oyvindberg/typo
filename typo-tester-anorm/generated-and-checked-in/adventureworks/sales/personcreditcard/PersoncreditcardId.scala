@@ -3,37 +3,39 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.personcreditcard
+package adventureworks.sales.personcreditcard;
 
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.userdefined.CustomCreditcardId
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.userdefined.CustomCreditcardId;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** Type for the composite primary key of table `sales.personcreditcard` */
-case class PersoncreditcardId(
-  businessentityid: BusinessentityId,
-  creditcardid: /* user-picked */ CustomCreditcardId
-)
+case class PersoncreditcardId(businessentityid: BusinessentityId, creditcardid: /* user-picked */ CustomCreditcardId)
+
 object PersoncreditcardId {
-  implicit lazy val reads: Reads[PersoncreditcardId] = Reads[PersoncreditcardId](json => JsResult.fromTry(
-      Try(
-        PersoncreditcardId(
-          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
-          creditcardid = json.\("creditcardid").as(CustomCreditcardId.reads)
+  implicit lazy val reads: Reads[PersoncreditcardId] = {
+    Reads[PersoncreditcardId](json => JsResult.fromTry(
+        Try(
+          PersoncreditcardId(
+            businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+            creditcardid = json.\("creditcardid").as(CustomCreditcardId.reads)
+          )
         )
-      )
-    ),
-  )
-  implicit lazy val writes: OWrites[PersoncreditcardId] = OWrites[PersoncreditcardId](o =>
-    new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
-      "creditcardid" -> CustomCreditcardId.writes.writes(o.creditcardid)
-    ))
-  )
+      ),
+    )
+  }
+  implicit lazy val writes: OWrites[PersoncreditcardId] = {
+    OWrites[PersoncreditcardId](o =>
+      new JsObject(ListMap[String, JsValue](
+        "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+        "creditcardid" -> CustomCreditcardId.writes.writes(o.creditcardid)
+      ))
+    )
+  }
 }

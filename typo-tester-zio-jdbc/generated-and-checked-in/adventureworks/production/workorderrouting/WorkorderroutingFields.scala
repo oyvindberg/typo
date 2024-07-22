@@ -3,28 +3,28 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.workorderrouting
+package adventureworks.production.workorderrouting;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.production.location.LocationFields
-import adventureworks.production.location.LocationId
-import adventureworks.production.location.LocationRow
-import adventureworks.production.workorder.WorkorderFields
-import adventureworks.production.workorder.WorkorderId
-import adventureworks.production.workorder.WorkorderRow
-import typo.dsl.ForeignKey
-import typo.dsl.PGType
-import typo.dsl.Path
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Const.As.as
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.production.location.LocationFields;
+import adventureworks.production.location.LocationId;
+import adventureworks.production.location.LocationRow;
+import adventureworks.production.workorder.WorkorderFields;
+import adventureworks.production.workorder.WorkorderId;
+import adventureworks.production.workorder.WorkorderRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.PGType;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait WorkorderroutingFields {
   def workorderid: IdField[WorkorderId, WorkorderroutingRow]

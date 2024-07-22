@@ -3,40 +3,39 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.crc
+package adventureworks.sa.crc;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.sales.currency.CurrencyId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.countryregion.CountryregionId;
+import adventureworks.sales.currency.CurrencyId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: sa.crc */
-case class CrcViewRow(
-  /** Points to [[adventureworks.sales.countryregioncurrency.CountryregioncurrencyRow.countryregioncode]] */
-  countryregioncode: CountryregionId,
-  /** Points to [[adventureworks.sales.countryregioncurrency.CountryregioncurrencyRow.currencycode]] */
-  currencycode: CurrencyId,
-  /** Points to [[adventureworks.sales.countryregioncurrency.CountryregioncurrencyRow.modifieddate]] */
-  modifieddate: TypoLocalDateTime
-)
+case class CrcViewRow(/** Points to [[adventureworks.sales.countryregioncurrency.CountryregioncurrencyRow.countryregioncode]] */
+                      countryregioncode: CountryregionId, /** Points to [[adventureworks.sales.countryregioncurrency.CountryregioncurrencyRow.currencycode]] */
+                      currencycode: CurrencyId, /** Points to [[adventureworks.sales.countryregioncurrency.CountryregioncurrencyRow.modifieddate]] */
+                      modifieddate: TypoLocalDateTime)
 
 object CrcViewRow {
   implicit lazy val decoder: Decoder[CrcViewRow] = Decoder.forProduct3[CrcViewRow, CountryregionId, CurrencyId, TypoLocalDateTime]("countryregioncode", "currencycode", "modifieddate")(CrcViewRow.apply)(CountryregionId.decoder, CurrencyId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[CrcViewRow] = Encoder.forProduct3[CrcViewRow, CountryregionId, CurrencyId, TypoLocalDateTime]("countryregioncode", "currencycode", "modifieddate")(x => (x.countryregioncode, x.currencycode, x.modifieddate))(CountryregionId.encoder, CurrencyId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[CrcViewRow] = new Read[CrcViewRow](
-    gets = List(
-      (CountryregionId.get, Nullability.NoNulls),
-      (CurrencyId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => CrcViewRow(
-      countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 0),
-      currencycode = CurrencyId.get.unsafeGetNonNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[CrcViewRow] = {
+    new Read[CrcViewRow](
+      gets = List(
+        (CountryregionId.get, Nullability.NoNulls),
+        (CurrencyId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => CrcViewRow(
+        countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 0),
+        currencycode = CurrencyId.get.unsafeGetNonNullable(rs, i + 1),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+      )
     )
-  )
+  
+  }
 }

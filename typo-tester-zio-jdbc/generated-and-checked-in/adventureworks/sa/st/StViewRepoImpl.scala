@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.st
+package adventureworks.sa.st;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class StViewRepoImpl extends StViewRepo {
-  override def select: SelectBuilder[StViewFields, StViewRow] = {
-    SelectBuilderSql("sa.st", StViewFields.structure, StViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, StViewRow] = {
-    sql"""select "id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sa.st""".query(using StViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[StViewFields, StViewRow] = SelectBuilderSql("sa.st", StViewFields.structure, StViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, StViewRow] = sql"""select "id", "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text from sa.st""".query(using StViewRow.jdbcDecoder).selectStream()
 }

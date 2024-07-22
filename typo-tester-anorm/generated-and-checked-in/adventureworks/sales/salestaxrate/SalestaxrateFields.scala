@@ -3,21 +3,21 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salestaxrate
+package adventureworks.sales.salestaxrate;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.stateprovince.StateprovinceFields
-import adventureworks.person.stateprovince.StateprovinceId
-import adventureworks.person.stateprovince.StateprovinceRow
-import adventureworks.public.Name
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.stateprovince.StateprovinceFields;
+import adventureworks.person.stateprovince.StateprovinceId;
+import adventureworks.person.stateprovince.StateprovinceRow;
+import adventureworks.public.Name;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait SalestaxrateFields {
   def salestaxrateid: IdField[SalestaxrateId, SalestaxrateRow]

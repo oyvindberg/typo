@@ -3,40 +3,39 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.pmi
+package adventureworks.pr.pmi;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.illustration.IllustrationId
-import adventureworks.production.productmodel.ProductmodelId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.illustration.IllustrationId;
+import adventureworks.production.productmodel.ProductmodelId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: pr.pmi */
-case class PmiViewRow(
-  /** Points to [[adventureworks.production.productmodelillustration.ProductmodelillustrationRow.productmodelid]] */
-  productmodelid: ProductmodelId,
-  /** Points to [[adventureworks.production.productmodelillustration.ProductmodelillustrationRow.illustrationid]] */
-  illustrationid: IllustrationId,
-  /** Points to [[adventureworks.production.productmodelillustration.ProductmodelillustrationRow.modifieddate]] */
-  modifieddate: TypoLocalDateTime
-)
+case class PmiViewRow(/** Points to [[adventureworks.production.productmodelillustration.ProductmodelillustrationRow.productmodelid]] */
+                      productmodelid: ProductmodelId, /** Points to [[adventureworks.production.productmodelillustration.ProductmodelillustrationRow.illustrationid]] */
+                      illustrationid: IllustrationId, /** Points to [[adventureworks.production.productmodelillustration.ProductmodelillustrationRow.modifieddate]] */
+                      modifieddate: TypoLocalDateTime)
 
 object PmiViewRow {
   implicit lazy val decoder: Decoder[PmiViewRow] = Decoder.forProduct3[PmiViewRow, ProductmodelId, IllustrationId, TypoLocalDateTime]("productmodelid", "illustrationid", "modifieddate")(PmiViewRow.apply)(ProductmodelId.decoder, IllustrationId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PmiViewRow] = Encoder.forProduct3[PmiViewRow, ProductmodelId, IllustrationId, TypoLocalDateTime]("productmodelid", "illustrationid", "modifieddate")(x => (x.productmodelid, x.illustrationid, x.modifieddate))(ProductmodelId.encoder, IllustrationId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PmiViewRow] = new Read[PmiViewRow](
-    gets = List(
-      (ProductmodelId.get, Nullability.NoNulls),
-      (IllustrationId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PmiViewRow(
-      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
-      illustrationid = IllustrationId.get.unsafeGetNonNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[PmiViewRow] = {
+    new Read[PmiViewRow](
+      gets = List(
+        (ProductmodelId.get, Nullability.NoNulls),
+        (IllustrationId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PmiViewRow(
+        productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
+        illustrationid = IllustrationId.get.unsafeGetNonNullable(rs, i + 1),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+      )
     )
-  )
+  
+  }
 }

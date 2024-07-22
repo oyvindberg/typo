@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.jobcandidate
+package adventureworks.humanresources.jobcandidate;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait JobcandidateRepo {
   def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow]
@@ -18,7 +18,7 @@ trait JobcandidateRepo {
   def insert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow]
   def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, JobcandidateRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[JobcandidateFields, JobcandidateRow]
   def selectAll: Stream[ConnectionIO, JobcandidateRow]
@@ -29,6 +29,6 @@ trait JobcandidateRepo {
   def update(row: JobcandidateRow): ConnectionIO[Boolean]
   def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow]
   def upsertBatch(unsaved: List[JobcandidateRow]): Stream[ConnectionIO, JobcandidateRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

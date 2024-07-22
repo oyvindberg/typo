@@ -3,6 +3,7 @@ package scripts
 import bleep.logging.{Formatter, LogLevel, Loggers}
 import bleep.{FileWatching, LogPatterns, cli}
 import typo.*
+import typo.internal.codegen.*
 import typo.internal.sqlfiles.readSqlFileDirectories
 import typo.internal.{FileSync, generate}
 
@@ -30,19 +31,21 @@ object GeneratedAdventureWorks {
         val metadb = Await.result(MetaDb.fromDb(TypoLogger.Console, ds, selector), Duration.Inf)
 
         val variants = List(
-          (DbLibName.Anorm, JsonLibName.PlayJson, "typo-tester-anorm", new AtomicReference(Map.empty[RelPath, sc.Code])),
-          (DbLibName.Doobie, JsonLibName.Circe, "typo-tester-doobie", new AtomicReference(Map.empty[RelPath, sc.Code])),
-          (DbLibName.ZioJdbc, JsonLibName.ZioJson, "typo-tester-zio-jdbc", new AtomicReference(Map.empty[RelPath, sc.Code]))
+          (LangScala, Some(DbLibName.Anorm), Some(JsonLibName.PlayJson), "typo-tester-anorm", new AtomicReference(Map.empty[RelPath, sc.Code])),
+          (LangScala, Some(DbLibName.Doobie), Some(JsonLibName.Circe), "typo-tester-doobie", new AtomicReference(Map.empty[RelPath, sc.Code])),
+          (LangScala, Some(DbLibName.ZioJdbc), Some(JsonLibName.ZioJson), "typo-tester-zio-jdbc", new AtomicReference(Map.empty[RelPath, sc.Code])),
+          (LangJava, None, None, "typo-tester-java", new AtomicReference(Map.empty[RelPath, sc.Code]))
         )
 
         def go(): Unit = {
           val newSqlScripts = Await.result(readSqlFileDirectories(TypoLogger.Console, scriptsPath, ds), Duration.Inf)
 
-          variants.foreach { case (dbLib, jsonLib, projectPath, oldFilesRef) =>
+          variants.foreach { case (lang, dbLib, jsonLib, projectPath, oldFilesRef) =>
             val options = Options(
               pkg = "adventureworks",
-              Some(dbLib),
-              List(jsonLib),
+              dbLib,
+              lang = lang,
+              jsonLib.toList,
               typeOverride = TypeOverride.relation {
                 case (_, "firstname")                     => "adventureworks.userdefined.FirstName"
                 case ("sales.creditcard", "creditcardid") => "adventureworks.userdefined.CustomCreditcardId"
@@ -51,7 +54,7 @@ object GeneratedAdventureWorks {
               enablePrimaryKeyType = !Selector.relationNames("billofmaterials"),
               enableTestInserts = Selector.All,
               readonlyRepo = Selector.relationNames("purchaseorderdetail"),
-              enableDsl = true
+              enableDsl = !projectPath.endsWith("java")
             )
             val targetSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 

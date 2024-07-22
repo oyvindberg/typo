@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.flaff
+package adventureworks.public.flaff;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait FlaffRepo {
   def delete: DeleteBuilder[FlaffFields, FlaffRow]
@@ -25,6 +25,6 @@ trait FlaffRepo {
   def update(row: FlaffRow)(implicit c: Connection): Boolean
   def upsert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow
   def upsertBatch(unsaved: Iterable[FlaffRow])(implicit c: Connection): List[FlaffRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

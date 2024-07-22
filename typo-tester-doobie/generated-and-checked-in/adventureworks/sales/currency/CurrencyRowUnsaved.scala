@@ -3,42 +3,33 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.currency
+package adventureworks.sales.currency;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import doobie.postgres.Text
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import doobie.postgres.Text;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** This class corresponds to a row in table `sales.currency` which has not been persisted yet */
-case class CurrencyRowUnsaved(
-  /** The ISO code for the Currency. */
-  currencycode: CurrencyId,
-  /** Currency name. */
-  name: Name,
-  /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-) {
-  def toRow(modifieddateDefault: => TypoLocalDateTime): CurrencyRow =
-    CurrencyRow(
-      currencycode = currencycode,
-      name = name,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
-    )
+case class CurrencyRowUnsaved(/** The ISO code for the Currency. */
+                              currencycode: CurrencyId, /** Currency name. */
+                              name: Name, /** Default: now() */
+                              modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()) {
+  def toRow(modifieddateDefault: => TypoLocalDateTime): CurrencyRow = new CurrencyRow(currencycode = currencycode, name = name, modifieddate = modifieddate.getOrElse(modifieddateDefault))
 }
+
 object CurrencyRowUnsaved {
   implicit lazy val decoder: Decoder[CurrencyRowUnsaved] = Decoder.forProduct3[CurrencyRowUnsaved, CurrencyId, Name, Defaulted[TypoLocalDateTime]]("currencycode", "name", "modifieddate")(CurrencyRowUnsaved.apply)(CurrencyId.decoder, Name.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[CurrencyRowUnsaved] = Encoder.forProduct3[CurrencyRowUnsaved, CurrencyId, Name, Defaulted[TypoLocalDateTime]]("currencycode", "name", "modifieddate")(x => (x.currencycode, x.name, x.modifieddate))(CurrencyId.encoder, Name.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
-  implicit lazy val text: Text[CurrencyRowUnsaved] = Text.instance[CurrencyRowUnsaved]{ (row, sb) =>
-    CurrencyId.text.unsafeEncode(row.currencycode, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  implicit lazy val text: Text[CurrencyRowUnsaved] = {
+    Text.instance[CurrencyRowUnsaved]{ (row, sb) =>
+      CurrencyId.text.unsafeEncode(row.currencycode, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
   }
 }

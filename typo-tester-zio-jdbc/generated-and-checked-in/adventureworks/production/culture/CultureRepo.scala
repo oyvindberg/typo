@@ -3,16 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.culture
+package adventureworks.production.culture;
 
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
+/** upsertBatch: Not implementable for zio-jdbc */
 trait CultureRepo {
   def delete: DeleteBuilder[CultureFields, CultureRow]
   def deleteById(cultureid: CultureId): ZIO[ZConnection, Throwable, Boolean]
@@ -20,7 +21,7 @@ trait CultureRepo {
   def insert(unsaved: CultureRow): ZIO[ZConnection, Throwable, CultureRow]
   def insert(unsaved: CultureRowUnsaved): ZIO[ZConnection, Throwable, CultureRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[CultureFields, CultureRow]
   def selectAll: ZStream[ZConnection, Throwable, CultureRow]
@@ -30,7 +31,6 @@ trait CultureRepo {
   def update: UpdateBuilder[CultureFields, CultureRow]
   def update(row: CultureRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CultureRow): ZIO[ZConnection, Throwable, UpdateResult[CultureRow]]
-  // Not implementable for zio-jdbc: upsertBatch
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CultureRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

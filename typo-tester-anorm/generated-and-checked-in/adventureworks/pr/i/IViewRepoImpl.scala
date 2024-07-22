@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.i
+package adventureworks.pr.i;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class IViewRepoImpl extends IViewRepo {
-  override def select: SelectBuilder[IViewFields, IViewRow] = {
-    SelectBuilderSql("pr.i", IViewFields.structure, IViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[IViewRow] = {
+  def select: SelectBuilder[IViewFields, IViewRow] = SelectBuilderSql("pr.i", IViewFields.structure, IViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[IViewRow] = {
     SQL"""select "id", "illustrationid", "diagram", "modifieddate"::text
           from pr.i
        """.as(IViewRow.rowParser(1).*)

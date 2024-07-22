@@ -25,7 +25,7 @@ class DbLibTextSupport(pkg: sc.QIdent, inlineImplicits: Boolean, externalText: O
         case TypesScala.Long                                               => code"$Text.longInstance"
         case TypesJava.String                                              => code"$Text.stringInstance"
         case sc.Type.ArrayOf(TypesScala.Byte)                              => code"$Text.byteArrayInstance"
-        case TypesScala.Optional(targ)                                     => code"$Text.option(${lookupTextFor(targ)})"
+        case LangScala.Optional(targ)                                      => code"$Text.option(${lookupTextFor(targ)})"
         case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$textName(${lookupTextFor(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) => code"$tpe.$textName"
         case sc.Type.ArrayOf(targ: sc.Type.Qualified) if targ.value.idents.startsWith(pkg.idents) =>
@@ -39,11 +39,11 @@ class DbLibTextSupport(pkg: sc.QIdent, inlineImplicits: Boolean, externalText: O
     sc.Given(
       tparams = List(T),
       name = textName,
-      implicitParams = List(sc.Param(textofT, Text.of(T), None)),
+      implicitParams = List(sc.Param(textofT, Text.of(T))),
       tpe = Text.of(default.Defaulted.of(T)),
       body = code"""|$Text.instance {
                |  case (${default.Defaulted}.${default.Provided}(value), sb) => $textofT.unsafeEncode(value, sb)
-               |  case (${default.Defaulted}.${default.UseDefault}, sb) =>
+               |  case (${default.Defaulted}.${default.UseDefault}(), sb) =>
                |    sb.append("$DefaultValue")
                |    ()
                |}""".stripMargin

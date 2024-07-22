@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productmodelillustration
+package adventureworks.production.productmodelillustration;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait ProductmodelillustrationRepo {
   def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow]
@@ -18,7 +18,7 @@ trait ProductmodelillustrationRepo {
   def insert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow]
   def insert(unsaved: ProductmodelillustrationRowUnsaved): ConnectionIO[ProductmodelillustrationRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, ProductmodelillustrationRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductmodelillustrationRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow]
   def selectAll: Stream[ConnectionIO, ProductmodelillustrationRow]
@@ -29,6 +29,6 @@ trait ProductmodelillustrationRepo {
   def update(row: ProductmodelillustrationRow): ConnectionIO[Boolean]
   def upsert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow]
   def upsertBatch(unsaved: List[ProductmodelillustrationRow]): Stream[ConnectionIO, ProductmodelillustrationRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, ProductmodelillustrationRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

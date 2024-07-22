@@ -3,25 +3,27 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesreason
+package adventureworks.sales.salesreason;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: sales.salesreason
-    Lookup table of customer purchase reasons.
-    Primary key: salesreasonid */
+  * Lookup table of customer purchase reasons.
+  * Primary key: salesreasonid
+  */
 case class SalesreasonRow(
   /** Primary key for SalesReason records.
-      Default: nextval('sales.salesreason_salesreasonid_seq'::regclass) */
+    * Default: nextval('sales.salesreason_salesreasonid_seq'::regclass)
+    */
   salesreasonid: SalesreasonId,
   /** Sales reason description. */
   name: Name,
@@ -29,55 +31,69 @@ case class SalesreasonRow(
   reasontype: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val id = salesreasonid
-   def toUnsavedRow(salesreasonid: Defaulted[SalesreasonId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SalesreasonRowUnsaved =
-     SalesreasonRowUnsaved(name, reasontype, salesreasonid, modifieddate)
- }
+) {
+  def id: SalesreasonId = salesreasonid
+  def toUnsavedRow(salesreasonid: Defaulted[SalesreasonId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): SalesreasonRowUnsaved = {
+    new SalesreasonRowUnsaved(
+      name,
+      reasontype,
+      salesreasonid,
+      modifieddate
+    )
+  }
+}
 
 object SalesreasonRow {
   implicit lazy val decoder: Decoder[SalesreasonRow] = Decoder.forProduct4[SalesreasonRow, SalesreasonId, Name, Name, TypoLocalDateTime]("salesreasonid", "name", "reasontype", "modifieddate")(SalesreasonRow.apply)(SalesreasonId.decoder, Name.decoder, Name.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SalesreasonRow] = Encoder.forProduct4[SalesreasonRow, SalesreasonId, Name, Name, TypoLocalDateTime]("salesreasonid", "name", "reasontype", "modifieddate")(x => (x.salesreasonid, x.name, x.reasontype, x.modifieddate))(SalesreasonId.encoder, Name.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SalesreasonRow] = new Read[SalesreasonRow](
-    gets = List(
-      (SalesreasonId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SalesreasonRow(
-      salesreasonid = SalesreasonId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      reasontype = Name.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[SalesreasonRow] = {
+    new Read[SalesreasonRow](
+      gets = List(
+        (SalesreasonId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SalesreasonRow(
+        salesreasonid = SalesreasonId.get.unsafeGetNonNullable(rs, i + 0),
+        name = Name.get.unsafeGetNonNullable(rs, i + 1),
+        reasontype = Name.get.unsafeGetNonNullable(rs, i + 2),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+      )
     )
-  )
-  implicit lazy val text: Text[SalesreasonRow] = Text.instance[SalesreasonRow]{ (row, sb) =>
-    SalesreasonId.text.unsafeEncode(row.salesreasonid, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.reasontype, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[SalesreasonRow] = new Write[SalesreasonRow](
-    puts = List((SalesreasonId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.salesreasonid, x.name, x.reasontype, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  SalesreasonId.put.unsafeSetNonNullable(rs, i + 0, a.salesreasonid)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  Name.put.unsafeSetNonNullable(rs, i + 2, a.reasontype)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     SalesreasonId.put.unsafeUpdateNonNullable(ps, i + 0, a.salesreasonid)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 2, a.reasontype)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[SalesreasonRow] = {
+    Text.instance[SalesreasonRow]{ (row, sb) =>
+      SalesreasonId.text.unsafeEncode(row.salesreasonid, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.reasontype, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[SalesreasonRow] = {
+    new Write[SalesreasonRow](
+      puts = List((SalesreasonId.put, Nullability.NoNulls),
+                  (Name.put, Nullability.NoNulls),
+                  (Name.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.salesreasonid, x.name, x.reasontype, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    SalesreasonId.put.unsafeSetNonNullable(rs, i + 0, a.salesreasonid)
+                    Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                    Name.put.unsafeSetNonNullable(rs, i + 2, a.reasontype)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       SalesreasonId.put.unsafeUpdateNonNullable(ps, i + 0, a.salesreasonid)
+                       Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                       Name.put.unsafeUpdateNonNullable(ps, i + 2, a.reasontype)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
+                     }
+    )
+  
+  }
 }

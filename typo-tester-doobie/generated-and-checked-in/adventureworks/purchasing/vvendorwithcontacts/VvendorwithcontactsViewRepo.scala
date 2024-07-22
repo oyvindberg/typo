@@ -3,11 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.vvendorwithcontacts
+package adventureworks.purchasing.vvendorwithcontacts;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.SelectBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
 
 trait VvendorwithcontactsViewRepo {
   def select: SelectBuilder[VvendorwithcontactsViewFields, VvendorwithcontactsViewRow]

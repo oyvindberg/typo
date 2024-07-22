@@ -3,33 +3,29 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.countryregioncurrency
+package adventureworks.sales.countryregioncurrency;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.sales.currency.CurrencyId
-import adventureworks.streamingInsert
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.SqlFragment
-import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.countryregion.CountryregionId;
+import adventureworks.sales.currency.CurrencyId;
+import adventureworks.streamingInsert;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.SqlFragment;
+import zio.jdbc.SqlFragment.Segment;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
-  override def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure)
-  }
-  override def deleteById(compositeId: CountryregioncurrencyId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.countryregioncurrency where "countryregioncode" = ${Segment.paramSegment(compositeId.countryregioncode)(CountryregionId.setter)} AND "currencycode" = ${Segment.paramSegment(compositeId.currencycode)(CurrencyId.setter)}""".delete.map(_ > 0)
-  }
-  override def deleteByIds(compositeIds: Array[CountryregioncurrencyId]): ZIO[ZConnection, Throwable, Long] = {
+  def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = DeleteBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure)
+  def deleteById(compositeId: CountryregioncurrencyId): ZIO[ZConnection, Throwable, Boolean] = sql"""delete from sales.countryregioncurrency where "countryregioncode" = ${Segment.paramSegment(compositeId.countryregioncode)(CountryregionId.setter)} AND "currencycode" = ${Segment.paramSegment(compositeId.currencycode)(CurrencyId.setter)}""".delete.map(_ > 0)
+  def deleteByIds(compositeIds: Array[CountryregioncurrencyId]): ZIO[ZConnection, Throwable, Long] = {
     val countryregioncode = compositeIds.map(_.countryregioncode)
     val currencycode = compositeIds.map(_.currencycode)
     sql"""delete
@@ -37,53 +33,43 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           where ("countryregioncode", "currencycode")
           in (select unnest(${Segment.paramSegment(countryregioncode)(CountryregionId.arraySetter)}), unnest(${Segment.paramSegment(currencycode)(CurrencyId.arraySetter)}))
        """.delete
-    
+  
   }
-  override def insert(unsaved: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, CountryregioncurrencyRow] = {
+  def insert(unsaved: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, CountryregioncurrencyRow] = {
     sql"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")
           values (${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}, ${Segment.paramSegment(unsaved.currencycode)(CurrencyId.setter)}::bpchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "countryregioncode", "currencycode", "modifieddate"::text
        """.insertReturning(using CountryregioncurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
   }
-  override def insert(unsaved: CountryregioncurrencyRowUnsaved): ZIO[ZConnection, Throwable, CountryregioncurrencyRow] = {
+  def insert(unsaved: CountryregioncurrencyRowUnsaved): ZIO[ZConnection, Throwable, CountryregioncurrencyRow] = {
     val fs = List(
       Some((sql""""countryregioncode"""", sql"${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}")),
-      Some((sql""""currencycode"""", sql"${Segment.paramSegment(unsaved.currencycode)(CurrencyId.setter)}::bpchar")),
-      unsaved.modifieddate match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
-      }
+                      Some((sql""""currencycode"""", sql"${Segment.paramSegment(unsaved.currencycode)(CurrencyId.setter)}::bpchar")),
+    unsaved.modifieddate match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
+    }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.countryregioncurrency default values
-            returning "countryregioncode", "currencycode", "modifieddate"::text
-         """
+                            returning "countryregioncode", "currencycode", "modifieddate"::text
+                         """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into sales.countryregioncurrency($names) values ($values) returning "countryregioncode", "currencycode", "modifieddate"::text"""
     }
     q.insertReturning(using CountryregioncurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
-    
+  
   }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregioncurrencyRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN""", batchSize, unsaved)(CountryregioncurrencyRow.text)
-  }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregioncurrencyRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregioncurrencyRowUnsaved.text)
-  }
-  override def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    SelectBuilderSql("sales.countryregioncurrency", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, CountryregioncurrencyRow] = {
-    sql"""select "countryregioncode", "currencycode", "modifieddate"::text from sales.countryregioncurrency""".query(using CountryregioncurrencyRow.jdbcDecoder).selectStream()
-  }
-  override def selectById(compositeId: CountryregioncurrencyId): ZIO[ZConnection, Throwable, Option[CountryregioncurrencyRow]] = {
-    sql"""select "countryregioncode", "currencycode", "modifieddate"::text from sales.countryregioncurrency where "countryregioncode" = ${Segment.paramSegment(compositeId.countryregioncode)(CountryregionId.setter)} AND "currencycode" = ${Segment.paramSegment(compositeId.currencycode)(CurrencyId.setter)}""".query(using CountryregioncurrencyRow.jdbcDecoder).selectOne
-  }
-  override def selectByIds(compositeIds: Array[CountryregioncurrencyId]): ZStream[ZConnection, Throwable, CountryregioncurrencyRow] = {
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregioncurrencyRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = streamingInsert(s"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN""", batchSize, unsaved)(CountryregioncurrencyRow.text)
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregioncurrencyRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = streamingInsert(s"""COPY sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregioncurrencyRowUnsaved.text)
+  def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = SelectBuilderSql("sales.countryregioncurrency", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, CountryregioncurrencyRow] = sql"""select "countryregioncode", "currencycode", "modifieddate"::text from sales.countryregioncurrency""".query(using CountryregioncurrencyRow.jdbcDecoder).selectStream()
+  def selectById(compositeId: CountryregioncurrencyId): ZIO[ZConnection, Throwable, Option[CountryregioncurrencyRow]] = sql"""select "countryregioncode", "currencycode", "modifieddate"::text from sales.countryregioncurrency where "countryregioncode" = ${Segment.paramSegment(compositeId.countryregioncode)(CountryregionId.setter)} AND "currencycode" = ${Segment.paramSegment(compositeId.currencycode)(CurrencyId.setter)}""".query(using CountryregioncurrencyRow.jdbcDecoder).selectOne
+  def selectByIds(compositeIds: Array[CountryregioncurrencyId]): ZStream[ZConnection, Throwable, CountryregioncurrencyRow] = {
     val countryregioncode = compositeIds.map(_.countryregioncode)
     val currencycode = compositeIds.map(_.currencycode)
     sql"""select "countryregioncode", "currencycode", "modifieddate"::text
@@ -91,24 +77,22 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
           where ("countryregioncode", "currencycode")
           in (select unnest(${Segment.paramSegment(countryregioncode)(CountryregionId.arraySetter)}), unnest(${Segment.paramSegment(currencycode)(CurrencyId.arraySetter)}))
        """.query(using CountryregioncurrencyRow.jdbcDecoder).selectStream()
-    
+  
   }
-  override def selectByIdsTracked(compositeIds: Array[CountryregioncurrencyId]): ZIO[ZConnection, Throwable, Map[CountryregioncurrencyId, CountryregioncurrencyRow]] = {
+  def selectByIdsTracked(compositeIds: Array[CountryregioncurrencyId]): ZIO[ZConnection, Throwable, Map[CountryregioncurrencyId, CountryregioncurrencyRow]] = {
     selectByIds(compositeIds).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
       compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
-    UpdateBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.jdbcDecoder)
-  }
-  override def update(row: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, Boolean] = {
+  def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = UpdateBuilder("sales.countryregioncurrency", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.jdbcDecoder)
+  def update(row: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
     sql"""update sales.countryregioncurrency
           set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "countryregioncode" = ${Segment.paramSegment(compositeId.countryregioncode)(CountryregionId.setter)} AND "currencycode" = ${Segment.paramSegment(compositeId.currencycode)(CurrencyId.setter)}""".update.map(_ > 0)
   }
-  override def upsert(unsaved: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CountryregioncurrencyRow]] = {
+  def upsert(unsaved: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CountryregioncurrencyRow]] = {
     sql"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)},
@@ -120,8 +104,8 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "countryregioncode", "currencycode", "modifieddate"::text""".insertReturning(using CountryregioncurrencyRow.jdbcDecoder)
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregioncurrencyRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregioncurrencyRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     val created = sql"create temporary table countryregioncurrency_TEMP (like sales.countryregioncurrency) on commit drop".execute
     val copied = streamingInsert(s"""copy countryregioncurrency_TEMP("countryregioncode", "currencycode", "modifieddate") from stdin""", batchSize, unsaved)(CountryregioncurrencyRow.text)
     val merged = sql"""insert into sales.countryregioncurrency("countryregioncode", "currencycode", "modifieddate")

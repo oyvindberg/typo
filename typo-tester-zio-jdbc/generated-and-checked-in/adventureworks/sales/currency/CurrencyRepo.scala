@@ -3,16 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.currency
+package adventureworks.sales.currency;
 
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
+/** upsertBatch: Not implementable for zio-jdbc */
 trait CurrencyRepo {
   def delete: DeleteBuilder[CurrencyFields, CurrencyRow]
   def deleteById(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Boolean]
@@ -20,7 +21,7 @@ trait CurrencyRepo {
   def insert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, CurrencyRow]
   def insert(unsaved: CurrencyRowUnsaved): ZIO[ZConnection, Throwable, CurrencyRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[CurrencyFields, CurrencyRow]
   def selectAll: ZStream[ZConnection, Throwable, CurrencyRow]
@@ -30,7 +31,6 @@ trait CurrencyRepo {
   def update: UpdateBuilder[CurrencyFields, CurrencyRow]
   def update(row: CurrencyRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyRow]]
-  // Not implementable for zio-jdbc: upsertBatch
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

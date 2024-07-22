@@ -3,20 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.shift
+package adventureworks.humanresources.shift;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoLocalTime
-import adventureworks.public.Name
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoLocalTime;
+import adventureworks.public.Name;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** This class corresponds to a row in table `humanresources.shift` which has not been persisted yet */
 case class ShiftRowUnsaved(
@@ -27,57 +27,60 @@ case class ShiftRowUnsaved(
   /** Shift end time. */
   endtime: TypoLocalTime,
   /** Default: nextval('humanresources.shift_shiftid_seq'::regclass)
-      Primary key for Shift records. */
-  shiftid: Defaulted[ShiftId] = Defaulted.UseDefault,
+    * Primary key for Shift records.
+    */
+  shiftid: Defaulted[ShiftId] = Defaulted.UseDefault(),
   /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()
 ) {
-  def toRow(shiftidDefault: => ShiftId, modifieddateDefault: => TypoLocalDateTime): ShiftRow =
-    ShiftRow(
-      shiftid = shiftid match {
-                  case Defaulted.UseDefault => shiftidDefault
-                  case Defaulted.Provided(value) => value
-                },
+  def toRow(shiftidDefault: => ShiftId, modifieddateDefault: => TypoLocalDateTime): ShiftRow = {
+    new ShiftRow(
+      shiftid = shiftid.getOrElse(shiftidDefault),
       name = name,
       starttime = starttime,
       endtime = endtime,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
+      modifieddate = modifieddate.getOrElse(modifieddateDefault)
     )
-}
-object ShiftRowUnsaved {
-  implicit lazy val reads: Reads[ShiftRowUnsaved] = Reads[ShiftRowUnsaved](json => JsResult.fromTry(
-      Try(
-        ShiftRowUnsaved(
-          name = json.\("name").as(Name.reads),
-          starttime = json.\("starttime").as(TypoLocalTime.reads),
-          endtime = json.\("endtime").as(TypoLocalTime.reads),
-          shiftid = json.\("shiftid").as(Defaulted.reads(ShiftId.reads)),
-          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
-        )
-      )
-    ),
-  )
-  implicit lazy val text: Text[ShiftRowUnsaved] = Text.instance[ShiftRowUnsaved]{ (row, sb) =>
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalTime.text.unsafeEncode(row.starttime, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalTime.text.unsafeEncode(row.endtime, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(ShiftId.text).unsafeEncode(row.shiftid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val writes: OWrites[ShiftRowUnsaved] = OWrites[ShiftRowUnsaved](o =>
-    new JsObject(ListMap[String, JsValue](
-      "name" -> Name.writes.writes(o.name),
-      "starttime" -> TypoLocalTime.writes.writes(o.starttime),
-      "endtime" -> TypoLocalTime.writes.writes(o.endtime),
-      "shiftid" -> Defaulted.writes(ShiftId.writes).writes(o.shiftid),
-      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
-    ))
-  )
+}
+
+object ShiftRowUnsaved {
+  implicit lazy val reads: Reads[ShiftRowUnsaved] = {
+    Reads[ShiftRowUnsaved](json => JsResult.fromTry(
+        Try(
+          ShiftRowUnsaved(
+            name = json.\("name").as(Name.reads),
+            starttime = json.\("starttime").as(TypoLocalTime.reads),
+            endtime = json.\("endtime").as(TypoLocalTime.reads),
+            shiftid = json.\("shiftid").as(Defaulted.reads(ShiftId.reads)),
+            modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+          )
+        )
+      ),
+    )
+  }
+  implicit lazy val text: Text[ShiftRowUnsaved] = {
+    Text.instance[ShiftRowUnsaved]{ (row, sb) =>
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalTime.text.unsafeEncode(row.starttime, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalTime.text.unsafeEncode(row.endtime, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(ShiftId.text).unsafeEncode(row.shiftid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[ShiftRowUnsaved] = {
+    OWrites[ShiftRowUnsaved](o =>
+      new JsObject(ListMap[String, JsValue](
+        "name" -> Name.writes.writes(o.name),
+        "starttime" -> TypoLocalTime.writes.writes(o.starttime),
+        "endtime" -> TypoLocalTime.writes.writes(o.endtime),
+        "shiftid" -> Defaulted.writes(ShiftId.writes).writes(o.shiftid),
+        "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
+      ))
+    )
+  }
 }

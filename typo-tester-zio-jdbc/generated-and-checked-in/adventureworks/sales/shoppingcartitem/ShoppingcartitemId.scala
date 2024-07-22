@@ -3,19 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.shoppingcartitem
+package adventureworks.sales.shoppingcartitem;
 
-import adventureworks.Text
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `sales.shoppingcartitem` */
-case class ShoppingcartitemId(value: Int) extends AnyVal
+case class ShoppingcartitemId(value: Int) extends scala.AnyVal
+
 object ShoppingcartitemId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[ShoppingcartitemId]] = adventureworks.IntArrayDecoder.map(_.map(ShoppingcartitemId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[ShoppingcartitemId]] = adventureworks.IntArrayEncoder.contramap(_.map(_.value))
@@ -27,8 +28,10 @@ object ShoppingcartitemId {
   implicit lazy val jsonEncoder: JsonEncoder[ShoppingcartitemId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val pgType: PGType[ShoppingcartitemId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[ShoppingcartitemId] = Setter.intSetter.contramap(_.value)
-  implicit lazy val text: Text[ShoppingcartitemId] = new Text[ShoppingcartitemId] {
-    override def unsafeEncode(v: ShoppingcartitemId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: ShoppingcartitemId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[ShoppingcartitemId] = {
+    new Text[ShoppingcartitemId] {
+      override def unsafeEncode(v: ShoppingcartitemId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: ShoppingcartitemId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

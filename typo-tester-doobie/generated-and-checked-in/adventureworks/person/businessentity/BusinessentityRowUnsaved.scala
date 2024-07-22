@@ -3,49 +3,35 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.businessentity
+package adventureworks.person.businessentity;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import doobie.postgres.Text
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import doobie.postgres.Text;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** This class corresponds to a row in table `person.businessentity` which has not been persisted yet */
-case class BusinessentityRowUnsaved(
-  /** Default: nextval('person.businessentity_businessentityid_seq'::regclass)
-      Primary key for all customers, vendors, and employees. */
-  businessentityid: Defaulted[BusinessentityId] = Defaulted.UseDefault,
-  /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
-  /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-) {
-  def toRow(businessentityidDefault: => BusinessentityId, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): BusinessentityRow =
-    BusinessentityRow(
-      businessentityid = businessentityid match {
-                           case Defaulted.UseDefault => businessentityidDefault
-                           case Defaulted.Provided(value) => value
-                         },
-      rowguid = rowguid match {
-                  case Defaulted.UseDefault => rowguidDefault
-                  case Defaulted.Provided(value) => value
-                },
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
-    )
+case class BusinessentityRowUnsaved(/** Default: nextval('person.businessentity_businessentityid_seq'::regclass)
+                                      * Primary key for all customers, vendors, and employees.
+                                      */
+                                    businessentityid: Defaulted[BusinessentityId] = Defaulted.UseDefault(), /** Default: uuid_generate_v1() */
+                                    rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault(), /** Default: now() */
+                                    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()) {
+  def toRow(businessentityidDefault: => BusinessentityId, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): BusinessentityRow = new BusinessentityRow(businessentityid = businessentityid.getOrElse(businessentityidDefault), rowguid = rowguid.getOrElse(rowguidDefault), modifieddate = modifieddate.getOrElse(modifieddateDefault))
 }
+
 object BusinessentityRowUnsaved {
   implicit lazy val decoder: Decoder[BusinessentityRowUnsaved] = Decoder.forProduct3[BusinessentityRowUnsaved, Defaulted[BusinessentityId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "rowguid", "modifieddate")(BusinessentityRowUnsaved.apply)(Defaulted.decoder(BusinessentityId.decoder), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[BusinessentityRowUnsaved] = Encoder.forProduct3[BusinessentityRowUnsaved, Defaulted[BusinessentityId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("businessentityid", "rowguid", "modifieddate")(x => (x.businessentityid, x.rowguid, x.modifieddate))(Defaulted.encoder(BusinessentityId.encoder), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
-  implicit lazy val text: Text[BusinessentityRowUnsaved] = Text.instance[BusinessentityRowUnsaved]{ (row, sb) =>
-    Defaulted.text(BusinessentityId.text).unsafeEncode(row.businessentityid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  implicit lazy val text: Text[BusinessentityRowUnsaved] = {
+    Text.instance[BusinessentityRowUnsaved]{ (row, sb) =>
+      Defaulted.text(BusinessentityId.text).unsafeEncode(row.businessentityid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
   }
 }

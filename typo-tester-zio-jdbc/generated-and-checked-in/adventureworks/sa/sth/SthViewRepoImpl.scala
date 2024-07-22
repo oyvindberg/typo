@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.sth
+package adventureworks.sa.sth;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class SthViewRepoImpl extends SthViewRepo {
-  override def select: SelectBuilder[SthViewFields, SthViewRow] = {
-    SelectBuilderSql("sa.sth", SthViewFields.structure, SthViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, SthViewRow] = {
-    sql"""select "id", "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sa.sth""".query(using SthViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[SthViewFields, SthViewRow] = SelectBuilderSql("sa.sth", SthViewFields.structure, SthViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, SthViewRow] = sql"""select "id", "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text from sa.sth""".query(using SthViewRow.jdbcDecoder).selectStream()
 }

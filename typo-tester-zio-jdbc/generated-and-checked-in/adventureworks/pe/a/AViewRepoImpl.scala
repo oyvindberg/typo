@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pe.a
+package adventureworks.pe.a;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class AViewRepoImpl extends AViewRepo {
-  override def select: SelectBuilder[AViewFields, AViewRow] = {
-    SelectBuilderSql("pe.a", AViewFields.structure, AViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, AViewRow] = {
-    sql"""select "id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from pe.a""".query(using AViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[AViewFields, AViewRow] = SelectBuilderSql("pe.a", AViewFields.structure, AViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, AViewRow] = sql"""select "id", "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from pe.a""".query(using AViewRow.jdbcDecoder).selectStream()
 }

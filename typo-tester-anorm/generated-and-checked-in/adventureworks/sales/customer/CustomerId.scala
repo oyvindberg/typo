@@ -3,31 +3,36 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.customer
+package adventureworks.sales.customer;
 
-import adventureworks.Text
-import anorm.Column
-import anorm.ParameterMetaData
-import anorm.ToStatement
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import typo.dsl.Bijection
+import adventureworks.Text;
+import anorm.Column;
+import anorm.ParameterMetaData;
+import anorm.ToStatement;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `sales.customer` */
-case class CustomerId(value: Int) extends AnyVal
+case class CustomerId(value: Int) extends scala.AnyVal
+
 object CustomerId {
   implicit lazy val arrayColumn: Column[Array[CustomerId]] = Column.columnToArray(column, implicitly)
   implicit lazy val arrayToStatement: ToStatement[Array[CustomerId]] = adventureworks.IntArrayToStatement.contramap(_.map(_.value))
   implicit lazy val bijection: Bijection[CustomerId, Int] = Bijection[CustomerId, Int](_.value)(CustomerId.apply)
   implicit lazy val column: Column[CustomerId] = Column.columnToInt.map(CustomerId.apply)
-  implicit lazy val parameterMetadata: ParameterMetaData[CustomerId] = new ParameterMetaData[CustomerId] {
-    override def sqlType: String = ParameterMetaData.IntParameterMetaData.sqlType
-    override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
+  implicit lazy val parameterMetadata: ParameterMetaData[CustomerId] = {
+    new ParameterMetaData[CustomerId] {
+      override def sqlType: String = ParameterMetaData.IntParameterMetaData.sqlType
+      override def jdbcType: Int = ParameterMetaData.IntParameterMetaData.jdbcType
+    }
   }
   implicit lazy val reads: Reads[CustomerId] = Reads.IntReads.map(CustomerId.apply)
-  implicit lazy val text: Text[CustomerId] = new Text[CustomerId] {
-    override def unsafeEncode(v: CustomerId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: CustomerId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[CustomerId] = {
+    new Text[CustomerId] {
+      override def unsafeEncode(v: CustomerId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: CustomerId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
   implicit lazy val toStatement: ToStatement[CustomerId] = ToStatement.intToStatement.contramap(_.value)
   implicit lazy val writes: Writes[CustomerId] = Writes.IntWrites.contramap(_.value)

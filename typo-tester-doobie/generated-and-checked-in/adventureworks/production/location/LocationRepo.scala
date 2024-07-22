@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.location
+package adventureworks.production.location;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait LocationRepo {
   def delete: DeleteBuilder[LocationFields, LocationRow]
@@ -18,7 +18,7 @@ trait LocationRepo {
   def insert(unsaved: LocationRow): ConnectionIO[LocationRow]
   def insert(unsaved: LocationRowUnsaved): ConnectionIO[LocationRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, LocationRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[LocationFields, LocationRow]
   def selectAll: Stream[ConnectionIO, LocationRow]
@@ -29,6 +29,6 @@ trait LocationRepo {
   def update(row: LocationRow): ConnectionIO[Boolean]
   def upsert(unsaved: LocationRow): ConnectionIO[LocationRow]
   def upsertBatch(unsaved: List[LocationRow]): Stream[ConnectionIO, LocationRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

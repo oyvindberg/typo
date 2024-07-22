@@ -3,25 +3,25 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.countryregioncurrency
+package adventureworks.sales.countryregioncurrency;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.countryregion.CountryregionFields
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.person.countryregion.CountryregionRow
-import adventureworks.sales.currency.CurrencyFields
-import adventureworks.sales.currency.CurrencyId
-import adventureworks.sales.currency.CurrencyRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Const.As.as
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.countryregion.CountryregionFields;
+import adventureworks.person.countryregion.CountryregionId;
+import adventureworks.person.countryregion.CountryregionRow;
+import adventureworks.sales.currency.CurrencyFields;
+import adventureworks.sales.currency.CurrencyId;
+import adventureworks.sales.currency.CurrencyRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait CountryregioncurrencyFields {
   def countryregioncode: IdField[CountryregionId, CountryregioncurrencyRow]

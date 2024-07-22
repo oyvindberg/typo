@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.shipmethod
+package adventureworks.purchasing.shipmethod;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait ShipmethodRepo {
   def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow]
@@ -18,7 +18,7 @@ trait ShipmethodRepo {
   def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow]
   def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, ShipmethodRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShipmethodRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[ShipmethodFields, ShipmethodRow]
   def selectAll: Stream[ConnectionIO, ShipmethodRow]
@@ -29,6 +29,6 @@ trait ShipmethodRepo {
   def update(row: ShipmethodRow): ConnectionIO[Boolean]
   def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow]
   def upsertBatch(unsaved: List[ShipmethodRow]): Stream[ConnectionIO, ShipmethodRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, ShipmethodRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

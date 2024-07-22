@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.spqh
+package adventureworks.sa.spqh;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class SpqhViewRepoImpl extends SpqhViewRepo {
-  override def select: SelectBuilder[SpqhViewFields, SpqhViewRow] = {
-    SelectBuilderSql("sa.spqh", SpqhViewFields.structure, SpqhViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[SpqhViewRow] = {
+  def select: SelectBuilder[SpqhViewFields, SpqhViewRow] = SelectBuilderSql("sa.spqh", SpqhViewFields.structure, SpqhViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[SpqhViewRow] = {
     SQL"""select "id", "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
           from sa.spqh
        """.as(SpqhViewRow.rowParser(1).*)

@@ -3,32 +3,25 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.businessentity
+package adventureworks.person.businessentity;
 
-import java.sql.Connection
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.DeleteBuilder.DeleteBuilderMock
-import typo.dsl.DeleteParams
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderMock
-import typo.dsl.SelectParams
-import typo.dsl.UpdateBuilder
-import typo.dsl.UpdateBuilder.UpdateBuilderMock
-import typo.dsl.UpdateParams
+import java.sql.Connection;
+import scala.annotation.nowarn;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.DeleteBuilder.DeleteBuilderMock;
+import typo.dsl.DeleteParams;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderMock;
+import typo.dsl.SelectParams;
+import typo.dsl.UpdateBuilder;
+import typo.dsl.UpdateBuilder.UpdateBuilderMock;
+import typo.dsl.UpdateParams;
 
-class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, BusinessentityRow],
-                             map: scala.collection.mutable.Map[BusinessentityId, BusinessentityRow] = scala.collection.mutable.Map.empty) extends BusinessentityRepo {
-  override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
-    DeleteBuilderMock(DeleteParams.empty, BusinessentityFields.structure, map)
-  }
-  override def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    map.remove(businessentityid).isDefined
-  }
-  override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
-    businessentityids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def insert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
+class BusinessentityRepoMock(val toRow: Function1[BusinessentityRowUnsaved, BusinessentityRow], val map: scala.collection.mutable.Map[BusinessentityId, BusinessentityRow] = scala.collection.mutable.Map.empty) extends BusinessentityRepo {
+  def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = DeleteBuilderMock(DeleteParams.empty, BusinessentityFields.structure, map)
+  def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = map.remove(businessentityid).isDefined
+  def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = businessentityids.map(id => map.remove(id)).count(_.isDefined)
+  def insert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
     val _ = if (map.contains(unsaved.businessentityid))
       sys.error(s"id ${unsaved.businessentityid} already exists")
     else
@@ -36,43 +29,31 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
     
     unsaved
   }
-  override def insert(unsaved: BusinessentityRowUnsaved)(implicit c: Connection): BusinessentityRow = {
-    insert(toRow(unsaved))
-  }
-  override def insertStreaming(unsaved: Iterator[BusinessentityRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
+  def insert(unsaved: BusinessentityRowUnsaved)(implicit c: Connection): BusinessentityRow = insert(toRow(unsaved))
+  def insertStreaming(unsaved: Iterator[BusinessentityRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.businessentityid -> row)
     }
     unsaved.size.toLong
   }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Iterator[BusinessentityRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[BusinessentityRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { unsavedRow =>
       val row = toRow(unsavedRow)
       map += (row.businessentityid -> row)
     }
     unsaved.size.toLong
   }
-  override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
-    SelectBuilderMock(BusinessentityFields.structure, () => map.values.toList, SelectParams.empty)
-  }
-  override def selectAll(implicit c: Connection): List[BusinessentityRow] = {
-    map.values.toList
-  }
-  override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[BusinessentityRow] = {
-    map.get(businessentityid)
-  }
-  override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[BusinessentityRow] = {
-    businessentityids.flatMap(map.get).toList
-  }
-  override def selectByIdsTracked(businessentityids: Array[BusinessentityId])(implicit c: Connection): Map[BusinessentityId, BusinessentityRow] = {
+  def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = SelectBuilderMock(BusinessentityFields.structure, () => map.values.toList, SelectParams.empty)
+  def selectAll(implicit c: Connection): List[BusinessentityRow] = map.values.toList
+  def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[BusinessentityRow] = map.get(businessentityid)
+  def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[BusinessentityRow] = businessentityids.flatMap(map.get).toList
+  def selectByIdsTracked(businessentityids: Array[BusinessentityId])(implicit c: Connection): Map[BusinessentityId, BusinessentityRow] = {
     val byId = selectByIds(businessentityids).view.map(x => (x.businessentityid, x)).toMap
     businessentityids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
-  override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
-    UpdateBuilderMock(UpdateParams.empty, BusinessentityFields.structure, map)
-  }
-  override def update(row: BusinessentityRow)(implicit c: Connection): Boolean = {
+  def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = UpdateBuilderMock(UpdateParams.empty, BusinessentityFields.structure, map)
+  def update(row: BusinessentityRow)(implicit c: Connection): Boolean = {
     map.get(row.businessentityid) match {
       case Some(`row`) => false
       case Some(_) =>
@@ -81,18 +62,18 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
       case None => false
     }
   }
-  override def upsert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
+  def upsert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {
     map.put(unsaved.businessentityid, unsaved): @nowarn
     unsaved
   }
-  override def upsertBatch(unsaved: Iterable[BusinessentityRow])(implicit c: Connection): List[BusinessentityRow] = {
+  def upsertBatch(unsaved: Iterable[BusinessentityRow])(implicit c: Connection): List[BusinessentityRow] = {
     unsaved.map { row =>
       map += (row.businessentityid -> row)
       row
     }.toList
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Iterator[BusinessentityRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[BusinessentityRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     unsaved.foreach { row =>
       map += (row.businessentityid -> row)
     }

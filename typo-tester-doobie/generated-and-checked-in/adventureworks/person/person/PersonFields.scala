@@ -3,24 +3,24 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.person
+package adventureworks.person.person;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.customtypes.TypoXml
-import adventureworks.person.businessentity.BusinessentityFields
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.person.businessentity.BusinessentityRow
-import adventureworks.public.Name
-import adventureworks.public.NameStyle
-import adventureworks.userdefined.FirstName
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.person.businessentity.BusinessentityFields;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.person.businessentity.BusinessentityRow;
+import adventureworks.public.Name;
+import adventureworks.public.NameStyle;
+import adventureworks.userdefined.FirstName;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait PersonFields {
   def businessentityid: IdField[BusinessentityId, PersonRow]

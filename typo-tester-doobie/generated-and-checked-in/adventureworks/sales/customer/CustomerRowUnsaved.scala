@@ -3,69 +3,68 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.customer
+package adventureworks.sales.customer;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.postgres.Text
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import doobie.postgres.Text;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** This class corresponds to a row in table `sales.customer` which has not been persisted yet */
 case class CustomerRowUnsaved(
   /** Foreign key to Person.BusinessEntityID
-      Points to [[adventureworks.person.person.PersonRow.businessentityid]] */
+    * Points to [[adventureworks.person.person.PersonRow.businessentityid]]
+    */
   personid: Option[BusinessentityId],
   /** Foreign key to Store.BusinessEntityID
-      Points to [[adventureworks.sales.store.StoreRow.businessentityid]] */
+    * Points to [[adventureworks.sales.store.StoreRow.businessentityid]]
+    */
   storeid: Option[BusinessentityId],
   /** ID of the territory in which the customer is located. Foreign key to SalesTerritory.SalesTerritoryID.
-      Points to [[adventureworks.sales.salesterritory.SalesterritoryRow.territoryid]] */
+    * Points to [[adventureworks.sales.salesterritory.SalesterritoryRow.territoryid]]
+    */
   territoryid: Option[SalesterritoryId],
   /** Default: nextval('sales.customer_customerid_seq'::regclass)
-      Primary key. */
-  customerid: Defaulted[CustomerId] = Defaulted.UseDefault,
+    * Primary key.
+    */
+  customerid: Defaulted[CustomerId] = Defaulted.UseDefault(),
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault(),
   /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()
 ) {
-  def toRow(customeridDefault: => CustomerId, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): CustomerRow =
-    CustomerRow(
-      customerid = customerid match {
-                     case Defaulted.UseDefault => customeridDefault
-                     case Defaulted.Provided(value) => value
-                   },
+  def toRow(customeridDefault: => CustomerId, rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): CustomerRow = {
+    new CustomerRow(
+      customerid = customerid.getOrElse(customeridDefault),
       personid = personid,
       storeid = storeid,
       territoryid = territoryid,
-      rowguid = rowguid match {
-                  case Defaulted.UseDefault => rowguidDefault
-                  case Defaulted.Provided(value) => value
-                },
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
+      rowguid = rowguid.getOrElse(rowguidDefault),
+      modifieddate = modifieddate.getOrElse(modifieddateDefault)
     )
+  }
 }
+
 object CustomerRowUnsaved {
   implicit lazy val decoder: Decoder[CustomerRowUnsaved] = Decoder.forProduct6[CustomerRowUnsaved, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], Defaulted[CustomerId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate")(CustomerRowUnsaved.apply)(Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(SalesterritoryId.decoder), Defaulted.decoder(CustomerId.decoder), Defaulted.decoder(TypoUUID.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[CustomerRowUnsaved] = Encoder.forProduct6[CustomerRowUnsaved, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], Defaulted[CustomerId], Defaulted[TypoUUID], Defaulted[TypoLocalDateTime]]("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate")(x => (x.personid, x.storeid, x.territoryid, x.customerid, x.rowguid, x.modifieddate))(Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(SalesterritoryId.encoder), Defaulted.encoder(CustomerId.encoder), Defaulted.encoder(TypoUUID.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
-  implicit lazy val text: Text[CustomerRowUnsaved] = Text.instance[CustomerRowUnsaved]{ (row, sb) =>
-    Text.option(BusinessentityId.text).unsafeEncode(row.personid, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(BusinessentityId.text).unsafeEncode(row.storeid, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(SalesterritoryId.text).unsafeEncode(row.territoryid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(CustomerId.text).unsafeEncode(row.customerid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  implicit lazy val text: Text[CustomerRowUnsaved] = {
+    Text.instance[CustomerRowUnsaved]{ (row, sb) =>
+      Text.option(BusinessentityId.text).unsafeEncode(row.personid, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(BusinessentityId.text).unsafeEncode(row.storeid, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(SalesterritoryId.text).unsafeEncode(row.territoryid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(CustomerId.text).unsafeEncode(row.customerid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
   }
 }

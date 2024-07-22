@@ -3,19 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.identity_test
+package adventureworks.public.identity_test;
 
-import adventureworks.Text
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `public.identity-test` */
-case class IdentityTestId(value: /* max 250 chars */ String) extends AnyVal
+case class IdentityTestId(value: /* max 250 chars */ String) extends scala.AnyVal
+
 object IdentityTestId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[IdentityTestId]] = adventureworks.StringArrayDecoder.map(_.map(IdentityTestId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[IdentityTestId]] = adventureworks.StringArrayEncoder.contramap(_.map(_.value))
@@ -27,8 +28,10 @@ object IdentityTestId {
   implicit lazy val jsonEncoder: JsonEncoder[IdentityTestId] = JsonEncoder.string.contramap(_.value)
   implicit lazy val pgType: PGType[IdentityTestId] = PGType.PGTypeString.as
   implicit lazy val setter: Setter[IdentityTestId] = Setter.stringSetter.contramap(_.value)
-  implicit lazy val text: Text[IdentityTestId] = new Text[IdentityTestId] {
-    override def unsafeEncode(v: IdentityTestId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: IdentityTestId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[IdentityTestId] = {
+    new Text[IdentityTestId] {
+      override def unsafeEncode(v: IdentityTestId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: IdentityTestId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

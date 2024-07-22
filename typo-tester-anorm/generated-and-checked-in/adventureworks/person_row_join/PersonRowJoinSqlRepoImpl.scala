@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person_row_join
+package adventureworks.person_row_join;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
 
 class PersonRowJoinSqlRepoImpl extends PersonRowJoinSqlRepo {
-  override def apply()(implicit c: Connection): List[PersonRowJoinSqlRow] = {
+  def apply(implicit c: Connection): List[PersonRowJoinSqlRow] = {
     val sql =
       SQL"""SELECT s.businessentityid,
                    (select array_agg(ROW(a.emailaddress, a.rowguid)) from person.emailaddress a where a.businessentityid = s.businessentityid) as email,

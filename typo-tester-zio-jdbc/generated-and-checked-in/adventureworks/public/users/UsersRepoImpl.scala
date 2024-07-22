@@ -3,102 +3,82 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.users
+package adventureworks.public.users;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoInstant
-import adventureworks.customtypes.TypoUnknownCitext
-import adventureworks.streamingInsert
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.SqlFragment
-import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoInstant;
+import adventureworks.customtypes.TypoUnknownCitext;
+import adventureworks.streamingInsert;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.SqlFragment;
+import zio.jdbc.SqlFragment.Segment;
+import zio.jdbc.SqlFragment.Setter;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class UsersRepoImpl extends UsersRepo {
-  override def delete: DeleteBuilder[UsersFields, UsersRow] = {
-    DeleteBuilder("public.users", UsersFields.structure)
-  }
-  override def deleteById(userId: UsersId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from public.users where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".delete.map(_ > 0)
-  }
-  override def deleteByIds(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from public.users where "user_id" = ANY(${Segment.paramSegment(userIds)(UsersId.arraySetter)})""".delete
-  }
-  override def insert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UsersRow] = {
+  def delete: DeleteBuilder[UsersFields, UsersRow] = DeleteBuilder("public.users", UsersFields.structure)
+  def deleteById(userId: UsersId): ZIO[ZConnection, Throwable, Boolean] = sql"""delete from public.users where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".delete.map(_ > 0)
+  def deleteByIds(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Long] = sql"""delete from public.users where "user_id" = ANY(${Segment.paramSegment(userIds)(UsersId.arraySetter)})""".delete
+  def insert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UsersRow] = {
     sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
           values (${Segment.paramSegment(unsaved.userId)(UsersId.setter)}::uuid, ${Segment.paramSegment(unsaved.name)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.lastName)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.email)(TypoUnknownCitext.setter)}::citext, ${Segment.paramSegment(unsaved.password)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.createdAt)(TypoInstant.setter)}::timestamptz, ${Segment.paramSegment(unsaved.verifiedOn)(Setter.optionParamSetter(TypoInstant.setter))}::timestamptz)
           returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
        """.insertReturning(using UsersRow.jdbcDecoder).map(_.updatedKeys.head)
   }
-  override def insert(unsaved: UsersRowUnsaved): ZIO[ZConnection, Throwable, UsersRow] = {
+  def insert(unsaved: UsersRowUnsaved): ZIO[ZConnection, Throwable, UsersRow] = {
     val fs = List(
       Some((sql""""user_id"""", sql"${Segment.paramSegment(unsaved.userId)(UsersId.setter)}::uuid")),
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter.stringSetter)}")),
-      Some((sql""""last_name"""", sql"${Segment.paramSegment(unsaved.lastName)(Setter.optionParamSetter(Setter.stringSetter))}")),
-      Some((sql""""email"""", sql"${Segment.paramSegment(unsaved.email)(TypoUnknownCitext.setter)}::citext")),
-      Some((sql""""password"""", sql"${Segment.paramSegment(unsaved.password)(Setter.stringSetter)}")),
-      Some((sql""""verified_on"""", sql"${Segment.paramSegment(unsaved.verifiedOn)(Setter.optionParamSetter(TypoInstant.setter))}::timestamptz")),
-      unsaved.createdAt match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""created_at"""", sql"${Segment.paramSegment(value: TypoInstant)(TypoInstant.setter)}::timestamptz"))
-      }
+                      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Setter.stringSetter)}")),
+                      Some((sql""""last_name"""", sql"${Segment.paramSegment(unsaved.lastName)(Setter.optionParamSetter(Setter.stringSetter))}")),
+                      Some((sql""""email"""", sql"${Segment.paramSegment(unsaved.email)(TypoUnknownCitext.setter)}::citext")),
+                      Some((sql""""password"""", sql"${Segment.paramSegment(unsaved.password)(Setter.stringSetter)}")),
+                      Some((sql""""verified_on"""", sql"${Segment.paramSegment(unsaved.verifiedOn)(Setter.optionParamSetter(TypoInstant.setter))}::timestamptz")),
+    unsaved.createdAt match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((sql""""created_at"""", sql"${Segment.paramSegment(value: TypoInstant)(TypoInstant.setter)}::timestamptz"))
+    }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into public.users default values
-            returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
-         """
+                            returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
+                         """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into public.users($names) values ($values) returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text"""
     }
     q.insertReturning(using UsersRow.jdbcDecoder).map(_.updatedKeys.head)
-    
+  
   }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""", batchSize, unsaved)(UsersRow.text)
-  }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UsersRowUnsaved.text)
-  }
-  override def select: SelectBuilder[UsersFields, UsersRow] = {
-    SelectBuilderSql("public.users", UsersFields.structure, UsersRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, UsersRow] = {
-    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users""".query(using UsersRow.jdbcDecoder).selectStream()
-  }
-  override def selectById(userId: UsersId): ZIO[ZConnection, Throwable, Option[UsersRow]] = {
-    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".query(using UsersRow.jdbcDecoder).selectOne
-  }
-  override def selectByIds(userIds: Array[UsersId]): ZStream[ZConnection, Throwable, UsersRow] = {
-    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ANY(${Segment.paramSegment(userIds)(UsersId.arraySetter)})""".query(using UsersRow.jdbcDecoder).selectStream()
-  }
-  override def selectByIdsTracked(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Map[UsersId, UsersRow]] = {
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""", batchSize, unsaved)(UsersRow.text)
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UsersRowUnsaved.text)
+  def select: SelectBuilder[UsersFields, UsersRow] = SelectBuilderSql("public.users", UsersFields.structure, UsersRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, UsersRow] = sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users""".query(using UsersRow.jdbcDecoder).selectStream()
+  def selectById(userId: UsersId): ZIO[ZConnection, Throwable, Option[UsersRow]] = sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".query(using UsersRow.jdbcDecoder).selectOne
+  def selectByIds(userIds: Array[UsersId]): ZStream[ZConnection, Throwable, UsersRow] = sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from public.users where "user_id" = ANY(${Segment.paramSegment(userIds)(UsersId.arraySetter)})""".query(using UsersRow.jdbcDecoder).selectStream()
+  def selectByIdsTracked(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Map[UsersId, UsersRow]] = {
     selectByIds(userIds).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.userId, x)).toMap
       userIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def selectByUniqueEmail(email: TypoUnknownCitext): ZIO[ZConnection, Throwable, Option[UsersRow]] = {
+  def selectByUniqueEmail(email: TypoUnknownCitext): ZIO[ZConnection, Throwable, Option[UsersRow]] = {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
           from public.users
           where "email" = ${Segment.paramSegment(email)(TypoUnknownCitext.setter)}
        """.query(using UsersRow.jdbcDecoder).selectOne
   }
-  override def update: UpdateBuilder[UsersFields, UsersRow] = {
-    UpdateBuilder("public.users", UsersFields.structure, UsersRow.jdbcDecoder)
-  }
-  override def update(row: UsersRow): ZIO[ZConnection, Throwable, Boolean] = {
+  def update: UpdateBuilder[UsersFields, UsersRow] = UpdateBuilder("public.users", UsersFields.structure, UsersRow.jdbcDecoder)
+  def update(row: UsersRow): ZIO[ZConnection, Throwable, Boolean] = {
     val userId = row.userId
     sql"""update public.users
           set "name" = ${Segment.paramSegment(row.name)(Setter.stringSetter)},
@@ -109,7 +89,7 @@ class UsersRepoImpl extends UsersRepo {
               "verified_on" = ${Segment.paramSegment(row.verifiedOn)(Setter.optionParamSetter(TypoInstant.setter))}::timestamptz
           where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".update.map(_ > 0)
   }
-  override def upsert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UpdateResult[UsersRow]] = {
+  def upsert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UpdateResult[UsersRow]] = {
     sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
           values (
             ${Segment.paramSegment(unsaved.userId)(UsersId.setter)}::uuid,
@@ -130,8 +110,8 @@ class UsersRepoImpl extends UsersRepo {
             "verified_on" = EXCLUDED."verified_on"
           returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text""".insertReturning(using UsersRow.jdbcDecoder)
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, UsersRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     val created = sql"create temporary table users_TEMP (like public.users) on commit drop".execute
     val copied = streamingInsert(s"""copy users_TEMP("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") from stdin""", batchSize, unsaved)(UsersRow.text)
     val merged = sql"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")

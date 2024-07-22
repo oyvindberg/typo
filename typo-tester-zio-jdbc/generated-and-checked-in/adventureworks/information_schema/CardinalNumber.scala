@@ -3,22 +3,23 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.information_schema
+package adventureworks.information_schema;
 
-import adventureworks.Text
-import java.sql.Types
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import java.sql.Types;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Domain `information_schema.cardinal_number`
   * Constraint: CHECK ((VALUE >= 0))
   */
 case class CardinalNumber(value: Int)
+
 object CardinalNumber {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[CardinalNumber]] = adventureworks.IntArrayDecoder.map(_.map(CardinalNumber.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[CardinalNumber]] = adventureworks.IntArrayEncoder.contramap(_.map(_.value))
@@ -30,8 +31,10 @@ object CardinalNumber {
   implicit lazy val jsonEncoder: JsonEncoder[CardinalNumber] = JsonEncoder.int.contramap(_.value)
   implicit lazy val pgType: PGType[CardinalNumber] = PGType.instance(""""information_schema"."cardinal_number"""", Types.OTHER)
   implicit lazy val setter: Setter[CardinalNumber] = Setter.intSetter.contramap(_.value)
-  implicit lazy val text: Text[CardinalNumber] = new Text[CardinalNumber] {
-    override def unsafeEncode(v: CardinalNumber, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: CardinalNumber, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[CardinalNumber] = {
+    new Text[CardinalNumber] {
+      override def unsafeEncode(v: CardinalNumber, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: CardinalNumber, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

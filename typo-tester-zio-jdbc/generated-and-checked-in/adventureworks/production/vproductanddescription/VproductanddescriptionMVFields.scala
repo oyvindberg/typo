@@ -3,15 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.vproductanddescription
+package adventureworks.production.vproductanddescription;
 
-import adventureworks.production.culture.CultureId
-import adventureworks.production.product.ProductId
-import adventureworks.public.Name
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.Structure.Relation
+import adventureworks.production.culture.CultureId;
+import adventureworks.production.product.ProductId;
+import adventureworks.public.Name;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait VproductanddescriptionMVFields {
   def productid: Field[ProductId, VproductanddescriptionMVRow]

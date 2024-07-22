@@ -3,11 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.vjobcandidateeducation
+package adventureworks.humanresources.vjobcandidateeducation;
 
-import typo.dsl.SelectBuilder
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
 trait VjobcandidateeducationViewRepo {
   def select: SelectBuilder[VjobcandidateeducationViewFields, VjobcandidateeducationViewRow]

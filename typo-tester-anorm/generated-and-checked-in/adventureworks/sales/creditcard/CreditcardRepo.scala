@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.creditcard
+package adventureworks.sales.creditcard;
 
-import adventureworks.userdefined.CustomCreditcardId
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import adventureworks.userdefined.CustomCreditcardId;
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait CreditcardRepo {
   def delete: DeleteBuilder[CreditcardFields, CreditcardRow]
@@ -18,7 +18,7 @@ trait CreditcardRepo {
   def insert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow
   def insert(unsaved: CreditcardRowUnsaved)(implicit c: Connection): CreditcardRow
   def insertStreaming(unsaved: Iterator[CreditcardRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[CreditcardRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[CreditcardFields, CreditcardRow]
   def selectAll(implicit c: Connection): List[CreditcardRow]
@@ -29,6 +29,6 @@ trait CreditcardRepo {
   def update(row: CreditcardRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow
   def upsertBatch(unsaved: Iterable[CreditcardRow])(implicit c: Connection): List[CreditcardRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[CreditcardRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

@@ -15,10 +15,10 @@ case class CustomType(
     toText: CustomType.Text,
     toTypoInArray: Option[CustomType.ToTypo] = None,
     fromTypoInArray: Option[CustomType.FromTypo] = None,
-    objBody: Option[sc.Type.Qualified => sc.Code] = None
+    objBody: sc.Type.Qualified => List[sc.ClassMember] = _ => Nil
 ) {
   def withComment(newComment: String): CustomType = copy(comment = comment + newComment)
-  def objBody0 = objBody.map(f => f(typoType))
+  def objBody0 = objBody(typoType)
   def toTypo0(expr: sc.Code): sc.Code = toTypo.toTypo(expr, typoType)
   def fromTypo0(expr: sc.Code): sc.Code = fromTypo.fromTypo0(expr)
 }

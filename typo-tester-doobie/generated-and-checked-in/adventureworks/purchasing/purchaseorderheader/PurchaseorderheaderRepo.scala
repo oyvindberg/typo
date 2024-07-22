@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.purchaseorderheader
+package adventureworks.purchasing.purchaseorderheader;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait PurchaseorderheaderRepo {
   def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
@@ -18,7 +18,7 @@ trait PurchaseorderheaderRepo {
   def insert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow]
   def insert(unsaved: PurchaseorderheaderRowUnsaved): ConnectionIO[PurchaseorderheaderRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, PurchaseorderheaderRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PurchaseorderheaderRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
   def selectAll: Stream[ConnectionIO, PurchaseorderheaderRow]
@@ -29,6 +29,6 @@ trait PurchaseorderheaderRepo {
   def update(row: PurchaseorderheaderRow): ConnectionIO[Boolean]
   def upsert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow]
   def upsertBatch(unsaved: List[PurchaseorderheaderRow]): Stream[ConnectionIO, PurchaseorderheaderRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, PurchaseorderheaderRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

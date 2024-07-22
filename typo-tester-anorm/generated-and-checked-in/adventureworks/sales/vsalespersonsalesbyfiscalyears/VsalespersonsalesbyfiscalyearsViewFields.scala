@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.vsalespersonsalesbyfiscalyears
+package adventureworks.sales.vsalespersonsalesbyfiscalyears;
 
-import typo.dsl.Path
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait VsalespersonsalesbyfiscalyearsViewFields {
   def salesPersonID: OptField[Int, VsalespersonsalesbyfiscalyearsViewRow]

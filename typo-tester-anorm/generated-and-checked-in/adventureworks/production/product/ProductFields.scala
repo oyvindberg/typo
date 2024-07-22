@@ -3,29 +3,29 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.product
+package adventureworks.production.product;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.production.productmodel.ProductmodelFields
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.production.productmodel.ProductmodelRow
-import adventureworks.production.productsubcategory.ProductsubcategoryFields
-import adventureworks.production.productsubcategory.ProductsubcategoryId
-import adventureworks.production.productsubcategory.ProductsubcategoryRow
-import adventureworks.production.unitmeasure.UnitmeasureFields
-import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.production.unitmeasure.UnitmeasureRow
-import adventureworks.public.Flag
-import adventureworks.public.Name
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.production.productmodel.ProductmodelFields;
+import adventureworks.production.productmodel.ProductmodelId;
+import adventureworks.production.productmodel.ProductmodelRow;
+import adventureworks.production.productsubcategory.ProductsubcategoryFields;
+import adventureworks.production.productsubcategory.ProductsubcategoryId;
+import adventureworks.production.productsubcategory.ProductsubcategoryRow;
+import adventureworks.production.unitmeasure.UnitmeasureFields;
+import adventureworks.production.unitmeasure.UnitmeasureId;
+import adventureworks.production.unitmeasure.UnitmeasureRow;
+import adventureworks.public.Flag;
+import adventureworks.public.Name;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait ProductFields {
   def productid: IdField[ProductId, ProductRow]

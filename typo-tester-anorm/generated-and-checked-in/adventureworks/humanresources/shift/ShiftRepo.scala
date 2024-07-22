@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.shift
+package adventureworks.humanresources.shift;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait ShiftRepo {
   def delete: DeleteBuilder[ShiftFields, ShiftRow]
@@ -17,7 +17,7 @@ trait ShiftRepo {
   def insert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow
   def insert(unsaved: ShiftRowUnsaved)(implicit c: Connection): ShiftRow
   def insertStreaming(unsaved: Iterator[ShiftRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[ShiftRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[ShiftFields, ShiftRow]
   def selectAll(implicit c: Connection): List[ShiftRow]
@@ -28,6 +28,6 @@ trait ShiftRepo {
   def update(row: ShiftRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow
   def upsertBatch(unsaved: Iterable[ShiftRow])(implicit c: Connection): List[ShiftRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[ShiftRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

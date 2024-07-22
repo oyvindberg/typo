@@ -3,25 +3,25 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.customer
+package adventureworks.sales.customer;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.person.person.PersonFields
-import adventureworks.person.person.PersonRow
-import adventureworks.sales.salesterritory.SalesterritoryFields
-import adventureworks.sales.salesterritory.SalesterritoryId
-import adventureworks.sales.salesterritory.SalesterritoryRow
-import adventureworks.sales.store.StoreFields
-import adventureworks.sales.store.StoreRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.person.person.PersonFields;
+import adventureworks.person.person.PersonRow;
+import adventureworks.sales.salesterritory.SalesterritoryFields;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import adventureworks.sales.salesterritory.SalesterritoryRow;
+import adventureworks.sales.store.StoreFields;
+import adventureworks.sales.store.StoreRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait CustomerFields {
   def customerid: IdField[CustomerId, CustomerRow]

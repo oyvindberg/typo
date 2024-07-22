@@ -3,16 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person_dynamic
+package adventureworks.person_dynamic;
 
-import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import zio.jdbc.SqlFragment.Segment;
+import zio.jdbc.SqlFragment.Setter;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class PersonDynamicSqlRepoImpl extends PersonDynamicSqlRepo {
-  override def apply(firstName: Option[String]): ZStream[ZConnection, Throwable, PersonDynamicSqlRow] = {
+  def apply(firstName: Option[String]): ZStream[ZConnection, Throwable, PersonDynamicSqlRow] = {
     val sql =
       sql"""SELECT p.title, p.firstname, p.middlename, p.lastname
             FROM person.person p

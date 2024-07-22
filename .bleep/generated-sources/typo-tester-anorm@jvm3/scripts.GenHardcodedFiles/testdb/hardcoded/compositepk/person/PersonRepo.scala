@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.compositepk.person
+package testdb.hardcoded.compositepk.person;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait PersonRepo {
   def delete: DeleteBuilder[PersonFields, PersonRow]
@@ -16,17 +16,17 @@ trait PersonRepo {
   def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow
   def insert(unsaved: PersonRowUnsaved)(implicit c: Connection): PersonRow
   def insertStreaming(unsaved: Iterator[PersonRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[PersonRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[PersonFields, PersonRow]
   def selectAll(implicit c: Connection): List[PersonRow]
-  def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]])(implicit c: Connection): List[PersonRow]
+  def selectByFieldValues(fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): List[PersonRow]
   def selectById(compositeId: PersonId)(implicit c: Connection): Option[PersonRow]
   def update: UpdateBuilder[PersonFields, PersonRow]
   def update(row: PersonRow)(implicit c: Connection): Boolean
   def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean
   def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow
   def upsertBatch(unsaved: Iterable[PersonRow])(implicit c: Connection): List[PersonRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[PersonRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

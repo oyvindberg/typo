@@ -3,115 +3,95 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.creditcard
+package adventureworks.sales.creditcard;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.userdefined.CustomCreditcardId
-import cats.instances.list.catsStdInstancesForList
-import doobie.free.connection.ConnectionIO
-import doobie.postgres.syntax.FragmentOps
-import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
-import doobie.syntax.string.toSqlInterpolator
-import doobie.util.Write
-import doobie.util.fragment.Fragment
-import doobie.util.meta.Meta
-import doobie.util.update.Update
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import typo.dsl.UpdateBuilder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.userdefined.CustomCreditcardId;
+import cats.instances.list.catsStdInstancesForList;
+import doobie.free.connection.ConnectionIO;
+import doobie.postgres.syntax.FragmentOps;
+import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite;
+import doobie.syntax.string.toSqlInterpolator;
+import doobie.util.Write;
+import doobie.util.fragment.Fragment;
+import doobie.util.meta.Meta;
+import doobie.util.update.Update;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import typo.dsl.UpdateBuilder;
 
 class CreditcardRepoImpl extends CreditcardRepo {
-  override def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = {
-    DeleteBuilder("sales.creditcard", CreditcardFields.structure)
-  }
-  override def deleteById(creditcardid: /* user-picked */ CustomCreditcardId): ConnectionIO[Boolean] = {
-    sql"""delete from sales.creditcard where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".update.run.map(_ > 0)
-  }
-  override def deleteByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId]): ConnectionIO[Int] = {
-    sql"""delete from sales.creditcard where "creditcardid" = ANY(${fromWrite(creditcardids)(Write.fromPut(CustomCreditcardId.arrayPut))})""".update.run
-  }
-  override def insert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
+  def delete: DeleteBuilder[CreditcardFields, CreditcardRow] = DeleteBuilder("sales.creditcard", CreditcardFields.structure)
+  def deleteById(creditcardid: /* user-picked */ CustomCreditcardId): ConnectionIO[Boolean] = sql"""delete from sales.creditcard where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".update.run.map(_ > 0)
+  def deleteByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId]): ConnectionIO[Int] = sql"""delete from sales.creditcard where "creditcardid" = ANY(${fromWrite(creditcardids)(Write.fromPut(CustomCreditcardId.arrayPut))})""".update.run
+  def insert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     sql"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
           values (${fromWrite(unsaved.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4, ${fromWrite(unsaved.cardtype)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.cardnumber)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.expmonth)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.expyear)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
        """.query(using CreditcardRow.read).unique
   }
-  override def insert(unsaved: CreditcardRowUnsaved): ConnectionIO[CreditcardRow] = {
+  def insert(unsaved: CreditcardRowUnsaved): ConnectionIO[CreditcardRow] = {
     val fs = List(
       Some((Fragment.const0(s""""cardtype""""), fr"${fromWrite(unsaved.cardtype)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""cardnumber""""), fr"${fromWrite(unsaved.cardnumber)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""expmonth""""), fr"${fromWrite(unsaved.expmonth)(Write.fromPut(TypoShort.put))}::int2")),
-      Some((Fragment.const0(s""""expyear""""), fr"${fromWrite(unsaved.expyear)(Write.fromPut(TypoShort.put))}::int2")),
-      unsaved.creditcardid match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""creditcardid""""), fr"${fromWrite(value: /* user-picked */ CustomCreditcardId)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4"))
-      },
-      unsaved.modifieddate match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
-      }
+                      Some((Fragment.const0(s""""cardnumber""""), fr"${fromWrite(unsaved.cardnumber)(Write.fromPut(Meta.StringMeta.put))}")),
+                      Some((Fragment.const0(s""""expmonth""""), fr"${fromWrite(unsaved.expmonth)(Write.fromPut(TypoShort.put))}::int2")),
+                      Some((Fragment.const0(s""""expyear""""), fr"${fromWrite(unsaved.expyear)(Write.fromPut(TypoShort.put))}::int2")),
+    unsaved.creditcardid match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((Fragment.const0(s""""creditcardid""""), fr"${fromWrite(value: /* user-picked */ CustomCreditcardId)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4"))
+    },
+    unsaved.modifieddate match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+    }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into sales.creditcard default values
-            returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
-         """
+                            returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
+                         """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
       sql"""insert into sales.creditcard(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
-            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
-            returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
-         """
+                            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
+                            returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
+                         """
     }
     q.query(using CreditcardRow.read).unique
-    
+  
   }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, CreditcardRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CreditcardRow.text)
-  }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CreditcardRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.creditcard("cardtype", "cardnumber", "expmonth", "expyear", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using CreditcardRowUnsaved.text)
-  }
-  override def select: SelectBuilder[CreditcardFields, CreditcardRow] = {
-    SelectBuilderSql("sales.creditcard", CreditcardFields.structure, CreditcardRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, CreditcardRow] = {
-    sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard""".query(using CreditcardRow.read).stream
-  }
-  override def selectById(creditcardid: /* user-picked */ CustomCreditcardId): ConnectionIO[Option[CreditcardRow]] = {
-    sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".query(using CreditcardRow.read).option
-  }
-  override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId]): Stream[ConnectionIO, CreditcardRow] = {
-    sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ANY(${fromWrite(creditcardids)(Write.fromPut(CustomCreditcardId.arrayPut))})""".query(using CreditcardRow.read).stream
-  }
-  override def selectByIdsTracked(creditcardids: Array[/* user-picked */ CustomCreditcardId]): ConnectionIO[Map[/* user-picked */ CustomCreditcardId, CreditcardRow]] = {
+  def insertStreaming(unsaved: Stream[ConnectionIO, CreditcardRow], batchSize: Int = 10000): ConnectionIO[Long] = new FragmentOps(sql"""COPY sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CreditcardRow.text)
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CreditcardRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = new FragmentOps(sql"""COPY sales.creditcard("cardtype", "cardnumber", "expmonth", "expyear", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using CreditcardRowUnsaved.text)
+  def select: SelectBuilder[CreditcardFields, CreditcardRow] = SelectBuilderSql("sales.creditcard", CreditcardFields.structure, CreditcardRow.read)
+  def selectAll: Stream[ConnectionIO, CreditcardRow] = sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard""".query(using CreditcardRow.read).stream
+  def selectById(creditcardid: /* user-picked */ CustomCreditcardId): ConnectionIO[Option[CreditcardRow]] = sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".query(using CreditcardRow.read).option
+  def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId]): Stream[ConnectionIO, CreditcardRow] = sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from sales.creditcard where "creditcardid" = ANY(${fromWrite(creditcardids)(Write.fromPut(CustomCreditcardId.arrayPut))})""".query(using CreditcardRow.read).stream
+  def selectByIdsTracked(creditcardids: Array[/* user-picked */ CustomCreditcardId]): ConnectionIO[Map[/* user-picked */ CustomCreditcardId, CreditcardRow]] = {
     selectByIds(creditcardids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.creditcardid, x)).toMap
       creditcardids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
-    UpdateBuilder("sales.creditcard", CreditcardFields.structure, CreditcardRow.read)
-  }
-  override def update(row: CreditcardRow): ConnectionIO[Boolean] = {
+  def update: UpdateBuilder[CreditcardFields, CreditcardRow] = UpdateBuilder("sales.creditcard", CreditcardFields.structure, CreditcardRow.read)
+  def update(row: CreditcardRow): ConnectionIO[Boolean] = {
     val creditcardid = row.creditcardid
     sql"""update sales.creditcard
-          set "cardtype" = ${fromWrite(row.cardtype)(Write.fromPut(Meta.StringMeta.put))},
-              "cardnumber" = ${fromWrite(row.cardnumber)(Write.fromPut(Meta.StringMeta.put))},
-              "expmonth" = ${fromWrite(row.expmonth)(Write.fromPut(TypoShort.put))}::int2,
-              "expyear" = ${fromWrite(row.expyear)(Write.fromPut(TypoShort.put))}::int2,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}"""
+                          set "cardtype" = ${fromWrite(row.cardtype)(Write.fromPut(Meta.StringMeta.put))},
+                              "cardnumber" = ${fromWrite(row.cardnumber)(Write.fromPut(Meta.StringMeta.put))},
+                              "expmonth" = ${fromWrite(row.expmonth)(Write.fromPut(TypoShort.put))}::int2,
+                              "expyear" = ${fromWrite(row.expyear)(Write.fromPut(TypoShort.put))}::int2,
+                              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+                          where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}"""
       .update
       .run
       .map(_ > 0)
   }
-  override def upsert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
+  def upsert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     sql"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
           values (
             ${fromWrite(unsaved.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4,
@@ -131,7 +111,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
           returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
        """.query(using CreditcardRow.read).unique
   }
-  override def upsertBatch(unsaved: List[CreditcardRow]): Stream[ConnectionIO, CreditcardRow] = {
+  def upsertBatch(unsaved: List[CreditcardRow]): Stream[ConnectionIO, CreditcardRow] = {
     Update[CreditcardRow](
       s"""insert into sales.creditcard("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
           values (?::int4,?,?,?::int2,?::int2,?::timestamp)
@@ -146,8 +126,8 @@ class CreditcardRepoImpl extends CreditcardRepo {
     )(using CreditcardRow.write)
     .updateManyWithGeneratedKeys[CreditcardRow]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(unsaved)(using catsStdInstancesForList, CreditcardRow.read)
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Stream[ConnectionIO, CreditcardRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, CreditcardRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
       _ <- sql"create temporary table creditcard_TEMP (like sales.creditcard) on commit drop".update.run
       _ <- new FragmentOps(sql"""copy creditcard_TEMP("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using CreditcardRow.text)

@@ -3,65 +3,62 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesorderheadersalesreason
+package adventureworks.sales.salesorderheadersalesreason;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.sales.salesorderheader.SalesorderheaderId
-import adventureworks.sales.salesreason.SalesreasonId
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.sales.salesorderheader.SalesorderheaderId;
+import adventureworks.sales.salesreason.SalesreasonId;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** This class corresponds to a row in table `sales.salesorderheadersalesreason` which has not been persisted yet */
-case class SalesorderheadersalesreasonRowUnsaved(
-  /** Primary key. Foreign key to SalesOrderHeader.SalesOrderID.
-      Points to [[adventureworks.sales.salesorderheader.SalesorderheaderRow.salesorderid]] */
-  salesorderid: SalesorderheaderId,
-  /** Primary key. Foreign key to SalesReason.SalesReasonID.
-      Points to [[adventureworks.sales.salesreason.SalesreasonRow.salesreasonid]] */
-  salesreasonid: SalesreasonId,
-  /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-) {
-  def toRow(modifieddateDefault: => TypoLocalDateTime): SalesorderheadersalesreasonRow =
-    SalesorderheadersalesreasonRow(
-      salesorderid = salesorderid,
-      salesreasonid = salesreasonid,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
-    )
+case class SalesorderheadersalesreasonRowUnsaved(/** Primary key. Foreign key to SalesOrderHeader.SalesOrderID.
+                                                   * Points to [[adventureworks.sales.salesorderheader.SalesorderheaderRow.salesorderid]]
+                                                   */
+                                                 salesorderid: SalesorderheaderId, /** Primary key. Foreign key to SalesReason.SalesReasonID.
+                                                   * Points to [[adventureworks.sales.salesreason.SalesreasonRow.salesreasonid]]
+                                                   */
+                                                 salesreasonid: SalesreasonId, /** Default: now() */
+                                                 modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()) {
+  def toRow(modifieddateDefault: => TypoLocalDateTime): SalesorderheadersalesreasonRow = new SalesorderheadersalesreasonRow(salesorderid = salesorderid, salesreasonid = salesreasonid, modifieddate = modifieddate.getOrElse(modifieddateDefault))
 }
+
 object SalesorderheadersalesreasonRowUnsaved {
-  implicit lazy val reads: Reads[SalesorderheadersalesreasonRowUnsaved] = Reads[SalesorderheadersalesreasonRowUnsaved](json => JsResult.fromTry(
-      Try(
-        SalesorderheadersalesreasonRowUnsaved(
-          salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
-          salesreasonid = json.\("salesreasonid").as(SalesreasonId.reads),
-          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+  implicit lazy val reads: Reads[SalesorderheadersalesreasonRowUnsaved] = {
+    Reads[SalesorderheadersalesreasonRowUnsaved](json => JsResult.fromTry(
+        Try(
+          SalesorderheadersalesreasonRowUnsaved(
+            salesorderid = json.\("salesorderid").as(SalesorderheaderId.reads),
+            salesreasonid = json.\("salesreasonid").as(SalesreasonId.reads),
+            modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+          )
         )
-      )
-    ),
-  )
-  implicit lazy val text: Text[SalesorderheadersalesreasonRowUnsaved] = Text.instance[SalesorderheadersalesreasonRowUnsaved]{ (row, sb) =>
-    SalesorderheaderId.text.unsafeEncode(row.salesorderid, sb)
-    sb.append(Text.DELIMETER)
-    SalesreasonId.text.unsafeEncode(row.salesreasonid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+      ),
+    )
   }
-  implicit lazy val writes: OWrites[SalesorderheadersalesreasonRowUnsaved] = OWrites[SalesorderheadersalesreasonRowUnsaved](o =>
-    new JsObject(ListMap[String, JsValue](
-      "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
-      "salesreasonid" -> SalesreasonId.writes.writes(o.salesreasonid),
-      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
-    ))
-  )
+  implicit lazy val text: Text[SalesorderheadersalesreasonRowUnsaved] = {
+    Text.instance[SalesorderheadersalesreasonRowUnsaved]{ (row, sb) =>
+      SalesorderheaderId.text.unsafeEncode(row.salesorderid, sb)
+      sb.append(Text.DELIMETER)
+      SalesreasonId.text.unsafeEncode(row.salesreasonid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[SalesorderheadersalesreasonRowUnsaved] = {
+    OWrites[SalesorderheadersalesreasonRowUnsaved](o =>
+      new JsObject(ListMap[String, JsValue](
+        "salesorderid" -> SalesorderheaderId.writes.writes(o.salesorderid),
+        "salesreasonid" -> SalesreasonId.writes.writes(o.salesreasonid),
+        "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
+      ))
+    )
+  }
 }

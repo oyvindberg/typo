@@ -3,45 +3,38 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.countryregioncurrency
+package adventureworks.sales.countryregioncurrency;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.sales.currency.CurrencyId
-import doobie.postgres.Text
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.countryregion.CountryregionId;
+import adventureworks.sales.currency.CurrencyId;
+import doobie.postgres.Text;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** This class corresponds to a row in table `sales.countryregioncurrency` which has not been persisted yet */
-case class CountryregioncurrencyRowUnsaved(
-  /** ISO code for countries and regions. Foreign key to CountryRegion.CountryRegionCode.
-      Points to [[adventureworks.person.countryregion.CountryregionRow.countryregioncode]] */
-  countryregioncode: CountryregionId,
-  /** ISO standard currency code. Foreign key to Currency.CurrencyCode.
-      Points to [[adventureworks.sales.currency.CurrencyRow.currencycode]] */
-  currencycode: CurrencyId,
-  /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-) {
-  def toRow(modifieddateDefault: => TypoLocalDateTime): CountryregioncurrencyRow =
-    CountryregioncurrencyRow(
-      countryregioncode = countryregioncode,
-      currencycode = currencycode,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
-    )
+case class CountryregioncurrencyRowUnsaved(/** ISO code for countries and regions. Foreign key to CountryRegion.CountryRegionCode.
+                                             * Points to [[adventureworks.person.countryregion.CountryregionRow.countryregioncode]]
+                                             */
+                                           countryregioncode: CountryregionId, /** ISO standard currency code. Foreign key to Currency.CurrencyCode.
+                                             * Points to [[adventureworks.sales.currency.CurrencyRow.currencycode]]
+                                             */
+                                           currencycode: CurrencyId, /** Default: now() */
+                                           modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()) {
+  def toRow(modifieddateDefault: => TypoLocalDateTime): CountryregioncurrencyRow = new CountryregioncurrencyRow(countryregioncode = countryregioncode, currencycode = currencycode, modifieddate = modifieddate.getOrElse(modifieddateDefault))
 }
+
 object CountryregioncurrencyRowUnsaved {
   implicit lazy val decoder: Decoder[CountryregioncurrencyRowUnsaved] = Decoder.forProduct3[CountryregioncurrencyRowUnsaved, CountryregionId, CurrencyId, Defaulted[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(CountryregioncurrencyRowUnsaved.apply)(CountryregionId.decoder, CurrencyId.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[CountryregioncurrencyRowUnsaved] = Encoder.forProduct3[CountryregioncurrencyRowUnsaved, CountryregionId, CurrencyId, Defaulted[TypoLocalDateTime]]("countryregioncode", "currencycode", "modifieddate")(x => (x.countryregioncode, x.currencycode, x.modifieddate))(CountryregionId.encoder, CurrencyId.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
-  implicit lazy val text: Text[CountryregioncurrencyRowUnsaved] = Text.instance[CountryregioncurrencyRowUnsaved]{ (row, sb) =>
-    CountryregionId.text.unsafeEncode(row.countryregioncode, sb)
-    sb.append(Text.DELIMETER)
-    CurrencyId.text.unsafeEncode(row.currencycode, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  implicit lazy val text: Text[CountryregioncurrencyRowUnsaved] = {
+    Text.instance[CountryregioncurrencyRowUnsaved]{ (row, sb) =>
+      CountryregionId.text.unsafeEncode(row.countryregioncode, sb)
+      sb.append(Text.DELIMETER)
+      CurrencyId.text.unsafeEncode(row.currencycode, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
   }
 }

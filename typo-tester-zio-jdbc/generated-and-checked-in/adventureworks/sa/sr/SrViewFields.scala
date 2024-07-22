@@ -3,15 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.sr
+package adventureworks.sa.sr;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import adventureworks.sales.salesreason.SalesreasonId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import adventureworks.sales.salesreason.SalesreasonId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait SrViewFields {
   def id: Field[SalesreasonId, SrViewRow]

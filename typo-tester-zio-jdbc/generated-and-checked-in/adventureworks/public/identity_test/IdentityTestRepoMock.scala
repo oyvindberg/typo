@@ -3,36 +3,29 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.identity_test
+package adventureworks.public.identity_test;
 
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.DeleteBuilder.DeleteBuilderMock
-import typo.dsl.DeleteParams
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderMock
-import typo.dsl.SelectParams
-import typo.dsl.UpdateBuilder
-import typo.dsl.UpdateBuilder.UpdateBuilderMock
-import typo.dsl.UpdateParams
-import zio.Chunk
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import scala.annotation.nowarn;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.DeleteBuilder.DeleteBuilderMock;
+import typo.dsl.DeleteParams;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderMock;
+import typo.dsl.SelectParams;
+import typo.dsl.UpdateBuilder;
+import typo.dsl.UpdateBuilder.UpdateBuilderMock;
+import typo.dsl.UpdateParams;
+import zio.Chunk;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
-class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTestRow],
-                           map: scala.collection.mutable.Map[IdentityTestId, IdentityTestRow] = scala.collection.mutable.Map.empty) extends IdentityTestRepo {
-  override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
-    DeleteBuilderMock(DeleteParams.empty, IdentityTestFields.structure, map)
-  }
-  override def deleteById(name: IdentityTestId): ZIO[ZConnection, Throwable, Boolean] = {
-    ZIO.succeed(map.remove(name).isDefined)
-  }
-  override def deleteByIds(names: Array[IdentityTestId]): ZIO[ZConnection, Throwable, Long] = {
-    ZIO.succeed(names.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def insert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, IdentityTestRow] = {
+class IdentityTestRepoMock(val toRow: Function1[IdentityTestRowUnsaved, IdentityTestRow], val map: scala.collection.mutable.Map[IdentityTestId, IdentityTestRow] = scala.collection.mutable.Map.empty) extends IdentityTestRepo {
+  def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = DeleteBuilderMock(DeleteParams.empty, IdentityTestFields.structure, map)
+  def deleteById(name: IdentityTestId): ZIO[ZConnection, Throwable, Boolean] = ZIO.succeed(map.remove(name).isDefined)
+  def deleteByIds(names: Array[IdentityTestId]): ZIO[ZConnection, Throwable, Long] = ZIO.succeed(names.map(id => map.remove(id)).count(_.isDefined).toLong)
+  def insert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, IdentityTestRow] = {
     ZIO.succeed {
       val _ =
         if (map.contains(unsaved.name))
@@ -43,10 +36,8 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
       unsaved
     }
   }
-  override def insert(unsaved: IdentityTestRowUnsaved): ZIO[ZConnection, Throwable, IdentityTestRow] = {
-    insert(toRow(unsaved))
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+  def insert(unsaved: IdentityTestRowUnsaved): ZIO[ZConnection, Throwable, IdentityTestRow] = insert(toRow(unsaved))
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
         map += (row.name -> row)
@@ -54,8 +45,8 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
       }
     }.runLast.map(_.getOrElse(0L))
   }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, unsavedRow) =>
       ZIO.succeed {
         val row = toRow(unsavedRow)
@@ -64,28 +55,18 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
       }
     }.runLast.map(_.getOrElse(0L))
   }
-  override def select: SelectBuilder[IdentityTestFields, IdentityTestRow] = {
-    SelectBuilderMock(IdentityTestFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, IdentityTestRow] = {
-    ZStream.fromIterable(map.values)
-  }
-  override def selectById(name: IdentityTestId): ZIO[ZConnection, Throwable, Option[IdentityTestRow]] = {
-    ZIO.succeed(map.get(name))
-  }
-  override def selectByIds(names: Array[IdentityTestId]): ZStream[ZConnection, Throwable, IdentityTestRow] = {
-    ZStream.fromIterable(names.flatMap(map.get))
-  }
-  override def selectByIdsTracked(names: Array[IdentityTestId]): ZIO[ZConnection, Throwable, Map[IdentityTestId, IdentityTestRow]] = {
+  def select: SelectBuilder[IdentityTestFields, IdentityTestRow] = SelectBuilderMock(IdentityTestFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+  def selectAll: ZStream[ZConnection, Throwable, IdentityTestRow] = ZStream.fromIterable(map.values)
+  def selectById(name: IdentityTestId): ZIO[ZConnection, Throwable, Option[IdentityTestRow]] = ZIO.succeed(map.get(name))
+  def selectByIds(names: Array[IdentityTestId]): ZStream[ZConnection, Throwable, IdentityTestRow] = ZStream.fromIterable(names.flatMap(map.get))
+  def selectByIdsTracked(names: Array[IdentityTestId]): ZIO[ZConnection, Throwable, Map[IdentityTestId, IdentityTestRow]] = {
     selectByIds(names).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.name, x)).toMap
       names.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
-    UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure, map)
-  }
-  override def update(row: IdentityTestRow): ZIO[ZConnection, Throwable, Boolean] = {
+  def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure, map)
+  def update(row: IdentityTestRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.name) match {
         case Some(`row`) => false
@@ -96,14 +77,14 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
       }
     }
   }
-  override def upsert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, UpdateResult[IdentityTestRow]] = {
+  def upsert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, UpdateResult[IdentityTestRow]] = {
     ZIO.succeed {
       map.put(unsaved.name, unsaved): @nowarn
       UpdateResult(1, Chunk.single(unsaved))
     }
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
         map += (row.name -> row)

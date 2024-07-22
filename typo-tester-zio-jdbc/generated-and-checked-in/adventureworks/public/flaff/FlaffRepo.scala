@@ -3,16 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.flaff
+package adventureworks.public.flaff;
 
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
+/** upsertBatch: Not implementable for zio-jdbc */
 trait FlaffRepo {
   def delete: DeleteBuilder[FlaffFields, FlaffRow]
   def deleteById(compositeId: FlaffId): ZIO[ZConnection, Throwable, Boolean]
@@ -27,7 +28,6 @@ trait FlaffRepo {
   def update: UpdateBuilder[FlaffFields, FlaffRow]
   def update(row: FlaffRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, UpdateResult[FlaffRow]]
-  // Not implementable for zio-jdbc: upsertBatch
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, FlaffRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

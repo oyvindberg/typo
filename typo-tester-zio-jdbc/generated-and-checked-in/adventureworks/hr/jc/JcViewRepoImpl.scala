@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.hr.jc
+package adventureworks.hr.jc;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class JcViewRepoImpl extends JcViewRepo {
-  override def select: SelectBuilder[JcViewFields, JcViewRow] = {
-    SelectBuilderSql("hr.jc", JcViewFields.structure, JcViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, JcViewRow] = {
-    sql"""select "id", "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from hr.jc""".query(using JcViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[JcViewFields, JcViewRow] = SelectBuilderSql("hr.jc", JcViewFields.structure, JcViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, JcViewRow] = sql"""select "id", "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from hr.jc""".query(using JcViewRow.jdbcDecoder).selectStream()
 }

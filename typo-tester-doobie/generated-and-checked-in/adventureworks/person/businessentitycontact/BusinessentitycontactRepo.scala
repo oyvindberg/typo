@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.businessentitycontact
+package adventureworks.person.businessentitycontact;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait BusinessentitycontactRepo {
   def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
@@ -18,7 +18,7 @@ trait BusinessentitycontactRepo {
   def insert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow]
   def insert(unsaved: BusinessentitycontactRowUnsaved): ConnectionIO[BusinessentitycontactRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentitycontactRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BusinessentitycontactRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def selectAll: Stream[ConnectionIO, BusinessentitycontactRow]
@@ -29,6 +29,6 @@ trait BusinessentitycontactRepo {
   def update(row: BusinessentitycontactRow): ConnectionIO[Boolean]
   def upsert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow]
   def upsertBatch(unsaved: List[BusinessentitycontactRow]): Stream[ConnectionIO, BusinessentitycontactRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, BusinessentitycontactRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

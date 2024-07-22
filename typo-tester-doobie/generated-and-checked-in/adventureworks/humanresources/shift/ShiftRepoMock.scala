@@ -3,34 +3,27 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.shift
+package adventureworks.humanresources.shift;
 
-import doobie.free.connection.ConnectionIO
-import doobie.free.connection.delay
-import fs2.Stream
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.DeleteBuilder.DeleteBuilderMock
-import typo.dsl.DeleteParams
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderMock
-import typo.dsl.SelectParams
-import typo.dsl.UpdateBuilder
-import typo.dsl.UpdateBuilder.UpdateBuilderMock
-import typo.dsl.UpdateParams
+import doobie.free.connection.ConnectionIO;
+import doobie.free.connection.delay;
+import fs2.Stream;
+import scala.annotation.nowarn;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.DeleteBuilder.DeleteBuilderMock;
+import typo.dsl.DeleteParams;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderMock;
+import typo.dsl.SelectParams;
+import typo.dsl.UpdateBuilder;
+import typo.dsl.UpdateBuilder.UpdateBuilderMock;
+import typo.dsl.UpdateParams;
 
-class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
-                    map: scala.collection.mutable.Map[ShiftId, ShiftRow] = scala.collection.mutable.Map.empty) extends ShiftRepo {
-  override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilderMock(DeleteParams.empty, ShiftFields.structure, map)
-  }
-  override def deleteById(shiftid: ShiftId): ConnectionIO[Boolean] = {
-    delay(map.remove(shiftid).isDefined)
-  }
-  override def deleteByIds(shiftids: Array[ShiftId]): ConnectionIO[Int] = {
-    delay(shiftids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
+class ShiftRepoMock(val toRow: Function1[ShiftRowUnsaved, ShiftRow], val map: scala.collection.mutable.Map[ShiftId, ShiftRow] = scala.collection.mutable.Map.empty) extends ShiftRepo {
+  def delete: DeleteBuilder[ShiftFields, ShiftRow] = DeleteBuilderMock(DeleteParams.empty, ShiftFields.structure, map)
+  def deleteById(shiftid: ShiftId): ConnectionIO[Boolean] = delay(map.remove(shiftid).isDefined)
+  def deleteByIds(shiftids: Array[ShiftId]): ConnectionIO[Int] = delay(shiftids.map(id => map.remove(id)).count(_.isDefined))
+  def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     delay {
       val _ = if (map.contains(unsaved.shiftid))
         sys.error(s"id ${unsaved.shiftid} already exists")
@@ -40,10 +33,8 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
       unsaved
     }
   }
-  override def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = {
-    insert(toRow(unsaved))
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int = 10000): ConnectionIO[Long] = {
+  def insert(unsaved: ShiftRowUnsaved): ConnectionIO[ShiftRow] = insert(toRow(unsaved))
+  def insertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int = 10000): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
       rows.foreach { row =>
@@ -53,8 +44,8 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
       num
     }
   }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShiftRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShiftRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
     unsaved.compile.toList.map { unsavedRows =>
       var num = 0L
       unsavedRows.foreach { unsavedRow =>
@@ -65,28 +56,18 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
       num
     }
   }
-  override def select: SelectBuilder[ShiftFields, ShiftRow] = {
-    SelectBuilderMock(ShiftFields.structure, delay(map.values.toList), SelectParams.empty)
-  }
-  override def selectAll: Stream[ConnectionIO, ShiftRow] = {
-    Stream.emits(map.values.toList)
-  }
-  override def selectById(shiftid: ShiftId): ConnectionIO[Option[ShiftRow]] = {
-    delay(map.get(shiftid))
-  }
-  override def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow] = {
-    Stream.emits(shiftids.flatMap(map.get).toList)
-  }
-  override def selectByIdsTracked(shiftids: Array[ShiftId]): ConnectionIO[Map[ShiftId, ShiftRow]] = {
+  def select: SelectBuilder[ShiftFields, ShiftRow] = SelectBuilderMock(ShiftFields.structure, delay(map.values.toList), SelectParams.empty)
+  def selectAll: Stream[ConnectionIO, ShiftRow] = Stream.emits(map.values.toList)
+  def selectById(shiftid: ShiftId): ConnectionIO[Option[ShiftRow]] = delay(map.get(shiftid))
+  def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow] = Stream.emits(shiftids.flatMap(map.get).toList)
+  def selectByIdsTracked(shiftids: Array[ShiftId]): ConnectionIO[Map[ShiftId, ShiftRow]] = {
     selectByIds(shiftids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.shiftid, x)).toMap
       shiftids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure, map)
-  }
-  override def update(row: ShiftRow): ConnectionIO[Boolean] = {
+  def update: UpdateBuilder[ShiftFields, ShiftRow] = UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure, map)
+  def update(row: ShiftRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.shiftid) match {
         case Some(`row`) => false
@@ -97,13 +78,13 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
       }
     }
   }
-  override def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
+  def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     delay {
       map.put(unsaved.shiftid, unsaved): @nowarn
       unsaved
     }
   }
-  override def upsertBatch(unsaved: List[ShiftRow]): Stream[ConnectionIO, ShiftRow] = {
+  def upsertBatch(unsaved: List[ShiftRow]): Stream[ConnectionIO, ShiftRow] = {
     Stream.emits {
       unsaved.map { row =>
         map += (row.shiftid -> row)
@@ -111,8 +92,8 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
       }
     }
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     unsaved.compile.toList.map { rows =>
       var num = 0
       rows.foreach { row =>

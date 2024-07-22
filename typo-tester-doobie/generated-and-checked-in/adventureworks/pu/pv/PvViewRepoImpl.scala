@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pu.pv
+package adventureworks.pu.pv;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class PvViewRepoImpl extends PvViewRepo {
-  override def select: SelectBuilder[PvViewFields, PvViewRow] = {
-    SelectBuilderSql("pu.pv", PvViewFields.structure, PvViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, PvViewRow] = {
-    sql"""select "id", "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from pu.pv""".query(using PvViewRow.read).stream
-  }
+  def select: SelectBuilder[PvViewFields, PvViewRow] = SelectBuilderSql("pu.pv", PvViewFields.structure, PvViewRow.read)
+  def selectAll: Stream[ConnectionIO, PvViewRow] = sql"""select "id", "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from pu.pv""".query(using PvViewRow.read).stream
 }

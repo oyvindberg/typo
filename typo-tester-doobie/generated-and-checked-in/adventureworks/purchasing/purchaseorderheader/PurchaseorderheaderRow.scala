@@ -3,171 +3,214 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.purchaseorderheader
+package adventureworks.purchasing.purchaseorderheader;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.purchasing.shipmethod.ShipmethodId
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.purchasing.shipmethod.ShipmethodId;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: purchasing.purchaseorderheader
-    General purchase order information. See PurchaseOrderDetail.
-    Primary key: purchaseorderid */
+  * General purchase order information. See PurchaseOrderDetail.
+  * Primary key: purchaseorderid
+  */
 case class PurchaseorderheaderRow(
   /** Primary key.
-      Default: nextval('purchasing.purchaseorderheader_purchaseorderid_seq'::regclass) */
+    * Default: nextval('purchasing.purchaseorderheader_purchaseorderid_seq'::regclass)
+    */
   purchaseorderid: PurchaseorderheaderId,
   /** Incremental number to track changes to the purchase order over time.
-      Default: 0 */
+    * Default: 0
+    */
   revisionnumber: TypoShort,
   /** Order current status. 1 = Pending; 2 = Approved; 3 = Rejected; 4 = Complete
-      Default: 1
-      Constraint CK_PurchaseOrderHeader_Status affecting columns status: (((status >= 1) AND (status <= 4))) */
+    * Default: 1
+    * Constraint CK_PurchaseOrderHeader_Status affecting columns status: (((status >= 1) AND (status <= 4)))
+    */
   status: TypoShort,
   /** Employee who created the purchase order. Foreign key to Employee.BusinessEntityID.
-      Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]] */
+    * Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]]
+    */
   employeeid: BusinessentityId,
   /** Vendor with whom the purchase order is placed. Foreign key to Vendor.BusinessEntityID.
-      Points to [[adventureworks.purchasing.vendor.VendorRow.businessentityid]] */
+    * Points to [[adventureworks.purchasing.vendor.VendorRow.businessentityid]]
+    */
   vendorid: BusinessentityId,
   /** Shipping method. Foreign key to ShipMethod.ShipMethodID.
-      Points to [[adventureworks.purchasing.shipmethod.ShipmethodRow.shipmethodid]] */
+    * Points to [[adventureworks.purchasing.shipmethod.ShipmethodRow.shipmethodid]]
+    */
   shipmethodid: ShipmethodId,
   /** Purchase order creation date.
-      Default: now()
-      Constraint CK_PurchaseOrderHeader_ShipDate affecting columns orderdate, shipdate: (((shipdate >= orderdate) OR (shipdate IS NULL))) */
+    * Default: now()
+    * Constraint CK_PurchaseOrderHeader_ShipDate affecting columns orderdate, shipdate: (((shipdate >= orderdate) OR (shipdate IS NULL)))
+    */
   orderdate: TypoLocalDateTime,
   /** Estimated shipment date from the vendor.
-      Constraint CK_PurchaseOrderHeader_ShipDate affecting columns orderdate, shipdate: (((shipdate >= orderdate) OR (shipdate IS NULL))) */
+    * Constraint CK_PurchaseOrderHeader_ShipDate affecting columns orderdate, shipdate: (((shipdate >= orderdate) OR (shipdate IS NULL)))
+    */
   shipdate: Option[TypoLocalDateTime],
   /** Purchase order subtotal. Computed as SUM(PurchaseOrderDetail.LineTotal)for the appropriate PurchaseOrderID.
-      Default: 0.00
-      Constraint CK_PurchaseOrderHeader_SubTotal affecting columns subtotal: ((subtotal >= 0.00)) */
+    * Default: 0.00
+    * Constraint CK_PurchaseOrderHeader_SubTotal affecting columns subtotal: ((subtotal >= 0.00))
+    */
   subtotal: BigDecimal,
   /** Tax amount.
-      Default: 0.00
-      Constraint CK_PurchaseOrderHeader_TaxAmt affecting columns taxamt: ((taxamt >= 0.00)) */
+    * Default: 0.00
+    * Constraint CK_PurchaseOrderHeader_TaxAmt affecting columns taxamt: ((taxamt >= 0.00))
+    */
   taxamt: BigDecimal,
   /** Shipping cost.
-      Default: 0.00
-      Constraint CK_PurchaseOrderHeader_Freight affecting columns freight: ((freight >= 0.00)) */
+    * Default: 0.00
+    * Constraint CK_PurchaseOrderHeader_Freight affecting columns freight: ((freight >= 0.00))
+    */
   freight: BigDecimal,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val id = purchaseorderid
-   def toUnsavedRow(purchaseorderid: Defaulted[PurchaseorderheaderId], revisionnumber: Defaulted[TypoShort] = Defaulted.Provided(this.revisionnumber), status: Defaulted[TypoShort] = Defaulted.Provided(this.status), orderdate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.orderdate), subtotal: Defaulted[BigDecimal] = Defaulted.Provided(this.subtotal), taxamt: Defaulted[BigDecimal] = Defaulted.Provided(this.taxamt), freight: Defaulted[BigDecimal] = Defaulted.Provided(this.freight), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): PurchaseorderheaderRowUnsaved =
-     PurchaseorderheaderRowUnsaved(employeeid, vendorid, shipmethodid, shipdate, purchaseorderid, revisionnumber, status, orderdate, subtotal, taxamt, freight, modifieddate)
- }
+) {
+  def id: PurchaseorderheaderId = purchaseorderid
+  def toUnsavedRow(
+    purchaseorderid: Defaulted[PurchaseorderheaderId],
+    revisionnumber: Defaulted[TypoShort] = Defaulted.Provided(this.revisionnumber),
+    status: Defaulted[TypoShort] = Defaulted.Provided(this.status),
+    orderdate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.orderdate),
+    subtotal: Defaulted[BigDecimal] = Defaulted.Provided(this.subtotal),
+    taxamt: Defaulted[BigDecimal] = Defaulted.Provided(this.taxamt),
+    freight: Defaulted[BigDecimal] = Defaulted.Provided(this.freight),
+    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)
+  ): PurchaseorderheaderRowUnsaved = {
+    new PurchaseorderheaderRowUnsaved(
+      employeeid,
+      vendorid,
+      shipmethodid,
+      shipdate,
+      purchaseorderid,
+      revisionnumber,
+      status,
+      orderdate,
+      subtotal,
+      taxamt,
+      freight,
+      modifieddate
+    )
+  }
+}
 
 object PurchaseorderheaderRow {
   implicit lazy val decoder: Decoder[PurchaseorderheaderRow] = Decoder.forProduct12[PurchaseorderheaderRow, PurchaseorderheaderId, TypoShort, TypoShort, BusinessentityId, BusinessentityId, ShipmethodId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(PurchaseorderheaderRow.apply)(PurchaseorderheaderId.decoder, TypoShort.decoder, TypoShort.decoder, BusinessentityId.decoder, BusinessentityId.decoder, ShipmethodId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PurchaseorderheaderRow] = Encoder.forProduct12[PurchaseorderheaderRow, PurchaseorderheaderId, TypoShort, TypoShort, BusinessentityId, BusinessentityId, ShipmethodId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")(x => (x.purchaseorderid, x.revisionnumber, x.status, x.employeeid, x.vendorid, x.shipmethodid, x.orderdate, x.shipdate, x.subtotal, x.taxamt, x.freight, x.modifieddate))(PurchaseorderheaderId.encoder, TypoShort.encoder, TypoShort.encoder, BusinessentityId.encoder, BusinessentityId.encoder, ShipmethodId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PurchaseorderheaderRow] = new Read[PurchaseorderheaderRow](
-    gets = List(
-      (PurchaseorderheaderId.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (ShipmethodId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PurchaseorderheaderRow(
-      purchaseorderid = PurchaseorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
-      revisionnumber = TypoShort.get.unsafeGetNonNullable(rs, i + 1),
-      status = TypoShort.get.unsafeGetNonNullable(rs, i + 2),
-      employeeid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 3),
-      vendorid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 4),
-      shipmethodid = ShipmethodId.get.unsafeGetNonNullable(rs, i + 5),
-      orderdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6),
-      shipdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 7),
-      subtotal = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 8),
-      taxamt = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 9),
-      freight = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 10),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 11)
+  implicit lazy val read: Read[PurchaseorderheaderRow] = {
+    new Read[PurchaseorderheaderRow](
+      gets = List(
+        (PurchaseorderheaderId.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (BusinessentityId.get, Nullability.NoNulls),
+        (BusinessentityId.get, Nullability.NoNulls),
+        (ShipmethodId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.Nullable),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PurchaseorderheaderRow(
+        purchaseorderid = PurchaseorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
+        revisionnumber = TypoShort.get.unsafeGetNonNullable(rs, i + 1),
+        status = TypoShort.get.unsafeGetNonNullable(rs, i + 2),
+        employeeid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 3),
+        vendorid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 4),
+        shipmethodid = ShipmethodId.get.unsafeGetNonNullable(rs, i + 5),
+        orderdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6),
+        shipdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 7),
+        subtotal = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 8),
+        taxamt = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 9),
+        freight = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 10),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 11)
+      )
     )
-  )
-  implicit lazy val text: Text[PurchaseorderheaderRow] = Text.instance[PurchaseorderheaderRow]{ (row, sb) =>
-    PurchaseorderheaderId.text.unsafeEncode(row.purchaseorderid, sb)
-    sb.append(Text.DELIMETER)
-    TypoShort.text.unsafeEncode(row.revisionnumber, sb)
-    sb.append(Text.DELIMETER)
-    TypoShort.text.unsafeEncode(row.status, sb)
-    sb.append(Text.DELIMETER)
-    BusinessentityId.text.unsafeEncode(row.employeeid, sb)
-    sb.append(Text.DELIMETER)
-    BusinessentityId.text.unsafeEncode(row.vendorid, sb)
-    sb.append(Text.DELIMETER)
-    ShipmethodId.text.unsafeEncode(row.shipmethodid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.orderdate, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoLocalDateTime.text).unsafeEncode(row.shipdate, sb)
-    sb.append(Text.DELIMETER)
-    Text.bigDecimalInstance.unsafeEncode(row.subtotal, sb)
-    sb.append(Text.DELIMETER)
-    Text.bigDecimalInstance.unsafeEncode(row.taxamt, sb)
-    sb.append(Text.DELIMETER)
-    Text.bigDecimalInstance.unsafeEncode(row.freight, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[PurchaseorderheaderRow] = new Write[PurchaseorderheaderRow](
-    puts = List((PurchaseorderheaderId.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (BusinessentityId.put, Nullability.NoNulls),
-                (BusinessentityId.put, Nullability.NoNulls),
-                (ShipmethodId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.Nullable),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.purchaseorderid, x.revisionnumber, x.status, x.employeeid, x.vendorid, x.shipmethodid, x.orderdate, x.shipdate, x.subtotal, x.taxamt, x.freight, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  PurchaseorderheaderId.put.unsafeSetNonNullable(rs, i + 0, a.purchaseorderid)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 1, a.revisionnumber)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 2, a.status)
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 3, a.employeeid)
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 4, a.vendorid)
-                  ShipmethodId.put.unsafeSetNonNullable(rs, i + 5, a.shipmethodid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 6, a.orderdate)
-                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 7, a.shipdate)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 8, a.subtotal)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 9, a.taxamt)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 10, a.freight)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 11, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     PurchaseorderheaderId.put.unsafeUpdateNonNullable(ps, i + 0, a.purchaseorderid)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 1, a.revisionnumber)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 2, a.status)
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 3, a.employeeid)
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 4, a.vendorid)
-                     ShipmethodId.put.unsafeUpdateNonNullable(ps, i + 5, a.shipmethodid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 6, a.orderdate)
-                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 7, a.shipdate)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 8, a.subtotal)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 9, a.taxamt)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 10, a.freight)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 11, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[PurchaseorderheaderRow] = {
+    Text.instance[PurchaseorderheaderRow]{ (row, sb) =>
+      PurchaseorderheaderId.text.unsafeEncode(row.purchaseorderid, sb)
+      sb.append(Text.DELIMETER)
+      TypoShort.text.unsafeEncode(row.revisionnumber, sb)
+      sb.append(Text.DELIMETER)
+      TypoShort.text.unsafeEncode(row.status, sb)
+      sb.append(Text.DELIMETER)
+      BusinessentityId.text.unsafeEncode(row.employeeid, sb)
+      sb.append(Text.DELIMETER)
+      BusinessentityId.text.unsafeEncode(row.vendorid, sb)
+      sb.append(Text.DELIMETER)
+      ShipmethodId.text.unsafeEncode(row.shipmethodid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.orderdate, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoLocalDateTime.text).unsafeEncode(row.shipdate, sb)
+      sb.append(Text.DELIMETER)
+      Text.bigDecimalInstance.unsafeEncode(row.subtotal, sb)
+      sb.append(Text.DELIMETER)
+      Text.bigDecimalInstance.unsafeEncode(row.taxamt, sb)
+      sb.append(Text.DELIMETER)
+      Text.bigDecimalInstance.unsafeEncode(row.freight, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[PurchaseorderheaderRow] = {
+    new Write[PurchaseorderheaderRow](
+      puts = List((PurchaseorderheaderId.put, Nullability.NoNulls),
+                  (TypoShort.put, Nullability.NoNulls),
+                  (TypoShort.put, Nullability.NoNulls),
+                  (BusinessentityId.put, Nullability.NoNulls),
+                  (BusinessentityId.put, Nullability.NoNulls),
+                  (ShipmethodId.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.Nullable),
+                  (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                  (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                  (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.purchaseorderid, x.revisionnumber, x.status, x.employeeid, x.vendorid, x.shipmethodid, x.orderdate, x.shipdate, x.subtotal, x.taxamt, x.freight, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    PurchaseorderheaderId.put.unsafeSetNonNullable(rs, i + 0, a.purchaseorderid)
+                    TypoShort.put.unsafeSetNonNullable(rs, i + 1, a.revisionnumber)
+                    TypoShort.put.unsafeSetNonNullable(rs, i + 2, a.status)
+                    BusinessentityId.put.unsafeSetNonNullable(rs, i + 3, a.employeeid)
+                    BusinessentityId.put.unsafeSetNonNullable(rs, i + 4, a.vendorid)
+                    ShipmethodId.put.unsafeSetNonNullable(rs, i + 5, a.shipmethodid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 6, a.orderdate)
+                    TypoLocalDateTime.put.unsafeSetNullable(rs, i + 7, a.shipdate)
+                    Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 8, a.subtotal)
+                    Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 9, a.taxamt)
+                    Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 10, a.freight)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 11, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       PurchaseorderheaderId.put.unsafeUpdateNonNullable(ps, i + 0, a.purchaseorderid)
+                       TypoShort.put.unsafeUpdateNonNullable(ps, i + 1, a.revisionnumber)
+                       TypoShort.put.unsafeUpdateNonNullable(ps, i + 2, a.status)
+                       BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 3, a.employeeid)
+                       BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 4, a.vendorid)
+                       ShipmethodId.put.unsafeUpdateNonNullable(ps, i + 5, a.shipmethodid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 6, a.orderdate)
+                       TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 7, a.shipdate)
+                       Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 8, a.subtotal)
+                       Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 9, a.taxamt)
+                       Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 10, a.freight)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 11, a.modifieddate)
+                     }
+    )
+  
+  }
 }

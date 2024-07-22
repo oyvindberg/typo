@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.department
+package adventureworks.humanresources.department;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait DepartmentRepo {
   def delete: DeleteBuilder[DepartmentFields, DepartmentRow]
@@ -18,7 +18,7 @@ trait DepartmentRepo {
   def insert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow]
   def insert(unsaved: DepartmentRowUnsaved): ConnectionIO[DepartmentRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, DepartmentRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, DepartmentRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[DepartmentFields, DepartmentRow]
   def selectAll: Stream[ConnectionIO, DepartmentRow]
@@ -29,6 +29,6 @@ trait DepartmentRepo {
   def update(row: DepartmentRow): ConnectionIO[Boolean]
   def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow]
   def upsertBatch(unsaved: List[DepartmentRow]): Stream[ConnectionIO, DepartmentRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, DepartmentRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

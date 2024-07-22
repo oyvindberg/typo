@@ -3,18 +3,18 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.vproductmodelinstructions
+package adventureworks.production.vproductmodelinstructions;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.public.Name
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.production.productmodel.ProductmodelId;
+import adventureworks.public.Name;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: production.vproductmodelinstructions */
 case class VproductmodelinstructionsViewRow(
@@ -38,32 +38,35 @@ case class VproductmodelinstructionsViewRow(
 object VproductmodelinstructionsViewRow {
   implicit lazy val decoder: Decoder[VproductmodelinstructionsViewRow] = Decoder.forProduct11[VproductmodelinstructionsViewRow, ProductmodelId, Name, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[/* max 1024 chars */ String], TypoUUID, TypoLocalDateTime]("productmodelid", "name", "instructions", "LocationID", "SetupHours", "MachineHours", "LaborHours", "LotSize", "Step", "rowguid", "modifieddate")(VproductmodelinstructionsViewRow.apply)(ProductmodelId.decoder, Name.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[VproductmodelinstructionsViewRow] = Encoder.forProduct11[VproductmodelinstructionsViewRow, ProductmodelId, Name, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[/* max 1024 chars */ String], TypoUUID, TypoLocalDateTime]("productmodelid", "name", "instructions", "LocationID", "SetupHours", "MachineHours", "LaborHours", "LotSize", "Step", "rowguid", "modifieddate")(x => (x.productmodelid, x.name, x.instructions, x.locationID, x.setupHours, x.machineHours, x.laborHours, x.lotSize, x.step, x.rowguid, x.modifieddate))(ProductmodelId.encoder, Name.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[VproductmodelinstructionsViewRow] = new Read[VproductmodelinstructionsViewRow](
-    gets = List(
-      (ProductmodelId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => VproductmodelinstructionsViewRow(
-      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      instructions = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      locationID = Meta.IntMeta.get.unsafeGetNullable(rs, i + 3),
-      setupHours = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
-      machineHours = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 5),
-      laborHours = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 6),
-      lotSize = Meta.IntMeta.get.unsafeGetNullable(rs, i + 7),
-      step = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 9),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 10)
+  implicit lazy val read: Read[VproductmodelinstructionsViewRow] = {
+    new Read[VproductmodelinstructionsViewRow](
+      gets = List(
+        (ProductmodelId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.Nullable),
+        (Meta.IntMeta.get, Nullability.Nullable),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+        (Meta.IntMeta.get, Nullability.Nullable),
+        (Meta.StringMeta.get, Nullability.Nullable),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => VproductmodelinstructionsViewRow(
+        productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
+        name = Name.get.unsafeGetNonNullable(rs, i + 1),
+        instructions = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+        locationID = Meta.IntMeta.get.unsafeGetNullable(rs, i + 3),
+        setupHours = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
+        machineHours = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 5),
+        laborHours = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 6),
+        lotSize = Meta.IntMeta.get.unsafeGetNullable(rs, i + 7),
+        step = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 9),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 10)
+      )
     )
-  )
+  
+  }
 }

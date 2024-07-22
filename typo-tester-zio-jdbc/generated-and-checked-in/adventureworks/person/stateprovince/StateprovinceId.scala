@@ -3,19 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.stateprovince
+package adventureworks.person.stateprovince;
 
-import adventureworks.Text
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `person.stateprovince` */
-case class StateprovinceId(value: Int) extends AnyVal
+case class StateprovinceId(value: Int) extends scala.AnyVal
+
 object StateprovinceId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[StateprovinceId]] = adventureworks.IntArrayDecoder.map(_.map(StateprovinceId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[StateprovinceId]] = adventureworks.IntArrayEncoder.contramap(_.map(_.value))
@@ -27,8 +28,10 @@ object StateprovinceId {
   implicit lazy val jsonEncoder: JsonEncoder[StateprovinceId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val pgType: PGType[StateprovinceId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[StateprovinceId] = Setter.intSetter.contramap(_.value)
-  implicit lazy val text: Text[StateprovinceId] = new Text[StateprovinceId] {
-    override def unsafeEncode(v: StateprovinceId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: StateprovinceId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[StateprovinceId] = {
+    new Text[StateprovinceId] {
+      override def unsafeEncode(v: StateprovinceId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: StateprovinceId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

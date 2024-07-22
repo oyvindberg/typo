@@ -3,9 +3,9 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person_dynamic
+package adventureworks.person_dynamic;
 
-import java.sql.Connection
+import java.sql.Connection;
 
 trait PersonDynamicSqlRepo {
   def apply(firstName: Option[String])(implicit c: Connection): List[PersonDynamicSqlRow]

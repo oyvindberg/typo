@@ -3,17 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.vstateprovincecountryregion
+package adventureworks.person.vstateprovincecountryregion;
 
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.person.stateprovince.StateprovinceId
-import adventureworks.public.Flag
-import adventureworks.public.Name
-import adventureworks.sales.salesterritory.SalesterritoryId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.Structure.Relation
+import adventureworks.person.countryregion.CountryregionId;
+import adventureworks.person.stateprovince.StateprovinceId;
+import adventureworks.public.Flag;
+import adventureworks.public.Name;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait VstateprovincecountryregionMVFields {
   def stateprovinceid: Field[StateprovinceId, VstateprovincecountryregionMVRow]

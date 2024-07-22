@@ -3,18 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.unitmeasure
+package adventureworks.production.unitmeasure;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `production.unitmeasure` */
-case class UnitmeasureId(value: /* bpchar, max 3 chars */ String) extends AnyVal
+case class UnitmeasureId(value: /* bpchar, max 3 chars */ String) extends scala.AnyVal
+
 object UnitmeasureId {
   implicit lazy val arrayGet: Get[Array[UnitmeasureId]] = adventureworks.StringArrayMeta.get.map(_.map(UnitmeasureId.apply))
   implicit lazy val arrayPut: Put[Array[UnitmeasureId]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
@@ -23,8 +24,10 @@ object UnitmeasureId {
   implicit lazy val encoder: Encoder[UnitmeasureId] = Encoder.encodeString.contramap(_.value)
   implicit lazy val get: Get[UnitmeasureId] = Meta.StringMeta.get.map(UnitmeasureId.apply)
   implicit lazy val put: Put[UnitmeasureId] = Meta.StringMeta.put.contramap(_.value)
-  implicit lazy val text: Text[UnitmeasureId] = new Text[UnitmeasureId] {
-    override def unsafeEncode(v: UnitmeasureId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: UnitmeasureId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[UnitmeasureId] = {
+    new Text[UnitmeasureId] {
+      override def unsafeEncode(v: UnitmeasureId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: UnitmeasureId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

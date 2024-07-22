@@ -3,47 +3,54 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.myschema.marital_status
+package testdb.hardcoded.myschema.marital_status;
 
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
-import testdb.hardcoded.Text
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
+import testdb.hardcoded.Text;
 
 /** Table: myschema.marital_status
-    Primary key: id */
-case class MaritalStatusRow(
-  id: MaritalStatusId
-)
+  * Primary key: id
+  */
+case class MaritalStatusRow(id: MaritalStatusId)
 
 object MaritalStatusRow {
-  implicit lazy val reads: Reads[MaritalStatusRow] = Reads[MaritalStatusRow](json => JsResult.fromTry(
-      Try(
-        MaritalStatusRow(
-          id = json.\("id").as(MaritalStatusId.reads)
+  implicit lazy val reads: Reads[MaritalStatusRow] = {
+    Reads[MaritalStatusRow](json => JsResult.fromTry(
+        Try(
+          MaritalStatusRow(
+            id = json.\("id").as(MaritalStatusId.reads)
+          )
         )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[MaritalStatusRow] = RowParser[MaritalStatusRow] { row =>
-    Success(
-      MaritalStatusRow(
-        id = row(idx + 0)(MaritalStatusId.column)
-      )
+      ),
     )
   }
-  implicit lazy val text: Text[MaritalStatusRow] = Text.instance[MaritalStatusRow]{ (row, sb) =>
-    MaritalStatusId.text.unsafeEncode(row.id, sb)
+  def rowParser(idx: Int): RowParser[MaritalStatusRow] = {
+    RowParser[MaritalStatusRow] { row =>
+      Success(
+        MaritalStatusRow(
+          id = row(idx + 0)(MaritalStatusId.column)
+        )
+      )
+    }
   }
-  implicit lazy val writes: OWrites[MaritalStatusRow] = OWrites[MaritalStatusRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "id" -> MaritalStatusId.writes.writes(o.id)
-    ))
-  )
+  implicit lazy val text: Text[MaritalStatusRow] = {
+    Text.instance[MaritalStatusRow]{ (row, sb) =>
+      MaritalStatusId.text.unsafeEncode(row.id, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[MaritalStatusRow] = {
+    OWrites[MaritalStatusRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "id" -> MaritalStatusId.writes.writes(o.id)
+      ))
+    )
+  }
 }

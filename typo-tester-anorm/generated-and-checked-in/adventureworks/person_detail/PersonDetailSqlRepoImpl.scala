@@ -3,16 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person_detail
+package adventureworks.person_detail;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.businessentity.BusinessentityId
-import anorm.ParameterValue
-import anorm.SqlStringInterpolation
-import java.sql.Connection
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.businessentity.BusinessentityId;
+import anorm.ParameterValue;
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
 
 class PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
-  override def apply(businessentityid: /* user-picked */ BusinessentityId, modifiedAfter: TypoLocalDateTime)(implicit c: Connection): List[PersonDetailSqlRow] = {
+  def apply(businessentityid: /* user-picked */ BusinessentityId, modifiedAfter: TypoLocalDateTime)(implicit c: Connection): List[PersonDetailSqlRow] = {
     val sql =
       SQL"""SELECT s.businessentityid,
                    p.title,

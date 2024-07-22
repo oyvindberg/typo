@@ -3,26 +3,28 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.shift
+package adventureworks.humanresources.shift;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoLocalTime
-import adventureworks.public.Name
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoLocalTime;
+import adventureworks.public.Name;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: humanresources.shift
-    Work shift lookup table.
-    Primary key: shiftid */
+  * Work shift lookup table.
+  * Primary key: shiftid
+  */
 case class ShiftRow(
   /** Primary key for Shift records.
-      Default: nextval('humanresources.shift_shiftid_seq'::regclass) */
+    * Default: nextval('humanresources.shift_shiftid_seq'::regclass)
+    */
   shiftid: ShiftId,
   /** Shift description. */
   name: Name,
@@ -32,62 +34,77 @@ case class ShiftRow(
   endtime: TypoLocalTime,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val id = shiftid
-   def toUnsavedRow(shiftid: Defaulted[ShiftId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ShiftRowUnsaved =
-     ShiftRowUnsaved(name, starttime, endtime, shiftid, modifieddate)
- }
+) {
+  def id: ShiftId = shiftid
+  def toUnsavedRow(shiftid: Defaulted[ShiftId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ShiftRowUnsaved = {
+    new ShiftRowUnsaved(
+      name,
+      starttime,
+      endtime,
+      shiftid,
+      modifieddate
+    )
+  }
+}
 
 object ShiftRow {
   implicit lazy val decoder: Decoder[ShiftRow] = Decoder.forProduct5[ShiftRow, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("shiftid", "name", "starttime", "endtime", "modifieddate")(ShiftRow.apply)(ShiftId.decoder, Name.decoder, TypoLocalTime.decoder, TypoLocalTime.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ShiftRow] = Encoder.forProduct5[ShiftRow, ShiftId, Name, TypoLocalTime, TypoLocalTime, TypoLocalDateTime]("shiftid", "name", "starttime", "endtime", "modifieddate")(x => (x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate))(ShiftId.encoder, Name.encoder, TypoLocalTime.encoder, TypoLocalTime.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ShiftRow] = new Read[ShiftRow](
-    gets = List(
-      (ShiftId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalTime.get, Nullability.NoNulls),
-      (TypoLocalTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ShiftRow(
-      shiftid = ShiftId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      starttime = TypoLocalTime.get.unsafeGetNonNullable(rs, i + 2),
-      endtime = TypoLocalTime.get.unsafeGetNonNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+  implicit lazy val read: Read[ShiftRow] = {
+    new Read[ShiftRow](
+      gets = List(
+        (ShiftId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (TypoLocalTime.get, Nullability.NoNulls),
+        (TypoLocalTime.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ShiftRow(
+        shiftid = ShiftId.get.unsafeGetNonNullable(rs, i + 0),
+        name = Name.get.unsafeGetNonNullable(rs, i + 1),
+        starttime = TypoLocalTime.get.unsafeGetNonNullable(rs, i + 2),
+        endtime = TypoLocalTime.get.unsafeGetNonNullable(rs, i + 3),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+      )
     )
-  )
-  implicit lazy val text: Text[ShiftRow] = Text.instance[ShiftRow]{ (row, sb) =>
-    ShiftId.text.unsafeEncode(row.shiftid, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalTime.text.unsafeEncode(row.starttime, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalTime.text.unsafeEncode(row.endtime, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[ShiftRow] = new Write[ShiftRow](
-    puts = List((ShiftId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoLocalTime.put, Nullability.NoNulls),
-                (TypoLocalTime.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ShiftId.put.unsafeSetNonNullable(rs, i + 0, a.shiftid)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  TypoLocalTime.put.unsafeSetNonNullable(rs, i + 2, a.starttime)
-                  TypoLocalTime.put.unsafeSetNonNullable(rs, i + 3, a.endtime)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ShiftId.put.unsafeUpdateNonNullable(ps, i + 0, a.shiftid)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     TypoLocalTime.put.unsafeUpdateNonNullable(ps, i + 2, a.starttime)
-                     TypoLocalTime.put.unsafeUpdateNonNullable(ps, i + 3, a.endtime)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[ShiftRow] = {
+    Text.instance[ShiftRow]{ (row, sb) =>
+      ShiftId.text.unsafeEncode(row.shiftid, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalTime.text.unsafeEncode(row.starttime, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalTime.text.unsafeEncode(row.endtime, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[ShiftRow] = {
+    new Write[ShiftRow](
+      puts = List((ShiftId.put, Nullability.NoNulls),
+                  (Name.put, Nullability.NoNulls),
+                  (TypoLocalTime.put, Nullability.NoNulls),
+                  (TypoLocalTime.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.shiftid, x.name, x.starttime, x.endtime, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    ShiftId.put.unsafeSetNonNullable(rs, i + 0, a.shiftid)
+                    Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                    TypoLocalTime.put.unsafeSetNonNullable(rs, i + 2, a.starttime)
+                    TypoLocalTime.put.unsafeSetNonNullable(rs, i + 3, a.endtime)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       ShiftId.put.unsafeUpdateNonNullable(ps, i + 0, a.shiftid)
+                       Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                       TypoLocalTime.put.unsafeUpdateNonNullable(ps, i + 2, a.starttime)
+                       TypoLocalTime.put.unsafeUpdateNonNullable(ps, i + 3, a.endtime)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
+                     }
+    )
+  
+  }
 }

@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salespersonquotahistory
+package adventureworks.sales.salespersonquotahistory;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait SalespersonquotahistoryRepo {
   def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
@@ -17,7 +17,7 @@ trait SalespersonquotahistoryRepo {
   def insert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow
   def insert(unsaved: SalespersonquotahistoryRowUnsaved)(implicit c: Connection): SalespersonquotahistoryRow
   def insertStreaming(unsaved: Iterator[SalespersonquotahistoryRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[SalespersonquotahistoryRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow]
   def selectAll(implicit c: Connection): List[SalespersonquotahistoryRow]
@@ -28,6 +28,6 @@ trait SalespersonquotahistoryRepo {
   def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean
   def upsert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow
   def upsertBatch(unsaved: Iterable[SalespersonquotahistoryRow])(implicit c: Connection): List[SalespersonquotahistoryRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[SalespersonquotahistoryRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

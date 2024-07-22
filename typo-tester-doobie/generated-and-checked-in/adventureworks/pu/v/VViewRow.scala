@@ -3,20 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pu.v
+package adventureworks.pu.v;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.AccountNumber
-import adventureworks.public.Flag
-import adventureworks.public.Name
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.AccountNumber;
+import adventureworks.public.Flag;
+import adventureworks.public.Name;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: pu.v */
 case class VViewRow(
@@ -43,28 +43,31 @@ case class VViewRow(
 object VViewRow {
   implicit lazy val decoder: Decoder[VViewRow] = Decoder.forProduct9[VViewRow, BusinessentityId, BusinessentityId, AccountNumber, Name, TypoShort, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("id", "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(VViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, AccountNumber.decoder, Name.decoder, TypoShort.decoder, Flag.decoder, Flag.decoder, Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[VViewRow] = Encoder.forProduct9[VViewRow, BusinessentityId, BusinessentityId, AccountNumber, Name, TypoShort, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("id", "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(x => (x.id, x.businessentityid, x.accountnumber, x.name, x.creditrating, x.preferredvendorstatus, x.activeflag, x.purchasingwebserviceurl, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, AccountNumber.encoder, Name.encoder, TypoShort.encoder, Flag.encoder, Flag.encoder, Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[VViewRow] = new Read[VViewRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (AccountNumber.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => VViewRow(
-      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      accountnumber = AccountNumber.get.unsafeGetNonNullable(rs, i + 2),
-      name = Name.get.unsafeGetNonNullable(rs, i + 3),
-      creditrating = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
-      preferredvendorstatus = Flag.get.unsafeGetNonNullable(rs, i + 5),
-      activeflag = Flag.get.unsafeGetNonNullable(rs, i + 6),
-      purchasingwebserviceurl = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
+  implicit lazy val read: Read[VViewRow] = {
+    new Read[VViewRow](
+      gets = List(
+        (BusinessentityId.get, Nullability.NoNulls),
+        (BusinessentityId.get, Nullability.NoNulls),
+        (AccountNumber.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (Flag.get, Nullability.NoNulls),
+        (Flag.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.Nullable),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => VViewRow(
+        id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+        businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+        accountnumber = AccountNumber.get.unsafeGetNonNullable(rs, i + 2),
+        name = Name.get.unsafeGetNonNullable(rs, i + 3),
+        creditrating = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
+        preferredvendorstatus = Flag.get.unsafeGetNonNullable(rs, i + 5),
+        activeflag = Flag.get.unsafeGetNonNullable(rs, i + 6),
+        purchasingwebserviceurl = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
+      )
     )
-  )
+  
+  }
 }

@@ -3,26 +3,28 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productcategory
+package adventureworks.production.productcategory;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.public.Name
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.public.Name;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: production.productcategory
-    High-level product categorization.
-    Primary key: productcategoryid */
+  * High-level product categorization.
+  * Primary key: productcategoryid
+  */
 case class ProductcategoryRow(
   /** Primary key for ProductCategory records.
-      Default: nextval('production.productcategory_productcategoryid_seq'::regclass) */
+    * Default: nextval('production.productcategory_productcategoryid_seq'::regclass)
+    */
   productcategoryid: ProductcategoryId,
   /** Category description. */
   name: Name,
@@ -30,55 +32,69 @@ case class ProductcategoryRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val id = productcategoryid
-   def toUnsavedRow(productcategoryid: Defaulted[ProductcategoryId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductcategoryRowUnsaved =
-     ProductcategoryRowUnsaved(name, productcategoryid, rowguid, modifieddate)
- }
+) {
+  def id: ProductcategoryId = productcategoryid
+  def toUnsavedRow(productcategoryid: Defaulted[ProductcategoryId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductcategoryRowUnsaved = {
+    new ProductcategoryRowUnsaved(
+      name,
+      productcategoryid,
+      rowguid,
+      modifieddate
+    )
+  }
+}
 
 object ProductcategoryRow {
   implicit lazy val decoder: Decoder[ProductcategoryRow] = Decoder.forProduct4[ProductcategoryRow, ProductcategoryId, Name, TypoUUID, TypoLocalDateTime]("productcategoryid", "name", "rowguid", "modifieddate")(ProductcategoryRow.apply)(ProductcategoryId.decoder, Name.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ProductcategoryRow] = Encoder.forProduct4[ProductcategoryRow, ProductcategoryId, Name, TypoUUID, TypoLocalDateTime]("productcategoryid", "name", "rowguid", "modifieddate")(x => (x.productcategoryid, x.name, x.rowguid, x.modifieddate))(ProductcategoryId.encoder, Name.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ProductcategoryRow] = new Read[ProductcategoryRow](
-    gets = List(
-      (ProductcategoryId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ProductcategoryRow(
-      productcategoryid = ProductcategoryId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[ProductcategoryRow] = {
+    new Read[ProductcategoryRow](
+      gets = List(
+        (ProductcategoryId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ProductcategoryRow(
+        productcategoryid = ProductcategoryId.get.unsafeGetNonNullable(rs, i + 0),
+        name = Name.get.unsafeGetNonNullable(rs, i + 1),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 2),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+      )
     )
-  )
-  implicit lazy val text: Text[ProductcategoryRow] = Text.instance[ProductcategoryRow]{ (row, sb) =>
-    ProductcategoryId.text.unsafeEncode(row.productcategoryid, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    TypoUUID.text.unsafeEncode(row.rowguid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[ProductcategoryRow] = new Write[ProductcategoryRow](
-    puts = List((ProductcategoryId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.productcategoryid, x.name, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ProductcategoryId.put.unsafeSetNonNullable(rs, i + 0, a.productcategoryid)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 2, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ProductcategoryId.put.unsafeUpdateNonNullable(ps, i + 0, a.productcategoryid)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 2, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[ProductcategoryRow] = {
+    Text.instance[ProductcategoryRow]{ (row, sb) =>
+      ProductcategoryId.text.unsafeEncode(row.productcategoryid, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      TypoUUID.text.unsafeEncode(row.rowguid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[ProductcategoryRow] = {
+    new Write[ProductcategoryRow](
+      puts = List((ProductcategoryId.put, Nullability.NoNulls),
+                  (Name.put, Nullability.NoNulls),
+                  (TypoUUID.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.productcategoryid, x.name, x.rowguid, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    ProductcategoryId.put.unsafeSetNonNullable(rs, i + 0, a.productcategoryid)
+                    Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                    TypoUUID.put.unsafeSetNonNullable(rs, i + 2, a.rowguid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       ProductcategoryId.put.unsafeUpdateNonNullable(ps, i + 0, a.productcategoryid)
+                       Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                       TypoUUID.put.unsafeUpdateNonNullable(ps, i + 2, a.rowguid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
+                     }
+    )
+  
+  }
 }

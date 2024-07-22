@@ -3,15 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.shift
+package adventureworks.humanresources.shift;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoLocalTime
-import adventureworks.public.Name
-import doobie.postgres.Text
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoLocalTime;
+import adventureworks.public.Name;
+import doobie.postgres.Text;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** This class corresponds to a row in table `humanresources.shift` which has not been persisted yet */
 case class ShiftRowUnsaved(
@@ -22,38 +22,37 @@ case class ShiftRowUnsaved(
   /** Shift end time. */
   endtime: TypoLocalTime,
   /** Default: nextval('humanresources.shift_shiftid_seq'::regclass)
-      Primary key for Shift records. */
-  shiftid: Defaulted[ShiftId] = Defaulted.UseDefault,
+    * Primary key for Shift records.
+    */
+  shiftid: Defaulted[ShiftId] = Defaulted.UseDefault(),
   /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()
 ) {
-  def toRow(shiftidDefault: => ShiftId, modifieddateDefault: => TypoLocalDateTime): ShiftRow =
-    ShiftRow(
-      shiftid = shiftid match {
-                  case Defaulted.UseDefault => shiftidDefault
-                  case Defaulted.Provided(value) => value
-                },
+  def toRow(shiftidDefault: => ShiftId, modifieddateDefault: => TypoLocalDateTime): ShiftRow = {
+    new ShiftRow(
+      shiftid = shiftid.getOrElse(shiftidDefault),
       name = name,
       starttime = starttime,
       endtime = endtime,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
+      modifieddate = modifieddate.getOrElse(modifieddateDefault)
     )
+  }
 }
+
 object ShiftRowUnsaved {
   implicit lazy val decoder: Decoder[ShiftRowUnsaved] = Decoder.forProduct5[ShiftRowUnsaved, Name, TypoLocalTime, TypoLocalTime, Defaulted[ShiftId], Defaulted[TypoLocalDateTime]]("name", "starttime", "endtime", "shiftid", "modifieddate")(ShiftRowUnsaved.apply)(Name.decoder, TypoLocalTime.decoder, TypoLocalTime.decoder, Defaulted.decoder(ShiftId.decoder), Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[ShiftRowUnsaved] = Encoder.forProduct5[ShiftRowUnsaved, Name, TypoLocalTime, TypoLocalTime, Defaulted[ShiftId], Defaulted[TypoLocalDateTime]]("name", "starttime", "endtime", "shiftid", "modifieddate")(x => (x.name, x.starttime, x.endtime, x.shiftid, x.modifieddate))(Name.encoder, TypoLocalTime.encoder, TypoLocalTime.encoder, Defaulted.encoder(ShiftId.encoder), Defaulted.encoder(TypoLocalDateTime.encoder))
-  implicit lazy val text: Text[ShiftRowUnsaved] = Text.instance[ShiftRowUnsaved]{ (row, sb) =>
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalTime.text.unsafeEncode(row.starttime, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalTime.text.unsafeEncode(row.endtime, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(ShiftId.text).unsafeEncode(row.shiftid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  implicit lazy val text: Text[ShiftRowUnsaved] = {
+    Text.instance[ShiftRowUnsaved]{ (row, sb) =>
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalTime.text.unsafeEncode(row.starttime, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalTime.text.unsafeEncode(row.endtime, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(ShiftId.text).unsafeEncode(row.shiftid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
   }
 }

@@ -3,32 +3,34 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productmodel
+package adventureworks.production.productmodel;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.customtypes.TypoXml
-import adventureworks.public.Name
-import anorm.Column
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.public.Name;
+import anorm.Column;
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** Table: production.productmodel
-    Product model classification.
-    Primary key: productmodelid */
+  * Product model classification.
+  * Primary key: productmodelid
+  */
 case class ProductmodelRow(
   /** Primary key for ProductModel records.
-      Default: nextval('production.productmodel_productmodelid_seq'::regclass) */
+    * Default: nextval('production.productmodel_productmodelid_seq'::regclass)
+    */
   productmodelid: ProductmodelId,
   /** Product model description. */
   name: Name,
@@ -40,59 +42,75 @@ case class ProductmodelRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val id = productmodelid
-   def toUnsavedRow(productmodelid: Defaulted[ProductmodelId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductmodelRowUnsaved =
-     ProductmodelRowUnsaved(name, catalogdescription, instructions, productmodelid, rowguid, modifieddate)
- }
-
-object ProductmodelRow {
-  implicit lazy val reads: Reads[ProductmodelRow] = Reads[ProductmodelRow](json => JsResult.fromTry(
-      Try(
-        ProductmodelRow(
-          productmodelid = json.\("productmodelid").as(ProductmodelId.reads),
-          name = json.\("name").as(Name.reads),
-          catalogdescription = json.\("catalogdescription").toOption.map(_.as(TypoXml.reads)),
-          instructions = json.\("instructions").toOption.map(_.as(TypoXml.reads)),
-          rowguid = json.\("rowguid").as(TypoUUID.reads),
-          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
-        )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[ProductmodelRow] = RowParser[ProductmodelRow] { row =>
-    Success(
-      ProductmodelRow(
-        productmodelid = row(idx + 0)(ProductmodelId.column),
-        name = row(idx + 1)(Name.column),
-        catalogdescription = row(idx + 2)(Column.columnToOption(TypoXml.column)),
-        instructions = row(idx + 3)(Column.columnToOption(TypoXml.column)),
-        rowguid = row(idx + 4)(TypoUUID.column),
-        modifieddate = row(idx + 5)(TypoLocalDateTime.column)
-      )
+) {
+  def id: ProductmodelId = productmodelid
+  def toUnsavedRow(productmodelid: Defaulted[ProductmodelId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductmodelRowUnsaved = {
+    new ProductmodelRowUnsaved(
+      name,
+      catalogdescription,
+      instructions,
+      productmodelid,
+      rowguid,
+      modifieddate
     )
   }
-  implicit lazy val text: Text[ProductmodelRow] = Text.instance[ProductmodelRow]{ (row, sb) =>
-    ProductmodelId.text.unsafeEncode(row.productmodelid, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoXml.text).unsafeEncode(row.catalogdescription, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoXml.text).unsafeEncode(row.instructions, sb)
-    sb.append(Text.DELIMETER)
-    TypoUUID.text.unsafeEncode(row.rowguid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+}
+
+object ProductmodelRow {
+  implicit lazy val reads: Reads[ProductmodelRow] = {
+    Reads[ProductmodelRow](json => JsResult.fromTry(
+        Try(
+          ProductmodelRow(
+            productmodelid = json.\("productmodelid").as(ProductmodelId.reads),
+            name = json.\("name").as(Name.reads),
+            catalogdescription = json.\("catalogdescription").toOption.map(_.as(TypoXml.reads)),
+            instructions = json.\("instructions").toOption.map(_.as(TypoXml.reads)),
+            rowguid = json.\("rowguid").as(TypoUUID.reads),
+            modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+          )
+        )
+      ),
+    )
   }
-  implicit lazy val writes: OWrites[ProductmodelRow] = OWrites[ProductmodelRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "productmodelid" -> ProductmodelId.writes.writes(o.productmodelid),
-      "name" -> Name.writes.writes(o.name),
-      "catalogdescription" -> Writes.OptionWrites(TypoXml.writes).writes(o.catalogdescription),
-      "instructions" -> Writes.OptionWrites(TypoXml.writes).writes(o.instructions),
-      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
-      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
-    ))
-  )
+  def rowParser(idx: Int): RowParser[ProductmodelRow] = {
+    RowParser[ProductmodelRow] { row =>
+      Success(
+        ProductmodelRow(
+          productmodelid = row(idx + 0)(ProductmodelId.column),
+          name = row(idx + 1)(Name.column),
+          catalogdescription = row(idx + 2)(Column.columnToOption(TypoXml.column)),
+          instructions = row(idx + 3)(Column.columnToOption(TypoXml.column)),
+          rowguid = row(idx + 4)(TypoUUID.column),
+          modifieddate = row(idx + 5)(TypoLocalDateTime.column)
+        )
+      )
+    }
+  }
+  implicit lazy val text: Text[ProductmodelRow] = {
+    Text.instance[ProductmodelRow]{ (row, sb) =>
+      ProductmodelId.text.unsafeEncode(row.productmodelid, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoXml.text).unsafeEncode(row.catalogdescription, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoXml.text).unsafeEncode(row.instructions, sb)
+      sb.append(Text.DELIMETER)
+      TypoUUID.text.unsafeEncode(row.rowguid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[ProductmodelRow] = {
+    OWrites[ProductmodelRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "productmodelid" -> ProductmodelId.writes.writes(o.productmodelid),
+        "name" -> Name.writes.writes(o.name),
+        "catalogdescription" -> Writes.OptionWrites(TypoXml.writes).writes(o.catalogdescription),
+        "instructions" -> Writes.OptionWrites(TypoXml.writes).writes(o.instructions),
+        "rowguid" -> TypoUUID.writes.writes(o.rowguid),
+        "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
+      ))
+    )
+  }
 }

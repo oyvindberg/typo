@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.document
+package adventureworks.production.document;
 
-import adventureworks.customtypes.TypoUUID
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import adventureworks.customtypes.TypoUUID;
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait DocumentRepo {
   def delete: DeleteBuilder[DocumentFields, DocumentRow]
@@ -18,7 +18,7 @@ trait DocumentRepo {
   def insert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow
   def insert(unsaved: DocumentRowUnsaved)(implicit c: Connection): DocumentRow
   def insertStreaming(unsaved: Iterator[DocumentRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[DocumentRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[DocumentFields, DocumentRow]
   def selectAll(implicit c: Connection): List[DocumentRow]
@@ -30,6 +30,6 @@ trait DocumentRepo {
   def update(row: DocumentRow)(implicit c: Connection): Boolean
   def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow
   def upsertBatch(unsaved: Iterable[DocumentRow])(implicit c: Connection): List[DocumentRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[DocumentRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

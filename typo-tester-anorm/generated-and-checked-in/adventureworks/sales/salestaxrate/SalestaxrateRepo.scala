@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salestaxrate
+package adventureworks.sales.salestaxrate;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait SalestaxrateRepo {
   def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow]
@@ -17,7 +17,7 @@ trait SalestaxrateRepo {
   def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow
   def insert(unsaved: SalestaxrateRowUnsaved)(implicit c: Connection): SalestaxrateRow
   def insertStreaming(unsaved: Iterator[SalestaxrateRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[SalestaxrateRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow]
   def selectAll(implicit c: Connection): List[SalestaxrateRow]
@@ -28,6 +28,6 @@ trait SalestaxrateRepo {
   def update(row: SalestaxrateRow)(implicit c: Connection): Boolean
   def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow
   def upsertBatch(unsaved: Iterable[SalestaxrateRow])(implicit c: Connection): List[SalestaxrateRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[SalestaxrateRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

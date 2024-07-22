@@ -3,37 +3,39 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.specialofferproduct
+package adventureworks.sales.specialofferproduct;
 
-import adventureworks.production.product.ProductId
-import adventureworks.sales.specialoffer.SpecialofferId
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
-import zio.json.ast.Json
-import zio.json.internal.Write
+import adventureworks.production.product.ProductId;
+import adventureworks.sales.specialoffer.SpecialofferId;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
+import zio.json.ast.Json;
+import zio.json.internal.Write;
 
 /** Type for the composite primary key of table `sales.specialofferproduct` */
-case class SpecialofferproductId(
-  specialofferid: SpecialofferId,
-  productid: ProductId
-)
+case class SpecialofferproductId(specialofferid: SpecialofferId, productid: ProductId)
+
 object SpecialofferproductId {
-  implicit lazy val jsonDecoder: JsonDecoder[SpecialofferproductId] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
-    val specialofferid = jsonObj.get("specialofferid").toRight("Missing field 'specialofferid'").flatMap(_.as(SpecialofferId.jsonDecoder))
-    val productid = jsonObj.get("productid").toRight("Missing field 'productid'").flatMap(_.as(ProductId.jsonDecoder))
-    if (specialofferid.isRight && productid.isRight)
-      Right(SpecialofferproductId(specialofferid = specialofferid.toOption.get, productid = productid.toOption.get))
-    else Left(List[Either[String, Any]](specialofferid, productid).flatMap(_.left.toOption).mkString(", "))
+  implicit lazy val jsonDecoder: JsonDecoder[SpecialofferproductId] = {
+    JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
+      val specialofferid = jsonObj.get("specialofferid").toRight("Missing field 'specialofferid'").flatMap(_.as(SpecialofferId.jsonDecoder))
+      val productid = jsonObj.get("productid").toRight("Missing field 'productid'").flatMap(_.as(ProductId.jsonDecoder))
+      if (specialofferid.isRight && productid.isRight)
+        Right(SpecialofferproductId(specialofferid = specialofferid.toOption.get, productid = productid.toOption.get))
+      else Left(List[Either[String, Any]](specialofferid, productid).flatMap(_.left.toOption).mkString(", "))
+    }
   }
-  implicit lazy val jsonEncoder: JsonEncoder[SpecialofferproductId] = new JsonEncoder[SpecialofferproductId] {
-    override def unsafeEncode(a: SpecialofferproductId, indent: Option[Int], out: Write): Unit = {
-      out.write("{")
-      out.write(""""specialofferid":""")
-      SpecialofferId.jsonEncoder.unsafeEncode(a.specialofferid, indent, out)
-      out.write(",")
-      out.write(""""productid":""")
-      ProductId.jsonEncoder.unsafeEncode(a.productid, indent, out)
-      out.write("}")
+  implicit lazy val jsonEncoder: JsonEncoder[SpecialofferproductId] = {
+    new JsonEncoder[SpecialofferproductId] {
+      override def unsafeEncode(a: SpecialofferproductId, indent: Option[Int], out: Write): Unit = {
+        out.write("{")
+        out.write(""""specialofferid":""")
+        SpecialofferId.jsonEncoder.unsafeEncode(a.specialofferid, indent, out)
+        out.write(",")
+        out.write(""""productid":""")
+        ProductId.jsonEncoder.unsafeEncode(a.productid, indent, out)
+        out.write("}")
+      }
     }
   }
 }

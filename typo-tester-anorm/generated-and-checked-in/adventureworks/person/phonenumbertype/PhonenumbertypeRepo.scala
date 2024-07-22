@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.phonenumbertype
+package adventureworks.person.phonenumbertype;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait PhonenumbertypeRepo {
   def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
@@ -17,7 +17,7 @@ trait PhonenumbertypeRepo {
   def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow
   def insert(unsaved: PhonenumbertypeRowUnsaved)(implicit c: Connection): PhonenumbertypeRow
   def insertStreaming(unsaved: Iterator[PhonenumbertypeRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[PhonenumbertypeRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
   def selectAll(implicit c: Connection): List[PhonenumbertypeRow]
@@ -28,6 +28,6 @@ trait PhonenumbertypeRepo {
   def update(row: PhonenumbertypeRow)(implicit c: Connection): Boolean
   def upsert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow
   def upsertBatch(unsaved: Iterable[PhonenumbertypeRow])(implicit c: Connection): List[PhonenumbertypeRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[PhonenumbertypeRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

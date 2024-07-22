@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.addresstype
+package adventureworks.person.addresstype;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait AddresstypeRepo {
   def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow]
@@ -17,7 +17,7 @@ trait AddresstypeRepo {
   def insert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow
   def insert(unsaved: AddresstypeRowUnsaved)(implicit c: Connection): AddresstypeRow
   def insertStreaming(unsaved: Iterator[AddresstypeRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[AddresstypeRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[AddresstypeFields, AddresstypeRow]
   def selectAll(implicit c: Connection): List[AddresstypeRow]
@@ -28,6 +28,6 @@ trait AddresstypeRepo {
   def update(row: AddresstypeRow)(implicit c: Connection): Boolean
   def upsert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow
   def upsertBatch(unsaved: Iterable[AddresstypeRow])(implicit c: Connection): List[AddresstypeRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[AddresstypeRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.i
+package adventureworks.pr.i;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class IViewRepoImpl extends IViewRepo {
-  override def select: SelectBuilder[IViewFields, IViewRow] = {
-    SelectBuilderSql("pr.i", IViewFields.structure, IViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, IViewRow] = {
-    sql"""select "id", "illustrationid", "diagram", "modifieddate"::text from pr.i""".query(using IViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[IViewFields, IViewRow] = SelectBuilderSql("pr.i", IViewFields.structure, IViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, IViewRow] = sql"""select "id", "illustrationid", "diagram", "modifieddate"::text from pr.i""".query(using IViewRow.jdbcDecoder).selectStream()
 }

@@ -3,15 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.cr
+package adventureworks.sa.cr;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.sales.currency.CurrencyId
-import adventureworks.sales.currencyrate.CurrencyrateId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.sales.currency.CurrencyId;
+import adventureworks.sales.currencyrate.CurrencyrateId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait CrViewFields {
   def currencyrateid: Field[CurrencyrateId, CrViewRow]

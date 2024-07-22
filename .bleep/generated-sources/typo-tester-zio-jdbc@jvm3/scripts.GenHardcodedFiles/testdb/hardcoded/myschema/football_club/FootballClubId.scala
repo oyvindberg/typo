@@ -3,19 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.myschema.football_club
+package testdb.hardcoded.myschema.football_club;
 
-import testdb.hardcoded.Text
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import testdb.hardcoded.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `myschema.football_club` */
-case class FootballClubId(value: Long) extends AnyVal
+case class FootballClubId(value: Long) extends scala.AnyVal
+
 object FootballClubId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[FootballClubId]] = testdb.hardcoded.LongArrayDecoder.map(_.map(FootballClubId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[FootballClubId]] = testdb.hardcoded.LongArrayEncoder.contramap(_.map(_.value))
@@ -27,8 +28,10 @@ object FootballClubId {
   implicit lazy val jsonEncoder: JsonEncoder[FootballClubId] = JsonEncoder.long.contramap(_.value)
   implicit lazy val pgType: PGType[FootballClubId] = PGType.PGTypeLong.as
   implicit lazy val setter: Setter[FootballClubId] = Setter.longSetter.contramap(_.value)
-  implicit lazy val text: Text[FootballClubId] = new Text[FootballClubId] {
-    override def unsafeEncode(v: FootballClubId, sb: StringBuilder) = Text.longInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: FootballClubId, sb: StringBuilder) = Text.longInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[FootballClubId] = {
+    new Text[FootballClubId] {
+      override def unsafeEncode(v: FootballClubId, sb: StringBuilder) = Text.longInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: FootballClubId, sb: StringBuilder) = Text.longInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

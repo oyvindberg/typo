@@ -3,27 +3,27 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productproductphoto
+package adventureworks.production.productproductphoto;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.product.ProductFields
-import adventureworks.production.product.ProductId
-import adventureworks.production.product.ProductRow
-import adventureworks.production.productphoto.ProductphotoFields
-import adventureworks.production.productphoto.ProductphotoId
-import adventureworks.production.productphoto.ProductphotoRow
-import adventureworks.public.Flag
-import typo.dsl.ForeignKey
-import typo.dsl.PGType
-import typo.dsl.Path
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Const.As.as
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.product.ProductFields;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.product.ProductRow;
+import adventureworks.production.productphoto.ProductphotoFields;
+import adventureworks.production.productphoto.ProductphotoId;
+import adventureworks.production.productphoto.ProductphotoRow;
+import adventureworks.public.Flag;
+import typo.dsl.ForeignKey;
+import typo.dsl.PGType;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait ProductproductphotoFields {
   def productid: IdField[ProductId, ProductproductphotoRow]

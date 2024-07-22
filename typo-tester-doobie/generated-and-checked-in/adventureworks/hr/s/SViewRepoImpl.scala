@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.hr.s
+package adventureworks.hr.s;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class SViewRepoImpl extends SViewRepo {
-  override def select: SelectBuilder[SViewFields, SViewRow] = {
-    SelectBuilderSql("hr.s", SViewFields.structure, SViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, SViewRow] = {
-    sql"""select "id", "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from hr.s""".query(using SViewRow.read).stream
-  }
+  def select: SelectBuilder[SViewFields, SViewRow] = SelectBuilderSql("hr.s", SViewFields.structure, SViewRow.read)
+  def selectAll: Stream[ConnectionIO, SViewRow] = sql"""select "id", "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from hr.s""".query(using SViewRow.read).stream
 }

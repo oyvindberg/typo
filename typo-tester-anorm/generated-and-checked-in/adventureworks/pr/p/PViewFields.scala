@@ -3,22 +3,22 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.p
+package adventureworks.pr.p;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.production.product.ProductId
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.production.productsubcategory.ProductsubcategoryId
-import adventureworks.production.unitmeasure.UnitmeasureId
-import adventureworks.public.Flag
-import adventureworks.public.Name
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.productmodel.ProductmodelId;
+import adventureworks.production.productsubcategory.ProductsubcategoryId;
+import adventureworks.production.unitmeasure.UnitmeasureId;
+import adventureworks.public.Flag;
+import adventureworks.public.Name;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait PViewFields {
   def id: Field[ProductId, PViewRow]

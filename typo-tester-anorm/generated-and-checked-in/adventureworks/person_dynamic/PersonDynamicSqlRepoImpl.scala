@@ -3,16 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person_dynamic
+package adventureworks.person_dynamic;
 
-import anorm.ParameterMetaData
-import anorm.ParameterValue
-import anorm.SqlStringInterpolation
-import anorm.ToStatement
-import java.sql.Connection
+import anorm.ParameterMetaData;
+import anorm.ParameterValue;
+import anorm.SqlStringInterpolation;
+import anorm.ToStatement;
+import java.sql.Connection;
 
 class PersonDynamicSqlRepoImpl extends PersonDynamicSqlRepo {
-  override def apply(firstName: Option[String])(implicit c: Connection): List[PersonDynamicSqlRow] = {
+  def apply(firstName: Option[String])(implicit c: Connection): List[PersonDynamicSqlRow] = {
     val sql =
       SQL"""SELECT p.title, p.firstname, p.middlename, p.lastname
             FROM person.person p

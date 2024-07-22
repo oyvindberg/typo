@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.vendor
+package adventureworks.purchasing.vendor;
 
-import adventureworks.person.businessentity.BusinessentityId
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import adventureworks.person.businessentity.BusinessentityId;
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait VendorRepo {
   def delete: DeleteBuilder[VendorFields, VendorRow]
@@ -18,7 +18,7 @@ trait VendorRepo {
   def insert(unsaved: VendorRow)(implicit c: Connection): VendorRow
   def insert(unsaved: VendorRowUnsaved)(implicit c: Connection): VendorRow
   def insertStreaming(unsaved: Iterator[VendorRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[VendorRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[VendorFields, VendorRow]
   def selectAll(implicit c: Connection): List[VendorRow]
@@ -29,6 +29,6 @@ trait VendorRepo {
   def update(row: VendorRow)(implicit c: Connection): Boolean
   def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow
   def upsertBatch(unsaved: Iterable[VendorRow])(implicit c: Connection): List[VendorRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[VendorRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

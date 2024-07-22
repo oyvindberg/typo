@@ -3,18 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productsubcategory
+package adventureworks.production.productsubcategory;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `production.productsubcategory` */
-case class ProductsubcategoryId(value: Int) extends AnyVal
+case class ProductsubcategoryId(value: Int) extends scala.AnyVal
+
 object ProductsubcategoryId {
   implicit lazy val arrayGet: Get[Array[ProductsubcategoryId]] = adventureworks.IntegerArrayMeta.get.map(_.map(ProductsubcategoryId.apply))
   implicit lazy val arrayPut: Put[Array[ProductsubcategoryId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
@@ -23,8 +24,10 @@ object ProductsubcategoryId {
   implicit lazy val encoder: Encoder[ProductsubcategoryId] = Encoder.encodeInt.contramap(_.value)
   implicit lazy val get: Get[ProductsubcategoryId] = Meta.IntMeta.get.map(ProductsubcategoryId.apply)
   implicit lazy val put: Put[ProductsubcategoryId] = Meta.IntMeta.put.contramap(_.value)
-  implicit lazy val text: Text[ProductsubcategoryId] = new Text[ProductsubcategoryId] {
-    override def unsafeEncode(v: ProductsubcategoryId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: ProductsubcategoryId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[ProductsubcategoryId] = {
+    new Text[ProductsubcategoryId] {
+      override def unsafeEncode(v: ProductsubcategoryId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: ProductsubcategoryId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

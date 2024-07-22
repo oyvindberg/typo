@@ -3,22 +3,23 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.information_schema
+package adventureworks.information_schema;
 
-import adventureworks.Text
-import java.sql.Types
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import java.sql.Types;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Domain `information_schema.yes_or_no`
   * Constraint: CHECK (((VALUE)::text = ANY ((ARRAY['YES'::character varying, 'NO'::character varying])::text[])))
   */
 case class YesOrNo(value: String)
+
 object YesOrNo {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[YesOrNo]] = adventureworks.StringArrayDecoder.map(_.map(YesOrNo.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[YesOrNo]] = adventureworks.StringArrayEncoder.contramap(_.map(_.value))
@@ -30,8 +31,10 @@ object YesOrNo {
   implicit lazy val jsonEncoder: JsonEncoder[YesOrNo] = JsonEncoder.string.contramap(_.value)
   implicit lazy val pgType: PGType[YesOrNo] = PGType.instance(""""information_schema"."yes_or_no"""", Types.OTHER)
   implicit lazy val setter: Setter[YesOrNo] = Setter.stringSetter.contramap(_.value)
-  implicit lazy val text: Text[YesOrNo] = new Text[YesOrNo] {
-    override def unsafeEncode(v: YesOrNo, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: YesOrNo, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[YesOrNo] = {
+    new Text[YesOrNo] {
+      override def unsafeEncode(v: YesOrNo, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: YesOrNo, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

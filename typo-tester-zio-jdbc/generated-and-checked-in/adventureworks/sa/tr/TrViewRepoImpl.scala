@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.tr
+package adventureworks.sa.tr;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class TrViewRepoImpl extends TrViewRepo {
-  override def select: SelectBuilder[TrViewFields, TrViewRow] = {
-    SelectBuilderSql("sa.tr", TrViewFields.structure, TrViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, TrViewRow] = {
-    sql"""select "id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sa.tr""".query(using TrViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[TrViewFields, TrViewRow] = SelectBuilderSql("sa.tr", TrViewFields.structure, TrViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, TrViewRow] = sql"""select "id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sa.tr""".query(using TrViewRow.jdbcDecoder).selectStream()
 }

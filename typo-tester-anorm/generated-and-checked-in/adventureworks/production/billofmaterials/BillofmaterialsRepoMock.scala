@@ -3,32 +3,25 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.billofmaterials
+package adventureworks.production.billofmaterials;
 
-import java.sql.Connection
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.DeleteBuilder.DeleteBuilderMock
-import typo.dsl.DeleteParams
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderMock
-import typo.dsl.SelectParams
-import typo.dsl.UpdateBuilder
-import typo.dsl.UpdateBuilder.UpdateBuilderMock
-import typo.dsl.UpdateParams
+import java.sql.Connection;
+import scala.annotation.nowarn;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.DeleteBuilder.DeleteBuilderMock;
+import typo.dsl.DeleteParams;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderMock;
+import typo.dsl.SelectParams;
+import typo.dsl.UpdateBuilder;
+import typo.dsl.UpdateBuilder.UpdateBuilderMock;
+import typo.dsl.UpdateParams;
 
-class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, BillofmaterialsRow],
-                              map: scala.collection.mutable.Map[Int, BillofmaterialsRow] = scala.collection.mutable.Map.empty) extends BillofmaterialsRepo {
-  override def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields.structure, map)
-  }
-  override def deleteById(billofmaterialsid: Int)(implicit c: Connection): Boolean = {
-    map.remove(billofmaterialsid).isDefined
-  }
-  override def deleteByIds(billofmaterialsids: Array[Int])(implicit c: Connection): Int = {
-    billofmaterialsids.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
+class BillofmaterialsRepoMock(val toRow: Function1[BillofmaterialsRowUnsaved, BillofmaterialsRow], val map: scala.collection.mutable.Map[Int, BillofmaterialsRow] = scala.collection.mutable.Map.empty) extends BillofmaterialsRepo {
+  def delete: DeleteBuilder[BillofmaterialsFields, BillofmaterialsRow] = DeleteBuilderMock(DeleteParams.empty, BillofmaterialsFields.structure, map)
+  def deleteById(billofmaterialsid: Int)(implicit c: Connection): Boolean = map.remove(billofmaterialsid).isDefined
+  def deleteByIds(billofmaterialsids: Array[Int])(implicit c: Connection): Int = billofmaterialsids.map(id => map.remove(id)).count(_.isDefined)
+  def insert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     val _ = if (map.contains(unsaved.billofmaterialsid))
       sys.error(s"id ${unsaved.billofmaterialsid} already exists")
     else
@@ -36,43 +29,31 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
     
     unsaved
   }
-  override def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow = {
-    insert(toRow(unsaved))
-  }
-  override def insertStreaming(unsaved: Iterator[BillofmaterialsRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
+  def insert(unsaved: BillofmaterialsRowUnsaved)(implicit c: Connection): BillofmaterialsRow = insert(toRow(unsaved))
+  def insertStreaming(unsaved: Iterator[BillofmaterialsRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.billofmaterialsid -> row)
     }
     unsaved.size.toLong
   }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Iterator[BillofmaterialsRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[BillofmaterialsRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { unsavedRow =>
       val row = toRow(unsavedRow)
       map += (row.billofmaterialsid -> row)
     }
     unsaved.size.toLong
   }
-  override def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    SelectBuilderMock(BillofmaterialsFields.structure, () => map.values.toList, SelectParams.empty)
-  }
-  override def selectAll(implicit c: Connection): List[BillofmaterialsRow] = {
-    map.values.toList
-  }
-  override def selectById(billofmaterialsid: Int)(implicit c: Connection): Option[BillofmaterialsRow] = {
-    map.get(billofmaterialsid)
-  }
-  override def selectByIds(billofmaterialsids: Array[Int])(implicit c: Connection): List[BillofmaterialsRow] = {
-    billofmaterialsids.flatMap(map.get).toList
-  }
-  override def selectByIdsTracked(billofmaterialsids: Array[Int])(implicit c: Connection): Map[Int, BillofmaterialsRow] = {
+  def select: SelectBuilder[BillofmaterialsFields, BillofmaterialsRow] = SelectBuilderMock(BillofmaterialsFields.structure, () => map.values.toList, SelectParams.empty)
+  def selectAll(implicit c: Connection): List[BillofmaterialsRow] = map.values.toList
+  def selectById(billofmaterialsid: Int)(implicit c: Connection): Option[BillofmaterialsRow] = map.get(billofmaterialsid)
+  def selectByIds(billofmaterialsids: Array[Int])(implicit c: Connection): List[BillofmaterialsRow] = billofmaterialsids.flatMap(map.get).toList
+  def selectByIdsTracked(billofmaterialsids: Array[Int])(implicit c: Connection): Map[Int, BillofmaterialsRow] = {
     val byId = selectByIds(billofmaterialsids).view.map(x => (x.billofmaterialsid, x)).toMap
     billofmaterialsids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
-  override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
-    UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields.structure, map)
-  }
-  override def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean = {
+  def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields.structure, map)
+  def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean = {
     map.get(row.billofmaterialsid) match {
       case Some(`row`) => false
       case Some(_) =>
@@ -81,18 +62,18 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
       case None => false
     }
   }
-  override def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
+  def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     map.put(unsaved.billofmaterialsid, unsaved): @nowarn
     unsaved
   }
-  override def upsertBatch(unsaved: Iterable[BillofmaterialsRow])(implicit c: Connection): List[BillofmaterialsRow] = {
+  def upsertBatch(unsaved: Iterable[BillofmaterialsRow])(implicit c: Connection): List[BillofmaterialsRow] = {
     unsaved.map { row =>
       map += (row.billofmaterialsid -> row)
       row
     }.toList
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Iterator[BillofmaterialsRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[BillofmaterialsRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     unsaved.foreach { row =>
       map += (row.billofmaterialsid -> row)
     }

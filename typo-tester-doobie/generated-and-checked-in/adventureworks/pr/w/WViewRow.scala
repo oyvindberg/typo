@@ -3,19 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.w
+package adventureworks.pr.w;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.production.product.ProductId
-import adventureworks.production.scrapreason.ScrapreasonId
-import adventureworks.production.workorder.WorkorderId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.scrapreason.ScrapreasonId;
+import adventureworks.production.workorder.WorkorderId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: pr.w */
 case class WViewRow(
@@ -44,30 +44,33 @@ case class WViewRow(
 object WViewRow {
   implicit lazy val decoder: Decoder[WViewRow] = Decoder.forProduct10[WViewRow, WorkorderId, WorkorderId, ProductId, Int, TypoShort, TypoLocalDateTime, Option[TypoLocalDateTime], TypoLocalDateTime, Option[ScrapreasonId], TypoLocalDateTime]("id", "workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")(WViewRow.apply)(WorkorderId.decoder, WorkorderId.decoder, ProductId.decoder, Decoder.decodeInt, TypoShort.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), TypoLocalDateTime.decoder, Decoder.decodeOption(ScrapreasonId.decoder), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[WViewRow] = Encoder.forProduct10[WViewRow, WorkorderId, WorkorderId, ProductId, Int, TypoShort, TypoLocalDateTime, Option[TypoLocalDateTime], TypoLocalDateTime, Option[ScrapreasonId], TypoLocalDateTime]("id", "workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")(x => (x.id, x.workorderid, x.productid, x.orderqty, x.scrappedqty, x.startdate, x.enddate, x.duedate, x.scrapreasonid, x.modifieddate))(WorkorderId.encoder, WorkorderId.encoder, ProductId.encoder, Encoder.encodeInt, TypoShort.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), TypoLocalDateTime.encoder, Encoder.encodeOption(ScrapreasonId.encoder), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[WViewRow] = new Read[WViewRow](
-    gets = List(
-      (WorkorderId.get, Nullability.NoNulls),
-      (WorkorderId.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (ScrapreasonId.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => WViewRow(
-      id = WorkorderId.get.unsafeGetNonNullable(rs, i + 0),
-      workorderid = WorkorderId.get.unsafeGetNonNullable(rs, i + 1),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 2),
-      orderqty = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
-      scrappedqty = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
-      startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5),
-      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6),
-      duedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7),
-      scrapreasonid = ScrapreasonId.get.unsafeGetNullable(rs, i + 8),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 9)
+  implicit lazy val read: Read[WViewRow] = {
+    new Read[WViewRow](
+      gets = List(
+        (WorkorderId.get, Nullability.NoNulls),
+        (WorkorderId.get, Nullability.NoNulls),
+        (ProductId.get, Nullability.NoNulls),
+        (Meta.IntMeta.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.Nullable),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (ScrapreasonId.get, Nullability.Nullable),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => WViewRow(
+        id = WorkorderId.get.unsafeGetNonNullable(rs, i + 0),
+        workorderid = WorkorderId.get.unsafeGetNonNullable(rs, i + 1),
+        productid = ProductId.get.unsafeGetNonNullable(rs, i + 2),
+        orderqty = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
+        scrappedqty = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
+        startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5),
+        enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6),
+        duedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7),
+        scrapreasonid = ScrapreasonId.get.unsafeGetNullable(rs, i + 8),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 9)
+      )
     )
-  )
+  
+  }
 }

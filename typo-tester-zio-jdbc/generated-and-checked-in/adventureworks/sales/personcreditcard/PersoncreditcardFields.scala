@@ -3,26 +3,26 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.personcreditcard
+package adventureworks.sales.personcreditcard;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.person.person.PersonFields
-import adventureworks.person.person.PersonRow
-import adventureworks.sales.creditcard.CreditcardFields
-import adventureworks.sales.creditcard.CreditcardRow
-import adventureworks.userdefined.CustomCreditcardId
-import typo.dsl.ForeignKey
-import typo.dsl.PGType
-import typo.dsl.Path
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Const.As.as
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.person.person.PersonFields;
+import adventureworks.person.person.PersonRow;
+import adventureworks.sales.creditcard.CreditcardFields;
+import adventureworks.sales.creditcard.CreditcardRow;
+import adventureworks.userdefined.CustomCreditcardId;
+import typo.dsl.ForeignKey;
+import typo.dsl.PGType;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait PersoncreditcardFields {
   def businessentityid: IdField[BusinessentityId, PersoncreditcardRow]

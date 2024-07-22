@@ -3,16 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.shift
+package adventureworks.humanresources.shift;
 
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
+/** upsertBatch: Not implementable for zio-jdbc */
 trait ShiftRepo {
   def delete: DeleteBuilder[ShiftFields, ShiftRow]
   def deleteById(shiftid: ShiftId): ZIO[ZConnection, Throwable, Boolean]
@@ -20,7 +21,7 @@ trait ShiftRepo {
   def insert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, ShiftRow]
   def insert(unsaved: ShiftRowUnsaved): ZIO[ZConnection, Throwable, ShiftRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[ShiftFields, ShiftRow]
   def selectAll: ZStream[ZConnection, Throwable, ShiftRow]
@@ -30,7 +31,6 @@ trait ShiftRepo {
   def update: UpdateBuilder[ShiftFields, ShiftRow]
   def update(row: ShiftRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, UpdateResult[ShiftRow]]
-  // Not implementable for zio-jdbc: upsertBatch
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

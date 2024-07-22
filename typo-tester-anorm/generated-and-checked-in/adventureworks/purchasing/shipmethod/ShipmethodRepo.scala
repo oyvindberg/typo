@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.shipmethod
+package adventureworks.purchasing.shipmethod;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait ShipmethodRepo {
   def delete: DeleteBuilder[ShipmethodFields, ShipmethodRow]
@@ -17,7 +17,7 @@ trait ShipmethodRepo {
   def insert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow
   def insert(unsaved: ShipmethodRowUnsaved)(implicit c: Connection): ShipmethodRow
   def insertStreaming(unsaved: Iterator[ShipmethodRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[ShipmethodRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[ShipmethodFields, ShipmethodRow]
   def selectAll(implicit c: Connection): List[ShipmethodRow]
@@ -28,6 +28,6 @@ trait ShipmethodRepo {
   def update(row: ShipmethodRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow
   def upsertBatch(unsaved: Iterable[ShipmethodRow])(implicit c: Connection): List[ShipmethodRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[ShipmethodRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

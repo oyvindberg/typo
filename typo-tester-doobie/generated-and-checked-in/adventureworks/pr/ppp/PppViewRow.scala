@@ -3,17 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.ppp
+package adventureworks.pr.ppp;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.product.ProductId
-import adventureworks.production.productphoto.ProductphotoId
-import adventureworks.public.Flag
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.product.ProductId;
+import adventureworks.production.productphoto.ProductphotoId;
+import adventureworks.public.Flag;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: pr.ppp */
 case class PppViewRow(
@@ -30,18 +30,21 @@ case class PppViewRow(
 object PppViewRow {
   implicit lazy val decoder: Decoder[PppViewRow] = Decoder.forProduct4[PppViewRow, ProductId, ProductphotoId, Flag, TypoLocalDateTime]("productid", "productphotoid", "primary", "modifieddate")(PppViewRow.apply)(ProductId.decoder, ProductphotoId.decoder, Flag.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PppViewRow] = Encoder.forProduct4[PppViewRow, ProductId, ProductphotoId, Flag, TypoLocalDateTime]("productid", "productphotoid", "primary", "modifieddate")(x => (x.productid, x.productphotoid, x.primary, x.modifieddate))(ProductId.encoder, ProductphotoId.encoder, Flag.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PppViewRow] = new Read[PppViewRow](
-    gets = List(
-      (ProductId.get, Nullability.NoNulls),
-      (ProductphotoId.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PppViewRow(
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 0),
-      productphotoid = ProductphotoId.get.unsafeGetNonNullable(rs, i + 1),
-      primary = Flag.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[PppViewRow] = {
+    new Read[PppViewRow](
+      gets = List(
+        (ProductId.get, Nullability.NoNulls),
+        (ProductphotoId.get, Nullability.NoNulls),
+        (Flag.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PppViewRow(
+        productid = ProductId.get.unsafeGetNonNullable(rs, i + 0),
+        productphotoid = ProductphotoId.get.unsafeGetNonNullable(rs, i + 1),
+        primary = Flag.get.unsafeGetNonNullable(rs, i + 2),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+      )
     )
-  )
+  
+  }
 }

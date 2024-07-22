@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.sci
+package adventureworks.sa.sci;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class SciViewRepoImpl extends SciViewRepo {
-  override def select: SelectBuilder[SciViewFields, SciViewRow] = {
-    SelectBuilderSql("sa.sci", SciViewFields.structure, SciViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, SciViewRow] = {
-    sql"""select "id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sa.sci""".query(using SciViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[SciViewFields, SciViewRow] = SelectBuilderSql("sa.sci", SciViewFields.structure, SciViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, SciViewRow] = sql"""select "id", "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sa.sci""".query(using SciViewRow.jdbcDecoder).selectStream()
 }

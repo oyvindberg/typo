@@ -3,22 +3,22 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.pd
+package adventureworks.pr.pd;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.production.productdescription.ProductdescriptionId
-import anorm.Column
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.production.productdescription.ProductdescriptionId;
+import anorm.Column;
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** View: pr.pd */
 case class PdViewRow(
@@ -35,36 +35,42 @@ case class PdViewRow(
 )
 
 object PdViewRow {
-  implicit lazy val reads: Reads[PdViewRow] = Reads[PdViewRow](json => JsResult.fromTry(
-      Try(
-        PdViewRow(
-          id = json.\("id").as(ProductdescriptionId.reads),
-          productdescriptionid = json.\("productdescriptionid").as(ProductdescriptionId.reads),
-          description = json.\("description").as(Reads.StringReads),
-          rowguid = json.\("rowguid").as(TypoUUID.reads),
-          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+  implicit lazy val reads: Reads[PdViewRow] = {
+    Reads[PdViewRow](json => JsResult.fromTry(
+        Try(
+          PdViewRow(
+            id = json.\("id").as(ProductdescriptionId.reads),
+            productdescriptionid = json.\("productdescriptionid").as(ProductdescriptionId.reads),
+            description = json.\("description").as(Reads.StringReads),
+            rowguid = json.\("rowguid").as(TypoUUID.reads),
+            modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+          )
         )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[PdViewRow] = RowParser[PdViewRow] { row =>
-    Success(
-      PdViewRow(
-        id = row(idx + 0)(ProductdescriptionId.column),
-        productdescriptionid = row(idx + 1)(ProductdescriptionId.column),
-        description = row(idx + 2)(Column.columnToString),
-        rowguid = row(idx + 3)(TypoUUID.column),
-        modifieddate = row(idx + 4)(TypoLocalDateTime.column)
-      )
+      ),
     )
   }
-  implicit lazy val writes: OWrites[PdViewRow] = OWrites[PdViewRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "id" -> ProductdescriptionId.writes.writes(o.id),
-      "productdescriptionid" -> ProductdescriptionId.writes.writes(o.productdescriptionid),
-      "description" -> Writes.StringWrites.writes(o.description),
-      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
-      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
-    ))
-  )
+  def rowParser(idx: Int): RowParser[PdViewRow] = {
+    RowParser[PdViewRow] { row =>
+      Success(
+        PdViewRow(
+          id = row(idx + 0)(ProductdescriptionId.column),
+          productdescriptionid = row(idx + 1)(ProductdescriptionId.column),
+          description = row(idx + 2)(Column.columnToString),
+          rowguid = row(idx + 3)(TypoUUID.column),
+          modifieddate = row(idx + 4)(TypoLocalDateTime.column)
+        )
+      )
+    }
+  }
+  implicit lazy val writes: OWrites[PdViewRow] = {
+    OWrites[PdViewRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "id" -> ProductdescriptionId.writes.writes(o.id),
+        "productdescriptionid" -> ProductdescriptionId.writes.writes(o.productdescriptionid),
+        "description" -> Writes.StringWrites.writes(o.description),
+        "rowguid" -> TypoUUID.writes.writes(o.rowguid),
+        "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
+      ))
+    )
+  }
 }

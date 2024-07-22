@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pe.bec
+package adventureworks.pe.bec;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class BecViewRepoImpl extends BecViewRepo {
-  override def select: SelectBuilder[BecViewFields, BecViewRow] = {
-    SelectBuilderSql("pe.bec", BecViewFields.structure, BecViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[BecViewRow] = {
+  def select: SelectBuilder[BecViewFields, BecViewRow] = SelectBuilderSql("pe.bec", BecViewFields.structure, BecViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[BecViewRow] = {
     SQL"""select "id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
           from pe.bec
        """.as(BecViewRow.rowParser(1).*)

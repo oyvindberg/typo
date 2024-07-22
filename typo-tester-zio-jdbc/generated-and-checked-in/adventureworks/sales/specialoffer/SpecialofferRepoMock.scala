@@ -3,36 +3,29 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.specialoffer
+package adventureworks.sales.specialoffer;
 
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.DeleteBuilder.DeleteBuilderMock
-import typo.dsl.DeleteParams
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderMock
-import typo.dsl.SelectParams
-import typo.dsl.UpdateBuilder
-import typo.dsl.UpdateBuilder.UpdateBuilderMock
-import typo.dsl.UpdateParams
-import zio.Chunk
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import scala.annotation.nowarn;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.DeleteBuilder.DeleteBuilderMock;
+import typo.dsl.DeleteParams;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderMock;
+import typo.dsl.SelectParams;
+import typo.dsl.UpdateBuilder;
+import typo.dsl.UpdateBuilder.UpdateBuilderMock;
+import typo.dsl.UpdateParams;
+import zio.Chunk;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
-class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, SpecialofferRow],
-                           map: scala.collection.mutable.Map[SpecialofferId, SpecialofferRow] = scala.collection.mutable.Map.empty) extends SpecialofferRepo {
-  override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SpecialofferFields.structure, map)
-  }
-  override def deleteById(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Boolean] = {
-    ZIO.succeed(map.remove(specialofferid).isDefined)
-  }
-  override def deleteByIds(specialofferids: Array[SpecialofferId]): ZIO[ZConnection, Throwable, Long] = {
-    ZIO.succeed(specialofferids.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def insert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, SpecialofferRow] = {
+class SpecialofferRepoMock(val toRow: Function1[SpecialofferRowUnsaved, SpecialofferRow], val map: scala.collection.mutable.Map[SpecialofferId, SpecialofferRow] = scala.collection.mutable.Map.empty) extends SpecialofferRepo {
+  def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = DeleteBuilderMock(DeleteParams.empty, SpecialofferFields.structure, map)
+  def deleteById(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Boolean] = ZIO.succeed(map.remove(specialofferid).isDefined)
+  def deleteByIds(specialofferids: Array[SpecialofferId]): ZIO[ZConnection, Throwable, Long] = ZIO.succeed(specialofferids.map(id => map.remove(id)).count(_.isDefined).toLong)
+  def insert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, SpecialofferRow] = {
     ZIO.succeed {
       val _ =
         if (map.contains(unsaved.specialofferid))
@@ -43,10 +36,8 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
       unsaved
     }
   }
-  override def insert(unsaved: SpecialofferRowUnsaved): ZIO[ZConnection, Throwable, SpecialofferRow] = {
-    insert(toRow(unsaved))
-  }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+  def insert(unsaved: SpecialofferRowUnsaved): ZIO[ZConnection, Throwable, SpecialofferRow] = insert(toRow(unsaved))
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
         map += (row.specialofferid -> row)
@@ -54,8 +45,8 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
       }
     }.runLast.map(_.getOrElse(0L))
   }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, unsavedRow) =>
       ZIO.succeed {
         val row = toRow(unsavedRow)
@@ -64,28 +55,18 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
       }
     }.runLast.map(_.getOrElse(0L))
   }
-  override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
-    SelectBuilderMock(SpecialofferFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, SpecialofferRow] = {
-    ZStream.fromIterable(map.values)
-  }
-  override def selectById(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Option[SpecialofferRow]] = {
-    ZIO.succeed(map.get(specialofferid))
-  }
-  override def selectByIds(specialofferids: Array[SpecialofferId]): ZStream[ZConnection, Throwable, SpecialofferRow] = {
-    ZStream.fromIterable(specialofferids.flatMap(map.get))
-  }
-  override def selectByIdsTracked(specialofferids: Array[SpecialofferId]): ZIO[ZConnection, Throwable, Map[SpecialofferId, SpecialofferRow]] = {
+  def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = SelectBuilderMock(SpecialofferFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+  def selectAll: ZStream[ZConnection, Throwable, SpecialofferRow] = ZStream.fromIterable(map.values)
+  def selectById(specialofferid: SpecialofferId): ZIO[ZConnection, Throwable, Option[SpecialofferRow]] = ZIO.succeed(map.get(specialofferid))
+  def selectByIds(specialofferids: Array[SpecialofferId]): ZStream[ZConnection, Throwable, SpecialofferRow] = ZStream.fromIterable(specialofferids.flatMap(map.get))
+  def selectByIdsTracked(specialofferids: Array[SpecialofferId]): ZIO[ZConnection, Throwable, Map[SpecialofferId, SpecialofferRow]] = {
     selectByIds(specialofferids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.specialofferid, x)).toMap
       specialofferids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SpecialofferFields.structure, map)
-  }
-  override def update(row: SpecialofferRow): ZIO[ZConnection, Throwable, Boolean] = {
+  def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = UpdateBuilderMock(UpdateParams.empty, SpecialofferFields.structure, map)
+  def update(row: SpecialofferRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.specialofferid) match {
         case Some(`row`) => false
@@ -96,14 +77,14 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
       }
     }
   }
-  override def upsert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, UpdateResult[SpecialofferRow]] = {
+  def upsert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, UpdateResult[SpecialofferRow]] = {
     ZIO.succeed {
       map.put(unsaved.specialofferid, unsaved): @nowarn
       UpdateResult(1, Chunk.single(unsaved))
     }
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
         map += (row.specialofferid -> row)

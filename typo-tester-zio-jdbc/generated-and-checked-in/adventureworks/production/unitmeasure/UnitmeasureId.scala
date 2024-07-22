@@ -3,19 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.unitmeasure
+package adventureworks.production.unitmeasure;
 
-import adventureworks.Text
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `production.unitmeasure` */
-case class UnitmeasureId(value: /* bpchar, max 3 chars */ String) extends AnyVal
+case class UnitmeasureId(value: /* bpchar, max 3 chars */ String) extends scala.AnyVal
+
 object UnitmeasureId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[UnitmeasureId]] = adventureworks.StringArrayDecoder.map(_.map(UnitmeasureId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[UnitmeasureId]] = adventureworks.StringArrayEncoder.contramap(_.map(_.value))
@@ -27,8 +28,10 @@ object UnitmeasureId {
   implicit lazy val jsonEncoder: JsonEncoder[UnitmeasureId] = JsonEncoder.string.contramap(_.value)
   implicit lazy val pgType: PGType[UnitmeasureId] = PGType.PGTypeString.as
   implicit lazy val setter: Setter[UnitmeasureId] = Setter.stringSetter.contramap(_.value)
-  implicit lazy val text: Text[UnitmeasureId] = new Text[UnitmeasureId] {
-    override def unsafeEncode(v: UnitmeasureId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: UnitmeasureId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[UnitmeasureId] = {
+    new Text[UnitmeasureId] {
+      override def unsafeEncode(v: UnitmeasureId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: UnitmeasureId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

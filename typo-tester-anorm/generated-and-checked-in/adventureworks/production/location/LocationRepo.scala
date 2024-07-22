@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.location
+package adventureworks.production.location;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait LocationRepo {
   def delete: DeleteBuilder[LocationFields, LocationRow]
@@ -17,7 +17,7 @@ trait LocationRepo {
   def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow
   def insert(unsaved: LocationRowUnsaved)(implicit c: Connection): LocationRow
   def insertStreaming(unsaved: Iterator[LocationRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[LocationRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[LocationFields, LocationRow]
   def selectAll(implicit c: Connection): List[LocationRow]
@@ -28,6 +28,6 @@ trait LocationRepo {
   def update(row: LocationRow)(implicit c: Connection): Boolean
   def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow
   def upsertBatch(unsaved: Iterable[LocationRow])(implicit c: Connection): List[LocationRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[LocationRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

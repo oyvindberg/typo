@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.so
+package adventureworks.sa.so;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class SoViewRepoImpl extends SoViewRepo {
-  override def select: SelectBuilder[SoViewFields, SoViewRow] = {
-    SelectBuilderSql("sa.so", SoViewFields.structure, SoViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, SoViewRow] = {
-    sql"""select "id", "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sa.so""".query(using SoViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[SoViewFields, SoViewRow] = SelectBuilderSql("sa.so", SoViewFields.structure, SoViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, SoViewRow] = sql"""select "id", "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from sa.so""".query(using SoViewRow.jdbcDecoder).selectStream()
 }

@@ -3,105 +3,131 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.shipmethod
+package adventureworks.purchasing.shipmethod;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.public.Name
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.public.Name;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: purchasing.shipmethod
-    Shipping company lookup table.
-    Primary key: shipmethodid */
+  * Shipping company lookup table.
+  * Primary key: shipmethodid
+  */
 case class ShipmethodRow(
   /** Primary key for ShipMethod records.
-      Default: nextval('purchasing.shipmethod_shipmethodid_seq'::regclass) */
+    * Default: nextval('purchasing.shipmethod_shipmethodid_seq'::regclass)
+    */
   shipmethodid: ShipmethodId,
   /** Shipping company name. */
   name: Name,
   /** Minimum shipping charge.
-      Default: 0.00
-      Constraint CK_ShipMethod_ShipBase affecting columns shipbase: ((shipbase > 0.00)) */
+    * Default: 0.00
+    * Constraint CK_ShipMethod_ShipBase affecting columns shipbase: ((shipbase > 0.00))
+    */
   shipbase: BigDecimal,
   /** Shipping charge per pound.
-      Default: 0.00
-      Constraint CK_ShipMethod_ShipRate affecting columns shiprate: ((shiprate > 0.00)) */
+    * Default: 0.00
+    * Constraint CK_ShipMethod_ShipRate affecting columns shiprate: ((shiprate > 0.00))
+    */
   shiprate: BigDecimal,
   /** Default: uuid_generate_v1() */
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val id = shipmethodid
-   def toUnsavedRow(shipmethodid: Defaulted[ShipmethodId], shipbase: Defaulted[BigDecimal] = Defaulted.Provided(this.shipbase), shiprate: Defaulted[BigDecimal] = Defaulted.Provided(this.shiprate), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ShipmethodRowUnsaved =
-     ShipmethodRowUnsaved(name, shipmethodid, shipbase, shiprate, rowguid, modifieddate)
- }
+) {
+  def id: ShipmethodId = shipmethodid
+  def toUnsavedRow(
+    shipmethodid: Defaulted[ShipmethodId],
+    shipbase: Defaulted[BigDecimal] = Defaulted.Provided(this.shipbase),
+    shiprate: Defaulted[BigDecimal] = Defaulted.Provided(this.shiprate),
+    rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid),
+    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)
+  ): ShipmethodRowUnsaved = {
+    new ShipmethodRowUnsaved(
+      name,
+      shipmethodid,
+      shipbase,
+      shiprate,
+      rowguid,
+      modifieddate
+    )
+  }
+}
 
 object ShipmethodRow {
   implicit lazy val decoder: Decoder[ShipmethodRow] = Decoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, TypoUUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(ShipmethodRow.apply)(ShipmethodId.decoder, Name.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ShipmethodRow] = Encoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, TypoUUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))(ShipmethodId.encoder, Name.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ShipmethodRow] = new Read[ShipmethodRow](
-    gets = List(
-      (ShipmethodId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ShipmethodRow(
-      shipmethodid = ShipmethodId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      shipbase = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 2),
-      shiprate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[ShipmethodRow] = {
+    new Read[ShipmethodRow](
+      gets = List(
+        (ShipmethodId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ShipmethodRow(
+        shipmethodid = ShipmethodId.get.unsafeGetNonNullable(rs, i + 0),
+        name = Name.get.unsafeGetNonNullable(rs, i + 1),
+        shipbase = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 2),
+        shiprate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+      )
     )
-  )
-  implicit lazy val text: Text[ShipmethodRow] = Text.instance[ShipmethodRow]{ (row, sb) =>
-    ShipmethodId.text.unsafeEncode(row.shipmethodid, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Text.bigDecimalInstance.unsafeEncode(row.shipbase, sb)
-    sb.append(Text.DELIMETER)
-    Text.bigDecimalInstance.unsafeEncode(row.shiprate, sb)
-    sb.append(Text.DELIMETER)
-    TypoUUID.text.unsafeEncode(row.rowguid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[ShipmethodRow] = new Write[ShipmethodRow](
-    puts = List((ShipmethodId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ShipmethodId.put.unsafeSetNonNullable(rs, i + 0, a.shipmethodid)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 2, a.shipbase)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 3, a.shiprate)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 4, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ShipmethodId.put.unsafeUpdateNonNullable(ps, i + 0, a.shipmethodid)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.shipbase)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.shiprate)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 4, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[ShipmethodRow] = {
+    Text.instance[ShipmethodRow]{ (row, sb) =>
+      ShipmethodId.text.unsafeEncode(row.shipmethodid, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Text.bigDecimalInstance.unsafeEncode(row.shipbase, sb)
+      sb.append(Text.DELIMETER)
+      Text.bigDecimalInstance.unsafeEncode(row.shiprate, sb)
+      sb.append(Text.DELIMETER)
+      TypoUUID.text.unsafeEncode(row.rowguid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[ShipmethodRow] = {
+    new Write[ShipmethodRow](
+      puts = List((ShipmethodId.put, Nullability.NoNulls),
+                  (Name.put, Nullability.NoNulls),
+                  (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                  (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                  (TypoUUID.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    ShipmethodId.put.unsafeSetNonNullable(rs, i + 0, a.shipmethodid)
+                    Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                    Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 2, a.shipbase)
+                    Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 3, a.shiprate)
+                    TypoUUID.put.unsafeSetNonNullable(rs, i + 4, a.rowguid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       ShipmethodId.put.unsafeUpdateNonNullable(ps, i + 0, a.shipmethodid)
+                       Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                       Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.shipbase)
+                       Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.shiprate)
+                       TypoUUID.put.unsafeUpdateNonNullable(ps, i + 4, a.rowguid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
+                     }
+    )
+  
+  }
 }

@@ -3,167 +3,224 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.workorderrouting
+package adventureworks.production.workorderrouting;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.production.location.LocationId
-import adventureworks.production.workorder.WorkorderId
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.production.location.LocationId;
+import adventureworks.production.workorder.WorkorderId;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: production.workorderrouting
-    Work order details.
-    Composite primary key: workorderid, productid, operationsequence */
+  * Work order details.
+  * Composite primary key: workorderid, productid, operationsequence
+  */
 case class WorkorderroutingRow(
   /** Primary key. Foreign key to WorkOrder.WorkOrderID.
-      Points to [[adventureworks.production.workorder.WorkorderRow.workorderid]] */
+    * Points to [[adventureworks.production.workorder.WorkorderRow.workorderid]]
+    */
   workorderid: WorkorderId,
   /** Primary key. Foreign key to Product.ProductID. */
   productid: Int,
   /** Primary key. Indicates the manufacturing process sequence. */
   operationsequence: TypoShort,
   /** Manufacturing location where the part is processed. Foreign key to Location.LocationID.
-      Points to [[adventureworks.production.location.LocationRow.locationid]] */
+    * Points to [[adventureworks.production.location.LocationRow.locationid]]
+    */
   locationid: LocationId,
   /** Planned manufacturing start date.
-      Constraint CK_WorkOrderRouting_ScheduledEndDate affecting columns scheduledenddate, scheduledstartdate: ((scheduledenddate >= scheduledstartdate)) */
+    * Constraint CK_WorkOrderRouting_ScheduledEndDate affecting columns scheduledenddate, scheduledstartdate: ((scheduledenddate >= scheduledstartdate))
+    */
   scheduledstartdate: TypoLocalDateTime,
   /** Planned manufacturing end date.
-      Constraint CK_WorkOrderRouting_ScheduledEndDate affecting columns scheduledenddate, scheduledstartdate: ((scheduledenddate >= scheduledstartdate)) */
+    * Constraint CK_WorkOrderRouting_ScheduledEndDate affecting columns scheduledenddate, scheduledstartdate: ((scheduledenddate >= scheduledstartdate))
+    */
   scheduledenddate: TypoLocalDateTime,
   /** Actual start date.
-      Constraint CK_WorkOrderRouting_ActualEndDate affecting columns actualenddate, actualstartdate: (((actualenddate >= actualstartdate) OR (actualenddate IS NULL) OR (actualstartdate IS NULL))) */
+    * Constraint CK_WorkOrderRouting_ActualEndDate affecting columns actualenddate, actualstartdate: (((actualenddate >= actualstartdate) OR (actualenddate IS NULL) OR (actualstartdate IS NULL)))
+    */
   actualstartdate: Option[TypoLocalDateTime],
   /** Actual end date.
-      Constraint CK_WorkOrderRouting_ActualEndDate affecting columns actualenddate, actualstartdate: (((actualenddate >= actualstartdate) OR (actualenddate IS NULL) OR (actualstartdate IS NULL))) */
+    * Constraint CK_WorkOrderRouting_ActualEndDate affecting columns actualenddate, actualstartdate: (((actualenddate >= actualstartdate) OR (actualenddate IS NULL) OR (actualstartdate IS NULL)))
+    */
   actualenddate: Option[TypoLocalDateTime],
   /** Number of manufacturing hours used.
-      Constraint CK_WorkOrderRouting_ActualResourceHrs affecting columns actualresourcehrs: ((actualresourcehrs >= 0.0000)) */
+    * Constraint CK_WorkOrderRouting_ActualResourceHrs affecting columns actualresourcehrs: ((actualresourcehrs >= 0.0000))
+    */
   actualresourcehrs: Option[BigDecimal],
   /** Estimated manufacturing cost.
-      Constraint CK_WorkOrderRouting_PlannedCost affecting columns plannedcost: ((plannedcost > 0.00)) */
+    * Constraint CK_WorkOrderRouting_PlannedCost affecting columns plannedcost: ((plannedcost > 0.00))
+    */
   plannedcost: BigDecimal,
   /** Actual manufacturing cost.
-      Constraint CK_WorkOrderRouting_ActualCost affecting columns actualcost: ((actualcost > 0.00)) */
+    * Constraint CK_WorkOrderRouting_ActualCost affecting columns actualcost: ((actualcost > 0.00))
+    */
   actualcost: Option[BigDecimal],
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val compositeId: WorkorderroutingId = WorkorderroutingId(workorderid, productid, operationsequence)
-   val id = compositeId
-   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): WorkorderroutingRowUnsaved =
-     WorkorderroutingRowUnsaved(workorderid, productid, operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)
- }
+) {
+  def compositeId: WorkorderroutingId = new WorkorderroutingId(workorderid, productid, operationsequence)
+  def id: WorkorderroutingId = compositeId
+  def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): WorkorderroutingRowUnsaved = {
+    new WorkorderroutingRowUnsaved(
+      workorderid,
+      productid,
+      operationsequence,
+      locationid,
+      scheduledstartdate,
+      scheduledenddate,
+      actualstartdate,
+      actualenddate,
+      actualresourcehrs,
+      plannedcost,
+      actualcost,
+      modifieddate
+    )
+  }
+}
 
 object WorkorderroutingRow {
-  def apply(compositeId: WorkorderroutingId, locationid: LocationId, scheduledstartdate: TypoLocalDateTime, scheduledenddate: TypoLocalDateTime, actualstartdate: Option[TypoLocalDateTime], actualenddate: Option[TypoLocalDateTime], actualresourcehrs: Option[BigDecimal], plannedcost: BigDecimal, actualcost: Option[BigDecimal], modifieddate: TypoLocalDateTime) =
-    new WorkorderroutingRow(compositeId.workorderid, compositeId.productid, compositeId.operationsequence, locationid, scheduledstartdate, scheduledenddate, actualstartdate, actualenddate, actualresourcehrs, plannedcost, actualcost, modifieddate)
+  def apply(
+    compositeId: WorkorderroutingId,
+    locationid: LocationId,
+    scheduledstartdate: TypoLocalDateTime,
+    scheduledenddate: TypoLocalDateTime,
+    actualstartdate: Option[TypoLocalDateTime],
+    actualenddate: Option[TypoLocalDateTime],
+    actualresourcehrs: Option[BigDecimal],
+    plannedcost: BigDecimal,
+    actualcost: Option[BigDecimal],
+    modifieddate: TypoLocalDateTime
+  ): WorkorderroutingRow = {
+    new WorkorderroutingRow(
+      compositeId.workorderid,
+      compositeId.productid,
+      compositeId.operationsequence,
+      locationid,
+      scheduledstartdate,
+      scheduledenddate,
+      actualstartdate,
+      actualenddate,
+      actualresourcehrs,
+      plannedcost,
+      actualcost,
+      modifieddate
+    )
+  }
   implicit lazy val decoder: Decoder[WorkorderroutingRow] = Decoder.forProduct12[WorkorderroutingRow, WorkorderId, Int, TypoShort, LocationId, TypoLocalDateTime, TypoLocalDateTime, Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], BigDecimal, Option[BigDecimal], TypoLocalDateTime]("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")(WorkorderroutingRow.apply)(WorkorderId.decoder, Decoder.decodeInt, TypoShort.decoder, LocationId.decoder, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeBigDecimal, Decoder.decodeOption(Decoder.decodeBigDecimal), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[WorkorderroutingRow] = Encoder.forProduct12[WorkorderroutingRow, WorkorderId, Int, TypoShort, LocationId, TypoLocalDateTime, TypoLocalDateTime, Option[TypoLocalDateTime], Option[TypoLocalDateTime], Option[BigDecimal], BigDecimal, Option[BigDecimal], TypoLocalDateTime]("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")(x => (x.workorderid, x.productid, x.operationsequence, x.locationid, x.scheduledstartdate, x.scheduledenddate, x.actualstartdate, x.actualenddate, x.actualresourcehrs, x.plannedcost, x.actualcost, x.modifieddate))(WorkorderId.encoder, Encoder.encodeInt, TypoShort.encoder, LocationId.encoder, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeBigDecimal, Encoder.encodeOption(Encoder.encodeBigDecimal), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[WorkorderroutingRow] = new Read[WorkorderroutingRow](
-    gets = List(
-      (WorkorderId.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (LocationId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => WorkorderroutingRow(
-      workorderid = WorkorderId.get.unsafeGetNonNullable(rs, i + 0),
-      productid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
-      operationsequence = TypoShort.get.unsafeGetNonNullable(rs, i + 2),
-      locationid = LocationId.get.unsafeGetNonNullable(rs, i + 3),
-      scheduledstartdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
-      scheduledenddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5),
-      actualstartdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6),
-      actualenddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 7),
-      actualresourcehrs = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 8),
-      plannedcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 9),
-      actualcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 10),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 11)
+  implicit lazy val read: Read[WorkorderroutingRow] = {
+    new Read[WorkorderroutingRow](
+      gets = List(
+        (WorkorderId.get, Nullability.NoNulls),
+        (Meta.IntMeta.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (LocationId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.Nullable),
+        (TypoLocalDateTime.get, Nullability.Nullable),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => WorkorderroutingRow(
+        workorderid = WorkorderId.get.unsafeGetNonNullable(rs, i + 0),
+        productid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
+        operationsequence = TypoShort.get.unsafeGetNonNullable(rs, i + 2),
+        locationid = LocationId.get.unsafeGetNonNullable(rs, i + 3),
+        scheduledstartdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
+        scheduledenddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5),
+        actualstartdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6),
+        actualenddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 7),
+        actualresourcehrs = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 8),
+        plannedcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 9),
+        actualcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 10),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 11)
+      )
     )
-  )
-  implicit lazy val text: Text[WorkorderroutingRow] = Text.instance[WorkorderroutingRow]{ (row, sb) =>
-    WorkorderId.text.unsafeEncode(row.workorderid, sb)
-    sb.append(Text.DELIMETER)
-    Text.intInstance.unsafeEncode(row.productid, sb)
-    sb.append(Text.DELIMETER)
-    TypoShort.text.unsafeEncode(row.operationsequence, sb)
-    sb.append(Text.DELIMETER)
-    LocationId.text.unsafeEncode(row.locationid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.scheduledstartdate, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.scheduledenddate, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoLocalDateTime.text).unsafeEncode(row.actualstartdate, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoLocalDateTime.text).unsafeEncode(row.actualenddate, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.bigDecimalInstance).unsafeEncode(row.actualresourcehrs, sb)
-    sb.append(Text.DELIMETER)
-    Text.bigDecimalInstance.unsafeEncode(row.plannedcost, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.bigDecimalInstance).unsafeEncode(row.actualcost, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[WorkorderroutingRow] = new Write[WorkorderroutingRow](
-    puts = List((WorkorderId.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (LocationId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.Nullable),
-                (TypoLocalDateTime.put, Nullability.Nullable),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.workorderid, x.productid, x.operationsequence, x.locationid, x.scheduledstartdate, x.scheduledenddate, x.actualstartdate, x.actualenddate, x.actualresourcehrs, x.plannedcost, x.actualcost, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  WorkorderId.put.unsafeSetNonNullable(rs, i + 0, a.workorderid)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 1, a.productid)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 2, a.operationsequence)
-                  LocationId.put.unsafeSetNonNullable(rs, i + 3, a.locationid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.scheduledstartdate)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.scheduledenddate)
-                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 6, a.actualstartdate)
-                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 7, a.actualenddate)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 8, a.actualresourcehrs)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 9, a.plannedcost)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 10, a.actualcost)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 11, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     WorkorderId.put.unsafeUpdateNonNullable(ps, i + 0, a.workorderid)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.productid)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 2, a.operationsequence)
-                     LocationId.put.unsafeUpdateNonNullable(ps, i + 3, a.locationid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.scheduledstartdate)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.scheduledenddate)
-                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 6, a.actualstartdate)
-                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 7, a.actualenddate)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 8, a.actualresourcehrs)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 9, a.plannedcost)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 10, a.actualcost)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 11, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[WorkorderroutingRow] = {
+    Text.instance[WorkorderroutingRow]{ (row, sb) =>
+      WorkorderId.text.unsafeEncode(row.workorderid, sb)
+      sb.append(Text.DELIMETER)
+      Text.intInstance.unsafeEncode(row.productid, sb)
+      sb.append(Text.DELIMETER)
+      TypoShort.text.unsafeEncode(row.operationsequence, sb)
+      sb.append(Text.DELIMETER)
+      LocationId.text.unsafeEncode(row.locationid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.scheduledstartdate, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.scheduledenddate, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoLocalDateTime.text).unsafeEncode(row.actualstartdate, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoLocalDateTime.text).unsafeEncode(row.actualenddate, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.bigDecimalInstance).unsafeEncode(row.actualresourcehrs, sb)
+      sb.append(Text.DELIMETER)
+      Text.bigDecimalInstance.unsafeEncode(row.plannedcost, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.bigDecimalInstance).unsafeEncode(row.actualcost, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[WorkorderroutingRow] = {
+    new Write[WorkorderroutingRow](
+      puts = List((WorkorderId.put, Nullability.NoNulls),
+                  (Meta.IntMeta.put, Nullability.NoNulls),
+                  (TypoShort.put, Nullability.NoNulls),
+                  (LocationId.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.Nullable),
+                  (TypoLocalDateTime.put, Nullability.Nullable),
+                  (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
+                  (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                  (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.workorderid, x.productid, x.operationsequence, x.locationid, x.scheduledstartdate, x.scheduledenddate, x.actualstartdate, x.actualenddate, x.actualresourcehrs, x.plannedcost, x.actualcost, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    WorkorderId.put.unsafeSetNonNullable(rs, i + 0, a.workorderid)
+                    Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 1, a.productid)
+                    TypoShort.put.unsafeSetNonNullable(rs, i + 2, a.operationsequence)
+                    LocationId.put.unsafeSetNonNullable(rs, i + 3, a.locationid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.scheduledstartdate)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.scheduledenddate)
+                    TypoLocalDateTime.put.unsafeSetNullable(rs, i + 6, a.actualstartdate)
+                    TypoLocalDateTime.put.unsafeSetNullable(rs, i + 7, a.actualenddate)
+                    Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 8, a.actualresourcehrs)
+                    Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 9, a.plannedcost)
+                    Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 10, a.actualcost)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 11, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       WorkorderId.put.unsafeUpdateNonNullable(ps, i + 0, a.workorderid)
+                       Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.productid)
+                       TypoShort.put.unsafeUpdateNonNullable(ps, i + 2, a.operationsequence)
+                       LocationId.put.unsafeUpdateNonNullable(ps, i + 3, a.locationid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.scheduledstartdate)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.scheduledenddate)
+                       TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 6, a.actualstartdate)
+                       TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 7, a.actualenddate)
+                       Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 8, a.actualresourcehrs)
+                       Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 9, a.plannedcost)
+                       Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 10, a.actualcost)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 11, a.modifieddate)
+                     }
+    )
+  
+  }
 }

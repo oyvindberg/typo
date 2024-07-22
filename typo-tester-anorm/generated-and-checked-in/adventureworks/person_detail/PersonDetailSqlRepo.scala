@@ -3,11 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person_detail
+package adventureworks.person_detail;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.businessentity.BusinessentityId
-import java.sql.Connection
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.businessentity.BusinessentityId;
+import java.sql.Connection;
 
 trait PersonDetailSqlRepo {
   def apply(businessentityid: /* user-picked */ BusinessentityId, modifiedAfter: TypoLocalDateTime)(implicit c: Connection): List[PersonDetailSqlRow]

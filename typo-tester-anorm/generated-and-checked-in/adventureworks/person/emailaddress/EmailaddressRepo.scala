@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.emailaddress
+package adventureworks.person.emailaddress;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait EmailaddressRepo {
   def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow]
@@ -17,7 +17,7 @@ trait EmailaddressRepo {
   def insert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow
   def insert(unsaved: EmailaddressRowUnsaved)(implicit c: Connection): EmailaddressRow
   def insertStreaming(unsaved: Iterator[EmailaddressRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[EmailaddressRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[EmailaddressFields, EmailaddressRow]
   def selectAll(implicit c: Connection): List[EmailaddressRow]
@@ -28,6 +28,6 @@ trait EmailaddressRepo {
   def update(row: EmailaddressRow)(implicit c: Connection): Boolean
   def upsert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow
   def upsertBatch(unsaved: Iterable[EmailaddressRow])(implicit c: Connection): List[EmailaddressRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[EmailaddressRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

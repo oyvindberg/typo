@@ -3,11 +3,11 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.vstorewithaddresses
+package adventureworks.sales.vstorewithaddresses;
 
-import typo.dsl.SelectBuilder
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
 trait VstorewithaddressesViewRepo {
   def select: SelectBuilder[VstorewithaddressesViewFields, VstorewithaddressesViewRow]

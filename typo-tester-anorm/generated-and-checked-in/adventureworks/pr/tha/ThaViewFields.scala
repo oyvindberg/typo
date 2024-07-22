@@ -3,14 +3,14 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.tha
+package adventureworks.pr.tha;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.transactionhistoryarchive.TransactionhistoryarchiveId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.transactionhistoryarchive.TransactionhistoryarchiveId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait ThaViewFields {
   def id: Field[TransactionhistoryarchiveId, ThaViewRow]

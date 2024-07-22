@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.tr
+package adventureworks.sa.tr;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class TrViewRepoImpl extends TrViewRepo {
-  override def select: SelectBuilder[TrViewFields, TrViewRow] = {
-    SelectBuilderSql("sa.tr", TrViewFields.structure, TrViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[TrViewRow] = {
+  def select: SelectBuilder[TrViewFields, TrViewRow] = SelectBuilderSql("sa.tr", TrViewFields.structure, TrViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[TrViewRow] = {
     SQL"""select "id", "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
           from sa.tr
        """.as(TrViewRow.rowParser(1).*)

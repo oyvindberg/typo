@@ -3,15 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.pmi
+package adventureworks.pr.pmi;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.illustration.IllustrationId
-import adventureworks.production.productmodel.ProductmodelId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.illustration.IllustrationId;
+import adventureworks.production.productmodel.ProductmodelId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait PmiViewFields {
   def productmodelid: Field[ProductmodelId, PmiViewRow]

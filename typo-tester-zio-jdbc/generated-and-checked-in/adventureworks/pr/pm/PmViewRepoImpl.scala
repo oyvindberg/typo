@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.pm
+package adventureworks.pr.pm;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class PmViewRepoImpl extends PmViewRepo {
-  override def select: SelectBuilder[PmViewFields, PmViewRow] = {
-    SelectBuilderSql("pr.pm", PmViewFields.structure, PmViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, PmViewRow] = {
-    sql"""select "id", "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from pr.pm""".query(using PmViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[PmViewFields, PmViewRow] = SelectBuilderSql("pr.pm", PmViewFields.structure, PmViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, PmViewRow] = sql"""select "id", "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text from pr.pm""".query(using PmViewRow.jdbcDecoder).selectStream()
 }

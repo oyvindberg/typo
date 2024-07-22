@@ -3,15 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.cu
+package adventureworks.sa.cu;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import adventureworks.sales.currency.CurrencyId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import adventureworks.sales.currency.CurrencyId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait CuViewFields {
   def id: Field[CurrencyId, CuViewRow]

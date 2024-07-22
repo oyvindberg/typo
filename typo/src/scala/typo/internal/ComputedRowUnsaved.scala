@@ -34,7 +34,7 @@ object ComputedRowUnsaved {
         case col => NormalCol(col)
       }
     val (normal, rest) = categorizedColumns.toList.partition {
-      case x: NormalCol => true
+      case _: NormalCol => true
       case _            => false
     }
 

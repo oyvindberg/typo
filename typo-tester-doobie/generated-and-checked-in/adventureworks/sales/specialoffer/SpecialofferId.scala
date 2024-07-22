@@ -3,18 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.specialoffer
+package adventureworks.sales.specialoffer;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `sales.specialoffer` */
-case class SpecialofferId(value: Int) extends AnyVal
+case class SpecialofferId(value: Int) extends scala.AnyVal
+
 object SpecialofferId {
   implicit lazy val arrayGet: Get[Array[SpecialofferId]] = adventureworks.IntegerArrayMeta.get.map(_.map(SpecialofferId.apply))
   implicit lazy val arrayPut: Put[Array[SpecialofferId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
@@ -23,8 +24,10 @@ object SpecialofferId {
   implicit lazy val encoder: Encoder[SpecialofferId] = Encoder.encodeInt.contramap(_.value)
   implicit lazy val get: Get[SpecialofferId] = Meta.IntMeta.get.map(SpecialofferId.apply)
   implicit lazy val put: Put[SpecialofferId] = Meta.IntMeta.put.contramap(_.value)
-  implicit lazy val text: Text[SpecialofferId] = new Text[SpecialofferId] {
-    override def unsafeEncode(v: SpecialofferId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: SpecialofferId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[SpecialofferId] = {
+    new Text[SpecialofferId] {
+      override def unsafeEncode(v: SpecialofferId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: SpecialofferId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

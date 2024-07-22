@@ -3,10 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.vproductmodelinstructions
+package adventureworks.production.vproductmodelinstructions;
 
-import java.sql.Connection
-import typo.dsl.SelectBuilder
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
 
 trait VproductmodelinstructionsViewRepo {
   def select: SelectBuilder[VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow]

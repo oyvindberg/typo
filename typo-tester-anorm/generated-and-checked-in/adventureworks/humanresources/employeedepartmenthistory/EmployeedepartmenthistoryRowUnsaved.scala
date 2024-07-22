@@ -3,92 +3,102 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.employeedepartmenthistory
+package adventureworks.humanresources.employeedepartmenthistory;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDate
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.humanresources.department.DepartmentId
-import adventureworks.humanresources.shift.ShiftId
-import adventureworks.person.businessentity.BusinessentityId
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDate;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.humanresources.department.DepartmentId;
+import adventureworks.humanresources.shift.ShiftId;
+import adventureworks.person.businessentity.BusinessentityId;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** This class corresponds to a row in table `humanresources.employeedepartmenthistory` which has not been persisted yet */
 case class EmployeedepartmenthistoryRowUnsaved(
   /** Employee identification number. Foreign key to Employee.BusinessEntityID.
-      Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]] */
+    * Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]]
+    */
   businessentityid: BusinessentityId,
   /** Department in which the employee worked including currently. Foreign key to Department.DepartmentID.
-      Points to [[adventureworks.humanresources.department.DepartmentRow.departmentid]] */
+    * Points to [[adventureworks.humanresources.department.DepartmentRow.departmentid]]
+    */
   departmentid: DepartmentId,
   /** Identifies which 8-hour shift the employee works. Foreign key to Shift.Shift.ID.
-      Points to [[adventureworks.humanresources.shift.ShiftRow.shiftid]] */
+    * Points to [[adventureworks.humanresources.shift.ShiftRow.shiftid]]
+    */
   shiftid: ShiftId,
   /** Date the employee started work in the department.
-      Constraint CK_EmployeeDepartmentHistory_EndDate affecting columns enddate, startdate:  (((enddate >= startdate) OR (enddate IS NULL))) */
+    * Constraint CK_EmployeeDepartmentHistory_EndDate affecting columns enddate, startdate:  (((enddate >= startdate) OR (enddate IS NULL)))
+    */
   startdate: TypoLocalDate,
   /** Date the employee left the department. NULL = Current department.
-      Constraint CK_EmployeeDepartmentHistory_EndDate affecting columns enddate, startdate:  (((enddate >= startdate) OR (enddate IS NULL))) */
+    * Constraint CK_EmployeeDepartmentHistory_EndDate affecting columns enddate, startdate:  (((enddate >= startdate) OR (enddate IS NULL)))
+    */
   enddate: Option[TypoLocalDate],
   /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()
 ) {
-  def toRow(modifieddateDefault: => TypoLocalDateTime): EmployeedepartmenthistoryRow =
-    EmployeedepartmenthistoryRow(
+  def toRow(modifieddateDefault: => TypoLocalDateTime): EmployeedepartmenthistoryRow = {
+    new EmployeedepartmenthistoryRow(
       businessentityid = businessentityid,
       departmentid = departmentid,
       shiftid = shiftid,
       startdate = startdate,
       enddate = enddate,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
+      modifieddate = modifieddate.getOrElse(modifieddateDefault)
     )
-}
-object EmployeedepartmenthistoryRowUnsaved {
-  implicit lazy val reads: Reads[EmployeedepartmenthistoryRowUnsaved] = Reads[EmployeedepartmenthistoryRowUnsaved](json => JsResult.fromTry(
-      Try(
-        EmployeedepartmenthistoryRowUnsaved(
-          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
-          departmentid = json.\("departmentid").as(DepartmentId.reads),
-          shiftid = json.\("shiftid").as(ShiftId.reads),
-          startdate = json.\("startdate").as(TypoLocalDate.reads),
-          enddate = json.\("enddate").toOption.map(_.as(TypoLocalDate.reads)),
-          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
-        )
-      )
-    ),
-  )
-  implicit lazy val text: Text[EmployeedepartmenthistoryRowUnsaved] = Text.instance[EmployeedepartmenthistoryRowUnsaved]{ (row, sb) =>
-    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
-    sb.append(Text.DELIMETER)
-    DepartmentId.text.unsafeEncode(row.departmentid, sb)
-    sb.append(Text.DELIMETER)
-    ShiftId.text.unsafeEncode(row.shiftid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDate.text.unsafeEncode(row.startdate, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoLocalDate.text).unsafeEncode(row.enddate, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val writes: OWrites[EmployeedepartmenthistoryRowUnsaved] = OWrites[EmployeedepartmenthistoryRowUnsaved](o =>
-    new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
-      "departmentid" -> DepartmentId.writes.writes(o.departmentid),
-      "shiftid" -> ShiftId.writes.writes(o.shiftid),
-      "startdate" -> TypoLocalDate.writes.writes(o.startdate),
-      "enddate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.enddate),
-      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
-    ))
-  )
+}
+
+object EmployeedepartmenthistoryRowUnsaved {
+  implicit lazy val reads: Reads[EmployeedepartmenthistoryRowUnsaved] = {
+    Reads[EmployeedepartmenthistoryRowUnsaved](json => JsResult.fromTry(
+        Try(
+          EmployeedepartmenthistoryRowUnsaved(
+            businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+            departmentid = json.\("departmentid").as(DepartmentId.reads),
+            shiftid = json.\("shiftid").as(ShiftId.reads),
+            startdate = json.\("startdate").as(TypoLocalDate.reads),
+            enddate = json.\("enddate").toOption.map(_.as(TypoLocalDate.reads)),
+            modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+          )
+        )
+      ),
+    )
+  }
+  implicit lazy val text: Text[EmployeedepartmenthistoryRowUnsaved] = {
+    Text.instance[EmployeedepartmenthistoryRowUnsaved]{ (row, sb) =>
+      BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+      sb.append(Text.DELIMETER)
+      DepartmentId.text.unsafeEncode(row.departmentid, sb)
+      sb.append(Text.DELIMETER)
+      ShiftId.text.unsafeEncode(row.shiftid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDate.text.unsafeEncode(row.startdate, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoLocalDate.text).unsafeEncode(row.enddate, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[EmployeedepartmenthistoryRowUnsaved] = {
+    OWrites[EmployeedepartmenthistoryRowUnsaved](o =>
+      new JsObject(ListMap[String, JsValue](
+        "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+        "departmentid" -> DepartmentId.writes.writes(o.departmentid),
+        "shiftid" -> ShiftId.writes.writes(o.shiftid),
+        "startdate" -> TypoLocalDate.writes.writes(o.startdate),
+        "enddate" -> Writes.OptionWrites(TypoLocalDate.writes).writes(o.enddate),
+        "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
+      ))
+    )
+  }
 }

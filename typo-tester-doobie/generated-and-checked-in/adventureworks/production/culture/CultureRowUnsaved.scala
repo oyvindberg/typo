@@ -3,42 +3,33 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.culture
+package adventureworks.production.culture;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import doobie.postgres.Text
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import doobie.postgres.Text;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** This class corresponds to a row in table `production.culture` which has not been persisted yet */
-case class CultureRowUnsaved(
-  /** Primary key for Culture records. */
-  cultureid: CultureId,
-  /** Culture description. */
-  name: Name,
-  /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-) {
-  def toRow(modifieddateDefault: => TypoLocalDateTime): CultureRow =
-    CultureRow(
-      cultureid = cultureid,
-      name = name,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
-    )
+case class CultureRowUnsaved(/** Primary key for Culture records. */
+                             cultureid: CultureId, /** Culture description. */
+                             name: Name, /** Default: now() */
+                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()) {
+  def toRow(modifieddateDefault: => TypoLocalDateTime): CultureRow = new CultureRow(cultureid = cultureid, name = name, modifieddate = modifieddate.getOrElse(modifieddateDefault))
 }
+
 object CultureRowUnsaved {
   implicit lazy val decoder: Decoder[CultureRowUnsaved] = Decoder.forProduct3[CultureRowUnsaved, CultureId, Name, Defaulted[TypoLocalDateTime]]("cultureid", "name", "modifieddate")(CultureRowUnsaved.apply)(CultureId.decoder, Name.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[CultureRowUnsaved] = Encoder.forProduct3[CultureRowUnsaved, CultureId, Name, Defaulted[TypoLocalDateTime]]("cultureid", "name", "modifieddate")(x => (x.cultureid, x.name, x.modifieddate))(CultureId.encoder, Name.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
-  implicit lazy val text: Text[CultureRowUnsaved] = Text.instance[CultureRowUnsaved]{ (row, sb) =>
-    CultureId.text.unsafeEncode(row.cultureid, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  implicit lazy val text: Text[CultureRowUnsaved] = {
+    Text.instance[CultureRowUnsaved]{ (row, sb) =>
+      CultureId.text.unsafeEncode(row.cultureid, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
   }
 }

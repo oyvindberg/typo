@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesorderheadersalesreason
+package adventureworks.sales.salesorderheadersalesreason;
 
-import adventureworks.sales.salesorderheader.SalesorderheaderId
-import adventureworks.sales.salesreason.SalesreasonId
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.sales.salesorderheader.SalesorderheaderId;
+import adventureworks.sales.salesreason.SalesreasonId;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** Type for the composite primary key of table `sales.salesorderheadersalesreason` */
-case class SalesorderheadersalesreasonId(
-  salesorderid: SalesorderheaderId,
-  salesreasonid: SalesreasonId
-)
+case class SalesorderheadersalesreasonId(salesorderid: SalesorderheaderId, salesreasonid: SalesreasonId)
+
 object SalesorderheadersalesreasonId {
   implicit lazy val decoder: Decoder[SalesorderheadersalesreasonId] = Decoder.forProduct2[SalesorderheadersalesreasonId, SalesorderheaderId, SalesreasonId]("salesorderid", "salesreasonid")(SalesorderheadersalesreasonId.apply)(SalesorderheaderId.decoder, SalesreasonId.decoder)
   implicit lazy val encoder: Encoder[SalesorderheadersalesreasonId] = Encoder.forProduct2[SalesorderheadersalesreasonId, SalesorderheaderId, SalesreasonId]("salesorderid", "salesreasonid")(x => (x.salesorderid, x.salesreasonid))(SalesorderheaderId.encoder, SalesreasonId.encoder)

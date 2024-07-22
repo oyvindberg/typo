@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesterritory
+package adventureworks.sales.salesterritory;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait SalesterritoryRepo {
   def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow]
@@ -18,7 +18,7 @@ trait SalesterritoryRepo {
   def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow]
   def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow]
   def selectAll: Stream[ConnectionIO, SalesterritoryRow]
@@ -29,6 +29,6 @@ trait SalesterritoryRepo {
   def update(row: SalesterritoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow]
   def upsertBatch(unsaved: List[SalesterritoryRow]): Stream[ConnectionIO, SalesterritoryRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

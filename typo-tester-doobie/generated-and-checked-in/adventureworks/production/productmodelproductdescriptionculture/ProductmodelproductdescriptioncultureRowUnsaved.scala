@@ -3,52 +3,56 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productmodelproductdescriptionculture
+package adventureworks.production.productmodelproductdescriptionculture;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.culture.CultureId
-import adventureworks.production.productdescription.ProductdescriptionId
-import adventureworks.production.productmodel.ProductmodelId
-import doobie.postgres.Text
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.culture.CultureId;
+import adventureworks.production.productdescription.ProductdescriptionId;
+import adventureworks.production.productmodel.ProductmodelId;
+import doobie.postgres.Text;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** This class corresponds to a row in table `production.productmodelproductdescriptionculture` which has not been persisted yet */
 case class ProductmodelproductdescriptioncultureRowUnsaved(
   /** Primary key. Foreign key to ProductModel.ProductModelID.
-      Points to [[adventureworks.production.productmodel.ProductmodelRow.productmodelid]] */
+    * Points to [[adventureworks.production.productmodel.ProductmodelRow.productmodelid]]
+    */
   productmodelid: ProductmodelId,
   /** Primary key. Foreign key to ProductDescription.ProductDescriptionID.
-      Points to [[adventureworks.production.productdescription.ProductdescriptionRow.productdescriptionid]] */
+    * Points to [[adventureworks.production.productdescription.ProductdescriptionRow.productdescriptionid]]
+    */
   productdescriptionid: ProductdescriptionId,
   /** Culture identification number. Foreign key to Culture.CultureID.
-      Points to [[adventureworks.production.culture.CultureRow.cultureid]] */
+    * Points to [[adventureworks.production.culture.CultureRow.cultureid]]
+    */
   cultureid: CultureId,
   /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()
 ) {
-  def toRow(modifieddateDefault: => TypoLocalDateTime): ProductmodelproductdescriptioncultureRow =
-    ProductmodelproductdescriptioncultureRow(
+  def toRow(modifieddateDefault: => TypoLocalDateTime): ProductmodelproductdescriptioncultureRow = {
+    new ProductmodelproductdescriptioncultureRow(
       productmodelid = productmodelid,
       productdescriptionid = productdescriptionid,
       cultureid = cultureid,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
+      modifieddate = modifieddate.getOrElse(modifieddateDefault)
     )
+  }
 }
+
 object ProductmodelproductdescriptioncultureRowUnsaved {
   implicit lazy val decoder: Decoder[ProductmodelproductdescriptioncultureRowUnsaved] = Decoder.forProduct4[ProductmodelproductdescriptioncultureRowUnsaved, ProductmodelId, ProductdescriptionId, CultureId, Defaulted[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(ProductmodelproductdescriptioncultureRowUnsaved.apply)(ProductmodelId.decoder, ProductdescriptionId.decoder, CultureId.decoder, Defaulted.decoder(TypoLocalDateTime.decoder))
   implicit lazy val encoder: Encoder[ProductmodelproductdescriptioncultureRowUnsaved] = Encoder.forProduct4[ProductmodelproductdescriptioncultureRowUnsaved, ProductmodelId, ProductdescriptionId, CultureId, Defaulted[TypoLocalDateTime]]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))(ProductmodelId.encoder, ProductdescriptionId.encoder, CultureId.encoder, Defaulted.encoder(TypoLocalDateTime.encoder))
-  implicit lazy val text: Text[ProductmodelproductdescriptioncultureRowUnsaved] = Text.instance[ProductmodelproductdescriptioncultureRowUnsaved]{ (row, sb) =>
-    ProductmodelId.text.unsafeEncode(row.productmodelid, sb)
-    sb.append(Text.DELIMETER)
-    ProductdescriptionId.text.unsafeEncode(row.productdescriptionid, sb)
-    sb.append(Text.DELIMETER)
-    CultureId.text.unsafeEncode(row.cultureid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+  implicit lazy val text: Text[ProductmodelproductdescriptioncultureRowUnsaved] = {
+    Text.instance[ProductmodelproductdescriptioncultureRowUnsaved]{ (row, sb) =>
+      ProductmodelId.text.unsafeEncode(row.productmodelid, sb)
+      sb.append(Text.DELIMETER)
+      ProductdescriptionId.text.unsafeEncode(row.productdescriptionid, sb)
+      sb.append(Text.DELIMETER)
+      CultureId.text.unsafeEncode(row.cultureid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
   }
 }

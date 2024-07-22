@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.plph
+package adventureworks.pr.plph;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class PlphViewRepoImpl extends PlphViewRepo {
-  override def select: SelectBuilder[PlphViewFields, PlphViewRow] = {
-    SelectBuilderSql("pr.plph", PlphViewFields.structure, PlphViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[PlphViewRow] = {
+  def select: SelectBuilder[PlphViewFields, PlphViewRow] = SelectBuilderSql("pr.plph", PlphViewFields.structure, PlphViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[PlphViewRow] = {
     SQL"""select "id", "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text
           from pr.plph
        """.as(PlphViewRow.rowParser(1).*)

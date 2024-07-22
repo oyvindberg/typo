@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.stateprovince
+package adventureworks.person.stateprovince;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait StateprovinceRepo {
   def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow]
@@ -18,7 +18,7 @@ trait StateprovinceRepo {
   def insert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow]
   def insert(unsaved: StateprovinceRowUnsaved): ConnectionIO[StateprovinceRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, StateprovinceRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, StateprovinceRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[StateprovinceFields, StateprovinceRow]
   def selectAll: Stream[ConnectionIO, StateprovinceRow]
@@ -29,6 +29,6 @@ trait StateprovinceRepo {
   def update(row: StateprovinceRow): ConnectionIO[Boolean]
   def upsert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow]
   def upsertBatch(unsaved: List[StateprovinceRow]): Stream[ConnectionIO, StateprovinceRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, StateprovinceRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

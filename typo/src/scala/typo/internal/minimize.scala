@@ -17,12 +17,23 @@ object minimize {
                 b += x
                 filesByQident.get(x).foreach(f => go(f.contents))
               }
-
-            case sc.Param(_, tpe, maybeCode) =>
+            case sc.New(target, args) =>
+              go(target)
+              args.foreach(goTree)
+            case sc.ApplyFunction1(target, arg) =>
+              go(target)
+              go(arg)
+            case sc.ApplyByName(target) =>
+              go(target)
+            case sc.ApplyNullary(target) =>
+              go(target)
+            case sc.Arg.Pos(value) =>
+              go(value)
+            case sc.Arg.Named(_, value) =>
+              go(value)
+            case sc.Param(_, _, tpe, maybeCode) =>
               goTree(tpe)
               maybeCode.foreach(go)
-            case sc.Params(params) =>
-              params.foreach(goTree)
             case sc.StrLit(_) => ()
             case sc.Summon(tpe) =>
               goTree(tpe)
@@ -36,17 +47,42 @@ object minimize {
               implicitParams.foreach(goTree)
               goTree(tpe)
               go(body)
-            case sc.Value(tparams, name, params, implicitParams, tpe, body) =>
+            case sc.Value(name, tpe, body) =>
+              goTree(name)
+              goTree(tpe)
+              body.foreach(go)
+            case sc.Method(_, tparams, name, params, implicitParams, tpe, body) =>
               tparams.foreach(goTree)
               goTree(name)
               params.foreach(goTree)
               implicitParams.foreach(goTree)
               goTree(tpe)
-              go(body)
-            case sc.Obj(name, members, body) =>
-              goTree(name)
-              members.foreach(goTree)
               body.foreach(go)
+            case sc.Enum(_, tpe, _, instances) =>
+              goTree(tpe)
+              instances.foreach(goTree)
+            case sc.Class(_, _, _, tparams, params, implicitParams, extends_, implements, members, staticMembers) =>
+              tparams.foreach(goTree)
+              params.foreach(goTree)
+              implicitParams.foreach(goTree)
+              extends_.foreach(goTree)
+              implements.foreach(goTree)
+              members.foreach(goTree)
+              staticMembers.foreach(goTree)
+            case sc.Adt.Record(_, _, _, tparams, params, implicitParams, extends_, implements, members, staticMembers) =>
+              tparams.foreach(goTree)
+              params.foreach(goTree)
+              implicitParams.foreach(goTree)
+              extends_.foreach(goTree)
+              implements.foreach(goTree)
+              members.foreach(goTree)
+              staticMembers.foreach(goTree)
+            case sc.Adt.Sum(_, _, tparams, members, implements, subtypes, staticMembers) =>
+              tparams.foreach(goTree)
+              members.foreach(goTree)
+              implements.foreach(goTree)
+              subtypes.foreach(goTree)
+              staticMembers.foreach(goTree)
             case sc.Type.Wildcard =>
               ()
             case sc.Type.TApply(underlying, targs) =>

@@ -36,14 +36,19 @@ object sc {
     def of(idents: Ident*): QIdent =
       QIdent(idents.toList)
   }
-  case class Param(name: Ident, tpe: Type, default: Option[sc.Code]) extends Tree
-  case class Params(params: List[Param]) extends Tree
+
+  case class Param(comments: Comments, name: Ident, tpe: Type, default: Option[sc.Code]) extends Tree
+  object Param {
+    def apply(name: Ident, tpe: Type): Param = Param(Comments.Empty, name, tpe, None)
+  }
 
   case class StrLit(str: String) extends Tree
 
   case class StringInterpolate(`import`: sc.Type, prefix: sc.Ident, content: sc.Code) extends Tree
 
-  sealed trait ClassMember extends Tree {
+  sealed trait StaticMember extends Tree
+
+  sealed trait ClassMember extends StaticMember {
     def name: sc.Ident
   }
 
@@ -57,20 +62,102 @@ object sc {
       body: sc.Code
   ) extends ClassMember
 
+  case class Comments(lines: List[String])
+  object Comments {
+    val Empty = Comments(Nil)
+  }
+
+  sealed trait ClassType
+  object ClassType {
+    case object Class extends ClassType
+    case object Interface extends ClassType
+  }
+
+  case class Enum(
+      comments: Comments,
+      tpe: sc.Type.Qualified,
+      members: List[(sc.Ident, String)],
+      instances: List[sc.ClassMember]
+  ) extends Tree
+
+  case class New(target: sc.Code, args: List[Arg]) extends Tree
+  case class ApplyFunction1(target: sc.Code, arg: sc.Code) extends Tree
+  case class ApplyNullary(target: sc.Code) extends Tree
+  case class ApplyByName(target: sc.Code) extends Tree
+
+  sealed trait Arg extends Tree
+  object Arg {
+    case class Pos(value: sc.Code) extends Arg
+    case class Named(name: sc.Ident, value: sc.Code) extends Arg
+  }
+
+  sealed trait Adt extends Tree {
+    def name: sc.Type.Qualified
+  }
+  object Adt {
+    case class Sum(
+        comments: Comments,
+        name: sc.Type.Qualified,
+        tparams: List[Type.Abstract],
+        members: List[Method],
+        implements: List[Type],
+        subtypes: List[Adt],
+        staticMembers: List[ClassMember]
+    ) extends Adt {
+      def flattenedSubtypes: List[sc.Adt] = {
+        val b = List.newBuilder[sc.Adt]
+        def go(subtype: sc.Adt): Unit = subtype match {
+          case x: sc.Adt.Sum =>
+            b += x.copy(subtypes = Nil)
+            x.subtypes.foreach(go)
+          case x: sc.Adt.Record =>
+            b += x
+        }
+        subtypes.foreach(go)
+        b.result()
+      }
+    }
+    case class Record(
+        isWrapper: Boolean,
+        comments: Comments,
+        name: sc.Type.Qualified,
+        tparams: List[Type.Abstract],
+        params: List[Param],
+        implicitParams: List[Param],
+        `extends`: Option[sc.Type],
+        implements: List[Type],
+        members: List[ClassMember],
+        staticMembers: List[ClassMember]
+    ) extends Adt
+  }
+  case class Class(
+      comments: Comments,
+      classType: ClassType,
+      name: sc.Type.Qualified,
+      tparams: List[Type.Abstract],
+      params: List[Param],
+      implicitParams: List[Param],
+      `extends`: Option[sc.Type],
+      implements: List[Type],
+      members: List[ClassMember],
+      staticMembers: List[ClassMember]
+  ) extends StaticMember
+
   case class Value(
+      name: sc.Ident,
+      tpe: sc.Type,
+      body: Option[sc.Code]
+  ) extends ClassMember
+
+  case class Method(
+      comments: Comments,
       tparams: List[Type.Abstract],
       name: sc.Ident,
       params: List[Param],
       implicitParams: List[Param],
       tpe: sc.Type,
-      body: sc.Code
-  ) extends ClassMember
-
-  case class Obj(
-      name: sc.QIdent,
-      members: List[ClassMember],
       body: Option[sc.Code]
-  ) extends Tree
+  ) extends ClassMember
 
   sealed trait Type extends Tree {
     def of(targs: Type*): Type = Type.TApply(this, targs.toList)
@@ -128,45 +215,6 @@ object sc {
       val UpdateParams = Qualified("typo.dsl.UpdateParams")
     }
 
-    // don't generate imports for these
-    val BuiltIn: Map[Ident, Type.Qualified] =
-      Set(
-        TypesScala.Any,
-        TypesScala.AnyRef,
-        TypesScala.AnyVal,
-        TypesScala.Array,
-        TypesScala.BigDecimal,
-        TypesScala.Boolean,
-        TypesScala.Byte,
-        TypesScala.Double,
-        TypesScala.Either,
-        TypesScala.Float,
-        TypesScala.Function1,
-        TypesScala.Int,
-        TypesScala.Iterable,
-        TypesScala.Iterator,
-        TypesJava.Character,
-        TypesJava.Integer,
-        TypesScala.Left,
-        TypesScala.List,
-        TypesScala.Long,
-        TypesScala.Map,
-        TypesScala.None,
-        TypesScala.Nil,
-        TypesScala.Numeric,
-        TypesScala.Option,
-        TypesScala.Right,
-        TypesScala.Short,
-        TypesScala.Some,
-        TypesJava.String,
-        TypesJava.StringBuilder,
-        TypesScala.StringContext,
-        TypesScala.Unit,
-        TypesJava.Throwable
-      )
-        .map(x => (x.value.name, x))
-        .toMap
-
     def containsUserDefined(tpe: sc.Type): Boolean = tpe match {
       case ArrayOf(targ)             => containsUserDefined(targ)
       case Wildcard                  => false
@@ -190,164 +238,6 @@ object sc {
     }
   }
 
-  val isScalaKeyword: Set[String] =
-    Set(
-      "abstract",
-      "case",
-      "class",
-      "catch",
-      "def",
-      "do",
-      "else",
-      "enum",
-      "extends",
-      "export",
-      "extension",
-      "false",
-      "final",
-      "finally",
-      "for",
-      "forSome",
-      "given",
-      "if",
-      "implicit",
-      "import",
-      "inline",
-      "lazy",
-      "macro",
-      "match",
-      "new",
-      "null",
-      "object",
-      "override",
-      "package",
-      "private",
-      "protected",
-      "return",
-      "sealed",
-      "super",
-      "then",
-      "this",
-      "throw",
-      "trait",
-      "true",
-      "try",
-      "type",
-      "using",
-      "val",
-      "var",
-      "with",
-      "while",
-      "yield",
-      ".",
-      "_",
-      ":",
-      "=",
-      "=>",
-      "<-",
-      "<:",
-      "<%",
-      ">:",
-      "#",
-      "@"
-    )
-
-  val Quote = '"'.toString
-  val TripleQuote = Quote * 3
-
-  def renderTree(tree: Tree): String =
-    tree match {
-      case Ident(value) =>
-        def isValidId(str: String) = str.head.isUnicodeIdentifierStart && str.drop(1).forall(_.isUnicodeIdentifierPart)
-
-        def escape(str: String) = s"`$str`"
-
-        if (isScalaKeyword(value) || !isValidId(value)) escape(value) else value
-      case QIdent(value)                      => value.map(renderTree).mkString(".")
-      case Param(name, tpe, Some(default))    => renderTree(name) + ": " + renderTree(tpe) + " = " + default.render
-      case Param(name, tpe, None)             => renderTree(name) + ": " + renderTree(tpe)
-      case Params(params)                     => params.map(renderTree).mkString("(", ", ", ")")
-      case StrLit(str) if str.contains(Quote) => TripleQuote + str + TripleQuote
-      case StrLit(str)                        => Quote + str + Quote
-      case Summon(tpe)                        => s"implicitly[${renderTree(tpe)}]"
-      case tpe: Type =>
-        tpe match {
-          case Type.ArrayOf(value)                 => s"Array[${renderTree(value)}]"
-          case Type.Abstract(value)                => renderTree(value)
-          case Type.Wildcard                       => "?"
-          case Type.TApply(underlying, targs)      => renderTree(underlying) + targs.map(renderTree).mkString("[", ", ", "]")
-          case Type.Qualified(value)               => renderTree(value)
-          case Type.Commented(underlying, comment) => s"$comment ${renderTree(underlying)}"
-          case Type.ByName(underlying)             => s"=> ${renderTree(underlying)}"
-          case Type.UserDefined(underlying)        => s"/* user-picked */ ${renderTree(underlying)}"
-        }
-      case StringInterpolate(_, prefix, content) =>
-        content.render.lines match {
-          case Array(one) if one.contains(Quote) =>
-            s"${renderTree(prefix)}$TripleQuote$one$TripleQuote"
-          case Array(one) =>
-            s"${renderTree(prefix)}$Quote$one$Quote"
-          case more =>
-            val renderedPrefix = renderTree(prefix)
-            val pre = s"$renderedPrefix$TripleQuote"
-            val ret = more.iterator.zipWithIndex.map {
-              case (line, n) if n == 0 => pre + line
-              // if line is last
-              case (line, n) if n == more.length - 1 =>
-                // if its empty align triple quotes with previous
-                if (line.isEmpty) s"${" " * renderedPrefix.length}$TripleQuote"
-                // or just align like the rest and put it at the end
-                else s"${" " * pre.length}$line$TripleQuote"
-              case (line, _) => s"${" " * pre.length}$line"
-            }.mkString
-            ret
-        }
-      case Given(tparams, name, implicitParams, tpe, body) =>
-        val renderedName = renderTree(name)
-        val renderedTpe = renderTree(tpe)
-        val renderedBody = body.render
-
-        if (tparams.isEmpty && implicitParams.isEmpty)
-          s"implicit lazy val $renderedName: $renderedTpe = $renderedBody"
-        else {
-          val renderedTparams = if (tparams.isEmpty) "" else tparams.map(renderTree).mkString("[", ", ", "]")
-          val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(implicit ", ", ", ")")
-          s"implicit def $renderedName$renderedTparams$renderedImplicitParams: $renderedTpe = $renderedBody"
-        }
-      case Value(tparams, name, params, implicitParams, tpe, body) =>
-        val renderedName = renderTree(name)
-        val renderedTpe = renderTree(tpe)
-        val renderedBody = body.render
-
-        if (tparams.isEmpty && params.isEmpty && implicitParams.isEmpty)
-          s"val $renderedName: $renderedTpe = $renderedBody"
-        else {
-          val renderedTparams = if (tparams.isEmpty) "" else tparams.map(renderTree).mkString("[", ", ", "]")
-          val init = s"def $renderedName$renderedTparams"
-          val renderedParams =
-            params match {
-              case Nil            => ""
-              case List(one)      => s"(${renderTree(one)})"
-              case List(one, two) => s"(${renderTree(one)}, ${renderTree(two)})"
-              case more =>
-                val indent = " " * (init.length + 1)
-                more.zipWithIndex.map { case (p, idx) => (if (idx == 0) "" else indent) + renderTree(p) }.mkString("(", ",\n", s"\n${" " * init.length})")
-            }
-          val renderedImplicitParams = if (implicitParams.isEmpty) "" else implicitParams.map(renderTree).mkString("(implicit ", ", ", ")")
-          s"def $renderedName$renderedTparams$renderedParams$renderedImplicitParams: $renderedTpe = $renderedBody"
-        }
-      case Obj(name, members, body) =>
-        if (members.isEmpty && body.isEmpty) ""
-        else {
-          val codeMembers: List[String] =
-            body.map(_.render.asString).toList ++ members.sortBy(_.name).map(renderTree)
-
-          s"""|object ${name.name.value} {
-              |${codeMembers.flatMap(_.linesIterator).map("  " + _).mkString("\n")}
-              |}""".stripMargin
-        }
-    }
-
   case class File(tpe: Type.Qualified, contents: Code, secondaryTypes: List[Type.Qualified], scope: Scope) {
     val name: Ident = tpe.value.name
     val pkg = QIdent(tpe.value.idents.dropRight(1))
@@ -356,7 +246,7 @@ object sc {
   /** Semi-structured generated code. We keep all `Tree`s as long as possible so we can write imports based on what is used
     */
   sealed trait Code {
-    override def toString: String = sys.error("stringifying code too early loses structure")
+//    override def toString: String = sys.error("stringifying code too early loses structure")
 
     def stripMargin: Code =
       this match {
@@ -368,7 +258,7 @@ object sc {
       }
 
     // render tree as a string in such a way that newlines inside interpolated strings preserves outer indentation
-    def render: Lines =
+    def render(language: Lang): Lines =
       this match {
         case Code.Interpolated(parts, args) =>
           val lines = Array.newBuilder[String]
@@ -402,7 +292,7 @@ object sc {
           // do the string interpolation
           parts.iterator.zipWithIndex.foreach { case (str, n) =>
             if (n > 0) {
-              val rendered = args(n - 1).render
+              val rendered = args(n - 1).render(language)
               // consider the current indentation level when interpolating in multiline strings
               consume(rendered, indent = currentLine.length)
             }
@@ -413,9 +303,9 @@ object sc {
           lines += currentLine.result()
           // recombine lines back into one string
           Lines(lines.result())
-        case Code.Combined(codes) => codes.iterator.map(_.render).reduceOption(_ ++ _).getOrElse(Lines.Empty)
+        case Code.Combined(codes) => codes.iterator.map(_.render(language)).reduceOption(_ ++ _).getOrElse(Lines.Empty)
         case Code.Str(str)        => Lines(str)
-        case Code.Tree(tree)      => Lines(renderTree(tree))
+        case Code.Tree(tree)      => language.renderTree(tree).render(language)
       }
 
     def mapTrees(f: Tree => Tree): Code =

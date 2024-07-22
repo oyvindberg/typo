@@ -3,31 +3,31 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesorderdetail
+package adventureworks.sales.salesorderdetail;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.production.product.ProductId
-import adventureworks.sales.salesorderheader.SalesorderheaderFields
-import adventureworks.sales.salesorderheader.SalesorderheaderId
-import adventureworks.sales.salesorderheader.SalesorderheaderRow
-import adventureworks.sales.specialoffer.SpecialofferId
-import adventureworks.sales.specialofferproduct.SpecialofferproductFields
-import adventureworks.sales.specialofferproduct.SpecialofferproductId
-import adventureworks.sales.specialofferproduct.SpecialofferproductRow
-import typo.dsl.ForeignKey
-import typo.dsl.PGType
-import typo.dsl.Path
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Const.As.as
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.production.product.ProductId;
+import adventureworks.sales.salesorderheader.SalesorderheaderFields;
+import adventureworks.sales.salesorderheader.SalesorderheaderId;
+import adventureworks.sales.salesorderheader.SalesorderheaderRow;
+import adventureworks.sales.specialoffer.SpecialofferId;
+import adventureworks.sales.specialofferproduct.SpecialofferproductFields;
+import adventureworks.sales.specialofferproduct.SpecialofferproductId;
+import adventureworks.sales.specialofferproduct.SpecialofferproductRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.PGType;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait SalesorderdetailFields {
   def salesorderid: IdField[SalesorderheaderId, SalesorderdetailRow]

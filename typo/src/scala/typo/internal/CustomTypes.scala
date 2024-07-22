@@ -5,17 +5,17 @@ import typo.internal.codegen.*
 
 import scala.collection.mutable
 
-class CustomTypes(pkg: sc.QIdent) {
+class CustomTypes(pkg: sc.QIdent, lang: Lang) {
 
   lazy val TypoBox = CustomType(
     comment = "This represents the box datatype in PostgreSQL",
     sqlType = "box",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoBox")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("x1"), TypesScala.Double, None),
-      sc.Param(sc.Ident("y1"), TypesScala.Double, None),
-      sc.Param(sc.Ident("x2"), TypesScala.Double, None),
-      sc.Param(sc.Ident("y2"), TypesScala.Double, None)
+      sc.Param(sc.Ident("x1"), lang.Double),
+      sc.Param(sc.Ident("y1"), lang.Double),
+      sc.Param(sc.Ident("x2"), lang.Double),
+      sc.Param(sc.Ident("y2"), lang.Double)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.PGbox,
@@ -33,18 +33,18 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "bytea",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoBytea")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), sc.Type.ArrayOf(TypesScala.Byte), None)
+      sc.Param(sc.Ident("value"), sc.Type.ArrayOf(lang.Byte))
     ),
     toTypo = CustomType.ToTypo(
-      jdbcType = sc.Type.ArrayOf(TypesScala.Byte),
+      jdbcType = sc.Type.ArrayOf(lang.Byte),
       toTypo = (expr, target) => code"$target($expr)"
     ),
     fromTypo = CustomType.FromTypo(
-      jdbcType = sc.Type.ArrayOf(TypesScala.Byte),
+      jdbcType = sc.Type.ArrayOf(lang.Byte),
       fromTypo = (expr, _) => code"$expr.value"
     ),
     forbidArray = true,
-    toText = CustomType.Text(sc.Type.ArrayOf(TypesScala.Byte), expr => code"$expr.value")
+    toText = CustomType.Text(sc.Type.ArrayOf(lang.Byte), expr => code"$expr.value")
   )
 
   lazy val TypoLocalDate = CustomType(
@@ -52,43 +52,85 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "date",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoLocalDate")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), TypesJava.LocalDate, None)
+      sc.Param(sc.Ident("value"), TypesJava.LocalDate)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.String,
-      toTypo = (expr, target) => code"$target(${TypesJava.LocalDate}.parse($expr))"
+      toTypo = (expr, target) => code"new $target(${TypesJava.LocalDate}.parse($expr))"
     ),
     fromTypo = CustomType.FromTypo(
       jdbcType = TypesJava.String,
-      fromTypo = (expr, _) => code"$expr.value.toString"
+      fromTypo = (expr, _) => code"$expr.value.toString()"
     ),
-    toText = CustomType.Text.string(expr => code"$expr.value.toString"),
-    objBody = Some { target =>
-      code"""|def now = $target(${TypesJava.LocalDate}.now)
-             |def apply(str: ${TypesJava.String}): $target = $target(${TypesJava.LocalDate}.parse(str))""".stripMargin
-    }
+    toText = CustomType.Text.string(expr => code"$expr.value.toString()"),
+    objBody = target =>
+      List(
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("now"),
+          params = Nil,
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"new $target(${TypesJava.LocalDate}.now())")
+        ),
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("apply"),
+          params = List(sc.Param(sc.Ident("str"), TypesJava.String)),
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"new $target(${TypesJava.LocalDate}.parse(str))")
+        )
+      )
   )
   lazy val TypoLocalTime = CustomType(
     comment = "This is `java.time.LocalTime`, but with microsecond precision and transferred to and from postgres as strings. The reason is that postgres driver and db libs are broken",
     sqlType = "time",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoLocalTime")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), TypesJava.LocalTime, None)
+      sc.Param(sc.Ident("value"), TypesJava.LocalTime)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.String,
-      toTypo = (expr, target) => code"$target(${TypesJava.LocalTime}.parse($expr))"
+      toTypo = (expr, target) => code"new $target(${TypesJava.LocalTime}.parse($expr))"
     ),
     fromTypo = CustomType.FromTypo(
       jdbcType = TypesJava.String,
       fromTypo = (expr, _) => code"$expr.value.toString"
     ),
     toText = CustomType.Text.string(expr => code"$expr.value.toString"),
-    objBody = Some { target =>
-      code"""|def apply(value: ${TypesJava.LocalTime}): $target = new $target(value.truncatedTo(${TypesJava.ChronoUnit}.MICROS))
-             |def apply(str: ${TypesJava.String}): $target = apply(${TypesJava.LocalTime}.parse(str))
-             |def now: $target = $target(${TypesJava.LocalTime}.now)""".stripMargin
-    }
+    objBody = target =>
+      List(
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("apply"),
+          params = List(sc.Param(sc.Ident("value"), TypesJava.LocalTime)),
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"new $target(value.truncatedTo(${TypesJava.ChronoUnit}.MICROS))")
+        ),
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("apply"),
+          params = List(sc.Param(sc.Ident("str"), TypesJava.String)),
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"apply(${TypesJava.LocalTime}.parse(str))")
+        ),
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("now"),
+          params = Nil,
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"new $target(${TypesJava.LocalTime}.now())")
+        )
+      )
   )
 
   lazy val TypoLocalDateTime = CustomType(
@@ -96,7 +138,7 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "timestamp",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoLocalDateTime")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), TypesJava.LocalDateTime, None)
+      sc.Param(sc.Ident("value"), TypesJava.LocalDateTime)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.String,
@@ -107,13 +149,41 @@ class CustomTypes(pkg: sc.QIdent) {
       fromTypo = (expr, _) => code"$expr.value.toString"
     ),
     toText = CustomType.Text.string(expr => code"$expr.value.toString"),
-    objBody = Some { target =>
-      code"""|val parser: ${TypesJava.DateTimeFormatter} = new ${TypesJava.DateTimeFormatterBuilder}().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(${TypesJava.ChronoField}.MICRO_OF_SECOND, 0, 6, true).toFormatter
-             |def apply(value: ${TypesJava.LocalDateTime}): $target = new $target(value.truncatedTo(${TypesJava.ChronoUnit}.MICROS))
-             |def apply(str: ${TypesJava.String}): $target = apply(${TypesJava.LocalDateTime}.parse(str, parser))
-             |def now = $target(${TypesJava.LocalDateTime}.now)
-             |""".stripMargin
-    }
+    objBody = target =>
+      List(
+        sc.Value(
+          name = sc.Ident("parser"),
+          tpe = TypesJava.DateTimeFormatter,
+          body = Some(code"""new ${TypesJava.DateTimeFormatterBuilder}().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(${TypesJava.ChronoField}.MICRO_OF_SECOND, 0, 6, true).toFormatter()""")
+        ),
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("apply"),
+          params = List(sc.Param(sc.Ident("value"), TypesJava.LocalDateTime)),
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"new $target(value.truncatedTo(${TypesJava.ChronoUnit}.MICROS))")
+        ),
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("apply"),
+          params = List(sc.Param(sc.Ident("str"), TypesJava.String)),
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"apply(${TypesJava.LocalDateTime}.parse(str, parser))")
+        ),
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("now"),
+          params = Nil,
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"new $target(${TypesJava.LocalDateTime}.now())")
+        )
+      )
   )
 
   lazy val TypoInstant = CustomType(
@@ -121,7 +191,7 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "timestamptz",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoInstant")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), TypesJava.Instant, None)
+      sc.Param(sc.Ident("value"), TypesJava.Instant)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.String,
@@ -132,13 +202,43 @@ class CustomTypes(pkg: sc.QIdent) {
       fromTypo = (expr, _) => code"$expr.value.toString"
     ),
     toText = CustomType.Text.string(expr => code"$expr.value.toString"),
-    objBody = Some { target =>
-      code"""|val parser: ${TypesJava.DateTimeFormatter} = new ${TypesJava.DateTimeFormatterBuilder}().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(${TypesJava.ChronoField}.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
-             |def apply(value: ${TypesJava.Instant}): $target = new $target(value.truncatedTo(${TypesJava.ChronoUnit}.MICROS))
-             |def apply(str: ${TypesJava.String}): $target = apply(${TypesJava.OffsetDateTime}.parse(str, parser).toInstant)
-             |def now = $target(${TypesJava.Instant}.now)
-             |""".stripMargin
-    }
+    objBody = target =>
+      List(
+        sc.Value(
+          name = sc.Ident("parser"),
+          tpe = TypesJava.DateTimeFormatter,
+          body = Some(
+            code"""new ${TypesJava.DateTimeFormatterBuilder}().appendPattern("yyyy-MM-dd HH:mm:ss").appendFraction(${TypesJava.ChronoField}.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter()"""
+          )
+        ),
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("apply"),
+          params = List(sc.Param(sc.Ident("value"), TypesJava.Instant)),
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"new $target(value.truncatedTo(${TypesJava.ChronoUnit}.MICROS))")
+        ),
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("apply"),
+          params = List(sc.Param(sc.Ident("str"), TypesJava.String)),
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"apply(${TypesJava.OffsetDateTime}.parse(str, parser).toInstant())")
+        ),
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("now"),
+          params = Nil,
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"new $target(${TypesJava.Instant}.now())")
+        )
+      )
   )
 
   lazy val TypoOffsetTime = CustomType(
@@ -146,7 +246,7 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "timetz",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoOffsetTime")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), TypesJava.OffsetTime, None)
+      sc.Param(sc.Ident("value"), TypesJava.OffsetTime)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.String,
@@ -157,13 +257,42 @@ class CustomTypes(pkg: sc.QIdent) {
       fromTypo = (expr, _) => code"$expr.value.toString"
     ),
     toText = CustomType.Text.string(expr => code"$expr.value.toString"),
-    objBody = Some { target =>
-      code"""|val parser: ${TypesJava.DateTimeFormatter} = new ${TypesJava.DateTimeFormatterBuilder}().appendPattern("HH:mm:ss").appendFraction(${TypesJava.ChronoField}.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter
-             |def apply(value: ${TypesJava.OffsetTime}): $target = new $target(value.truncatedTo(${TypesJava.ChronoUnit}.MICROS))
-             |def apply(str: ${TypesJava.String}): $target = apply(${TypesJava.OffsetTime}.parse(str, parser))
-             |def now = $target(${TypesJava.OffsetTime}.now)
-             |""".stripMargin
-    }
+    objBody = target =>
+      List(
+        sc.Value(
+          name = sc.Ident("parser"),
+          tpe = TypesJava.DateTimeFormatter,
+          body =
+            Some(code"""new ${TypesJava.DateTimeFormatterBuilder}().appendPattern("HH:mm:ss").appendFraction(${TypesJava.ChronoField}.MICRO_OF_SECOND, 0, 6, true).appendPattern("X").toFormatter()""")
+        ),
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("apply"),
+          params = List(sc.Param(sc.Ident("value"), TypesJava.OffsetTime)),
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"new $target(value.truncatedTo(${TypesJava.ChronoUnit}.MICROS))")
+        ),
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("apply"),
+          params = List(sc.Param(sc.Ident("str"), TypesJava.String)),
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"apply(${TypesJava.OffsetTime}.parse(str, parser))")
+        ),
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("now"),
+          params = Nil,
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"new $target(${TypesJava.OffsetTime}.now())")
+        )
+      )
   )
 
   lazy val TypoCircle = CustomType(
@@ -171,8 +300,8 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "circle",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoCircle")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("center"), TypoPoint.typoType, None),
-      sc.Param(sc.Ident("radius"), TypesScala.Double, None)
+      sc.Param(sc.Ident("center"), TypoPoint.typoType),
+      sc.Param(sc.Ident("radius"), lang.Double)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.PGcircle,
@@ -190,9 +319,9 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "line",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoLine")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("a"), TypesScala.Double, None),
-      sc.Param(sc.Ident("b"), TypesScala.Double, None),
-      sc.Param(sc.Ident("c"), TypesScala.Double, None)
+      sc.Param(sc.Ident("a"), lang.Double),
+      sc.Param(sc.Ident("b"), lang.Double),
+      sc.Param(sc.Ident("c"), lang.Double)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.PGline,
@@ -210,8 +339,8 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "lseg",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoLineSegment")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("p1"), TypoPoint.typoType, None),
-      sc.Param(sc.Ident("p2"), TypoPoint.typoType, None)
+      sc.Param(sc.Ident("p1"), TypoPoint.typoType),
+      sc.Param(sc.Ident("p2"), TypoPoint.typoType)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.PGlseg,
@@ -229,8 +358,8 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "path",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoPath")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("open"), TypesScala.Boolean, None),
-      sc.Param(sc.Ident("points"), TypesScala.List.of(TypoPoint.typoType), None)
+      sc.Param(sc.Ident("open"), lang.Boolean),
+      sc.Param(sc.Ident("points"), lang.ListType.of(TypoPoint.typoType))
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.PGpath,
@@ -253,8 +382,8 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "point",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoPoint")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("x"), TypesScala.Double, None),
-      sc.Param(sc.Ident("y"), TypesScala.Double, None)
+      sc.Param(sc.Ident("x"), lang.Double),
+      sc.Param(sc.Ident("y"), lang.Double)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.PGpoint,
@@ -272,7 +401,7 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "polygon",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoPolygon")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("points"), TypesScala.List.of(TypoPoint.typoType), None)
+      sc.Param(sc.Ident("points"), lang.ListType.of(TypoPoint.typoType))
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.PGpolygon,
@@ -293,12 +422,12 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "interval",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoInterval")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("years"), TypesScala.Int, None),
-      sc.Param(sc.Ident("months"), TypesScala.Int, None),
-      sc.Param(sc.Ident("days"), TypesScala.Int, None),
-      sc.Param(sc.Ident("hours"), TypesScala.Int, None),
-      sc.Param(sc.Ident("minutes"), TypesScala.Int, None),
-      sc.Param(sc.Ident("seconds"), TypesScala.Double, None)
+      sc.Param(sc.Ident("years"), lang.Int),
+      sc.Param(sc.Ident("months"), lang.Int),
+      sc.Param(sc.Ident("days"), lang.Int),
+      sc.Param(sc.Ident("hours"), lang.Int),
+      sc.Param(sc.Ident("minutes"), lang.Int),
+      sc.Param(sc.Ident("seconds"), lang.Double)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.PGInterval,
@@ -318,16 +447,21 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "hstore",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoHStore")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), TypesScala.Map.of(TypesJava.String, TypesJava.String), None)
+      sc.Param(sc.Ident("value"), lang.MapType.of(TypesJava.String, TypesJava.String))
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.Map.of(sc.Type.Wildcard, sc.Type.Wildcard),
       toTypo = (expr, target) => {
-        code"""|{
-               |  val b = ${TypesScala.Map}.newBuilder[${TypesJava.String}, ${TypesJava.String}]
-               |  $expr.forEach { case (k, v) => b += k.asInstanceOf[${TypesJava.String}] -> v.asInstanceOf[${TypesJava.String}]}
-               |  $target(b.result())
-               |}""".stripMargin
+        lang match {
+          case LangJava => code"new $target((${lang.MapType.of(TypesJava.String, TypesJava.String)}) $expr)"
+          case LangScala =>
+            code"""|{
+                   |  val b = ${lang.MapType}.newBuilder[${TypesJava.String}, ${TypesJava.String}]
+                   |  $expr.forEach { case (k, v) => b += k.asInstanceOf[${TypesJava.String}] -> v.asInstanceOf[${TypesJava.String}]}
+                   |  $target(b.result())
+                   |}""".stripMargin
+          case other => sys.error("Unsupported language: " + other)
+        }
       }
     ),
     fromTypo = CustomType.FromTypo(
@@ -351,17 +485,35 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "money",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoMoney")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), TypesScala.BigDecimal, None)
+      sc.Param(sc.Ident("value"), lang.BigDecimal)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.BigDecimal,
-      toTypo = (expr, target) => code"$target(${TypesScala.BigDecimal}($expr))"
+      toTypo = (expr, target) =>
+        lang match {
+          case LangJava  => code"$target($expr)"
+          case LangScala => code"$target(${lang.BigDecimal}($expr))"
+          case other     => sys.error("Unsupported language: " + other)
+        }
     ),
     fromTypo = CustomType.FromTypo(
       jdbcType = TypesJava.BigDecimal,
-      fromTypo = (expr, _) => code"$expr.value.bigDecimal"
+      fromTypo = (expr, _) =>
+        lang match {
+          case LangJava  => code"$expr"
+          case LangScala => code"$expr.value.bigDecimal"
+          case other     => sys.error("Unsupported language: " + other)
+        }
     ),
-    toText = CustomType.Text(TypesScala.BigDecimal, expr => code"$expr.value")
+    toText = CustomType.Text(
+      lang.BigDecimal,
+      expr =>
+        lang match {
+          case LangJava  => code"$expr"
+          case LangScala => code"$expr.value"
+          case other     => sys.error("Unsupported language: " + other)
+        }
+    )
   )
 
   lazy val TypoShort = CustomType(
@@ -369,7 +521,7 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "int2",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoShort")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), TypesScala.Short, None)
+      sc.Param(sc.Ident("value"), lang.Short)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.Integer,
@@ -379,7 +531,7 @@ class CustomTypes(pkg: sc.QIdent) {
       jdbcType = TypesJava.Integer,
       fromTypo = (expr, _) => code"$expr.value.toInt"
     ),
-    toText = CustomType.Text(TypesScala.Short, expr => code"$expr.value"),
+    toText = CustomType.Text(lang.Short, expr => code"$expr.value"),
     toTypoInArray = Some(
       CustomType.ToTypo(
         jdbcType = TypesJava.Short,
@@ -392,23 +544,30 @@ class CustomTypes(pkg: sc.QIdent) {
         fromTypo = (expr, _) => code"$expr.value: ${TypesJava.Short}"
       )
     ),
-    objBody = Some(target => {
-      val numericOfTarget = TypesScala.Numeric.of(target)
-      code"""|implicit object numeric extends $numericOfTarget {
-               |    override def compare(x: $target, y: $target): ${TypesScala.Int} = ${TypesJava.Short}.compare(x.value, y.value)
-               |    override def plus(x: $target, y: $target): $target = $target((x.value + y.value).toShort)
-               |    override def minus(x: $target, y: $target): $target = $target((x.value - y.value).toShort)
-               |    override def times(x: $target, y: $target): $target = $target((x.value * y.value).toShort)
-               |    override def negate(x: $target): $target = $target((-x.value).toShort)
-               |    override def fromInt(x: Int): $target = $target(x.toShort)
-               |    override def toInt(x: $target): ${TypesScala.Int} = x.value.toInt
-               |    override def toLong(x: $target): ${TypesScala.Long} = x.value.toLong
-               |    override def toFloat(x: $target): ${TypesScala.Float} = x.value.toFloat
-               |    override def toDouble(x: $target): ${TypesScala.Double} = x.value.toDouble
-               |    def parseString(str: String): Option[$target] = str.toShortOption.map($target.apply)
-               |  }
-               |""".stripMargin
-    })
+    objBody = target => {
+      lang match {
+        case LangJava => Nil
+        case LangScala =>
+          val numericOfTarget = TypesScala.Numeric.of(target)
+          val numericBody =
+            code"""|new $numericOfTarget {
+                   |  override def compare(x: $target, y: $target): ${lang.Int} = ${TypesJava.Short}.compare(x.value, y.value)
+                   |  override def plus(x: $target, y: $target): $target = $target((x.value + y.value).toShort)
+                   |  override def minus(x: $target, y: $target): $target = $target((x.value - y.value).toShort)
+                   |  override def times(x: $target, y: $target): $target = $target((x.value * y.value).toShort)
+                   |  override def negate(x: $target): $target = $target((-x.value).toShort)
+                   |  override def fromInt(x: Int): $target = $target(x.toShort)
+                   |  override def toInt(x: $target): ${lang.Int} = x.value.toInt
+                   |  override def toLong(x: $target): ${lang.Long} = x.value.toLong
+                   |  override def toFloat(x: $target): ${lang.Float} = x.value.toFloat
+                   |  override def toDouble(x: $target): ${lang.Double} = x.value.toDouble
+                   |  def parseString(str: String): Option[$target] = str.toShortOption.map($target.apply)
+                   |  locally{val _ = parseString("1")}
+                   |}"""
+          List(sc.Given(Nil, sc.Ident("numeric"), Nil, numericOfTarget, body = numericBody.stripMargin))
+        case other => sys.error("Unsupported language: " + other)
+      }
+    }
   )
 
   lazy val TypoUUID = CustomType(
@@ -416,7 +575,7 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "uuid",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoUUID")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), TypesJava.UUID, None)
+      sc.Param(sc.Ident("value"), TypesJava.UUID)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.UUID,
@@ -427,8 +586,27 @@ class CustomTypes(pkg: sc.QIdent) {
       fromTypo = (expr, _) => code"$expr.value"
     ),
     toText = CustomType.Text.string(expr => code"$expr.value.toString"),
-    objBody = Some(target => code"""|def apply(str: ${TypesJava.String}): $target = $target(${TypesJava.UUID}.fromString(str))
-             |def randomUUID: $target = $target(${TypesJava.UUID}.randomUUID())""".stripMargin)
+    objBody = target =>
+      List(
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("apply"),
+          params = List(sc.Param(sc.Ident("str"), TypesJava.String)),
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"new $target(${TypesJava.UUID}.fromString(str))")
+        ),
+        sc.Method(
+          comments = sc.Comments.Empty,
+          tparams = Nil,
+          name = sc.Ident("randomUUID"),
+          params = Nil,
+          implicitParams = Nil,
+          tpe = target,
+          body = Some(code"new $target(${TypesJava.UUID}.randomUUID())")
+        )
+      )
   )
 
   lazy val TypoVector = CustomType(
@@ -436,7 +614,7 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "vector",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoVector")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), sc.Type.ArrayOf(TypesScala.Float), None)
+      sc.Param(sc.Ident("value"), sc.Type.ArrayOf(lang.Float))
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.PgArray,
@@ -455,7 +633,7 @@ class CustomTypes(pkg: sc.QIdent) {
     sqlType = "xml",
     typoType = sc.Type.Qualified(pkg / sc.Ident("TypoXml")),
     params = NonEmptyList(
-      sc.Param(sc.Ident("value"), TypesJava.String, None)
+      sc.Param(sc.Ident("value"), TypesJava.String)
     ),
     toTypo = CustomType.ToTypo(
       jdbcType = TypesJava.PgSQLXML,
@@ -492,9 +670,7 @@ class CustomTypes(pkg: sc.QIdent) {
       comment = s"$sqlType (via PGObject)",
       sqlType = sqlType,
       typoType = sc.Type.Qualified(pkg / sc.Ident(name)),
-      params = NonEmptyList(
-        sc.Param(sc.Ident("value"), TypesJava.String, None)
-      ),
+      params = NonEmptyList(sc.Param(sc.Ident("value"), TypesJava.String)),
       toTypo = CustomType.ToTypo(
         jdbcType = TypesJava.PGobject,
         toTypo = (expr, target) => code"$target($expr.getValue)"
@@ -591,7 +767,7 @@ class CustomTypes(pkg: sc.QIdent) {
       comment = "This is a type typo does not know how to handle yet. This falls back to casting to string and crossing fingers. Time to file an issue! :]",
       sqlType = sqlType,
       typoType = sc.Type.Qualified(pkg / sc.Ident(s"TypoUnknown${Naming.titleCase(sqlType)}")),
-      params = NonEmptyList(sc.Param(sc.Ident("value"), TypesJava.String, None)),
+      params = NonEmptyList(sc.Param(sc.Ident("value"), TypesJava.String)),
       toTypo = CustomType.ToTypo(
         jdbcType = TypesJava.String,
         toTypo = (expr, target) => code"$target($expr)"

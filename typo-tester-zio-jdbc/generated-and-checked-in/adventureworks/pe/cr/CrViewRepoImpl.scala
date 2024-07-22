@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pe.cr
+package adventureworks.pe.cr;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class CrViewRepoImpl extends CrViewRepo {
-  override def select: SelectBuilder[CrViewFields, CrViewRow] = {
-    SelectBuilderSql("pe.cr", CrViewFields.structure, CrViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, CrViewRow] = {
-    sql"""select "countryregioncode", "name", "modifieddate"::text from pe.cr""".query(using CrViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[CrViewFields, CrViewRow] = SelectBuilderSql("pe.cr", CrViewFields.structure, CrViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, CrViewRow] = sql"""select "countryregioncode", "name", "modifieddate"::text from pe.cr""".query(using CrViewRow.jdbcDecoder).selectStream()
 }

@@ -22,6 +22,7 @@ object generate {
       ComputedDefault(publicOptions.naming(customTypesPackage))
 
     val naming = publicOptions.naming(pkg)
+    val language = publicOptions.lang
 
     val options = InternalOptions(
       dbLib = publicOptions.dbLib.map {
@@ -49,8 +50,8 @@ object generate {
       readonlyRepo = publicOptions.readonlyRepo,
       typeOverride = publicOptions.typeOverride
     )
-    val customTypes = new CustomTypes(customTypesPackage)
-    val scalaTypeMapper = TypeMapperScala(options.typeOverride, publicOptions.nullabilityOverride, naming, customTypes)
+    val customTypes = new CustomTypes(customTypesPackage, language)
+    val scalaTypeMapper = TypeMapperJvm(language, options.typeOverride, publicOptions.nullabilityOverride, naming, customTypes)
     val enums = metaDb.enums.map(ComputedStringEnum(naming))
     val domains = metaDb.domains.map(ComputedDomain(naming, scalaTypeMapper))
     val domainsByName = domains.map(d => (d.underlying.name, d)).toMap
@@ -90,13 +91,13 @@ object generate {
 
         // yeah, sorry about the naming overload. this is a list of output files generated for each input sql file
         val sqlFileFiles: List[sc.File] =
-          computedSqlFiles.flatMap(x => FilesSqlFile(x, naming, options).all)
+          computedSqlFiles.flatMap(x => FilesSqlFile(language, x, naming, options).all)
 
         val relationFilesByName = computedRelations.flatMap {
-          case viewComputed: ComputedView => FilesView(viewComputed, options).all.map(x => (viewComputed.view.name, x))
+          case viewComputed: ComputedView => FilesView(language, viewComputed, options).all.map(x => (viewComputed.view.name, x))
           case tableComputed: ComputedTable =>
             val fkAnalysis = FkAnalysis(computedRelationsByName, tableComputed)
-            FilesTable(tableComputed, fkAnalysis, options, domainsByName).all.map(x => (tableComputed.dbTable.name, x))
+            FilesTable(language, tableComputed, fkAnalysis, options, domainsByName).all.map(x => (tableComputed.dbTable.name, x))
           case _ => Nil
         }
 
@@ -105,7 +106,7 @@ object generate {
         val mostFiles: List[sc.File] =
           List(
             options.dbLib.toList.flatMap(_.additionalFiles),
-            List(FileDefault(default, options.jsonLibs, options.dbLib).file),
+            List(FileDefault(default, options.jsonLibs, options.dbLib, language).file),
             enums.map(enm => FileStringEnum(options, enm)),
             domainFiles,
             customTypes.All.values.map(FileCustomType(options)),
@@ -132,7 +133,7 @@ object generate {
               val keptTables =
                 computedRelations.collect { case x: ComputedTable if options.enableTestInserts.include(x.dbTable.name) && keptTypes(x.names.RepoImplName) => x }
               if (keptTables.nonEmpty) {
-                val computed = ComputedTestInserts(project.name, options, customTypes, domains, enums, computedRelationsByName, keptTables)
+                val computed = ComputedTestInserts(project.name, options, language, customTypes, domains, enums, computedRelationsByName, keptTables)
                 FileTestInserts(computed, dbLib)
               } else Nil
             case _ => Nil
@@ -144,7 +145,7 @@ object generate {
               (pkg, files.flatMap(f => (f.name, f.tpe) :: f.secondaryTypes.map(tpe => (tpe.value.name, tpe))).toMap)
             }
 
-          val withImports = (testInsertsDataFiles.iterator ++ keptMostFiles).map(file => addPackageAndImports(knownNamesByPkg, file))
+          val withImports = (testInsertsDataFiles.iterator ++ keptMostFiles).map(file => addPackageAndImports(language, knownNamesByPkg, file))
           val all = withImports ++ pkgObject.iterator
           all.map(file => file.copy(contents = options.fileHeader.code ++ file.contents))
         }
@@ -159,7 +160,7 @@ object generate {
       }
 
     val deduplicated = deduplicate(projectsWithFiles)
-    deduplicated.toList.flatMap { p => Generated(p.target, p.testTarget, p.value.valuesIterator ++ p.scripts) }
+    deduplicated.toList.flatMap { p => Generated(publicOptions.lang, p.target, p.testTarget, p.value.valuesIterator ++ p.scripts) }
   }
 
   // projects in graph will have duplicated files, this will pull the files up until they are no longer duplicated

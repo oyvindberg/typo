@@ -3,15 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.pdoc
+package adventureworks.pr.pdoc;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.document.DocumentId
-import adventureworks.production.product.ProductId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.document.DocumentId;
+import adventureworks.production.product.ProductId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait PdocViewFields {
   def id: Field[ProductId, PdocViewRow]

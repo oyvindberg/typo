@@ -3,16 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.identity_test
+package adventureworks.public.identity_test;
 
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
+/** upsertBatch: Not implementable for zio-jdbc */
 trait IdentityTestRepo {
   def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow]
   def deleteById(name: IdentityTestId): ZIO[ZConnection, Throwable, Boolean]
@@ -20,7 +21,7 @@ trait IdentityTestRepo {
   def insert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, IdentityTestRow]
   def insert(unsaved: IdentityTestRowUnsaved): ZIO[ZConnection, Throwable, IdentityTestRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[IdentityTestFields, IdentityTestRow]
   def selectAll: ZStream[ZConnection, Throwable, IdentityTestRow]
@@ -30,7 +31,6 @@ trait IdentityTestRepo {
   def update: UpdateBuilder[IdentityTestFields, IdentityTestRow]
   def update(row: IdentityTestRow): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, UpdateResult[IdentityTestRow]]
-  // Not implementable for zio-jdbc: upsertBatch
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, IdentityTestRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.identity_test
+package adventureworks.public.identity_test;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait IdentityTestRepo {
   def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow]
@@ -18,7 +18,7 @@ trait IdentityTestRepo {
   def insert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow]
   def insert(unsaved: IdentityTestRowUnsaved): ConnectionIO[IdentityTestRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, IdentityTestRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IdentityTestRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[IdentityTestFields, IdentityTestRow]
   def selectAll: Stream[ConnectionIO, IdentityTestRow]
@@ -29,6 +29,6 @@ trait IdentityTestRepo {
   def update(row: IdentityTestRow): ConnectionIO[Boolean]
   def upsert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow]
   def upsertBatch(unsaved: List[IdentityTestRow]): Stream[ConnectionIO, IdentityTestRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, IdentityTestRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

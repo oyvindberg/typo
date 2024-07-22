@@ -3,20 +3,21 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public
+package adventureworks.public;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Domain `public.Name`
   * No constraint
   */
 case class Name(value: String)
+
 object Name {
   implicit lazy val arrayGet: Get[Array[Name]] = adventureworks.StringArrayMeta.get.map(_.map(Name.apply))
   implicit lazy val arrayPut: Put[Array[Name]] = adventureworks.StringArrayMeta.put.contramap(_.map(_.value))
@@ -25,8 +26,10 @@ object Name {
   implicit lazy val encoder: Encoder[Name] = Encoder.encodeString.contramap(_.value)
   implicit lazy val get: Get[Name] = Meta.StringMeta.get.map(Name.apply)
   implicit lazy val put: Put[Name] = Meta.StringMeta.put.contramap(_.value)
-  implicit lazy val text: Text[Name] = new Text[Name] {
-    override def unsafeEncode(v: Name, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: Name, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[Name] = {
+    new Text[Name] {
+      override def unsafeEncode(v: Name, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: Name, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

@@ -3,10 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.purchasing.vvendorwithaddresses
+package adventureworks.purchasing.vvendorwithaddresses;
 
-import java.sql.Connection
-import typo.dsl.SelectBuilder
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
 
 trait VvendorwithaddressesViewRepo {
   def select: SelectBuilder[VvendorwithaddressesViewFields, VvendorwithaddressesViewRow]

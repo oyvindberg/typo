@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.d
+package adventureworks.pr.d;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class DViewRepoImpl extends DViewRepo {
-  override def select: SelectBuilder[DViewFields, DViewRow] = {
-    SelectBuilderSql("pr.d", DViewFields.structure, DViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, DViewRow] = {
-    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from pr.d""".query(using DViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[DViewFields, DViewRow] = SelectBuilderSql("pr.d", DViewFields.structure, DViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, DViewRow] = sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from pr.d""".query(using DViewRow.jdbcDecoder).selectStream()
 }

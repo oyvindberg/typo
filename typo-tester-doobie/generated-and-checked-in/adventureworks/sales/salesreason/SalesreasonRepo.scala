@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesreason
+package adventureworks.sales.salesreason;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait SalesreasonRepo {
   def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow]
@@ -18,7 +18,7 @@ trait SalesreasonRepo {
   def insert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow]
   def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, SalesreasonRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesreasonRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[SalesreasonFields, SalesreasonRow]
   def selectAll: Stream[ConnectionIO, SalesreasonRow]
@@ -29,6 +29,6 @@ trait SalesreasonRepo {
   def update(row: SalesreasonRow): ConnectionIO[Boolean]
   def upsert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow]
   def upsertBatch(unsaved: List[SalesreasonRow]): Stream[ConnectionIO, SalesreasonRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, SalesreasonRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

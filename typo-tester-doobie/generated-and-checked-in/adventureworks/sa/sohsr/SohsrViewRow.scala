@@ -3,40 +3,39 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.sohsr
+package adventureworks.sa.sohsr;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.sales.salesorderheader.SalesorderheaderId
-import adventureworks.sales.salesreason.SalesreasonId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.sales.salesorderheader.SalesorderheaderId;
+import adventureworks.sales.salesreason.SalesreasonId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: sa.sohsr */
-case class SohsrViewRow(
-  /** Points to [[adventureworks.sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.salesorderid]] */
-  salesorderid: SalesorderheaderId,
-  /** Points to [[adventureworks.sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.salesreasonid]] */
-  salesreasonid: SalesreasonId,
-  /** Points to [[adventureworks.sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.modifieddate]] */
-  modifieddate: TypoLocalDateTime
-)
+case class SohsrViewRow(/** Points to [[adventureworks.sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.salesorderid]] */
+                        salesorderid: SalesorderheaderId, /** Points to [[adventureworks.sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.salesreasonid]] */
+                        salesreasonid: SalesreasonId, /** Points to [[adventureworks.sales.salesorderheadersalesreason.SalesorderheadersalesreasonRow.modifieddate]] */
+                        modifieddate: TypoLocalDateTime)
 
 object SohsrViewRow {
   implicit lazy val decoder: Decoder[SohsrViewRow] = Decoder.forProduct3[SohsrViewRow, SalesorderheaderId, SalesreasonId, TypoLocalDateTime]("salesorderid", "salesreasonid", "modifieddate")(SohsrViewRow.apply)(SalesorderheaderId.decoder, SalesreasonId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SohsrViewRow] = Encoder.forProduct3[SohsrViewRow, SalesorderheaderId, SalesreasonId, TypoLocalDateTime]("salesorderid", "salesreasonid", "modifieddate")(x => (x.salesorderid, x.salesreasonid, x.modifieddate))(SalesorderheaderId.encoder, SalesreasonId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SohsrViewRow] = new Read[SohsrViewRow](
-    gets = List(
-      (SalesorderheaderId.get, Nullability.NoNulls),
-      (SalesreasonId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SohsrViewRow(
-      salesorderid = SalesorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
-      salesreasonid = SalesreasonId.get.unsafeGetNonNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[SohsrViewRow] = {
+    new Read[SohsrViewRow](
+      gets = List(
+        (SalesorderheaderId.get, Nullability.NoNulls),
+        (SalesreasonId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => SohsrViewRow(
+        salesorderid = SalesorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
+        salesreasonid = SalesreasonId.get.unsafeGetNonNullable(rs, i + 1),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+      )
     )
-  )
+  
+  }
 }

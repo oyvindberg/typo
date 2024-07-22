@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.vstateprovincecountryregion
+package adventureworks.person.vstateprovincecountryregion;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class VstateprovincecountryregionMVRepoImpl extends VstateprovincecountryregionMVRepo {
-  override def select: SelectBuilder[VstateprovincecountryregionMVFields, VstateprovincecountryregionMVRow] = {
-    SelectBuilderSql("person.vstateprovincecountryregion", VstateprovincecountryregionMVFields.structure, VstateprovincecountryregionMVRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, VstateprovincecountryregionMVRow] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "isonlystateprovinceflag", "stateprovincename", "territoryid", "countryregioncode", "countryregionname" from person.vstateprovincecountryregion""".query(using VstateprovincecountryregionMVRow.read).stream
-  }
+  def select: SelectBuilder[VstateprovincecountryregionMVFields, VstateprovincecountryregionMVRow] = SelectBuilderSql("person.vstateprovincecountryregion", VstateprovincecountryregionMVFields.structure, VstateprovincecountryregionMVRow.read)
+  def selectAll: Stream[ConnectionIO, VstateprovincecountryregionMVRow] = sql"""select "stateprovinceid", "stateprovincecode", "isonlystateprovinceflag", "stateprovincename", "territoryid", "countryregioncode", "countryregionname" from person.vstateprovincecountryregion""".query(using VstateprovincecountryregionMVRow.read).stream
 }

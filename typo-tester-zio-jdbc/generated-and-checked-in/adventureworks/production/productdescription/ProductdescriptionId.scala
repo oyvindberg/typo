@@ -3,19 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productdescription
+package adventureworks.production.productdescription;
 
-import adventureworks.Text
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `production.productdescription` */
-case class ProductdescriptionId(value: Int) extends AnyVal
+case class ProductdescriptionId(value: Int) extends scala.AnyVal
+
 object ProductdescriptionId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[ProductdescriptionId]] = adventureworks.IntArrayDecoder.map(_.map(ProductdescriptionId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[ProductdescriptionId]] = adventureworks.IntArrayEncoder.contramap(_.map(_.value))
@@ -27,8 +28,10 @@ object ProductdescriptionId {
   implicit lazy val jsonEncoder: JsonEncoder[ProductdescriptionId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val pgType: PGType[ProductdescriptionId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[ProductdescriptionId] = Setter.intSetter.contramap(_.value)
-  implicit lazy val text: Text[ProductdescriptionId] = new Text[ProductdescriptionId] {
-    override def unsafeEncode(v: ProductdescriptionId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: ProductdescriptionId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[ProductdescriptionId] = {
+    new Text[ProductdescriptionId] {
+      override def unsafeEncode(v: ProductdescriptionId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: ProductdescriptionId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

@@ -3,34 +3,27 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesterritory
+package adventureworks.sales.salesterritory;
 
-import doobie.free.connection.ConnectionIO
-import doobie.free.connection.delay
-import fs2.Stream
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.DeleteBuilder.DeleteBuilderMock
-import typo.dsl.DeleteParams
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderMock
-import typo.dsl.SelectParams
-import typo.dsl.UpdateBuilder
-import typo.dsl.UpdateBuilder.UpdateBuilderMock
-import typo.dsl.UpdateParams
+import doobie.free.connection.ConnectionIO;
+import doobie.free.connection.delay;
+import fs2.Stream;
+import scala.annotation.nowarn;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.DeleteBuilder.DeleteBuilderMock;
+import typo.dsl.DeleteParams;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderMock;
+import typo.dsl.SelectParams;
+import typo.dsl.UpdateBuilder;
+import typo.dsl.UpdateBuilder.UpdateBuilderMock;
+import typo.dsl.UpdateParams;
 
-class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, SalesterritoryRow],
-                             map: scala.collection.mutable.Map[SalesterritoryId, SalesterritoryRow] = scala.collection.mutable.Map.empty) extends SalesterritoryRepo {
-  override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields.structure, map)
-  }
-  override def deleteById(territoryid: SalesterritoryId): ConnectionIO[Boolean] = {
-    delay(map.remove(territoryid).isDefined)
-  }
-  override def deleteByIds(territoryids: Array[SalesterritoryId]): ConnectionIO[Int] = {
-    delay(territoryids.map(id => map.remove(id)).count(_.isDefined))
-  }
-  override def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
+class SalesterritoryRepoMock(val toRow: Function1[SalesterritoryRowUnsaved, SalesterritoryRow], val map: scala.collection.mutable.Map[SalesterritoryId, SalesterritoryRow] = scala.collection.mutable.Map.empty) extends SalesterritoryRepo {
+  def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = DeleteBuilderMock(DeleteParams.empty, SalesterritoryFields.structure, map)
+  def deleteById(territoryid: SalesterritoryId): ConnectionIO[Boolean] = delay(map.remove(territoryid).isDefined)
+  def deleteByIds(territoryids: Array[SalesterritoryId]): ConnectionIO[Int] = delay(territoryids.map(id => map.remove(id)).count(_.isDefined))
+  def insert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     delay {
       val _ = if (map.contains(unsaved.territoryid))
         sys.error(s"id ${unsaved.territoryid} already exists")
@@ -40,10 +33,8 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
       unsaved
     }
   }
-  override def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow] = {
-    insert(toRow(unsaved))
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int = 10000): ConnectionIO[Long] = {
+  def insert(unsaved: SalesterritoryRowUnsaved): ConnectionIO[SalesterritoryRow] = insert(toRow(unsaved))
+  def insertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int = 10000): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
       rows.foreach { row =>
@@ -53,8 +44,8 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
       num
     }
   }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
     unsaved.compile.toList.map { unsavedRows =>
       var num = 0L
       unsavedRows.foreach { unsavedRow =>
@@ -65,28 +56,18 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
       num
     }
   }
-  override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    SelectBuilderMock(SalesterritoryFields.structure, delay(map.values.toList), SelectParams.empty)
-  }
-  override def selectAll: Stream[ConnectionIO, SalesterritoryRow] = {
-    Stream.emits(map.values.toList)
-  }
-  override def selectById(territoryid: SalesterritoryId): ConnectionIO[Option[SalesterritoryRow]] = {
-    delay(map.get(territoryid))
-  }
-  override def selectByIds(territoryids: Array[SalesterritoryId]): Stream[ConnectionIO, SalesterritoryRow] = {
-    Stream.emits(territoryids.flatMap(map.get).toList)
-  }
-  override def selectByIdsTracked(territoryids: Array[SalesterritoryId]): ConnectionIO[Map[SalesterritoryId, SalesterritoryRow]] = {
+  def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = SelectBuilderMock(SalesterritoryFields.structure, delay(map.values.toList), SelectParams.empty)
+  def selectAll: Stream[ConnectionIO, SalesterritoryRow] = Stream.emits(map.values.toList)
+  def selectById(territoryid: SalesterritoryId): ConnectionIO[Option[SalesterritoryRow]] = delay(map.get(territoryid))
+  def selectByIds(territoryids: Array[SalesterritoryId]): Stream[ConnectionIO, SalesterritoryRow] = Stream.emits(territoryids.flatMap(map.get).toList)
+  def selectByIdsTracked(territoryids: Array[SalesterritoryId]): ConnectionIO[Map[SalesterritoryId, SalesterritoryRow]] = {
     selectByIds(territoryids).compile.toList.map { rows =>
       val byId = rows.view.map(x => (x.territoryid, x)).toMap
       territoryids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields.structure, map)
-  }
-  override def update(row: SalesterritoryRow): ConnectionIO[Boolean] = {
+  def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields.structure, map)
+  def update(row: SalesterritoryRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.territoryid) match {
         case Some(`row`) => false
@@ -97,13 +78,13 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
       }
     }
   }
-  override def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
+  def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     delay {
       map.put(unsaved.territoryid, unsaved): @nowarn
       unsaved
     }
   }
-  override def upsertBatch(unsaved: List[SalesterritoryRow]): Stream[ConnectionIO, SalesterritoryRow] = {
+  def upsertBatch(unsaved: List[SalesterritoryRow]): Stream[ConnectionIO, SalesterritoryRow] = {
     Stream.emits {
       unsaved.map { row =>
         map += (row.territoryid -> row)
@@ -111,8 +92,8 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
       }
     }
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, SalesterritoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     unsaved.compile.toList.map { rows =>
       var num = 0
       rows.foreach { row =>

@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.vproductanddescription
+package adventureworks.production.vproductanddescription;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class VproductanddescriptionMVRepoImpl extends VproductanddescriptionMVRepo {
-  override def select: SelectBuilder[VproductanddescriptionMVFields, VproductanddescriptionMVRow] = {
-    SelectBuilderSql("production.vproductanddescription", VproductanddescriptionMVFields.structure, VproductanddescriptionMVRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, VproductanddescriptionMVRow] = {
-    sql"""select "productid", "name", "productmodel", "cultureid", "description" from production.vproductanddescription""".query(using VproductanddescriptionMVRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[VproductanddescriptionMVFields, VproductanddescriptionMVRow] = SelectBuilderSql("production.vproductanddescription", VproductanddescriptionMVFields.structure, VproductanddescriptionMVRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, VproductanddescriptionMVRow] = sql"""select "productid", "name", "productmodel", "cultureid", "description" from production.vproductanddescription""".query(using VproductanddescriptionMVRow.jdbcDecoder).selectStream()
 }

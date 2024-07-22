@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productcosthistory
+package adventureworks.production.productcosthistory;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait ProductcosthistoryRepo {
   def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
@@ -17,7 +17,7 @@ trait ProductcosthistoryRepo {
   def insert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow
   def insert(unsaved: ProductcosthistoryRowUnsaved)(implicit c: Connection): ProductcosthistoryRow
   def insertStreaming(unsaved: Iterator[ProductcosthistoryRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[ProductcosthistoryRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow]
   def selectAll(implicit c: Connection): List[ProductcosthistoryRow]
@@ -28,6 +28,6 @@ trait ProductcosthistoryRepo {
   def update(row: ProductcosthistoryRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow
   def upsertBatch(unsaved: Iterable[ProductcosthistoryRow])(implicit c: Connection): List[ProductcosthistoryRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[ProductcosthistoryRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.sr
+package adventureworks.sa.sr;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class SrViewRepoImpl extends SrViewRepo {
-  override def select: SelectBuilder[SrViewFields, SrViewRow] = {
-    SelectBuilderSql("sa.sr", SrViewFields.structure, SrViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[SrViewRow] = {
+  def select: SelectBuilder[SrViewFields, SrViewRow] = SelectBuilderSql("sa.sr", SrViewFields.structure, SrViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[SrViewRow] = {
     SQL"""select "id", "salesreasonid", "name", "reasontype", "modifieddate"::text
           from sa.sr
        """.as(SrViewRow.rowParser(1).*)

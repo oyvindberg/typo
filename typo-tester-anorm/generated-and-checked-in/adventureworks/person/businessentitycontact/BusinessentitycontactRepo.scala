@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.businessentitycontact
+package adventureworks.person.businessentitycontact;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait BusinessentitycontactRepo {
   def delete: DeleteBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
@@ -17,7 +17,7 @@ trait BusinessentitycontactRepo {
   def insert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow
   def insert(unsaved: BusinessentitycontactRowUnsaved)(implicit c: Connection): BusinessentitycontactRow
   def insertStreaming(unsaved: Iterator[BusinessentitycontactRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[BusinessentitycontactRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[BusinessentitycontactFields, BusinessentitycontactRow]
   def selectAll(implicit c: Connection): List[BusinessentitycontactRow]
@@ -28,6 +28,6 @@ trait BusinessentitycontactRepo {
   def update(row: BusinessentitycontactRow)(implicit c: Connection): Boolean
   def upsert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow
   def upsertBatch(unsaved: Iterable[BusinessentitycontactRow])(implicit c: Connection): List[BusinessentitycontactRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[BusinessentitycontactRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

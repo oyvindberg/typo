@@ -3,17 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.update_person_returning
+package adventureworks.update_person_returning;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import adventureworks.customtypes.TypoLocalDateTime;
+import zio.jdbc.SqlFragment.Segment;
+import zio.jdbc.SqlFragment.Setter;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
-  override def apply(suffix: /* nullability unknown */ Option[String], cutoff: /* nullability unknown */ Option[TypoLocalDateTime]): ZStream[ZConnection, Throwable, UpdatePersonReturningSqlRow] = {
+  def apply(suffix: /* nullability unknown */ Option[String], cutoff: /* nullability unknown */ Option[TypoLocalDateTime]): ZStream[ZConnection, Throwable, UpdatePersonReturningSqlRow] = {
     val sql =
       sql"""with row as (
               update person.person

@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.psc
+package adventureworks.pr.psc;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class PscViewRepoImpl extends PscViewRepo {
-  override def select: SelectBuilder[PscViewFields, PscViewRow] = {
-    SelectBuilderSql("pr.psc", PscViewFields.structure, PscViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, PscViewRow] = {
-    sql"""select "id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from pr.psc""".query(using PscViewRow.read).stream
-  }
+  def select: SelectBuilder[PscViewFields, PscViewRow] = SelectBuilderSql("pr.psc", PscViewFields.structure, PscViewRow.read)
+  def selectAll: Stream[ConnectionIO, PscViewRow] = sql"""select "id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from pr.psc""".query(using PscViewRow.read).stream
 }

@@ -3,35 +3,38 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.document
+package adventureworks.production.document;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoBytea
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.Flag
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoBytea;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.Flag;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: production.document
-    Product maintenance documents.
-    Primary key: documentnode */
+  * Product maintenance documents.
+  * Primary key: documentnode
+  */
 case class DocumentRow(
   /** Title of the document. */
   title: /* max 50 chars */ String,
   /** Employee who controls the document.  Foreign key to Employee.BusinessEntityID
-      Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]] */
+    * Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]]
+    */
   owner: BusinessentityId,
   /** 0 = This is a folder, 1 = This is a document.
-      Default: false */
+    * Default: false
+    */
   folderflag: Flag,
   /** File name of the document */
   filename: /* max 400 chars */ String,
@@ -40,135 +43,168 @@ case class DocumentRow(
   /** Revision number of the document. */
   revision: /* bpchar, max 5 chars */ String,
   /** Engineering change approval number.
-      Default: 0 */
+    * Default: 0
+    */
   changenumber: Int,
   /** 1 = Pending approval, 2 = Approved, 3 = Obsolete
-      Constraint CK_Document_Status affecting columns status: (((status >= 1) AND (status <= 3))) */
+    * Constraint CK_Document_Status affecting columns status: (((status >= 1) AND (status <= 3)))
+    */
   status: TypoShort,
   /** Document abstract. */
   documentsummary: Option[String],
   /** Complete document. */
   document: Option[TypoBytea],
   /** ROWGUIDCOL number uniquely identifying the record. Required for FileStream.
-      Default: uuid_generate_v1() */
+    * Default: uuid_generate_v1()
+    */
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime,
   /** Primary key for Document records.
-      Default: '/'::character varying */
+    * Default: '/'::character varying
+    */
   documentnode: DocumentId
-){
-   val id = documentnode
-   def toUnsavedRow(documentnode: Defaulted[DocumentId], folderflag: Defaulted[Flag] = Defaulted.Provided(this.folderflag), changenumber: Defaulted[Int] = Defaulted.Provided(this.changenumber), rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): DocumentRowUnsaved =
-     DocumentRowUnsaved(title, owner, filename, fileextension, revision, status, documentsummary, document, folderflag, changenumber, rowguid, modifieddate, documentnode)
- }
+) {
+  def id: DocumentId = documentnode
+  def toUnsavedRow(
+    documentnode: Defaulted[DocumentId],
+    folderflag: Defaulted[Flag] = Defaulted.Provided(this.folderflag),
+    changenumber: Defaulted[Int] = Defaulted.Provided(this.changenumber),
+    rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid),
+    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)
+  ): DocumentRowUnsaved = {
+    new DocumentRowUnsaved(
+      title,
+      owner,
+      filename,
+      fileextension,
+      revision,
+      status,
+      documentsummary,
+      document,
+      folderflag,
+      changenumber,
+      rowguid,
+      modifieddate,
+      documentnode
+    )
+  }
+}
 
 object DocumentRow {
   implicit lazy val decoder: Decoder[DocumentRow] = Decoder.forProduct13[DocumentRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar, max 5 chars */ String, Int, TypoShort, Option[String], Option[TypoBytea], TypoUUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(DocumentRow.apply)(Decoder.decodeString, BusinessentityId.decoder, Flag.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeInt, TypoShort.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoBytea.decoder), TypoUUID.decoder, TypoLocalDateTime.decoder, DocumentId.decoder)
   implicit lazy val encoder: Encoder[DocumentRow] = Encoder.forProduct13[DocumentRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar, max 5 chars */ String, Int, TypoShort, Option[String], Option[TypoBytea], TypoUUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(x => (x.title, x.owner, x.folderflag, x.filename, x.fileextension, x.revision, x.changenumber, x.status, x.documentsummary, x.document, x.rowguid, x.modifieddate, x.documentnode))(Encoder.encodeString, BusinessentityId.encoder, Flag.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeInt, TypoShort.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoBytea.encoder), TypoUUID.encoder, TypoLocalDateTime.encoder, DocumentId.encoder)
-  implicit lazy val read: Read[DocumentRow] = new Read[DocumentRow](
-    gets = List(
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoBytea.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (DocumentId.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => DocumentRow(
-      title = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
-      owner = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      folderflag = Flag.get.unsafeGetNonNullable(rs, i + 2),
-      filename = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      fileextension = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      revision = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
-      changenumber = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 6),
-      status = TypoShort.get.unsafeGetNonNullable(rs, i + 7),
-      documentsummary = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      document = TypoBytea.get.unsafeGetNullable(rs, i + 9),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 10),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 11),
-      documentnode = DocumentId.get.unsafeGetNonNullable(rs, i + 12)
+  implicit lazy val read: Read[DocumentRow] = {
+    new Read[DocumentRow](
+      gets = List(
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (BusinessentityId.get, Nullability.NoNulls),
+        (Flag.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.Nullable),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (Meta.IntMeta.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.Nullable),
+        (TypoBytea.get, Nullability.Nullable),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (DocumentId.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => DocumentRow(
+        title = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
+        owner = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+        folderflag = Flag.get.unsafeGetNonNullable(rs, i + 2),
+        filename = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+        fileextension = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
+        revision = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
+        changenumber = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 6),
+        status = TypoShort.get.unsafeGetNonNullable(rs, i + 7),
+        documentsummary = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
+        document = TypoBytea.get.unsafeGetNullable(rs, i + 9),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 10),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 11),
+        documentnode = DocumentId.get.unsafeGetNonNullable(rs, i + 12)
+      )
     )
-  )
-  implicit lazy val text: Text[DocumentRow] = Text.instance[DocumentRow]{ (row, sb) =>
-    Text.stringInstance.unsafeEncode(row.title, sb)
-    sb.append(Text.DELIMETER)
-    BusinessentityId.text.unsafeEncode(row.owner, sb)
-    sb.append(Text.DELIMETER)
-    Flag.text.unsafeEncode(row.folderflag, sb)
-    sb.append(Text.DELIMETER)
-    Text.stringInstance.unsafeEncode(row.filename, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.stringInstance).unsafeEncode(row.fileextension, sb)
-    sb.append(Text.DELIMETER)
-    Text.stringInstance.unsafeEncode(row.revision, sb)
-    sb.append(Text.DELIMETER)
-    Text.intInstance.unsafeEncode(row.changenumber, sb)
-    sb.append(Text.DELIMETER)
-    TypoShort.text.unsafeEncode(row.status, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.stringInstance).unsafeEncode(row.documentsummary, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoBytea.text).unsafeEncode(row.document, sb)
-    sb.append(Text.DELIMETER)
-    TypoUUID.text.unsafeEncode(row.rowguid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
-    sb.append(Text.DELIMETER)
-    DocumentId.text.unsafeEncode(row.documentnode, sb)
+  
   }
-  implicit lazy val write: Write[DocumentRow] = new Write[DocumentRow](
-    puts = List((Meta.StringMeta.put, Nullability.NoNulls),
-                (BusinessentityId.put, Nullability.NoNulls),
-                (Flag.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (TypoBytea.put, Nullability.Nullable),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (DocumentId.put, Nullability.NoNulls)),
-    toList = x => List(x.title, x.owner, x.folderflag, x.filename, x.fileextension, x.revision, x.changenumber, x.status, x.documentsummary, x.document, x.rowguid, x.modifieddate, x.documentnode),
-    unsafeSet = (rs, i, a) => {
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 0, a.title)
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 1, a.owner)
-                  Flag.put.unsafeSetNonNullable(rs, i + 2, a.folderflag)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 3, a.filename)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 4, a.fileextension)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 5, a.revision)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 6, a.changenumber)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 7, a.status)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 8, a.documentsummary)
-                  TypoBytea.put.unsafeSetNullable(rs, i + 9, a.document)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 10, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 11, a.modifieddate)
-                  DocumentId.put.unsafeSetNonNullable(rs, i + 12, a.documentnode)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 0, a.title)
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 1, a.owner)
-                     Flag.put.unsafeUpdateNonNullable(ps, i + 2, a.folderflag)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.filename)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 4, a.fileextension)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.revision)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.changenumber)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 7, a.status)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 8, a.documentsummary)
-                     TypoBytea.put.unsafeUpdateNullable(ps, i + 9, a.document)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 10, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 11, a.modifieddate)
-                     DocumentId.put.unsafeUpdateNonNullable(ps, i + 12, a.documentnode)
-                   }
-  )
+  implicit lazy val text: Text[DocumentRow] = {
+    Text.instance[DocumentRow]{ (row, sb) =>
+      Text.stringInstance.unsafeEncode(row.title, sb)
+      sb.append(Text.DELIMETER)
+      BusinessentityId.text.unsafeEncode(row.owner, sb)
+      sb.append(Text.DELIMETER)
+      Flag.text.unsafeEncode(row.folderflag, sb)
+      sb.append(Text.DELIMETER)
+      Text.stringInstance.unsafeEncode(row.filename, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.stringInstance).unsafeEncode(row.fileextension, sb)
+      sb.append(Text.DELIMETER)
+      Text.stringInstance.unsafeEncode(row.revision, sb)
+      sb.append(Text.DELIMETER)
+      Text.intInstance.unsafeEncode(row.changenumber, sb)
+      sb.append(Text.DELIMETER)
+      TypoShort.text.unsafeEncode(row.status, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.stringInstance).unsafeEncode(row.documentsummary, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoBytea.text).unsafeEncode(row.document, sb)
+      sb.append(Text.DELIMETER)
+      TypoUUID.text.unsafeEncode(row.rowguid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+      sb.append(Text.DELIMETER)
+      DocumentId.text.unsafeEncode(row.documentnode, sb)
+    }
+  }
+  implicit lazy val write: Write[DocumentRow] = {
+    new Write[DocumentRow](
+      puts = List((Meta.StringMeta.put, Nullability.NoNulls),
+                  (BusinessentityId.put, Nullability.NoNulls),
+                  (Flag.put, Nullability.NoNulls),
+                  (Meta.StringMeta.put, Nullability.NoNulls),
+                  (Meta.StringMeta.put, Nullability.Nullable),
+                  (Meta.StringMeta.put, Nullability.NoNulls),
+                  (Meta.IntMeta.put, Nullability.NoNulls),
+                  (TypoShort.put, Nullability.NoNulls),
+                  (Meta.StringMeta.put, Nullability.Nullable),
+                  (TypoBytea.put, Nullability.Nullable),
+                  (TypoUUID.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls),
+                  (DocumentId.put, Nullability.NoNulls)),
+      toList = x => List(x.title, x.owner, x.folderflag, x.filename, x.fileextension, x.revision, x.changenumber, x.status, x.documentsummary, x.document, x.rowguid, x.modifieddate, x.documentnode),
+      unsafeSet = (rs, i, a) => {
+                    Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 0, a.title)
+                    BusinessentityId.put.unsafeSetNonNullable(rs, i + 1, a.owner)
+                    Flag.put.unsafeSetNonNullable(rs, i + 2, a.folderflag)
+                    Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 3, a.filename)
+                    Meta.StringMeta.put.unsafeSetNullable(rs, i + 4, a.fileextension)
+                    Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 5, a.revision)
+                    Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 6, a.changenumber)
+                    TypoShort.put.unsafeSetNonNullable(rs, i + 7, a.status)
+                    Meta.StringMeta.put.unsafeSetNullable(rs, i + 8, a.documentsummary)
+                    TypoBytea.put.unsafeSetNullable(rs, i + 9, a.document)
+                    TypoUUID.put.unsafeSetNonNullable(rs, i + 10, a.rowguid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 11, a.modifieddate)
+                    DocumentId.put.unsafeSetNonNullable(rs, i + 12, a.documentnode)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 0, a.title)
+                       BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 1, a.owner)
+                       Flag.put.unsafeUpdateNonNullable(ps, i + 2, a.folderflag)
+                       Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.filename)
+                       Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 4, a.fileextension)
+                       Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.revision)
+                       Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.changenumber)
+                       TypoShort.put.unsafeUpdateNonNullable(ps, i + 7, a.status)
+                       Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 8, a.documentsummary)
+                       TypoBytea.put.unsafeUpdateNullable(ps, i + 9, a.document)
+                       TypoUUID.put.unsafeUpdateNonNullable(ps, i + 10, a.rowguid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 11, a.modifieddate)
+                       DocumentId.put.unsafeUpdateNonNullable(ps, i + 12, a.documentnode)
+                     }
+    )
+  
+  }
 }

@@ -3,22 +3,23 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public
+package adventureworks.public;
 
-import adventureworks.Text
-import java.sql.Types
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import java.sql.Types;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Domain `public.AccountNumber`
   * No constraint
   */
 case class AccountNumber(value: String)
+
 object AccountNumber {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[AccountNumber]] = adventureworks.StringArrayDecoder.map(_.map(AccountNumber.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[AccountNumber]] = adventureworks.StringArrayEncoder.contramap(_.map(_.value))
@@ -30,8 +31,10 @@ object AccountNumber {
   implicit lazy val jsonEncoder: JsonEncoder[AccountNumber] = JsonEncoder.string.contramap(_.value)
   implicit lazy val pgType: PGType[AccountNumber] = PGType.instance(""""public"."AccountNumber"""", Types.OTHER)
   implicit lazy val setter: Setter[AccountNumber] = Setter.stringSetter.contramap(_.value)
-  implicit lazy val text: Text[AccountNumber] = new Text[AccountNumber] {
-    override def unsafeEncode(v: AccountNumber, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: AccountNumber, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[AccountNumber] = {
+    new Text[AccountNumber] {
+      override def unsafeEncode(v: AccountNumber, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: AccountNumber, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

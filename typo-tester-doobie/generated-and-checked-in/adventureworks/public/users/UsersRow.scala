@@ -3,22 +3,23 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.users
+package adventureworks.public.users;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoInstant
-import adventureworks.customtypes.TypoUnknownCitext
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoInstant;
+import adventureworks.customtypes.TypoUnknownCitext;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: public.users
-    Primary key: user_id */
+  * Primary key: user_id
+  */
 case class UsersRow(
   userId: UsersId,
   name: String,
@@ -28,76 +29,93 @@ case class UsersRow(
   /** Default: now() */
   createdAt: TypoInstant,
   verifiedOn: Option[TypoInstant]
-){
-   val id = userId
-   def toUnsavedRow(createdAt: Defaulted[TypoInstant] = Defaulted.Provided(this.createdAt)): UsersRowUnsaved =
-     UsersRowUnsaved(userId, name, lastName, email, password, verifiedOn, createdAt)
- }
+) {
+  def id: UsersId = userId
+  def toUnsavedRow(createdAt: Defaulted[TypoInstant] = Defaulted.Provided(this.createdAt)): UsersRowUnsaved = {
+    new UsersRowUnsaved(
+      userId,
+      name,
+      lastName,
+      email,
+      password,
+      verifiedOn,
+      createdAt
+    )
+  }
+}
 
 object UsersRow {
   implicit lazy val decoder: Decoder[UsersRow] = Decoder.forProduct7[UsersRow, UsersId, String, Option[String], TypoUnknownCitext, String, TypoInstant, Option[TypoInstant]]("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")(UsersRow.apply)(UsersId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), TypoUnknownCitext.decoder, Decoder.decodeString, TypoInstant.decoder, Decoder.decodeOption(TypoInstant.decoder))
   implicit lazy val encoder: Encoder[UsersRow] = Encoder.forProduct7[UsersRow, UsersId, String, Option[String], TypoUnknownCitext, String, TypoInstant, Option[TypoInstant]]("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")(x => (x.userId, x.name, x.lastName, x.email, x.password, x.createdAt, x.verifiedOn))(UsersId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), TypoUnknownCitext.encoder, Encoder.encodeString, TypoInstant.encoder, Encoder.encodeOption(TypoInstant.encoder))
-  implicit lazy val read: Read[UsersRow] = new Read[UsersRow](
-    gets = List(
-      (UsersId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoUnknownCitext.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoInstant.get, Nullability.NoNulls),
-      (TypoInstant.get, Nullability.Nullable)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => UsersRow(
-      userId = UsersId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      lastName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      email = TypoUnknownCitext.get.unsafeGetNonNullable(rs, i + 3),
-      password = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
-      createdAt = TypoInstant.get.unsafeGetNonNullable(rs, i + 5),
-      verifiedOn = TypoInstant.get.unsafeGetNullable(rs, i + 6)
+  implicit lazy val read: Read[UsersRow] = {
+    new Read[UsersRow](
+      gets = List(
+        (UsersId.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.Nullable),
+        (TypoUnknownCitext.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (TypoInstant.get, Nullability.NoNulls),
+        (TypoInstant.get, Nullability.Nullable)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => UsersRow(
+        userId = UsersId.get.unsafeGetNonNullable(rs, i + 0),
+        name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+        lastName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
+        email = TypoUnknownCitext.get.unsafeGetNonNullable(rs, i + 3),
+        password = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
+        createdAt = TypoInstant.get.unsafeGetNonNullable(rs, i + 5),
+        verifiedOn = TypoInstant.get.unsafeGetNullable(rs, i + 6)
+      )
     )
-  )
-  implicit lazy val text: Text[UsersRow] = Text.instance[UsersRow]{ (row, sb) =>
-    UsersId.text.unsafeEncode(row.userId, sb)
-    sb.append(Text.DELIMETER)
-    Text.stringInstance.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(Text.stringInstance).unsafeEncode(row.lastName, sb)
-    sb.append(Text.DELIMETER)
-    TypoUnknownCitext.text.unsafeEncode(row.email, sb)
-    sb.append(Text.DELIMETER)
-    Text.stringInstance.unsafeEncode(row.password, sb)
-    sb.append(Text.DELIMETER)
-    TypoInstant.text.unsafeEncode(row.createdAt, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoInstant.text).unsafeEncode(row.verifiedOn, sb)
+  
   }
-  implicit lazy val write: Write[UsersRow] = new Write[UsersRow](
-    puts = List((UsersId.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (TypoUnknownCitext.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (TypoInstant.put, Nullability.NoNulls),
-                (TypoInstant.put, Nullability.Nullable)),
-    toList = x => List(x.userId, x.name, x.lastName, x.email, x.password, x.createdAt, x.verifiedOn),
-    unsafeSet = (rs, i, a) => {
-                  UsersId.put.unsafeSetNonNullable(rs, i + 0, a.userId)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 2, a.lastName)
-                  TypoUnknownCitext.put.unsafeSetNonNullable(rs, i + 3, a.email)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 4, a.password)
-                  TypoInstant.put.unsafeSetNonNullable(rs, i + 5, a.createdAt)
-                  TypoInstant.put.unsafeSetNullable(rs, i + 6, a.verifiedOn)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     UsersId.put.unsafeUpdateNonNullable(ps, i + 0, a.userId)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 2, a.lastName)
-                     TypoUnknownCitext.put.unsafeUpdateNonNullable(ps, i + 3, a.email)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 4, a.password)
-                     TypoInstant.put.unsafeUpdateNonNullable(ps, i + 5, a.createdAt)
-                     TypoInstant.put.unsafeUpdateNullable(ps, i + 6, a.verifiedOn)
-                   }
-  )
+  implicit lazy val text: Text[UsersRow] = {
+    Text.instance[UsersRow]{ (row, sb) =>
+      UsersId.text.unsafeEncode(row.userId, sb)
+      sb.append(Text.DELIMETER)
+      Text.stringInstance.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(Text.stringInstance).unsafeEncode(row.lastName, sb)
+      sb.append(Text.DELIMETER)
+      TypoUnknownCitext.text.unsafeEncode(row.email, sb)
+      sb.append(Text.DELIMETER)
+      Text.stringInstance.unsafeEncode(row.password, sb)
+      sb.append(Text.DELIMETER)
+      TypoInstant.text.unsafeEncode(row.createdAt, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoInstant.text).unsafeEncode(row.verifiedOn, sb)
+    }
+  }
+  implicit lazy val write: Write[UsersRow] = {
+    new Write[UsersRow](
+      puts = List((UsersId.put, Nullability.NoNulls),
+                  (Meta.StringMeta.put, Nullability.NoNulls),
+                  (Meta.StringMeta.put, Nullability.Nullable),
+                  (TypoUnknownCitext.put, Nullability.NoNulls),
+                  (Meta.StringMeta.put, Nullability.NoNulls),
+                  (TypoInstant.put, Nullability.NoNulls),
+                  (TypoInstant.put, Nullability.Nullable)),
+      toList = x => List(x.userId, x.name, x.lastName, x.email, x.password, x.createdAt, x.verifiedOn),
+      unsafeSet = (rs, i, a) => {
+                    UsersId.put.unsafeSetNonNullable(rs, i + 0, a.userId)
+                    Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                    Meta.StringMeta.put.unsafeSetNullable(rs, i + 2, a.lastName)
+                    TypoUnknownCitext.put.unsafeSetNonNullable(rs, i + 3, a.email)
+                    Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 4, a.password)
+                    TypoInstant.put.unsafeSetNonNullable(rs, i + 5, a.createdAt)
+                    TypoInstant.put.unsafeSetNullable(rs, i + 6, a.verifiedOn)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       UsersId.put.unsafeUpdateNonNullable(ps, i + 0, a.userId)
+                       Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                       Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 2, a.lastName)
+                       TypoUnknownCitext.put.unsafeUpdateNonNullable(ps, i + 3, a.email)
+                       Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 4, a.password)
+                       TypoInstant.put.unsafeUpdateNonNullable(ps, i + 5, a.createdAt)
+                       TypoInstant.put.unsafeUpdateNullable(ps, i + 6, a.verifiedOn)
+                     }
+    )
+  
+  }
 }

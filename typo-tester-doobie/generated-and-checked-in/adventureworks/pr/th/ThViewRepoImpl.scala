@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.th
+package adventureworks.pr.th;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class ThViewRepoImpl extends ThViewRepo {
-  override def select: SelectBuilder[ThViewFields, ThViewRow] = {
-    SelectBuilderSql("pr.th", ThViewFields.structure, ThViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, ThViewRow] = {
-    sql"""select "id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from pr.th""".query(using ThViewRow.read).stream
-  }
+  def select: SelectBuilder[ThViewFields, ThViewRow] = SelectBuilderSql("pr.th", ThViewFields.structure, ThViewRow.read)
+  def selectAll: Stream[ConnectionIO, ThViewRow] = sql"""select "id", "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from pr.th""".query(using ThViewRow.read).stream
 }

@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.vstorewithaddresses
+package adventureworks.sales.vstorewithaddresses;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class VstorewithaddressesViewRepoImpl extends VstorewithaddressesViewRepo {
-  override def select: SelectBuilder[VstorewithaddressesViewFields, VstorewithaddressesViewRow] = {
-    SelectBuilderSql("sales.vstorewithaddresses", VstorewithaddressesViewFields.structure, VstorewithaddressesViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[VstorewithaddressesViewRow] = {
+  def select: SelectBuilder[VstorewithaddressesViewFields, VstorewithaddressesViewRow] = SelectBuilderSql("sales.vstorewithaddresses", VstorewithaddressesViewFields.structure, VstorewithaddressesViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[VstorewithaddressesViewRow] = {
     SQL"""select "businessentityid", "name", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname"
           from sales.vstorewithaddresses
        """.as(VstorewithaddressesViewRow.rowParser(1).*)

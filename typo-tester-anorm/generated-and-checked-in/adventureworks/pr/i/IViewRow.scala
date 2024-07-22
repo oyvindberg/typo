@@ -3,22 +3,22 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.i
+package adventureworks.pr.i;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoXml
-import adventureworks.production.illustration.IllustrationId
-import anorm.Column
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.production.illustration.IllustrationId;
+import anorm.Column;
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** View: pr.i */
 case class IViewRow(
@@ -33,33 +33,39 @@ case class IViewRow(
 )
 
 object IViewRow {
-  implicit lazy val reads: Reads[IViewRow] = Reads[IViewRow](json => JsResult.fromTry(
-      Try(
-        IViewRow(
-          id = json.\("id").as(IllustrationId.reads),
-          illustrationid = json.\("illustrationid").as(IllustrationId.reads),
-          diagram = json.\("diagram").toOption.map(_.as(TypoXml.reads)),
-          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+  implicit lazy val reads: Reads[IViewRow] = {
+    Reads[IViewRow](json => JsResult.fromTry(
+        Try(
+          IViewRow(
+            id = json.\("id").as(IllustrationId.reads),
+            illustrationid = json.\("illustrationid").as(IllustrationId.reads),
+            diagram = json.\("diagram").toOption.map(_.as(TypoXml.reads)),
+            modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+          )
         )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[IViewRow] = RowParser[IViewRow] { row =>
-    Success(
-      IViewRow(
-        id = row(idx + 0)(IllustrationId.column),
-        illustrationid = row(idx + 1)(IllustrationId.column),
-        diagram = row(idx + 2)(Column.columnToOption(TypoXml.column)),
-        modifieddate = row(idx + 3)(TypoLocalDateTime.column)
-      )
+      ),
     )
   }
-  implicit lazy val writes: OWrites[IViewRow] = OWrites[IViewRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "id" -> IllustrationId.writes.writes(o.id),
-      "illustrationid" -> IllustrationId.writes.writes(o.illustrationid),
-      "diagram" -> Writes.OptionWrites(TypoXml.writes).writes(o.diagram),
-      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
-    ))
-  )
+  def rowParser(idx: Int): RowParser[IViewRow] = {
+    RowParser[IViewRow] { row =>
+      Success(
+        IViewRow(
+          id = row(idx + 0)(IllustrationId.column),
+          illustrationid = row(idx + 1)(IllustrationId.column),
+          diagram = row(idx + 2)(Column.columnToOption(TypoXml.column)),
+          modifieddate = row(idx + 3)(TypoLocalDateTime.column)
+        )
+      )
+    }
+  }
+  implicit lazy val writes: OWrites[IViewRow] = {
+    OWrites[IViewRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "id" -> IllustrationId.writes.writes(o.id),
+        "illustrationid" -> IllustrationId.writes.writes(o.illustrationid),
+        "diagram" -> Writes.OptionWrites(TypoXml.writes).writes(o.diagram),
+        "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
+      ))
+    )
+  }
 }

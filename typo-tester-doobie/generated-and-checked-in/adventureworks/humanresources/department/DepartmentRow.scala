@@ -3,25 +3,27 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.department
+package adventureworks.humanresources.department;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: humanresources.department
-    Lookup table containing the departments within the Adventure Works Cycles company.
-    Primary key: departmentid */
+  * Lookup table containing the departments within the Adventure Works Cycles company.
+  * Primary key: departmentid
+  */
 case class DepartmentRow(
   /** Primary key for Department records.
-      Default: nextval('humanresources.department_departmentid_seq'::regclass) */
+    * Default: nextval('humanresources.department_departmentid_seq'::regclass)
+    */
   departmentid: DepartmentId,
   /** Name of the department. */
   name: Name,
@@ -29,55 +31,69 @@ case class DepartmentRow(
   groupname: Name,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val id = departmentid
-   def toUnsavedRow(departmentid: Defaulted[DepartmentId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): DepartmentRowUnsaved =
-     DepartmentRowUnsaved(name, groupname, departmentid, modifieddate)
- }
+) {
+  def id: DepartmentId = departmentid
+  def toUnsavedRow(departmentid: Defaulted[DepartmentId], modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): DepartmentRowUnsaved = {
+    new DepartmentRowUnsaved(
+      name,
+      groupname,
+      departmentid,
+      modifieddate
+    )
+  }
+}
 
 object DepartmentRow {
   implicit lazy val decoder: Decoder[DepartmentRow] = Decoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(DepartmentRow.apply)(DepartmentId.decoder, Name.decoder, Name.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[DepartmentRow] = Encoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(x => (x.departmentid, x.name, x.groupname, x.modifieddate))(DepartmentId.encoder, Name.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[DepartmentRow] = new Read[DepartmentRow](
-    gets = List(
-      (DepartmentId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => DepartmentRow(
-      departmentid = DepartmentId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      groupname = Name.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[DepartmentRow] = {
+    new Read[DepartmentRow](
+      gets = List(
+        (DepartmentId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => DepartmentRow(
+        departmentid = DepartmentId.get.unsafeGetNonNullable(rs, i + 0),
+        name = Name.get.unsafeGetNonNullable(rs, i + 1),
+        groupname = Name.get.unsafeGetNonNullable(rs, i + 2),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+      )
     )
-  )
-  implicit lazy val text: Text[DepartmentRow] = Text.instance[DepartmentRow]{ (row, sb) =>
-    DepartmentId.text.unsafeEncode(row.departmentid, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.groupname, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[DepartmentRow] = new Write[DepartmentRow](
-    puts = List((DepartmentId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.departmentid, x.name, x.groupname, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  DepartmentId.put.unsafeSetNonNullable(rs, i + 0, a.departmentid)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  Name.put.unsafeSetNonNullable(rs, i + 2, a.groupname)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     DepartmentId.put.unsafeUpdateNonNullable(ps, i + 0, a.departmentid)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 2, a.groupname)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[DepartmentRow] = {
+    Text.instance[DepartmentRow]{ (row, sb) =>
+      DepartmentId.text.unsafeEncode(row.departmentid, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.groupname, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[DepartmentRow] = {
+    new Write[DepartmentRow](
+      puts = List((DepartmentId.put, Nullability.NoNulls),
+                  (Name.put, Nullability.NoNulls),
+                  (Name.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.departmentid, x.name, x.groupname, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    DepartmentId.put.unsafeSetNonNullable(rs, i + 0, a.departmentid)
+                    Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                    Name.put.unsafeSetNonNullable(rs, i + 2, a.groupname)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       DepartmentId.put.unsafeUpdateNonNullable(ps, i + 0, a.departmentid)
+                       Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                       Name.put.unsafeUpdateNonNullable(ps, i + 2, a.groupname)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
+                     }
+    )
+  
+  }
 }

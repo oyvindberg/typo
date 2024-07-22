@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.vemployee
+package adventureworks.humanresources.vemployee;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class VemployeeViewRepoImpl extends VemployeeViewRepo {
-  override def select: SelectBuilder[VemployeeViewFields, VemployeeViewRow] = {
-    SelectBuilderSql("humanresources.vemployee", VemployeeViewFields.structure, VemployeeViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, VemployeeViewRow] = {
-    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "additionalcontactinfo" from humanresources.vemployee""".query(using VemployeeViewRow.read).stream
-  }
+  def select: SelectBuilder[VemployeeViewFields, VemployeeViewRow] = SelectBuilderSql("humanresources.vemployee", VemployeeViewFields.structure, VemployeeViewRow.read)
+  def selectAll: Stream[ConnectionIO, VemployeeViewRow] = sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "additionalcontactinfo" from humanresources.vemployee""".query(using VemployeeViewRow.read).stream
 }

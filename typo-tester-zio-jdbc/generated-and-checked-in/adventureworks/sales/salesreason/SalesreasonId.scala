@@ -3,19 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesreason
+package adventureworks.sales.salesreason;
 
-import adventureworks.Text
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `sales.salesreason` */
-case class SalesreasonId(value: Int) extends AnyVal
+case class SalesreasonId(value: Int) extends scala.AnyVal
+
 object SalesreasonId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[SalesreasonId]] = adventureworks.IntArrayDecoder.map(_.map(SalesreasonId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[SalesreasonId]] = adventureworks.IntArrayEncoder.contramap(_.map(_.value))
@@ -27,8 +28,10 @@ object SalesreasonId {
   implicit lazy val jsonEncoder: JsonEncoder[SalesreasonId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val pgType: PGType[SalesreasonId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[SalesreasonId] = Setter.intSetter.contramap(_.value)
-  implicit lazy val text: Text[SalesreasonId] = new Text[SalesreasonId] {
-    override def unsafeEncode(v: SalesreasonId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: SalesreasonId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[SalesreasonId] = {
+    new Text[SalesreasonId] {
+      override def unsafeEncode(v: SalesreasonId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: SalesreasonId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

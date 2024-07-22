@@ -3,18 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.contacttype
+package adventureworks.person.contacttype;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `person.contacttype` */
-case class ContacttypeId(value: Int) extends AnyVal
+case class ContacttypeId(value: Int) extends scala.AnyVal
+
 object ContacttypeId {
   implicit lazy val arrayGet: Get[Array[ContacttypeId]] = adventureworks.IntegerArrayMeta.get.map(_.map(ContacttypeId.apply))
   implicit lazy val arrayPut: Put[Array[ContacttypeId]] = adventureworks.IntegerArrayMeta.put.contramap(_.map(_.value))
@@ -23,8 +24,10 @@ object ContacttypeId {
   implicit lazy val encoder: Encoder[ContacttypeId] = Encoder.encodeInt.contramap(_.value)
   implicit lazy val get: Get[ContacttypeId] = Meta.IntMeta.get.map(ContacttypeId.apply)
   implicit lazy val put: Put[ContacttypeId] = Meta.IntMeta.put.contramap(_.value)
-  implicit lazy val text: Text[ContacttypeId] = new Text[ContacttypeId] {
-    override def unsafeEncode(v: ContacttypeId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: ContacttypeId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[ContacttypeId] = {
+    new Text[ContacttypeId] {
+      override def unsafeEncode(v: ContacttypeId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: ContacttypeId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

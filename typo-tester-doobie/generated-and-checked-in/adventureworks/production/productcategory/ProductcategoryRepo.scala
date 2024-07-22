@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productcategory
+package adventureworks.production.productcategory;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait ProductcategoryRepo {
   def delete: DeleteBuilder[ProductcategoryFields, ProductcategoryRow]
@@ -18,7 +18,7 @@ trait ProductcategoryRepo {
   def insert(unsaved: ProductcategoryRow): ConnectionIO[ProductcategoryRow]
   def insert(unsaved: ProductcategoryRowUnsaved): ConnectionIO[ProductcategoryRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, ProductcategoryRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductcategoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[ProductcategoryFields, ProductcategoryRow]
   def selectAll: Stream[ConnectionIO, ProductcategoryRow]
@@ -29,6 +29,6 @@ trait ProductcategoryRepo {
   def update(row: ProductcategoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: ProductcategoryRow): ConnectionIO[ProductcategoryRow]
   def upsertBatch(unsaved: List[ProductcategoryRow]): Stream[ConnectionIO, ProductcategoryRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, ProductcategoryRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

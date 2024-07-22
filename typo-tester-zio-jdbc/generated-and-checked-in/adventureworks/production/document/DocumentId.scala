@@ -3,19 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.document
+package adventureworks.production.document;
 
-import adventureworks.Text
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `production.document` */
-case class DocumentId(value: String) extends AnyVal
+case class DocumentId(value: String) extends scala.AnyVal
+
 object DocumentId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[DocumentId]] = adventureworks.StringArrayDecoder.map(_.map(DocumentId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[DocumentId]] = adventureworks.StringArrayEncoder.contramap(_.map(_.value))
@@ -27,8 +28,10 @@ object DocumentId {
   implicit lazy val jsonEncoder: JsonEncoder[DocumentId] = JsonEncoder.string.contramap(_.value)
   implicit lazy val pgType: PGType[DocumentId] = PGType.PGTypeString.as
   implicit lazy val setter: Setter[DocumentId] = Setter.stringSetter.contramap(_.value)
-  implicit lazy val text: Text[DocumentId] = new Text[DocumentId] {
-    override def unsafeEncode(v: DocumentId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: DocumentId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[DocumentId] = {
+    new Text[DocumentId] {
+      override def unsafeEncode(v: DocumentId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: DocumentId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

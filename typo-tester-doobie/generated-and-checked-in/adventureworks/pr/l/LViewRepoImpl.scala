@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.l
+package adventureworks.pr.l;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class LViewRepoImpl extends LViewRepo {
-  override def select: SelectBuilder[LViewFields, LViewRow] = {
-    SelectBuilderSql("pr.l", LViewFields.structure, LViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, LViewRow] = {
-    sql"""select "id", "locationid", "name", "costrate", "availability", "modifieddate"::text from pr.l""".query(using LViewRow.read).stream
-  }
+  def select: SelectBuilder[LViewFields, LViewRow] = SelectBuilderSql("pr.l", LViewFields.structure, LViewRow.read)
+  def selectAll: Stream[ConnectionIO, LViewRow] = sql"""select "id", "locationid", "name", "costrate", "availability", "modifieddate"::text from pr.l""".query(using LViewRow.read).stream
 }

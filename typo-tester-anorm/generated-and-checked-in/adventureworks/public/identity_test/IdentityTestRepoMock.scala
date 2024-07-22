@@ -3,32 +3,25 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.identity_test
+package adventureworks.public.identity_test;
 
-import java.sql.Connection
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.DeleteBuilder.DeleteBuilderMock
-import typo.dsl.DeleteParams
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderMock
-import typo.dsl.SelectParams
-import typo.dsl.UpdateBuilder
-import typo.dsl.UpdateBuilder.UpdateBuilderMock
-import typo.dsl.UpdateParams
+import java.sql.Connection;
+import scala.annotation.nowarn;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.DeleteBuilder.DeleteBuilderMock;
+import typo.dsl.DeleteParams;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderMock;
+import typo.dsl.SelectParams;
+import typo.dsl.UpdateBuilder;
+import typo.dsl.UpdateBuilder.UpdateBuilderMock;
+import typo.dsl.UpdateParams;
 
-class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTestRow],
-                           map: scala.collection.mutable.Map[IdentityTestId, IdentityTestRow] = scala.collection.mutable.Map.empty) extends IdentityTestRepo {
-  override def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = {
-    DeleteBuilderMock(DeleteParams.empty, IdentityTestFields.structure, map)
-  }
-  override def deleteById(name: IdentityTestId)(implicit c: Connection): Boolean = {
-    map.remove(name).isDefined
-  }
-  override def deleteByIds(names: Array[IdentityTestId])(implicit c: Connection): Int = {
-    names.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def insert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow = {
+class IdentityTestRepoMock(val toRow: Function1[IdentityTestRowUnsaved, IdentityTestRow], val map: scala.collection.mutable.Map[IdentityTestId, IdentityTestRow] = scala.collection.mutable.Map.empty) extends IdentityTestRepo {
+  def delete: DeleteBuilder[IdentityTestFields, IdentityTestRow] = DeleteBuilderMock(DeleteParams.empty, IdentityTestFields.structure, map)
+  def deleteById(name: IdentityTestId)(implicit c: Connection): Boolean = map.remove(name).isDefined
+  def deleteByIds(names: Array[IdentityTestId])(implicit c: Connection): Int = names.map(id => map.remove(id)).count(_.isDefined)
+  def insert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow = {
     val _ = if (map.contains(unsaved.name))
       sys.error(s"id ${unsaved.name} already exists")
     else
@@ -36,43 +29,31 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
     
     unsaved
   }
-  override def insert(unsaved: IdentityTestRowUnsaved)(implicit c: Connection): IdentityTestRow = {
-    insert(toRow(unsaved))
-  }
-  override def insertStreaming(unsaved: Iterator[IdentityTestRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
+  def insert(unsaved: IdentityTestRowUnsaved)(implicit c: Connection): IdentityTestRow = insert(toRow(unsaved))
+  def insertStreaming(unsaved: Iterator[IdentityTestRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.name -> row)
     }
     unsaved.size.toLong
   }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Iterator[IdentityTestRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[IdentityTestRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { unsavedRow =>
       val row = toRow(unsavedRow)
       map += (row.name -> row)
     }
     unsaved.size.toLong
   }
-  override def select: SelectBuilder[IdentityTestFields, IdentityTestRow] = {
-    SelectBuilderMock(IdentityTestFields.structure, () => map.values.toList, SelectParams.empty)
-  }
-  override def selectAll(implicit c: Connection): List[IdentityTestRow] = {
-    map.values.toList
-  }
-  override def selectById(name: IdentityTestId)(implicit c: Connection): Option[IdentityTestRow] = {
-    map.get(name)
-  }
-  override def selectByIds(names: Array[IdentityTestId])(implicit c: Connection): List[IdentityTestRow] = {
-    names.flatMap(map.get).toList
-  }
-  override def selectByIdsTracked(names: Array[IdentityTestId])(implicit c: Connection): Map[IdentityTestId, IdentityTestRow] = {
+  def select: SelectBuilder[IdentityTestFields, IdentityTestRow] = SelectBuilderMock(IdentityTestFields.structure, () => map.values.toList, SelectParams.empty)
+  def selectAll(implicit c: Connection): List[IdentityTestRow] = map.values.toList
+  def selectById(name: IdentityTestId)(implicit c: Connection): Option[IdentityTestRow] = map.get(name)
+  def selectByIds(names: Array[IdentityTestId])(implicit c: Connection): List[IdentityTestRow] = names.flatMap(map.get).toList
+  def selectByIdsTracked(names: Array[IdentityTestId])(implicit c: Connection): Map[IdentityTestId, IdentityTestRow] = {
     val byId = selectByIds(names).view.map(x => (x.name, x)).toMap
     names.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
-  override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
-    UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure, map)
-  }
-  override def update(row: IdentityTestRow)(implicit c: Connection): Boolean = {
+  def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure, map)
+  def update(row: IdentityTestRow)(implicit c: Connection): Boolean = {
     map.get(row.name) match {
       case Some(`row`) => false
       case Some(_) =>
@@ -81,18 +62,18 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
       case None => false
     }
   }
-  override def upsert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow = {
+  def upsert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow = {
     map.put(unsaved.name, unsaved): @nowarn
     unsaved
   }
-  override def upsertBatch(unsaved: Iterable[IdentityTestRow])(implicit c: Connection): List[IdentityTestRow] = {
+  def upsertBatch(unsaved: Iterable[IdentityTestRow])(implicit c: Connection): List[IdentityTestRow] = {
     unsaved.map { row =>
       map += (row.name -> row)
       row
     }.toList
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Iterator[IdentityTestRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[IdentityTestRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     unsaved.foreach { row =>
       map += (row.name -> row)
     }

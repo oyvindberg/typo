@@ -3,17 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.emailaddress
+package adventureworks.person.emailaddress;
 
-import adventureworks.person.businessentity.BusinessentityId
-import io.circe.Decoder
-import io.circe.Encoder
+import adventureworks.person.businessentity.BusinessentityId;
+import io.circe.Decoder;
+import io.circe.Encoder;
 
 /** Type for the composite primary key of table `person.emailaddress` */
-case class EmailaddressId(
-  businessentityid: BusinessentityId,
-  emailaddressid: Int
-)
+case class EmailaddressId(businessentityid: BusinessentityId, emailaddressid: Int)
+
 object EmailaddressId {
   implicit lazy val decoder: Decoder[EmailaddressId] = Decoder.forProduct2[EmailaddressId, BusinessentityId, Int]("businessentityid", "emailaddressid")(EmailaddressId.apply)(BusinessentityId.decoder, Decoder.decodeInt)
   implicit lazy val encoder: Encoder[EmailaddressId] = Encoder.forProduct2[EmailaddressId, BusinessentityId, Int]("businessentityid", "emailaddressid")(x => (x.businessentityid, x.emailaddressid))(BusinessentityId.encoder, Encoder.encodeInt)

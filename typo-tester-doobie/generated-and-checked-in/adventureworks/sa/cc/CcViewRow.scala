@@ -3,17 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.cc
+package adventureworks.sa.cc;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.userdefined.CustomCreditcardId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.userdefined.CustomCreditcardId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: sa.cc */
 case class CcViewRow(
@@ -36,24 +36,27 @@ case class CcViewRow(
 object CcViewRow {
   implicit lazy val decoder: Decoder[CcViewRow] = Decoder.forProduct7[CcViewRow, /* user-picked */ CustomCreditcardId, /* user-picked */ CustomCreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, TypoShort, TypoShort, TypoLocalDateTime]("id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(CcViewRow.apply)(CustomCreditcardId.decoder, CustomCreditcardId.decoder, Decoder.decodeString, Decoder.decodeString, TypoShort.decoder, TypoShort.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[CcViewRow] = Encoder.forProduct7[CcViewRow, /* user-picked */ CustomCreditcardId, /* user-picked */ CustomCreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, TypoShort, TypoShort, TypoLocalDateTime]("id", "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(x => (x.id, x.creditcardid, x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.modifieddate))(CustomCreditcardId.encoder, CustomCreditcardId.encoder, Encoder.encodeString, Encoder.encodeString, TypoShort.encoder, TypoShort.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[CcViewRow] = new Read[CcViewRow](
-    gets = List(
-      (/* user-picked */ CustomCreditcardId.get, Nullability.NoNulls),
-      (/* user-picked */ CustomCreditcardId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => CcViewRow(
-      id = /* user-picked */ CustomCreditcardId.get.unsafeGetNonNullable(rs, i + 0),
-      creditcardid = /* user-picked */ CustomCreditcardId.get.unsafeGetNonNullable(rs, i + 1),
-      cardtype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      cardnumber = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      expmonth = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
-      expyear = TypoShort.get.unsafeGetNonNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+  implicit lazy val read: Read[CcViewRow] = {
+    new Read[CcViewRow](
+      gets = List(
+        (/* user-picked */ CustomCreditcardId.get, Nullability.NoNulls),
+        (/* user-picked */ CustomCreditcardId.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => CcViewRow(
+        id = /* user-picked */ CustomCreditcardId.get.unsafeGetNonNullable(rs, i + 0),
+        creditcardid = /* user-picked */ CustomCreditcardId.get.unsafeGetNonNullable(rs, i + 1),
+        cardtype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
+        cardnumber = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
+        expmonth = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
+        expyear = TypoShort.get.unsafeGetNonNullable(rs, i + 5),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+      )
     )
-  )
+  
+  }
 }

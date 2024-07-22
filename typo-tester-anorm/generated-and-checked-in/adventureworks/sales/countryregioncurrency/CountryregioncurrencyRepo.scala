@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.countryregioncurrency
+package adventureworks.sales.countryregioncurrency;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait CountryregioncurrencyRepo {
   def delete: DeleteBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
@@ -17,7 +17,7 @@ trait CountryregioncurrencyRepo {
   def insert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow
   def insert(unsaved: CountryregioncurrencyRowUnsaved)(implicit c: Connection): CountryregioncurrencyRow
   def insertStreaming(unsaved: Iterator[CountryregioncurrencyRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[CountryregioncurrencyRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow]
   def selectAll(implicit c: Connection): List[CountryregioncurrencyRow]
@@ -28,6 +28,6 @@ trait CountryregioncurrencyRepo {
   def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow
   def upsertBatch(unsaved: Iterable[CountryregioncurrencyRow])(implicit c: Connection): List[CountryregioncurrencyRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[CountryregioncurrencyRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

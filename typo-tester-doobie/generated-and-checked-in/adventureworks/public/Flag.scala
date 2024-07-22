@@ -3,20 +3,21 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public
+package adventureworks.public;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Domain `public.Flag`
   * No constraint
   */
 case class Flag(value: Boolean)
+
 object Flag {
   implicit lazy val arrayGet: Get[Array[Flag]] = adventureworks.BooleanArrayMeta.get.map(_.map(Flag.apply))
   implicit lazy val arrayPut: Put[Array[Flag]] = adventureworks.BooleanArrayMeta.put.contramap(_.map(_.value))
@@ -25,8 +26,10 @@ object Flag {
   implicit lazy val encoder: Encoder[Flag] = Encoder.encodeBoolean.contramap(_.value)
   implicit lazy val get: Get[Flag] = Meta.BooleanMeta.get.map(Flag.apply)
   implicit lazy val put: Put[Flag] = Meta.BooleanMeta.put.contramap(_.value)
-  implicit lazy val text: Text[Flag] = new Text[Flag] {
-    override def unsafeEncode(v: Flag, sb: StringBuilder) = Text.booleanInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: Flag, sb: StringBuilder) = Text.booleanInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[Flag] = {
+    new Text[Flag] {
+      override def unsafeEncode(v: Flag, sb: StringBuilder) = Text.booleanInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: Flag, sb: StringBuilder) = Text.booleanInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

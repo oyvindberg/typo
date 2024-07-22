@@ -3,29 +3,29 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productmodelproductdescriptionculture
+package adventureworks.production.productmodelproductdescriptionculture;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.culture.CultureFields
-import adventureworks.production.culture.CultureId
-import adventureworks.production.culture.CultureRow
-import adventureworks.production.productdescription.ProductdescriptionFields
-import adventureworks.production.productdescription.ProductdescriptionId
-import adventureworks.production.productdescription.ProductdescriptionRow
-import adventureworks.production.productmodel.ProductmodelFields
-import adventureworks.production.productmodel.ProductmodelId
-import adventureworks.production.productmodel.ProductmodelRow
-import anorm.ToParameterValue
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Const.As.as
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.culture.CultureFields;
+import adventureworks.production.culture.CultureId;
+import adventureworks.production.culture.CultureRow;
+import adventureworks.production.productdescription.ProductdescriptionFields;
+import adventureworks.production.productdescription.ProductdescriptionId;
+import adventureworks.production.productdescription.ProductdescriptionRow;
+import adventureworks.production.productmodel.ProductmodelFields;
+import adventureworks.production.productmodel.ProductmodelId;
+import adventureworks.production.productmodel.ProductmodelRow;
+import anorm.ToParameterValue;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait ProductmodelproductdescriptioncultureFields {
   def productmodelid: IdField[ProductmodelId, ProductmodelproductdescriptioncultureRow]

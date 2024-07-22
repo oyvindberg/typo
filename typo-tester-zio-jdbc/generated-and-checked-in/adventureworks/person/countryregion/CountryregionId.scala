@@ -3,19 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.countryregion
+package adventureworks.person.countryregion;
 
-import adventureworks.Text
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `person.countryregion` */
-case class CountryregionId(value: /* max 3 chars */ String) extends AnyVal
+case class CountryregionId(value: /* max 3 chars */ String) extends scala.AnyVal
+
 object CountryregionId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[CountryregionId]] = adventureworks.StringArrayDecoder.map(_.map(CountryregionId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[CountryregionId]] = adventureworks.StringArrayEncoder.contramap(_.map(_.value))
@@ -27,8 +28,10 @@ object CountryregionId {
   implicit lazy val jsonEncoder: JsonEncoder[CountryregionId] = JsonEncoder.string.contramap(_.value)
   implicit lazy val pgType: PGType[CountryregionId] = PGType.PGTypeString.as
   implicit lazy val setter: Setter[CountryregionId] = Setter.stringSetter.contramap(_.value)
-  implicit lazy val text: Text[CountryregionId] = new Text[CountryregionId] {
-    override def unsafeEncode(v: CountryregionId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: CountryregionId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[CountryregionId] = {
+    new Text[CountryregionId] {
+      override def unsafeEncode(v: CountryregionId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: CountryregionId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

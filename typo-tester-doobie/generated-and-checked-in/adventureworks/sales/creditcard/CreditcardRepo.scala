@@ -3,14 +3,14 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.creditcard
+package adventureworks.sales.creditcard;
 
-import adventureworks.userdefined.CustomCreditcardId
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import adventureworks.userdefined.CustomCreditcardId;
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait CreditcardRepo {
   def delete: DeleteBuilder[CreditcardFields, CreditcardRow]
@@ -19,7 +19,7 @@ trait CreditcardRepo {
   def insert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow]
   def insert(unsaved: CreditcardRowUnsaved): ConnectionIO[CreditcardRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, CreditcardRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CreditcardRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[CreditcardFields, CreditcardRow]
   def selectAll: Stream[ConnectionIO, CreditcardRow]
@@ -30,6 +30,6 @@ trait CreditcardRepo {
   def update(row: CreditcardRow): ConnectionIO[Boolean]
   def upsert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow]
   def upsertBatch(unsaved: List[CreditcardRow]): Stream[ConnectionIO, CreditcardRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, CreditcardRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

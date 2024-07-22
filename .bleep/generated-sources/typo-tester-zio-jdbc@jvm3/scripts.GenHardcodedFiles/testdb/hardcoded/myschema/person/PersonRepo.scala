@@ -3,16 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.myschema.person
+package testdb.hardcoded.myschema.person;
 
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
+/** upsertBatch: Not implementable for zio-jdbc */
 trait PersonRepo {
   def delete: DeleteBuilder[PersonFields, PersonRow]
   def deleteById(id: PersonId): ZIO[ZConnection, Throwable, Boolean]
@@ -20,11 +21,11 @@ trait PersonRepo {
   def insert(unsaved: PersonRow): ZIO[ZConnection, Throwable, PersonRow]
   def insert(unsaved: PersonRowUnsaved): ZIO[ZConnection, Throwable, PersonRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[PersonFields, PersonRow]
   def selectAll: ZStream[ZConnection, Throwable, PersonRow]
-  def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, PersonRow]
+  def selectByFieldValues(fieldValues: List[PersonFieldValue[?]]): ZStream[ZConnection, Throwable, PersonRow]
   def selectById(id: PersonId): ZIO[ZConnection, Throwable, Option[PersonRow]]
   def selectByIds(ids: Array[PersonId]): ZStream[ZConnection, Throwable, PersonRow]
   def selectByIdsTracked(ids: Array[PersonId]): ZIO[ZConnection, Throwable, Map[PersonId, PersonRow]]
@@ -32,7 +33,6 @@ trait PersonRepo {
   def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean]
   def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: PersonRow): ZIO[ZConnection, Throwable, UpdateResult[PersonRow]]
-  // Not implementable for zio-jdbc: upsertBatch
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
 }

@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.vpersondemographics
+package adventureworks.sales.vpersondemographics;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
-  override def select: SelectBuilder[VpersondemographicsViewFields, VpersondemographicsViewRow] = {
-    SelectBuilderSql("sales.vpersondemographics", VpersondemographicsViewFields.structure, VpersondemographicsViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[VpersondemographicsViewRow] = {
+  def select: SelectBuilder[VpersondemographicsViewFields, VpersondemographicsViewRow] = SelectBuilderSql("sales.vpersondemographics", VpersondemographicsViewFields.structure, VpersondemographicsViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[VpersondemographicsViewRow] = {
     SQL"""select "businessentityid", "totalpurchaseytd"::numeric, "datefirstpurchase"::text, "birthdate"::text, "maritalstatus", "yearlyincome", "gender", "totalchildren", "numberchildrenathome", "education", "occupation", "homeownerflag", "numbercarsowned"
           from sales.vpersondemographics
        """.as(VpersondemographicsViewRow.rowParser(1).*)

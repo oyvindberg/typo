@@ -9,7 +9,7 @@ case class ComputedView(
     view: db.View,
     naming: Naming,
     typeMapperDb: TypeMapperDb,
-    scalaTypeMapper: TypeMapperScala,
+    scalaTypeMapper: TypeMapperJvm,
     eval: Eval[db.RelationName, HasSource],
     enableFieldValue: Boolean,
     enableDsl: Boolean
@@ -45,14 +45,9 @@ case class ComputedView(
 
   val repoMethods: NonEmptyList[RepoMethod] = {
     val maybeSelectByFieldValues = for {
-      fieldOrIdValueName <- names.FieldOrIdValueName
-      fieldValueName <- names.FieldValueName
+      fieldValueName <- names.FieldOrIdValueName
     } yield {
-      val fieldValuesParam = sc.Param(
-        sc.Ident("fieldValues"),
-        TypesScala.List.of(fieldOrIdValueName.of(sc.Type.Wildcard)),
-        None
-      )
+      val fieldValuesParam = sc.Param(sc.Ident("fieldValues"), TypesScala.List.of(fieldValueName.of(sc.Type.Wildcard)))
       RepoMethod.SelectByFieldValues(view.name, cols, fieldValueName, fieldValuesParam, names.RowName)
     }
     val maybeSelectBuilder = for {

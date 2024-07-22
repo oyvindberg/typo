@@ -3,10 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.vpersondemographics
+package adventureworks.sales.vpersondemographics;
 
-import java.sql.Connection
-import typo.dsl.SelectBuilder
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
 
 trait VpersondemographicsViewRepo {
   def select: SelectBuilder[VpersondemographicsViewFields, VpersondemographicsViewRow]

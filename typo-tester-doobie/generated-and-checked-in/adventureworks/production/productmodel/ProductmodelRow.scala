@@ -3,27 +3,29 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productmodel
+package adventureworks.production.productmodel;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.customtypes.TypoXml
-import adventureworks.public.Name
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.public.Name;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: production.productmodel
-    Product model classification.
-    Primary key: productmodelid */
+  * Product model classification.
+  * Primary key: productmodelid
+  */
 case class ProductmodelRow(
   /** Primary key for ProductModel records.
-      Default: nextval('production.productmodel_productmodelid_seq'::regclass) */
+    * Default: nextval('production.productmodel_productmodelid_seq'::regclass)
+    */
   productmodelid: ProductmodelId,
   /** Product model description. */
   name: Name,
@@ -35,69 +37,85 @@ case class ProductmodelRow(
   rowguid: TypoUUID,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val id = productmodelid
-   def toUnsavedRow(productmodelid: Defaulted[ProductmodelId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductmodelRowUnsaved =
-     ProductmodelRowUnsaved(name, catalogdescription, instructions, productmodelid, rowguid, modifieddate)
- }
+) {
+  def id: ProductmodelId = productmodelid
+  def toUnsavedRow(productmodelid: Defaulted[ProductmodelId], rowguid: Defaulted[TypoUUID] = Defaulted.Provided(this.rowguid), modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductmodelRowUnsaved = {
+    new ProductmodelRowUnsaved(
+      name,
+      catalogdescription,
+      instructions,
+      productmodelid,
+      rowguid,
+      modifieddate
+    )
+  }
+}
 
 object ProductmodelRow {
   implicit lazy val decoder: Decoder[ProductmodelRow] = Decoder.forProduct6[ProductmodelRow, ProductmodelId, Name, Option[TypoXml], Option[TypoXml], TypoUUID, TypoLocalDateTime]("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(ProductmodelRow.apply)(ProductmodelId.decoder, Name.decoder, Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ProductmodelRow] = Encoder.forProduct6[ProductmodelRow, ProductmodelId, Name, Option[TypoXml], Option[TypoXml], TypoUUID, TypoLocalDateTime]("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(x => (x.productmodelid, x.name, x.catalogdescription, x.instructions, x.rowguid, x.modifieddate))(ProductmodelId.encoder, Name.encoder, Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ProductmodelRow] = new Read[ProductmodelRow](
-    gets = List(
-      (ProductmodelId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ProductmodelRow(
-      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      catalogdescription = TypoXml.get.unsafeGetNullable(rs, i + 2),
-      instructions = TypoXml.get.unsafeGetNullable(rs, i + 3),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[ProductmodelRow] = {
+    new Read[ProductmodelRow](
+      gets = List(
+        (ProductmodelId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (TypoXml.get, Nullability.Nullable),
+        (TypoXml.get, Nullability.Nullable),
+        (TypoUUID.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ProductmodelRow(
+        productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
+        name = Name.get.unsafeGetNonNullable(rs, i + 1),
+        catalogdescription = TypoXml.get.unsafeGetNullable(rs, i + 2),
+        instructions = TypoXml.get.unsafeGetNullable(rs, i + 3),
+        rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+      )
     )
-  )
-  implicit lazy val text: Text[ProductmodelRow] = Text.instance[ProductmodelRow]{ (row, sb) =>
-    ProductmodelId.text.unsafeEncode(row.productmodelid, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoXml.text).unsafeEncode(row.catalogdescription, sb)
-    sb.append(Text.DELIMETER)
-    Text.option(TypoXml.text).unsafeEncode(row.instructions, sb)
-    sb.append(Text.DELIMETER)
-    TypoUUID.text.unsafeEncode(row.rowguid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[ProductmodelRow] = new Write[ProductmodelRow](
-    puts = List((ProductmodelId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoXml.put, Nullability.Nullable),
-                (TypoXml.put, Nullability.Nullable),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.productmodelid, x.name, x.catalogdescription, x.instructions, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ProductmodelId.put.unsafeSetNonNullable(rs, i + 0, a.productmodelid)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  TypoXml.put.unsafeSetNullable(rs, i + 2, a.catalogdescription)
-                  TypoXml.put.unsafeSetNullable(rs, i + 3, a.instructions)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 4, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ProductmodelId.put.unsafeUpdateNonNullable(ps, i + 0, a.productmodelid)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     TypoXml.put.unsafeUpdateNullable(ps, i + 2, a.catalogdescription)
-                     TypoXml.put.unsafeUpdateNullable(ps, i + 3, a.instructions)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 4, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[ProductmodelRow] = {
+    Text.instance[ProductmodelRow]{ (row, sb) =>
+      ProductmodelId.text.unsafeEncode(row.productmodelid, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoXml.text).unsafeEncode(row.catalogdescription, sb)
+      sb.append(Text.DELIMETER)
+      Text.option(TypoXml.text).unsafeEncode(row.instructions, sb)
+      sb.append(Text.DELIMETER)
+      TypoUUID.text.unsafeEncode(row.rowguid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[ProductmodelRow] = {
+    new Write[ProductmodelRow](
+      puts = List((ProductmodelId.put, Nullability.NoNulls),
+                  (Name.put, Nullability.NoNulls),
+                  (TypoXml.put, Nullability.Nullable),
+                  (TypoXml.put, Nullability.Nullable),
+                  (TypoUUID.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.productmodelid, x.name, x.catalogdescription, x.instructions, x.rowguid, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    ProductmodelId.put.unsafeSetNonNullable(rs, i + 0, a.productmodelid)
+                    Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
+                    TypoXml.put.unsafeSetNullable(rs, i + 2, a.catalogdescription)
+                    TypoXml.put.unsafeSetNullable(rs, i + 3, a.instructions)
+                    TypoUUID.put.unsafeSetNonNullable(rs, i + 4, a.rowguid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       ProductmodelId.put.unsafeUpdateNonNullable(ps, i + 0, a.productmodelid)
+                       Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
+                       TypoXml.put.unsafeUpdateNullable(ps, i + 2, a.catalogdescription)
+                       TypoXml.put.unsafeUpdateNullable(ps, i + 3, a.instructions)
+                       TypoUUID.put.unsafeUpdateNonNullable(ps, i + 4, a.rowguid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
+                     }
+    )
+  
+  }
 }

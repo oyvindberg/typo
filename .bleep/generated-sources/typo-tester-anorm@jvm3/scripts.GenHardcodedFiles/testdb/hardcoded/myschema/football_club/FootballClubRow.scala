@@ -3,56 +3,62 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.myschema.football_club
+package testdb.hardcoded.myschema.football_club;
 
-import anorm.Column
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
-import testdb.hardcoded.Text
+import anorm.Column;
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
+import testdb.hardcoded.Text;
 
 /** Table: myschema.football_club
-    football club
-    Primary key: id */
-case class FootballClubRow(
-  id: FootballClubId,
-  name: /* max 100 chars */ String
-)
+  * football club
+  * Primary key: id
+  */
+case class FootballClubRow(id: FootballClubId, name: /* max 100 chars */ String)
 
 object FootballClubRow {
-  implicit lazy val reads: Reads[FootballClubRow] = Reads[FootballClubRow](json => JsResult.fromTry(
-      Try(
-        FootballClubRow(
-          id = json.\("id").as(FootballClubId.reads),
-          name = json.\("name").as(Reads.StringReads)
+  implicit lazy val reads: Reads[FootballClubRow] = {
+    Reads[FootballClubRow](json => JsResult.fromTry(
+        Try(
+          FootballClubRow(
+            id = json.\("id").as(FootballClubId.reads),
+            name = json.\("name").as(Reads.StringReads)
+          )
         )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[FootballClubRow] = RowParser[FootballClubRow] { row =>
-    Success(
-      FootballClubRow(
-        id = row(idx + 0)(FootballClubId.column),
-        name = row(idx + 1)(Column.columnToString)
-      )
+      ),
     )
   }
-  implicit lazy val text: Text[FootballClubRow] = Text.instance[FootballClubRow]{ (row, sb) =>
-    FootballClubId.text.unsafeEncode(row.id, sb)
-    sb.append(Text.DELIMETER)
-    Text.stringInstance.unsafeEncode(row.name, sb)
+  def rowParser(idx: Int): RowParser[FootballClubRow] = {
+    RowParser[FootballClubRow] { row =>
+      Success(
+        FootballClubRow(
+          id = row(idx + 0)(FootballClubId.column),
+          name = row(idx + 1)(Column.columnToString)
+        )
+      )
+    }
   }
-  implicit lazy val writes: OWrites[FootballClubRow] = OWrites[FootballClubRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "id" -> FootballClubId.writes.writes(o.id),
-      "name" -> Writes.StringWrites.writes(o.name)
-    ))
-  )
+  implicit lazy val text: Text[FootballClubRow] = {
+    Text.instance[FootballClubRow]{ (row, sb) =>
+      FootballClubId.text.unsafeEncode(row.id, sb)
+      sb.append(Text.DELIMETER)
+      Text.stringInstance.unsafeEncode(row.name, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[FootballClubRow] = {
+    OWrites[FootballClubRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "id" -> FootballClubId.writes.writes(o.id),
+        "name" -> Writes.StringWrites.writes(o.name)
+      ))
+    )
+  }
 }

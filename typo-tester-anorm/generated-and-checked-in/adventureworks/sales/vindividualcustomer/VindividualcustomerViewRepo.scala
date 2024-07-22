@@ -3,10 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.vindividualcustomer
+package adventureworks.sales.vindividualcustomer;
 
-import java.sql.Connection
-import typo.dsl.SelectBuilder
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
 
 trait VindividualcustomerViewRepo {
   def select: SelectBuilder[VindividualcustomerViewFields, VindividualcustomerViewRow]

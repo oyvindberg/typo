@@ -3,32 +3,25 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.workorderrouting
+package adventureworks.production.workorderrouting;
 
-import java.sql.Connection
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.DeleteBuilder.DeleteBuilderMock
-import typo.dsl.DeleteParams
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderMock
-import typo.dsl.SelectParams
-import typo.dsl.UpdateBuilder
-import typo.dsl.UpdateBuilder.UpdateBuilderMock
-import typo.dsl.UpdateParams
+import java.sql.Connection;
+import scala.annotation.nowarn;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.DeleteBuilder.DeleteBuilderMock;
+import typo.dsl.DeleteParams;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderMock;
+import typo.dsl.SelectParams;
+import typo.dsl.UpdateBuilder;
+import typo.dsl.UpdateBuilder.UpdateBuilderMock;
+import typo.dsl.UpdateParams;
 
-class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, WorkorderroutingRow],
-                               map: scala.collection.mutable.Map[WorkorderroutingId, WorkorderroutingRow] = scala.collection.mutable.Map.empty) extends WorkorderroutingRepo {
-  override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    DeleteBuilderMock(DeleteParams.empty, WorkorderroutingFields.structure, map)
-  }
-  override def deleteById(compositeId: WorkorderroutingId)(implicit c: Connection): Boolean = {
-    map.remove(compositeId).isDefined
-  }
-  override def deleteByIds(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): Int = {
-    compositeIds.map(id => map.remove(id)).count(_.isDefined)
-  }
-  override def insert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow = {
+class WorkorderroutingRepoMock(val toRow: Function1[WorkorderroutingRowUnsaved, WorkorderroutingRow], val map: scala.collection.mutable.Map[WorkorderroutingId, WorkorderroutingRow] = scala.collection.mutable.Map.empty) extends WorkorderroutingRepo {
+  def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = DeleteBuilderMock(DeleteParams.empty, WorkorderroutingFields.structure, map)
+  def deleteById(compositeId: WorkorderroutingId)(implicit c: Connection): Boolean = map.remove(compositeId).isDefined
+  def deleteByIds(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): Int = compositeIds.map(id => map.remove(id)).count(_.isDefined)
+  def insert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow = {
     val _ = if (map.contains(unsaved.compositeId))
       sys.error(s"id ${unsaved.compositeId} already exists")
     else
@@ -36,43 +29,31 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
     
     unsaved
   }
-  override def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow = {
-    insert(toRow(unsaved))
-  }
-  override def insertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
+  def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow = insert(toRow(unsaved))
+  def insertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { row =>
       map += (row.compositeId -> row)
     }
     unsaved.size.toLong
   }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Iterator[WorkorderroutingRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[WorkorderroutingRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
     unsaved.foreach { unsavedRow =>
       val row = toRow(unsavedRow)
       map += (row.compositeId -> row)
     }
     unsaved.size.toLong
   }
-  override def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    SelectBuilderMock(WorkorderroutingFields.structure, () => map.values.toList, SelectParams.empty)
-  }
-  override def selectAll(implicit c: Connection): List[WorkorderroutingRow] = {
-    map.values.toList
-  }
-  override def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow] = {
-    map.get(compositeId)
-  }
-  override def selectByIds(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): List[WorkorderroutingRow] = {
-    compositeIds.flatMap(map.get).toList
-  }
-  override def selectByIdsTracked(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): Map[WorkorderroutingId, WorkorderroutingRow] = {
+  def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow] = SelectBuilderMock(WorkorderroutingFields.structure, () => map.values.toList, SelectParams.empty)
+  def selectAll(implicit c: Connection): List[WorkorderroutingRow] = map.values.toList
+  def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow] = map.get(compositeId)
+  def selectByIds(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): List[WorkorderroutingRow] = compositeIds.flatMap(map.get).toList
+  def selectByIdsTracked(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): Map[WorkorderroutingId, WorkorderroutingRow] = {
     val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
     compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
-  override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    UpdateBuilderMock(UpdateParams.empty, WorkorderroutingFields.structure, map)
-  }
-  override def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
+  def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = UpdateBuilderMock(UpdateParams.empty, WorkorderroutingFields.structure, map)
+  def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
     map.get(row.compositeId) match {
       case Some(`row`) => false
       case Some(_) =>
@@ -81,18 +62,18 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
       case None => false
     }
   }
-  override def upsert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow = {
+  def upsert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow = {
     map.put(unsaved.compositeId, unsaved): @nowarn
     unsaved
   }
-  override def upsertBatch(unsaved: Iterable[WorkorderroutingRow])(implicit c: Connection): List[WorkorderroutingRow] = {
+  def upsertBatch(unsaved: Iterable[WorkorderroutingRow])(implicit c: Connection): List[WorkorderroutingRow] = {
     unsaved.map { row =>
       map += (row.compositeId -> row)
       row
     }.toList
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     unsaved.foreach { row =>
       map += (row.compositeId -> row)
     }

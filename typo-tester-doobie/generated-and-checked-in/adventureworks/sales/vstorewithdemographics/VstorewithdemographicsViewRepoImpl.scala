@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.vstorewithdemographics
+package adventureworks.sales.vstorewithdemographics;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo {
-  override def select: SelectBuilder[VstorewithdemographicsViewFields, VstorewithdemographicsViewRow] = {
-    SelectBuilderSql("sales.vstorewithdemographics", VstorewithdemographicsViewFields.structure, VstorewithdemographicsViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, VstorewithdemographicsViewRow] = {
-    sql"""select "businessentityid", "name", "AnnualSales"::numeric, "AnnualRevenue"::numeric, "BankName", "BusinessType", "YearOpened", "Specialty", "SquareFeet", "Brands", "Internet", "NumberEmployees" from sales.vstorewithdemographics""".query(using VstorewithdemographicsViewRow.read).stream
-  }
+  def select: SelectBuilder[VstorewithdemographicsViewFields, VstorewithdemographicsViewRow] = SelectBuilderSql("sales.vstorewithdemographics", VstorewithdemographicsViewFields.structure, VstorewithdemographicsViewRow.read)
+  def selectAll: Stream[ConnectionIO, VstorewithdemographicsViewRow] = sql"""select "businessentityid", "name", "AnnualSales"::numeric, "AnnualRevenue"::numeric, "BankName", "BusinessType", "YearOpened", "Specialty", "SquareFeet", "Brands", "Internet", "NumberEmployees" from sales.vstorewithdemographics""".query(using VstorewithdemographicsViewRow.read).stream
 }

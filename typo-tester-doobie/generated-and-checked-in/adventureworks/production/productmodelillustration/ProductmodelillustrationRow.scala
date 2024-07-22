@@ -3,77 +3,82 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productmodelillustration
+package adventureworks.production.productmodelillustration;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.illustration.IllustrationId
-import adventureworks.production.productmodel.ProductmodelId
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.illustration.IllustrationId;
+import adventureworks.production.productmodel.ProductmodelId;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: production.productmodelillustration
-    Cross-reference table mapping product models and illustrations.
-    Composite primary key: productmodelid, illustrationid */
-case class ProductmodelillustrationRow(
-  /** Primary key. Foreign key to ProductModel.ProductModelID.
-      Points to [[adventureworks.production.productmodel.ProductmodelRow.productmodelid]] */
-  productmodelid: ProductmodelId,
-  /** Primary key. Foreign key to Illustration.IllustrationID.
-      Points to [[adventureworks.production.illustration.IllustrationRow.illustrationid]] */
-  illustrationid: IllustrationId,
-  /** Default: now() */
-  modifieddate: TypoLocalDateTime
-){
-   val compositeId: ProductmodelillustrationId = ProductmodelillustrationId(productmodelid, illustrationid)
-   val id = compositeId
-   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductmodelillustrationRowUnsaved =
-     ProductmodelillustrationRowUnsaved(productmodelid, illustrationid, modifieddate)
- }
+  * Cross-reference table mapping product models and illustrations.
+  * Composite primary key: productmodelid, illustrationid
+  */
+case class ProductmodelillustrationRow(/** Primary key. Foreign key to ProductModel.ProductModelID.
+                                         * Points to [[adventureworks.production.productmodel.ProductmodelRow.productmodelid]]
+                                         */
+                                       productmodelid: ProductmodelId, /** Primary key. Foreign key to Illustration.IllustrationID.
+                                         * Points to [[adventureworks.production.illustration.IllustrationRow.illustrationid]]
+                                         */
+                                       illustrationid: IllustrationId, /** Default: now() */
+                                       modifieddate: TypoLocalDateTime) {
+  def compositeId: ProductmodelillustrationId = new ProductmodelillustrationId(productmodelid, illustrationid)
+  def id: ProductmodelillustrationId = compositeId
+  def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductmodelillustrationRowUnsaved = new ProductmodelillustrationRowUnsaved(productmodelid, illustrationid, modifieddate)
+}
 
 object ProductmodelillustrationRow {
-  def apply(compositeId: ProductmodelillustrationId, modifieddate: TypoLocalDateTime) =
-    new ProductmodelillustrationRow(compositeId.productmodelid, compositeId.illustrationid, modifieddate)
+  def apply(compositeId: ProductmodelillustrationId, modifieddate: TypoLocalDateTime): ProductmodelillustrationRow = new ProductmodelillustrationRow(compositeId.productmodelid, compositeId.illustrationid, modifieddate)
   implicit lazy val decoder: Decoder[ProductmodelillustrationRow] = Decoder.forProduct3[ProductmodelillustrationRow, ProductmodelId, IllustrationId, TypoLocalDateTime]("productmodelid", "illustrationid", "modifieddate")(ProductmodelillustrationRow.apply)(ProductmodelId.decoder, IllustrationId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ProductmodelillustrationRow] = Encoder.forProduct3[ProductmodelillustrationRow, ProductmodelId, IllustrationId, TypoLocalDateTime]("productmodelid", "illustrationid", "modifieddate")(x => (x.productmodelid, x.illustrationid, x.modifieddate))(ProductmodelId.encoder, IllustrationId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ProductmodelillustrationRow] = new Read[ProductmodelillustrationRow](
-    gets = List(
-      (ProductmodelId.get, Nullability.NoNulls),
-      (IllustrationId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ProductmodelillustrationRow(
-      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
-      illustrationid = IllustrationId.get.unsafeGetNonNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[ProductmodelillustrationRow] = {
+    new Read[ProductmodelillustrationRow](
+      gets = List(
+        (ProductmodelId.get, Nullability.NoNulls),
+        (IllustrationId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ProductmodelillustrationRow(
+        productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
+        illustrationid = IllustrationId.get.unsafeGetNonNullable(rs, i + 1),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+      )
     )
-  )
-  implicit lazy val text: Text[ProductmodelillustrationRow] = Text.instance[ProductmodelillustrationRow]{ (row, sb) =>
-    ProductmodelId.text.unsafeEncode(row.productmodelid, sb)
-    sb.append(Text.DELIMETER)
-    IllustrationId.text.unsafeEncode(row.illustrationid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[ProductmodelillustrationRow] = new Write[ProductmodelillustrationRow](
-    puts = List((ProductmodelId.put, Nullability.NoNulls),
-                (IllustrationId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.productmodelid, x.illustrationid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ProductmodelId.put.unsafeSetNonNullable(rs, i + 0, a.productmodelid)
-                  IllustrationId.put.unsafeSetNonNullable(rs, i + 1, a.illustrationid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ProductmodelId.put.unsafeUpdateNonNullable(ps, i + 0, a.productmodelid)
-                     IllustrationId.put.unsafeUpdateNonNullable(ps, i + 1, a.illustrationid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[ProductmodelillustrationRow] = {
+    Text.instance[ProductmodelillustrationRow]{ (row, sb) =>
+      ProductmodelId.text.unsafeEncode(row.productmodelid, sb)
+      sb.append(Text.DELIMETER)
+      IllustrationId.text.unsafeEncode(row.illustrationid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[ProductmodelillustrationRow] = {
+    new Write[ProductmodelillustrationRow](
+      puts = List((ProductmodelId.put, Nullability.NoNulls),
+                  (IllustrationId.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.productmodelid, x.illustrationid, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    ProductmodelId.put.unsafeSetNonNullable(rs, i + 0, a.productmodelid)
+                    IllustrationId.put.unsafeSetNonNullable(rs, i + 1, a.illustrationid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       ProductmodelId.put.unsafeUpdateNonNullable(ps, i + 0, a.productmodelid)
+                       IllustrationId.put.unsafeUpdateNonNullable(ps, i + 1, a.illustrationid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
+                     }
+    )
+  
+  }
 }

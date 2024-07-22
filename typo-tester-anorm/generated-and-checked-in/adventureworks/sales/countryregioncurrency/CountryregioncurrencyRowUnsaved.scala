@@ -3,65 +3,62 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.countryregioncurrency
+package adventureworks.sales.countryregioncurrency;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.sales.currency.CurrencyId
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.countryregion.CountryregionId;
+import adventureworks.sales.currency.CurrencyId;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** This class corresponds to a row in table `sales.countryregioncurrency` which has not been persisted yet */
-case class CountryregioncurrencyRowUnsaved(
-  /** ISO code for countries and regions. Foreign key to CountryRegion.CountryRegionCode.
-      Points to [[adventureworks.person.countryregion.CountryregionRow.countryregioncode]] */
-  countryregioncode: CountryregionId,
-  /** ISO standard currency code. Foreign key to Currency.CurrencyCode.
-      Points to [[adventureworks.sales.currency.CurrencyRow.currencycode]] */
-  currencycode: CurrencyId,
-  /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-) {
-  def toRow(modifieddateDefault: => TypoLocalDateTime): CountryregioncurrencyRow =
-    CountryregioncurrencyRow(
-      countryregioncode = countryregioncode,
-      currencycode = currencycode,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
-    )
+case class CountryregioncurrencyRowUnsaved(/** ISO code for countries and regions. Foreign key to CountryRegion.CountryRegionCode.
+                                             * Points to [[adventureworks.person.countryregion.CountryregionRow.countryregioncode]]
+                                             */
+                                           countryregioncode: CountryregionId, /** ISO standard currency code. Foreign key to Currency.CurrencyCode.
+                                             * Points to [[adventureworks.sales.currency.CurrencyRow.currencycode]]
+                                             */
+                                           currencycode: CurrencyId, /** Default: now() */
+                                           modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()) {
+  def toRow(modifieddateDefault: => TypoLocalDateTime): CountryregioncurrencyRow = new CountryregioncurrencyRow(countryregioncode = countryregioncode, currencycode = currencycode, modifieddate = modifieddate.getOrElse(modifieddateDefault))
 }
+
 object CountryregioncurrencyRowUnsaved {
-  implicit lazy val reads: Reads[CountryregioncurrencyRowUnsaved] = Reads[CountryregioncurrencyRowUnsaved](json => JsResult.fromTry(
-      Try(
-        CountryregioncurrencyRowUnsaved(
-          countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
-          currencycode = json.\("currencycode").as(CurrencyId.reads),
-          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+  implicit lazy val reads: Reads[CountryregioncurrencyRowUnsaved] = {
+    Reads[CountryregioncurrencyRowUnsaved](json => JsResult.fromTry(
+        Try(
+          CountryregioncurrencyRowUnsaved(
+            countryregioncode = json.\("countryregioncode").as(CountryregionId.reads),
+            currencycode = json.\("currencycode").as(CurrencyId.reads),
+            modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+          )
         )
-      )
-    ),
-  )
-  implicit lazy val text: Text[CountryregioncurrencyRowUnsaved] = Text.instance[CountryregioncurrencyRowUnsaved]{ (row, sb) =>
-    CountryregionId.text.unsafeEncode(row.countryregioncode, sb)
-    sb.append(Text.DELIMETER)
-    CurrencyId.text.unsafeEncode(row.currencycode, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+      ),
+    )
   }
-  implicit lazy val writes: OWrites[CountryregioncurrencyRowUnsaved] = OWrites[CountryregioncurrencyRowUnsaved](o =>
-    new JsObject(ListMap[String, JsValue](
-      "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
-      "currencycode" -> CurrencyId.writes.writes(o.currencycode),
-      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
-    ))
-  )
+  implicit lazy val text: Text[CountryregioncurrencyRowUnsaved] = {
+    Text.instance[CountryregioncurrencyRowUnsaved]{ (row, sb) =>
+      CountryregionId.text.unsafeEncode(row.countryregioncode, sb)
+      sb.append(Text.DELIMETER)
+      CurrencyId.text.unsafeEncode(row.currencycode, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[CountryregioncurrencyRowUnsaved] = {
+    OWrites[CountryregioncurrencyRowUnsaved](o =>
+      new JsObject(ListMap[String, JsValue](
+        "countryregioncode" -> CountryregionId.writes.writes(o.countryregioncode),
+        "currencycode" -> CurrencyId.writes.writes(o.currencycode),
+        "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
+      ))
+    )
+  }
 }

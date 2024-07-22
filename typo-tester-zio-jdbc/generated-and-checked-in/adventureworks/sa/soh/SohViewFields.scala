@@ -3,27 +3,27 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.soh
+package adventureworks.sa.soh;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.address.AddressId
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.public.AccountNumber
-import adventureworks.public.Flag
-import adventureworks.public.OrderNumber
-import adventureworks.purchasing.shipmethod.ShipmethodId
-import adventureworks.sales.currencyrate.CurrencyrateId
-import adventureworks.sales.customer.CustomerId
-import adventureworks.sales.salesorderheader.SalesorderheaderId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import adventureworks.userdefined.CustomCreditcardId
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.OptField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.address.AddressId;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.public.AccountNumber;
+import adventureworks.public.Flag;
+import adventureworks.public.OrderNumber;
+import adventureworks.purchasing.shipmethod.ShipmethodId;
+import adventureworks.sales.currencyrate.CurrencyrateId;
+import adventureworks.sales.customer.CustomerId;
+import adventureworks.sales.salesorderheader.SalesorderheaderId;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import adventureworks.userdefined.CustomCreditcardId;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.OptField;
+import typo.dsl.Structure.Relation;
 
 trait SohViewFields {
   def id: Field[SalesorderheaderId, SohViewRow]

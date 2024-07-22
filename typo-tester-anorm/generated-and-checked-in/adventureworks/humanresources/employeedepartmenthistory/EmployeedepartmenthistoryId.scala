@@ -3,19 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.employeedepartmenthistory
+package adventureworks.humanresources.employeedepartmenthistory;
 
-import adventureworks.customtypes.TypoLocalDate
-import adventureworks.humanresources.department.DepartmentId
-import adventureworks.humanresources.shift.ShiftId
-import adventureworks.person.businessentity.BusinessentityId
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.customtypes.TypoLocalDate;
+import adventureworks.humanresources.department.DepartmentId;
+import adventureworks.humanresources.shift.ShiftId;
+import adventureworks.person.businessentity.BusinessentityId;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** Type for the composite primary key of table `humanresources.employeedepartmenthistory` */
 case class EmployeedepartmenthistoryId(
@@ -24,24 +24,29 @@ case class EmployeedepartmenthistoryId(
   departmentid: DepartmentId,
   shiftid: ShiftId
 )
+
 object EmployeedepartmenthistoryId {
-  implicit lazy val reads: Reads[EmployeedepartmenthistoryId] = Reads[EmployeedepartmenthistoryId](json => JsResult.fromTry(
-      Try(
-        EmployeedepartmenthistoryId(
-          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
-          startdate = json.\("startdate").as(TypoLocalDate.reads),
-          departmentid = json.\("departmentid").as(DepartmentId.reads),
-          shiftid = json.\("shiftid").as(ShiftId.reads)
+  implicit lazy val reads: Reads[EmployeedepartmenthistoryId] = {
+    Reads[EmployeedepartmenthistoryId](json => JsResult.fromTry(
+        Try(
+          EmployeedepartmenthistoryId(
+            businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+            startdate = json.\("startdate").as(TypoLocalDate.reads),
+            departmentid = json.\("departmentid").as(DepartmentId.reads),
+            shiftid = json.\("shiftid").as(ShiftId.reads)
+          )
         )
-      )
-    ),
-  )
-  implicit lazy val writes: OWrites[EmployeedepartmenthistoryId] = OWrites[EmployeedepartmenthistoryId](o =>
-    new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
-      "startdate" -> TypoLocalDate.writes.writes(o.startdate),
-      "departmentid" -> DepartmentId.writes.writes(o.departmentid),
-      "shiftid" -> ShiftId.writes.writes(o.shiftid)
-    ))
-  )
+      ),
+    )
+  }
+  implicit lazy val writes: OWrites[EmployeedepartmenthistoryId] = {
+    OWrites[EmployeedepartmenthistoryId](o =>
+      new JsObject(ListMap[String, JsValue](
+        "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+        "startdate" -> TypoLocalDate.writes.writes(o.startdate),
+        "departmentid" -> DepartmentId.writes.writes(o.departmentid),
+        "shiftid" -> ShiftId.writes.writes(o.shiftid)
+      ))
+    )
+  }
 }

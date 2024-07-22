@@ -5,6 +5,7 @@ import bleep.logging.Logger
 import typo.*
 import typo.internal.FileSync.SoftWrite
 import typo.internal.analysis.ParsedName
+import typo.internal.codegen.{LangScala, LangJava}
 import typo.internal.{DebugJson, Lazy, generate}
 
 // this runs automatically at build time to instantly see results.
@@ -136,12 +137,14 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
          |""".stripMargin
 
     targets.foreach { target =>
-      val (dbLib, jsonLib) =
+      val (language, dbLib, jsonLib, dslEnabled) =
         if (target.project.value.contains("doobie"))
-          (DbLibName.Doobie, JsonLibName.Circe)
+          (LangScala, Some(DbLibName.Doobie), Some(JsonLibName.Circe), true)
         else if (target.project.value.contains("zio-jdbc"))
-          (DbLibName.ZioJdbc, JsonLibName.ZioJson)
-        else (DbLibName.Anorm, JsonLibName.PlayJson)
+          (LangScala, Some(DbLibName.ZioJdbc), Some(JsonLibName.ZioJson), true)
+        else if (target.project.value.contains("java"))
+          (LangJava, None, None, false)
+        else (LangScala, Some(DbLibName.Anorm), Some(JsonLibName.PlayJson), true)
       val domains = Nil
 
       val metaDb = MetaDb(relations = all.map(t => t.name -> Lazy(t)).toMap, enums = enums, domains = domains)
@@ -150,17 +153,18 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         generate(
           Options(
             pkg = "testdb.hardcoded",
-            Some(dbLib),
-            List(jsonLib),
+            dbLib,
+            lang = language,
+            jsonLib.toList,
+            silentBanner = true,
+            fileHeader = header,
             naming = pkg =>
               new Naming(pkg) {
                 override def enumValue(name: String): sc.Ident = sc.Ident("_" + name.toLowerCase)
               },
-            fileHeader = header,
-            enableDsl = true,
-            enableTestInserts = Selector.All,
             enableFieldValue = Selector.All,
-            silentBanner = true
+            enableTestInserts = Selector.All,
+            enableDsl = dslEnabled
           ),
           metaDb,
           ProjectGraph(name = "", target.sources, None, Selector.All, scripts = Nil, Nil)

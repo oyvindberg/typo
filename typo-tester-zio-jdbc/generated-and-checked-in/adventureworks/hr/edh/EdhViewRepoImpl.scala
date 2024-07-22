@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.hr.edh
+package adventureworks.hr.edh;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class EdhViewRepoImpl extends EdhViewRepo {
-  override def select: SelectBuilder[EdhViewFields, EdhViewRow] = {
-    SelectBuilderSql("hr.edh", EdhViewFields.structure, EdhViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, EdhViewRow] = {
-    sql"""select "id", "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from hr.edh""".query(using EdhViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[EdhViewFields, EdhViewRow] = SelectBuilderSql("hr.edh", EdhViewFields.structure, EdhViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, EdhViewRow] = sql"""select "id", "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from hr.edh""".query(using EdhViewRow.jdbcDecoder).selectStream()
 }

@@ -3,88 +3,112 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productmodelproductdescriptionculture
+package adventureworks.production.productmodelproductdescriptionculture;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.production.culture.CultureId
-import adventureworks.production.productdescription.ProductdescriptionId
-import adventureworks.production.productmodel.ProductmodelId
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.production.culture.CultureId;
+import adventureworks.production.productdescription.ProductdescriptionId;
+import adventureworks.production.productmodel.ProductmodelId;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: production.productmodelproductdescriptionculture
-    Cross-reference table mapping product descriptions and the language the description is written in.
-    Composite primary key: productmodelid, productdescriptionid, cultureid */
+  * Cross-reference table mapping product descriptions and the language the description is written in.
+  * Composite primary key: productmodelid, productdescriptionid, cultureid
+  */
 case class ProductmodelproductdescriptioncultureRow(
   /** Primary key. Foreign key to ProductModel.ProductModelID.
-      Points to [[adventureworks.production.productmodel.ProductmodelRow.productmodelid]] */
+    * Points to [[adventureworks.production.productmodel.ProductmodelRow.productmodelid]]
+    */
   productmodelid: ProductmodelId,
   /** Primary key. Foreign key to ProductDescription.ProductDescriptionID.
-      Points to [[adventureworks.production.productdescription.ProductdescriptionRow.productdescriptionid]] */
+    * Points to [[adventureworks.production.productdescription.ProductdescriptionRow.productdescriptionid]]
+    */
   productdescriptionid: ProductdescriptionId,
   /** Culture identification number. Foreign key to Culture.CultureID.
-      Points to [[adventureworks.production.culture.CultureRow.cultureid]] */
+    * Points to [[adventureworks.production.culture.CultureRow.cultureid]]
+    */
   cultureid: CultureId,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val compositeId: ProductmodelproductdescriptioncultureId = ProductmodelproductdescriptioncultureId(productmodelid, productdescriptionid, cultureid)
-   val id = compositeId
-   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductmodelproductdescriptioncultureRowUnsaved =
-     ProductmodelproductdescriptioncultureRowUnsaved(productmodelid, productdescriptionid, cultureid, modifieddate)
- }
+) {
+  def compositeId: ProductmodelproductdescriptioncultureId = new ProductmodelproductdescriptioncultureId(productmodelid, productdescriptionid, cultureid)
+  def id: ProductmodelproductdescriptioncultureId = compositeId
+  def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): ProductmodelproductdescriptioncultureRowUnsaved = {
+    new ProductmodelproductdescriptioncultureRowUnsaved(
+      productmodelid,
+      productdescriptionid,
+      cultureid,
+      modifieddate
+    )
+  }
+}
 
 object ProductmodelproductdescriptioncultureRow {
-  def apply(compositeId: ProductmodelproductdescriptioncultureId, modifieddate: TypoLocalDateTime) =
-    new ProductmodelproductdescriptioncultureRow(compositeId.productmodelid, compositeId.productdescriptionid, compositeId.cultureid, modifieddate)
+  def apply(compositeId: ProductmodelproductdescriptioncultureId, modifieddate: TypoLocalDateTime): ProductmodelproductdescriptioncultureRow = {
+    new ProductmodelproductdescriptioncultureRow(
+      compositeId.productmodelid,
+      compositeId.productdescriptionid,
+      compositeId.cultureid,
+      modifieddate
+    )
+  }
   implicit lazy val decoder: Decoder[ProductmodelproductdescriptioncultureRow] = Decoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(ProductmodelproductdescriptioncultureRow.apply)(ProductmodelId.decoder, ProductdescriptionId.decoder, CultureId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ProductmodelproductdescriptioncultureRow] = Encoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))(ProductmodelId.encoder, ProductdescriptionId.encoder, CultureId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ProductmodelproductdescriptioncultureRow] = new Read[ProductmodelproductdescriptioncultureRow](
-    gets = List(
-      (ProductmodelId.get, Nullability.NoNulls),
-      (ProductdescriptionId.get, Nullability.NoNulls),
-      (CultureId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ProductmodelproductdescriptioncultureRow(
-      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
-      productdescriptionid = ProductdescriptionId.get.unsafeGetNonNullable(rs, i + 1),
-      cultureid = CultureId.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[ProductmodelproductdescriptioncultureRow] = {
+    new Read[ProductmodelproductdescriptioncultureRow](
+      gets = List(
+        (ProductmodelId.get, Nullability.NoNulls),
+        (ProductdescriptionId.get, Nullability.NoNulls),
+        (CultureId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => ProductmodelproductdescriptioncultureRow(
+        productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
+        productdescriptionid = ProductdescriptionId.get.unsafeGetNonNullable(rs, i + 1),
+        cultureid = CultureId.get.unsafeGetNonNullable(rs, i + 2),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+      )
     )
-  )
-  implicit lazy val text: Text[ProductmodelproductdescriptioncultureRow] = Text.instance[ProductmodelproductdescriptioncultureRow]{ (row, sb) =>
-    ProductmodelId.text.unsafeEncode(row.productmodelid, sb)
-    sb.append(Text.DELIMETER)
-    ProductdescriptionId.text.unsafeEncode(row.productdescriptionid, sb)
-    sb.append(Text.DELIMETER)
-    CultureId.text.unsafeEncode(row.cultureid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[ProductmodelproductdescriptioncultureRow] = new Write[ProductmodelproductdescriptioncultureRow](
-    puts = List((ProductmodelId.put, Nullability.NoNulls),
-                (ProductdescriptionId.put, Nullability.NoNulls),
-                (CultureId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ProductmodelId.put.unsafeSetNonNullable(rs, i + 0, a.productmodelid)
-                  ProductdescriptionId.put.unsafeSetNonNullable(rs, i + 1, a.productdescriptionid)
-                  CultureId.put.unsafeSetNonNullable(rs, i + 2, a.cultureid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ProductmodelId.put.unsafeUpdateNonNullable(ps, i + 0, a.productmodelid)
-                     ProductdescriptionId.put.unsafeUpdateNonNullable(ps, i + 1, a.productdescriptionid)
-                     CultureId.put.unsafeUpdateNonNullable(ps, i + 2, a.cultureid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[ProductmodelproductdescriptioncultureRow] = {
+    Text.instance[ProductmodelproductdescriptioncultureRow]{ (row, sb) =>
+      ProductmodelId.text.unsafeEncode(row.productmodelid, sb)
+      sb.append(Text.DELIMETER)
+      ProductdescriptionId.text.unsafeEncode(row.productdescriptionid, sb)
+      sb.append(Text.DELIMETER)
+      CultureId.text.unsafeEncode(row.cultureid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[ProductmodelproductdescriptioncultureRow] = {
+    new Write[ProductmodelproductdescriptioncultureRow](
+      puts = List((ProductmodelId.put, Nullability.NoNulls),
+                  (ProductdescriptionId.put, Nullability.NoNulls),
+                  (CultureId.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    ProductmodelId.put.unsafeSetNonNullable(rs, i + 0, a.productmodelid)
+                    ProductdescriptionId.put.unsafeSetNonNullable(rs, i + 1, a.productdescriptionid)
+                    CultureId.put.unsafeSetNonNullable(rs, i + 2, a.cultureid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       ProductmodelId.put.unsafeUpdateNonNullable(ps, i + 0, a.productmodelid)
+                       ProductdescriptionId.put.unsafeUpdateNonNullable(ps, i + 1, a.productdescriptionid)
+                       CultureId.put.unsafeUpdateNonNullable(ps, i + 2, a.cultureid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
+                     }
+    )
+  
+  }
 }

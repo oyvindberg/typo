@@ -3,62 +3,57 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.currency
+package adventureworks.sales.currency;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** This class corresponds to a row in table `sales.currency` which has not been persisted yet */
-case class CurrencyRowUnsaved(
-  /** The ISO code for the Currency. */
-  currencycode: CurrencyId,
-  /** Currency name. */
-  name: Name,
-  /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-) {
-  def toRow(modifieddateDefault: => TypoLocalDateTime): CurrencyRow =
-    CurrencyRow(
-      currencycode = currencycode,
-      name = name,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
-    )
+case class CurrencyRowUnsaved(/** The ISO code for the Currency. */
+                              currencycode: CurrencyId, /** Currency name. */
+                              name: Name, /** Default: now() */
+                              modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()) {
+  def toRow(modifieddateDefault: => TypoLocalDateTime): CurrencyRow = new CurrencyRow(currencycode = currencycode, name = name, modifieddate = modifieddate.getOrElse(modifieddateDefault))
 }
+
 object CurrencyRowUnsaved {
-  implicit lazy val reads: Reads[CurrencyRowUnsaved] = Reads[CurrencyRowUnsaved](json => JsResult.fromTry(
-      Try(
-        CurrencyRowUnsaved(
-          currencycode = json.\("currencycode").as(CurrencyId.reads),
-          name = json.\("name").as(Name.reads),
-          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+  implicit lazy val reads: Reads[CurrencyRowUnsaved] = {
+    Reads[CurrencyRowUnsaved](json => JsResult.fromTry(
+        Try(
+          CurrencyRowUnsaved(
+            currencycode = json.\("currencycode").as(CurrencyId.reads),
+            name = json.\("name").as(Name.reads),
+            modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+          )
         )
-      )
-    ),
-  )
-  implicit lazy val text: Text[CurrencyRowUnsaved] = Text.instance[CurrencyRowUnsaved]{ (row, sb) =>
-    CurrencyId.text.unsafeEncode(row.currencycode, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+      ),
+    )
   }
-  implicit lazy val writes: OWrites[CurrencyRowUnsaved] = OWrites[CurrencyRowUnsaved](o =>
-    new JsObject(ListMap[String, JsValue](
-      "currencycode" -> CurrencyId.writes.writes(o.currencycode),
-      "name" -> Name.writes.writes(o.name),
-      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
-    ))
-  )
+  implicit lazy val text: Text[CurrencyRowUnsaved] = {
+    Text.instance[CurrencyRowUnsaved]{ (row, sb) =>
+      CurrencyId.text.unsafeEncode(row.currencycode, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[CurrencyRowUnsaved] = {
+    OWrites[CurrencyRowUnsaved](o =>
+      new JsObject(ListMap[String, JsValue](
+        "currencycode" -> CurrencyId.writes.writes(o.currencycode),
+        "name" -> Name.writes.writes(o.name),
+        "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
+      ))
+    )
+  }
 }

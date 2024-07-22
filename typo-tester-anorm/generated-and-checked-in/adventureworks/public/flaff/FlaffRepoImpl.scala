@@ -3,31 +3,27 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.flaff
+package adventureworks.public.flaff;
 
-import adventureworks.public.ShortText
-import adventureworks.streamingInsert
-import anorm.BatchSql
-import anorm.NamedParameter
-import anorm.ParameterMetaData
-import anorm.ParameterValue
-import anorm.SqlStringInterpolation
-import anorm.ToStatement
-import java.sql.Connection
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import typo.dsl.UpdateBuilder
+import adventureworks.public.ShortText;
+import adventureworks.streamingInsert;
+import anorm.BatchSql;
+import anorm.NamedParameter;
+import anorm.ParameterMetaData;
+import anorm.ParameterValue;
+import anorm.SqlStringInterpolation;
+import anorm.ToStatement;
+import java.sql.Connection;
+import scala.annotation.nowarn;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import typo.dsl.UpdateBuilder;
 
 class FlaffRepoImpl extends FlaffRepo {
-  override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
-    DeleteBuilder("public.flaff", FlaffFields.structure)
-  }
-  override def deleteById(compositeId: FlaffId)(implicit c: Connection): Boolean = {
-    SQL"""delete from public.flaff where "code" = ${ParameterValue(compositeId.code, null, ShortText.toStatement)} AND "another_code" = ${ParameterValue(compositeId.anotherCode, null, ToStatement.stringToStatement)} AND "some_number" = ${ParameterValue(compositeId.someNumber, null, ToStatement.intToStatement)} AND "specifier" = ${ParameterValue(compositeId.specifier, null, ShortText.toStatement)}""".executeUpdate() > 0
-  }
-  override def deleteByIds(compositeIds: Array[FlaffId])(implicit c: Connection): Int = {
+  def delete: DeleteBuilder[FlaffFields, FlaffRow] = DeleteBuilder("public.flaff", FlaffFields.structure)
+  def deleteById(compositeId: FlaffId)(implicit c: Connection): Boolean = SQL"""delete from public.flaff where "code" = ${ParameterValue(compositeId.code, null, ShortText.toStatement)} AND "another_code" = ${ParameterValue(compositeId.anotherCode, null, ToStatement.stringToStatement)} AND "some_number" = ${ParameterValue(compositeId.someNumber, null, ToStatement.intToStatement)} AND "specifier" = ${ParameterValue(compositeId.specifier, null, ShortText.toStatement)}""".executeUpdate() > 0
+  def deleteByIds(compositeIds: Array[FlaffId])(implicit c: Connection): Int = {
     val code = compositeIds.map(_.code)
     val anotherCode = compositeIds.map(_.anotherCode)
     val someNumber = compositeIds.map(_.someNumber)
@@ -37,77 +33,71 @@ class FlaffRepoImpl extends FlaffRepo {
           where ("code", "another_code", "some_number", "specifier")
           in (select unnest(${ParameterValue(code, null, ShortText.arrayToStatement)}), unnest(${ParameterValue(anotherCode, null, ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData))}), unnest(${ParameterValue(someNumber, null, adventureworks.IntArrayToStatement)}), unnest(${ParameterValue(specifier, null, ShortText.arrayToStatement)}))
        """.executeUpdate()
-    
+  
   }
-  override def insert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow = {
+  def insert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow = {
     SQL"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")
-          values (${ParameterValue(unsaved.code, null, ShortText.toStatement)}::text, ${ParameterValue(unsaved.anotherCode, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.someNumber, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.specifier, null, ShortText.toStatement)}::text, ${ParameterValue(unsaved.parentspecifier, null, ToStatement.optionToStatement(ShortText.toStatement, ShortText.parameterMetadata))}::text)
-          returning "code", "another_code", "some_number", "specifier", "parentspecifier"
-       """
+           values (${ParameterValue(unsaved.code, null, ShortText.toStatement)}::text, ${ParameterValue(unsaved.anotherCode, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.someNumber, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.specifier, null, ShortText.toStatement)}::text, ${ParameterValue(unsaved.parentspecifier, null, ToStatement.optionToStatement(ShortText.toStatement, ShortText.parameterMetadata))}::text)
+           returning "code", "another_code", "some_number", "specifier", "parentspecifier"
+        """
       .executeInsert(FlaffRow.rowParser(1).single)
-    
+  
   }
-  override def insertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier") FROM STDIN""", batchSize, unsaved)(FlaffRow.text, c)
-  }
-  override def select: SelectBuilder[FlaffFields, FlaffRow] = {
-    SelectBuilderSql("public.flaff", FlaffFields.structure, FlaffRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[FlaffRow] = {
+  def insertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int = 10000)(implicit c: Connection): Long = streamingInsert(s"""COPY public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier") FROM STDIN""", batchSize, unsaved)(FlaffRow.text, c)
+  def select: SelectBuilder[FlaffFields, FlaffRow] = SelectBuilderSql("public.flaff", FlaffFields.structure, FlaffRow.rowParser)
+  def selectAll(implicit c: Connection): List[FlaffRow] = {
     SQL"""select "code", "another_code", "some_number", "specifier", "parentspecifier"
           from public.flaff
        """.as(FlaffRow.rowParser(1).*)
   }
-  override def selectById(compositeId: FlaffId)(implicit c: Connection): Option[FlaffRow] = {
+  def selectById(compositeId: FlaffId)(implicit c: Connection): Option[FlaffRow] = {
     SQL"""select "code", "another_code", "some_number", "specifier", "parentspecifier"
           from public.flaff
           where "code" = ${ParameterValue(compositeId.code, null, ShortText.toStatement)} AND "another_code" = ${ParameterValue(compositeId.anotherCode, null, ToStatement.stringToStatement)} AND "some_number" = ${ParameterValue(compositeId.someNumber, null, ToStatement.intToStatement)} AND "specifier" = ${ParameterValue(compositeId.specifier, null, ShortText.toStatement)}
        """.as(FlaffRow.rowParser(1).singleOpt)
   }
-  override def selectByIds(compositeIds: Array[FlaffId])(implicit c: Connection): List[FlaffRow] = {
+  def selectByIds(compositeIds: Array[FlaffId])(implicit c: Connection): List[FlaffRow] = {
     val code = compositeIds.map(_.code)
     val anotherCode = compositeIds.map(_.anotherCode)
     val someNumber = compositeIds.map(_.someNumber)
     val specifier = compositeIds.map(_.specifier)
     SQL"""select "code", "another_code", "some_number", "specifier", "parentspecifier"
           from public.flaff
-          where ("code", "another_code", "some_number", "specifier") 
+          where ("code", "another_code", "some_number", "specifier")
           in (select unnest(${ParameterValue(code, null, ShortText.arrayToStatement)}), unnest(${ParameterValue(anotherCode, null, ToStatement.arrayToParameter(ParameterMetaData.StringParameterMetaData))}), unnest(${ParameterValue(someNumber, null, adventureworks.IntArrayToStatement)}), unnest(${ParameterValue(specifier, null, ShortText.arrayToStatement)}))
        """.as(FlaffRow.rowParser(1).*)
-    
+  
   }
-  override def selectByIdsTracked(compositeIds: Array[FlaffId])(implicit c: Connection): Map[FlaffId, FlaffRow] = {
+  def selectByIdsTracked(compositeIds: Array[FlaffId])(implicit c: Connection): Map[FlaffId, FlaffRow] = {
     val byId = selectByIds(compositeIds).view.map(x => (x.compositeId, x)).toMap
     compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
-  override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
-    UpdateBuilder("public.flaff", FlaffFields.structure, FlaffRow.rowParser)
-  }
-  override def update(row: FlaffRow)(implicit c: Connection): Boolean = {
+  def update: UpdateBuilder[FlaffFields, FlaffRow] = UpdateBuilder("public.flaff", FlaffFields.structure, FlaffRow.rowParser)
+  def update(row: FlaffRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
     SQL"""update public.flaff
-          set "parentspecifier" = ${ParameterValue(row.parentspecifier, null, ToStatement.optionToStatement(ShortText.toStatement, ShortText.parameterMetadata))}::text
-          where "code" = ${ParameterValue(compositeId.code, null, ShortText.toStatement)} AND "another_code" = ${ParameterValue(compositeId.anotherCode, null, ToStatement.stringToStatement)} AND "some_number" = ${ParameterValue(compositeId.someNumber, null, ToStatement.intToStatement)} AND "specifier" = ${ParameterValue(compositeId.specifier, null, ShortText.toStatement)}
-       """.executeUpdate() > 0
+                          set "parentspecifier" = ${ParameterValue(row.parentspecifier, null, ToStatement.optionToStatement(ShortText.toStatement, ShortText.parameterMetadata))}::text
+                          where "code" = ${ParameterValue(compositeId.code, null, ShortText.toStatement)} AND "another_code" = ${ParameterValue(compositeId.anotherCode, null, ToStatement.stringToStatement)} AND "some_number" = ${ParameterValue(compositeId.someNumber, null, ToStatement.intToStatement)} AND "specifier" = ${ParameterValue(compositeId.specifier, null, ShortText.toStatement)}
+                       """.executeUpdate() > 0
   }
-  override def upsert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow = {
+  def upsert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow = {
     SQL"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")
-          values (
-            ${ParameterValue(unsaved.code, null, ShortText.toStatement)}::text,
-            ${ParameterValue(unsaved.anotherCode, null, ToStatement.stringToStatement)},
-            ${ParameterValue(unsaved.someNumber, null, ToStatement.intToStatement)}::int4,
-            ${ParameterValue(unsaved.specifier, null, ShortText.toStatement)}::text,
-            ${ParameterValue(unsaved.parentspecifier, null, ToStatement.optionToStatement(ShortText.toStatement, ShortText.parameterMetadata))}::text
-          )
-          on conflict ("code", "another_code", "some_number", "specifier")
-          do update set
-            "parentspecifier" = EXCLUDED."parentspecifier"
-          returning "code", "another_code", "some_number", "specifier", "parentspecifier"
-       """
+           values (
+             ${ParameterValue(unsaved.code, null, ShortText.toStatement)}::text,
+             ${ParameterValue(unsaved.anotherCode, null, ToStatement.stringToStatement)},
+             ${ParameterValue(unsaved.someNumber, null, ToStatement.intToStatement)}::int4,
+             ${ParameterValue(unsaved.specifier, null, ShortText.toStatement)}::text,
+             ${ParameterValue(unsaved.parentspecifier, null, ToStatement.optionToStatement(ShortText.toStatement, ShortText.parameterMetadata))}::text
+           )
+           on conflict ("code", "another_code", "some_number", "specifier")
+           do update set
+             "parentspecifier" = EXCLUDED."parentspecifier"
+           returning "code", "another_code", "some_number", "specifier", "parentspecifier"
+        """
       .executeInsert(FlaffRow.rowParser(1).single)
-    
+  
   }
-  override def upsertBatch(unsaved: Iterable[FlaffRow])(implicit c: Connection): List[FlaffRow] = {
+  def upsertBatch(unsaved: Iterable[FlaffRow])(implicit c: Connection): List[FlaffRow] = {
     def toNamedParameter(row: FlaffRow): List[NamedParameter] = List(
       NamedParameter("code", ParameterValue(row.code, null, ShortText.toStatement)),
       NamedParameter("another_code", ParameterValue(row.anotherCode, null, ToStatement.stringToStatement)),
@@ -133,8 +123,8 @@ class FlaffRepoImpl extends FlaffRepo {
         ).executeReturning(FlaffRow.rowParser(1).*)
     }
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[FlaffRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     SQL"create temporary table flaff_TEMP (like public.flaff) on commit drop".execute(): @nowarn
     streamingInsert(s"""copy flaff_TEMP("code", "another_code", "some_number", "specifier", "parentspecifier") from stdin""", batchSize, unsaved)(FlaffRow.text, c): @nowarn
     SQL"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")

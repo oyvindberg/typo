@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.unitmeasure
+package adventureworks.production.unitmeasure;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait UnitmeasureRepo {
   def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow]
@@ -18,7 +18,7 @@ trait UnitmeasureRepo {
   def insert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow]
   def insert(unsaved: UnitmeasureRowUnsaved): ConnectionIO[UnitmeasureRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow]
   def selectAll: Stream[ConnectionIO, UnitmeasureRow]
@@ -29,6 +29,6 @@ trait UnitmeasureRepo {
   def update(row: UnitmeasureRow): ConnectionIO[Boolean]
   def upsert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow]
   def upsertBatch(unsaved: List[UnitmeasureRow]): Stream[ConnectionIO, UnitmeasureRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, UnitmeasureRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productsubcategory
+package adventureworks.production.productsubcategory;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait ProductsubcategoryRepo {
   def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow]
@@ -17,7 +17,7 @@ trait ProductsubcategoryRepo {
   def insert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow
   def insert(unsaved: ProductsubcategoryRowUnsaved)(implicit c: Connection): ProductsubcategoryRow
   def insertStreaming(unsaved: Iterator[ProductsubcategoryRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[ProductsubcategoryRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow]
   def selectAll(implicit c: Connection): List[ProductsubcategoryRow]
@@ -28,6 +28,6 @@ trait ProductsubcategoryRepo {
   def update(row: ProductsubcategoryRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow
   def upsertBatch(unsaved: Iterable[ProductsubcategoryRow])(implicit c: Connection): List[ProductsubcategoryRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[ProductsubcategoryRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

@@ -3,17 +3,17 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.update_person
+package adventureworks.update_person;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import zio.ZIO
-import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
+import adventureworks.customtypes.TypoLocalDateTime;
+import zio.ZIO;
+import zio.jdbc.SqlFragment.Segment;
+import zio.jdbc.SqlFragment.Setter;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
 
 class UpdatePersonSqlRepoImpl extends UpdatePersonSqlRepo {
-  override def apply(suffix: String, cutoff: Option[TypoLocalDateTime]): ZIO[ZConnection, Throwable, Long] = {
+  def apply(suffix: String, cutoff: Option[TypoLocalDateTime]): ZIO[ZConnection, Throwable, Long] = {
     sql"""update person.person
           set firstname = firstname || '-' || ${Segment.paramSegment(suffix)(Setter.stringSetter)}
           where modifieddate < ${Segment.paramSegment(cutoff)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp""".update

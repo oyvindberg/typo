@@ -3,25 +3,25 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.tr
+package adventureworks.sa.tr;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.stateprovince.StateprovinceId
-import adventureworks.public.Name
-import adventureworks.sales.salestaxrate.SalestaxrateId
-import anorm.Column
-import anorm.RowParser
-import anorm.Success
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.stateprovince.StateprovinceId;
+import adventureworks.public.Name;
+import adventureworks.sales.salestaxrate.SalestaxrateId;
+import anorm.Column;
+import anorm.RowParser;
+import anorm.Success;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import play.api.libs.json.Writes;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** View: sa.tr */
 case class TrViewRow(
@@ -44,45 +44,51 @@ case class TrViewRow(
 )
 
 object TrViewRow {
-  implicit lazy val reads: Reads[TrViewRow] = Reads[TrViewRow](json => JsResult.fromTry(
-      Try(
-        TrViewRow(
-          id = json.\("id").as(SalestaxrateId.reads),
-          salestaxrateid = json.\("salestaxrateid").as(SalestaxrateId.reads),
-          stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
-          taxtype = json.\("taxtype").as(TypoShort.reads),
-          taxrate = json.\("taxrate").as(Reads.bigDecReads),
-          name = json.\("name").as(Name.reads),
-          rowguid = json.\("rowguid").as(TypoUUID.reads),
-          modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+  implicit lazy val reads: Reads[TrViewRow] = {
+    Reads[TrViewRow](json => JsResult.fromTry(
+        Try(
+          TrViewRow(
+            id = json.\("id").as(SalestaxrateId.reads),
+            salestaxrateid = json.\("salestaxrateid").as(SalestaxrateId.reads),
+            stateprovinceid = json.\("stateprovinceid").as(StateprovinceId.reads),
+            taxtype = json.\("taxtype").as(TypoShort.reads),
+            taxrate = json.\("taxrate").as(Reads.bigDecReads),
+            name = json.\("name").as(Name.reads),
+            rowguid = json.\("rowguid").as(TypoUUID.reads),
+            modifieddate = json.\("modifieddate").as(TypoLocalDateTime.reads)
+          )
         )
-      )
-    ),
-  )
-  def rowParser(idx: Int): RowParser[TrViewRow] = RowParser[TrViewRow] { row =>
-    Success(
-      TrViewRow(
-        id = row(idx + 0)(SalestaxrateId.column),
-        salestaxrateid = row(idx + 1)(SalestaxrateId.column),
-        stateprovinceid = row(idx + 2)(StateprovinceId.column),
-        taxtype = row(idx + 3)(TypoShort.column),
-        taxrate = row(idx + 4)(Column.columnToScalaBigDecimal),
-        name = row(idx + 5)(Name.column),
-        rowguid = row(idx + 6)(TypoUUID.column),
-        modifieddate = row(idx + 7)(TypoLocalDateTime.column)
-      )
+      ),
     )
   }
-  implicit lazy val writes: OWrites[TrViewRow] = OWrites[TrViewRow](o =>
-    new JsObject(ListMap[String, JsValue](
-      "id" -> SalestaxrateId.writes.writes(o.id),
-      "salestaxrateid" -> SalestaxrateId.writes.writes(o.salestaxrateid),
-      "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
-      "taxtype" -> TypoShort.writes.writes(o.taxtype),
-      "taxrate" -> Writes.BigDecimalWrites.writes(o.taxrate),
-      "name" -> Name.writes.writes(o.name),
-      "rowguid" -> TypoUUID.writes.writes(o.rowguid),
-      "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
-    ))
-  )
+  def rowParser(idx: Int): RowParser[TrViewRow] = {
+    RowParser[TrViewRow] { row =>
+      Success(
+        TrViewRow(
+          id = row(idx + 0)(SalestaxrateId.column),
+          salestaxrateid = row(idx + 1)(SalestaxrateId.column),
+          stateprovinceid = row(idx + 2)(StateprovinceId.column),
+          taxtype = row(idx + 3)(TypoShort.column),
+          taxrate = row(idx + 4)(Column.columnToScalaBigDecimal),
+          name = row(idx + 5)(Name.column),
+          rowguid = row(idx + 6)(TypoUUID.column),
+          modifieddate = row(idx + 7)(TypoLocalDateTime.column)
+        )
+      )
+    }
+  }
+  implicit lazy val writes: OWrites[TrViewRow] = {
+    OWrites[TrViewRow](o =>
+      new JsObject(ListMap[String, JsValue](
+        "id" -> SalestaxrateId.writes.writes(o.id),
+        "salestaxrateid" -> SalestaxrateId.writes.writes(o.salestaxrateid),
+        "stateprovinceid" -> StateprovinceId.writes.writes(o.stateprovinceid),
+        "taxtype" -> TypoShort.writes.writes(o.taxtype),
+        "taxrate" -> Writes.BigDecimalWrites.writes(o.taxrate),
+        "name" -> Name.writes.writes(o.name),
+        "rowguid" -> TypoUUID.writes.writes(o.rowguid),
+        "modifieddate" -> TypoLocalDateTime.writes.writes(o.modifieddate)
+      ))
+    )
+  }
 }

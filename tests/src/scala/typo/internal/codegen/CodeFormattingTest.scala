@@ -8,7 +8,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class CodeFormattingTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("interpolation keeps indentation of interpolation point") {
     val actual = code"""|a${List("b1", "b2").mkString("\n")}
-                        |a""".stripMargin.render
+                        |a""".stripMargin.render(LangScala)
 
     val expected = """|ab1
                       | b2
@@ -20,7 +20,7 @@ class CodeFormattingTest extends AnyFunSuite with TypeCheckedTripleEquals {
   test("work with mkCode") {
     val foo = List("b1", "b2").map(x => code"import $x").mkCode("\n")
     val actual = code"""|a $foo
-                        |a""".stripMargin.render
+                        |a""".stripMargin.render(LangScala)
 
     val expected = """|a import b1
                       |  import b2
@@ -34,7 +34,7 @@ class CodeFormattingTest extends AnyFunSuite with TypeCheckedTripleEquals {
     val cs = List("c1", "c2").map(x => code"import $x").mkCode("\n\n")
     val actual = code"""|$bs
 
-                        |$cs""".stripMargin.render
+                        |$cs""".stripMargin.render(LangScala)
 
     val expected = """|import b1
                       |
@@ -48,7 +48,7 @@ class CodeFormattingTest extends AnyFunSuite with TypeCheckedTripleEquals {
   }
 
   test("multiple on same line") {
-    val actual = code"""${"a"}${"b"}${"___\n___"}${"a"}""".stripMargin.render
+    val actual = code"""${"a"}${"b"}${"___\n___"}${"a"}""".stripMargin.render(LangScala)
 
     val expected = s"""|ab___
                        |  ___a""".stripMargin

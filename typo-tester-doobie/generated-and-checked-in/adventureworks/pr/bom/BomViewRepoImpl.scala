@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.bom
+package adventureworks.pr.bom;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class BomViewRepoImpl extends BomViewRepo {
-  override def select: SelectBuilder[BomViewFields, BomViewRow] = {
-    SelectBuilderSql("pr.bom", BomViewFields.structure, BomViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, BomViewRow] = {
-    sql"""select "id", "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from pr.bom""".query(using BomViewRow.read).stream
-  }
+  def select: SelectBuilder[BomViewFields, BomViewRow] = SelectBuilderSql("pr.bom", BomViewFields.structure, BomViewRow.read)
+  def selectAll: Stream[ConnectionIO, BomViewRow] = sql"""select "id", "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from pr.bom""".query(using BomViewRow.read).stream
 }

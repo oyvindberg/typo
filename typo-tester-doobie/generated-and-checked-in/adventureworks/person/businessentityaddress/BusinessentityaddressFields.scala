@@ -3,29 +3,29 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.businessentityaddress
+package adventureworks.person.businessentityaddress;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.address.AddressFields
-import adventureworks.person.address.AddressId
-import adventureworks.person.address.AddressRow
-import adventureworks.person.addresstype.AddresstypeFields
-import adventureworks.person.addresstype.AddresstypeId
-import adventureworks.person.addresstype.AddresstypeRow
-import adventureworks.person.businessentity.BusinessentityFields
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.person.businessentity.BusinessentityRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Const.As.as
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.address.AddressFields;
+import adventureworks.person.address.AddressId;
+import adventureworks.person.address.AddressRow;
+import adventureworks.person.addresstype.AddresstypeFields;
+import adventureworks.person.addresstype.AddresstypeId;
+import adventureworks.person.addresstype.AddresstypeRow;
+import adventureworks.person.businessentity.BusinessentityFields;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.person.businessentity.BusinessentityRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait BusinessentityaddressFields {
   def businessentityid: IdField[BusinessentityId, BusinessentityaddressRow]

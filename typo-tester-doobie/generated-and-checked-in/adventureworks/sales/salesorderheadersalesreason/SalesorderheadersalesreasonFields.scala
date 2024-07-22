@@ -3,25 +3,25 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesorderheadersalesreason
+package adventureworks.sales.salesorderheadersalesreason;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.sales.salesorderheader.SalesorderheaderFields
-import adventureworks.sales.salesorderheader.SalesorderheaderId
-import adventureworks.sales.salesorderheader.SalesorderheaderRow
-import adventureworks.sales.salesreason.SalesreasonFields
-import adventureworks.sales.salesreason.SalesreasonId
-import adventureworks.sales.salesreason.SalesreasonRow
-import typo.dsl.ForeignKey
-import typo.dsl.Path
-import typo.dsl.SqlExpr
-import typo.dsl.SqlExpr.CompositeIn
-import typo.dsl.SqlExpr.CompositeIn.TuplePart
-import typo.dsl.SqlExpr.Const.As.as
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.SqlExpr.IdField
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.sales.salesorderheader.SalesorderheaderFields;
+import adventureworks.sales.salesorderheader.SalesorderheaderId;
+import adventureworks.sales.salesorderheader.SalesorderheaderRow;
+import adventureworks.sales.salesreason.SalesreasonFields;
+import adventureworks.sales.salesreason.SalesreasonId;
+import adventureworks.sales.salesreason.SalesreasonRow;
+import typo.dsl.ForeignKey;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr;
+import typo.dsl.SqlExpr.CompositeIn;
+import typo.dsl.SqlExpr.CompositeIn.TuplePart;
+import typo.dsl.SqlExpr.Const.As.as;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.SqlExpr.IdField;
+import typo.dsl.Structure.Relation;
 
 trait SalesorderheadersalesreasonFields {
   def salesorderid: IdField[SalesorderheaderId, SalesorderheadersalesreasonRow]

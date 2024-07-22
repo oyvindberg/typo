@@ -3,154 +3,142 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.customer
+package adventureworks.sales.customer;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.sales.salesterritory.SalesterritoryId
-import adventureworks.streamingInsert
-import anorm.BatchSql
-import anorm.NamedParameter
-import anorm.ParameterValue
-import anorm.RowParser
-import anorm.SQL
-import anorm.SimpleSql
-import anorm.SqlStringInterpolation
-import anorm.ToStatement
-import java.sql.Connection
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import typo.dsl.UpdateBuilder
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import adventureworks.streamingInsert;
+import anorm.BatchSql;
+import anorm.NamedParameter;
+import anorm.ParameterValue;
+import anorm.RowParser;
+import anorm.SQL;
+import anorm.SimpleSql;
+import anorm.SqlStringInterpolation;
+import anorm.ToStatement;
+import java.sql.Connection;
+import scala.annotation.nowarn;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import typo.dsl.UpdateBuilder;
 
 class CustomerRepoImpl extends CustomerRepo {
-  override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
-    DeleteBuilder("sales.customer", CustomerFields.structure)
-  }
-  override def deleteById(customerid: CustomerId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.customer where "customerid" = ${ParameterValue(customerid, null, CustomerId.toStatement)}""".executeUpdate() > 0
-  }
-  override def deleteByIds(customerids: Array[CustomerId])(implicit c: Connection): Int = {
+  def delete: DeleteBuilder[CustomerFields, CustomerRow] = DeleteBuilder("sales.customer", CustomerFields.structure)
+  def deleteById(customerid: CustomerId)(implicit c: Connection): Boolean = SQL"""delete from sales.customer where "customerid" = ${ParameterValue(customerid, null, CustomerId.toStatement)}""".executeUpdate() > 0
+  def deleteByIds(customerids: Array[CustomerId])(implicit c: Connection): Int = {
     SQL"""delete
           from sales.customer
           where "customerid" = ANY(${ParameterValue(customerids, null, CustomerId.arrayToStatement)})
        """.executeUpdate()
-    
+  
   }
-  override def insert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
+  def insert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     SQL"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
-          values (${ParameterValue(unsaved.customerid, null, CustomerId.toStatement)}::int4, ${ParameterValue(unsaved.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
-          returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
-       """
+           values (${ParameterValue(unsaved.customerid, null, CustomerId.toStatement)}::int4, ${ParameterValue(unsaved.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
+           returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
+        """
       .executeInsert(CustomerRow.rowParser(1).single)
-    
+  
   }
-  override def insert(unsaved: CustomerRowUnsaved)(implicit c: Connection): CustomerRow = {
+  def insert(unsaved: CustomerRowUnsaved)(implicit c: Connection): CustomerRow = {
     val namedParameters = List(
       Some((NamedParameter("personid", ParameterValue(unsaved.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))), "::int4")),
-      Some((NamedParameter("storeid", ParameterValue(unsaved.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))), "::int4")),
-      Some((NamedParameter("territoryid", ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))), "::int4")),
-      unsaved.customerid match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("customerid", ParameterValue(value, null, CustomerId.toStatement)), "::int4"))
-      },
-      unsaved.rowguid match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, TypoUUID.toStatement)), "::uuid"))
-      },
-      unsaved.modifieddate match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
-      }
+                      Some((NamedParameter("storeid", ParameterValue(unsaved.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))), "::int4")),
+                      Some((NamedParameter("territoryid", ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))), "::int4")),
+    unsaved.customerid match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((NamedParameter("customerid", ParameterValue(value, null, CustomerId.toStatement)), "::int4"))
+    },
+    unsaved.rowguid match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((NamedParameter("rowguid", ParameterValue(value, null, TypoUUID.toStatement)), "::uuid"))
+    },
+    unsaved.modifieddate match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((NamedParameter("modifieddate", ParameterValue(value, null, TypoLocalDateTime.toStatement)), "::timestamp"))
+    }
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
       SQL"""insert into sales.customer default values
-            returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
-         """
+                            returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
+                         """
         .executeInsert(CustomerRow.rowParser(1).single)
     } else {
       val q = s"""insert into sales.customer(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
-                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
-                  returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
-               """
+                                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                                  returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
+                               """
       SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
         .executeInsert(CustomerRow.rowParser(1).single)
     }
-    
+  
   }
-  override def insertStreaming(unsaved: Iterator[CustomerRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(CustomerRow.text, c)
-  }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Iterator[CustomerRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.customer("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CustomerRowUnsaved.text, c)
-  }
-  override def select: SelectBuilder[CustomerFields, CustomerRow] = {
-    SelectBuilderSql("sales.customer", CustomerFields.structure, CustomerRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[CustomerRow] = {
+  def insertStreaming(unsaved: Iterator[CustomerRow], batchSize: Int = 10000)(implicit c: Connection): Long = streamingInsert(s"""COPY sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(CustomerRow.text, c)
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[CustomerRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = streamingInsert(s"""COPY sales.customer("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CustomerRowUnsaved.text, c)
+  def select: SelectBuilder[CustomerFields, CustomerRow] = SelectBuilderSql("sales.customer", CustomerFields.structure, CustomerRow.rowParser)
+  def selectAll(implicit c: Connection): List[CustomerRow] = {
     SQL"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
           from sales.customer
        """.as(CustomerRow.rowParser(1).*)
   }
-  override def selectById(customerid: CustomerId)(implicit c: Connection): Option[CustomerRow] = {
+  def selectById(customerid: CustomerId)(implicit c: Connection): Option[CustomerRow] = {
     SQL"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
           from sales.customer
           where "customerid" = ${ParameterValue(customerid, null, CustomerId.toStatement)}
        """.as(CustomerRow.rowParser(1).singleOpt)
   }
-  override def selectByIds(customerids: Array[CustomerId])(implicit c: Connection): List[CustomerRow] = {
+  def selectByIds(customerids: Array[CustomerId])(implicit c: Connection): List[CustomerRow] = {
     SQL"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
           from sales.customer
           where "customerid" = ANY(${ParameterValue(customerids, null, CustomerId.arrayToStatement)})
        """.as(CustomerRow.rowParser(1).*)
-    
+  
   }
-  override def selectByIdsTracked(customerids: Array[CustomerId])(implicit c: Connection): Map[CustomerId, CustomerRow] = {
+  def selectByIdsTracked(customerids: Array[CustomerId])(implicit c: Connection): Map[CustomerId, CustomerRow] = {
     val byId = selectByIds(customerids).view.map(x => (x.customerid, x)).toMap
     customerids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
-  override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
-    UpdateBuilder("sales.customer", CustomerFields.structure, CustomerRow.rowParser)
-  }
-  override def update(row: CustomerRow)(implicit c: Connection): Boolean = {
+  def update: UpdateBuilder[CustomerFields, CustomerRow] = UpdateBuilder("sales.customer", CustomerFields.structure, CustomerRow.rowParser)
+  def update(row: CustomerRow)(implicit c: Connection): Boolean = {
     val customerid = row.customerid
     SQL"""update sales.customer
-          set "personid" = ${ParameterValue(row.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
-              "storeid" = ${ParameterValue(row.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
-              "territoryid" = ${ParameterValue(row.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4,
-              "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
-              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          where "customerid" = ${ParameterValue(customerid, null, CustomerId.toStatement)}
-       """.executeUpdate() > 0
+                          set "personid" = ${ParameterValue(row.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
+                              "storeid" = ${ParameterValue(row.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
+                              "territoryid" = ${ParameterValue(row.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4,
+                              "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
+                              "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+                          where "customerid" = ${ParameterValue(customerid, null, CustomerId.toStatement)}
+                       """.executeUpdate() > 0
   }
-  override def upsert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
+  def upsert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     SQL"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
-          values (
-            ${ParameterValue(unsaved.customerid, null, CustomerId.toStatement)}::int4,
-            ${ParameterValue(unsaved.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
-            ${ParameterValue(unsaved.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
-            ${ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4,
-            ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid,
-            ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
-          )
-          on conflict ("customerid")
-          do update set
-            "personid" = EXCLUDED."personid",
-            "storeid" = EXCLUDED."storeid",
-            "territoryid" = EXCLUDED."territoryid",
-            "rowguid" = EXCLUDED."rowguid",
-            "modifieddate" = EXCLUDED."modifieddate"
-          returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
-       """
+           values (
+             ${ParameterValue(unsaved.customerid, null, CustomerId.toStatement)}::int4,
+             ${ParameterValue(unsaved.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
+             ${ParameterValue(unsaved.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
+             ${ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4,
+             ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid,
+             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
+           )
+           on conflict ("customerid")
+           do update set
+             "personid" = EXCLUDED."personid",
+             "storeid" = EXCLUDED."storeid",
+             "territoryid" = EXCLUDED."territoryid",
+             "rowguid" = EXCLUDED."rowguid",
+             "modifieddate" = EXCLUDED."modifieddate"
+           returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
+        """
       .executeInsert(CustomerRow.rowParser(1).single)
-    
+  
   }
-  override def upsertBatch(unsaved: Iterable[CustomerRow])(implicit c: Connection): List[CustomerRow] = {
+  def upsertBatch(unsaved: Iterable[CustomerRow])(implicit c: Connection): List[CustomerRow] = {
     def toNamedParameter(row: CustomerRow): List[NamedParameter] = List(
       NamedParameter("customerid", ParameterValue(row.customerid, null, CustomerId.toStatement)),
       NamedParameter("personid", ParameterValue(row.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))),
@@ -181,8 +169,8 @@ class CustomerRepoImpl extends CustomerRepo {
         ).executeReturning(CustomerRow.rowParser(1).*)
     }
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Iterator[CustomerRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Iterator[CustomerRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     SQL"create temporary table customer_TEMP (like sales.customer) on commit drop".execute(): @nowarn
     streamingInsert(s"""copy customer_TEMP("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(CustomerRow.text, c): @nowarn
     SQL"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")

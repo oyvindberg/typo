@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.illustration
+package adventureworks.production.illustration;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait IllustrationRepo {
   def delete: DeleteBuilder[IllustrationFields, IllustrationRow]
@@ -18,7 +18,7 @@ trait IllustrationRepo {
   def insert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow]
   def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IllustrationRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[IllustrationFields, IllustrationRow]
   def selectAll: Stream[ConnectionIO, IllustrationRow]
@@ -29,6 +29,6 @@ trait IllustrationRepo {
   def update(row: IllustrationRow): ConnectionIO[Boolean]
   def upsert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow]
   def upsertBatch(unsaved: List[IllustrationRow]): Stream[ConnectionIO, IllustrationRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

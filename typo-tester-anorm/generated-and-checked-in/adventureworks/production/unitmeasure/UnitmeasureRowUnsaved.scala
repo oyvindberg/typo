@@ -3,62 +3,57 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.unitmeasure
+package adventureworks.production.unitmeasure;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.public.Name
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.public.Name;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** This class corresponds to a row in table `production.unitmeasure` which has not been persisted yet */
-case class UnitmeasureRowUnsaved(
-  /** Primary key. */
-  unitmeasurecode: UnitmeasureId,
-  /** Unit of measure description. */
-  name: Name,
-  /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-) {
-  def toRow(modifieddateDefault: => TypoLocalDateTime): UnitmeasureRow =
-    UnitmeasureRow(
-      unitmeasurecode = unitmeasurecode,
-      name = name,
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
-    )
+case class UnitmeasureRowUnsaved(/** Primary key. */
+                                 unitmeasurecode: UnitmeasureId, /** Unit of measure description. */
+                                 name: Name, /** Default: now() */
+                                 modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()) {
+  def toRow(modifieddateDefault: => TypoLocalDateTime): UnitmeasureRow = new UnitmeasureRow(unitmeasurecode = unitmeasurecode, name = name, modifieddate = modifieddate.getOrElse(modifieddateDefault))
 }
+
 object UnitmeasureRowUnsaved {
-  implicit lazy val reads: Reads[UnitmeasureRowUnsaved] = Reads[UnitmeasureRowUnsaved](json => JsResult.fromTry(
-      Try(
-        UnitmeasureRowUnsaved(
-          unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
-          name = json.\("name").as(Name.reads),
-          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+  implicit lazy val reads: Reads[UnitmeasureRowUnsaved] = {
+    Reads[UnitmeasureRowUnsaved](json => JsResult.fromTry(
+        Try(
+          UnitmeasureRowUnsaved(
+            unitmeasurecode = json.\("unitmeasurecode").as(UnitmeasureId.reads),
+            name = json.\("name").as(Name.reads),
+            modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+          )
         )
-      )
-    ),
-  )
-  implicit lazy val text: Text[UnitmeasureRowUnsaved] = Text.instance[UnitmeasureRowUnsaved]{ (row, sb) =>
-    UnitmeasureId.text.unsafeEncode(row.unitmeasurecode, sb)
-    sb.append(Text.DELIMETER)
-    Name.text.unsafeEncode(row.name, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+      ),
+    )
   }
-  implicit lazy val writes: OWrites[UnitmeasureRowUnsaved] = OWrites[UnitmeasureRowUnsaved](o =>
-    new JsObject(ListMap[String, JsValue](
-      "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
-      "name" -> Name.writes.writes(o.name),
-      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
-    ))
-  )
+  implicit lazy val text: Text[UnitmeasureRowUnsaved] = {
+    Text.instance[UnitmeasureRowUnsaved]{ (row, sb) =>
+      UnitmeasureId.text.unsafeEncode(row.unitmeasurecode, sb)
+      sb.append(Text.DELIMETER)
+      Name.text.unsafeEncode(row.name, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[UnitmeasureRowUnsaved] = {
+    OWrites[UnitmeasureRowUnsaved](o =>
+      new JsObject(ListMap[String, JsValue](
+        "unitmeasurecode" -> UnitmeasureId.writes.writes(o.unitmeasurecode),
+        "name" -> Name.writes.writes(o.name),
+        "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
+      ))
+    )
+  }
 }

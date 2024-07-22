@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.vjobcandidate
+package adventureworks.humanresources.vjobcandidate;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class VjobcandidateViewRepoImpl extends VjobcandidateViewRepo {
-  override def select: SelectBuilder[VjobcandidateViewFields, VjobcandidateViewRow] = {
-    SelectBuilderSql("humanresources.vjobcandidate", VjobcandidateViewFields.structure, VjobcandidateViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[VjobcandidateViewRow] = {
+  def select: SelectBuilder[VjobcandidateViewFields, VjobcandidateViewRow] = SelectBuilderSql("humanresources.vjobcandidate", VjobcandidateViewFields.structure, VjobcandidateViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[VjobcandidateViewRow] = {
     SQL"""select "jobcandidateid", "businessentityid", "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", "Skills", "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", "EMail", "WebSite", "modifieddate"::text
           from humanresources.vjobcandidate
        """.as(VjobcandidateViewRow.rowParser(1).*)

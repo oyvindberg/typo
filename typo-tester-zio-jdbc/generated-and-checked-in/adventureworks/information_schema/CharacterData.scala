@@ -3,22 +3,23 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.information_schema
+package adventureworks.information_schema;
 
-import adventureworks.Text
-import java.sql.Types
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import java.sql.Types;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Domain `information_schema.character_data`
   * No constraint
   */
 case class CharacterData(value: String)
+
 object CharacterData {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[CharacterData]] = adventureworks.StringArrayDecoder.map(_.map(CharacterData.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[CharacterData]] = adventureworks.StringArrayEncoder.contramap(_.map(_.value))
@@ -30,8 +31,10 @@ object CharacterData {
   implicit lazy val jsonEncoder: JsonEncoder[CharacterData] = JsonEncoder.string.contramap(_.value)
   implicit lazy val pgType: PGType[CharacterData] = PGType.instance(""""information_schema"."character_data"""", Types.OTHER)
   implicit lazy val setter: Setter[CharacterData] = Setter.stringSetter.contramap(_.value)
-  implicit lazy val text: Text[CharacterData] = new Text[CharacterData] {
-    override def unsafeEncode(v: CharacterData, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: CharacterData, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[CharacterData] = {
+    new Text[CharacterData] {
+      override def unsafeEncode(v: CharacterData, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: CharacterData, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

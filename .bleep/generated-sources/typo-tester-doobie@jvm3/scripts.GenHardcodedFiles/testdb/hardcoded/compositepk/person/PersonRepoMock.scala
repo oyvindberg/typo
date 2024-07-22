@@ -3,31 +3,26 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.compositepk.person
+package testdb.hardcoded.compositepk.person;
 
-import doobie.free.connection.ConnectionIO
-import doobie.free.connection.delay
-import fs2.Stream
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.DeleteBuilder.DeleteBuilderMock
-import typo.dsl.DeleteParams
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderMock
-import typo.dsl.SelectParams
-import typo.dsl.UpdateBuilder
-import typo.dsl.UpdateBuilder.UpdateBuilderMock
-import typo.dsl.UpdateParams
+import doobie.free.connection.ConnectionIO;
+import doobie.free.connection.delay;
+import fs2.Stream;
+import scala.annotation.nowarn;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.DeleteBuilder.DeleteBuilderMock;
+import typo.dsl.DeleteParams;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderMock;
+import typo.dsl.SelectParams;
+import typo.dsl.UpdateBuilder;
+import typo.dsl.UpdateBuilder.UpdateBuilderMock;
+import typo.dsl.UpdateParams;
 
-class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
-                     map: scala.collection.mutable.Map[PersonId, PersonRow] = scala.collection.mutable.Map.empty) extends PersonRepo {
-  override def delete: DeleteBuilder[PersonFields, PersonRow] = {
-    DeleteBuilderMock(DeleteParams.empty, PersonFields.structure, map)
-  }
-  override def deleteById(compositeId: PersonId): ConnectionIO[Boolean] = {
-    delay(map.remove(compositeId).isDefined)
-  }
-  override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
+class PersonRepoMock(val toRow: Function1[PersonRowUnsaved, PersonRow], val map: scala.collection.mutable.Map[PersonId, PersonRow] = scala.collection.mutable.Map.empty) extends PersonRepo {
+  def delete: DeleteBuilder[PersonFields, PersonRow] = DeleteBuilderMock(DeleteParams.empty, PersonFields.structure, map)
+  def deleteById(compositeId: PersonId): ConnectionIO[Boolean] = delay(map.remove(compositeId).isDefined)
+  def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     delay {
       val _ = if (map.contains(unsaved.compositeId))
         sys.error(s"id ${unsaved.compositeId} already exists")
@@ -37,10 +32,8 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
       unsaved
     }
   }
-  override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
-    insert(toRow(unsaved))
-  }
-  override def insertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int = 10000): ConnectionIO[Long] = {
+  def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = insert(toRow(unsaved))
+  def insertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int = 10000): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
       rows.foreach { row =>
@@ -50,8 +43,8 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
       num
     }
   }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
     unsaved.compile.toList.map { unsavedRows =>
       var num = 0L
       unsavedRows.foreach { unsavedRow =>
@@ -62,13 +55,9 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
       num
     }
   }
-  override def select: SelectBuilder[PersonFields, PersonRow] = {
-    SelectBuilderMock(PersonFields.structure, delay(map.values.toList), SelectParams.empty)
-  }
-  override def selectAll: Stream[ConnectionIO, PersonRow] = {
-    Stream.emits(map.values.toList)
-  }
-  override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): Stream[ConnectionIO, PersonRow] = {
+  def select: SelectBuilder[PersonFields, PersonRow] = SelectBuilderMock(PersonFields.structure, delay(map.values.toList), SelectParams.empty)
+  def selectAll: Stream[ConnectionIO, PersonRow] = Stream.emits(map.values.toList)
+  def selectByFieldValues(fieldValues: List[PersonFieldValue[?]]): Stream[ConnectionIO, PersonRow] = {
     Stream.emits {
       fieldValues.foldLeft(map.values) {
         case (acc, PersonFieldValue.one(value)) => acc.filter(_.one == value)
@@ -77,13 +66,9 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
       }.toList
     }
   }
-  override def selectById(compositeId: PersonId): ConnectionIO[Option[PersonRow]] = {
-    delay(map.get(compositeId))
-  }
-  override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilderMock(UpdateParams.empty, PersonFields.structure, map)
-  }
-  override def update(row: PersonRow): ConnectionIO[Boolean] = {
+  def selectById(compositeId: PersonId): ConnectionIO[Option[PersonRow]] = delay(map.get(compositeId))
+  def update: UpdateBuilder[PersonFields, PersonRow] = UpdateBuilderMock(UpdateParams.empty, PersonFields.structure, map)
+  def update(row: PersonRow): ConnectionIO[Boolean] = {
     delay {
       map.get(row.compositeId) match {
         case Some(`row`) => false
@@ -94,11 +79,13 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
       }
     }
   }
-  override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]]): ConnectionIO[Boolean] = {
+  def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]]): ConnectionIO[Boolean] = {
     delay {
       map.get(compositeId) match {
         case Some(oldRow) =>
           val updatedRow = fieldValues.foldLeft(oldRow) {
+            case (acc, PersonFieldValue.one(value)) => acc.copy(one = value)
+            case (acc, PersonFieldValue.two(value)) => acc.copy(two = value)
             case (acc, PersonFieldValue.name(value)) => acc.copy(name = value)
           }
           if (updatedRow != oldRow) {
@@ -111,13 +98,13 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
       }
     }
   }
-  override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
+  def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     delay {
       map.put(unsaved.compositeId, unsaved): @nowarn
       unsaved
     }
   }
-  override def upsertBatch(unsaved: List[PersonRow]): Stream[ConnectionIO, PersonRow] = {
+  def upsertBatch(unsaved: List[PersonRow]): Stream[ConnectionIO, PersonRow] = {
     Stream.emits {
       unsaved.map { row =>
         map += (row.compositeId -> row)
@@ -125,8 +112,8 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
       }
     }
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int = 10000): ConnectionIO[Int] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     unsaved.compile.toList.map { rows =>
       var num = 0
       rows.foreach { row =>

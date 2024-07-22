@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.pcc
+package adventureworks.sa.pcc;
 
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class PccViewRepoImpl extends PccViewRepo {
-  override def select: SelectBuilder[PccViewFields, PccViewRow] = {
-    SelectBuilderSql("sa.pcc", PccViewFields.structure, PccViewRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, PccViewRow] = {
-    sql"""select "id", "businessentityid", "creditcardid", "modifieddate"::text from sa.pcc""".query(using PccViewRow.jdbcDecoder).selectStream()
-  }
+  def select: SelectBuilder[PccViewFields, PccViewRow] = SelectBuilderSql("sa.pcc", PccViewFields.structure, PccViewRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, PccViewRow] = sql"""select "id", "businessentityid", "creditcardid", "modifieddate"::text from sa.pcc""".query(using PccViewRow.jdbcDecoder).selectStream()
 }

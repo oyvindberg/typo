@@ -3,22 +3,23 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public
+package adventureworks.public;
 
-import adventureworks.Text
-import java.sql.Types
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import java.sql.Types;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Domain `public.Flag`
   * No constraint
   */
 case class Flag(value: Boolean)
+
 object Flag {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[Flag]] = adventureworks.BooleanArrayDecoder.map(_.map(Flag.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[Flag]] = adventureworks.BooleanArrayEncoder.contramap(_.map(_.value))
@@ -30,8 +31,10 @@ object Flag {
   implicit lazy val jsonEncoder: JsonEncoder[Flag] = JsonEncoder.boolean.contramap(_.value)
   implicit lazy val pgType: PGType[Flag] = PGType.instance(""""public"."Flag"""", Types.OTHER)
   implicit lazy val setter: Setter[Flag] = Setter.booleanSetter.contramap(_.value)
-  implicit lazy val text: Text[Flag] = new Text[Flag] {
-    override def unsafeEncode(v: Flag, sb: StringBuilder) = Text.booleanInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: Flag, sb: StringBuilder) = Text.booleanInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[Flag] = {
+    new Text[Flag] {
+      override def unsafeEncode(v: Flag, sb: StringBuilder) = Text.booleanInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: Flag, sb: StringBuilder) = Text.booleanInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

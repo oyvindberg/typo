@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.salesorderheader
+package adventureworks.sales.salesorderheader;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait SalesorderheaderRepo {
   def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow]
@@ -17,7 +17,7 @@ trait SalesorderheaderRepo {
   def insert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow
   def insert(unsaved: SalesorderheaderRowUnsaved)(implicit c: Connection): SalesorderheaderRow
   def insertStreaming(unsaved: Iterator[SalesorderheaderRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[SalesorderheaderRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow]
   def selectAll(implicit c: Connection): List[SalesorderheaderRow]
@@ -28,6 +28,6 @@ trait SalesorderheaderRepo {
   def update(row: SalesorderheaderRow)(implicit c: Connection): Boolean
   def upsert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow
   def upsertBatch(unsaved: Iterable[SalesorderheaderRow])(implicit c: Connection): List[SalesorderheaderRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[SalesorderheaderRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

@@ -5,6 +5,7 @@ package codegen
 import play.api.libs.json.Json
 
 case class FilesRelation(
+    lang: Lang,
     naming: Naming,
     names: ComputedNames,
     maybeCols: Option[NonEmptyList[ComputedColumn]],
@@ -14,132 +15,161 @@ case class FilesRelation(
 ) {
   def RowFile(rowType: DbLib.RowType, comment: Option[String], maybeUnsavedRow: Option[(ComputedRowUnsaved, ComputedDefault)]): Option[sc.File] =
     maybeCols.map { cols =>
-      val members = List[Iterable[sc.Code]](
+      val members = List[Iterable[sc.ClassMember]](
         names.maybeId.collect { case x: IdComputed.Composite =>
-          code"""val ${x.paramName}: ${x.tpe} = ${x.tpe}(${x.cols.map(x => x.name.code).mkCode(", ")})"""
+          sc.Method(sc.Comments.Empty, Nil, x.paramName, Nil, Nil, x.tpe, Some(code"""new ${x.tpe}(${x.cols.map(x => x.name.code).mkCode(", ")})"""))
         },
         // id member which points to either `compositeId` val defined above or id column
         if (maybeCols.exists(_.exists(_.name.value == "id"))) None
         else
           names.maybeId.collect {
-            case id: IdComputed.Unary     => code"val id = ${id.col.name}"
-            case id: IdComputed.Composite => code"val id = ${id.paramName}"
+            case id: IdComputed.Unary =>
+              sc.Method(sc.Comments.Empty, Nil, sc.Ident("id"), Nil, Nil, id.tpe, Some(id.col.name.code))
+            case id: IdComputed.Composite =>
+              sc.Method(sc.Comments.Empty, Nil, sc.Ident("id"), Nil, Nil, id.tpe, Some(sc.ApplyNullary(id.paramName.code)))
           },
         maybeFkAnalysis.toList.flatMap(_.extractFksIdsFromRowNotId).map { extractFkId =>
-          val args = extractFkId.colPairs.map { case (inComposite, inId) => code"${inComposite.name} = ${inId.name}" }
-
-          val body =
-            code"""|${extractFkId.otherCompositeIdType}(
-                     |  ${args.mkCode(",\n")}
-                     |)""".stripMargin
-
-          sc.Value(Nil, extractFkId.name.prepended("extract"), Nil, Nil, extractFkId.otherCompositeIdType, body)
+          val args = extractFkId.colPairs.map { case (inComposite, inId) => sc.Arg.Named(inComposite.name, inId.name.code) }
+          sc.Method(
+            sc.Comments.Empty,
+            Nil,
+            extractFkId.name.prepended("extract"),
+            Nil,
+            Nil,
+            extractFkId.otherCompositeIdType,
+            Some(sc.New(extractFkId.otherCompositeIdType, args))
+          )
         },
         maybeUnsavedRow.map { case (unsaved, defaults) =>
           val (partOfId, rest) = unsaved.defaultCols.toList.partition { case ComputedRowUnsaved.DefaultedCol(col, _) => names.isIdColumn(col.dbName) }
-          val partOfIdParams = partOfId.map { case ComputedRowUnsaved.DefaultedCol(col, _) => sc.Param(col.name, col.tpe, None) }
+          val partOfIdParams = partOfId.map { case ComputedRowUnsaved.DefaultedCol(col, _) => sc.Param(col.name, col.tpe) }
           val restParams = rest.map { case ComputedRowUnsaved.DefaultedCol(col, _) =>
-            sc.Param(col.name, col.tpe, Some(code"${defaults.Defaulted}.${defaults.Provided}(this.${col.name})"))
+            sc.Param(col.name, col.tpe).copy(default = Some(code"${defaults.Defaulted}.${defaults.Provided}(this.${col.name})"))
           }
           val params = partOfIdParams ++ restParams
-          code"""|def toUnsavedRow(${params.map(_.code).mkCode(", ")}): ${unsaved.tpe} =
-                 |  ${unsaved.tpe}(${unsaved.allCols.map(col => col.name.code).mkCode(", ")})""".stripMargin
+          sc.Method(
+            comments = sc.Comments.Empty,
+            tparams = Nil,
+            name = sc.Ident("toUnsavedRow"),
+            params = params,
+            implicitParams = Nil,
+            tpe = unsaved.tpe,
+            body = Some(sc.New(unsaved.tpe, unsaved.allCols.toList.map(col => sc.Arg.Pos(col.name))))
+          )
         }
-      )
-      val formattedMembers = members.flatten match {
-        case Nil => sc.Code.Empty
-        case nonEmpty =>
-          code"""|{
-                 |  ${nonEmpty.mkCode("\n")}
-                 |}""".stripMargin
-      }
-      val formattedCols = cols.map { col =>
-        val commentPieces = List[Iterable[String]](
-          col.dbCol.comment,
-          col.dbCol.columnDefault.map(x => s"Default: $x"),
-          col.dbCol.identity.map(_.asString),
-          col.pointsTo.map { case (relationName, columnName) =>
-            val rowName = naming.rowName(relationName)
-            s"Points to [[${rowName.dotName}.${naming.field(columnName).value}]]"
-          },
-          col.dbCol.constraints.map(c => s"Constraint ${c.name} affecting columns ${c.columns.map(_.value).mkString(", ")}: ${c.checkClause}"),
-          if (options.debugTypes)
-            col.dbCol.jsonDescription.maybeJson.map(other => s"debug: ${Json.stringify(other)}")
-          else None
-        ).flatten
+      ).flatten
 
-        val comment = commentPieces match {
-          case Nil => sc.Code.Empty
-          case nonEmpty =>
-            val lines = nonEmpty.flatMap(_.linesIterator).map(_.code)
-            code"""|/** ${lines.mkCode("\n")} */
-                 |""".stripMargin
+      val commentedParams: NonEmptyList[sc.Param] =
+        cols.map { col =>
+          val commentPieces = List[Iterable[String]](
+            col.dbCol.comment,
+            col.dbCol.columnDefault.map(x => s"Default: $x"),
+            col.dbCol.identity.map(_.asString),
+            col.pointsTo.map { case (relationName, columnName) => lang.docLink(naming.rowName(relationName), naming.field(columnName)) },
+            col.dbCol.constraints.map(c => s"Constraint ${c.name} affecting columns ${c.columns.map(_.value).mkString(", ")}: ${c.checkClause}"),
+            if (options.debugTypes)
+              col.dbCol.jsonDescription.maybeJson.map(other => s"debug: ${Json.stringify(other)}")
+            else None
+          ).flatten
+
+          col.param.copy(comments = sc.Comments(commentPieces))
         }
 
-        code"$comment${col.param.code}"
-      }
-      val instances =
+      val instances: List[sc.ClassMember] =
         options.jsonLibs.flatMap(_.instances(names.RowName, cols)) ++
           options.dbLib.toList.flatMap(_.rowInstances(names.RowName, cols, rowType = rowType))
 
       val classComment = {
-        val lines = List[Iterable[String]](
-          Some(names.source match {
-            case Source.Table(name)       => s"Table: ${name.value}"
-            case Source.View(name, true)  => s"Materialized View: ${name.value}"
-            case Source.View(name, false) => s"View: ${name.value}"
-            case Source.SqlFile(relPath)  => s"SQL file: ${relPath.asString}"
-          }),
-          comment,
-          names.maybeId.map {
-            case x: IdComputed.Unary     => s"Primary key: ${x.col.dbName.value}"
-            case x: IdComputed.Composite => s"Composite primary key: ${x.cols.map(_.dbName.value).mkString(", ")}"
-          }
-        ).flatten
-        code"""|/** ${lines.mkString("\n")} */
-             |""".stripMargin
+        sc.Comments(
+          List[Iterable[String]](
+            Some(names.source match {
+              case Source.Table(name)       => s"Table: ${name.value}"
+              case Source.View(name, true)  => s"Materialized View: ${name.value}"
+              case Source.View(name, false) => s"View: ${name.value}"
+              case Source.SqlFile(relPath)  => s"SQL file: ${relPath.asString}"
+            }),
+            comment,
+            names.maybeId.map {
+              case x: IdComputed.Unary     => s"Primary key: ${x.col.dbName.value}"
+              case x: IdComputed.Composite => s"Composite primary key: ${x.cols.map(_.dbName.value).mkString(", ")}"
+            }
+          ).flatten
+        )
       }
 
-      val maybeExtraApply: Option[sc.Code] =
+      val maybeExtraApply: Option[sc.Method] =
         names.maybeId.collect { case id: IdComputed.Composite =>
           val nonKeyColumns = cols.toList.filter(col => !names.isIdColumn(col.dbCol.name))
-          val params = sc.Param(id.paramName, id.tpe, None) :: nonKeyColumns.map(col => sc.Param(col.name, col.tpe, None))
-          val args = cols.map { col => if (names.isIdColumn(col.dbCol.name)) code"${id.paramName}.${col.name}" else col.name.code }
-          code"""|def apply(${params.map(_.code).mkCode(", ")}) =
-               |  new ${names.RowName}(${args.map(_.code).mkCode(", ")})""".stripMargin
+          val params = sc.Param(id.paramName, id.tpe) :: nonKeyColumns.map(col => sc.Param(col.name, col.tpe))
+          val args = cols.map(col => sc.Arg.Pos(if (names.isIdColumn(col.dbCol.name)) sc.ApplyNullary(code"${id.paramName}.${col.name}") else col.name.code))
+          sc.Method(comments = sc.Comments.Empty, Nil, sc.Ident("apply"), params, Nil, names.RowName, Some(sc.New(names.RowName, args.toList)))
         }
 
-      val str =
-        code"""${classComment}case class ${names.RowName.name}(
-            |  ${formattedCols.mkCode(",\n")}
-            |)$formattedMembers
-            |
-            |${sc.Obj(names.RowName.value, instances, maybeExtraApply)}
-            |""".stripMargin
-
-      sc.File(names.RowName, str, secondaryTypes = Nil, scope = Scope.Main)
+      sc.File(
+        names.RowName,
+        sc.Adt.Record(
+          isWrapper = false,
+          comments = classComment,
+          name = names.RowName,
+          tparams = Nil,
+          params = commentedParams.toList,
+          implicitParams = Nil,
+          `extends` = None,
+          implements = Nil,
+          members = members,
+          staticMembers = instances ++ maybeExtraApply.toList
+        ),
+        secondaryTypes = Nil,
+        scope = Scope.Main
+      )
     }
 
   val FieldValueFile: Option[sc.File] =
     for {
-      fieldOrIdValueName <- names.FieldOrIdValueName
-      fieldValueName <- names.FieldValueName
+      fieldValueName <- names.FieldOrIdValueName
       cols <- maybeCols
     } yield {
-      val members = {
-        cols.map { col =>
-          val parent = if (names.isIdColumn(col.dbName)) fieldOrIdValueName else fieldValueName
-          code"case class ${col.name}(override val value: ${col.tpe}) extends $parent(${sc.StrLit(col.dbName.value)}, value)"
-        }
-      }
-      val str =
-        code"""sealed abstract class ${fieldOrIdValueName.name}[T](val name: String, val value: T)
-              |sealed abstract class ${fieldValueName.name}[T](name: String, value: T) extends ${fieldOrIdValueName.name}(name, value)
-              |
-              |${sc.Obj(fieldValueName.value, Nil, Some(members.mkCode("\n")))}
-              |""".stripMargin
+      val T = sc.Type.Abstract(sc.Ident("T"))
+      val abstractMembers = List(
+        sc.Method(sc.Comments.Empty, Nil, sc.Ident("name"), Nil, Nil, TypesJava.String, None),
+        sc.Method(sc.Comments.Empty, Nil, sc.Ident("value"), Nil, Nil, T, None)
+      )
 
-      sc.File(fieldValueName, str, secondaryTypes = List(fieldOrIdValueName), scope = Scope.Main)
+      val colRecords = cols.toList.map { col =>
+        sc.Adt.Record(
+          isWrapper = false,
+          comments = sc.Comments.Empty,
+          name = sc.Type.Qualified(col.name),
+          tparams = Nil,
+          params = List(sc.Param(sc.Ident("value"), col.tpe)),
+          implicitParams = Nil,
+          `extends` = None,
+          implements = List(fieldValueName.of(col.tpe)),
+          members = List(
+            sc.Method(
+              comments = sc.Comments.Empty,
+              tparams = Nil,
+              name = sc.Ident("name"),
+              params = Nil,
+              implicitParams = Nil,
+              tpe = TypesJava.String,
+              body = Some(sc.StrLit(col.dbName.value))
+            )
+          ),
+          staticMembers = Nil
+        )
+      }
+
+      val fieldOrIdValue = sc.Adt.Sum(
+        comments = sc.Comments.Empty,
+        name = fieldValueName,
+        tparams = List(T),
+        implements = Nil,
+        members = abstractMembers,
+        staticMembers = Nil,
+        subtypes = colRecords
+      )
+      sc.File(fieldValueName, fieldOrIdValue, secondaryTypes = Nil, scope = Scope.Main)
     }
 
   val FieldsFile: Option[sc.File] =
@@ -152,8 +182,8 @@ case class FilesRelation(
           if (names.isIdColumn(col.dbName)) (sc.Type.dsl.IdField, col.tpe)
           else
             col.tpe match {
-              case TypesScala.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
-              case _                               => (sc.Type.dsl.Field, col.tpe)
+              case lang.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
+              case _                         => (sc.Type.dsl.Field, col.tpe)
             }
         code"def ${col.name}: ${cls.of(tpe, names.RowName)}"
       }
@@ -261,8 +291,8 @@ case class FilesRelation(
             if (names.isIdColumn(col.dbName)) (sc.Type.dsl.IdField, col.tpe)
             else
               col.tpe match {
-                case TypesScala.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
-                case _                               => (sc.Type.dsl.Field, col.tpe)
+                case lang.Optional(underlying) => (sc.Type.dsl.OptField, underlying)
+                case _                         => (sc.Type.dsl.Field, col.tpe)
               }
 
           val readSqlCast = SqlCast.fromPg(col.dbCol.tpe) match {
@@ -297,50 +327,65 @@ case class FilesRelation(
   }
 
   def RepoTraitFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
-    val renderedMethods = repoMethods.map { repoMethod =>
-      dbLib.repoSig(repoMethod) match {
-        case Left(DbLib.NotImplementedFor(lib)) => code"// Not implementable for $lib: ${repoMethod.methodName}"
-        case Right(sig)                         => code"${repoMethod.comment.fold("")(c => c + "\n")}$sig"
-      }
-    }
-    val str =
-      code"""trait ${names.RepoName.name} {
-            |  ${renderedMethods.mkCode("\n")}
-            |}
-            |""".stripMargin
+    val maybeSignatures = repoMethods.toList.map(dbLib.repoSig)
 
-    sc.File(names.RepoName, str, secondaryTypes = Nil, scope = Scope.Main)
+    val cls = sc.Class(
+      comments = sc.Comments(maybeSignatures.collect { case Left(DbLib.NotImplementedFor(repoMethod, lib)) =>
+        s"${repoMethod.methodName}: Not implementable for $lib"
+      }),
+      classType = sc.ClassType.Interface,
+      name = names.RepoName,
+      tparams = Nil,
+      params = Nil,
+      implicitParams = Nil,
+      `extends` = None,
+      implements = Nil,
+      members = maybeSignatures.collect { case Right(signature) => signature },
+      staticMembers = Nil
+    )
+
+    sc.File(names.RepoName, cls, secondaryTypes = Nil, scope = Scope.Main)
   }
 
   def RepoImplFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
-    val renderedMethods: List[sc.Code] = repoMethods.toList.flatMap { repoMethod =>
-      dbLib.repoSig(repoMethod).toOption.map { sig =>
-        code"""|${repoMethod.comment.fold("")(c => c + "\n")}override $sig = {
-               |  ${dbLib.repoImpl(repoMethod)}
-               |}""".stripMargin
+    val methods: List[sc.Method] =
+      repoMethods.toList.flatMap { repoMethod =>
+        dbLib.repoSig(repoMethod) match {
+          case Right(sig @ sc.Method(_, _, _, _, _, _, None)) =>
+            Some(sig.copy(body = Some(dbLib.repoImpl(repoMethod))))
+          case _ =>
+            None
+        }
       }
-    }
-    val str =
-      code"""|class ${names.RepoImplName.name} extends ${names.RepoName} {
-             |  ${renderedMethods.mkCode("\n")}
-             |}
-             |""".stripMargin
+    val cls = sc.Class(
+      comments = sc.Comments.Empty,
+      classType = sc.ClassType.Class,
+      name = names.RepoImplName,
+      tparams = Nil,
+      params = Nil,
+      implicitParams = Nil,
+      `extends` = None,
+      implements = List(names.RepoName),
+      members = methods,
+      staticMembers = Nil
+    )
 
-    sc.File(names.RepoImplName, str, secondaryTypes = Nil, scope = Scope.Main)
+    sc.File(names.RepoImplName, cls, secondaryTypes = Nil, scope = Scope.Main)
   }
 
   def RepoMockFile(dbLib: DbLib, idComputed: IdComputed, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val maybeToRowParam: Option[sc.Param] =
       repoMethods.toList.collectFirst { case RepoMethod.InsertUnsaved(_, _, unsaved, _, _, _) =>
-        sc.Param(sc.Ident("toRow"), TypesScala.Function1.of(unsaved.tpe, names.RowName), None)
+        sc.Param(sc.Ident("toRow"), TypesScala.Function1.of(unsaved.tpe, names.RowName))
       }
 
-    val methods: List[sc.Code] =
+    val methods: List[sc.Method] =
       repoMethods.toList.flatMap { repoMethod =>
-        dbLib.repoSig(repoMethod).toOption.map { sig =>
-          code"""|${repoMethod.comment.fold("")(c => c + "\n")}override $sig = {
-                 |  ${dbLib.mockRepoImpl(idComputed, repoMethod, maybeToRowParam)}
-                 |}""".stripMargin
+        dbLib.repoSig(repoMethod) match {
+          case Right(sig @ sc.Method(_, _, _, _, _, _, None)) =>
+            Some(sig.copy(body = Some(dbLib.mockRepoImpl(idComputed, repoMethod, maybeToRowParam))))
+          case _ =>
+            None
         }
       }
 
@@ -348,6 +393,7 @@ case class FilesRelation(
       maybeToRowParam,
       Some(
         sc.Param(
+          sc.Comments.Empty,
           sc.Ident("map"),
           TypesScala.mutableMap.of(idComputed.tpe, names.RowName),
           Some(code"${TypesScala.mutableMap}.empty")
@@ -355,12 +401,18 @@ case class FilesRelation(
       )
     ).flatten
 
-    val str =
-      code"""|class ${names.RepoMockName.name}(${classParams.map(_.code).mkCode(",\n")}) extends ${names.RepoName} {
-             |  ${methods.mkCode("\n")}
-             |}
-             |""".stripMargin
-
-    sc.File(names.RepoMockName, str, secondaryTypes = Nil, scope = Scope.Test)
+    val cls = sc.Class(
+      comments = sc.Comments.Empty,
+      classType = sc.ClassType.Class,
+      name = names.RepoMockName,
+      tparams = Nil,
+      params = classParams,
+      implicitParams = Nil,
+      `extends` = None,
+      implements = List(names.RepoName),
+      members = methods,
+      staticMembers = Nil
+    )
+    sc.File(names.RepoMockName, cls, secondaryTypes = Nil, scope = Scope.Test)
   }
 }

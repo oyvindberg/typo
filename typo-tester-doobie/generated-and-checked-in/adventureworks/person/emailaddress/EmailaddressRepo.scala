@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.emailaddress
+package adventureworks.person.emailaddress;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait EmailaddressRepo {
   def delete: DeleteBuilder[EmailaddressFields, EmailaddressRow]
@@ -18,7 +18,7 @@ trait EmailaddressRepo {
   def insert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow]
   def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, EmailaddressRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, EmailaddressRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[EmailaddressFields, EmailaddressRow]
   def selectAll: Stream[ConnectionIO, EmailaddressRow]
@@ -29,6 +29,6 @@ trait EmailaddressRepo {
   def update(row: EmailaddressRow): ConnectionIO[Boolean]
   def upsert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow]
   def upsertBatch(unsaved: List[EmailaddressRow]): Stream[ConnectionIO, EmailaddressRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, EmailaddressRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

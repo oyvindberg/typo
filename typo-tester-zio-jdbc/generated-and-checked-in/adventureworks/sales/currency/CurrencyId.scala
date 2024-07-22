@@ -3,19 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sales.currency
+package adventureworks.sales.currency;
 
-import adventureworks.Text
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `sales.currency` */
-case class CurrencyId(value: /* bpchar, max 3 chars */ String) extends AnyVal
+case class CurrencyId(value: /* bpchar, max 3 chars */ String) extends scala.AnyVal
+
 object CurrencyId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[CurrencyId]] = adventureworks.StringArrayDecoder.map(_.map(CurrencyId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[CurrencyId]] = adventureworks.StringArrayEncoder.contramap(_.map(_.value))
@@ -27,8 +28,10 @@ object CurrencyId {
   implicit lazy val jsonEncoder: JsonEncoder[CurrencyId] = JsonEncoder.string.contramap(_.value)
   implicit lazy val pgType: PGType[CurrencyId] = PGType.PGTypeString.as
   implicit lazy val setter: Setter[CurrencyId] = Setter.stringSetter.contramap(_.value)
-  implicit lazy val text: Text[CurrencyId] = new Text[CurrencyId] {
-    override def unsafeEncode(v: CurrencyId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: CurrencyId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[CurrencyId] = {
+    new Text[CurrencyId] {
+      override def unsafeEncode(v: CurrencyId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: CurrencyId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

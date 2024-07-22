@@ -3,10 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person_dynamic
+package adventureworks.person_dynamic;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
 
 trait PersonDynamicSqlRepo {
   def apply(firstName: Option[String]): Stream[ConnectionIO, PersonDynamicSqlRow]

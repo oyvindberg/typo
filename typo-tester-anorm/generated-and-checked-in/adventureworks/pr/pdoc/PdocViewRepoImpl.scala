@@ -3,18 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.pr.pdoc
+package adventureworks.pr.pdoc;
 
-import anorm.SqlStringInterpolation
-import java.sql.Connection
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import anorm.SqlStringInterpolation;
+import java.sql.Connection;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class PdocViewRepoImpl extends PdocViewRepo {
-  override def select: SelectBuilder[PdocViewFields, PdocViewRow] = {
-    SelectBuilderSql("pr.pdoc", PdocViewFields.structure, PdocViewRow.rowParser)
-  }
-  override def selectAll(implicit c: Connection): List[PdocViewRow] = {
+  def select: SelectBuilder[PdocViewFields, PdocViewRow] = SelectBuilderSql("pr.pdoc", PdocViewFields.structure, PdocViewRow.rowParser)
+  def selectAll(implicit c: Connection): List[PdocViewRow] = {
     SQL"""select "id", "productid", "modifieddate"::text, "documentnode"
           from pr.pdoc
        """.as(PdocViewRow.rowParser(1).*)

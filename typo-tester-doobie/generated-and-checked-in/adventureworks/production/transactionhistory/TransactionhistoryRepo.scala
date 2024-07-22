@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.transactionhistory
+package adventureworks.production.transactionhistory;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait TransactionhistoryRepo {
   def delete: DeleteBuilder[TransactionhistoryFields, TransactionhistoryRow]
@@ -18,7 +18,7 @@ trait TransactionhistoryRepo {
   def insert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow]
   def insert(unsaved: TransactionhistoryRowUnsaved): ConnectionIO[TransactionhistoryRow]
   def insertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int = 10000): ConnectionIO[Long]
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[TransactionhistoryFields, TransactionhistoryRow]
   def selectAll: Stream[ConnectionIO, TransactionhistoryRow]
@@ -29,6 +29,6 @@ trait TransactionhistoryRepo {
   def update(row: TransactionhistoryRow): ConnectionIO[Boolean]
   def upsert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow]
   def upsertBatch(unsaved: List[TransactionhistoryRow]): Stream[ConnectionIO, TransactionhistoryRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, TransactionhistoryRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

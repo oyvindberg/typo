@@ -3,85 +3,90 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.businessentityaddress
+package adventureworks.person.businessentityaddress;
 
-import adventureworks.Text
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.address.AddressId
-import adventureworks.person.addresstype.AddresstypeId
-import adventureworks.person.businessentity.BusinessentityId
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsValue
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
-import scala.collection.immutable.ListMap
-import scala.util.Try
+import adventureworks.Text;
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.address.AddressId;
+import adventureworks.person.addresstype.AddresstypeId;
+import adventureworks.person.businessentity.BusinessentityId;
+import play.api.libs.json.JsObject;
+import play.api.libs.json.JsResult;
+import play.api.libs.json.JsValue;
+import play.api.libs.json.OWrites;
+import play.api.libs.json.Reads;
+import scala.collection.immutable.ListMap;
+import scala.util.Try;
 
 /** This class corresponds to a row in table `person.businessentityaddress` which has not been persisted yet */
 case class BusinessentityaddressRowUnsaved(
   /** Primary key. Foreign key to BusinessEntity.BusinessEntityID.
-      Points to [[adventureworks.person.businessentity.BusinessentityRow.businessentityid]] */
+    * Points to [[adventureworks.person.businessentity.BusinessentityRow.businessentityid]]
+    */
   businessentityid: BusinessentityId,
   /** Primary key. Foreign key to Address.AddressID.
-      Points to [[adventureworks.person.address.AddressRow.addressid]] */
+    * Points to [[adventureworks.person.address.AddressRow.addressid]]
+    */
   addressid: AddressId,
   /** Primary key. Foreign key to AddressType.AddressTypeID.
-      Points to [[adventureworks.person.addresstype.AddresstypeRow.addresstypeid]] */
+    * Points to [[adventureworks.person.addresstype.AddresstypeRow.addresstypeid]]
+    */
   addresstypeid: AddresstypeId,
   /** Default: uuid_generate_v1() */
-  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
+  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault(),
   /** Default: now() */
-  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
+  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault()
 ) {
-  def toRow(rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): BusinessentityaddressRow =
-    BusinessentityaddressRow(
+  def toRow(rowguidDefault: => TypoUUID, modifieddateDefault: => TypoLocalDateTime): BusinessentityaddressRow = {
+    new BusinessentityaddressRow(
       businessentityid = businessentityid,
       addressid = addressid,
       addresstypeid = addresstypeid,
-      rowguid = rowguid match {
-                  case Defaulted.UseDefault => rowguidDefault
-                  case Defaulted.Provided(value) => value
-                },
-      modifieddate = modifieddate match {
-                       case Defaulted.UseDefault => modifieddateDefault
-                       case Defaulted.Provided(value) => value
-                     }
+      rowguid = rowguid.getOrElse(rowguidDefault),
+      modifieddate = modifieddate.getOrElse(modifieddateDefault)
     )
-}
-object BusinessentityaddressRowUnsaved {
-  implicit lazy val reads: Reads[BusinessentityaddressRowUnsaved] = Reads[BusinessentityaddressRowUnsaved](json => JsResult.fromTry(
-      Try(
-        BusinessentityaddressRowUnsaved(
-          businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
-          addressid = json.\("addressid").as(AddressId.reads),
-          addresstypeid = json.\("addresstypeid").as(AddresstypeId.reads),
-          rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
-          modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
-        )
-      )
-    ),
-  )
-  implicit lazy val text: Text[BusinessentityaddressRowUnsaved] = Text.instance[BusinessentityaddressRowUnsaved]{ (row, sb) =>
-    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
-    sb.append(Text.DELIMETER)
-    AddressId.text.unsafeEncode(row.addressid, sb)
-    sb.append(Text.DELIMETER)
-    AddresstypeId.text.unsafeEncode(row.addresstypeid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val writes: OWrites[BusinessentityaddressRowUnsaved] = OWrites[BusinessentityaddressRowUnsaved](o =>
-    new JsObject(ListMap[String, JsValue](
-      "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
-      "addressid" -> AddressId.writes.writes(o.addressid),
-      "addresstypeid" -> AddresstypeId.writes.writes(o.addresstypeid),
-      "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
-      "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
-    ))
-  )
+}
+
+object BusinessentityaddressRowUnsaved {
+  implicit lazy val reads: Reads[BusinessentityaddressRowUnsaved] = {
+    Reads[BusinessentityaddressRowUnsaved](json => JsResult.fromTry(
+        Try(
+          BusinessentityaddressRowUnsaved(
+            businessentityid = json.\("businessentityid").as(BusinessentityId.reads),
+            addressid = json.\("addressid").as(AddressId.reads),
+            addresstypeid = json.\("addresstypeid").as(AddresstypeId.reads),
+            rowguid = json.\("rowguid").as(Defaulted.reads(TypoUUID.reads)),
+            modifieddate = json.\("modifieddate").as(Defaulted.reads(TypoLocalDateTime.reads))
+          )
+        )
+      ),
+    )
+  }
+  implicit lazy val text: Text[BusinessentityaddressRowUnsaved] = {
+    Text.instance[BusinessentityaddressRowUnsaved]{ (row, sb) =>
+      BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+      sb.append(Text.DELIMETER)
+      AddressId.text.unsafeEncode(row.addressid, sb)
+      sb.append(Text.DELIMETER)
+      AddresstypeId.text.unsafeEncode(row.addresstypeid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoUUID.text).unsafeEncode(row.rowguid, sb)
+      sb.append(Text.DELIMETER)
+      Defaulted.text(TypoLocalDateTime.text).unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val writes: OWrites[BusinessentityaddressRowUnsaved] = {
+    OWrites[BusinessentityaddressRowUnsaved](o =>
+      new JsObject(ListMap[String, JsValue](
+        "businessentityid" -> BusinessentityId.writes.writes(o.businessentityid),
+        "addressid" -> AddressId.writes.writes(o.addressid),
+        "addresstypeid" -> AddresstypeId.writes.writes(o.addresstypeid),
+        "rowguid" -> Defaulted.writes(TypoUUID.writes).writes(o.rowguid),
+        "modifieddate" -> Defaulted.writes(TypoLocalDateTime.writes).writes(o.modifieddate)
+      ))
+    )
+  }
 }

@@ -3,22 +3,23 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public
+package adventureworks.public;
 
-import adventureworks.Text
-import java.sql.Types
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import java.sql.Types;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Domain `public.NameStyle`
   * No constraint
   */
 case class NameStyle(value: Boolean)
+
 object NameStyle {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[NameStyle]] = adventureworks.BooleanArrayDecoder.map(_.map(NameStyle.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[NameStyle]] = adventureworks.BooleanArrayEncoder.contramap(_.map(_.value))
@@ -30,8 +31,10 @@ object NameStyle {
   implicit lazy val jsonEncoder: JsonEncoder[NameStyle] = JsonEncoder.boolean.contramap(_.value)
   implicit lazy val pgType: PGType[NameStyle] = PGType.instance(""""public"."NameStyle"""", Types.OTHER)
   implicit lazy val setter: Setter[NameStyle] = Setter.booleanSetter.contramap(_.value)
-  implicit lazy val text: Text[NameStyle] = new Text[NameStyle] {
-    override def unsafeEncode(v: NameStyle, sb: StringBuilder) = Text.booleanInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: NameStyle, sb: StringBuilder) = Text.booleanInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[NameStyle] = {
+    new Text[NameStyle] {
+      override def unsafeEncode(v: NameStyle, sb: StringBuilder) = Text.booleanInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: NameStyle, sb: StringBuilder) = Text.booleanInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

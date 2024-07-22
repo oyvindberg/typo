@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.workorderrouting
+package adventureworks.production.workorderrouting;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait WorkorderroutingRepo {
   def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow]
@@ -17,7 +17,7 @@ trait WorkorderroutingRepo {
   def insert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow
   def insert(unsaved: WorkorderroutingRowUnsaved)(implicit c: Connection): WorkorderroutingRow
   def insertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[WorkorderroutingRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow]
   def selectAll(implicit c: Connection): List[WorkorderroutingRow]
@@ -28,6 +28,6 @@ trait WorkorderroutingRepo {
   def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean
   def upsert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow
   def upsertBatch(unsaved: Iterable[WorkorderroutingRow])(implicit c: Connection): List[WorkorderroutingRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

@@ -4,6 +4,7 @@ import bleep.*
 import bleep.commands.SourceGen
 import bleep.model.{CrossProjectName, ProjectName}
 import typo.*
+import typo.internal.codegen.LangScala
 import typo.internal.generate
 import typo.internal.sqlfiles.readSqlFileDirectories
 
@@ -56,12 +57,13 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
             Options(
               pkg = "adventureworks",
               dbLib,
+              lang = LangScala,
               jsonLib,
-              enableDsl = dbLib.nonEmpty,
               enableTestInserts = Selector.All,
+              enableStreamingInserts = false,
+              enableDsl = dbLib.nonEmpty,
               inlineImplicits = inlineImplicits,
-              fixVerySlowImplicit = fixVerySlowImplicit,
-              enableStreamingInserts = false
+              fixVerySlowImplicit = fixVerySlowImplicit
             ),
             metadb,
             ProjectGraph(

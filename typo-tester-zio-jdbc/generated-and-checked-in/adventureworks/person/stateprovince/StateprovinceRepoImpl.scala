@@ -3,110 +3,90 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.stateprovince
+package adventureworks.person.stateprovince;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoUUID
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.public.Flag
-import adventureworks.public.Name
-import adventureworks.sales.salesterritory.SalesterritoryId
-import adventureworks.streamingInsert
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
-import typo.dsl.UpdateBuilder
-import zio.ZIO
-import zio.jdbc.SqlFragment
-import zio.jdbc.SqlFragment.Segment
-import zio.jdbc.SqlFragment.Setter
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.jdbc.sqlInterpolator
-import zio.stream.ZStream
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.person.countryregion.CountryregionId;
+import adventureworks.public.Flag;
+import adventureworks.public.Name;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import adventureworks.streamingInsert;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
+import typo.dsl.UpdateBuilder;
+import zio.ZIO;
+import zio.jdbc.SqlFragment;
+import zio.jdbc.SqlFragment.Segment;
+import zio.jdbc.SqlFragment.Setter;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.jdbc.sqlInterpolator;
+import zio.stream.ZStream;
 
 class StateprovinceRepoImpl extends StateprovinceRepo {
-  override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
-    DeleteBuilder("person.stateprovince", StateprovinceFields.structure)
-  }
-  override def deleteById(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from person.stateprovince where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".delete.map(_ > 0)
-  }
-  override def deleteByIds(stateprovinceids: Array[StateprovinceId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from person.stateprovince where "stateprovinceid" = ANY(${Segment.paramSegment(stateprovinceids)(StateprovinceId.arraySetter)})""".delete
-  }
-  override def insert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, StateprovinceRow] = {
+  def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = DeleteBuilder("person.stateprovince", StateprovinceFields.structure)
+  def deleteById(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Boolean] = sql"""delete from person.stateprovince where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".delete.map(_ > 0)
+  def deleteByIds(stateprovinceids: Array[StateprovinceId]): ZIO[ZConnection, Throwable, Long] = sql"""delete from person.stateprovince where "stateprovinceid" = ANY(${Segment.paramSegment(stateprovinceids)(StateprovinceId.arraySetter)})""".delete
+  def insert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, StateprovinceRow] = {
     sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4, ${Segment.paramSegment(unsaved.stateprovincecode)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}, ${Segment.paramSegment(unsaved.isonlystateprovinceflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.territoryid)(SalesterritoryId.setter)}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
        """.insertReturning(using StateprovinceRow.jdbcDecoder).map(_.updatedKeys.head)
   }
-  override def insert(unsaved: StateprovinceRowUnsaved): ZIO[ZConnection, Throwable, StateprovinceRow] = {
+  def insert(unsaved: StateprovinceRowUnsaved): ZIO[ZConnection, Throwable, StateprovinceRow] = {
     val fs = List(
       Some((sql""""stateprovincecode"""", sql"${Segment.paramSegment(unsaved.stateprovincecode)(Setter.stringSetter)}::bpchar")),
-      Some((sql""""countryregioncode"""", sql"${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}")),
-      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
-      Some((sql""""territoryid"""", sql"${Segment.paramSegment(unsaved.territoryid)(SalesterritoryId.setter)}::int4")),
-      unsaved.stateprovinceid match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""stateprovinceid"""", sql"${Segment.paramSegment(value: StateprovinceId)(StateprovinceId.setter)}::int4"))
-      },
-      unsaved.isonlystateprovinceflag match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""isonlystateprovinceflag"""", sql"${Segment.paramSegment(value: Flag)(Flag.setter)}::bool"))
-      },
-      unsaved.rowguid match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
-      },
-      unsaved.modifieddate match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
-      }
+                      Some((sql""""countryregioncode"""", sql"${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}")),
+                      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar")),
+                      Some((sql""""territoryid"""", sql"${Segment.paramSegment(unsaved.territoryid)(SalesterritoryId.setter)}::int4")),
+    unsaved.stateprovinceid match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((sql""""stateprovinceid"""", sql"${Segment.paramSegment(value: StateprovinceId)(StateprovinceId.setter)}::int4"))
+    },
+    unsaved.isonlystateprovinceflag match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((sql""""isonlystateprovinceflag"""", sql"${Segment.paramSegment(value: Flag)(Flag.setter)}::bool"))
+    },
+    unsaved.rowguid match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((sql""""rowguid"""", sql"${Segment.paramSegment(value: TypoUUID)(TypoUUID.setter)}::uuid"))
+    },
+    unsaved.modifieddate match {
+      case Defaulted.UseDefault() => None
+      case Defaulted.Provided(value) => Some((sql""""modifieddate"""", sql"${Segment.paramSegment(value: TypoLocalDateTime)(TypoLocalDateTime.setter)}::timestamp"))
+    }
     ).flatten
     
     val q = if (fs.isEmpty) {
       sql"""insert into person.stateprovince default values
-            returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
-         """
+                            returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
+                         """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
       sql"""insert into person.stateprovince($names) values ($values) returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text"""
     }
     q.insertReturning(using StateprovinceRow.jdbcDecoder).map(_.updatedKeys.head)
-    
+  
   }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StateprovinceRow.text)
-  }
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
-  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY person.stateprovince("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StateprovinceRowUnsaved.text)
-  }
-  override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
-    SelectBuilderSql("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.jdbcDecoder)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, StateprovinceRow] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince""".query(using StateprovinceRow.jdbcDecoder).selectStream()
-  }
-  override def selectById(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Option[StateprovinceRow]] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".query(using StateprovinceRow.jdbcDecoder).selectOne
-  }
-  override def selectByIds(stateprovinceids: Array[StateprovinceId]): ZStream[ZConnection, Throwable, StateprovinceRow] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ANY(${Segment.paramSegment(stateprovinceids)(StateprovinceId.arraySetter)})""".query(using StateprovinceRow.jdbcDecoder).selectStream()
-  }
-  override def selectByIdsTracked(stateprovinceids: Array[StateprovinceId]): ZIO[ZConnection, Throwable, Map[StateprovinceId, StateprovinceRow]] = {
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = streamingInsert(s"""COPY person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StateprovinceRow.text)
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = streamingInsert(s"""COPY person.stateprovince("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StateprovinceRowUnsaved.text)
+  def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = SelectBuilderSql("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.jdbcDecoder)
+  def selectAll: ZStream[ZConnection, Throwable, StateprovinceRow] = sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince""".query(using StateprovinceRow.jdbcDecoder).selectStream()
+  def selectById(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Option[StateprovinceRow]] = sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".query(using StateprovinceRow.jdbcDecoder).selectOne
+  def selectByIds(stateprovinceids: Array[StateprovinceId]): ZStream[ZConnection, Throwable, StateprovinceRow] = sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ANY(${Segment.paramSegment(stateprovinceids)(StateprovinceId.arraySetter)})""".query(using StateprovinceRow.jdbcDecoder).selectStream()
+  def selectByIdsTracked(stateprovinceids: Array[StateprovinceId]): ZIO[ZConnection, Throwable, Map[StateprovinceId, StateprovinceRow]] = {
     selectByIds(stateprovinceids).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.stateprovinceid, x)).toMap
       stateprovinceids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
-    UpdateBuilder("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.jdbcDecoder)
-  }
-  override def update(row: StateprovinceRow): ZIO[ZConnection, Throwable, Boolean] = {
+  def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = UpdateBuilder("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.jdbcDecoder)
+  def update(row: StateprovinceRow): ZIO[ZConnection, Throwable, Boolean] = {
     val stateprovinceid = row.stateprovinceid
     sql"""update person.stateprovince
           set "stateprovincecode" = ${Segment.paramSegment(row.stateprovincecode)(Setter.stringSetter)}::bpchar,
@@ -118,7 +98,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".update.map(_ > 0)
   }
-  override def upsert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, UpdateResult[StateprovinceRow]] = {
+  def upsert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, UpdateResult[StateprovinceRow]] = {
     sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4,
@@ -141,8 +121,8 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
             "modifieddate" = EXCLUDED."modifieddate"
           returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text""".insertReturning(using StateprovinceRow.jdbcDecoder)
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     val created = sql"create temporary table stateprovince_TEMP (like person.stateprovince) on commit drop".execute
     val copied = streamingInsert(s"""copy stateprovince_TEMP("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(StateprovinceRow.text)
     val merged = sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")

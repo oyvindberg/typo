@@ -3,19 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.person.vstateprovincecountryregion
+package adventureworks.person.vstateprovincecountryregion;
 
-import adventureworks.person.countryregion.CountryregionId
-import adventureworks.person.stateprovince.StateprovinceId
-import adventureworks.public.Flag
-import adventureworks.public.Name
-import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.person.countryregion.CountryregionId;
+import adventureworks.person.stateprovince.StateprovinceId;
+import adventureworks.public.Flag;
+import adventureworks.public.Name;
+import adventureworks.sales.salesterritory.SalesterritoryId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Materialized View: person.vstateprovincecountryregion */
 case class VstateprovincecountryregionMVRow(
@@ -38,24 +38,27 @@ case class VstateprovincecountryregionMVRow(
 object VstateprovincecountryregionMVRow {
   implicit lazy val decoder: Decoder[VstateprovincecountryregionMVRow] = Decoder.forProduct7[VstateprovincecountryregionMVRow, StateprovinceId, /* bpchar, max 3 chars */ String, Flag, Name, SalesterritoryId, CountryregionId, Name]("stateprovinceid", "stateprovincecode", "isonlystateprovinceflag", "stateprovincename", "territoryid", "countryregioncode", "countryregionname")(VstateprovincecountryregionMVRow.apply)(StateprovinceId.decoder, Decoder.decodeString, Flag.decoder, Name.decoder, SalesterritoryId.decoder, CountryregionId.decoder, Name.decoder)
   implicit lazy val encoder: Encoder[VstateprovincecountryregionMVRow] = Encoder.forProduct7[VstateprovincecountryregionMVRow, StateprovinceId, /* bpchar, max 3 chars */ String, Flag, Name, SalesterritoryId, CountryregionId, Name]("stateprovinceid", "stateprovincecode", "isonlystateprovinceflag", "stateprovincename", "territoryid", "countryregioncode", "countryregionname")(x => (x.stateprovinceid, x.stateprovincecode, x.isonlystateprovinceflag, x.stateprovincename, x.territoryid, x.countryregioncode, x.countryregionname))(StateprovinceId.encoder, Encoder.encodeString, Flag.encoder, Name.encoder, SalesterritoryId.encoder, CountryregionId.encoder, Name.encoder)
-  implicit lazy val read: Read[VstateprovincecountryregionMVRow] = new Read[VstateprovincecountryregionMVRow](
-    gets = List(
-      (StateprovinceId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (SalesterritoryId.get, Nullability.NoNulls),
-      (CountryregionId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => VstateprovincecountryregionMVRow(
-      stateprovinceid = StateprovinceId.get.unsafeGetNonNullable(rs, i + 0),
-      stateprovincecode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      isonlystateprovinceflag = Flag.get.unsafeGetNonNullable(rs, i + 2),
-      stateprovincename = Name.get.unsafeGetNonNullable(rs, i + 3),
-      territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 4),
-      countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 5),
-      countryregionname = Name.get.unsafeGetNonNullable(rs, i + 6)
+  implicit lazy val read: Read[VstateprovincecountryregionMVRow] = {
+    new Read[VstateprovincecountryregionMVRow](
+      gets = List(
+        (StateprovinceId.get, Nullability.NoNulls),
+        (Meta.StringMeta.get, Nullability.NoNulls),
+        (Flag.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls),
+        (SalesterritoryId.get, Nullability.NoNulls),
+        (CountryregionId.get, Nullability.NoNulls),
+        (Name.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => VstateprovincecountryregionMVRow(
+        stateprovinceid = StateprovinceId.get.unsafeGetNonNullable(rs, i + 0),
+        stateprovincecode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
+        isonlystateprovinceflag = Flag.get.unsafeGetNonNullable(rs, i + 2),
+        stateprovincename = Name.get.unsafeGetNonNullable(rs, i + 3),
+        territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 4),
+        countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 5),
+        countryregionname = Name.get.unsafeGetNonNullable(rs, i + 6)
+      )
     )
-  )
+  
+  }
 }

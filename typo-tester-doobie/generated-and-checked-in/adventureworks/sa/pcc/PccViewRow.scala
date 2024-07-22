@@ -3,16 +3,16 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.sa.pcc
+package adventureworks.sa.pcc;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.person.businessentity.BusinessentityId
-import adventureworks.userdefined.CustomCreditcardId
-import doobie.enumerated.Nullability
-import doobie.util.Read
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.person.businessentity.BusinessentityId;
+import adventureworks.userdefined.CustomCreditcardId;
+import doobie.enumerated.Nullability;
+import doobie.util.Read;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** View: sa.pcc */
 case class PccViewRow(
@@ -29,18 +29,21 @@ case class PccViewRow(
 object PccViewRow {
   implicit lazy val decoder: Decoder[PccViewRow] = Decoder.forProduct4[PccViewRow, BusinessentityId, BusinessentityId, /* user-picked */ CustomCreditcardId, TypoLocalDateTime]("id", "businessentityid", "creditcardid", "modifieddate")(PccViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, CustomCreditcardId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PccViewRow] = Encoder.forProduct4[PccViewRow, BusinessentityId, BusinessentityId, /* user-picked */ CustomCreditcardId, TypoLocalDateTime]("id", "businessentityid", "creditcardid", "modifieddate")(x => (x.id, x.businessentityid, x.creditcardid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, CustomCreditcardId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PccViewRow] = new Read[PccViewRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (/* user-picked */ CustomCreditcardId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PccViewRow(
-      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      creditcardid = /* user-picked */ CustomCreditcardId.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[PccViewRow] = {
+    new Read[PccViewRow](
+      gets = List(
+        (BusinessentityId.get, Nullability.NoNulls),
+        (BusinessentityId.get, Nullability.NoNulls),
+        (/* user-picked */ CustomCreditcardId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => PccViewRow(
+        id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+        businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
+        creditcardid = /* user-picked */ CustomCreditcardId.get.unsafeGetNonNullable(rs, i + 2),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+      )
     )
-  )
+  
+  }
 }

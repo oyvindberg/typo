@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.productmodelillustration
+package adventureworks.production.productmodelillustration;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait ProductmodelillustrationRepo {
   def delete: DeleteBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow]
@@ -17,7 +17,7 @@ trait ProductmodelillustrationRepo {
   def insert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow
   def insert(unsaved: ProductmodelillustrationRowUnsaved)(implicit c: Connection): ProductmodelillustrationRow
   def insertStreaming(unsaved: Iterator[ProductmodelillustrationRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[ProductmodelillustrationRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow]
   def selectAll(implicit c: Connection): List[ProductmodelillustrationRow]
@@ -28,6 +28,6 @@ trait ProductmodelillustrationRepo {
   def update(row: ProductmodelillustrationRow)(implicit c: Connection): Boolean
   def upsert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow
   def upsertBatch(unsaved: Iterable[ProductmodelillustrationRow])(implicit c: Connection): List[ProductmodelillustrationRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[ProductmodelillustrationRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

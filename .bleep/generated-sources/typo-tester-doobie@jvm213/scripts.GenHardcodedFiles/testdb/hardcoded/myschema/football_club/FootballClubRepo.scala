@@ -3,13 +3,13 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.myschema.football_club
+package testdb.hardcoded.myschema.football_club;
 
-import doobie.free.connection.ConnectionIO
-import fs2.Stream
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import doobie.free.connection.ConnectionIO;
+import fs2.Stream;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait FootballClubRepo {
   def delete: DeleteBuilder[FootballClubFields, FootballClubRow]
@@ -19,7 +19,7 @@ trait FootballClubRepo {
   def insertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int = 10000): ConnectionIO[Long]
   def select: SelectBuilder[FootballClubFields, FootballClubRow]
   def selectAll: Stream[ConnectionIO, FootballClubRow]
-  def selectByFieldValues(fieldValues: List[FootballClubFieldOrIdValue[?]]): Stream[ConnectionIO, FootballClubRow]
+  def selectByFieldValues(fieldValues: List[FootballClubFieldValue[?]]): Stream[ConnectionIO, FootballClubRow]
   def selectById(id: FootballClubId): ConnectionIO[Option[FootballClubRow]]
   def selectByIds(ids: Array[FootballClubId]): Stream[ConnectionIO, FootballClubRow]
   def selectByIdsTracked(ids: Array[FootballClubId]): ConnectionIO[Map[FootballClubId, FootballClubRow]]
@@ -28,6 +28,6 @@ trait FootballClubRepo {
   def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ConnectionIO[Boolean]
   def upsert(unsaved: FootballClubRow): ConnectionIO[FootballClubRow]
   def upsertBatch(unsaved: List[FootballClubRow]): Stream[ConnectionIO, FootballClubRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Stream[ConnectionIO, FootballClubRow], batchSize: Int = 10000): ConnectionIO[Int]
 }

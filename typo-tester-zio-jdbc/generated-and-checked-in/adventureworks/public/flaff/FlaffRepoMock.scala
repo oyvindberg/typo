@@ -3,35 +3,29 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.flaff
+package adventureworks.public.flaff;
 
-import scala.annotation.nowarn
-import typo.dsl.DeleteBuilder
-import typo.dsl.DeleteBuilder.DeleteBuilderMock
-import typo.dsl.DeleteParams
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderMock
-import typo.dsl.SelectParams
-import typo.dsl.UpdateBuilder
-import typo.dsl.UpdateBuilder.UpdateBuilderMock
-import typo.dsl.UpdateParams
-import zio.Chunk
-import zio.ZIO
-import zio.jdbc.UpdateResult
-import zio.jdbc.ZConnection
-import zio.stream.ZStream
+import scala.annotation.nowarn;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.DeleteBuilder.DeleteBuilderMock;
+import typo.dsl.DeleteParams;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderMock;
+import typo.dsl.SelectParams;
+import typo.dsl.UpdateBuilder;
+import typo.dsl.UpdateBuilder.UpdateBuilderMock;
+import typo.dsl.UpdateParams;
+import zio.Chunk;
+import zio.ZIO;
+import zio.jdbc.UpdateResult;
+import zio.jdbc.ZConnection;
+import zio.stream.ZStream;
 
-class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala.collection.mutable.Map.empty) extends FlaffRepo {
-  override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
-    DeleteBuilderMock(DeleteParams.empty, FlaffFields.structure, map)
-  }
-  override def deleteById(compositeId: FlaffId): ZIO[ZConnection, Throwable, Boolean] = {
-    ZIO.succeed(map.remove(compositeId).isDefined)
-  }
-  override def deleteByIds(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Long] = {
-    ZIO.succeed(compositeIds.map(id => map.remove(id)).count(_.isDefined).toLong)
-  }
-  override def insert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, FlaffRow] = {
+class FlaffRepoMock(val map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala.collection.mutable.Map.empty) extends FlaffRepo {
+  def delete: DeleteBuilder[FlaffFields, FlaffRow] = DeleteBuilderMock(DeleteParams.empty, FlaffFields.structure, map)
+  def deleteById(compositeId: FlaffId): ZIO[ZConnection, Throwable, Boolean] = ZIO.succeed(map.remove(compositeId).isDefined)
+  def deleteByIds(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Long] = ZIO.succeed(compositeIds.map(id => map.remove(id)).count(_.isDefined).toLong)
+  def insert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, FlaffRow] = {
     ZIO.succeed {
       val _ =
         if (map.contains(unsaved.compositeId))
@@ -42,7 +36,7 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
       unsaved
     }
   }
-  override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FlaffRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+  def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FlaffRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
         map += (row.compositeId -> row)
@@ -50,28 +44,18 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
       }
     }.runLast.map(_.getOrElse(0L))
   }
-  override def select: SelectBuilder[FlaffFields, FlaffRow] = {
-    SelectBuilderMock(FlaffFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
-  }
-  override def selectAll: ZStream[ZConnection, Throwable, FlaffRow] = {
-    ZStream.fromIterable(map.values)
-  }
-  override def selectById(compositeId: FlaffId): ZIO[ZConnection, Throwable, Option[FlaffRow]] = {
-    ZIO.succeed(map.get(compositeId))
-  }
-  override def selectByIds(compositeIds: Array[FlaffId]): ZStream[ZConnection, Throwable, FlaffRow] = {
-    ZStream.fromIterable(compositeIds.flatMap(map.get))
-  }
-  override def selectByIdsTracked(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Map[FlaffId, FlaffRow]] = {
+  def select: SelectBuilder[FlaffFields, FlaffRow] = SelectBuilderMock(FlaffFields.structure, ZIO.succeed(Chunk.fromIterable(map.values)), SelectParams.empty)
+  def selectAll: ZStream[ZConnection, Throwable, FlaffRow] = ZStream.fromIterable(map.values)
+  def selectById(compositeId: FlaffId): ZIO[ZConnection, Throwable, Option[FlaffRow]] = ZIO.succeed(map.get(compositeId))
+  def selectByIds(compositeIds: Array[FlaffId]): ZStream[ZConnection, Throwable, FlaffRow] = ZStream.fromIterable(compositeIds.flatMap(map.get))
+  def selectByIdsTracked(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Map[FlaffId, FlaffRow]] = {
     selectByIds(compositeIds).runCollect.map { rows =>
       val byId = rows.view.map(x => (x.compositeId, x)).toMap
       compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
     }
   }
-  override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
-    UpdateBuilderMock(UpdateParams.empty, FlaffFields.structure, map)
-  }
-  override def update(row: FlaffRow): ZIO[ZConnection, Throwable, Boolean] = {
+  def update: UpdateBuilder[FlaffFields, FlaffRow] = UpdateBuilderMock(UpdateParams.empty, FlaffFields.structure, map)
+  def update(row: FlaffRow): ZIO[ZConnection, Throwable, Boolean] = {
     ZIO.succeed {
       map.get(row.compositeId) match {
         case Some(`row`) => false
@@ -82,14 +66,14 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
       }
     }
   }
-  override def upsert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, UpdateResult[FlaffRow]] = {
+  def upsert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, UpdateResult[FlaffRow]] = {
     ZIO.succeed {
       map.put(unsaved.compositeId, unsaved): @nowarn
       UpdateResult(1, Chunk.single(unsaved))
     }
   }
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
-  override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, FlaffRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, FlaffRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
         map += (row.compositeId -> row)

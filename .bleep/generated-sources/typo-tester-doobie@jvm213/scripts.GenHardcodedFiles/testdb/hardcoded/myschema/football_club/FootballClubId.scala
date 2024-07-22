@@ -3,18 +3,19 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN
  */
-package testdb.hardcoded.myschema.football_club
+package testdb.hardcoded.myschema.football_club;
 
-import doobie.postgres.Text
-import doobie.util.Get
-import doobie.util.Put
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import typo.dsl.Bijection
+import doobie.postgres.Text;
+import doobie.util.Get;
+import doobie.util.Put;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import typo.dsl.Bijection;
 
 /** Type for the primary key of table `myschema.football_club` */
-case class FootballClubId(value: Long) extends AnyVal
+case class FootballClubId(value: Long) extends scala.AnyVal
+
 object FootballClubId {
   implicit lazy val arrayGet: Get[Array[FootballClubId]] = testdb.hardcoded.LongArrayMeta.get.map(_.map(FootballClubId.apply))
   implicit lazy val arrayPut: Put[Array[FootballClubId]] = testdb.hardcoded.LongArrayMeta.put.contramap(_.map(_.value))
@@ -23,8 +24,10 @@ object FootballClubId {
   implicit lazy val encoder: Encoder[FootballClubId] = Encoder.encodeLong.contramap(_.value)
   implicit lazy val get: Get[FootballClubId] = Meta.LongMeta.get.map(FootballClubId.apply)
   implicit lazy val put: Put[FootballClubId] = Meta.LongMeta.put.contramap(_.value)
-  implicit lazy val text: Text[FootballClubId] = new Text[FootballClubId] {
-    override def unsafeEncode(v: FootballClubId, sb: StringBuilder) = Text.longInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: FootballClubId, sb: StringBuilder) = Text.longInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[FootballClubId] = {
+    new Text[FootballClubId] {
+      override def unsafeEncode(v: FootballClubId, sb: StringBuilder) = Text.longInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: FootballClubId, sb: StringBuilder) = Text.longInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

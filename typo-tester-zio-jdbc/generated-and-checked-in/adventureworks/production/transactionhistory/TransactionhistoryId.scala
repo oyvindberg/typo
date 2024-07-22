@@ -3,19 +3,20 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.transactionhistory
+package adventureworks.production.transactionhistory;
 
-import adventureworks.Text
-import typo.dsl.Bijection
-import typo.dsl.PGType
-import zio.jdbc.JdbcDecoder
-import zio.jdbc.JdbcEncoder
-import zio.jdbc.SqlFragment.Setter
-import zio.json.JsonDecoder
-import zio.json.JsonEncoder
+import adventureworks.Text;
+import typo.dsl.Bijection;
+import typo.dsl.PGType;
+import zio.jdbc.JdbcDecoder;
+import zio.jdbc.JdbcEncoder;
+import zio.jdbc.SqlFragment.Setter;
+import zio.json.JsonDecoder;
+import zio.json.JsonEncoder;
 
 /** Type for the primary key of table `production.transactionhistory` */
-case class TransactionhistoryId(value: Int) extends AnyVal
+case class TransactionhistoryId(value: Int) extends scala.AnyVal
+
 object TransactionhistoryId {
   implicit lazy val arrayJdbcDecoder: JdbcDecoder[Array[TransactionhistoryId]] = adventureworks.IntArrayDecoder.map(_.map(TransactionhistoryId.apply))
   implicit lazy val arrayJdbcEncoder: JdbcEncoder[Array[TransactionhistoryId]] = adventureworks.IntArrayEncoder.contramap(_.map(_.value))
@@ -27,8 +28,10 @@ object TransactionhistoryId {
   implicit lazy val jsonEncoder: JsonEncoder[TransactionhistoryId] = JsonEncoder.int.contramap(_.value)
   implicit lazy val pgType: PGType[TransactionhistoryId] = PGType.PGTypeInt.as
   implicit lazy val setter: Setter[TransactionhistoryId] = Setter.intSetter.contramap(_.value)
-  implicit lazy val text: Text[TransactionhistoryId] = new Text[TransactionhistoryId] {
-    override def unsafeEncode(v: TransactionhistoryId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
-    override def unsafeArrayEncode(v: TransactionhistoryId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+  implicit lazy val text: Text[TransactionhistoryId] = {
+    new Text[TransactionhistoryId] {
+      override def unsafeEncode(v: TransactionhistoryId, sb: StringBuilder) = Text.intInstance.unsafeEncode(v.value, sb)
+      override def unsafeArrayEncode(v: TransactionhistoryId, sb: StringBuilder) = Text.intInstance.unsafeArrayEncode(v.value, sb)
+    }
   }
 }

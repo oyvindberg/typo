@@ -3,38 +3,38 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.public.pgtest
+package adventureworks.public.pgtest;
 
-import adventureworks.customtypes.TypoBox
-import adventureworks.customtypes.TypoBytea
-import adventureworks.customtypes.TypoCircle
-import adventureworks.customtypes.TypoHStore
-import adventureworks.customtypes.TypoInet
-import adventureworks.customtypes.TypoInstant
-import adventureworks.customtypes.TypoInt2Vector
-import adventureworks.customtypes.TypoInterval
-import adventureworks.customtypes.TypoJson
-import adventureworks.customtypes.TypoJsonb
-import adventureworks.customtypes.TypoLine
-import adventureworks.customtypes.TypoLineSegment
-import adventureworks.customtypes.TypoLocalDate
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoLocalTime
-import adventureworks.customtypes.TypoMoney
-import adventureworks.customtypes.TypoOffsetTime
-import adventureworks.customtypes.TypoPath
-import adventureworks.customtypes.TypoPoint
-import adventureworks.customtypes.TypoPolygon
-import adventureworks.customtypes.TypoShort
-import adventureworks.customtypes.TypoUUID
-import adventureworks.customtypes.TypoVector
-import adventureworks.customtypes.TypoXml
-import adventureworks.public.Mydomain
-import adventureworks.public.Myenum
-import typo.dsl.Path
-import typo.dsl.SqlExpr.Field
-import typo.dsl.SqlExpr.FieldLike
-import typo.dsl.Structure.Relation
+import adventureworks.customtypes.TypoBox;
+import adventureworks.customtypes.TypoBytea;
+import adventureworks.customtypes.TypoCircle;
+import adventureworks.customtypes.TypoHStore;
+import adventureworks.customtypes.TypoInet;
+import adventureworks.customtypes.TypoInstant;
+import adventureworks.customtypes.TypoInt2Vector;
+import adventureworks.customtypes.TypoInterval;
+import adventureworks.customtypes.TypoJson;
+import adventureworks.customtypes.TypoJsonb;
+import adventureworks.customtypes.TypoLine;
+import adventureworks.customtypes.TypoLineSegment;
+import adventureworks.customtypes.TypoLocalDate;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoLocalTime;
+import adventureworks.customtypes.TypoMoney;
+import adventureworks.customtypes.TypoOffsetTime;
+import adventureworks.customtypes.TypoPath;
+import adventureworks.customtypes.TypoPoint;
+import adventureworks.customtypes.TypoPolygon;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.customtypes.TypoUUID;
+import adventureworks.customtypes.TypoVector;
+import adventureworks.customtypes.TypoXml;
+import adventureworks.public.Mydomain;
+import adventureworks.public.Myenum;
+import typo.dsl.Path;
+import typo.dsl.SqlExpr.Field;
+import typo.dsl.SqlExpr.FieldLike;
+import typo.dsl.Structure.Relation;
 
 trait PgtestFields {
   def bool: Field[Boolean, PgtestRow]

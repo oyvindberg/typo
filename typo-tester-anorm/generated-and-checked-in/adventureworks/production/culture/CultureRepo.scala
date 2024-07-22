@@ -3,12 +3,12 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.production.culture
+package adventureworks.production.culture;
 
-import java.sql.Connection
-import typo.dsl.DeleteBuilder
-import typo.dsl.SelectBuilder
-import typo.dsl.UpdateBuilder
+import java.sql.Connection;
+import typo.dsl.DeleteBuilder;
+import typo.dsl.SelectBuilder;
+import typo.dsl.UpdateBuilder;
 
 trait CultureRepo {
   def delete: DeleteBuilder[CultureFields, CultureRow]
@@ -17,7 +17,7 @@ trait CultureRepo {
   def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow
   def insert(unsaved: CultureRowUnsaved)(implicit c: Connection): CultureRow
   def insertStreaming(unsaved: Iterator[CultureRow], batchSize: Int = 10000)(implicit c: Connection): Long
-  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  /** NOTE: this functionality requires PostgreSQL 16 or later! */
   def insertUnsavedStreaming(unsaved: Iterator[CultureRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[CultureFields, CultureRow]
   def selectAll(implicit c: Connection): List[CultureRow]
@@ -28,6 +28,6 @@ trait CultureRepo {
   def update(row: CultureRow)(implicit c: Connection): Boolean
   def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow
   def upsertBatch(unsaved: Iterable[CultureRow])(implicit c: Connection): List[CultureRow]
-  /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
+  /** NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   def upsertStreaming(unsaved: Iterator[CultureRow], batchSize: Int = 10000)(implicit c: Connection): Int
 }

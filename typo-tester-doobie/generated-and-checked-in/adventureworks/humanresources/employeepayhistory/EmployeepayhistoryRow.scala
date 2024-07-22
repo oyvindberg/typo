@@ -3,97 +3,128 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.humanresources.employeepayhistory
+package adventureworks.humanresources.employeepayhistory;
 
-import adventureworks.customtypes.Defaulted
-import adventureworks.customtypes.TypoLocalDateTime
-import adventureworks.customtypes.TypoShort
-import adventureworks.person.businessentity.BusinessentityId
-import doobie.enumerated.Nullability
-import doobie.postgres.Text
-import doobie.util.Read
-import doobie.util.Write
-import doobie.util.meta.Meta
-import io.circe.Decoder
-import io.circe.Encoder
-import java.sql.ResultSet
+import adventureworks.customtypes.Defaulted;
+import adventureworks.customtypes.TypoLocalDateTime;
+import adventureworks.customtypes.TypoShort;
+import adventureworks.person.businessentity.BusinessentityId;
+import doobie.enumerated.Nullability;
+import doobie.postgres.Text;
+import doobie.util.Read;
+import doobie.util.Write;
+import doobie.util.meta.Meta;
+import io.circe.Decoder;
+import io.circe.Encoder;
+import java.sql.ResultSet;
 
 /** Table: humanresources.employeepayhistory
-    Employee pay history.
-    Composite primary key: businessentityid, ratechangedate */
+  * Employee pay history.
+  * Composite primary key: businessentityid, ratechangedate
+  */
 case class EmployeepayhistoryRow(
   /** Employee identification number. Foreign key to Employee.BusinessEntityID.
-      Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]] */
+    * Points to [[adventureworks.humanresources.employee.EmployeeRow.businessentityid]]
+    */
   businessentityid: BusinessentityId,
   /** Date the change in pay is effective */
   ratechangedate: TypoLocalDateTime,
   /** Salary hourly rate.
-      Constraint CK_EmployeePayHistory_Rate affecting columns rate: (((rate >= 6.50) AND (rate <= 200.00))) */
+    * Constraint CK_EmployeePayHistory_Rate affecting columns rate: (((rate >= 6.50) AND (rate <= 200.00)))
+    */
   rate: BigDecimal,
   /** 1 = Salary received monthly, 2 = Salary received biweekly
-      Constraint CK_EmployeePayHistory_PayFrequency affecting columns payfrequency: ((payfrequency = ANY (ARRAY[1, 2]))) */
+    * Constraint CK_EmployeePayHistory_PayFrequency affecting columns payfrequency: ((payfrequency = ANY (ARRAY[1, 2])))
+    */
   payfrequency: TypoShort,
   /** Default: now() */
   modifieddate: TypoLocalDateTime
-){
-   val compositeId: EmployeepayhistoryId = EmployeepayhistoryId(businessentityid, ratechangedate)
-   val id = compositeId
-   def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): EmployeepayhistoryRowUnsaved =
-     EmployeepayhistoryRowUnsaved(businessentityid, ratechangedate, rate, payfrequency, modifieddate)
- }
+) {
+  def compositeId: EmployeepayhistoryId = new EmployeepayhistoryId(businessentityid, ratechangedate)
+  def id: EmployeepayhistoryId = compositeId
+  def toUnsavedRow(modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.Provided(this.modifieddate)): EmployeepayhistoryRowUnsaved = {
+    new EmployeepayhistoryRowUnsaved(
+      businessentityid,
+      ratechangedate,
+      rate,
+      payfrequency,
+      modifieddate
+    )
+  }
+}
 
 object EmployeepayhistoryRow {
-  def apply(compositeId: EmployeepayhistoryId, rate: BigDecimal, payfrequency: TypoShort, modifieddate: TypoLocalDateTime) =
-    new EmployeepayhistoryRow(compositeId.businessentityid, compositeId.ratechangedate, rate, payfrequency, modifieddate)
+  def apply(
+    compositeId: EmployeepayhistoryId,
+    rate: BigDecimal,
+    payfrequency: TypoShort,
+    modifieddate: TypoLocalDateTime
+  ): EmployeepayhistoryRow = {
+    new EmployeepayhistoryRow(
+      compositeId.businessentityid,
+      compositeId.ratechangedate,
+      rate,
+      payfrequency,
+      modifieddate
+    )
+  }
   implicit lazy val decoder: Decoder[EmployeepayhistoryRow] = Decoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, TypoShort, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(EmployeepayhistoryRow.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, TypoShort.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[EmployeepayhistoryRow] = Encoder.forProduct5[EmployeepayhistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, TypoShort, TypoLocalDateTime]("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")(x => (x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate))(BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, TypoShort.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[EmployeepayhistoryRow] = new Read[EmployeepayhistoryRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => EmployeepayhistoryRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      ratechangedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 1),
-      rate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 2),
-      payfrequency = TypoShort.get.unsafeGetNonNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+  implicit lazy val read: Read[EmployeepayhistoryRow] = {
+    new Read[EmployeepayhistoryRow](
+      gets = List(
+        (BusinessentityId.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls),
+        (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
+        (TypoShort.get, Nullability.NoNulls),
+        (TypoLocalDateTime.get, Nullability.NoNulls)
+      ),
+      unsafeGet = (rs: ResultSet, i: Int) => EmployeepayhistoryRow(
+        businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
+        ratechangedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 1),
+        rate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 2),
+        payfrequency = TypoShort.get.unsafeGetNonNullable(rs, i + 3),
+        modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+      )
     )
-  )
-  implicit lazy val text: Text[EmployeepayhistoryRow] = Text.instance[EmployeepayhistoryRow]{ (row, sb) =>
-    BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.ratechangedate, sb)
-    sb.append(Text.DELIMETER)
-    Text.bigDecimalInstance.unsafeEncode(row.rate, sb)
-    sb.append(Text.DELIMETER)
-    TypoShort.text.unsafeEncode(row.payfrequency, sb)
-    sb.append(Text.DELIMETER)
-    TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+  
   }
-  implicit lazy val write: Write[EmployeepayhistoryRow] = new Write[EmployeepayhistoryRow](
-    puts = List((BusinessentityId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 1, a.ratechangedate)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 2, a.rate)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 3, a.payfrequency)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 1, a.ratechangedate)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.rate)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 3, a.payfrequency)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
-                   }
-  )
+  implicit lazy val text: Text[EmployeepayhistoryRow] = {
+    Text.instance[EmployeepayhistoryRow]{ (row, sb) =>
+      BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.ratechangedate, sb)
+      sb.append(Text.DELIMETER)
+      Text.bigDecimalInstance.unsafeEncode(row.rate, sb)
+      sb.append(Text.DELIMETER)
+      TypoShort.text.unsafeEncode(row.payfrequency, sb)
+      sb.append(Text.DELIMETER)
+      TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
+    }
+  }
+  implicit lazy val write: Write[EmployeepayhistoryRow] = {
+    new Write[EmployeepayhistoryRow](
+      puts = List((BusinessentityId.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls),
+                  (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
+                  (TypoShort.put, Nullability.NoNulls),
+                  (TypoLocalDateTime.put, Nullability.NoNulls)),
+      toList = x => List(x.businessentityid, x.ratechangedate, x.rate, x.payfrequency, x.modifieddate),
+      unsafeSet = (rs, i, a) => {
+                    BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 1, a.ratechangedate)
+                    Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 2, a.rate)
+                    TypoShort.put.unsafeSetNonNullable(rs, i + 3, a.payfrequency)
+                    TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
+                  },
+      unsafeUpdate = (ps, i, a) => {
+                       BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 1, a.ratechangedate)
+                       Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.rate)
+                       TypoShort.put.unsafeUpdateNonNullable(ps, i + 3, a.payfrequency)
+                       TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
+                     }
+    )
+  
+  }
 }

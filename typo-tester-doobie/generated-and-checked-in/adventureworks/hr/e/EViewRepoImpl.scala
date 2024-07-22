@@ -3,19 +3,15 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.hr.e
+package adventureworks.hr.e;
 
-import doobie.free.connection.ConnectionIO
-import doobie.syntax.string.toSqlInterpolator
-import fs2.Stream
-import typo.dsl.SelectBuilder
-import typo.dsl.SelectBuilderSql
+import doobie.free.connection.ConnectionIO;
+import doobie.syntax.string.toSqlInterpolator;
+import fs2.Stream;
+import typo.dsl.SelectBuilder;
+import typo.dsl.SelectBuilderSql;
 
 class EViewRepoImpl extends EViewRepo {
-  override def select: SelectBuilder[EViewFields, EViewRow] = {
-    SelectBuilderSql("hr.e", EViewFields.structure, EViewRow.read)
-  }
-  override def selectAll: Stream[ConnectionIO, EViewRow] = {
-    sql"""select "id", "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode" from hr.e""".query(using EViewRow.read).stream
-  }
+  def select: SelectBuilder[EViewFields, EViewRow] = SelectBuilderSql("hr.e", EViewFields.structure, EViewRow.read)
+  def selectAll: Stream[ConnectionIO, EViewRow] = sql"""select "id", "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode" from hr.e""".query(using EViewRow.read).stream
 }

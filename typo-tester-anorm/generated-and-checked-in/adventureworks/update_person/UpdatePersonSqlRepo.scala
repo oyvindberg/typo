@@ -3,10 +3,10 @@
  *
  * IF YOU CHANGE THIS FILE YOUR CHANGES WILL BE OVERWRITTEN.
  */
-package adventureworks.update_person
+package adventureworks.update_person;
 
-import adventureworks.customtypes.TypoLocalDateTime
-import java.sql.Connection
+import adventureworks.customtypes.TypoLocalDateTime;
+import java.sql.Connection;
 
 trait UpdatePersonSqlRepo {
   def apply(suffix: String, cutoff: Option[TypoLocalDateTime])(implicit c: Connection): Int
