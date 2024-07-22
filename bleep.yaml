@@ -3,13 +3,11 @@ $version: 0.0.4
 jvm:
   name: graalvm-community:21.0.2
 projects:
-  # these tests do not depend on running codegen, just unit tests and so on
   tests:
     dependencies: org.scalatest::scalatest:3.2.18
     dependsOn: typo
     extends: template-nocross
     isTestProject: true
-  # main project
   typo:
     dependencies:
     - com.typesafe.play::play-json:2.10.6
@@ -22,23 +20,41 @@ projects:
       mainClass: com.foo.App
     sources: ./generated-and-checked-in
   typo-dsl-anorm:
-    dependencies: org.playframework.anorm::anorm:2.7.0
+    dependsOn: typo-runtime-anorm
     extends: template-cross
     sources: ../typo-dsl-shared
   typo-dsl-doobie:
-    dependencies: org.tpolecat::doobie-postgres:1.0.0-RC5
+    dependsOn: typo-runtime-doobie
     extends: template-cross
     sources: ../typo-dsl-shared
   typo-dsl-zio-jdbc:
-    dependencies: dev.zio::zio-jdbc:0.1.2
+    dependsOn: typo-runtime-zio-jdbc
     extends: template-cross
     sources: ../typo-dsl-shared
-  # scripts for publishing, codegen and so on
+  typo-runtime-anorm:
+    dependencies: org.playframework.anorm::anorm:2.7.0
+    dependsOn: typo-runtime-java
+    extends: template-cross
+  typo-runtime-doobie:
+    dependencies: org.tpolecat::doobie-postgres:1.0.0-RC5
+    dependsOn: typo-runtime-java
+    extends: template-cross
+  typo-runtime-java:
+    java:
+      options: --enable-preview --release 21 -proc:none
+    dependencies:
+      - org.postgresql:postgresql:42.7.3
+      - net.hamnaberg.json:immutable-json-ast:7.0.1
+    platform:
+      name: jvm
+  typo-runtime-zio-jdbc:
+    dependencies: dev.zio::zio-jdbc:0.1.2
+    dependsOn: typo-runtime-java
+    extends: template-cross
   typo-scripts:
     dependencies: build.bleep::bleep-plugin-ci-release:${BLEEP_VERSION}
     dependsOn: typo
     extends: template-nocross
-    # scripts for generating docs
   typo-scripts-doc:
     dependencies:
     - build.bleep::bleep-plugin-dynver:${BLEEP_VERSION}
@@ -53,7 +69,6 @@ projects:
   typo-tester-anorm:
     dependencies:
     - com.typesafe.play::play-json:2.10.6
-    - org.postgresql:postgresql:42.7.3
     - org.scalatest::scalatest:3.2.18
     dependsOn: typo-dsl-anorm
     extends: template-cross
@@ -65,7 +80,6 @@ projects:
   typo-tester-doobie:
     dependencies:
     - io.circe::circe-core:0.14.7
-    - org.postgresql:postgresql:42.7.3
     - org.scalatest::scalatest:3.2.18
     dependsOn: typo-dsl-doobie
     extends: template-cross
@@ -74,13 +88,18 @@ projects:
       main: scripts.GenHardcodedFiles
       project: typo-scripts
     sources: ./generated-and-checked-in
+  typo-tester-java:
+    dependsOn: typo-runtime-java
+    isTestProject: true
+    platform:
+      name: jvm
+    sources: ./generated-and-checked-in
   typo-tester-none:
     extends: template-cross
     sources: ./generated-and-checked-in
   typo-tester-zio-jdbc:
     dependencies:
     - dev.zio::zio-json:0.7.0
-    - org.postgresql:postgresql:42.7.3
     - org.scalatest::scalatest:3.2.18
     dependsOn: typo-dsl-zio-jdbc
     extends: template-cross
