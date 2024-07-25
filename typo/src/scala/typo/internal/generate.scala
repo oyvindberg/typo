@@ -4,7 +4,6 @@ package internal
 import typo.internal.codegen.*
 import typo.internal.sqlfiles.SqlFile
 
-import scala.annotation.nowarn
 import scala.collection.immutable
 import scala.collection.immutable.SortedMap
 
@@ -77,8 +76,7 @@ object generate {
 
         computedLazyRelations.foreach { case (relName, lazyValue) =>
           if (selector.include(relName)) {
-            lazyValue.get: @nowarn
-            ()
+            forget(lazyValue.get)
           }
         }
 

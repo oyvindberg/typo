@@ -1,6 +1,8 @@
 package typo
 package internal
 
+import typo.internal.compat.*
+
 sealed trait IdComputed {
   def paramName: sc.Ident
   def cols: NonEmptyList[ComputedColumn]
@@ -8,7 +10,7 @@ sealed trait IdComputed {
   final def param: sc.Param = sc.Param(paramName, tpe, None)
 
   final lazy val userDefinedColTypes: List[sc.Type] =
-    cols.toList.collect { case x if sc.Type.containsUserDefined(x.tpe) => x }.map(_.tpe).distinctBy(sc.Type.base)
+    cols.toList.collect { case x if sc.Type.containsUserDefined(x.tpe) => x }.map(_.tpe).distinctByCompat(sc.Type.base)
 }
 
 object IdComputed {

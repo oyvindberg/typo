@@ -3,6 +3,7 @@ package internal
 package codegen
 
 import play.api.libs.json.Json
+import typo.internal.compat.*
 
 case class FilesRelation(
     naming: Naming,
@@ -33,7 +34,7 @@ case class FilesRelation(
                      |  ${args.mkCode(",\n")}
                      |)""".stripMargin
 
-          sc.Value(Nil, extractFkId.name.prepended("extract"), Nil, Nil, extractFkId.otherCompositeIdType, body)
+          sc.Value(Nil, extractFkId.name.prepended("extract"), Nil, Nil, extractFkId.otherCompositeIdType, body).code
         },
         maybeUnsavedRow.map { case (unsaved, defaults) =>
           val (partOfId, rest) = unsaved.defaultCols.toList.partition { case (col, _) => names.isIdColumn(col.dbName) }
@@ -182,7 +183,7 @@ case class FilesRelation(
                        |    ${columnPairs.mkCode("\n")}""".stripMargin
                 (fkName, body)
               }
-              .distinctBy(_._1)
+              .distinctByCompat(_._1)
               .map(_._2)
           case Source.SqlFile(_) => Nil
         }
