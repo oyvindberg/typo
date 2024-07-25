@@ -1,6 +1,8 @@
 package typo.internal
 
 object quote {
-  def apply(str: String) = s"'$str'"
-  def double(str: String) = s"\"$str\""
+  val Quote = '\''
+  val DoubleQuote = '"'
+  def apply(str: String) = s"$Quote${str}$Quote"
+  def double(str: String) = s"$DoubleQuote${str}$DoubleQuote"
 }

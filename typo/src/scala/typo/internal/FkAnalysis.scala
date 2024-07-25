@@ -2,6 +2,7 @@ package typo
 package internal
 
 import typo.internal.codegen.*
+import typo.internal.compat.*
 
 class FkAnalysis(table: ComputedTable, candidateFks: List[FkAnalysis.CandidateFk]) {
   lazy val createWithFkIdsRow: Option[FkAnalysis.CreateWithFkIds] =
@@ -44,7 +45,8 @@ object FkAnalysis {
     lazy val exprsForColumn: Map[sc.Ident, List[sc.Code]] =
       byFks.toList
         .flatMap(colsFromFk => colsFromFk.colPairs.map { case (_, col) => (col.name, colsFromFk.expr(col.name)) })
-        .groupMap { case (colName, _) => colName } { case (_, expr) => expr }
+        .groupBy { case (colName, _) => colName }
+        .map { case (k, tuples) => (k, tuples.map { case (_, expr) => expr }) }
 
     /** reduce the potentially multiple values in [[exprsForColumn]] down to one expression, with `require` to assert that the others contain the same value */
     lazy val exprForColumn: Map[sc.Ident, sc.Code] =
@@ -164,7 +166,7 @@ object FkAnalysis {
         .toList
         // consider longest first, plus disambiguate for consistency
         .sortBy(x => (-x.colPairs.length, x.name))
-        .distinctBy(_.name)
+        .distinctByCompat(_.name)
   }
 
   case class CandidateFk(thisFk: db.ForeignKey, otherTable: ComputedTable, otherId: IdComputed.Composite)

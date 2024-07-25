@@ -2,6 +2,7 @@ package typo
 package internal
 
 import typo.internal.rewriteDependentData.EvalMaybe
+import typo.internal.compat.*
 
 // we let types flow through constraints down to this column, the point is to reuse id types downstream
 object findTypeFromFk {
@@ -25,7 +26,7 @@ object findTypeFromFk {
           } yield Right(otherCol.tpe)
       }
 
-    all.distinctBy { e => sc.Type.base(e.merge) } match {
+    all.distinctByCompat { e => sc.Type.base(e.merge) } match {
       case Nil      => None
       case e :: Nil => Some(e.merge)
       case all =>

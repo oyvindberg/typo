@@ -3,6 +3,7 @@ package internal
 
 import typo.db.Type
 import typo.internal.codegen.*
+import typo.internal.compat.*
 
 case class ComputedTestInserts(tpe: sc.Type.Qualified, methods: List[ComputedTestInserts.InsertMethod], maybeDomainMethods: Option[ComputedTestInserts.GenerateDomainMethods])
 
@@ -223,7 +224,7 @@ object ComputedTestInserts {
         }
       } yield GenerateDomainMethod(domain)
 
-      NonEmptyList.fromList(all.toList.distinctBy(_.dom.tpe).sortBy(_.dom.tpe))
+      NonEmptyList.fromList(all.toList.distinctByCompat(_.dom.tpe).sortBy(_.dom.tpe))
     }
   }
 }

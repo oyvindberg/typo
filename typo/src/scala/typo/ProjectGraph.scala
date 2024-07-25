@@ -1,5 +1,7 @@
 package typo
 
+import typo.internal.compat.*
+
 import java.nio.file.Path
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -11,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 final case class ProjectGraph[T, S](name: String, target: Path, testTarget: Option[Path], value: T, scripts: S, downstream: List[ProjectGraph[T, S]]) {
   def toList: List[ProjectGraph[T, S]] =
-    (this :: downstream.flatMap(_.toList)).distinctBy(_.target)
+    (this :: downstream.flatMap(_.toList)).distinctByCompat(_.target)
 
   def valueFromProject[TT, SS](f: ProjectGraph[T, S] => (TT, SS)): ProjectGraph[TT, SS] = {
     val (tt, ss) = f(this)

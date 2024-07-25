@@ -11,6 +11,12 @@ projects:
     isTestProject: true
   # main project
   typo:
+    cross:
+      jvm212:
+        scala:
+          strict: false
+          options: -Xsource:3 -language:higherKinds -language:implicitConversions
+          version: 2.12.19
     dependencies:
     - com.typesafe.play::play-json:2.10.6
     - org.playframework.anorm::anorm:2.7.0
