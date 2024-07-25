@@ -24,7 +24,8 @@ case class Options(
     fixVerySlowImplicit: Boolean = true,
     keepDependencies: Boolean = false,
     rewriteDatabase: MetaDb => MetaDb = identity,
-    executionContext: ExecutionContext = ExecutionContext.global
+    executionContext: ExecutionContext = ExecutionContext.global,
+    schemaMode: SchemaMode = SchemaMode.MultiSchema
 )
 
 object Options {

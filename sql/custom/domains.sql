@@ -1,4 +1,4 @@
-SELECT nsp.nspname                   as "schema",
+SELECT nsp.nspname                   as "schema?",
        typ.typname                   as "name",
        tt.typname                    as "type",
        pc.collname                   as "collation",

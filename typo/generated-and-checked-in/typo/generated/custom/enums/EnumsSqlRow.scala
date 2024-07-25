@@ -25,8 +25,8 @@ import scala.util.Try
 /** SQL file: custom/enums.sql */
 case class EnumsSqlRow(
   /** Points to [[pg_catalog.pg_namespace.PgNamespaceRow.nspname]]
-      debug: {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"enum_schema","originalName":"enum_schema"},"columnName":"enum_schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */
-  enumSchema: String,
+      debug: {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"enum_schema","originalName":"enum_schema?","nullability":"Nullable"},"columnName":"enum_schema?","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */
+  enumSchema: Option[String],
   /** Points to [[pg_catalog.pg_type.PgTypeRow.typname]]
       debug: {"baseColumnName":"typname","baseRelationName":"pg_catalog.pg_type","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"enum_name","originalName":"enum_name"},"columnName":"enum_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_type"} */
   enumName: String,
@@ -42,7 +42,7 @@ object EnumsSqlRow {
   implicit lazy val reads: Reads[EnumsSqlRow] = Reads[EnumsSqlRow](json => JsResult.fromTry(
       Try(
         EnumsSqlRow(
-          enumSchema = json.\("enum_schema").as(Reads.StringReads),
+          enumSchema = json.\("enum_schema").toOption.map(_.as(Reads.StringReads)),
           enumName = json.\("enum_name").as(Reads.StringReads),
           enumSortOrder = json.\("enum_sort_order").as(Reads.FloatReads),
           enumValue = json.\("enum_value").as(Reads.StringReads)
@@ -53,7 +53,7 @@ object EnumsSqlRow {
   def rowParser(idx: Int): RowParser[EnumsSqlRow] = RowParser[EnumsSqlRow] { row =>
     Success(
       EnumsSqlRow(
-        enumSchema = row(idx + 0)(Column.columnToString),
+        enumSchema = row(idx + 0)(Column.columnToOption(Column.columnToString)),
         enumName = row(idx + 1)(Column.columnToString),
         enumSortOrder = row(idx + 2)(Column.columnToFloat),
         enumValue = row(idx + 3)(Column.columnToString)
@@ -62,7 +62,7 @@ object EnumsSqlRow {
   }
   implicit lazy val writes: OWrites[EnumsSqlRow] = OWrites[EnumsSqlRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "enum_schema" -> Writes.StringWrites.writes(o.enumSchema),
+      "enum_schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.enumSchema),
       "enum_name" -> Writes.StringWrites.writes(o.enumName),
       "enum_sort_order" -> Writes.FloatWrites.writes(o.enumSortOrder),
       "enum_value" -> Writes.StringWrites.writes(o.enumValue)

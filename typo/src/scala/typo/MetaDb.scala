@@ -39,7 +39,48 @@ object MetaDb {
       columnComments: List[CommentsSqlRow],
       constraints: List[ConstraintsSqlRow],
       tableComments: List[TableCommentsSqlRow]
-  )
+  ) {
+    def filter(schemaMode: SchemaMode): Input = {
+      schemaMode match {
+        case SchemaMode.MultiSchema => this
+        case SchemaMode.SingleSchema(wantedSchema) =>
+          def keep(os: Option[String]): Boolean = os.contains(wantedSchema)
+
+          Input(
+            tableConstraints = tableConstraints.collect {
+              case x if keep(x.tableSchema) || keep(x.constraintSchema) =>
+                x.copy(tableSchema = None, constraintSchema = None)
+            },
+            keyColumnUsage = keyColumnUsage.collect {
+              case x if keep(x.tableSchema) || keep(x.constraintSchema) =>
+                x.copy(tableSchema = None, constraintSchema = None)
+            },
+            referentialConstraints = referentialConstraints.collect {
+              case x if keep(x.constraintSchema) =>
+                x.copy(constraintSchema = None)
+            },
+            pgEnums = pgEnums.collect { case x if keep(x.enumSchema) => x.copy(enumSchema = None) },
+            tables = tables.collect { case x if keep(x.tableSchema) => x.copy(tableSchema = None) },
+            columns = columns.collect {
+              case x if keep(x.tableSchema) =>
+                x.copy(
+                  tableSchema = None,
+                  characterSetSchema = None,
+                  collationSchema = None,
+                  domainSchema = None,
+                  udtSchema = None,
+                  scopeSchema = None
+                )
+            },
+            views = views.collect { case (k, v) if keep(k.schema) => k.copy(schema = None) -> v.copy(row = v.row.copy(tableSchema = None)) },
+            domains = domains.collect { case x if keep(x.schema) => x.copy(schema = None) },
+            columnComments = columnComments.collect { case c if keep(c.tableSchema) => c.copy(tableSchema = None) },
+            constraints = constraints.collect { case c if keep(c.tableSchema) => c.copy(tableSchema = None) },
+            tableComments = tableComments.collect { case c if keep(c.schema) => c.copy(schema = None) }
+          )
+      }
+    }
+  }
 
   case class AnalyzedView(
       row: ViewFindAllSqlRow,
@@ -49,7 +90,7 @@ object MetaDb {
   )
 
   object Input {
-    def fromDb(logger: TypoLogger, ds: TypoDataSource, viewSelector: Selector)(implicit ev: ExecutionContext): Future[Input] = {
+    def fromDb(logger: TypoLogger, ds: TypoDataSource, viewSelector: Selector, schemaMode: SchemaMode)(implicit ev: ExecutionContext): Future[Input] = {
       val tableConstraints = logger.timed("fetching tableConstraints")(ds.run(implicit c => (new TableConstraintsViewRepoImpl).selectAll))
       val keyColumnUsage = logger.timed("fetching keyColumnUsage")(ds.run(implicit c => (new KeyColumnUsageViewRepoImpl).selectAll))
       val referentialConstraints = logger.timed("fetching referentialConstraints")(ds.run(implicit c => (new ReferentialConstraintsViewRepoImpl).selectAll))
@@ -92,24 +133,28 @@ object MetaDb {
         columnComments <- columnComments
         constraints <- constraints
         tableComments <- tableComments
-      } yield Input(
-        tableConstraints,
-        keyColumnUsage,
-        referentialConstraints,
-        pgEnums,
-        tables,
-        columns,
-        views,
-        domains,
-        columnComments,
-        constraints,
-        tableComments
-      )
+      } yield {
+        val input = Input(
+          tableConstraints,
+          keyColumnUsage,
+          referentialConstraints,
+          pgEnums,
+          tables,
+          columns,
+          views,
+          domains,
+          columnComments,
+          constraints,
+          tableComments
+        )
+        // todo: do this at SQL level instead for performance
+        input.filter(schemaMode)
+      }
     }
   }
 
-  def fromDb(logger: TypoLogger, ds: TypoDataSource, viewSelector: Selector)(implicit ec: ExecutionContext): Future[MetaDb] =
-    Input.fromDb(logger, ds, viewSelector).map(input => fromInput(logger, input))
+  def fromDb(logger: TypoLogger, ds: TypoDataSource, viewSelector: Selector, schemaMode: SchemaMode)(implicit ec: ExecutionContext): Future[MetaDb] =
+    Input.fromDb(logger, ds, viewSelector, schemaMode: SchemaMode).map(input => fromInput(logger, input))
 
   def fromInput(logger: TypoLogger, input: Input): MetaDb = {
     val foreignKeys = ForeignKeys(input.tableConstraints, input.keyColumnUsage, input.referentialConstraints)
@@ -123,7 +168,7 @@ object MetaDb {
       }
 
       db.Domain(
-        name = db.RelationName(Some(d.schema), d.name),
+        name = db.RelationName(d.schema, d.name),
         tpe = tpe,
         originalType = d.`type`,
         isNotNull = if (d.isNotNull) Nullability.NoNulls else Nullability.Nullable,
@@ -153,7 +198,7 @@ object MetaDb {
     val columnsByTable: Map[db.RelationName, List[ColumnsViewRow]] =
       input.columns.groupBy(c => db.RelationName(c.tableSchema, c.tableName.get))
     val tableCommentsByTable: Map[db.RelationName, String] =
-      input.tableComments.flatMap(c => c.description.map(d => (db.RelationName(Some(c.schema), c.name), d))).toMap
+      input.tableComments.flatMap(c => c.description.map(d => (db.RelationName(c.schema, c.name), d))).toMap
     val views: Map[db.RelationName, Lazy[db.View]] =
       input.views.map { case (relationName, AnalyzedView(viewRow, decomposedSql, jdbcMetadata, nullabilityAnalysis)) =>
         val lazyAnalysis = Lazy {

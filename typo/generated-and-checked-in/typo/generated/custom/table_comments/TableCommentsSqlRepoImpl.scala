@@ -16,7 +16,7 @@ import java.sql.Connection
 class TableCommentsSqlRepoImpl extends TableCommentsSqlRepo {
   override def apply()(implicit c: Connection): List[TableCommentsSqlRow] = {
     val sql =
-      SQL"""SELECT n.nspname                                     as schema,
+      SQL"""SELECT n.nspname                                     as "schema?",
                    c.relname                                     as name,
                    pg_catalog.obj_description(c.oid, 'pg_class') as description
             FROM pg_catalog.pg_class c
