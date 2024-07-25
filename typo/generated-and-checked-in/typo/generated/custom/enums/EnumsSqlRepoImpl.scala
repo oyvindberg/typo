@@ -16,7 +16,7 @@ import java.sql.Connection
 class EnumsSqlRepoImpl extends EnumsSqlRepo {
   override def apply()(implicit c: Connection): List[EnumsSqlRow] = {
     val sql =
-      SQL"""select n.nspname as enum_schema,
+      SQL"""select n.nspname as "enum_schema?",
                    t.typname as enum_name,
                    e.enumsortorder as enum_sort_order,
                    e.enumlabel as enum_value

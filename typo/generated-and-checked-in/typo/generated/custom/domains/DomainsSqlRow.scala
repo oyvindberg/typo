@@ -25,8 +25,8 @@ import scala.util.Try
 /** SQL file: custom/domains.sql */
 case class DomainsSqlRow(
   /** Points to [[pg_catalog.pg_namespace.PgNamespaceRow.nspname]]
-      debug: {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"schema","originalName":"schema"},"columnName":"schema","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */
-  schema: String,
+      debug: {"baseColumnName":"nspname","baseRelationName":"pg_catalog.pg_namespace","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"schema","originalName":"schema?","nullability":"Nullable"},"columnName":"schema?","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_namespace"} */
+  schema: Option[String],
   /** Points to [[pg_catalog.pg_type.PgTypeRow.typname]]
       debug: {"baseColumnName":"typname","baseRelationName":"pg_catalog.pg_type","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"name","originalName":"name"},"columnName":"name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"NoNulls","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"pg_type"} */
   name: String,
@@ -53,7 +53,7 @@ object DomainsSqlRow {
   implicit lazy val reads: Reads[DomainsSqlRow] = Reads[DomainsSqlRow](json => JsResult.fromTry(
       Try(
         DomainsSqlRow(
-          schema = json.\("schema").as(Reads.StringReads),
+          schema = json.\("schema").toOption.map(_.as(Reads.StringReads)),
           name = json.\("name").as(Reads.StringReads),
           `type` = json.\("type").as(Reads.StringReads),
           collation = json.\("collation").toOption.map(_.as(Reads.StringReads)),
@@ -68,7 +68,7 @@ object DomainsSqlRow {
   def rowParser(idx: Int): RowParser[DomainsSqlRow] = RowParser[DomainsSqlRow] { row =>
     Success(
       DomainsSqlRow(
-        schema = row(idx + 0)(Column.columnToString),
+        schema = row(idx + 0)(Column.columnToOption(Column.columnToString)),
         name = row(idx + 1)(Column.columnToString),
         `type` = row(idx + 2)(Column.columnToString),
         collation = row(idx + 3)(Column.columnToOption(Column.columnToString)),
@@ -81,7 +81,7 @@ object DomainsSqlRow {
   }
   implicit lazy val writes: OWrites[DomainsSqlRow] = OWrites[DomainsSqlRow](o =>
     new JsObject(ListMap[String, JsValue](
-      "schema" -> Writes.StringWrites.writes(o.schema),
+      "schema" -> Writes.OptionWrites(Writes.StringWrites).writes(o.schema),
       "name" -> Writes.StringWrites.writes(o.name),
       "type" -> Writes.StringWrites.writes(o.`type`),
       "collation" -> Writes.OptionWrites(Writes.StringWrites).writes(o.collation),

@@ -32,7 +32,7 @@ object generateFromDb {
     Banner.maybePrint(options)
     implicit val ec: ExecutionContext = options.executionContext
     val viewSelector = graph.toList.map(_.value).foldLeft(Selector.None)(_.or(_))
-    val eventualMetaDb = MetaDb.fromDb(options.logger, dataSource, viewSelector)
+    val eventualMetaDb = MetaDb.fromDb(options.logger, dataSource, viewSelector, options.schemaMode)
     val eventualScripts = graph.mapScripts(paths => Future.sequence(paths.map(p => readSqlFileDirectories(options.logger, p, dataSource))).map(_.flatten))
     val combined = for {
       metaDb <- eventualMetaDb

@@ -28,7 +28,7 @@ object CompileBenchmark extends BleepScript("CompileBenchmark") {
 
   override def run(started: Started, commands: Commands, args: List[String]): Unit = {
     val ds = TypoDataSource.hikari(server = "localhost", port = 6432, databaseName = "Adventureworks", username = "postgres", password = "password")
-    val metadb = Await.result(MetaDb.fromDb(logger = TypoLogger.Noop, ds = ds, viewSelector = Selector.All), Duration.Inf)
+    val metadb = Await.result(MetaDb.fromDb(logger = TypoLogger.Noop, ds = ds, viewSelector = Selector.All, schemaMode = SchemaMode.MultiSchema), Duration.Inf)
     val sqlFiles = Await.result(readSqlFileDirectories(TypoLogger.Noop, buildDir.resolve("adventureworks_sql"), ds), Duration.Inf)
 
     val crossIds = List(

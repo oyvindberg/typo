@@ -1,4 +1,4 @@
-SELECT n.nspname                                     as schema,
+SELECT n.nspname                                     as "schema?",
        c.relname                                     as name,
        pg_catalog.obj_description(c.oid, 'pg_class') as description
 FROM pg_catalog.pg_class c

@@ -35,9 +35,8 @@ case class ConstraintsSqlRow(
   /** Points to [[information_schema.table_constraints.TableConstraintsViewRow.constraintName]]
       debug: {"baseColumnName":"constraint_name","baseRelationName":"information_schema.table_constraints","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"constraint_name","originalName":"constraint_name"},"columnName":"constraint_name","columnType":"VarChar","columnTypeName":"name","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"table_constraints"} */
   constraintName: Option[/* nullability unknown */ String],
-  /** Points to [[information_schema.check_constraints.CheckConstraintsViewRow.checkClause]]
-      debug: {"baseColumnName":"check_clause","baseRelationName":"information_schema.check_constraints","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"check_clause","originalName":"check_clause"},"columnName":"check_clause","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"check_constraints"} */
-  checkClause: Option[/* nullability unknown */ String]
+  /** debug: {"baseColumnName":"check_clause","baseRelationName":"information_schema.check_constraints","columnClassName":"java.lang.String","columnDisplaySize":2147483647,"parsedColumnName":{"name":"check_clause","originalName":"check_clause"},"columnName":"check_clause","columnType":"VarChar","columnTypeName":"varchar","format":0,"isAutoIncrement":false,"isCaseSensitive":true,"isCurrency":false,"isDefinitelyWritable":false,"isNullable":"Nullable","isReadOnly":false,"isSearchable":true,"isSigned":false,"isWritable":true,"precision":2147483647,"scale":0,"tableName":"check_constraints"} */
+  checkClause: Option[String]
 )
 
 object ConstraintsSqlRow {

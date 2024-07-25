@@ -16,7 +16,7 @@ import java.sql.Connection
 class DomainsSqlRepoImpl extends DomainsSqlRepo {
   override def apply()(implicit c: Connection): List[DomainsSqlRow] = {
     val sql =
-      SQL"""SELECT nsp.nspname                   as "schema",
+      SQL"""SELECT nsp.nspname                   as "schema?",
                    typ.typname                   as "name",
                    tt.typname                    as "type",
                    pc.collname                   as "collation",

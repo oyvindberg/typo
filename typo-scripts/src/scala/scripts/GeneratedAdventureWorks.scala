@@ -27,7 +27,7 @@ object GeneratedAdventureWorks {
         val ds = TypoDataSource.hikari(server = "localhost", port = 6432, databaseName = "Adventureworks", username = "postgres", password = "password")
         val scriptsPath = buildDir.resolve("adventureworks_sql")
         val selector = Selector.ExcludePostgresInternal
-        val metadb = Await.result(MetaDb.fromDb(TypoLogger.Console, ds, selector), Duration.Inf)
+        val metadb = Await.result(MetaDb.fromDb(TypoLogger.Console, ds, selector, schemaMode = SchemaMode.MultiSchema), Duration.Inf)
 
         val variants = List(
           (DbLibName.Anorm, JsonLibName.PlayJson, "typo-tester-anorm", new AtomicReference(Map.empty[RelPath, sc.Code])),

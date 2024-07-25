@@ -1,4 +1,4 @@
-select n.nspname as enum_schema,
+select n.nspname as "enum_schema?",
        t.typname as enum_name,
        e.enumsortorder as enum_sort_order,
        e.enumlabel as enum_value
