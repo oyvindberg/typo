@@ -69,7 +69,9 @@ class DbLibTextSupport(pkg: sc.QIdent, inlineImplicits: Boolean, externalText: O
   def rowInstance(tpe: sc.Type, cols: NonEmptyList[ComputedColumn]): sc.Given = {
     val row = sc.Ident("row")
     val sb = sc.Ident("sb")
-    val textCols = cols.map { col => code"${lookupTextFor(col.tpe)}.unsafeEncode($row.${col.name}, $sb)" }
+    val textCols = cols.toList
+      .filterNot(_.dbCol.identity.exists(_.ALWAYS))
+      .map { col => code"${lookupTextFor(col.tpe)}.unsafeEncode($row.${col.name}, $sb)" }
     val body =
       code"""|$Text.instance[$tpe]{ ($row, $sb) =>
              |  ${textCols.mkCode(code"\n$sb.append($Text.DELIMETER)\n")}

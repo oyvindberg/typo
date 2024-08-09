@@ -55,7 +55,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         udtName = Some("myschema.sector"),
         nullability = Nullability.NoNulls,
         columnDefault = Some("PUBLIC"),
-        identity = None,
+        identity = Some(db.Identity("ALWAYS", None, None, None, None)),
         comment = None,
         constraints = Nil,
         jsonDescription = DebugJson.Empty

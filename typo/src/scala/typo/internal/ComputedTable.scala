@@ -115,6 +115,16 @@ case class ComputedTable(
       )
     }
 
+  val writeableColumnsNotId: Option[NonEmptyList[ComputedColumn]] =
+    colsNotId.flatMap { colsNotId =>
+      NonEmptyList.fromList(
+        colsNotId.toList.filterNot(_.dbCol.identity.exists(_.ALWAYS))
+      )
+    }
+
+  val writeableColumnsWithId: Option[NonEmptyList[ComputedColumn]] =
+    NonEmptyList.fromList(cols.toList.filterNot(c => c.dbCol.identity.exists(_.ALWAYS)))
+
   val maybeUnsavedRow: Option[ComputedRowUnsaved] =
     ComputedRowUnsaved(source, cols, default, naming)
 
@@ -131,9 +141,12 @@ case class ComputedTable(
         } yield builder,
         Some(RepoMethod.SelectAll(dbTable.name, cols, names.RowName)),
         maybeId.map(id => RepoMethod.SelectById(dbTable.name, cols, id, names.RowName)),
-        maybeId.map { id =>
+        for {
+          id <- maybeId
+          writeableColumnsWithId <- writeableColumnsWithId
+        } yield {
           val unsavedParam = sc.Param(sc.Ident("unsaved"), names.RowName, None)
-          RepoMethod.Upsert(dbTable.name, cols, id, unsavedParam, names.RowName)
+          RepoMethod.Upsert(dbTable.name, cols, id, unsavedParam, names.RowName, writeableColumnsWithId)
         },
         maybeId
           .collect {
@@ -169,19 +182,27 @@ case class ComputedTable(
         ),
         for {
           id <- maybeId
-          colsNotId <- colsNotId
-        } yield RepoMethod.Update(dbTable.name, cols, id, sc.Param(sc.Ident("row"), names.RowName, None), colsNotId),
-        Some {
+          writeableColumnsNotId <- writeableColumnsNotId
+        } yield RepoMethod.Update(dbTable.name, cols, id, sc.Param(sc.Ident("row"), names.RowName, None), writeableColumnsNotId),
+        for {
+          writeableColumnsWithId <- writeableColumnsWithId
+        } yield {
           val unsavedParam = sc.Param(sc.Ident("unsaved"), names.RowName, None)
-          RepoMethod.Insert(dbTable.name, cols, unsavedParam, names.RowName)
+          RepoMethod.Insert(dbTable.name, cols, unsavedParam, names.RowName, writeableColumnsWithId)
         },
-        if (options.enableStreamingInserts) Some(RepoMethod.InsertStreaming(dbTable.name, cols, names.RowName)) else None,
-        maybeId.collect {
-          case id if options.enableStreamingInserts => RepoMethod.UpsertStreaming(dbTable.name, cols, id, names.RowName)
-        },
-        maybeId.collect { case id =>
-          RepoMethod.UpsertBatch(dbTable.name, cols, id, names.RowName)
-        },
+        for {
+          writeableColumnsWithId <- writeableColumnsWithId
+          _ <- if (options.enableStreamingInserts) Some(()) else None // weird syntax because of scala 2.13
+        } yield RepoMethod.InsertStreaming(dbTable.name, names.RowName, writeableColumnsWithId),
+        for {
+          id <- maybeId
+          writeableColumnsWithId <- writeableColumnsWithId
+          _ <- if (options.enableStreamingInserts) Some(()) else None // weird syntax because of scala 2.13
+        } yield RepoMethod.UpsertStreaming(dbTable.name, id, names.RowName, writeableColumnsWithId),
+        for {
+          id <- maybeId
+          writeableColumnsWithId <- writeableColumnsWithId
+        } yield RepoMethod.UpsertBatch(dbTable.name, cols, id, names.RowName, writeableColumnsWithId),
         maybeUnsavedRow.map { unsavedRow =>
           val unsavedParam = sc.Param(sc.Ident("unsaved"), unsavedRow.tpe, None)
           RepoMethod.InsertUnsaved(dbTable.name, cols, unsavedRow, unsavedParam, default, names.RowName)

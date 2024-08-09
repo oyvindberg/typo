@@ -42,8 +42,8 @@ class PersonRepoImpl extends PersonRepo {
     
   }
   override def insert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    SQL"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
-          values (${ParameterValue(unsaved.id, null, PersonId.toStatement)}::int8, ${ParameterValue(unsaved.favouriteFootballClubId, null, FootballClubId.toStatement)}, ${ParameterValue(unsaved.name, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.nickName, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.blogUrl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.email, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.phone, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.likesPizza, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.maritalStatusId, null, MaritalStatusId.toStatement)}, ${ParameterValue(unsaved.workEmail, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.sector, null, Sector.toStatement)}::myschema.sector, ${ParameterValue(unsaved.favoriteNumber, null, Number.toStatement)}::myschema.number)
+    SQL"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "favorite_number")
+          values (${ParameterValue(unsaved.id, null, PersonId.toStatement)}::int8, ${ParameterValue(unsaved.favouriteFootballClubId, null, FootballClubId.toStatement)}, ${ParameterValue(unsaved.name, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.nickName, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.blogUrl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.email, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.phone, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.likesPizza, null, ToStatement.booleanToStatement)}, ${ParameterValue(unsaved.maritalStatusId, null, MaritalStatusId.toStatement)}, ${ParameterValue(unsaved.workEmail, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.favoriteNumber, null, Number.toStatement)}::myschema.number)
           returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
        """
       .executeInsert(PersonRow.rowParser(1).single)
@@ -67,10 +67,6 @@ class PersonRepoImpl extends PersonRepo {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("marital_status_id", ParameterValue(value, null, MaritalStatusId.toStatement)), ""))
       },
-      unsaved.sector match {
-        case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((NamedParameter("sector", ParameterValue(value, null, Sector.toStatement)), "::myschema.sector"))
-      },
       unsaved.favoriteNumber match {
         case Defaulted.UseDefault => None
         case Defaulted.Provided(value) => Some((NamedParameter("favorite_number", ParameterValue(value, null, Number.toStatement)), "::myschema.number"))
@@ -93,11 +89,11 @@ class PersonRepoImpl extends PersonRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[PersonRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number") FROM STDIN""", batchSize, unsaved)(PersonRow.text, c)
+    streamingInsert(s"""COPY "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "favorite_number") FROM STDIN""", batchSize, unsaved)(PersonRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[PersonRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY "myschema"."person"("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector", "favorite_number") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text, c)
+    streamingInsert(s"""COPY "myschema"."person"("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "favorite_number") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
     SelectBuilderSql(""""myschema"."person"""", PersonFields.structure, PersonRow.rowParser)
@@ -167,7 +163,6 @@ class PersonRepoImpl extends PersonRepo {
               "likes_pizza" = ${ParameterValue(row.likesPizza, null, ToStatement.booleanToStatement)},
               "marital_status_id" = ${ParameterValue(row.maritalStatusId, null, MaritalStatusId.toStatement)},
               "work_email" = ${ParameterValue(row.workEmail, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-              "sector" = ${ParameterValue(row.sector, null, Sector.toStatement)}::myschema.sector,
               "favorite_number" = ${ParameterValue(row.favoriteNumber, null, Number.toStatement)}::myschema.number
           where "id" = ${ParameterValue(id, null, PersonId.toStatement)}
        """.executeUpdate() > 0
@@ -200,7 +195,7 @@ class PersonRepoImpl extends PersonRepo {
     
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
-    SQL"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
+    SQL"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "favorite_number")
           values (
             ${ParameterValue(unsaved.id, null, PersonId.toStatement)}::int8,
             ${ParameterValue(unsaved.favouriteFootballClubId, null, FootballClubId.toStatement)},
@@ -212,7 +207,6 @@ class PersonRepoImpl extends PersonRepo {
             ${ParameterValue(unsaved.likesPizza, null, ToStatement.booleanToStatement)},
             ${ParameterValue(unsaved.maritalStatusId, null, MaritalStatusId.toStatement)},
             ${ParameterValue(unsaved.workEmail, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
-            ${ParameterValue(unsaved.sector, null, Sector.toStatement)}::myschema.sector,
             ${ParameterValue(unsaved.favoriteNumber, null, Number.toStatement)}::myschema.number
           )
           on conflict ("id")
@@ -226,7 +220,6 @@ class PersonRepoImpl extends PersonRepo {
             "likes_pizza" = EXCLUDED."likes_pizza",
             "marital_status_id" = EXCLUDED."marital_status_id",
             "work_email" = EXCLUDED."work_email",
-            "sector" = EXCLUDED."sector",
             "favorite_number" = EXCLUDED."favorite_number"
           returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
        """
@@ -245,7 +238,6 @@ class PersonRepoImpl extends PersonRepo {
       NamedParameter("likes_pizza", ParameterValue(row.likesPizza, null, ToStatement.booleanToStatement)),
       NamedParameter("marital_status_id", ParameterValue(row.maritalStatusId, null, MaritalStatusId.toStatement)),
       NamedParameter("work_email", ParameterValue(row.workEmail, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))),
-      NamedParameter("sector", ParameterValue(row.sector, null, Sector.toStatement)),
       NamedParameter("favorite_number", ParameterValue(row.favoriteNumber, null, Number.toStatement))
     )
     unsaved.toList match {
@@ -253,8 +245,8 @@ class PersonRepoImpl extends PersonRepo {
       case head :: rest =>
         new anorm.testdb.hardcoded.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
-                values ({id}::int8, {favourite_football_club_id}, {name}, {nick_name}, {blog_url}, {email}, {phone}, {likes_pizza}, {marital_status_id}, {work_email}, {sector}::myschema.sector, {favorite_number}::myschema.number)
+            s"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "favorite_number")
+                values ({id}::int8, {favourite_football_club_id}, {name}, {nick_name}, {blog_url}, {email}, {phone}, {likes_pizza}, {marital_status_id}, {work_email}, {favorite_number}::myschema.number)
                 on conflict ("id")
                 do update set
                   "favourite_football_club_id" = EXCLUDED."favourite_football_club_id",
@@ -266,7 +258,6 @@ class PersonRepoImpl extends PersonRepo {
                   "likes_pizza" = EXCLUDED."likes_pizza",
                   "marital_status_id" = EXCLUDED."marital_status_id",
                   "work_email" = EXCLUDED."work_email",
-                  "sector" = EXCLUDED."sector",
                   "favorite_number" = EXCLUDED."favorite_number"
                 returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
              """,
@@ -279,8 +270,8 @@ class PersonRepoImpl extends PersonRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[PersonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     SQL"""create temporary table person_TEMP (like "myschema"."person") on commit drop""".execute(): @nowarn
-    streamingInsert(s"""copy person_TEMP("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number") from stdin""", batchSize, unsaved)(PersonRow.text, c): @nowarn
-    SQL"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
+    streamingInsert(s"""copy person_TEMP("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "favorite_number") from stdin""", batchSize, unsaved)(PersonRow.text, c): @nowarn
+    SQL"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "favorite_number")
           select * from person_TEMP
           on conflict ("id")
           do update set
@@ -293,7 +284,6 @@ class PersonRepoImpl extends PersonRepo {
             "likes_pizza" = EXCLUDED."likes_pizza",
             "marital_status_id" = EXCLUDED."marital_status_id",
             "work_email" = EXCLUDED."work_email",
-            "sector" = EXCLUDED."sector",
             "favorite_number" = EXCLUDED."favorite_number"
           ;
           drop table person_TEMP;""".executeUpdate()

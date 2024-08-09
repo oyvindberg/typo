@@ -13,7 +13,6 @@ import testdb.hardcoded.compositepk.person.PersonRow
 import testdb.hardcoded.compositepk.person.PersonRowUnsaved
 import testdb.hardcoded.customtypes.Defaulted
 import testdb.hardcoded.myschema.Number
-import testdb.hardcoded.myschema.Sector
 import testdb.hardcoded.myschema.football_club.FootballClubId
 import testdb.hardcoded.myschema.football_club.FootballClubRepoImpl
 import testdb.hardcoded.myschema.football_club.FootballClubRow
@@ -39,7 +38,6 @@ class TestInsert(random: Random) {
                      workEmail: Option[/* max 254 chars */ String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
                      id: Defaulted[PersonId] = Defaulted.UseDefault,
                      maritalStatusId: Defaulted[MaritalStatusId] = Defaulted.UseDefault,
-                     sector: Defaulted[Sector] = Defaulted.UseDefault,
                      favoriteNumber: Defaulted[Number] = Defaulted.UseDefault
-                    ): ConnectionIO[testdb.hardcoded.myschema.person.PersonRow] = (new testdb.hardcoded.myschema.person.PersonRepoImpl).insert(new testdb.hardcoded.myschema.person.PersonRowUnsaved(favouriteFootballClubId = favouriteFootballClubId, name = name, nickName = nickName, blogUrl = blogUrl, email = email, phone = phone, likesPizza = likesPizza, workEmail = workEmail, id = id, maritalStatusId = maritalStatusId, sector = sector, favoriteNumber = favoriteNumber))
+                    ): ConnectionIO[testdb.hardcoded.myschema.person.PersonRow] = (new testdb.hardcoded.myschema.person.PersonRepoImpl).insert(new testdb.hardcoded.myschema.person.PersonRowUnsaved(favouriteFootballClubId = favouriteFootballClubId, name = name, nickName = nickName, blogUrl = blogUrl, email = email, phone = phone, likesPizza = likesPizza, workEmail = workEmail, id = id, maritalStatusId = maritalStatusId, favoriteNumber = favoriteNumber))
 }

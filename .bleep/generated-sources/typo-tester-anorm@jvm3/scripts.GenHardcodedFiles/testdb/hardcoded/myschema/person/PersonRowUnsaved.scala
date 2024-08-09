@@ -36,12 +36,10 @@ case class PersonRowUnsaved(
   /** Default: some-value
       Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: Defaulted[MaritalStatusId] = Defaulted.UseDefault,
-  /** Default: PUBLIC */
-  sector: Defaulted[Sector] = Defaulted.UseDefault,
   /** Default: one */
   favoriteNumber: Defaulted[Number] = Defaulted.UseDefault
 ) {
-  def toRow(idDefault: => PersonId, maritalStatusIdDefault: => MaritalStatusId, sectorDefault: => Sector, favoriteNumberDefault: => Number): PersonRow =
+  def toRow(idDefault: => PersonId, maritalStatusIdDefault: => MaritalStatusId, favoriteNumberDefault: => Number, sectorDefault: => Sector): PersonRow =
     PersonRow(
       favouriteFootballClubId = favouriteFootballClubId,
       name = name,
@@ -59,14 +57,11 @@ case class PersonRowUnsaved(
                           case Defaulted.UseDefault => maritalStatusIdDefault
                           case Defaulted.Provided(value) => value
                         },
-      sector = sector match {
-                 case Defaulted.UseDefault => sectorDefault
-                 case Defaulted.Provided(value) => value
-               },
       favoriteNumber = favoriteNumber match {
                          case Defaulted.UseDefault => favoriteNumberDefault
                          case Defaulted.Provided(value) => value
-                       }
+                       },
+      sector = sectorDefault
     )
 }
 object PersonRowUnsaved {
@@ -83,7 +78,6 @@ object PersonRowUnsaved {
           workEmail = json.\("work_email").toOption.map(_.as(Reads.StringReads)),
           id = json.\("id").as(Defaulted.reads(PersonId.reads)),
           maritalStatusId = json.\("marital_status_id").as(Defaulted.reads(MaritalStatusId.reads)),
-          sector = json.\("sector").as(Defaulted.reads(Sector.reads)),
           favoriteNumber = json.\("favorite_number").as(Defaulted.reads(Number.reads))
         )
       )
@@ -110,8 +104,6 @@ object PersonRowUnsaved {
     sb.append(Text.DELIMETER)
     Defaulted.text(MaritalStatusId.text).unsafeEncode(row.maritalStatusId, sb)
     sb.append(Text.DELIMETER)
-    Defaulted.text(Sector.text).unsafeEncode(row.sector, sb)
-    sb.append(Text.DELIMETER)
     Defaulted.text(Number.text).unsafeEncode(row.favoriteNumber, sb)
   }
   implicit lazy val writes: OWrites[PersonRowUnsaved] = OWrites[PersonRowUnsaved](o =>
@@ -126,7 +118,6 @@ object PersonRowUnsaved {
       "work_email" -> Writes.OptionWrites(Writes.StringWrites).writes(o.workEmail),
       "id" -> Defaulted.writes(PersonId.writes).writes(o.id),
       "marital_status_id" -> Defaulted.writes(MaritalStatusId.writes).writes(o.maritalStatusId),
-      "sector" -> Defaulted.writes(Sector.writes).writes(o.sector),
       "favorite_number" -> Defaulted.writes(Number.writes).writes(o.favoriteNumber)
     ))
   )

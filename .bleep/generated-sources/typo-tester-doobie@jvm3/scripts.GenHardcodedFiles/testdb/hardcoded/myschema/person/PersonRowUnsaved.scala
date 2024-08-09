@@ -31,12 +31,10 @@ case class PersonRowUnsaved(
   /** Default: some-value
       Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: Defaulted[MaritalStatusId] = Defaulted.UseDefault,
-  /** Default: PUBLIC */
-  sector: Defaulted[Sector] = Defaulted.UseDefault,
   /** Default: one */
   favoriteNumber: Defaulted[Number] = Defaulted.UseDefault
 ) {
-  def toRow(idDefault: => PersonId, maritalStatusIdDefault: => MaritalStatusId, sectorDefault: => Sector, favoriteNumberDefault: => Number): PersonRow =
+  def toRow(idDefault: => PersonId, maritalStatusIdDefault: => MaritalStatusId, favoriteNumberDefault: => Number, sectorDefault: => Sector): PersonRow =
     PersonRow(
       favouriteFootballClubId = favouriteFootballClubId,
       name = name,
@@ -54,19 +52,16 @@ case class PersonRowUnsaved(
                           case Defaulted.UseDefault => maritalStatusIdDefault
                           case Defaulted.Provided(value) => value
                         },
-      sector = sector match {
-                 case Defaulted.UseDefault => sectorDefault
-                 case Defaulted.Provided(value) => value
-               },
       favoriteNumber = favoriteNumber match {
                          case Defaulted.UseDefault => favoriteNumberDefault
                          case Defaulted.Provided(value) => value
-                       }
+                       },
+      sector = sectorDefault
     )
 }
 object PersonRowUnsaved {
-  implicit lazy val decoder: Decoder[PersonRowUnsaved] = Decoder.forProduct12[PersonRowUnsaved, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, Option[/* max 254 chars */ String], Defaulted[PersonId], Defaulted[MaritalStatusId], Defaulted[Sector], Defaulted[Number]]("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector", "favorite_number")(PersonRowUnsaved.apply)(FootballClubId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeString, Decoder.decodeBoolean, Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(PersonId.decoder), Defaulted.decoder(MaritalStatusId.decoder), Defaulted.decoder(Sector.decoder), Defaulted.decoder(Number.decoder))
-  implicit lazy val encoder: Encoder[PersonRowUnsaved] = Encoder.forProduct12[PersonRowUnsaved, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, Option[/* max 254 chars */ String], Defaulted[PersonId], Defaulted[MaritalStatusId], Defaulted[Sector], Defaulted[Number]]("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector", "favorite_number")(x => (x.favouriteFootballClubId, x.name, x.nickName, x.blogUrl, x.email, x.phone, x.likesPizza, x.workEmail, x.id, x.maritalStatusId, x.sector, x.favoriteNumber))(FootballClubId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeString, Encoder.encodeBoolean, Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(PersonId.encoder), Defaulted.encoder(MaritalStatusId.encoder), Defaulted.encoder(Sector.encoder), Defaulted.encoder(Number.encoder))
+  implicit lazy val decoder: Decoder[PersonRowUnsaved] = Decoder.forProduct11[PersonRowUnsaved, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, Option[/* max 254 chars */ String], Defaulted[PersonId], Defaulted[MaritalStatusId], Defaulted[Number]]("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "favorite_number")(PersonRowUnsaved.apply)(FootballClubId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeString, Decoder.decodeBoolean, Decoder.decodeOption(Decoder.decodeString), Defaulted.decoder(PersonId.decoder), Defaulted.decoder(MaritalStatusId.decoder), Defaulted.decoder(Number.decoder))
+  implicit lazy val encoder: Encoder[PersonRowUnsaved] = Encoder.forProduct11[PersonRowUnsaved, FootballClubId, /* max 100 chars */ String, Option[/* max 30 chars */ String], Option[/* max 100 chars */ String], /* max 254 chars */ String, /* max 8 chars */ String, Boolean, Option[/* max 254 chars */ String], Defaulted[PersonId], Defaulted[MaritalStatusId], Defaulted[Number]]("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "favorite_number")(x => (x.favouriteFootballClubId, x.name, x.nickName, x.blogUrl, x.email, x.phone, x.likesPizza, x.workEmail, x.id, x.maritalStatusId, x.favoriteNumber))(FootballClubId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeString, Encoder.encodeBoolean, Encoder.encodeOption(Encoder.encodeString), Defaulted.encoder(PersonId.encoder), Defaulted.encoder(MaritalStatusId.encoder), Defaulted.encoder(Number.encoder))
   implicit lazy val text: Text[PersonRowUnsaved] = Text.instance[PersonRowUnsaved]{ (row, sb) =>
     FootballClubId.text.unsafeEncode(row.favouriteFootballClubId, sb)
     sb.append(Text.DELIMETER)
@@ -87,8 +82,6 @@ object PersonRowUnsaved {
     Defaulted.text(PersonId.text).unsafeEncode(row.id, sb)
     sb.append(Text.DELIMETER)
     Defaulted.text(MaritalStatusId.text).unsafeEncode(row.maritalStatusId, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(Sector.text).unsafeEncode(row.sector, sb)
     sb.append(Text.DELIMETER)
     Defaulted.text(Number.text).unsafeEncode(row.favoriteNumber, sb)
   }

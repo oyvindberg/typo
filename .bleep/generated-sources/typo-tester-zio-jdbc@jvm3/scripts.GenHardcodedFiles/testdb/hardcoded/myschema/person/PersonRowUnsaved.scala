@@ -32,12 +32,10 @@ case class PersonRowUnsaved(
   /** Default: some-value
       Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: Defaulted[MaritalStatusId] = Defaulted.UseDefault,
-  /** Default: PUBLIC */
-  sector: Defaulted[Sector] = Defaulted.UseDefault,
   /** Default: one */
   favoriteNumber: Defaulted[Number] = Defaulted.UseDefault
 ) {
-  def toRow(idDefault: => PersonId, maritalStatusIdDefault: => MaritalStatusId, sectorDefault: => Sector, favoriteNumberDefault: => Number): PersonRow =
+  def toRow(idDefault: => PersonId, maritalStatusIdDefault: => MaritalStatusId, favoriteNumberDefault: => Number, sectorDefault: => Sector): PersonRow =
     PersonRow(
       favouriteFootballClubId = favouriteFootballClubId,
       name = name,
@@ -55,14 +53,11 @@ case class PersonRowUnsaved(
                           case Defaulted.UseDefault => maritalStatusIdDefault
                           case Defaulted.Provided(value) => value
                         },
-      sector = sector match {
-                 case Defaulted.UseDefault => sectorDefault
-                 case Defaulted.Provided(value) => value
-               },
       favoriteNumber = favoriteNumber match {
                          case Defaulted.UseDefault => favoriteNumberDefault
                          case Defaulted.Provided(value) => value
-                       }
+                       },
+      sector = sectorDefault
     )
 }
 object PersonRowUnsaved {
@@ -77,11 +72,10 @@ object PersonRowUnsaved {
     val workEmail = jsonObj.get("work_email").fold[Either[String, Option[String]]](Right(None))(_.as(JsonDecoder.option(using JsonDecoder.string)))
     val id = jsonObj.get("id").toRight("Missing field 'id'").flatMap(_.as(Defaulted.jsonDecoder(PersonId.jsonDecoder)))
     val maritalStatusId = jsonObj.get("marital_status_id").toRight("Missing field 'marital_status_id'").flatMap(_.as(Defaulted.jsonDecoder(MaritalStatusId.jsonDecoder)))
-    val sector = jsonObj.get("sector").toRight("Missing field 'sector'").flatMap(_.as(Defaulted.jsonDecoder(Sector.jsonDecoder)))
     val favoriteNumber = jsonObj.get("favorite_number").toRight("Missing field 'favorite_number'").flatMap(_.as(Defaulted.jsonDecoder(Number.jsonDecoder)))
-    if (favouriteFootballClubId.isRight && name.isRight && nickName.isRight && blogUrl.isRight && email.isRight && phone.isRight && likesPizza.isRight && workEmail.isRight && id.isRight && maritalStatusId.isRight && sector.isRight && favoriteNumber.isRight)
-      Right(PersonRowUnsaved(favouriteFootballClubId = favouriteFootballClubId.toOption.get, name = name.toOption.get, nickName = nickName.toOption.get, blogUrl = blogUrl.toOption.get, email = email.toOption.get, phone = phone.toOption.get, likesPizza = likesPizza.toOption.get, workEmail = workEmail.toOption.get, id = id.toOption.get, maritalStatusId = maritalStatusId.toOption.get, sector = sector.toOption.get, favoriteNumber = favoriteNumber.toOption.get))
-    else Left(List[Either[String, Any]](favouriteFootballClubId, name, nickName, blogUrl, email, phone, likesPizza, workEmail, id, maritalStatusId, sector, favoriteNumber).flatMap(_.left.toOption).mkString(", "))
+    if (favouriteFootballClubId.isRight && name.isRight && nickName.isRight && blogUrl.isRight && email.isRight && phone.isRight && likesPizza.isRight && workEmail.isRight && id.isRight && maritalStatusId.isRight && favoriteNumber.isRight)
+      Right(PersonRowUnsaved(favouriteFootballClubId = favouriteFootballClubId.toOption.get, name = name.toOption.get, nickName = nickName.toOption.get, blogUrl = blogUrl.toOption.get, email = email.toOption.get, phone = phone.toOption.get, likesPizza = likesPizza.toOption.get, workEmail = workEmail.toOption.get, id = id.toOption.get, maritalStatusId = maritalStatusId.toOption.get, favoriteNumber = favoriteNumber.toOption.get))
+    else Left(List[Either[String, Any]](favouriteFootballClubId, name, nickName, blogUrl, email, phone, likesPizza, workEmail, id, maritalStatusId, favoriteNumber).flatMap(_.left.toOption).mkString(", "))
   }
   implicit lazy val jsonEncoder: JsonEncoder[PersonRowUnsaved] = new JsonEncoder[PersonRowUnsaved] {
     override def unsafeEncode(a: PersonRowUnsaved, indent: Option[Int], out: Write): Unit = {
@@ -116,9 +110,6 @@ object PersonRowUnsaved {
       out.write(""""marital_status_id":""")
       Defaulted.jsonEncoder(MaritalStatusId.jsonEncoder).unsafeEncode(a.maritalStatusId, indent, out)
       out.write(",")
-      out.write(""""sector":""")
-      Defaulted.jsonEncoder(Sector.jsonEncoder).unsafeEncode(a.sector, indent, out)
-      out.write(",")
       out.write(""""favorite_number":""")
       Defaulted.jsonEncoder(Number.jsonEncoder).unsafeEncode(a.favoriteNumber, indent, out)
       out.write("}")
@@ -144,8 +135,6 @@ object PersonRowUnsaved {
     Defaulted.text(PersonId.text).unsafeEncode(row.id, sb)
     sb.append(Text.DELIMETER)
     Defaulted.text(MaritalStatusId.text).unsafeEncode(row.maritalStatusId, sb)
-    sb.append(Text.DELIMETER)
-    Defaulted.text(Sector.text).unsafeEncode(row.sector, sb)
     sb.append(Text.DELIMETER)
     Defaulted.text(Number.text).unsafeEncode(row.favoriteNumber, sb)
   }

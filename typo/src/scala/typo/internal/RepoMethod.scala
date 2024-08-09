@@ -75,7 +75,7 @@ object RepoMethod {
       cols: NonEmptyList[ComputedColumn],
       id: IdComputed,
       param: sc.Param,
-      colsNotId: NonEmptyList[ComputedColumn]
+      writeableColumnsNotId: NonEmptyList[ComputedColumn]
   ) extends Mutator("update", 1)
 
   case class Upsert(
@@ -83,21 +83,23 @@ object RepoMethod {
       cols: NonEmptyList[ComputedColumn],
       id: IdComputed,
       unsavedParam: sc.Param,
-      rowType: sc.Type
+      rowType: sc.Type,
+      writeableColumnsWithId: NonEmptyList[ComputedColumn]
   ) extends Mutator("upsert")
 
   case class UpsertBatch(
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],
       id: IdComputed,
-      rowType: sc.Type
+      rowType: sc.Type,
+      writeableColumnsWithId: NonEmptyList[ComputedColumn]
   ) extends Mutator("upsertBatch")
 
   case class UpsertStreaming(
       relName: db.RelationName,
-      cols: NonEmptyList[ComputedColumn],
       id: IdComputed,
-      rowType: sc.Type
+      rowType: sc.Type,
+      writeableColumnsWithId: NonEmptyList[ComputedColumn]
   ) extends Mutator("upsertStreaming") {
     override val comment: Option[String] = Some("/* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */")
   }
@@ -106,7 +108,8 @@ object RepoMethod {
       relName: db.RelationName,
       cols: NonEmptyList[ComputedColumn],
       unsavedParam: sc.Param,
-      rowType: sc.Type
+      rowType: sc.Type,
+      writeableColumnsWithId: NonEmptyList[ComputedColumn]
   ) extends Mutator("insert", 2)
 
   case class InsertUnsaved(
@@ -120,8 +123,8 @@ object RepoMethod {
 
   case class InsertStreaming(
       relName: db.RelationName,
-      cols: NonEmptyList[ComputedColumn],
-      rowType: sc.Type
+      rowType: sc.Type,
+      writeableColumnsWithId: NonEmptyList[ComputedColumn]
   ) extends Mutator("insertStreaming")
 
   case class InsertUnsavedStreaming(

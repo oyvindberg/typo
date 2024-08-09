@@ -55,8 +55,6 @@ object IdentityTestRow {
     )
   }
   implicit lazy val text: Text[IdentityTestRow] = Text.instance[IdentityTestRow]{ (row, sb) =>
-    Text.intInstance.unsafeEncode(row.alwaysGenerated, sb)
-    sb.append(Text.DELIMETER)
     Text.intInstance.unsafeEncode(row.defaultGenerated, sb)
     sb.append(Text.DELIMETER)
     IdentityTestId.text.unsafeEncode(row.name, sb)

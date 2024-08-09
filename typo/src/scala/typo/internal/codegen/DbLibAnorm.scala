@@ -219,15 +219,15 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         Right(code"def $name(${id.param}, $varargs)(implicit c: ${TypesJava.Connection}): ${TypesScala.Boolean}")
       case RepoMethod.Update(_, _, _, param, _) =>
         Right(code"def $name($param)(implicit c: ${TypesJava.Connection}): ${TypesScala.Boolean}")
-      case RepoMethod.Insert(_, _, unsavedParam, rowType) =>
+      case RepoMethod.Insert(_, _, unsavedParam, rowType, _) =>
         Right(code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType")
-      case RepoMethod.InsertStreaming(_, _, rowType) =>
+      case RepoMethod.InsertStreaming(_, rowType, _) =>
         Right(code"def $name(unsaved: ${TypesScala.Iterator.of(rowType)}, batchSize: ${TypesScala.Int} = 10000)(implicit c: ${TypesJava.Connection}): ${TypesScala.Long}")
-      case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
+      case RepoMethod.Upsert(_, _, _, unsavedParam, rowType, _) =>
         Right(code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType")
-      case RepoMethod.UpsertBatch(_, _, _, rowType) =>
+      case RepoMethod.UpsertBatch(_, _, _, rowType, _) =>
         Right(code"def $name(unsaved: ${TypesScala.Iterable.of(rowType)})(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}")
-      case RepoMethod.UpsertStreaming(_, _, _, rowType) =>
+      case RepoMethod.UpsertStreaming(_, _, rowType, _) =>
         Right(code"def $name(unsaved: ${TypesScala.Iterator.of(rowType)}, batchSize: ${TypesScala.Int} = 10000)(implicit c: ${TypesJava.Connection}): ${TypesScala.Int}")
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
         Right(code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType")
@@ -381,9 +381,9 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
               |      .executeUpdate() > 0
               |}
               |""".stripMargin
-      case RepoMethod.Update(relName, _, id, param, colsUnsaved) =>
+      case RepoMethod.Update(relName, _, id, param, writeableColumnsNotId) =>
         val sql = SQL {
-          val setCols = colsUnsaved.map { col =>
+          val setCols = writeableColumnsNotId.map { col =>
             code"${col.dbName.code} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${SqlCast.toPgCode(col)}"
           }
           code"""|update $relName
@@ -394,12 +394,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         code"""|val ${id.paramName} = ${param.name}.${id.paramName}
                |$sql.executeUpdate() > 0"""
 
-      case RepoMethod.Insert(relName, cols, unsavedParam, rowType) =>
-        val values = cols.map { c =>
+      case RepoMethod.Insert(relName, cols, unsavedParam, rowType, writeableColumnsWithId) =>
+        val values = writeableColumnsWithId.map { c =>
           runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}", c.tpe).code ++ SqlCast.toPgCode(c)
         }
         val sql = SQL {
-          code"""|insert into $relName(${dbNames(cols, isRead = false)})
+          code"""|insert into $relName(${dbNames(writeableColumnsWithId, isRead = false)})
                  |values (${values.mkCode(", ")})
                  |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
@@ -408,12 +408,14 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         code"""|$sql
                |  .executeInsert(${rowParserFor(rowType)}.single)
                |"""
-      case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType) =>
-        val values = cols.map { c =>
+      case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType, writeableColumnsWithId) =>
+        val writeableColumnsNotId = writeableColumnsWithId.toList.filterNot(c => id.cols.exists(_.name == c.name))
+
+        val values = writeableColumnsWithId.map { c =>
           runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}", c.tpe).code ++ SqlCast.toPgCode(c)
         }
 
-        val conflictAction = cols.toList.filterNot(c => id.cols.exists(_.name == c.name)) match {
+        val conflictAction = writeableColumnsNotId match {
           case Nil => code"do nothing"
           case nonEmpty =>
             code"""|do update set
@@ -421,7 +423,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         }
 
         val sql = SQL {
-          code"""|insert into $relName(${dbNames(cols, isRead = false)})
+          code"""|insert into $relName(${dbNames(writeableColumnsWithId, isRead = false)})
                  |values (
                  |  ${values.mkCode(",\n")}
                  |)
@@ -434,8 +436,10 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         code"""|$sql
                |  .executeInsert(${rowParserFor(rowType)}.single)
                |"""
-      case RepoMethod.UpsertBatch(relName, cols, id, rowType) =>
-        val conflictAction = cols.toList.filterNot(c => id.cols.exists(_.name == c.name)) match {
+      case RepoMethod.UpsertBatch(relName, cols, id, rowType, writeableColumnsWithId) =>
+        val writeableColumnsNotId = writeableColumnsWithId.toList.filterNot(c => id.cols.exists(_.name == c.name))
+
+        val conflictAction = writeableColumnsNotId match {
           case Nil => code"do nothing"
           case nonEmpty =>
             code"""|do update set
@@ -443,8 +447,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         }
 
         val sql = sc.s {
-          code"""|insert into $relName(${dbNames(cols, isRead = false)})
-                 |values (${cols.map(c => code"{${c.dbName.value}}${SqlCast.toPgCode(c)}").mkCode(", ")})
+          code"""|insert into $relName(${dbNames(writeableColumnsWithId, isRead = false)})
+                 |values (${writeableColumnsWithId.map(c => code"{${c.dbName.value}}${SqlCast.toPgCode(c)}").mkCode(", ")})
                  |on conflict (${dbNames(id.cols, isRead = false)})
                  |$conflictAction
                  |returning ${dbNames(cols, isRead = true)}
@@ -452,7 +456,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         }
 
         code"""|def toNamedParameter(row: $rowType): ${TypesScala.List.of(NamedParameter)} = ${TypesScala.List}(
-               |  ${cols.map(c => code"$NamedParameter(${sc.StrLit(c.dbName.value)}, $ParameterValue(row.${c.name}, null, ${lookupToStatementFor(c.tpe)}))").mkCode(",\n")}
+               |  ${writeableColumnsWithId.map(c => code"$NamedParameter(${sc.StrLit(c.dbName.value)}, $ParameterValue(row.${c.name}, null, ${lookupToStatementFor(c.tpe)}))").mkCode(",\n")}
                |)
                |unsaved.toList match {
                |  case Nil => ${TypesScala.Nil}
@@ -466,8 +470,10 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                |    ).executeReturning(${rowParserFor(rowType)}.*)
                |}""".stripMargin
 
-      case RepoMethod.UpsertStreaming(relName, cols, id, rowType) =>
-        val conflictAction = cols.toList.filterNot(c => id.cols.exists(_.name == c.name)) match {
+      case RepoMethod.UpsertStreaming(relName, id, rowType, writeableColumnsWithId) =>
+        val writeableColumnsNotId = writeableColumnsWithId.toList.filterNot(c => id.cols.exists(_.name == c.name))
+
+        val conflictAction = writeableColumnsNotId match {
           case Nil => code"do nothing"
           case nonEmpty =>
             code"""|do update set
@@ -475,10 +481,10 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         }
         val tempTablename = s"${relName.name}_TEMP"
 
-        val copySql = sc.s(code"copy $tempTablename(${dbNames(cols, isRead = false)}) from stdin")
+        val copySql = sc.s(code"copy $tempTablename(${dbNames(writeableColumnsWithId, isRead = false)}) from stdin")
 
         val mergeSql = SQL {
-          code"""|insert into $relName(${dbNames(cols, isRead = false)})
+          code"""|insert into $relName(${dbNames(writeableColumnsWithId, isRead = false)})
                  |select * from $tempTablename
                  |on conflict (${dbNames(id.cols, isRead = false)})
                  |$conflictAction
@@ -530,8 +536,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                |    .executeInsert(${rowParserFor(rowType)}.single)
                |}
                |"""
-      case RepoMethod.InsertStreaming(relName, cols, rowType) =>
-        val sql = sc.s(code"COPY $relName(${dbNames(cols, isRead = false)}) FROM STDIN")
+      case RepoMethod.InsertStreaming(relName, rowType, writeableColumnsWithId) =>
+        val sql = sc.s(code"COPY $relName(${dbNames(writeableColumnsWithId, isRead = false)}) FROM STDIN")
         code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.lookupTextFor(rowType)}, c)"
       case RepoMethod.InsertUnsavedStreaming(relName, unsaved) =>
         val sql = sc.s(code"COPY $relName(${dbNames(unsaved.allCols, isRead = false)}) FROM STDIN (DEFAULT '${textSupport.get.DefaultValue}')")
@@ -656,22 +662,22 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
               |    true
               |  case ${TypesScala.None} => false
               |}""".stripMargin
-      case RepoMethod.Insert(_, _, unsavedParam, _) =>
+      case RepoMethod.Insert(_, _, unsavedParam, _, _) =>
         code"""|val _ = if (map.contains(${unsavedParam.name}.${id.paramName}))
                |  sys.error(s"id $${${unsavedParam.name}.${id.paramName}} already exists")
                |else
                |  map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name})
                |
                |${unsavedParam.name}"""
-      case RepoMethod.Upsert(_, _, _, unsavedParam, _) =>
+      case RepoMethod.Upsert(_, _, _, unsavedParam, _, _) =>
         code"""|map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name}): @${TypesScala.nowarn}
                |${unsavedParam.name}"""
-      case RepoMethod.UpsertStreaming(_, _, id, _) =>
+      case RepoMethod.UpsertStreaming(_, id, _, _) =>
         code"""|unsaved.foreach { row =>
                |  map += (row.${id.paramName} -> row)
                |}
                |unsaved.size""".stripMargin
-      case RepoMethod.UpsertBatch(_, _, id, _) =>
+      case RepoMethod.UpsertBatch(_, _, id, _, _) =>
         code"""|unsaved.map { row =>
                |  map += (row.${id.paramName} -> row)
                |  row
@@ -890,6 +896,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
     missingInstances.collect { case x: sc.Given => (x.tpe, pkg / x.name) }.toMap
 
   override def rowInstances(tpe: sc.Type, cols: NonEmptyList[ComputedColumn], rowType: DbLib.RowType): List[sc.ClassMember] = {
+
     val text = textSupport.map(_.rowInstance(tpe, cols))
     val rowParser = {
       val mappedValues = cols.zipWithIndex.map { case (x, num) => code"${x.name} = row(idx + $num)(${lookupColumnFor(x.tpe)})" }
