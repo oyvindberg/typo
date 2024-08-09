@@ -26,16 +26,16 @@ import zio.stream.ZStream
 
 class JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
-    DeleteBuilder("humanresources.jobcandidate", JobcandidateFields.structure)
+    DeleteBuilder(""""humanresources"."jobcandidate"""", JobcandidateFields.structure)
   }
   override def deleteById(jobcandidateid: JobcandidateId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from humanresources.jobcandidate where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "humanresources"."jobcandidate" where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(jobcandidateids: Array[JobcandidateId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from humanresources.jobcandidate where "jobcandidateid" = ANY(${jobcandidateids})""".delete
+    sql"""delete from "humanresources"."jobcandidate" where "jobcandidateid" = ANY(${jobcandidateids})""".delete
   }
   override def insert(unsaved: JobcandidateRow): ZIO[ZConnection, Throwable, JobcandidateRow] = {
-    sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
+    sql"""insert into "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate")
           values (${Segment.paramSegment(unsaved.jobcandidateid)(JobcandidateId.setter)}::int4, ${Segment.paramSegment(unsaved.businessentityid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4, ${Segment.paramSegment(unsaved.resume)(Setter.optionParamSetter(TypoXml.setter))}::xml, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
        """.insertReturning(using JobcandidateRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -55,35 +55,35 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into humanresources.jobcandidate default values
+      sql"""insert into "humanresources"."jobcandidate" default values
             returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into humanresources.jobcandidate($names) values ($values) returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text"""
+      sql"""insert into "humanresources"."jobcandidate"($names) values ($values) returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text"""
     }
     q.insertReturning(using JobcandidateRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, JobcandidateRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate") FROM STDIN""", batchSize, unsaved)(JobcandidateRow.text)
+    streamingInsert(s"""COPY "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate") FROM STDIN""", batchSize, unsaved)(JobcandidateRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, JobcandidateRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY humanresources.jobcandidate("businessentityid", "resume", "jobcandidateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(JobcandidateRowUnsaved.text)
+    streamingInsert(s"""COPY "humanresources"."jobcandidate"("businessentityid", "resume", "jobcandidateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(JobcandidateRowUnsaved.text)
   }
   override def select: SelectBuilder[JobcandidateFields, JobcandidateRow] = {
-    SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.jdbcDecoder)
+    SelectBuilderSql(""""humanresources"."jobcandidate"""", JobcandidateFields.structure, JobcandidateRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, JobcandidateRow] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate""".query(using JobcandidateRow.jdbcDecoder).selectStream()
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from "humanresources"."jobcandidate"""".query(using JobcandidateRow.jdbcDecoder).selectStream()
   }
   override def selectById(jobcandidateid: JobcandidateId): ZIO[ZConnection, Throwable, Option[JobcandidateRow]] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".query(using JobcandidateRow.jdbcDecoder).selectOne
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from "humanresources"."jobcandidate" where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".query(using JobcandidateRow.jdbcDecoder).selectOne
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): ZStream[ZConnection, Throwable, JobcandidateRow] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ANY(${Segment.paramSegment(jobcandidateids)(JobcandidateId.arraySetter)})""".query(using JobcandidateRow.jdbcDecoder).selectStream()
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from "humanresources"."jobcandidate" where "jobcandidateid" = ANY(${Segment.paramSegment(jobcandidateids)(JobcandidateId.arraySetter)})""".query(using JobcandidateRow.jdbcDecoder).selectStream()
   }
   override def selectByIdsTracked(jobcandidateids: Array[JobcandidateId]): ZIO[ZConnection, Throwable, Map[JobcandidateId, JobcandidateRow]] = {
     selectByIds(jobcandidateids).runCollect.map { rows =>
@@ -92,18 +92,18 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     }
   }
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
-    UpdateBuilder("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.jdbcDecoder)
+    UpdateBuilder(""""humanresources"."jobcandidate"""", JobcandidateFields.structure, JobcandidateRow.jdbcDecoder)
   }
   override def update(row: JobcandidateRow): ZIO[ZConnection, Throwable, Boolean] = {
     val jobcandidateid = row.jobcandidateid
-    sql"""update humanresources.jobcandidate
+    sql"""update "humanresources"."jobcandidate"
           set "businessentityid" = ${Segment.paramSegment(row.businessentityid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4,
               "resume" = ${Segment.paramSegment(row.resume)(Setter.optionParamSetter(TypoXml.setter))}::xml,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: JobcandidateRow): ZIO[ZConnection, Throwable, UpdateResult[JobcandidateRow]] = {
-    sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
+    sql"""insert into "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.jobcandidateid)(JobcandidateId.setter)}::int4,
             ${Segment.paramSegment(unsaved.businessentityid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4,
@@ -119,9 +119,9 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, JobcandidateRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table jobcandidate_TEMP (like humanresources.jobcandidate) on commit drop".execute
+    val created = sql"""create temporary table jobcandidate_TEMP (like "humanresources"."jobcandidate") on commit drop""".execute
     val copied = streamingInsert(s"""copy jobcandidate_TEMP("jobcandidateid", "businessentityid", "resume", "modifieddate") from stdin""", batchSize, unsaved)(JobcandidateRow.text)
-    val merged = sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
+    val merged = sql"""insert into "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate")
                        select * from jobcandidate_TEMP
                        on conflict ("jobcandidateid")
                        do update set

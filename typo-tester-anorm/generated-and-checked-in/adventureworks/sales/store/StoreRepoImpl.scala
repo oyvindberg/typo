@@ -30,20 +30,20 @@ import typo.dsl.UpdateBuilder
 
 class StoreRepoImpl extends StoreRepo {
   override def delete: DeleteBuilder[StoreFields, StoreRow] = {
-    DeleteBuilder("sales.store", StoreFields.structure)
+    DeleteBuilder(""""sales"."store"""", StoreFields.structure)
   }
   override def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.store where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "sales"."store" where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
     SQL"""delete
-          from sales.store
+          from "sales"."store"
           where "businessentityid" = ANY(${businessentityids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
-    SQL"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."store"("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.salespersonid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
        """
@@ -67,12 +67,12 @@ class StoreRepoImpl extends StoreRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into sales.store default values
+      SQL"""insert into "sales"."store" default values
             returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
          """
         .executeInsert(StoreRow.rowParser(1).single)
     } else {
-      val q = s"""insert into sales.store(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "sales"."store"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
                """
@@ -82,29 +82,29 @@ class StoreRepoImpl extends StoreRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[StoreRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StoreRow.text, c)
+    streamingInsert(s"""COPY "sales"."store"("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StoreRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[StoreRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StoreRowUnsaved.text, c)
+    streamingInsert(s"""COPY "sales"."store"("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StoreRowUnsaved.text, c)
   }
   override def select: SelectBuilder[StoreFields, StoreRow] = {
-    SelectBuilderSql("sales.store", StoreFields.structure, StoreRow.rowParser)
+    SelectBuilderSql(""""sales"."store"""", StoreFields.structure, StoreRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[StoreRow] = {
     SQL"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
-          from sales.store
+          from "sales"."store"
        """.as(StoreRow.rowParser(1).*)
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[StoreRow] = {
     SQL"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
-          from sales.store
+          from "sales"."store"
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.as(StoreRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[StoreRow] = {
     SQL"""select "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
-          from sales.store
+          from "sales"."store"
           where "businessentityid" = ANY(${businessentityids})
        """.as(StoreRow.rowParser(1).*)
     
@@ -114,11 +114,11 @@ class StoreRepoImpl extends StoreRepo {
     businessentityids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[StoreFields, StoreRow] = {
-    UpdateBuilder("sales.store", StoreFields.structure, StoreRow.rowParser)
+    UpdateBuilder(""""sales"."store"""", StoreFields.structure, StoreRow.rowParser)
   }
   override def update(row: StoreRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
-    SQL"""update sales.store
+    SQL"""update "sales"."store"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "salespersonid" = ${ParameterValue(row.salespersonid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
               "demographics" = ${ParameterValue(row.demographics, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
@@ -128,7 +128,7 @@ class StoreRepoImpl extends StoreRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
-    SQL"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."store"("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
@@ -163,7 +163,7 @@ class StoreRepoImpl extends StoreRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
+            s"""insert into "sales"."store"("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
                 values ({businessentityid}::int4, {name}::varchar, {salespersonid}::int4, {demographics}::xml, {rowguid}::uuid, {modifieddate}::timestamp)
                 on conflict ("businessentityid")
                 do update set
@@ -182,9 +182,9 @@ class StoreRepoImpl extends StoreRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[StoreRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table store_TEMP (like sales.store) on commit drop".execute(): @nowarn
+    SQL"""create temporary table store_TEMP (like "sales"."store") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy store_TEMP("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(StoreRow.text, c): @nowarn
-    SQL"""insert into sales.store("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."store"("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")
           select * from store_TEMP
           on conflict ("businessentityid")
           do update set

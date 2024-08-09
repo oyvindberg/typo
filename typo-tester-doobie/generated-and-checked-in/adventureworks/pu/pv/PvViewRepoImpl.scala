@@ -15,9 +15,9 @@ import typo.dsl.SelectBuilderSql
 
 class PvViewRepoImpl extends PvViewRepo {
   override def select: SelectBuilder[PvViewFields, PvViewRow] = {
-    SelectBuilderSql("pu.pv", PvViewFields.structure, PvViewRow.read)
+    SelectBuilderSql(""""pu"."pv"""", PvViewFields.structure, PvViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PvViewRow] = {
-    sql"""select "id", "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from pu.pv""".query(using PvViewRow.read).stream
+    sql"""select "id", "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from "pu"."pv"""".query(using PvViewRow.read).stream
   }
 }

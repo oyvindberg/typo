@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class VproductmodelinstructionsViewRepoImpl extends VproductmodelinstructionsViewRepo {
   override def select: SelectBuilder[VproductmodelinstructionsViewFields, VproductmodelinstructionsViewRow] = {
-    SelectBuilderSql("production.vproductmodelinstructions", VproductmodelinstructionsViewFields.structure, VproductmodelinstructionsViewRow.rowParser)
+    SelectBuilderSql(""""production"."vproductmodelinstructions"""", VproductmodelinstructionsViewFields.structure, VproductmodelinstructionsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VproductmodelinstructionsViewRow] = {
     SQL"""select "productmodelid", "name", "instructions", "LocationID", "SetupHours", "MachineHours", "LaborHours", "LotSize", "Step", "rowguid", "modifieddate"::text
-          from production.vproductmodelinstructions
+          from "production"."vproductmodelinstructions"
        """.as(VproductmodelinstructionsViewRow.rowParser(1).*)
   }
 }

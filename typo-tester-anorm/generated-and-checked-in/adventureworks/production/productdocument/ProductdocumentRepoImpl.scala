@@ -27,23 +27,23 @@ import typo.dsl.UpdateBuilder
 
 class ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    DeleteBuilder("production.productdocument", ProductdocumentFields.structure)
+    DeleteBuilder(""""production"."productdocument"""", ProductdocumentFields.structure)
   }
   override def deleteById(compositeId: ProductdocumentId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productdocument where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "documentnode" = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "production"."productdocument" where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "documentnode" = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[ProductdocumentId])(implicit c: Connection): Int = {
     val productid = compositeIds.map(_.productid)
     val documentnode = compositeIds.map(_.documentnode)
     SQL"""delete
-          from production.productdocument
+          from "production"."productdocument"
           where ("productid", "documentnode")
           in (select unnest(${productid}), unnest(${documentnode}))
        """.executeUpdate()
     
   }
   override def insert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow = {
-    SQL"""insert into production.productdocument("productid", "modifieddate", "documentnode")
+    SQL"""insert into "production"."productdocument"("productid", "modifieddate", "documentnode")
           values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.documentnode, null, DocumentId.toStatement)})
           returning "productid", "modifieddate"::text, "documentnode"
        """
@@ -64,12 +64,12 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into production.productdocument default values
+      SQL"""insert into "production"."productdocument" default values
             returning "productid", "modifieddate"::text, "documentnode"
          """
         .executeInsert(ProductdocumentRow.rowParser(1).single)
     } else {
-      val q = s"""insert into production.productdocument(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "production"."productdocument"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "productid", "modifieddate"::text, "documentnode"
                """
@@ -79,23 +79,23 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[ProductdocumentRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN""", batchSize, unsaved)(ProductdocumentRow.text, c)
+    streamingInsert(s"""COPY "production"."productdocument"("productid", "modifieddate", "documentnode") FROM STDIN""", batchSize, unsaved)(ProductdocumentRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductdocumentRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductdocumentRowUnsaved.text, c)
+    streamingInsert(s"""COPY "production"."productdocument"("productid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductdocumentRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    SelectBuilderSql("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.rowParser)
+    SelectBuilderSql(""""production"."productdocument"""", ProductdocumentFields.structure, ProductdocumentRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductdocumentRow] = {
     SQL"""select "productid", "modifieddate"::text, "documentnode"
-          from production.productdocument
+          from "production"."productdocument"
        """.as(ProductdocumentRow.rowParser(1).*)
   }
   override def selectById(compositeId: ProductdocumentId)(implicit c: Connection): Option[ProductdocumentRow] = {
     SQL"""select "productid", "modifieddate"::text, "documentnode"
-          from production.productdocument
+          from "production"."productdocument"
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "documentnode" = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}
        """.as(ProductdocumentRow.rowParser(1).singleOpt)
   }
@@ -103,7 +103,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     val productid = compositeIds.map(_.productid)
     val documentnode = compositeIds.map(_.documentnode)
     SQL"""select "productid", "modifieddate"::text, "documentnode"
-          from production.productdocument
+          from "production"."productdocument"
           where ("productid", "documentnode") 
           in (select unnest(${productid}), unnest(${documentnode}))
        """.as(ProductdocumentRow.rowParser(1).*)
@@ -114,17 +114,17 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    UpdateBuilder("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.rowParser)
+    UpdateBuilder(""""production"."productdocument"""", ProductdocumentFields.structure, ProductdocumentRow.rowParser)
   }
   override def update(row: ProductdocumentRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
-    SQL"""update production.productdocument
+    SQL"""update "production"."productdocument"
           set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "documentnode" = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow = {
-    SQL"""insert into production.productdocument("productid", "modifieddate", "documentnode")
+    SQL"""insert into "production"."productdocument"("productid", "modifieddate", "documentnode")
           values (
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
             ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp,
@@ -149,7 +149,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into production.productdocument("productid", "modifieddate", "documentnode")
+            s"""insert into "production"."productdocument"("productid", "modifieddate", "documentnode")
                 values ({productid}::int4, {modifieddate}::timestamp, {documentnode})
                 on conflict ("productid", "documentnode")
                 do update set
@@ -164,9 +164,9 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductdocumentRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table productdocument_TEMP (like production.productdocument) on commit drop".execute(): @nowarn
+    SQL"""create temporary table productdocument_TEMP (like "production"."productdocument") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy productdocument_TEMP("productid", "modifieddate", "documentnode") from stdin""", batchSize, unsaved)(ProductdocumentRow.text, c): @nowarn
-    SQL"""insert into production.productdocument("productid", "modifieddate", "documentnode")
+    SQL"""insert into "production"."productdocument"("productid", "modifieddate", "documentnode")
           select * from productdocument_TEMP
           on conflict ("productid", "documentnode")
           do update set

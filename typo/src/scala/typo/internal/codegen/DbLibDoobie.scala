@@ -146,7 +146,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
   override def repoImpl(repoMethod: RepoMethod): sc.Code =
     repoMethod match {
       case RepoMethod.SelectBuilder(relName, fieldsType, rowType) =>
-        code"""${sc.Type.dsl.SelectBuilderSql}(${sc.StrLit(relName.value)}, $fieldsType.structure, $rowType.read)"""
+        code"""${sc.Type.dsl.SelectBuilderSql}(${sc.StrLit(relName.quotedValue)}, $fieldsType.structure, $rowType.read)"""
 
       case RepoMethod.SelectAll(relName, cols, rowType) =>
         val joinedColNames = dbNames(cols, isRead = true)
@@ -235,7 +235,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
               |}""".stripMargin
 
       case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
-        code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.value)}, $fieldsType.structure, $rowType.read)"
+        code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.quotedValue)}, $fieldsType.structure, $rowType.read)"
 
       case RepoMethod.Update(relName, _, id, param, colsNotId) =>
         val sql = SQL(
@@ -393,7 +393,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         code"${query(sql, rowType)}.unique"
 
       case RepoMethod.DeleteBuilder(relName, fieldsType, _) =>
-        code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.value)}, $fieldsType.structure)"
+        code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.quotedValue)}, $fieldsType.structure)"
       case RepoMethod.Delete(relName, id) =>
         val sql = SQL(code"""delete from $relName where ${matchId(id)}""")
         code"$sql.update.run.map(_ > 0)"

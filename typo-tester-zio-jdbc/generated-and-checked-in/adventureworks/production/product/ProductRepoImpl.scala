@@ -31,16 +31,16 @@ import zio.stream.ZStream
 
 class ProductRepoImpl extends ProductRepo {
   override def delete: DeleteBuilder[ProductFields, ProductRow] = {
-    DeleteBuilder("production.product", ProductFields.structure)
+    DeleteBuilder(""""production"."product"""", ProductFields.structure)
   }
   override def deleteById(productid: ProductId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.product where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "production"."product" where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(productids: Array[ProductId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from production.product where "productid" = ANY(${productids})""".delete
+    sql"""delete from "production"."product" where "productid" = ANY(${productids})""".delete
   }
   override def insert(unsaved: ProductRow): ZIO[ZConnection, Throwable, ProductRow] = {
-    sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
+    sql"""insert into "production"."product"("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.productnumber)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.makeflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.finishedgoodsflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.color)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.safetystocklevel)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.reorderpoint)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.standardcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.listprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.size)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.sizeunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar, ${Segment.paramSegment(unsaved.weightunitmeasurecode)(Setter.optionParamSetter(UnitmeasureId.setter))}::bpchar, ${Segment.paramSegment(unsaved.weight)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric, ${Segment.paramSegment(unsaved.daystomanufacture)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.productline)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.`class`)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.style)(Setter.optionParamSetter(Setter.stringSetter))}::bpchar, ${Segment.paramSegment(unsaved.productsubcategoryid)(Setter.optionParamSetter(ProductsubcategoryId.setter))}::int4, ${Segment.paramSegment(unsaved.productmodelid)(Setter.optionParamSetter(ProductmodelId.setter))}::int4, ${Segment.paramSegment(unsaved.sellstartdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.sellenddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.discontinueddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text
        """.insertReturning(using ProductRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -90,35 +90,35 @@ class ProductRepoImpl extends ProductRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.product default values
+      sql"""insert into "production"."product" default values
             returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into production.product($names) values ($values) returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text"""
+      sql"""insert into "production"."product"($names) values ($values) returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text"""
     }
     q.insertReturning(using ProductRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductRow.text)
+    streamingInsert(s"""COPY "production"."product"("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.product("name", "productnumber", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "productid", "makeflag", "finishedgoodsflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductRowUnsaved.text)
+    streamingInsert(s"""COPY "production"."product"("name", "productnumber", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "productid", "makeflag", "finishedgoodsflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductFields, ProductRow] = {
-    SelectBuilderSql("production.product", ProductFields.structure, ProductRow.jdbcDecoder)
+    SelectBuilderSql(""""production"."product"""", ProductFields.structure, ProductRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductRow] = {
-    sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product""".query(using ProductRow.jdbcDecoder).selectStream()
+    sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from "production"."product"""".query(using ProductRow.jdbcDecoder).selectStream()
   }
   override def selectById(productid: ProductId): ZIO[ZConnection, Throwable, Option[ProductRow]] = {
-    sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}""".query(using ProductRow.jdbcDecoder).selectOne
+    sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from "production"."product" where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}""".query(using ProductRow.jdbcDecoder).selectOne
   }
   override def selectByIds(productids: Array[ProductId]): ZStream[ZConnection, Throwable, ProductRow] = {
-    sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from production.product where "productid" = ANY(${Segment.paramSegment(productids)(ProductId.arraySetter)})""".query(using ProductRow.jdbcDecoder).selectStream()
+    sql"""select "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text from "production"."product" where "productid" = ANY(${Segment.paramSegment(productids)(ProductId.arraySetter)})""".query(using ProductRow.jdbcDecoder).selectStream()
   }
   override def selectByIdsTracked(productids: Array[ProductId]): ZIO[ZConnection, Throwable, Map[ProductId, ProductRow]] = {
     selectByIds(productids).runCollect.map { rows =>
@@ -127,11 +127,11 @@ class ProductRepoImpl extends ProductRepo {
     }
   }
   override def update: UpdateBuilder[ProductFields, ProductRow] = {
-    UpdateBuilder("production.product", ProductFields.structure, ProductRow.jdbcDecoder)
+    UpdateBuilder(""""production"."product"""", ProductFields.structure, ProductRow.jdbcDecoder)
   }
   override def update(row: ProductRow): ZIO[ZConnection, Throwable, Boolean] = {
     val productid = row.productid
-    sql"""update production.product
+    sql"""update "production"."product"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "productnumber" = ${Segment.paramSegment(row.productnumber)(Setter.stringSetter)},
               "makeflag" = ${Segment.paramSegment(row.makeflag)(Flag.setter)}::bool,
@@ -159,7 +159,7 @@ class ProductRepoImpl extends ProductRepo {
           where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: ProductRow): ZIO[ZConnection, Throwable, UpdateResult[ProductRow]] = {
-    sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
+    sql"""insert into "production"."product"("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
             ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
@@ -217,9 +217,9 @@ class ProductRepoImpl extends ProductRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table product_TEMP (like production.product) on commit drop".execute
+    val created = sql"""create temporary table product_TEMP (like "production"."product") on commit drop""".execute
     val copied = streamingInsert(s"""copy product_TEMP("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(ProductRow.text)
-    val merged = sql"""insert into production.product("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
+    val merged = sql"""insert into "production"."product"("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")
                        select * from product_TEMP
                        on conflict ("productid")
                        do update set

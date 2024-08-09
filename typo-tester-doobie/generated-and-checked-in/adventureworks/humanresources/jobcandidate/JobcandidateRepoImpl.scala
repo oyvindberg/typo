@@ -27,16 +27,16 @@ import typo.dsl.UpdateBuilder
 
 class JobcandidateRepoImpl extends JobcandidateRepo {
   override def delete: DeleteBuilder[JobcandidateFields, JobcandidateRow] = {
-    DeleteBuilder("humanresources.jobcandidate", JobcandidateFields.structure)
+    DeleteBuilder(""""humanresources"."jobcandidate"""", JobcandidateFields.structure)
   }
   override def deleteById(jobcandidateid: JobcandidateId): ConnectionIO[Boolean] = {
-    sql"""delete from humanresources.jobcandidate where "jobcandidateid" = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "humanresources"."jobcandidate" where "jobcandidateid" = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(jobcandidateids: Array[JobcandidateId]): ConnectionIO[Int] = {
-    sql"""delete from humanresources.jobcandidate where "jobcandidateid" = ANY(${jobcandidateids})""".update.run
+    sql"""delete from "humanresources"."jobcandidate" where "jobcandidateid" = ANY(${jobcandidateids})""".update.run
   }
   override def insert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
-    sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
+    sql"""insert into "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate")
           values (${fromWrite(unsaved.jobcandidateid)(Write.fromPut(JobcandidateId.put))}::int4, ${fromWrite(unsaved.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.resume)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
        """.query(using JobcandidateRow.read).unique
@@ -56,12 +56,12 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into humanresources.jobcandidate default values
+      sql"""insert into "humanresources"."jobcandidate" default values
             returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into humanresources.jobcandidate(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "humanresources"."jobcandidate"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
          """
@@ -70,23 +70,23 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using JobcandidateRow.text)
+    new FragmentOps(sql"""COPY "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using JobcandidateRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, JobcandidateRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.jobcandidate("businessentityid", "resume", "jobcandidateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using JobcandidateRowUnsaved.text)
+    new FragmentOps(sql"""COPY "humanresources"."jobcandidate"("businessentityid", "resume", "jobcandidateid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using JobcandidateRowUnsaved.text)
   }
   override def select: SelectBuilder[JobcandidateFields, JobcandidateRow] = {
-    SelectBuilderSql("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.read)
+    SelectBuilderSql(""""humanresources"."jobcandidate"""", JobcandidateFields.structure, JobcandidateRow.read)
   }
   override def selectAll: Stream[ConnectionIO, JobcandidateRow] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate""".query(using JobcandidateRow.read).stream
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from "humanresources"."jobcandidate"""".query(using JobcandidateRow.read).stream
   }
   override def selectById(jobcandidateid: JobcandidateId): ConnectionIO[Option[JobcandidateRow]] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}""".query(using JobcandidateRow.read).option
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from "humanresources"."jobcandidate" where "jobcandidateid" = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}""".query(using JobcandidateRow.read).option
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from humanresources.jobcandidate where "jobcandidateid" = ANY(${jobcandidateids})""".query(using JobcandidateRow.read).stream
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from "humanresources"."jobcandidate" where "jobcandidateid" = ANY(${jobcandidateids})""".query(using JobcandidateRow.read).stream
   }
   override def selectByIdsTracked(jobcandidateids: Array[JobcandidateId]): ConnectionIO[Map[JobcandidateId, JobcandidateRow]] = {
     selectByIds(jobcandidateids).compile.toList.map { rows =>
@@ -95,11 +95,11 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     }
   }
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
-    UpdateBuilder("humanresources.jobcandidate", JobcandidateFields.structure, JobcandidateRow.read)
+    UpdateBuilder(""""humanresources"."jobcandidate"""", JobcandidateFields.structure, JobcandidateRow.read)
   }
   override def update(row: JobcandidateRow): ConnectionIO[Boolean] = {
     val jobcandidateid = row.jobcandidateid
-    sql"""update humanresources.jobcandidate
+    sql"""update "humanresources"."jobcandidate"
           set "businessentityid" = ${fromWrite(row.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4,
               "resume" = ${fromWrite(row.resume)(Write.fromPutOption(TypoXml.put))}::xml,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
@@ -109,7 +109,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
-    sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
+    sql"""insert into "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate")
           values (
             ${fromWrite(unsaved.jobcandidateid)(Write.fromPut(JobcandidateId.put))}::int4,
             ${fromWrite(unsaved.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4,
@@ -126,7 +126,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
   }
   override def upsertBatch(unsaved: List[JobcandidateRow]): Stream[ConnectionIO, JobcandidateRow] = {
     Update[JobcandidateRow](
-      s"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
+      s"""insert into "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate")
           values (?::int4,?::int4,?::xml,?::timestamp)
           on conflict ("jobcandidateid")
           do update set
@@ -140,9 +140,9 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, JobcandidateRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table jobcandidate_TEMP (like humanresources.jobcandidate) on commit drop".update.run
+      _ <- sql"""create temporary table jobcandidate_TEMP (like "humanresources"."jobcandidate") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy jobcandidate_TEMP("jobcandidateid", "businessentityid", "resume", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using JobcandidateRow.text)
-      res <- sql"""insert into humanresources.jobcandidate("jobcandidateid", "businessentityid", "resume", "modifieddate")
+      res <- sql"""insert into "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate")
                    select * from jobcandidate_TEMP
                    on conflict ("jobcandidateid")
                    do update set

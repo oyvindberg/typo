@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class PiViewRepoImpl extends PiViewRepo {
   override def select: SelectBuilder[PiViewFields, PiViewRow] = {
-    SelectBuilderSql("pr.pi", PiViewFields.structure, PiViewRow.rowParser)
+    SelectBuilderSql(""""pr"."pi"""", PiViewFields.structure, PiViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PiViewRow] = {
     SQL"""select "id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
-          from pr.pi
+          from "pr"."pi"
        """.as(PiViewRow.rowParser(1).*)
   }
 }

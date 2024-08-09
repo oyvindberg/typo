@@ -24,16 +24,16 @@ import zio.stream.ZStream
 
 class CurrencyRepoImpl extends CurrencyRepo {
   override def delete: DeleteBuilder[CurrencyFields, CurrencyRow] = {
-    DeleteBuilder("sales.currency", CurrencyFields.structure)
+    DeleteBuilder(""""sales"."currency"""", CurrencyFields.structure)
   }
   override def deleteById(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.currency where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "sales"."currency" where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(currencycodes: Array[CurrencyId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from sales.currency where "currencycode" = ANY(${currencycodes})""".delete
+    sql"""delete from "sales"."currency" where "currencycode" = ANY(${currencycodes})""".delete
   }
   override def insert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, CurrencyRow] = {
-    sql"""insert into sales.currency("currencycode", "name", "modifieddate")
+    sql"""insert into "sales"."currency"("currencycode", "name", "modifieddate")
           values (${Segment.paramSegment(unsaved.currencycode)(CurrencyId.setter)}::bpchar, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "currencycode", "name", "modifieddate"::text
        """.insertReturning(using CurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -49,35 +49,35 @@ class CurrencyRepoImpl extends CurrencyRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into sales.currency default values
+      sql"""insert into "sales"."currency" default values
             returning "currencycode", "name", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into sales.currency($names) values ($values) returning "currencycode", "name", "modifieddate"::text"""
+      sql"""insert into "sales"."currency"($names) values ($values) returning "currencycode", "name", "modifieddate"::text"""
     }
     q.insertReturning(using CurrencyRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CurrencyRow.text)
+    streamingInsert(s"""COPY "sales"."currency"("currencycode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CurrencyRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.currency("currencycode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CurrencyRowUnsaved.text)
+    streamingInsert(s"""COPY "sales"."currency"("currencycode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CurrencyRowUnsaved.text)
   }
   override def select: SelectBuilder[CurrencyFields, CurrencyRow] = {
-    SelectBuilderSql("sales.currency", CurrencyFields.structure, CurrencyRow.jdbcDecoder)
+    SelectBuilderSql(""""sales"."currency"""", CurrencyFields.structure, CurrencyRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CurrencyRow] = {
-    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency""".query(using CurrencyRow.jdbcDecoder).selectStream()
+    sql"""select "currencycode", "name", "modifieddate"::text from "sales"."currency"""".query(using CurrencyRow.jdbcDecoder).selectStream()
   }
   override def selectById(currencycode: CurrencyId): ZIO[ZConnection, Throwable, Option[CurrencyRow]] = {
-    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".query(using CurrencyRow.jdbcDecoder).selectOne
+    sql"""select "currencycode", "name", "modifieddate"::text from "sales"."currency" where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".query(using CurrencyRow.jdbcDecoder).selectOne
   }
   override def selectByIds(currencycodes: Array[CurrencyId]): ZStream[ZConnection, Throwable, CurrencyRow] = {
-    sql"""select "currencycode", "name", "modifieddate"::text from sales.currency where "currencycode" = ANY(${Segment.paramSegment(currencycodes)(CurrencyId.arraySetter)})""".query(using CurrencyRow.jdbcDecoder).selectStream()
+    sql"""select "currencycode", "name", "modifieddate"::text from "sales"."currency" where "currencycode" = ANY(${Segment.paramSegment(currencycodes)(CurrencyId.arraySetter)})""".query(using CurrencyRow.jdbcDecoder).selectStream()
   }
   override def selectByIdsTracked(currencycodes: Array[CurrencyId]): ZIO[ZConnection, Throwable, Map[CurrencyId, CurrencyRow]] = {
     selectByIds(currencycodes).runCollect.map { rows =>
@@ -86,17 +86,17 @@ class CurrencyRepoImpl extends CurrencyRepo {
     }
   }
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
-    UpdateBuilder("sales.currency", CurrencyFields.structure, CurrencyRow.jdbcDecoder)
+    UpdateBuilder(""""sales"."currency"""", CurrencyFields.structure, CurrencyRow.jdbcDecoder)
   }
   override def update(row: CurrencyRow): ZIO[ZConnection, Throwable, Boolean] = {
     val currencycode = row.currencycode
-    sql"""update sales.currency
+    sql"""update "sales"."currency"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyRow]] = {
-    sql"""insert into sales.currency("currencycode", "name", "modifieddate")
+    sql"""insert into "sales"."currency"("currencycode", "name", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.currencycode)(CurrencyId.setter)}::bpchar,
             ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
@@ -110,9 +110,9 @@ class CurrencyRepoImpl extends CurrencyRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CurrencyRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table currency_TEMP (like sales.currency) on commit drop".execute
+    val created = sql"""create temporary table currency_TEMP (like "sales"."currency") on commit drop""".execute
     val copied = streamingInsert(s"""copy currency_TEMP("currencycode", "name", "modifieddate") from stdin""", batchSize, unsaved)(CurrencyRow.text)
-    val merged = sql"""insert into sales.currency("currencycode", "name", "modifieddate")
+    val merged = sql"""insert into "sales"."currency"("currencycode", "name", "modifieddate")
                        select * from currency_TEMP
                        on conflict ("currencycode")
                        do update set

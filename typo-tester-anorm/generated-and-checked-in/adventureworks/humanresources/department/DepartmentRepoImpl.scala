@@ -26,20 +26,20 @@ import typo.dsl.UpdateBuilder
 
 class DepartmentRepoImpl extends DepartmentRepo {
   override def delete: DeleteBuilder[DepartmentFields, DepartmentRow] = {
-    DeleteBuilder("humanresources.department", DepartmentFields.structure)
+    DeleteBuilder(""""humanresources"."department"""", DepartmentFields.structure)
   }
   override def deleteById(departmentid: DepartmentId)(implicit c: Connection): Boolean = {
-    SQL"""delete from humanresources.department where "departmentid" = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "humanresources"."department" where "departmentid" = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(departmentids: Array[DepartmentId])(implicit c: Connection): Int = {
     SQL"""delete
-          from humanresources.department
+          from "humanresources"."department"
           where "departmentid" = ANY(${departmentids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
-    SQL"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
+    SQL"""insert into "humanresources"."department"("departmentid", "name", "groupname", "modifieddate")
           values (${ParameterValue(unsaved.departmentid, null, DepartmentId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.groupname, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "departmentid", "name", "groupname", "modifieddate"::text
        """
@@ -61,12 +61,12 @@ class DepartmentRepoImpl extends DepartmentRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into humanresources.department default values
+      SQL"""insert into "humanresources"."department" default values
             returning "departmentid", "name", "groupname", "modifieddate"::text
          """
         .executeInsert(DepartmentRow.rowParser(1).single)
     } else {
-      val q = s"""insert into humanresources.department(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "humanresources"."department"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "departmentid", "name", "groupname", "modifieddate"::text
                """
@@ -76,29 +76,29 @@ class DepartmentRepoImpl extends DepartmentRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[DepartmentRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY humanresources.department("departmentid", "name", "groupname", "modifieddate") FROM STDIN""", batchSize, unsaved)(DepartmentRow.text, c)
+    streamingInsert(s"""COPY "humanresources"."department"("departmentid", "name", "groupname", "modifieddate") FROM STDIN""", batchSize, unsaved)(DepartmentRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[DepartmentRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY humanresources.department("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(DepartmentRowUnsaved.text, c)
+    streamingInsert(s"""COPY "humanresources"."department"("name", "groupname", "departmentid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(DepartmentRowUnsaved.text, c)
   }
   override def select: SelectBuilder[DepartmentFields, DepartmentRow] = {
-    SelectBuilderSql("humanresources.department", DepartmentFields.structure, DepartmentRow.rowParser)
+    SelectBuilderSql(""""humanresources"."department"""", DepartmentFields.structure, DepartmentRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[DepartmentRow] = {
     SQL"""select "departmentid", "name", "groupname", "modifieddate"::text
-          from humanresources.department
+          from "humanresources"."department"
        """.as(DepartmentRow.rowParser(1).*)
   }
   override def selectById(departmentid: DepartmentId)(implicit c: Connection): Option[DepartmentRow] = {
     SQL"""select "departmentid", "name", "groupname", "modifieddate"::text
-          from humanresources.department
+          from "humanresources"."department"
           where "departmentid" = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}
        """.as(DepartmentRow.rowParser(1).singleOpt)
   }
   override def selectByIds(departmentids: Array[DepartmentId])(implicit c: Connection): List[DepartmentRow] = {
     SQL"""select "departmentid", "name", "groupname", "modifieddate"::text
-          from humanresources.department
+          from "humanresources"."department"
           where "departmentid" = ANY(${departmentids})
        """.as(DepartmentRow.rowParser(1).*)
     
@@ -108,11 +108,11 @@ class DepartmentRepoImpl extends DepartmentRepo {
     departmentids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
-    UpdateBuilder("humanresources.department", DepartmentFields.structure, DepartmentRow.rowParser)
+    UpdateBuilder(""""humanresources"."department"""", DepartmentFields.structure, DepartmentRow.rowParser)
   }
   override def update(row: DepartmentRow)(implicit c: Connection): Boolean = {
     val departmentid = row.departmentid
-    SQL"""update humanresources.department
+    SQL"""update "humanresources"."department"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "groupname" = ${ParameterValue(row.groupname, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
@@ -120,7 +120,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
-    SQL"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
+    SQL"""insert into "humanresources"."department"("departmentid", "name", "groupname", "modifieddate")
           values (
             ${ParameterValue(unsaved.departmentid, null, DepartmentId.toStatement)}::int4,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
@@ -149,7 +149,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
+            s"""insert into "humanresources"."department"("departmentid", "name", "groupname", "modifieddate")
                 values ({departmentid}::int4, {name}::varchar, {groupname}::varchar, {modifieddate}::timestamp)
                 on conflict ("departmentid")
                 do update set
@@ -166,9 +166,9 @@ class DepartmentRepoImpl extends DepartmentRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[DepartmentRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table department_TEMP (like humanresources.department) on commit drop".execute(): @nowarn
+    SQL"""create temporary table department_TEMP (like "humanresources"."department") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy department_TEMP("departmentid", "name", "groupname", "modifieddate") from stdin""", batchSize, unsaved)(DepartmentRow.text, c): @nowarn
-    SQL"""insert into humanresources.department("departmentid", "name", "groupname", "modifieddate")
+    SQL"""insert into "humanresources"."department"("departmentid", "name", "groupname", "modifieddate")
           select * from department_TEMP
           on conflict ("departmentid")
           do update set

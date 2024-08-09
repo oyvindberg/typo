@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class UmViewRepoImpl extends UmViewRepo {
   override def select: SelectBuilder[UmViewFields, UmViewRow] = {
-    SelectBuilderSql("pr.um", UmViewFields.structure, UmViewRow.rowParser)
+    SelectBuilderSql(""""pr"."um"""", UmViewFields.structure, UmViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[UmViewRow] = {
     SQL"""select "id", "unitmeasurecode", "name", "modifieddate"::text
-          from pr.um
+          from "pr"."um"
        """.as(UmViewRow.rowParser(1).*)
   }
 }

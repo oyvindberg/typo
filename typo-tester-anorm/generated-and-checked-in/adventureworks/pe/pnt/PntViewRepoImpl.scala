@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class PntViewRepoImpl extends PntViewRepo {
   override def select: SelectBuilder[PntViewFields, PntViewRow] = {
-    SelectBuilderSql("pe.pnt", PntViewFields.structure, PntViewRow.rowParser)
+    SelectBuilderSql(""""pe"."pnt"""", PntViewFields.structure, PntViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PntViewRow] = {
     SQL"""select "id", "phonenumbertypeid", "name", "modifieddate"::text
-          from pe.pnt
+          from "pe"."pnt"
        """.as(PntViewRow.rowParser(1).*)
   }
 }

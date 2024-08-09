@@ -28,23 +28,23 @@ import typo.dsl.UpdateBuilder
 
 class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    DeleteBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure)
+    DeleteBuilder(""""sales"."salespersonquotahistory"""", SalespersonquotahistoryFields.structure)
   }
   override def deleteById(compositeId: SalespersonquotahistoryId): ConnectionIO[Boolean] = {
-    sql"""delete from sales.salespersonquotahistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."salespersonquotahistory" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[SalespersonquotahistoryId]): ConnectionIO[Int] = {
     val businessentityid = compositeIds.map(_.businessentityid)
     val quotadate = compositeIds.map(_.quotadate)
     sql"""delete
-          from sales.salespersonquotahistory
+          from "sales"."salespersonquotahistory"
           where ("businessentityid", "quotadate")
           in (select unnest(${businessentityid}), unnest(${quotadate}))
        """.update.run
     
   }
   override def insert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow] = {
-    sql"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
+    sql"""insert into "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.quotadate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.salesquota)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
        """.query(using SalespersonquotahistoryRow.read).unique
@@ -65,12 +65,12 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into sales.salespersonquotahistory default values
+      sql"""insert into "sales"."salespersonquotahistory" default values
             returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into sales.salespersonquotahistory(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "sales"."salespersonquotahistory"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
          """
@@ -79,26 +79,26 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SalespersonquotahistoryRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalespersonquotahistoryRow.text)
+    new FragmentOps(sql"""COPY "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalespersonquotahistoryRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalespersonquotahistoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalespersonquotahistoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalespersonquotahistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    SelectBuilderSql("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.read)
+    SelectBuilderSql(""""sales"."salespersonquotahistory"""", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SalespersonquotahistoryRow] = {
-    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory""".query(using SalespersonquotahistoryRow.read).stream
+    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from "sales"."salespersonquotahistory"""".query(using SalespersonquotahistoryRow.read).stream
   }
   override def selectById(compositeId: SalespersonquotahistoryId): ConnectionIO[Option[SalespersonquotahistoryRow]] = {
-    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(Write.fromPut(TypoLocalDateTime.put))}""".query(using SalespersonquotahistoryRow.read).option
+    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from "sales"."salespersonquotahistory" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(Write.fromPut(TypoLocalDateTime.put))}""".query(using SalespersonquotahistoryRow.read).option
   }
   override def selectByIds(compositeIds: Array[SalespersonquotahistoryId]): Stream[ConnectionIO, SalespersonquotahistoryRow] = {
     val businessentityid = compositeIds.map(_.businessentityid)
     val quotadate = compositeIds.map(_.quotadate)
     sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
-          from sales.salespersonquotahistory
+          from "sales"."salespersonquotahistory"
           where ("businessentityid", "quotadate") 
           in (select unnest(${businessentityid}), unnest(${quotadate}))
        """.query(using SalespersonquotahistoryRow.read).stream
@@ -111,11 +111,11 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     }
   }
   override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    UpdateBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.read)
+    UpdateBuilder(""""sales"."salespersonquotahistory"""", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.read)
   }
   override def update(row: SalespersonquotahistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
-    sql"""update sales.salespersonquotahistory
+    sql"""update "sales"."salespersonquotahistory"
           set "salesquota" = ${fromWrite(row.salesquota)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
@@ -125,7 +125,7 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow] = {
-    sql"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
+    sql"""insert into "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
           values (
             ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
             ${fromWrite(unsaved.quotadate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
@@ -143,7 +143,7 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   }
   override def upsertBatch(unsaved: List[SalespersonquotahistoryRow]): Stream[ConnectionIO, SalespersonquotahistoryRow] = {
     Update[SalespersonquotahistoryRow](
-      s"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
+      s"""insert into "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
           values (?::int4,?::timestamp,?::numeric,?::uuid,?::timestamp)
           on conflict ("businessentityid", "quotadate")
           do update set
@@ -157,9 +157,9 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, SalespersonquotahistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table salespersonquotahistory_TEMP (like sales.salespersonquotahistory) on commit drop".update.run
+      _ <- sql"""create temporary table salespersonquotahistory_TEMP (like "sales"."salespersonquotahistory") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy salespersonquotahistory_TEMP("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SalespersonquotahistoryRow.text)
-      res <- sql"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
+      res <- sql"""insert into "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
                    select * from salespersonquotahistory_TEMP
                    on conflict ("businessentityid", "quotadate")
                    do update set

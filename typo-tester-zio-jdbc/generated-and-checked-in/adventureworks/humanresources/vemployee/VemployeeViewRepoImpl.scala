@@ -15,9 +15,9 @@ import zio.stream.ZStream
 
 class VemployeeViewRepoImpl extends VemployeeViewRepo {
   override def select: SelectBuilder[VemployeeViewFields, VemployeeViewRow] = {
-    SelectBuilderSql("humanresources.vemployee", VemployeeViewFields.structure, VemployeeViewRow.jdbcDecoder)
+    SelectBuilderSql(""""humanresources"."vemployee"""", VemployeeViewFields.structure, VemployeeViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VemployeeViewRow] = {
-    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "additionalcontactinfo" from humanresources.vemployee""".query(using VemployeeViewRow.jdbcDecoder).selectStream()
+    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "additionalcontactinfo" from "humanresources"."vemployee"""".query(using VemployeeViewRow.jdbcDecoder).selectStream()
   }
 }

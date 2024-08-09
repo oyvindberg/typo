@@ -1,5 +1,5 @@
 with 
-emailaddress0 as (
-  (select emailaddress0 from person.emailaddress emailaddress0 WHERE ((emailaddress0).businessentityid , (emailaddress0).emailaddressid ) in (select unnest(?::_int4 ), unnest(?::_int4 ))) 
+personemailaddress0 as (
+  (select personemailaddress0 from "person"."emailaddress" personemailaddress0 WHERE ((personemailaddress0).businessentityid , (personemailaddress0).emailaddressid ) in (select unnest(?::_int4 ), unnest(?::_int4 ))) 
 ) 
-select (emailaddress0)."businessentityid",(emailaddress0)."emailaddressid",(emailaddress0)."emailaddress",(emailaddress0)."rowguid",(emailaddress0)."modifieddate"::text from emailaddress0 
+select (personemailaddress0)."businessentityid",(personemailaddress0)."emailaddressid",(personemailaddress0)."emailaddress",(personemailaddress0)."rowguid",(personemailaddress0)."modifieddate"::text from personemailaddress0 

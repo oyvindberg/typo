@@ -26,20 +26,20 @@ import typo.dsl.UpdateBuilder
 
 class SalesreasonRepoImpl extends SalesreasonRepo {
   override def delete: DeleteBuilder[SalesreasonFields, SalesreasonRow] = {
-    DeleteBuilder("sales.salesreason", SalesreasonFields.structure)
+    DeleteBuilder(""""sales"."salesreason"""", SalesreasonFields.structure)
   }
   override def deleteById(salesreasonid: SalesreasonId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.salesreason where "salesreasonid" = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "sales"."salesreason" where "salesreasonid" = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): Int = {
     SQL"""delete
-          from sales.salesreason
+          from "sales"."salesreason"
           where "salesreasonid" = ANY(${salesreasonids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
-    SQL"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
+    SQL"""insert into "sales"."salesreason"("salesreasonid", "name", "reasontype", "modifieddate")
           values (${ParameterValue(unsaved.salesreasonid, null, SalesreasonId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.reasontype, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "salesreasonid", "name", "reasontype", "modifieddate"::text
        """
@@ -61,12 +61,12 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into sales.salesreason default values
+      SQL"""insert into "sales"."salesreason" default values
             returning "salesreasonid", "name", "reasontype", "modifieddate"::text
          """
         .executeInsert(SalesreasonRow.rowParser(1).single)
     } else {
-      val q = s"""insert into sales.salesreason(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "sales"."salesreason"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "salesreasonid", "name", "reasontype", "modifieddate"::text
                """
@@ -76,29 +76,29 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[SalesreasonRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesreasonRow.text, c)
+    streamingInsert(s"""COPY "sales"."salesreason"("salesreasonid", "name", "reasontype", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesreasonRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SalesreasonRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salesreason("name", "reasontype", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesreasonRowUnsaved.text, c)
+    streamingInsert(s"""COPY "sales"."salesreason"("name", "reasontype", "salesreasonid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesreasonRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalesreasonFields, SalesreasonRow] = {
-    SelectBuilderSql("sales.salesreason", SalesreasonFields.structure, SalesreasonRow.rowParser)
+    SelectBuilderSql(""""sales"."salesreason"""", SalesreasonFields.structure, SalesreasonRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SalesreasonRow] = {
     SQL"""select "salesreasonid", "name", "reasontype", "modifieddate"::text
-          from sales.salesreason
+          from "sales"."salesreason"
        """.as(SalesreasonRow.rowParser(1).*)
   }
   override def selectById(salesreasonid: SalesreasonId)(implicit c: Connection): Option[SalesreasonRow] = {
     SQL"""select "salesreasonid", "name", "reasontype", "modifieddate"::text
-          from sales.salesreason
+          from "sales"."salesreason"
           where "salesreasonid" = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}
        """.as(SalesreasonRow.rowParser(1).singleOpt)
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId])(implicit c: Connection): List[SalesreasonRow] = {
     SQL"""select "salesreasonid", "name", "reasontype", "modifieddate"::text
-          from sales.salesreason
+          from "sales"."salesreason"
           where "salesreasonid" = ANY(${salesreasonids})
        """.as(SalesreasonRow.rowParser(1).*)
     
@@ -108,11 +108,11 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
     salesreasonids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
-    UpdateBuilder("sales.salesreason", SalesreasonFields.structure, SalesreasonRow.rowParser)
+    UpdateBuilder(""""sales"."salesreason"""", SalesreasonFields.structure, SalesreasonRow.rowParser)
   }
   override def update(row: SalesreasonRow)(implicit c: Connection): Boolean = {
     val salesreasonid = row.salesreasonid
-    SQL"""update sales.salesreason
+    SQL"""update "sales"."salesreason"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "reasontype" = ${ParameterValue(row.reasontype, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
@@ -120,7 +120,7 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
-    SQL"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
+    SQL"""insert into "sales"."salesreason"("salesreasonid", "name", "reasontype", "modifieddate")
           values (
             ${ParameterValue(unsaved.salesreasonid, null, SalesreasonId.toStatement)}::int4,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
@@ -149,7 +149,7 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
+            s"""insert into "sales"."salesreason"("salesreasonid", "name", "reasontype", "modifieddate")
                 values ({salesreasonid}::int4, {name}::varchar, {reasontype}::varchar, {modifieddate}::timestamp)
                 on conflict ("salesreasonid")
                 do update set
@@ -166,9 +166,9 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[SalesreasonRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table salesreason_TEMP (like sales.salesreason) on commit drop".execute(): @nowarn
+    SQL"""create temporary table salesreason_TEMP (like "sales"."salesreason") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy salesreason_TEMP("salesreasonid", "name", "reasontype", "modifieddate") from stdin""", batchSize, unsaved)(SalesreasonRow.text, c): @nowarn
-    SQL"""insert into sales.salesreason("salesreasonid", "name", "reasontype", "modifieddate")
+    SQL"""insert into "sales"."salesreason"("salesreasonid", "name", "reasontype", "modifieddate")
           select * from salesreason_TEMP
           on conflict ("salesreasonid")
           do update set

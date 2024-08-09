@@ -30,20 +30,20 @@ import typo.dsl.UpdateBuilder
 
 class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    DeleteBuilder("sales.salestaxrate", SalestaxrateFields.structure)
+    DeleteBuilder(""""sales"."salestaxrate"""", SalestaxrateFields.structure)
   }
   override def deleteById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.salestaxrate where "salestaxrateid" = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "sales"."salestaxrate" where "salestaxrateid" = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): Int = {
     SQL"""delete
-          from sales.salestaxrate
+          from "sales"."salestaxrate"
           where "salestaxrateid" = ANY(${salestaxrateids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
-    SQL"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.salestaxrateid, null, SalestaxrateId.toStatement)}::int4, ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.taxtype, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
        """
@@ -74,12 +74,12 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into sales.salestaxrate default values
+      SQL"""insert into "sales"."salestaxrate" default values
             returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
          """
         .executeInsert(SalestaxrateRow.rowParser(1).single)
     } else {
-      val q = s"""insert into sales.salestaxrate(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "sales"."salestaxrate"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
                """
@@ -89,29 +89,29 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[SalestaxrateRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalestaxrateRow.text, c)
+    streamingInsert(s"""COPY "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalestaxrateRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SalestaxrateRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salestaxrate("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalestaxrateRowUnsaved.text, c)
+    streamingInsert(s"""COPY "sales"."salestaxrate"("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalestaxrateRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    SelectBuilderSql("sales.salestaxrate", SalestaxrateFields.structure, SalestaxrateRow.rowParser)
+    SelectBuilderSql(""""sales"."salestaxrate"""", SalestaxrateFields.structure, SalestaxrateRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SalestaxrateRow] = {
     SQL"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
-          from sales.salestaxrate
+          from "sales"."salestaxrate"
        """.as(SalestaxrateRow.rowParser(1).*)
   }
   override def selectById(salestaxrateid: SalestaxrateId)(implicit c: Connection): Option[SalestaxrateRow] = {
     SQL"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
-          from sales.salestaxrate
+          from "sales"."salestaxrate"
           where "salestaxrateid" = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}
        """.as(SalestaxrateRow.rowParser(1).singleOpt)
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId])(implicit c: Connection): List[SalestaxrateRow] = {
     SQL"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
-          from sales.salestaxrate
+          from "sales"."salestaxrate"
           where "salestaxrateid" = ANY(${salestaxrateids})
        """.as(SalestaxrateRow.rowParser(1).*)
     
@@ -121,11 +121,11 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     salestaxrateids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    UpdateBuilder("sales.salestaxrate", SalestaxrateFields.structure, SalestaxrateRow.rowParser)
+    UpdateBuilder(""""sales"."salestaxrate"""", SalestaxrateFields.structure, SalestaxrateRow.rowParser)
   }
   override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {
     val salestaxrateid = row.salestaxrateid
-    SQL"""update sales.salestaxrate
+    SQL"""update "sales"."salestaxrate"
           set "stateprovinceid" = ${ParameterValue(row.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
               "taxtype" = ${ParameterValue(row.taxtype, null, TypoShort.toStatement)}::int2,
               "taxrate" = ${ParameterValue(row.taxrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
@@ -136,7 +136,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
-    SQL"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.salestaxrateid, null, SalestaxrateId.toStatement)}::int4,
             ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
@@ -174,7 +174,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+            s"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
                 values ({salestaxrateid}::int4, {stateprovinceid}::int4, {taxtype}::int2, {taxrate}::numeric, {name}::varchar, {rowguid}::uuid, {modifieddate}::timestamp)
                 on conflict ("salestaxrateid")
                 do update set
@@ -194,9 +194,9 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[SalestaxrateRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table salestaxrate_TEMP (like sales.salestaxrate) on commit drop".execute(): @nowarn
+    SQL"""create temporary table salestaxrate_TEMP (like "sales"."salestaxrate") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy salestaxrate_TEMP("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalestaxrateRow.text, c): @nowarn
-    SQL"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           select * from salestaxrate_TEMP
           on conflict ("salestaxrateid")
           do update set

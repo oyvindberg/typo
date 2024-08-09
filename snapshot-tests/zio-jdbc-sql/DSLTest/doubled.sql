@@ -1,115 +1,115 @@
 with
-salesperson0 as (
-  (select salesperson0 from sales.salesperson salesperson0  WHERE ((salesperson0).rowguid = ?::uuid))
+salessalesperson0 as (
+  (select salessalesperson0 from "sales"."salesperson" salessalesperson0  WHERE ((salessalesperson0).rowguid = ?::uuid))
 ),
-employee0 as (
-  (select employee0 from humanresources.employee employee0 )
+humanresourcesemployee0 as (
+  (select humanresourcesemployee0 from "humanresources"."employee" humanresourcesemployee0 )
 ),
 join_cte5 as (
-  select salesperson0, employee0
-  from salesperson0
-  join employee0
-  on ((salesperson0).businessentityid = (employee0).businessentityid)
+  select salessalesperson0, humanresourcesemployee0
+  from salessalesperson0
+  join humanresourcesemployee0
+  on ((salessalesperson0).businessentityid = (humanresourcesemployee0).businessentityid)
   
 ),
-person0 as (
-  (select person0 from person.person person0 )
+personperson0 as (
+  (select personperson0 from "person"."person" personperson0 )
 ),
 join_cte4 as (
-  select salesperson0, employee0, person0
+  select salessalesperson0, humanresourcesemployee0, personperson0
   from join_cte5
-  join person0
-  on ((employee0).businessentityid = (person0).businessentityid)
+  join personperson0
+  on ((humanresourcesemployee0).businessentityid = (personperson0).businessentityid)
   
 ),
-businessentity0 as (
-  (select businessentity0 from person.businessentity businessentity0 )
+personbusinessentity0 as (
+  (select personbusinessentity0 from "person"."businessentity" personbusinessentity0 )
 ),
 join_cte3 as (
-  select salesperson0, employee0, person0, businessentity0
+  select salessalesperson0, humanresourcesemployee0, personperson0, personbusinessentity0
   from join_cte4
-  join businessentity0
-  on ((person0).businessentityid = (businessentity0).businessentityid)
+  join personbusinessentity0
+  on ((personperson0).businessentityid = (personbusinessentity0).businessentityid)
   
 ),
-emailaddress0 as (
-  (select emailaddress0 from person.emailaddress emailaddress0  ORDER BY (emailaddress0).rowguid ASC )
+personemailaddress0 as (
+  (select personemailaddress0 from "person"."emailaddress" personemailaddress0  ORDER BY (personemailaddress0).rowguid ASC )
 ),
 join_cte2 as (
-  select salesperson0, employee0, person0, businessentity0, emailaddress0
+  select salessalesperson0, humanresourcesemployee0, personperson0, personbusinessentity0, personemailaddress0
   from join_cte3
-  join emailaddress0
-  on ((emailaddress0).businessentityid = (businessentity0).businessentityid)
+  join personemailaddress0
+  on ((personemailaddress0).businessentityid = (personbusinessentity0).businessentityid)
   
 ),
-salesperson1 as (
-  (select salesperson1 from sales.salesperson salesperson1 )
+salessalesperson1 as (
+  (select salessalesperson1 from "sales"."salesperson" salessalesperson1 )
 ),
 join_cte1 as (
-  select salesperson0, employee0, person0, businessentity0, emailaddress0, salesperson1
+  select salessalesperson0, humanresourcesemployee0, personperson0, personbusinessentity0, personemailaddress0, salessalesperson1
   from join_cte2
-  join salesperson1
-  on ((emailaddress0).businessentityid = (salesperson1).businessentityid)
+  join salessalesperson1
+  on ((personemailaddress0).businessentityid = (salessalesperson1).businessentityid)
   
 ),
-salesperson2 as (
-  (select salesperson2 from sales.salesperson salesperson2  WHERE ((salesperson2).rowguid = ?::uuid))
+salessalesperson2 as (
+  (select salessalesperson2 from "sales"."salesperson" salessalesperson2  WHERE ((salessalesperson2).rowguid = ?::uuid))
 ),
-employee1 as (
-  (select employee1 from humanresources.employee employee1 )
+humanresourcesemployee1 as (
+  (select humanresourcesemployee1 from "humanresources"."employee" humanresourcesemployee1 )
 ),
 join_cte10 as (
-  select salesperson2, employee1
-  from salesperson2
-  join employee1
-  on ((salesperson2).businessentityid = (employee1).businessentityid)
+  select salessalesperson2, humanresourcesemployee1
+  from salessalesperson2
+  join humanresourcesemployee1
+  on ((salessalesperson2).businessentityid = (humanresourcesemployee1).businessentityid)
   
 ),
-person1 as (
-  (select person1 from person.person person1 )
+personperson1 as (
+  (select personperson1 from "person"."person" personperson1 )
 ),
 join_cte9 as (
-  select salesperson2, employee1, person1
+  select salessalesperson2, humanresourcesemployee1, personperson1
   from join_cte10
-  join person1
-  on ((employee1).businessentityid = (person1).businessentityid)
+  join personperson1
+  on ((humanresourcesemployee1).businessentityid = (personperson1).businessentityid)
   
 ),
-businessentity1 as (
-  (select businessentity1 from person.businessentity businessentity1 )
+personbusinessentity1 as (
+  (select personbusinessentity1 from "person"."businessentity" personbusinessentity1 )
 ),
 join_cte8 as (
-  select salesperson2, employee1, person1, businessentity1
+  select salessalesperson2, humanresourcesemployee1, personperson1, personbusinessentity1
   from join_cte9
-  join businessentity1
-  on ((person1).businessentityid = (businessentity1).businessentityid)
+  join personbusinessentity1
+  on ((personperson1).businessentityid = (personbusinessentity1).businessentityid)
   
 ),
-emailaddress1 as (
-  (select emailaddress1 from person.emailaddress emailaddress1  ORDER BY (emailaddress1).rowguid ASC )
+personemailaddress1 as (
+  (select personemailaddress1 from "person"."emailaddress" personemailaddress1  ORDER BY (personemailaddress1).rowguid ASC )
 ),
 join_cte7 as (
-  select salesperson2, employee1, person1, businessentity1, emailaddress1
+  select salessalesperson2, humanresourcesemployee1, personperson1, personbusinessentity1, personemailaddress1
   from join_cte8
-  join emailaddress1
-  on ((emailaddress1).businessentityid = (businessentity1).businessentityid)
+  join personemailaddress1
+  on ((personemailaddress1).businessentityid = (personbusinessentity1).businessentityid)
   
 ),
-salesperson3 as (
-  (select salesperson3 from sales.salesperson salesperson3 )
+salessalesperson3 as (
+  (select salessalesperson3 from "sales"."salesperson" salessalesperson3 )
 ),
 join_cte6 as (
-  select salesperson2, employee1, person1, businessentity1, emailaddress1, salesperson3
+  select salessalesperson2, humanresourcesemployee1, personperson1, personbusinessentity1, personemailaddress1, salessalesperson3
   from join_cte7
-  join salesperson3
-  on ((emailaddress1).businessentityid = (salesperson3).businessentityid)
+  join salessalesperson3
+  on ((personemailaddress1).businessentityid = (salessalesperson3).businessentityid)
   
 ),
 join_cte0 as (
-  select salesperson0, employee0, person0, businessentity0, emailaddress0, salesperson1, salesperson2, employee1, person1, businessentity1, emailaddress1, salesperson3
+  select salessalesperson0, humanresourcesemployee0, personperson0, personbusinessentity0, personemailaddress0, salessalesperson1, salessalesperson2, humanresourcesemployee1, personperson1, personbusinessentity1, personemailaddress1, salessalesperson3
   from join_cte1
   join join_cte6
-  on ((emailaddress0).businessentityid = (emailaddress1).businessentityid)
+  on ((personemailaddress0).businessentityid = (personemailaddress1).businessentityid)
   
 )
-select (salesperson0)."businessentityid",(salesperson0)."territoryid",(salesperson0)."salesquota",(salesperson0)."bonus",(salesperson0)."commissionpct",(salesperson0)."salesytd",(salesperson0)."saleslastyear",(salesperson0)."rowguid",(salesperson0)."modifieddate"::text,(employee0)."businessentityid",(employee0)."nationalidnumber",(employee0)."loginid",(employee0)."jobtitle",(employee0)."birthdate"::text,(employee0)."maritalstatus",(employee0)."gender",(employee0)."hiredate"::text,(employee0)."salariedflag",(employee0)."vacationhours",(employee0)."sickleavehours",(employee0)."currentflag",(employee0)."rowguid",(employee0)."modifieddate"::text,(employee0)."organizationnode",(person0)."businessentityid",(person0)."persontype",(person0)."namestyle",(person0)."title",(person0)."firstname",(person0)."middlename",(person0)."lastname",(person0)."suffix",(person0)."emailpromotion",(person0)."additionalcontactinfo",(person0)."demographics",(person0)."rowguid",(person0)."modifieddate"::text,(businessentity0)."businessentityid",(businessentity0)."rowguid",(businessentity0)."modifieddate"::text,(emailaddress0)."businessentityid",(emailaddress0)."emailaddressid",(emailaddress0)."emailaddress",(emailaddress0)."rowguid",(emailaddress0)."modifieddate"::text,(salesperson1)."businessentityid",(salesperson1)."territoryid",(salesperson1)."salesquota",(salesperson1)."bonus",(salesperson1)."commissionpct",(salesperson1)."salesytd",(salesperson1)."saleslastyear",(salesperson1)."rowguid",(salesperson1)."modifieddate"::text,(salesperson2)."businessentityid",(salesperson2)."territoryid",(salesperson2)."salesquota",(salesperson2)."bonus",(salesperson2)."commissionpct",(salesperson2)."salesytd",(salesperson2)."saleslastyear",(salesperson2)."rowguid",(salesperson2)."modifieddate"::text,(employee1)."businessentityid",(employee1)."nationalidnumber",(employee1)."loginid",(employee1)."jobtitle",(employee1)."birthdate"::text,(employee1)."maritalstatus",(employee1)."gender",(employee1)."hiredate"::text,(employee1)."salariedflag",(employee1)."vacationhours",(employee1)."sickleavehours",(employee1)."currentflag",(employee1)."rowguid",(employee1)."modifieddate"::text,(employee1)."organizationnode",(person1)."businessentityid",(person1)."persontype",(person1)."namestyle",(person1)."title",(person1)."firstname",(person1)."middlename",(person1)."lastname",(person1)."suffix",(person1)."emailpromotion",(person1)."additionalcontactinfo",(person1)."demographics",(person1)."rowguid",(person1)."modifieddate"::text,(businessentity1)."businessentityid",(businessentity1)."rowguid",(businessentity1)."modifieddate"::text,(emailaddress1)."businessentityid",(emailaddress1)."emailaddressid",(emailaddress1)."emailaddress",(emailaddress1)."rowguid",(emailaddress1)."modifieddate"::text,(salesperson3)."businessentityid",(salesperson3)."territoryid",(salesperson3)."salesquota",(salesperson3)."bonus",(salesperson3)."commissionpct",(salesperson3)."salesytd",(salesperson3)."saleslastyear",(salesperson3)."rowguid",(salesperson3)."modifieddate"::text from join_cte0
+select (salessalesperson0)."businessentityid",(salessalesperson0)."territoryid",(salessalesperson0)."salesquota",(salessalesperson0)."bonus",(salessalesperson0)."commissionpct",(salessalesperson0)."salesytd",(salessalesperson0)."saleslastyear",(salessalesperson0)."rowguid",(salessalesperson0)."modifieddate"::text,(humanresourcesemployee0)."businessentityid",(humanresourcesemployee0)."nationalidnumber",(humanresourcesemployee0)."loginid",(humanresourcesemployee0)."jobtitle",(humanresourcesemployee0)."birthdate"::text,(humanresourcesemployee0)."maritalstatus",(humanresourcesemployee0)."gender",(humanresourcesemployee0)."hiredate"::text,(humanresourcesemployee0)."salariedflag",(humanresourcesemployee0)."vacationhours",(humanresourcesemployee0)."sickleavehours",(humanresourcesemployee0)."currentflag",(humanresourcesemployee0)."rowguid",(humanresourcesemployee0)."modifieddate"::text,(humanresourcesemployee0)."organizationnode",(personperson0)."businessentityid",(personperson0)."persontype",(personperson0)."namestyle",(personperson0)."title",(personperson0)."firstname",(personperson0)."middlename",(personperson0)."lastname",(personperson0)."suffix",(personperson0)."emailpromotion",(personperson0)."additionalcontactinfo",(personperson0)."demographics",(personperson0)."rowguid",(personperson0)."modifieddate"::text,(personbusinessentity0)."businessentityid",(personbusinessentity0)."rowguid",(personbusinessentity0)."modifieddate"::text,(personemailaddress0)."businessentityid",(personemailaddress0)."emailaddressid",(personemailaddress0)."emailaddress",(personemailaddress0)."rowguid",(personemailaddress0)."modifieddate"::text,(salessalesperson1)."businessentityid",(salessalesperson1)."territoryid",(salessalesperson1)."salesquota",(salessalesperson1)."bonus",(salessalesperson1)."commissionpct",(salessalesperson1)."salesytd",(salessalesperson1)."saleslastyear",(salessalesperson1)."rowguid",(salessalesperson1)."modifieddate"::text,(salessalesperson2)."businessentityid",(salessalesperson2)."territoryid",(salessalesperson2)."salesquota",(salessalesperson2)."bonus",(salessalesperson2)."commissionpct",(salessalesperson2)."salesytd",(salessalesperson2)."saleslastyear",(salessalesperson2)."rowguid",(salessalesperson2)."modifieddate"::text,(humanresourcesemployee1)."businessentityid",(humanresourcesemployee1)."nationalidnumber",(humanresourcesemployee1)."loginid",(humanresourcesemployee1)."jobtitle",(humanresourcesemployee1)."birthdate"::text,(humanresourcesemployee1)."maritalstatus",(humanresourcesemployee1)."gender",(humanresourcesemployee1)."hiredate"::text,(humanresourcesemployee1)."salariedflag",(humanresourcesemployee1)."vacationhours",(humanresourcesemployee1)."sickleavehours",(humanresourcesemployee1)."currentflag",(humanresourcesemployee1)."rowguid",(humanresourcesemployee1)."modifieddate"::text,(humanresourcesemployee1)."organizationnode",(personperson1)."businessentityid",(personperson1)."persontype",(personperson1)."namestyle",(personperson1)."title",(personperson1)."firstname",(personperson1)."middlename",(personperson1)."lastname",(personperson1)."suffix",(personperson1)."emailpromotion",(personperson1)."additionalcontactinfo",(personperson1)."demographics",(personperson1)."rowguid",(personperson1)."modifieddate"::text,(personbusinessentity1)."businessentityid",(personbusinessentity1)."rowguid",(personbusinessentity1)."modifieddate"::text,(personemailaddress1)."businessentityid",(personemailaddress1)."emailaddressid",(personemailaddress1)."emailaddress",(personemailaddress1)."rowguid",(personemailaddress1)."modifieddate"::text,(salessalesperson3)."businessentityid",(salessalesperson3)."territoryid",(salessalesperson3)."salesquota",(salessalesperson3)."bonus",(salessalesperson3)."commissionpct",(salessalesperson3)."salesytd",(salessalesperson3)."saleslastyear",(salessalesperson3)."rowguid",(salessalesperson3)."modifieddate"::text from join_cte0

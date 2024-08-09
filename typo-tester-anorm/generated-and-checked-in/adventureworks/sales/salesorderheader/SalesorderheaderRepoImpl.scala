@@ -39,20 +39,20 @@ import typo.dsl.UpdateBuilder
 
 class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def delete: DeleteBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    DeleteBuilder("sales.salesorderheader", SalesorderheaderFields.structure)
+    DeleteBuilder(""""sales"."salesorderheader"""", SalesorderheaderFields.structure)
   }
   override def deleteById(salesorderid: SalesorderheaderId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.salesorderheader where "salesorderid" = ${ParameterValue(salesorderid, null, SalesorderheaderId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "sales"."salesorderheader" where "salesorderid" = ${ParameterValue(salesorderid, null, SalesorderheaderId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(salesorderids: Array[SalesorderheaderId])(implicit c: Connection): Int = {
     SQL"""delete
-          from sales.salesorderheader
+          from "sales"."salesorderheader"
           where "salesorderid" = ANY(${salesorderids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
-    SQL"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."salesorderheader"("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.revisionnumber, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.orderdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.shipdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.status, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.onlineorderflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.purchaseordernumber, null, ToStatement.optionToStatement(OrderNumber.toStatement, OrderNumber.parameterMetadata))}::varchar, ${ParameterValue(unsaved.accountnumber, null, ToStatement.optionToStatement(AccountNumber.toStatement, AccountNumber.parameterMetadata))}::varchar, ${ParameterValue(unsaved.customerid, null, CustomerId.toStatement)}::int4, ${ParameterValue(unsaved.salespersonid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4, ${ParameterValue(unsaved.billtoaddressid, null, AddressId.toStatement)}::int4, ${ParameterValue(unsaved.shiptoaddressid, null, AddressId.toStatement)}::int4, ${ParameterValue(unsaved.shipmethodid, null, ShipmethodId.toStatement)}::int4, ${ParameterValue(unsaved.creditcardid, null, ToStatement.optionToStatement(CustomCreditcardId.toStatement, CustomCreditcardId.parameterMetadata))}::int4, ${ParameterValue(unsaved.creditcardapprovalcode, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.currencyrateid, null, ToStatement.optionToStatement(CurrencyrateId.toStatement, CurrencyrateId.parameterMetadata))}::int4, ${ParameterValue(unsaved.subtotal, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.taxamt, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.freight, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.totaldue, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric, ${ParameterValue(unsaved.comment, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
        """
@@ -119,12 +119,12 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into sales.salesorderheader default values
+      SQL"""insert into "sales"."salesorderheader" default values
             returning "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
          """
         .executeInsert(SalesorderheaderRow.rowParser(1).single)
     } else {
-      val q = s"""insert into sales.salesorderheader(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "sales"."salesorderheader"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
                """
@@ -134,29 +134,29 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[SalesorderheaderRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderheaderRow.text, c)
+    streamingInsert(s"""COPY "sales"."salesorderheader"("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderheaderRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SalesorderheaderRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salesorderheader("duedate", "shipdate", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "totaldue", "comment", "salesorderid", "revisionnumber", "orderdate", "status", "onlineorderflag", "subtotal", "taxamt", "freight", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesorderheaderRowUnsaved.text, c)
+    streamingInsert(s"""COPY "sales"."salesorderheader"("duedate", "shipdate", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "totaldue", "comment", "salesorderid", "revisionnumber", "orderdate", "status", "onlineorderflag", "subtotal", "taxamt", "freight", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesorderheaderRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    SelectBuilderSql("sales.salesorderheader", SalesorderheaderFields.structure, SalesorderheaderRow.rowParser)
+    SelectBuilderSql(""""sales"."salesorderheader"""", SalesorderheaderFields.structure, SalesorderheaderRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SalesorderheaderRow] = {
     SQL"""select "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
-          from sales.salesorderheader
+          from "sales"."salesorderheader"
        """.as(SalesorderheaderRow.rowParser(1).*)
   }
   override def selectById(salesorderid: SalesorderheaderId)(implicit c: Connection): Option[SalesorderheaderRow] = {
     SQL"""select "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
-          from sales.salesorderheader
+          from "sales"."salesorderheader"
           where "salesorderid" = ${ParameterValue(salesorderid, null, SalesorderheaderId.toStatement)}
        """.as(SalesorderheaderRow.rowParser(1).singleOpt)
   }
   override def selectByIds(salesorderids: Array[SalesorderheaderId])(implicit c: Connection): List[SalesorderheaderRow] = {
     SQL"""select "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text
-          from sales.salesorderheader
+          from "sales"."salesorderheader"
           where "salesorderid" = ANY(${salesorderids})
        """.as(SalesorderheaderRow.rowParser(1).*)
     
@@ -166,11 +166,11 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
     salesorderids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
-    UpdateBuilder("sales.salesorderheader", SalesorderheaderFields.structure, SalesorderheaderRow.rowParser)
+    UpdateBuilder(""""sales"."salesorderheader"""", SalesorderheaderFields.structure, SalesorderheaderRow.rowParser)
   }
   override def update(row: SalesorderheaderRow)(implicit c: Connection): Boolean = {
     val salesorderid = row.salesorderid
-    SQL"""update sales.salesorderheader
+    SQL"""update "sales"."salesorderheader"
           set "revisionnumber" = ${ParameterValue(row.revisionnumber, null, TypoShort.toStatement)}::int2,
               "orderdate" = ${ParameterValue(row.orderdate, null, TypoLocalDateTime.toStatement)}::timestamp,
               "duedate" = ${ParameterValue(row.duedate, null, TypoLocalDateTime.toStatement)}::timestamp,
@@ -199,7 +199,7 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: SalesorderheaderRow)(implicit c: Connection): SalesorderheaderRow = {
-    SQL"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."salesorderheader"("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)}::int4,
             ${ParameterValue(unsaved.revisionnumber, null, TypoShort.toStatement)}::int2,
@@ -291,7 +291,7 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
+            s"""insert into "sales"."salesorderheader"("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
                 values ({salesorderid}::int4, {revisionnumber}::int2, {orderdate}::timestamp, {duedate}::timestamp, {shipdate}::timestamp, {status}::int2, {onlineorderflag}::bool, {purchaseordernumber}::varchar, {accountnumber}::varchar, {customerid}::int4, {salespersonid}::int4, {territoryid}::int4, {billtoaddressid}::int4, {shiptoaddressid}::int4, {shipmethodid}::int4, {creditcardid}::int4, {creditcardapprovalcode}, {currencyrateid}::int4, {subtotal}::numeric, {taxamt}::numeric, {freight}::numeric, {totaldue}::numeric, {comment}, {rowguid}::uuid, {modifieddate}::timestamp)
                 on conflict ("salesorderid")
                 do update set
@@ -329,9 +329,9 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[SalesorderheaderRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table salesorderheader_TEMP (like sales.salesorderheader) on commit drop".execute(): @nowarn
+    SQL"""create temporary table salesorderheader_TEMP (like "sales"."salesorderheader") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy salesorderheader_TEMP("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalesorderheaderRow.text, c): @nowarn
-    SQL"""insert into sales.salesorderheader("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."salesorderheader"("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")
           select * from salesorderheader_TEMP
           on conflict ("salesorderid")
           do update set

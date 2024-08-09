@@ -25,16 +25,16 @@ import zio.stream.ZStream
 
 class LocationRepoImpl extends LocationRepo {
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilder("production.location", LocationFields.structure)
+    DeleteBuilder(""""production"."location"""", LocationFields.structure)
   }
   override def deleteById(locationid: LocationId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.location where "locationid" = ${Segment.paramSegment(locationid)(LocationId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "production"."location" where "locationid" = ${Segment.paramSegment(locationid)(LocationId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from production.location where "locationid" = ANY(${locationids})""".delete
+    sql"""delete from "production"."location" where "locationid" = ANY(${locationids})""".delete
   }
   override def insert(unsaved: LocationRow): ZIO[ZConnection, Throwable, LocationRow] = {
-    sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
+    sql"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")
           values (${Segment.paramSegment(unsaved.locationid)(LocationId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.costrate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.availability)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "locationid", "name", "costrate", "availability", "modifieddate"::text
        """.insertReturning(using LocationRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -61,35 +61,35 @@ class LocationRepoImpl extends LocationRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.location default values
+      sql"""insert into "production"."location" default values
             returning "locationid", "name", "costrate", "availability", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into production.location($names) values ($values) returning "locationid", "name", "costrate", "availability", "modifieddate"::text"""
+      sql"""insert into "production"."location"($names) values ($values) returning "locationid", "name", "costrate", "availability", "modifieddate"::text"""
     }
     q.insertReturning(using LocationRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""", batchSize, unsaved)(LocationRow.text)
+    streamingInsert(s"""COPY "production"."location"("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""", batchSize, unsaved)(LocationRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(LocationRowUnsaved.text)
+    streamingInsert(s"""COPY "production"."location"("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(LocationRowUnsaved.text)
   }
   override def select: SelectBuilder[LocationFields, LocationRow] = {
-    SelectBuilderSql("production.location", LocationFields.structure, LocationRow.jdbcDecoder)
+    SelectBuilderSql(""""production"."location"""", LocationFields.structure, LocationRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, LocationRow] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location""".query(using LocationRow.jdbcDecoder).selectStream()
+    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from "production"."location"""".query(using LocationRow.jdbcDecoder).selectStream()
   }
   override def selectById(locationid: LocationId): ZIO[ZConnection, Throwable, Option[LocationRow]] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ${Segment.paramSegment(locationid)(LocationId.setter)}""".query(using LocationRow.jdbcDecoder).selectOne
+    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from "production"."location" where "locationid" = ${Segment.paramSegment(locationid)(LocationId.setter)}""".query(using LocationRow.jdbcDecoder).selectOne
   }
   override def selectByIds(locationids: Array[LocationId]): ZStream[ZConnection, Throwable, LocationRow] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ANY(${Segment.paramSegment(locationids)(LocationId.arraySetter)})""".query(using LocationRow.jdbcDecoder).selectStream()
+    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from "production"."location" where "locationid" = ANY(${Segment.paramSegment(locationids)(LocationId.arraySetter)})""".query(using LocationRow.jdbcDecoder).selectStream()
   }
   override def selectByIdsTracked(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Map[LocationId, LocationRow]] = {
     selectByIds(locationids).runCollect.map { rows =>
@@ -98,11 +98,11 @@ class LocationRepoImpl extends LocationRepo {
     }
   }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilder("production.location", LocationFields.structure, LocationRow.jdbcDecoder)
+    UpdateBuilder(""""production"."location"""", LocationFields.structure, LocationRow.jdbcDecoder)
   }
   override def update(row: LocationRow): ZIO[ZConnection, Throwable, Boolean] = {
     val locationid = row.locationid
-    sql"""update production.location
+    sql"""update "production"."location"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "costrate" = ${Segment.paramSegment(row.costrate)(Setter.bigDecimalScalaSetter)}::numeric,
               "availability" = ${Segment.paramSegment(row.availability)(Setter.bigDecimalScalaSetter)}::numeric,
@@ -110,7 +110,7 @@ class LocationRepoImpl extends LocationRepo {
           where "locationid" = ${Segment.paramSegment(locationid)(LocationId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: LocationRow): ZIO[ZConnection, Throwable, UpdateResult[LocationRow]] = {
-    sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
+    sql"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.locationid)(LocationId.setter)}::int4,
             ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
@@ -128,9 +128,9 @@ class LocationRepoImpl extends LocationRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, LocationRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table location_TEMP (like production.location) on commit drop".execute
+    val created = sql"""create temporary table location_TEMP (like "production"."location") on commit drop""".execute
     val copied = streamingInsert(s"""copy location_TEMP("locationid", "name", "costrate", "availability", "modifieddate") from stdin""", batchSize, unsaved)(LocationRow.text)
-    val merged = sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
+    val merged = sql"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")
                        select * from location_TEMP
                        on conflict ("locationid")
                        do update set

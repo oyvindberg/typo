@@ -31,16 +31,16 @@ import typo.dsl.UpdateBuilder
 
 class PersonRepoImpl extends PersonRepo {
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
-    DeleteBuilder("myschema.person", PersonFields.structure)
+    DeleteBuilder(""""myschema"."person"""", PersonFields.structure)
   }
   override def deleteById(id: PersonId): ConnectionIO[Boolean] = {
-    sql"""delete from myschema.person where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "myschema"."person" where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(ids: Array[PersonId]): ConnectionIO[Int] = {
-    sql"""delete from myschema.person where "id" = ANY(${ids})""".update.run
+    sql"""delete from "myschema"."person" where "id" = ANY(${ids})""".update.run
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
-    sql"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
+    sql"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
           values (${fromWrite(unsaved.id)(Write.fromPut(PersonId.put))}::int8, ${fromWrite(unsaved.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))}, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.nickName)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.blogUrl)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.email)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.phone)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.likesPizza)(Write.fromPut(Meta.BooleanMeta.put))}, ${fromWrite(unsaved.maritalStatusId)(Write.fromPut(MaritalStatusId.put))}, ${fromWrite(unsaved.workEmail)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.sector)(Write.fromPut(Sector.put))}::myschema.sector, ${fromWrite(unsaved.favoriteNumber)(Write.fromPut(Number.put))}::myschema.number)
           returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
        """.query(using PersonRow.read).unique
@@ -74,12 +74,12 @@ class PersonRepoImpl extends PersonRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into myschema.person default values
+      sql"""insert into "myschema"."person" default values
             returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into myschema.person(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "myschema"."person"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
          """
@@ -88,17 +88,17 @@ class PersonRepoImpl extends PersonRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number") FROM STDIN""").copyIn(unsaved, batchSize)(using PersonRow.text)
+    new FragmentOps(sql"""COPY "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number") FROM STDIN""").copyIn(unsaved, batchSize)(using PersonRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY myschema.person("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector", "favorite_number") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PersonRowUnsaved.text)
+    new FragmentOps(sql"""COPY "myschema"."person"("favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "work_email", "id", "marital_status_id", "sector", "favorite_number") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PersonRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
-    SelectBuilderSql("myschema.person", PersonFields.structure, PersonRow.read)
+    SelectBuilderSql(""""myschema"."person"""", PersonFields.structure, PersonRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersonRow] = {
-    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person""".query(using PersonRow.read).stream
+    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from "myschema"."person"""".query(using PersonRow.read).stream
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): Stream[ConnectionIO, PersonRow] = {
     val where = fragments.whereAndOpt(
@@ -117,13 +117,13 @@ class PersonRepoImpl extends PersonRepo {
         case PersonFieldValue.favoriteNumber(value) => fr""""favorite_number" = ${fromWrite(value)(Write.fromPut(Number.put))}"""
       }
     )
-    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person $where""".query(using PersonRow.read).stream
+    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from "myschema"."person" $where""".query(using PersonRow.read).stream
   }
   override def selectById(id: PersonId): ConnectionIO[Option[PersonRow]] = {
-    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}""".query(using PersonRow.read).option
+    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from "myschema"."person" where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}""".query(using PersonRow.read).option
   }
   override def selectByIds(ids: Array[PersonId]): Stream[ConnectionIO, PersonRow] = {
-    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from myschema.person where "id" = ANY(${ids})""".query(using PersonRow.read).stream
+    sql"""select "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number" from "myschema"."person" where "id" = ANY(${ids})""".query(using PersonRow.read).stream
   }
   override def selectByIdsTracked(ids: Array[PersonId]): ConnectionIO[Map[PersonId, PersonRow]] = {
     selectByIds(ids).compile.toList.map { rows =>
@@ -132,11 +132,11 @@ class PersonRepoImpl extends PersonRepo {
     }
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilder("myschema.person", PersonFields.structure, PersonRow.read)
+    UpdateBuilder(""""myschema"."person"""", PersonFields.structure, PersonRow.read)
   }
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val id = row.id
-    sql"""update myschema.person
+    sql"""update "myschema"."person"
           set "favourite_football_club_id" = ${fromWrite(row.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))},
               "name" = ${fromWrite(row.name)(Write.fromPut(Meta.StringMeta.put))},
               "nick_name" = ${fromWrite(row.nickName)(Write.fromPutOption(Meta.StringMeta.put))},
@@ -172,13 +172,13 @@ class PersonRepoImpl extends PersonRepo {
             case PersonFieldValue.favoriteNumber(value) => fr""""favorite_number" = ${fromWrite(value)(Write.fromPut(Number.put))}::myschema.number"""
           }
         )
-        sql"""update myschema.person
+        sql"""update "myschema"."person"
               $updates
               where "id" = ${fromWrite(id)(Write.fromPut(PersonId.put))}""".update.run.map(_ > 0)
     }
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
-    sql"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
+    sql"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
           values (
             ${fromWrite(unsaved.id)(Write.fromPut(PersonId.put))}::int8,
             ${fromWrite(unsaved.favouriteFootballClubId)(Write.fromPut(FootballClubId.put))},
@@ -211,7 +211,7 @@ class PersonRepoImpl extends PersonRepo {
   }
   override def upsertBatch(unsaved: List[PersonRow]): Stream[ConnectionIO, PersonRow] = {
     Update[PersonRow](
-      s"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
+      s"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
           values (?::int8,?,?,?,?,?,?,?,?,?,?::myschema.sector,?::myschema.number)
           on conflict ("id")
           do update set
@@ -233,9 +233,9 @@ class PersonRepoImpl extends PersonRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, PersonRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table person_TEMP (like myschema.person) on commit drop".update.run
+      _ <- sql"""create temporary table person_TEMP (like "myschema"."person") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy person_TEMP("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number") from stdin""").copyIn(unsaved, batchSize)(using PersonRow.text)
-      res <- sql"""insert into myschema.person("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
+      res <- sql"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
                    select * from person_TEMP
                    on conflict ("id")
                    do update set

@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class EdhViewRepoImpl extends EdhViewRepo {
   override def select: SelectBuilder[EdhViewFields, EdhViewRow] = {
-    SelectBuilderSql("hr.edh", EdhViewFields.structure, EdhViewRow.rowParser)
+    SelectBuilderSql(""""hr"."edh"""", EdhViewFields.structure, EdhViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[EdhViewRow] = {
     SQL"""select "id", "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
-          from hr.edh
+          from "hr"."edh"
        """.as(EdhViewRow.rowParser(1).*)
   }
 }

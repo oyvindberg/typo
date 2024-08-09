@@ -15,9 +15,9 @@ import typo.dsl.SelectBuilderSql
 
 class VemployeeViewRepoImpl extends VemployeeViewRepo {
   override def select: SelectBuilder[VemployeeViewFields, VemployeeViewRow] = {
-    SelectBuilderSql("humanresources.vemployee", VemployeeViewFields.structure, VemployeeViewRow.read)
+    SelectBuilderSql(""""humanresources"."vemployee"""", VemployeeViewFields.structure, VemployeeViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VemployeeViewRow] = {
-    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "additionalcontactinfo" from humanresources.vemployee""".query(using VemployeeViewRow.read).stream
+    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "jobtitle", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "additionalcontactinfo" from "humanresources"."vemployee"""".query(using VemployeeViewRow.read).stream
   }
 }

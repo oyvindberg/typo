@@ -28,23 +28,23 @@ import typo.dsl.UpdateBuilder
 
 class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    DeleteBuilder("production.productproductphoto", ProductproductphotoFields.structure)
+    DeleteBuilder(""""production"."productproductphoto"""", ProductproductphotoFields.structure)
   }
   override def deleteById(compositeId: ProductproductphotoId): ConnectionIO[Boolean] = {
-    sql"""delete from production.productproductphoto where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."productproductphoto" where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductproductphotoId]): ConnectionIO[Int] = {
     val productid = compositeIds.map(_.productid)
     val productphotoid = compositeIds.map(_.productphotoid)
     sql"""delete
-          from production.productproductphoto
+          from "production"."productproductphoto"
           where ("productid", "productphotoid")
           in (select unnest(${productid}), unnest(${productphotoid}))
        """.update.run
     
   }
   override def insert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow] = {
-    sql"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
+    sql"""insert into "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4, ${fromWrite(unsaved.primary)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "productphotoid", "primary", "modifieddate"::text
        """.query(using ProductproductphotoRow.read).unique
@@ -64,12 +64,12 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.productproductphoto default values
+      sql"""insert into "production"."productproductphoto" default values
             returning "productid", "productphotoid", "primary", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into production.productproductphoto(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "production"."productproductphoto"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productid", "productphotoid", "primary", "modifieddate"::text
          """
@@ -78,26 +78,26 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductproductphotoRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductproductphotoRow.text)
+    new FragmentOps(sql"""COPY "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductproductphotoRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductproductphotoRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductproductphotoRowUnsaved.text)
+    new FragmentOps(sql"""COPY "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductproductphotoRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    SelectBuilderSql("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.read)
+    SelectBuilderSql(""""production"."productproductphoto"""", ProductproductphotoFields.structure, ProductproductphotoRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductproductphotoRow] = {
-    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto""".query(using ProductproductphotoRow.read).stream
+    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from "production"."productproductphoto"""".query(using ProductproductphotoRow.read).stream
   }
   override def selectById(compositeId: ProductproductphotoId): ConnectionIO[Option[ProductproductphotoRow]] = {
-    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from production.productproductphoto where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}""".query(using ProductproductphotoRow.read).option
+    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from "production"."productproductphoto" where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}""".query(using ProductproductphotoRow.read).option
   }
   override def selectByIds(compositeIds: Array[ProductproductphotoId]): Stream[ConnectionIO, ProductproductphotoRow] = {
     val productid = compositeIds.map(_.productid)
     val productphotoid = compositeIds.map(_.productphotoid)
     sql"""select "productid", "productphotoid", "primary", "modifieddate"::text
-          from production.productproductphoto
+          from "production"."productproductphoto"
           where ("productid", "productphotoid") 
           in (select unnest(${productid}), unnest(${productphotoid}))
        """.query(using ProductproductphotoRow.read).stream
@@ -110,11 +110,11 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     }
   }
   override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    UpdateBuilder("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.read)
+    UpdateBuilder(""""production"."productproductphoto"""", ProductproductphotoFields.structure, ProductproductphotoRow.read)
   }
   override def update(row: ProductproductphotoRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
-    sql"""update production.productproductphoto
+    sql"""update "production"."productproductphoto"
           set "primary" = ${fromWrite(row.primary)(Write.fromPut(Flag.put))}::bool,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}"""
@@ -123,7 +123,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow] = {
-    sql"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
+    sql"""insert into "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate")
           values (
             ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
             ${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4,
@@ -139,7 +139,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   }
   override def upsertBatch(unsaved: List[ProductproductphotoRow]): Stream[ConnectionIO, ProductproductphotoRow] = {
     Update[ProductproductphotoRow](
-      s"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
+      s"""insert into "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate")
           values (?::int4,?::int4,?::bool,?::timestamp)
           on conflict ("productid", "productphotoid")
           do update set
@@ -152,9 +152,9 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductproductphotoRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table productproductphoto_TEMP (like production.productproductphoto) on commit drop".update.run
+      _ <- sql"""create temporary table productproductphoto_TEMP (like "production"."productproductphoto") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy productproductphoto_TEMP("productid", "productphotoid", "primary", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductproductphotoRow.text)
-      res <- sql"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
+      res <- sql"""insert into "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate")
                    select * from productproductphoto_TEMP
                    on conflict ("productid", "productphotoid")
                    do update set

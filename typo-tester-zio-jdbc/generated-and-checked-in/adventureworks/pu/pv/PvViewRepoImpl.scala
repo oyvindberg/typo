@@ -15,9 +15,9 @@ import zio.stream.ZStream
 
 class PvViewRepoImpl extends PvViewRepo {
   override def select: SelectBuilder[PvViewFields, PvViewRow] = {
-    SelectBuilderSql("pu.pv", PvViewFields.structure, PvViewRow.jdbcDecoder)
+    SelectBuilderSql(""""pu"."pv"""", PvViewFields.structure, PvViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PvViewRow] = {
-    sql"""select "id", "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from pu.pv""".query(using PvViewRow.jdbcDecoder).selectStream()
+    sql"""select "id", "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text from "pu"."pv"""".query(using PvViewRow.jdbcDecoder).selectStream()
   }
 }

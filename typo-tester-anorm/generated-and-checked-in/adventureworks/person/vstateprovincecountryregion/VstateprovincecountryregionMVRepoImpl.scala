@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class VstateprovincecountryregionMVRepoImpl extends VstateprovincecountryregionMVRepo {
   override def select: SelectBuilder[VstateprovincecountryregionMVFields, VstateprovincecountryregionMVRow] = {
-    SelectBuilderSql("person.vstateprovincecountryregion", VstateprovincecountryregionMVFields.structure, VstateprovincecountryregionMVRow.rowParser)
+    SelectBuilderSql(""""person"."vstateprovincecountryregion"""", VstateprovincecountryregionMVFields.structure, VstateprovincecountryregionMVRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VstateprovincecountryregionMVRow] = {
     SQL"""select "stateprovinceid", "stateprovincecode", "isonlystateprovinceflag", "stateprovincename", "territoryid", "countryregioncode", "countryregionname"
-          from person.vstateprovincecountryregion
+          from "person"."vstateprovincecountryregion"
        """.as(VstateprovincecountryregionMVRow.rowParser(1).*)
   }
 }

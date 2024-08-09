@@ -29,23 +29,23 @@ import zio.stream.ZStream
 
 class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    DeleteBuilder("sales.salesorderdetail", SalesorderdetailFields.structure)
+    DeleteBuilder(""""sales"."salesorderdetail"""", SalesorderdetailFields.structure)
   }
   override def deleteById(compositeId: SalesorderdetailId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.salesorderdetail where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".delete.map(_ > 0)
+    sql"""delete from "sales"."salesorderdetail" where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[SalesorderdetailId]): ZIO[ZConnection, Throwable, Long] = {
     val salesorderid = compositeIds.map(_.salesorderid)
     val salesorderdetailid = compositeIds.map(_.salesorderdetailid)
     sql"""delete
-          from sales.salesorderdetail
+          from "sales"."salesorderdetail"
           where ("salesorderid", "salesorderdetailid")
           in (select unnest(${salesorderid}), unnest(${salesorderdetailid}))
        """.delete
     
   }
   override def insert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, SalesorderdetailRow] = {
-    sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+    sql"""insert into "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.salesorderid)(SalesorderheaderId.setter)}::int4, ${Segment.paramSegment(unsaved.salesorderdetailid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.carriertrackingnumber)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.orderqty)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.specialofferid)(SpecialofferId.setter)}::int4, ${Segment.paramSegment(unsaved.unitprice)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.unitpricediscount)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
        """.insertReturning(using SalesorderdetailRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -77,38 +77,38 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into sales.salesorderdetail default values
+      sql"""insert into "sales"."salesorderdetail" default values
             returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into sales.salesorderdetail($names) values ($values) returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text"""
+      sql"""insert into "sales"."salesorderdetail"($names) values ($values) returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text"""
     }
     q.insertReturning(using SalesorderdetailRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderdetailRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderdetailRow.text)
+    streamingInsert(s"""COPY "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderdetailRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderdetailRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.salesorderdetail("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesorderdetailRowUnsaved.text)
+    streamingInsert(s"""COPY "sales"."salesorderdetail"("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesorderdetailRowUnsaved.text)
   }
   override def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    SelectBuilderSql("sales.salesorderdetail", SalesorderdetailFields.structure, SalesorderdetailRow.jdbcDecoder)
+    SelectBuilderSql(""""sales"."salesorderdetail"""", SalesorderdetailFields.structure, SalesorderdetailRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalesorderdetailRow] = {
-    sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sales.salesorderdetail""".query(using SalesorderdetailRow.jdbcDecoder).selectStream()
+    sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from "sales"."salesorderdetail"""".query(using SalesorderdetailRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: SalesorderdetailId): ZIO[ZConnection, Throwable, Option[SalesorderdetailRow]] = {
-    sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from sales.salesorderdetail where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".query(using SalesorderdetailRow.jdbcDecoder).selectOne
+    sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from "sales"."salesorderdetail" where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".query(using SalesorderdetailRow.jdbcDecoder).selectOne
   }
   override def selectByIds(compositeIds: Array[SalesorderdetailId]): ZStream[ZConnection, Throwable, SalesorderdetailRow] = {
     val salesorderid = compositeIds.map(_.salesorderid)
     val salesorderdetailid = compositeIds.map(_.salesorderdetailid)
     sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
-          from sales.salesorderdetail
+          from "sales"."salesorderdetail"
           where ("salesorderid", "salesorderdetailid")
           in (select unnest(${salesorderid}), unnest(${salesorderdetailid}))
        """.query(using SalesorderdetailRow.jdbcDecoder).selectStream()
@@ -121,11 +121,11 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     }
   }
   override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    UpdateBuilder("sales.salesorderdetail", SalesorderdetailFields.structure, SalesorderdetailRow.jdbcDecoder)
+    UpdateBuilder(""""sales"."salesorderdetail"""", SalesorderdetailFields.structure, SalesorderdetailRow.jdbcDecoder)
   }
   override def update(row: SalesorderdetailRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
-    sql"""update sales.salesorderdetail
+    sql"""update "sales"."salesorderdetail"
           set "carriertrackingnumber" = ${Segment.paramSegment(row.carriertrackingnumber)(Setter.optionParamSetter(Setter.stringSetter))},
               "orderqty" = ${Segment.paramSegment(row.orderqty)(TypoShort.setter)}::int2,
               "productid" = ${Segment.paramSegment(row.productid)(ProductId.setter)}::int4,
@@ -137,7 +137,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
           where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderdetailRow]] = {
-    sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+    sql"""insert into "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.salesorderid)(SalesorderheaderId.setter)}::int4,
             ${Segment.paramSegment(unsaved.salesorderdetailid)(Setter.intSetter)}::int4,
@@ -164,9 +164,9 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SalesorderdetailRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table salesorderdetail_TEMP (like sales.salesorderdetail) on commit drop".execute
+    val created = sql"""create temporary table salesorderdetail_TEMP (like "sales"."salesorderdetail") on commit drop""".execute
     val copied = streamingInsert(s"""copy salesorderdetail_TEMP("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalesorderdetailRow.text)
-    val merged = sql"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+    val merged = sql"""insert into "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
                        select * from salesorderdetail_TEMP
                        on conflict ("salesorderid", "salesorderdetailid")
                        do update set

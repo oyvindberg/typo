@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class AtViewRepoImpl extends AtViewRepo {
   override def select: SelectBuilder[AtViewFields, AtViewRow] = {
-    SelectBuilderSql("pe.at", AtViewFields.structure, AtViewRow.rowParser)
+    SelectBuilderSql(""""pe"."at"""", AtViewFields.structure, AtViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[AtViewRow] = {
     SQL"""select "id", "addresstypeid", "name", "rowguid", "modifieddate"::text
-          from pe.at
+          from "pe"."at"
        """.as(AtViewRow.rowParser(1).*)
   }
 }

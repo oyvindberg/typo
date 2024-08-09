@@ -15,9 +15,9 @@ import zio.stream.ZStream
 
 class BecViewRepoImpl extends BecViewRepo {
   override def select: SelectBuilder[BecViewFields, BecViewRow] = {
-    SelectBuilderSql("pe.bec", BecViewFields.structure, BecViewRow.jdbcDecoder)
+    SelectBuilderSql(""""pe"."bec"""", BecViewFields.structure, BecViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, BecViewRow] = {
-    sql"""select "id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from pe.bec""".query(using BecViewRow.jdbcDecoder).selectStream()
+    sql"""select "id", "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text from "pe"."bec"""".query(using BecViewRow.jdbcDecoder).selectStream()
   }
 }

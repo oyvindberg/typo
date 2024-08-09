@@ -29,16 +29,16 @@ import typo.dsl.UpdateBuilder
 
 class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def delete: DeleteBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    DeleteBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure)
+    DeleteBuilder(""""purchasing"."purchaseorderheader"""", PurchaseorderheaderFields.structure)
   }
   override def deleteById(purchaseorderid: PurchaseorderheaderId): ConnectionIO[Boolean] = {
-    sql"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ${fromWrite(purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "purchasing"."purchaseorderheader" where "purchaseorderid" = ${fromWrite(purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(purchaseorderids: Array[PurchaseorderheaderId]): ConnectionIO[Int] = {
-    sql"""delete from purchasing.purchaseorderheader where "purchaseorderid" = ANY(${purchaseorderids})""".update.run
+    sql"""delete from "purchasing"."purchaseorderheader" where "purchaseorderid" = ANY(${purchaseorderids})""".update.run
   }
   override def insert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
-    sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
+    sql"""insert into "purchasing"."purchaseorderheader"("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
           values (${fromWrite(unsaved.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}::int4, ${fromWrite(unsaved.revisionnumber)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.employeeid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.vendorid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4, ${fromWrite(unsaved.orderdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.shipdate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.subtotal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.taxamt)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.freight)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text
        """.query(using PurchaseorderheaderRow.read).unique
@@ -84,12 +84,12 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into purchasing.purchaseorderheader default values
+      sql"""insert into "purchasing"."purchaseorderheader" default values
             returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into purchasing.purchaseorderheader(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "purchasing"."purchaseorderheader"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text
          """
@@ -98,23 +98,23 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PurchaseorderheaderRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PurchaseorderheaderRow.text)
+    new FragmentOps(sql"""COPY "purchasing"."purchaseorderheader"("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PurchaseorderheaderRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PurchaseorderheaderRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY purchasing.purchaseorderheader("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PurchaseorderheaderRowUnsaved.text)
+    new FragmentOps(sql"""COPY "purchasing"."purchaseorderheader"("employeeid", "vendorid", "shipmethodid", "shipdate", "purchaseorderid", "revisionnumber", "status", "orderdate", "subtotal", "taxamt", "freight", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PurchaseorderheaderRowUnsaved.text)
   }
   override def select: SelectBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    SelectBuilderSql("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.read)
+    SelectBuilderSql(""""purchasing"."purchaseorderheader"""", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PurchaseorderheaderRow] = {
-    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader""".query(using PurchaseorderheaderRow.read).stream
+    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from "purchasing"."purchaseorderheader"""".query(using PurchaseorderheaderRow.read).stream
   }
   override def selectById(purchaseorderid: PurchaseorderheaderId): ConnectionIO[Option[PurchaseorderheaderRow]] = {
-    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader where "purchaseorderid" = ${fromWrite(purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}""".query(using PurchaseorderheaderRow.read).option
+    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from "purchasing"."purchaseorderheader" where "purchaseorderid" = ${fromWrite(purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}""".query(using PurchaseorderheaderRow.read).option
   }
   override def selectByIds(purchaseorderids: Array[PurchaseorderheaderId]): Stream[ConnectionIO, PurchaseorderheaderRow] = {
-    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from purchasing.purchaseorderheader where "purchaseorderid" = ANY(${purchaseorderids})""".query(using PurchaseorderheaderRow.read).stream
+    sql"""select "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text from "purchasing"."purchaseorderheader" where "purchaseorderid" = ANY(${purchaseorderids})""".query(using PurchaseorderheaderRow.read).stream
   }
   override def selectByIdsTracked(purchaseorderids: Array[PurchaseorderheaderId]): ConnectionIO[Map[PurchaseorderheaderId, PurchaseorderheaderRow]] = {
     selectByIds(purchaseorderids).compile.toList.map { rows =>
@@ -123,11 +123,11 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
     }
   }
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
-    UpdateBuilder("purchasing.purchaseorderheader", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.read)
+    UpdateBuilder(""""purchasing"."purchaseorderheader"""", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.read)
   }
   override def update(row: PurchaseorderheaderRow): ConnectionIO[Boolean] = {
     val purchaseorderid = row.purchaseorderid
-    sql"""update purchasing.purchaseorderheader
+    sql"""update "purchasing"."purchaseorderheader"
           set "revisionnumber" = ${fromWrite(row.revisionnumber)(Write.fromPut(TypoShort.put))}::int2,
               "status" = ${fromWrite(row.status)(Write.fromPut(TypoShort.put))}::int2,
               "employeeid" = ${fromWrite(row.employeeid)(Write.fromPut(BusinessentityId.put))}::int4,
@@ -145,7 +145,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
-    sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
+    sql"""insert into "purchasing"."purchaseorderheader"("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
           values (
             ${fromWrite(unsaved.purchaseorderid)(Write.fromPut(PurchaseorderheaderId.put))}::int4,
             ${fromWrite(unsaved.revisionnumber)(Write.fromPut(TypoShort.put))}::int2,
@@ -178,7 +178,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   }
   override def upsertBatch(unsaved: List[PurchaseorderheaderRow]): Stream[ConnectionIO, PurchaseorderheaderRow] = {
     Update[PurchaseorderheaderRow](
-      s"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
+      s"""insert into "purchasing"."purchaseorderheader"("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
           values (?::int4,?::int2,?::int2,?::int4,?::int4,?::int4,?::timestamp,?::timestamp,?::numeric,?::numeric,?::numeric,?::timestamp)
           on conflict ("purchaseorderid")
           do update set
@@ -200,9 +200,9 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, PurchaseorderheaderRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table purchaseorderheader_TEMP (like purchasing.purchaseorderheader) on commit drop".update.run
+      _ <- sql"""create temporary table purchaseorderheader_TEMP (like "purchasing"."purchaseorderheader") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy purchaseorderheader_TEMP("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using PurchaseorderheaderRow.text)
-      res <- sql"""insert into purchasing.purchaseorderheader("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
+      res <- sql"""insert into "purchasing"."purchaseorderheader"("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")
                    select * from purchaseorderheader_TEMP
                    on conflict ("purchaseorderid")
                    do update set

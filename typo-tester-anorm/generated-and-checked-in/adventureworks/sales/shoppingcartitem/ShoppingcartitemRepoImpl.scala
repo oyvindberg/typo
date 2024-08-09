@@ -27,20 +27,20 @@ import typo.dsl.UpdateBuilder
 
 class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure)
+    DeleteBuilder(""""sales"."shoppingcartitem"""", ShoppingcartitemFields.structure)
   }
   override def deleteById(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${ParameterValue(shoppingcartitemid, null, ShoppingcartitemId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "sales"."shoppingcartitem" where "shoppingcartitemid" = ${ParameterValue(shoppingcartitemid, null, ShoppingcartitemId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): Int = {
     SQL"""delete
-          from sales.shoppingcartitem
+          from "sales"."shoppingcartitem"
           where "shoppingcartitemid" = ANY(${shoppingcartitemids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
-    SQL"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
+    SQL"""insert into "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
           values (${ParameterValue(unsaved.shoppingcartitemid, null, ShoppingcartitemId.toStatement)}::int4, ${ParameterValue(unsaved.shoppingcartid, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.quantity, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.datecreated, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
        """
@@ -70,12 +70,12 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into sales.shoppingcartitem default values
+      SQL"""insert into "sales"."shoppingcartitem" default values
             returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
          """
         .executeInsert(ShoppingcartitemRow.rowParser(1).single)
     } else {
-      val q = s"""insert into sales.shoppingcartitem(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "sales"."shoppingcartitem"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
                """
@@ -85,29 +85,29 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[ShoppingcartitemRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShoppingcartitemRow.text, c)
+    streamingInsert(s"""COPY "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShoppingcartitemRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ShoppingcartitemRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.shoppingcartitem("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShoppingcartitemRowUnsaved.text, c)
+    streamingInsert(s"""COPY "sales"."shoppingcartitem"("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShoppingcartitemRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    SelectBuilderSql("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.rowParser)
+    SelectBuilderSql(""""sales"."shoppingcartitem"""", ShoppingcartitemFields.structure, ShoppingcartitemRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ShoppingcartitemRow] = {
     SQL"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
-          from sales.shoppingcartitem
+          from "sales"."shoppingcartitem"
        """.as(ShoppingcartitemRow.rowParser(1).*)
   }
   override def selectById(shoppingcartitemid: ShoppingcartitemId)(implicit c: Connection): Option[ShoppingcartitemRow] = {
     SQL"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
-          from sales.shoppingcartitem
+          from "sales"."shoppingcartitem"
           where "shoppingcartitemid" = ${ParameterValue(shoppingcartitemid, null, ShoppingcartitemId.toStatement)}
        """.as(ShoppingcartitemRow.rowParser(1).singleOpt)
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId])(implicit c: Connection): List[ShoppingcartitemRow] = {
     SQL"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
-          from sales.shoppingcartitem
+          from "sales"."shoppingcartitem"
           where "shoppingcartitemid" = ANY(${shoppingcartitemids})
        """.as(ShoppingcartitemRow.rowParser(1).*)
     
@@ -117,11 +117,11 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     shoppingcartitemids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.rowParser)
+    UpdateBuilder(""""sales"."shoppingcartitem"""", ShoppingcartitemFields.structure, ShoppingcartitemRow.rowParser)
   }
   override def update(row: ShoppingcartitemRow)(implicit c: Connection): Boolean = {
     val shoppingcartitemid = row.shoppingcartitemid
-    SQL"""update sales.shoppingcartitem
+    SQL"""update "sales"."shoppingcartitem"
           set "shoppingcartid" = ${ParameterValue(row.shoppingcartid, null, ToStatement.stringToStatement)},
               "quantity" = ${ParameterValue(row.quantity, null, ToStatement.intToStatement)}::int4,
               "productid" = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
@@ -131,7 +131,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
-    SQL"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
+    SQL"""insert into "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
           values (
             ${ParameterValue(unsaved.shoppingcartitemid, null, ShoppingcartitemId.toStatement)}::int4,
             ${ParameterValue(unsaved.shoppingcartid, null, ToStatement.stringToStatement)},
@@ -166,7 +166,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
+            s"""insert into "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
                 values ({shoppingcartitemid}::int4, {shoppingcartid}, {quantity}::int4, {productid}::int4, {datecreated}::timestamp, {modifieddate}::timestamp)
                 on conflict ("shoppingcartitemid")
                 do update set
@@ -185,9 +185,9 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ShoppingcartitemRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table shoppingcartitem_TEMP (like sales.shoppingcartitem) on commit drop".execute(): @nowarn
+    SQL"""create temporary table shoppingcartitem_TEMP (like "sales"."shoppingcartitem") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy shoppingcartitem_TEMP("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") from stdin""", batchSize, unsaved)(ShoppingcartitemRow.text, c): @nowarn
-    SQL"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
+    SQL"""insert into "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
           select * from shoppingcartitem_TEMP
           on conflict ("shoppingcartitemid")
           do update set

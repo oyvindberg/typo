@@ -15,9 +15,9 @@ import zio.stream.ZStream
 
 class PccViewRepoImpl extends PccViewRepo {
   override def select: SelectBuilder[PccViewFields, PccViewRow] = {
-    SelectBuilderSql("sa.pcc", PccViewFields.structure, PccViewRow.jdbcDecoder)
+    SelectBuilderSql(""""sa"."pcc"""", PccViewFields.structure, PccViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PccViewRow] = {
-    sql"""select "id", "businessentityid", "creditcardid", "modifieddate"::text from sa.pcc""".query(using PccViewRow.jdbcDecoder).selectStream()
+    sql"""select "id", "businessentityid", "creditcardid", "modifieddate"::text from "sa"."pcc"""".query(using PccViewRow.jdbcDecoder).selectStream()
   }
 }

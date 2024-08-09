@@ -15,9 +15,9 @@ import typo.dsl.SelectBuilderSql
 
 class VproductmodelcatalogdescriptionViewRepoImpl extends VproductmodelcatalogdescriptionViewRepo {
   override def select: SelectBuilder[VproductmodelcatalogdescriptionViewFields, VproductmodelcatalogdescriptionViewRow] = {
-    SelectBuilderSql("production.vproductmodelcatalogdescription", VproductmodelcatalogdescriptionViewFields.structure, VproductmodelcatalogdescriptionViewRow.read)
+    SelectBuilderSql(""""production"."vproductmodelcatalogdescription"""", VproductmodelcatalogdescriptionViewFields.structure, VproductmodelcatalogdescriptionViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VproductmodelcatalogdescriptionViewRow] = {
-    sql"""select "productmodelid", "name", "Summary", "manufacturer", "copyright", "producturl", "warrantyperiod", "warrantydescription", "noofyears", "maintenancedescription", "wheel", "saddle", "pedal", "bikeframe", "crankset", "pictureangle", "picturesize", "productphotoid", "material", "color", "productline", "style", "riderexperience", "rowguid", "modifieddate"::text from production.vproductmodelcatalogdescription""".query(using VproductmodelcatalogdescriptionViewRow.read).stream
+    sql"""select "productmodelid", "name", "Summary", "manufacturer", "copyright", "producturl", "warrantyperiod", "warrantydescription", "noofyears", "maintenancedescription", "wheel", "saddle", "pedal", "bikeframe", "crankset", "pictureangle", "picturesize", "productphotoid", "material", "color", "productline", "style", "riderexperience", "rowguid", "modifieddate"::text from "production"."vproductmodelcatalogdescription"""".query(using VproductmodelcatalogdescriptionViewRow.read).stream
   }
 }

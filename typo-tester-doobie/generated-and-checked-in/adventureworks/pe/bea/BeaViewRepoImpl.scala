@@ -15,9 +15,9 @@ import typo.dsl.SelectBuilderSql
 
 class BeaViewRepoImpl extends BeaViewRepo {
   override def select: SelectBuilder[BeaViewFields, BeaViewRow] = {
-    SelectBuilderSql("pe.bea", BeaViewFields.structure, BeaViewRow.read)
+    SelectBuilderSql(""""pe"."bea"""", BeaViewFields.structure, BeaViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, BeaViewRow] = {
-    sql"""select "id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from pe.bea""".query(using BeaViewRow.read).stream
+    sql"""select "id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from "pe"."bea"""".query(using BeaViewRow.read).stream
   }
 }

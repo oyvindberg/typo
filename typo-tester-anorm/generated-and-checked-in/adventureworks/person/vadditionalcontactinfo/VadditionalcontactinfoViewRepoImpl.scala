@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class VadditionalcontactinfoViewRepoImpl extends VadditionalcontactinfoViewRepo {
   override def select: SelectBuilder[VadditionalcontactinfoViewFields, VadditionalcontactinfoViewRow] = {
-    SelectBuilderSql("person.vadditionalcontactinfo", VadditionalcontactinfoViewFields.structure, VadditionalcontactinfoViewRow.rowParser)
+    SelectBuilderSql(""""person"."vadditionalcontactinfo"""", VadditionalcontactinfoViewFields.structure, VadditionalcontactinfoViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VadditionalcontactinfoViewRow] = {
     SQL"""select "businessentityid", "firstname", "middlename", "lastname", "telephonenumber", "telephonespecialinstructions", "street", "city", "stateprovince", "postalcode", "countryregion", "homeaddressspecialinstructions", "emailaddress", "emailspecialinstructions", "emailtelephonenumber", "rowguid", "modifieddate"::text
-          from person.vadditionalcontactinfo
+          from "person"."vadditionalcontactinfo"
        """.as(VadditionalcontactinfoViewRow.rowParser(1).*)
   }
 }

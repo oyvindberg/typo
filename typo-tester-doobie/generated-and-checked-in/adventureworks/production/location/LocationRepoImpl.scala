@@ -27,16 +27,16 @@ import typo.dsl.UpdateBuilder
 
 class LocationRepoImpl extends LocationRepo {
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilder("production.location", LocationFields.structure)
+    DeleteBuilder(""""production"."location"""", LocationFields.structure)
   }
   override def deleteById(locationid: LocationId): ConnectionIO[Boolean] = {
-    sql"""delete from production.location where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."location" where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(locationids: Array[LocationId]): ConnectionIO[Int] = {
-    sql"""delete from production.location where "locationid" = ANY(${locationids})""".update.run
+    sql"""delete from "production"."location" where "locationid" = ANY(${locationids})""".update.run
   }
   override def insert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
-    sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
+    sql"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")
           values (${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.costrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.availability)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "locationid", "name", "costrate", "availability", "modifieddate"::text
        """.query(using LocationRow.read).unique
@@ -63,12 +63,12 @@ class LocationRepoImpl extends LocationRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.location default values
+      sql"""insert into "production"."location" default values
             returning "locationid", "name", "costrate", "availability", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into production.location(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "production"."location"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "locationid", "name", "costrate", "availability", "modifieddate"::text
          """
@@ -77,23 +77,23 @@ class LocationRepoImpl extends LocationRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using LocationRow.text)
+    new FragmentOps(sql"""COPY "production"."location"("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using LocationRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, LocationRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using LocationRowUnsaved.text)
+    new FragmentOps(sql"""COPY "production"."location"("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using LocationRowUnsaved.text)
   }
   override def select: SelectBuilder[LocationFields, LocationRow] = {
-    SelectBuilderSql("production.location", LocationFields.structure, LocationRow.read)
+    SelectBuilderSql(""""production"."location"""", LocationFields.structure, LocationRow.read)
   }
   override def selectAll: Stream[ConnectionIO, LocationRow] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location""".query(using LocationRow.read).stream
+    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from "production"."location"""".query(using LocationRow.read).stream
   }
   override def selectById(locationid: LocationId): ConnectionIO[Option[LocationRow]] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".query(using LocationRow.read).option
+    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from "production"."location" where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".query(using LocationRow.read).option
   }
   override def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from production.location where "locationid" = ANY(${locationids})""".query(using LocationRow.read).stream
+    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from "production"."location" where "locationid" = ANY(${locationids})""".query(using LocationRow.read).stream
   }
   override def selectByIdsTracked(locationids: Array[LocationId]): ConnectionIO[Map[LocationId, LocationRow]] = {
     selectByIds(locationids).compile.toList.map { rows =>
@@ -102,11 +102,11 @@ class LocationRepoImpl extends LocationRepo {
     }
   }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilder("production.location", LocationFields.structure, LocationRow.read)
+    UpdateBuilder(""""production"."location"""", LocationFields.structure, LocationRow.read)
   }
   override def update(row: LocationRow): ConnectionIO[Boolean] = {
     val locationid = row.locationid
-    sql"""update production.location
+    sql"""update "production"."location"
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               "costrate" = ${fromWrite(row.costrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "availability" = ${fromWrite(row.availability)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
@@ -117,7 +117,7 @@ class LocationRepoImpl extends LocationRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
-    sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
+    sql"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")
           values (
             ${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int4,
             ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
@@ -136,7 +136,7 @@ class LocationRepoImpl extends LocationRepo {
   }
   override def upsertBatch(unsaved: List[LocationRow]): Stream[ConnectionIO, LocationRow] = {
     Update[LocationRow](
-      s"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
+      s"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")
           values (?::int4,?::varchar,?::numeric,?::numeric,?::timestamp)
           on conflict ("locationid")
           do update set
@@ -151,9 +151,9 @@ class LocationRepoImpl extends LocationRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, LocationRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table location_TEMP (like production.location) on commit drop".update.run
+      _ <- sql"""create temporary table location_TEMP (like "production"."location") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy location_TEMP("locationid", "name", "costrate", "availability", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using LocationRow.text)
-      res <- sql"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
+      res <- sql"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")
                    select * from location_TEMP
                    on conflict ("locationid")
                    do update set

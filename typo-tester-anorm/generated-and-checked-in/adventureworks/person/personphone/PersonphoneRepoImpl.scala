@@ -28,24 +28,24 @@ import typo.dsl.UpdateBuilder
 
 class PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
-    DeleteBuilder("person.personphone", PersonphoneFields.structure)
+    DeleteBuilder(""""person"."personphone"""", PersonphoneFields.structure)
   }
   override def deleteById(compositeId: PersonphoneId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.personphone where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "phonenumber" = ${ParameterValue(compositeId.phonenumber, null, Phone.toStatement)} AND "phonenumbertypeid" = ${ParameterValue(compositeId.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "person"."personphone" where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "phonenumber" = ${ParameterValue(compositeId.phonenumber, null, Phone.toStatement)} AND "phonenumbertypeid" = ${ParameterValue(compositeId.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[PersonphoneId])(implicit c: Connection): Int = {
     val businessentityid = compositeIds.map(_.businessentityid)
     val phonenumber = compositeIds.map(_.phonenumber)
     val phonenumbertypeid = compositeIds.map(_.phonenumbertypeid)
     SQL"""delete
-          from person.personphone
+          from "person"."personphone"
           where ("businessentityid", "phonenumber", "phonenumbertypeid")
           in (select unnest(${businessentityid}), unnest(${phonenumber}), unnest(${phonenumbertypeid}))
        """.executeUpdate()
     
   }
   override def insert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow = {
-    SQL"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
+    SQL"""insert into "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.phonenumber, null, Phone.toStatement)}::varchar, ${ParameterValue(unsaved.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}::int4, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
        """
@@ -64,12 +64,12 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into person.personphone default values
+      SQL"""insert into "person"."personphone" default values
             returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
          """
         .executeInsert(PersonphoneRow.rowParser(1).single)
     } else {
-      val q = s"""insert into person.personphone(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "person"."personphone"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
                """
@@ -79,23 +79,23 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[PersonphoneRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersonphoneRow.text, c)
+    streamingInsert(s"""COPY "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersonphoneRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[PersonphoneRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonphoneRowUnsaved.text, c)
+    streamingInsert(s"""COPY "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonphoneRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PersonphoneFields, PersonphoneRow] = {
-    SelectBuilderSql("person.personphone", PersonphoneFields.structure, PersonphoneRow.rowParser)
+    SelectBuilderSql(""""person"."personphone"""", PersonphoneFields.structure, PersonphoneRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PersonphoneRow] = {
     SQL"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
-          from person.personphone
+          from "person"."personphone"
        """.as(PersonphoneRow.rowParser(1).*)
   }
   override def selectById(compositeId: PersonphoneId)(implicit c: Connection): Option[PersonphoneRow] = {
     SQL"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
-          from person.personphone
+          from "person"."personphone"
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "phonenumber" = ${ParameterValue(compositeId.phonenumber, null, Phone.toStatement)} AND "phonenumbertypeid" = ${ParameterValue(compositeId.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}
        """.as(PersonphoneRow.rowParser(1).singleOpt)
   }
@@ -104,7 +104,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     val phonenumber = compositeIds.map(_.phonenumber)
     val phonenumbertypeid = compositeIds.map(_.phonenumbertypeid)
     SQL"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
-          from person.personphone
+          from "person"."personphone"
           where ("businessentityid", "phonenumber", "phonenumbertypeid") 
           in (select unnest(${businessentityid}), unnest(${phonenumber}), unnest(${phonenumbertypeid}))
        """.as(PersonphoneRow.rowParser(1).*)
@@ -115,17 +115,17 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
-    UpdateBuilder("person.personphone", PersonphoneFields.structure, PersonphoneRow.rowParser)
+    UpdateBuilder(""""person"."personphone"""", PersonphoneFields.structure, PersonphoneRow.rowParser)
   }
   override def update(row: PersonphoneRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
-    SQL"""update person.personphone
+    SQL"""update "person"."personphone"
           set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "phonenumber" = ${ParameterValue(compositeId.phonenumber, null, Phone.toStatement)} AND "phonenumbertypeid" = ${ParameterValue(compositeId.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow = {
-    SQL"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
+    SQL"""insert into "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.phonenumber, null, Phone.toStatement)}::varchar,
@@ -152,7 +152,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
+            s"""insert into "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
                 values ({businessentityid}::int4, {phonenumber}::varchar, {phonenumbertypeid}::int4, {modifieddate}::timestamp)
                 on conflict ("businessentityid", "phonenumber", "phonenumbertypeid")
                 do update set
@@ -167,9 +167,9 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[PersonphoneRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table personphone_TEMP (like person.personphone) on commit drop".execute(): @nowarn
+    SQL"""create temporary table personphone_TEMP (like "person"."personphone") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy personphone_TEMP("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") from stdin""", batchSize, unsaved)(PersonphoneRow.text, c): @nowarn
-    SQL"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
+    SQL"""insert into "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
           select * from personphone_TEMP
           on conflict ("businessentityid", "phonenumber", "phonenumbertypeid")
           do update set

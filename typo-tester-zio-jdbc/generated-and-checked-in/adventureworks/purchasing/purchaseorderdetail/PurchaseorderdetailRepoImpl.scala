@@ -19,19 +19,19 @@ import zio.stream.ZStream
 
 class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
-    SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields.structure, PurchaseorderdetailRow.jdbcDecoder)
+    SelectBuilderSql(""""purchasing"."purchaseorderdetail"""", PurchaseorderdetailFields.structure, PurchaseorderdetailRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PurchaseorderdetailRow] = {
-    sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from purchasing.purchaseorderdetail""".query(using PurchaseorderdetailRow.jdbcDecoder).selectStream()
+    sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from "purchasing"."purchaseorderdetail"""".query(using PurchaseorderdetailRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: PurchaseorderdetailId): ZIO[ZConnection, Throwable, Option[PurchaseorderdetailRow]] = {
-    sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from purchasing.purchaseorderdetail where "purchaseorderid" = ${Segment.paramSegment(compositeId.purchaseorderid)(PurchaseorderheaderId.setter)} AND "purchaseorderdetailid" = ${Segment.paramSegment(compositeId.purchaseorderdetailid)(Setter.intSetter)}""".query(using PurchaseorderdetailRow.jdbcDecoder).selectOne
+    sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text from "purchasing"."purchaseorderdetail" where "purchaseorderid" = ${Segment.paramSegment(compositeId.purchaseorderid)(PurchaseorderheaderId.setter)} AND "purchaseorderdetailid" = ${Segment.paramSegment(compositeId.purchaseorderdetailid)(Setter.intSetter)}""".query(using PurchaseorderdetailRow.jdbcDecoder).selectOne
   }
   override def selectByIds(compositeIds: Array[PurchaseorderdetailId]): ZStream[ZConnection, Throwable, PurchaseorderdetailRow] = {
     val purchaseorderid = compositeIds.map(_.purchaseorderid)
     val purchaseorderdetailid = compositeIds.map(_.purchaseorderdetailid)
     sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text
-          from purchasing.purchaseorderdetail
+          from "purchasing"."purchaseorderdetail"
           where ("purchaseorderid", "purchaseorderdetailid")
           in (select unnest(${purchaseorderid}), unnest(${purchaseorderdetailid}))
        """.query(using PurchaseorderdetailRow.jdbcDecoder).selectStream()

@@ -27,20 +27,20 @@ import typo.dsl.UpdateBuilder
 
 class IllustrationRepoImpl extends IllustrationRepo {
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
-    DeleteBuilder("production.illustration", IllustrationFields.structure)
+    DeleteBuilder(""""production"."illustration"""", IllustrationFields.structure)
   }
   override def deleteById(illustrationid: IllustrationId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.illustration where "illustrationid" = ${ParameterValue(illustrationid, null, IllustrationId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "production"."illustration" where "illustrationid" = ${ParameterValue(illustrationid, null, IllustrationId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): Int = {
     SQL"""delete
-          from production.illustration
+          from "production"."illustration"
           where "illustrationid" = ANY(${illustrationids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
-    SQL"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+    SQL"""insert into "production"."illustration"("illustrationid", "diagram", "modifieddate")
           values (${ParameterValue(unsaved.illustrationid, null, IllustrationId.toStatement)}::int4, ${ParameterValue(unsaved.diagram, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "illustrationid", "diagram", "modifieddate"::text
        """
@@ -61,12 +61,12 @@ class IllustrationRepoImpl extends IllustrationRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into production.illustration default values
+      SQL"""insert into "production"."illustration" default values
             returning "illustrationid", "diagram", "modifieddate"::text
          """
         .executeInsert(IllustrationRow.rowParser(1).single)
     } else {
-      val q = s"""insert into production.illustration(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "production"."illustration"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "illustrationid", "diagram", "modifieddate"::text
                """
@@ -76,29 +76,29 @@ class IllustrationRepoImpl extends IllustrationRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[IllustrationRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.illustration("illustrationid", "diagram", "modifieddate") FROM STDIN""", batchSize, unsaved)(IllustrationRow.text, c)
+    streamingInsert(s"""COPY "production"."illustration"("illustrationid", "diagram", "modifieddate") FROM STDIN""", batchSize, unsaved)(IllustrationRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[IllustrationRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.illustration("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(IllustrationRowUnsaved.text, c)
+    streamingInsert(s"""COPY "production"."illustration"("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(IllustrationRowUnsaved.text, c)
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
-    SelectBuilderSql("production.illustration", IllustrationFields.structure, IllustrationRow.rowParser)
+    SelectBuilderSql(""""production"."illustration"""", IllustrationFields.structure, IllustrationRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[IllustrationRow] = {
     SQL"""select "illustrationid", "diagram", "modifieddate"::text
-          from production.illustration
+          from "production"."illustration"
        """.as(IllustrationRow.rowParser(1).*)
   }
   override def selectById(illustrationid: IllustrationId)(implicit c: Connection): Option[IllustrationRow] = {
     SQL"""select "illustrationid", "diagram", "modifieddate"::text
-          from production.illustration
+          from "production"."illustration"
           where "illustrationid" = ${ParameterValue(illustrationid, null, IllustrationId.toStatement)}
        """.as(IllustrationRow.rowParser(1).singleOpt)
   }
   override def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow] = {
     SQL"""select "illustrationid", "diagram", "modifieddate"::text
-          from production.illustration
+          from "production"."illustration"
           where "illustrationid" = ANY(${illustrationids})
        """.as(IllustrationRow.rowParser(1).*)
     
@@ -108,18 +108,18 @@ class IllustrationRepoImpl extends IllustrationRepo {
     illustrationids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
-    UpdateBuilder("production.illustration", IllustrationFields.structure, IllustrationRow.rowParser)
+    UpdateBuilder(""""production"."illustration"""", IllustrationFields.structure, IllustrationRow.rowParser)
   }
   override def update(row: IllustrationRow)(implicit c: Connection): Boolean = {
     val illustrationid = row.illustrationid
-    SQL"""update production.illustration
+    SQL"""update "production"."illustration"
           set "diagram" = ${ParameterValue(row.diagram, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "illustrationid" = ${ParameterValue(illustrationid, null, IllustrationId.toStatement)}
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
-    SQL"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+    SQL"""insert into "production"."illustration"("illustrationid", "diagram", "modifieddate")
           values (
             ${ParameterValue(unsaved.illustrationid, null, IllustrationId.toStatement)}::int4,
             ${ParameterValue(unsaved.diagram, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
@@ -145,7 +145,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+            s"""insert into "production"."illustration"("illustrationid", "diagram", "modifieddate")
                 values ({illustrationid}::int4, {diagram}::xml, {modifieddate}::timestamp)
                 on conflict ("illustrationid")
                 do update set
@@ -161,9 +161,9 @@ class IllustrationRepoImpl extends IllustrationRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[IllustrationRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table illustration_TEMP (like production.illustration) on commit drop".execute(): @nowarn
+    SQL"""create temporary table illustration_TEMP (like "production"."illustration") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy illustration_TEMP("illustrationid", "diagram", "modifieddate") from stdin""", batchSize, unsaved)(IllustrationRow.text, c): @nowarn
-    SQL"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+    SQL"""insert into "production"."illustration"("illustrationid", "diagram", "modifieddate")
           select * from illustration_TEMP
           on conflict ("illustrationid")
           do update set

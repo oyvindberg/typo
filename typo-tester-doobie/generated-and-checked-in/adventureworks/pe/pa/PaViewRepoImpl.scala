@@ -15,9 +15,9 @@ import typo.dsl.SelectBuilderSql
 
 class PaViewRepoImpl extends PaViewRepo {
   override def select: SelectBuilder[PaViewFields, PaViewRow] = {
-    SelectBuilderSql("pe.pa", PaViewFields.structure, PaViewRow.read)
+    SelectBuilderSql(""""pe"."pa"""", PaViewFields.structure, PaViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PaViewRow] = {
-    sql"""select "id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from pe.pa""".query(using PaViewRow.read).stream
+    sql"""select "id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from "pe"."pa"""".query(using PaViewRow.read).stream
   }
 }

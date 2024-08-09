@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class PscViewRepoImpl extends PscViewRepo {
   override def select: SelectBuilder[PscViewFields, PscViewRow] = {
-    SelectBuilderSql("pr.psc", PscViewFields.structure, PscViewRow.rowParser)
+    SelectBuilderSql(""""pr"."psc"""", PscViewFields.structure, PscViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PscViewRow] = {
     SQL"""select "id", "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text
-          from pr.psc
+          from "pr"."psc"
        """.as(PscViewRow.rowParser(1).*)
   }
 }

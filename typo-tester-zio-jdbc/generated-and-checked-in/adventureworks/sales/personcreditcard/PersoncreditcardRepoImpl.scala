@@ -26,23 +26,23 @@ import zio.stream.ZStream
 
 class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def delete: DeleteBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    DeleteBuilder("sales.personcreditcard", PersoncreditcardFields.structure)
+    DeleteBuilder(""""sales"."personcreditcard"""", PersoncreditcardFields.structure)
   }
   override def deleteById(compositeId: PersoncreditcardId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.personcreditcard where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "creditcardid" = ${Segment.paramSegment(compositeId.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "sales"."personcreditcard" where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "creditcardid" = ${Segment.paramSegment(compositeId.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[PersoncreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZIO[ZConnection, Throwable, Long] = {
     val businessentityid = compositeIds.map(_.businessentityid)
     val creditcardid = compositeIds.map(_.creditcardid)
     sql"""delete
-          from sales.personcreditcard
+          from "sales"."personcreditcard"
           where ("businessentityid", "creditcardid")
           in (select unnest(${businessentityid}), unnest(${creditcardid}))
        """.delete
     
   }
   override def insert(unsaved: PersoncreditcardRow): ZIO[ZConnection, Throwable, PersoncreditcardRow] = {
-    sql"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
+    sql"""insert into "sales"."personcreditcard"("businessentityid", "creditcardid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}::int4, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "creditcardid", "modifieddate"::text
        """.insertReturning(using PersoncreditcardRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -58,38 +58,38 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into sales.personcreditcard default values
+      sql"""insert into "sales"."personcreditcard" default values
             returning "businessentityid", "creditcardid", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into sales.personcreditcard($names) values ($values) returning "businessentityid", "creditcardid", "modifieddate"::text"""
+      sql"""insert into "sales"."personcreditcard"($names) values ($values) returning "businessentityid", "creditcardid", "modifieddate"::text"""
     }
     q.insertReturning(using PersoncreditcardRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PersoncreditcardRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersoncreditcardRow.text)
+    streamingInsert(s"""COPY "sales"."personcreditcard"("businessentityid", "creditcardid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PersoncreditcardRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PersoncreditcardRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.personcreditcard("businessentityid", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersoncreditcardRowUnsaved.text)
+    streamingInsert(s"""COPY "sales"."personcreditcard"("businessentityid", "creditcardid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersoncreditcardRowUnsaved.text)
   }
   override def select: SelectBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    SelectBuilderSql("sales.personcreditcard", PersoncreditcardFields.structure, PersoncreditcardRow.jdbcDecoder)
+    SelectBuilderSql(""""sales"."personcreditcard"""", PersoncreditcardFields.structure, PersoncreditcardRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PersoncreditcardRow] = {
-    sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard""".query(using PersoncreditcardRow.jdbcDecoder).selectStream()
+    sql"""select "businessentityid", "creditcardid", "modifieddate"::text from "sales"."personcreditcard"""".query(using PersoncreditcardRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: PersoncreditcardId): ZIO[ZConnection, Throwable, Option[PersoncreditcardRow]] = {
-    sql"""select "businessentityid", "creditcardid", "modifieddate"::text from sales.personcreditcard where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "creditcardid" = ${Segment.paramSegment(compositeId.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".query(using PersoncreditcardRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "creditcardid", "modifieddate"::text from "sales"."personcreditcard" where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "creditcardid" = ${Segment.paramSegment(compositeId.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".query(using PersoncreditcardRow.jdbcDecoder).selectOne
   }
   override def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit encoder0: JdbcEncoder[Array[/* user-picked */ CustomCreditcardId]]): ZStream[ZConnection, Throwable, PersoncreditcardRow] = {
     val businessentityid = compositeIds.map(_.businessentityid)
     val creditcardid = compositeIds.map(_.creditcardid)
     sql"""select "businessentityid", "creditcardid", "modifieddate"::text
-          from sales.personcreditcard
+          from "sales"."personcreditcard"
           where ("businessentityid", "creditcardid")
           in (select unnest(${businessentityid}), unnest(${creditcardid}))
        """.query(using PersoncreditcardRow.jdbcDecoder).selectStream()
@@ -102,16 +102,16 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     }
   }
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
-    UpdateBuilder("sales.personcreditcard", PersoncreditcardFields.structure, PersoncreditcardRow.jdbcDecoder)
+    UpdateBuilder(""""sales"."personcreditcard"""", PersoncreditcardFields.structure, PersoncreditcardRow.jdbcDecoder)
   }
   override def update(row: PersoncreditcardRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
-    sql"""update sales.personcreditcard
+    sql"""update "sales"."personcreditcard"
           set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "creditcardid" = ${Segment.paramSegment(compositeId.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: PersoncreditcardRow): ZIO[ZConnection, Throwable, UpdateResult[PersoncreditcardRow]] = {
-    sql"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
+    sql"""insert into "sales"."personcreditcard"("businessentityid", "creditcardid", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4,
             ${Segment.paramSegment(unsaved.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}::int4,
@@ -124,9 +124,9 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, PersoncreditcardRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table personcreditcard_TEMP (like sales.personcreditcard) on commit drop".execute
+    val created = sql"""create temporary table personcreditcard_TEMP (like "sales"."personcreditcard") on commit drop""".execute
     val copied = streamingInsert(s"""copy personcreditcard_TEMP("businessentityid", "creditcardid", "modifieddate") from stdin""", batchSize, unsaved)(PersoncreditcardRow.text)
-    val merged = sql"""insert into sales.personcreditcard("businessentityid", "creditcardid", "modifieddate")
+    val merged = sql"""insert into "sales"."personcreditcard"("businessentityid", "creditcardid", "modifieddate")
                        select * from personcreditcard_TEMP
                        on conflict ("businessentityid", "creditcardid")
                        do update set

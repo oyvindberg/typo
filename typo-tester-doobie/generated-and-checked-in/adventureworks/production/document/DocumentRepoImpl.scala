@@ -31,16 +31,16 @@ import typo.dsl.UpdateBuilder
 
 class DocumentRepoImpl extends DocumentRepo {
   override def delete: DeleteBuilder[DocumentFields, DocumentRow] = {
-    DeleteBuilder("production.document", DocumentFields.structure)
+    DeleteBuilder(""""production"."document"""", DocumentFields.structure)
   }
   override def deleteById(documentnode: DocumentId): ConnectionIO[Boolean] = {
-    sql"""delete from production.document where "documentnode" = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."document" where "documentnode" = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(documentnodes: Array[DocumentId]): ConnectionIO[Int] = {
-    sql"""delete from production.document where "documentnode" = ANY(${documentnodes})""".update.run
+    sql"""delete from "production"."document" where "documentnode" = ANY(${documentnodes})""".update.run
   }
   override def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
-    sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
+    sql"""insert into "production"."document"("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
           values (${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.owner)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.folderflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.filename)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.fileextension)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.changenumber)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.document)(Write.fromPutOption(TypoBytea.put))}::bytea, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.documentnode)(Write.fromPut(DocumentId.put))})
           returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
        """.query(using DocumentRow.read).unique
@@ -78,12 +78,12 @@ class DocumentRepoImpl extends DocumentRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.document default values
+      sql"""insert into "production"."document" default values
             returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into production.document(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "production"."document"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
          """
@@ -92,23 +92,23 @@ class DocumentRepoImpl extends DocumentRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") FROM STDIN""").copyIn(unsaved, batchSize)(using DocumentRow.text)
+    new FragmentOps(sql"""COPY "production"."document"("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") FROM STDIN""").copyIn(unsaved, batchSize)(using DocumentRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, DocumentRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.document("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using DocumentRowUnsaved.text)
+    new FragmentOps(sql"""COPY "production"."document"("title", "owner", "filename", "fileextension", "revision", "status", "documentsummary", "document", "folderflag", "changenumber", "rowguid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using DocumentRowUnsaved.text)
   }
   override def select: SelectBuilder[DocumentFields, DocumentRow] = {
-    SelectBuilderSql("production.document", DocumentFields.structure, DocumentRow.read)
+    SelectBuilderSql(""""production"."document"""", DocumentFields.structure, DocumentRow.read)
   }
   override def selectAll: Stream[ConnectionIO, DocumentRow] = {
-    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document""".query(using DocumentRow.read).stream
+    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from "production"."document"""".query(using DocumentRow.read).stream
   }
   override def selectById(documentnode: DocumentId): ConnectionIO[Option[DocumentRow]] = {
-    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document where "documentnode" = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}""".query(using DocumentRow.read).option
+    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from "production"."document" where "documentnode" = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}""".query(using DocumentRow.read).option
   }
   override def selectByIds(documentnodes: Array[DocumentId]): Stream[ConnectionIO, DocumentRow] = {
-    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from production.document where "documentnode" = ANY(${documentnodes})""".query(using DocumentRow.read).stream
+    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from "production"."document" where "documentnode" = ANY(${documentnodes})""".query(using DocumentRow.read).stream
   }
   override def selectByIdsTracked(documentnodes: Array[DocumentId]): ConnectionIO[Map[DocumentId, DocumentRow]] = {
     selectByIds(documentnodes).compile.toList.map { rows =>
@@ -118,16 +118,16 @@ class DocumentRepoImpl extends DocumentRepo {
   }
   override def selectByUniqueRowguid(rowguid: TypoUUID): ConnectionIO[Option[DocumentRow]] = {
     sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
-          from production.document
+          from "production"."document"
           where "rowguid" = ${fromWrite(rowguid)(Write.fromPut(TypoUUID.put))}
        """.query(using DocumentRow.read).option
   }
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
-    UpdateBuilder("production.document", DocumentFields.structure, DocumentRow.read)
+    UpdateBuilder(""""production"."document"""", DocumentFields.structure, DocumentRow.read)
   }
   override def update(row: DocumentRow): ConnectionIO[Boolean] = {
     val documentnode = row.documentnode
-    sql"""update production.document
+    sql"""update "production"."document"
           set "title" = ${fromWrite(row.title)(Write.fromPut(Meta.StringMeta.put))},
               "owner" = ${fromWrite(row.owner)(Write.fromPut(BusinessentityId.put))}::int4,
               "folderflag" = ${fromWrite(row.folderflag)(Write.fromPut(Flag.put))}::bool,
@@ -146,7 +146,7 @@ class DocumentRepoImpl extends DocumentRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
-    sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
+    sql"""insert into "production"."document"("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
           values (
             ${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))},
             ${fromWrite(unsaved.owner)(Write.fromPut(BusinessentityId.put))}::int4,
@@ -181,7 +181,7 @@ class DocumentRepoImpl extends DocumentRepo {
   }
   override def upsertBatch(unsaved: List[DocumentRow]): Stream[ConnectionIO, DocumentRow] = {
     Update[DocumentRow](
-      s"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
+      s"""insert into "production"."document"("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
           values (?,?::int4,?::bool,?,?,?::bpchar,?::int4,?::int2,?,?::bytea,?::uuid,?::timestamp,?)
           on conflict ("documentnode")
           do update set
@@ -204,9 +204,9 @@ class DocumentRepoImpl extends DocumentRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, DocumentRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table document_TEMP (like production.document) on commit drop".update.run
+      _ <- sql"""create temporary table document_TEMP (like "production"."document") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy document_TEMP("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode") from stdin""").copyIn(unsaved, batchSize)(using DocumentRow.text)
-      res <- sql"""insert into production.document("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
+      res <- sql"""insert into "production"."document"("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
                    select * from document_TEMP
                    on conflict ("documentnode")
                    do update set

@@ -27,20 +27,20 @@ import typo.dsl.UpdateBuilder
 
 class LocationRepoImpl extends LocationRepo {
   override def delete: DeleteBuilder[LocationFields, LocationRow] = {
-    DeleteBuilder("production.location", LocationFields.structure)
+    DeleteBuilder(""""production"."location"""", LocationFields.structure)
   }
   override def deleteById(locationid: LocationId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.location where "locationid" = ${ParameterValue(locationid, null, LocationId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "production"."location" where "locationid" = ${ParameterValue(locationid, null, LocationId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(locationids: Array[LocationId])(implicit c: Connection): Int = {
     SQL"""delete
-          from production.location
+          from "production"."location"
           where "locationid" = ANY(${locationids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
-    SQL"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
+    SQL"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")
           values (${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.costrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.availability, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "locationid", "name", "costrate", "availability", "modifieddate"::text
        """
@@ -69,12 +69,12 @@ class LocationRepoImpl extends LocationRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into production.location default values
+      SQL"""insert into "production"."location" default values
             returning "locationid", "name", "costrate", "availability", "modifieddate"::text
          """
         .executeInsert(LocationRow.rowParser(1).single)
     } else {
-      val q = s"""insert into production.location(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "production"."location"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "locationid", "name", "costrate", "availability", "modifieddate"::text
                """
@@ -84,29 +84,29 @@ class LocationRepoImpl extends LocationRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[LocationRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.location("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""", batchSize, unsaved)(LocationRow.text, c)
+    streamingInsert(s"""COPY "production"."location"("locationid", "name", "costrate", "availability", "modifieddate") FROM STDIN""", batchSize, unsaved)(LocationRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[LocationRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.location("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(LocationRowUnsaved.text, c)
+    streamingInsert(s"""COPY "production"."location"("name", "locationid", "costrate", "availability", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(LocationRowUnsaved.text, c)
   }
   override def select: SelectBuilder[LocationFields, LocationRow] = {
-    SelectBuilderSql("production.location", LocationFields.structure, LocationRow.rowParser)
+    SelectBuilderSql(""""production"."location"""", LocationFields.structure, LocationRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[LocationRow] = {
     SQL"""select "locationid", "name", "costrate", "availability", "modifieddate"::text
-          from production.location
+          from "production"."location"
        """.as(LocationRow.rowParser(1).*)
   }
   override def selectById(locationid: LocationId)(implicit c: Connection): Option[LocationRow] = {
     SQL"""select "locationid", "name", "costrate", "availability", "modifieddate"::text
-          from production.location
+          from "production"."location"
           where "locationid" = ${ParameterValue(locationid, null, LocationId.toStatement)}
        """.as(LocationRow.rowParser(1).singleOpt)
   }
   override def selectByIds(locationids: Array[LocationId])(implicit c: Connection): List[LocationRow] = {
     SQL"""select "locationid", "name", "costrate", "availability", "modifieddate"::text
-          from production.location
+          from "production"."location"
           where "locationid" = ANY(${locationids})
        """.as(LocationRow.rowParser(1).*)
     
@@ -116,11 +116,11 @@ class LocationRepoImpl extends LocationRepo {
     locationids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
-    UpdateBuilder("production.location", LocationFields.structure, LocationRow.rowParser)
+    UpdateBuilder(""""production"."location"""", LocationFields.structure, LocationRow.rowParser)
   }
   override def update(row: LocationRow)(implicit c: Connection): Boolean = {
     val locationid = row.locationid
-    SQL"""update production.location
+    SQL"""update "production"."location"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "costrate" = ${ParameterValue(row.costrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "availability" = ${ParameterValue(row.availability, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
@@ -129,7 +129,7 @@ class LocationRepoImpl extends LocationRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
-    SQL"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
+    SQL"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")
           values (
             ${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int4,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
@@ -161,7 +161,7 @@ class LocationRepoImpl extends LocationRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
+            s"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")
                 values ({locationid}::int4, {name}::varchar, {costrate}::numeric, {availability}::numeric, {modifieddate}::timestamp)
                 on conflict ("locationid")
                 do update set
@@ -179,9 +179,9 @@ class LocationRepoImpl extends LocationRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[LocationRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table location_TEMP (like production.location) on commit drop".execute(): @nowarn
+    SQL"""create temporary table location_TEMP (like "production"."location") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy location_TEMP("locationid", "name", "costrate", "availability", "modifieddate") from stdin""", batchSize, unsaved)(LocationRow.text, c): @nowarn
-    SQL"""insert into production.location("locationid", "name", "costrate", "availability", "modifieddate")
+    SQL"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")
           select * from location_TEMP
           on conflict ("locationid")
           do update set

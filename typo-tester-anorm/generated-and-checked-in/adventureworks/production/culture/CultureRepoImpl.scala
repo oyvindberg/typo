@@ -26,20 +26,20 @@ import typo.dsl.UpdateBuilder
 
 class CultureRepoImpl extends CultureRepo {
   override def delete: DeleteBuilder[CultureFields, CultureRow] = {
-    DeleteBuilder("production.culture", CultureFields.structure)
+    DeleteBuilder(""""production"."culture"""", CultureFields.structure)
   }
   override def deleteById(cultureid: CultureId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.culture where "cultureid" = ${ParameterValue(cultureid, null, CultureId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "production"."culture" where "cultureid" = ${ParameterValue(cultureid, null, CultureId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(cultureids: Array[CultureId])(implicit c: Connection): Int = {
     SQL"""delete
-          from production.culture
+          from "production"."culture"
           where "cultureid" = ANY(${cultureids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
-    SQL"""insert into production.culture("cultureid", "name", "modifieddate")
+    SQL"""insert into "production"."culture"("cultureid", "name", "modifieddate")
           values (${ParameterValue(unsaved.cultureid, null, CultureId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "cultureid", "name", "modifieddate"::text
        """
@@ -57,12 +57,12 @@ class CultureRepoImpl extends CultureRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into production.culture default values
+      SQL"""insert into "production"."culture" default values
             returning "cultureid", "name", "modifieddate"::text
          """
         .executeInsert(CultureRow.rowParser(1).single)
     } else {
-      val q = s"""insert into production.culture(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "production"."culture"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "cultureid", "name", "modifieddate"::text
                """
@@ -72,29 +72,29 @@ class CultureRepoImpl extends CultureRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[CultureRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CultureRow.text, c)
+    streamingInsert(s"""COPY "production"."culture"("cultureid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CultureRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[CultureRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.culture("cultureid", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CultureRowUnsaved.text, c)
+    streamingInsert(s"""COPY "production"."culture"("cultureid", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CultureRowUnsaved.text, c)
   }
   override def select: SelectBuilder[CultureFields, CultureRow] = {
-    SelectBuilderSql("production.culture", CultureFields.structure, CultureRow.rowParser)
+    SelectBuilderSql(""""production"."culture"""", CultureFields.structure, CultureRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CultureRow] = {
     SQL"""select "cultureid", "name", "modifieddate"::text
-          from production.culture
+          from "production"."culture"
        """.as(CultureRow.rowParser(1).*)
   }
   override def selectById(cultureid: CultureId)(implicit c: Connection): Option[CultureRow] = {
     SQL"""select "cultureid", "name", "modifieddate"::text
-          from production.culture
+          from "production"."culture"
           where "cultureid" = ${ParameterValue(cultureid, null, CultureId.toStatement)}
        """.as(CultureRow.rowParser(1).singleOpt)
   }
   override def selectByIds(cultureids: Array[CultureId])(implicit c: Connection): List[CultureRow] = {
     SQL"""select "cultureid", "name", "modifieddate"::text
-          from production.culture
+          from "production"."culture"
           where "cultureid" = ANY(${cultureids})
        """.as(CultureRow.rowParser(1).*)
     
@@ -104,18 +104,18 @@ class CultureRepoImpl extends CultureRepo {
     cultureids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
-    UpdateBuilder("production.culture", CultureFields.structure, CultureRow.rowParser)
+    UpdateBuilder(""""production"."culture"""", CultureFields.structure, CultureRow.rowParser)
   }
   override def update(row: CultureRow)(implicit c: Connection): Boolean = {
     val cultureid = row.cultureid
-    SQL"""update production.culture
+    SQL"""update "production"."culture"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "cultureid" = ${ParameterValue(cultureid, null, CultureId.toStatement)}
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
-    SQL"""insert into production.culture("cultureid", "name", "modifieddate")
+    SQL"""insert into "production"."culture"("cultureid", "name", "modifieddate")
           values (
             ${ParameterValue(unsaved.cultureid, null, CultureId.toStatement)}::bpchar,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
@@ -141,7 +141,7 @@ class CultureRepoImpl extends CultureRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into production.culture("cultureid", "name", "modifieddate")
+            s"""insert into "production"."culture"("cultureid", "name", "modifieddate")
                 values ({cultureid}::bpchar, {name}::varchar, {modifieddate}::timestamp)
                 on conflict ("cultureid")
                 do update set
@@ -157,9 +157,9 @@ class CultureRepoImpl extends CultureRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[CultureRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table culture_TEMP (like production.culture) on commit drop".execute(): @nowarn
+    SQL"""create temporary table culture_TEMP (like "production"."culture") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy culture_TEMP("cultureid", "name", "modifieddate") from stdin""", batchSize, unsaved)(CultureRow.text, c): @nowarn
-    SQL"""insert into production.culture("cultureid", "name", "modifieddate")
+    SQL"""insert into "production"."culture"("cultureid", "name", "modifieddate")
           select * from culture_TEMP
           on conflict ("cultureid")
           do update set

@@ -28,23 +28,23 @@ import typo.dsl.UpdateBuilder
 
 class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def delete: DeleteBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
-    DeleteBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields.structure)
+    DeleteBuilder(""""humanresources"."employeepayhistory"""", EmployeepayhistoryFields.structure)
   }
   override def deleteById(compositeId: EmployeepayhistoryId)(implicit c: Connection): Boolean = {
-    SQL"""delete from humanresources.employeepayhistory where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "ratechangedate" = ${ParameterValue(compositeId.ratechangedate, null, TypoLocalDateTime.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "humanresources"."employeepayhistory" where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "ratechangedate" = ${ParameterValue(compositeId.ratechangedate, null, TypoLocalDateTime.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): Int = {
     val businessentityid = compositeIds.map(_.businessentityid)
     val ratechangedate = compositeIds.map(_.ratechangedate)
     SQL"""delete
-          from humanresources.employeepayhistory
+          from "humanresources"."employeepayhistory"
           where ("businessentityid", "ratechangedate")
           in (select unnest(${businessentityid}), unnest(${ratechangedate}))
        """.executeUpdate()
     
   }
   override def insert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow = {
-    SQL"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
+    SQL"""insert into "humanresources"."employeepayhistory"("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.ratechangedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.rate, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.payfrequency, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
        """
@@ -64,12 +64,12 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into humanresources.employeepayhistory default values
+      SQL"""insert into "humanresources"."employeepayhistory" default values
             returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
          """
         .executeInsert(EmployeepayhistoryRow.rowParser(1).single)
     } else {
-      val q = s"""insert into humanresources.employeepayhistory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "humanresources"."employeepayhistory"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
                """
@@ -79,23 +79,23 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[EmployeepayhistoryRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN""", batchSize, unsaved)(EmployeepayhistoryRow.text, c)
+    streamingInsert(s"""COPY "humanresources"."employeepayhistory"("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN""", batchSize, unsaved)(EmployeepayhistoryRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[EmployeepayhistoryRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmployeepayhistoryRowUnsaved.text, c)
+    streamingInsert(s"""COPY "humanresources"."employeepayhistory"("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmployeepayhistoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
-    SelectBuilderSql("humanresources.employeepayhistory", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.rowParser)
+    SelectBuilderSql(""""humanresources"."employeepayhistory"""", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[EmployeepayhistoryRow] = {
     SQL"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
-          from humanresources.employeepayhistory
+          from "humanresources"."employeepayhistory"
        """.as(EmployeepayhistoryRow.rowParser(1).*)
   }
   override def selectById(compositeId: EmployeepayhistoryId)(implicit c: Connection): Option[EmployeepayhistoryRow] = {
     SQL"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
-          from humanresources.employeepayhistory
+          from "humanresources"."employeepayhistory"
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "ratechangedate" = ${ParameterValue(compositeId.ratechangedate, null, TypoLocalDateTime.toStatement)}
        """.as(EmployeepayhistoryRow.rowParser(1).singleOpt)
   }
@@ -103,7 +103,7 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     val businessentityid = compositeIds.map(_.businessentityid)
     val ratechangedate = compositeIds.map(_.ratechangedate)
     SQL"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
-          from humanresources.employeepayhistory
+          from "humanresources"."employeepayhistory"
           where ("businessentityid", "ratechangedate") 
           in (select unnest(${businessentityid}), unnest(${ratechangedate}))
        """.as(EmployeepayhistoryRow.rowParser(1).*)
@@ -114,11 +114,11 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
-    UpdateBuilder("humanresources.employeepayhistory", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.rowParser)
+    UpdateBuilder(""""humanresources"."employeepayhistory"""", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.rowParser)
   }
   override def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
-    SQL"""update humanresources.employeepayhistory
+    SQL"""update "humanresources"."employeepayhistory"
           set "rate" = ${ParameterValue(row.rate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "payfrequency" = ${ParameterValue(row.payfrequency, null, TypoShort.toStatement)}::int2,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
@@ -126,7 +126,7 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow = {
-    SQL"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
+    SQL"""insert into "humanresources"."employeepayhistory"("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.ratechangedate, null, TypoLocalDateTime.toStatement)}::timestamp,
@@ -157,7 +157,7 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
+            s"""insert into "humanresources"."employeepayhistory"("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
                 values ({businessentityid}::int4, {ratechangedate}::timestamp, {rate}::numeric, {payfrequency}::int2, {modifieddate}::timestamp)
                 on conflict ("businessentityid", "ratechangedate")
                 do update set
@@ -174,9 +174,9 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[EmployeepayhistoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table employeepayhistory_TEMP (like humanresources.employeepayhistory) on commit drop".execute(): @nowarn
+    SQL"""create temporary table employeepayhistory_TEMP (like "humanresources"."employeepayhistory") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy employeepayhistory_TEMP("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate") from stdin""", batchSize, unsaved)(EmployeepayhistoryRow.text, c): @nowarn
-    SQL"""insert into humanresources.employeepayhistory("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
+    SQL"""insert into "humanresources"."employeepayhistory"("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")
           select * from employeepayhistory_TEMP
           on conflict ("businessentityid", "ratechangedate")
           do update set

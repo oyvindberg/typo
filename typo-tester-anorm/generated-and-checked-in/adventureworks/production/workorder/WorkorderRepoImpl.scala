@@ -29,20 +29,20 @@ import typo.dsl.UpdateBuilder
 
 class WorkorderRepoImpl extends WorkorderRepo {
   override def delete: DeleteBuilder[WorkorderFields, WorkorderRow] = {
-    DeleteBuilder("production.workorder", WorkorderFields.structure)
+    DeleteBuilder(""""production"."workorder"""", WorkorderFields.structure)
   }
   override def deleteById(workorderid: WorkorderId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.workorder where "workorderid" = ${ParameterValue(workorderid, null, WorkorderId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "production"."workorder" where "workorderid" = ${ParameterValue(workorderid, null, WorkorderId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(workorderids: Array[WorkorderId])(implicit c: Connection): Int = {
     SQL"""delete
-          from production.workorder
+          from "production"."workorder"
           where "workorderid" = ANY(${workorderids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
-    SQL"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
+    SQL"""insert into "production"."workorder"("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
           values (${ParameterValue(unsaved.workorderid, null, WorkorderId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.orderqty, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.scrappedqty, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.duedate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.scrapreasonid, null, ToStatement.optionToStatement(ScrapreasonId.toStatement, ScrapreasonId.parameterMetadata))}::int2, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
        """
@@ -69,12 +69,12 @@ class WorkorderRepoImpl extends WorkorderRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into production.workorder default values
+      SQL"""insert into "production"."workorder" default values
             returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
          """
         .executeInsert(WorkorderRow.rowParser(1).single)
     } else {
-      val q = s"""insert into production.workorder(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "production"."workorder"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
                """
@@ -84,29 +84,29 @@ class WorkorderRepoImpl extends WorkorderRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[WorkorderRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""", batchSize, unsaved)(WorkorderRow.text, c)
+    streamingInsert(s"""COPY "production"."workorder"("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") FROM STDIN""", batchSize, unsaved)(WorkorderRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[WorkorderRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.workorder("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(WorkorderRowUnsaved.text, c)
+    streamingInsert(s"""COPY "production"."workorder"("productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "workorderid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(WorkorderRowUnsaved.text, c)
   }
   override def select: SelectBuilder[WorkorderFields, WorkorderRow] = {
-    SelectBuilderSql("production.workorder", WorkorderFields.structure, WorkorderRow.rowParser)
+    SelectBuilderSql(""""production"."workorder"""", WorkorderFields.structure, WorkorderRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[WorkorderRow] = {
     SQL"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
-          from production.workorder
+          from "production"."workorder"
        """.as(WorkorderRow.rowParser(1).*)
   }
   override def selectById(workorderid: WorkorderId)(implicit c: Connection): Option[WorkorderRow] = {
     SQL"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
-          from production.workorder
+          from "production"."workorder"
           where "workorderid" = ${ParameterValue(workorderid, null, WorkorderId.toStatement)}
        """.as(WorkorderRow.rowParser(1).singleOpt)
   }
   override def selectByIds(workorderids: Array[WorkorderId])(implicit c: Connection): List[WorkorderRow] = {
     SQL"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
-          from production.workorder
+          from "production"."workorder"
           where "workorderid" = ANY(${workorderids})
        """.as(WorkorderRow.rowParser(1).*)
     
@@ -116,11 +116,11 @@ class WorkorderRepoImpl extends WorkorderRepo {
     workorderids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
-    UpdateBuilder("production.workorder", WorkorderFields.structure, WorkorderRow.rowParser)
+    UpdateBuilder(""""production"."workorder"""", WorkorderFields.structure, WorkorderRow.rowParser)
   }
   override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
     val workorderid = row.workorderid
-    SQL"""update production.workorder
+    SQL"""update "production"."workorder"
           set "productid" = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
               "orderqty" = ${ParameterValue(row.orderqty, null, ToStatement.intToStatement)}::int4,
               "scrappedqty" = ${ParameterValue(row.scrappedqty, null, TypoShort.toStatement)}::int2,
@@ -133,7 +133,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
-    SQL"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
+    SQL"""insert into "production"."workorder"("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
           values (
             ${ParameterValue(unsaved.workorderid, null, WorkorderId.toStatement)}::int4,
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
@@ -177,7 +177,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
+            s"""insert into "production"."workorder"("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
                 values ({workorderid}::int4, {productid}::int4, {orderqty}::int4, {scrappedqty}::int2, {startdate}::timestamp, {enddate}::timestamp, {duedate}::timestamp, {scrapreasonid}::int2, {modifieddate}::timestamp)
                 on conflict ("workorderid")
                 do update set
@@ -199,9 +199,9 @@ class WorkorderRepoImpl extends WorkorderRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[WorkorderRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table workorder_TEMP (like production.workorder) on commit drop".execute(): @nowarn
+    SQL"""create temporary table workorder_TEMP (like "production"."workorder") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy workorder_TEMP("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate") from stdin""", batchSize, unsaved)(WorkorderRow.text, c): @nowarn
-    SQL"""insert into production.workorder("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
+    SQL"""insert into "production"."workorder"("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
           select * from workorder_TEMP
           on conflict ("workorderid")
           do update set

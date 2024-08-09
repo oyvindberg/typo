@@ -30,20 +30,20 @@ import typo.dsl.UpdateBuilder
 
 class AddressRepoImpl extends AddressRepo {
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
-    DeleteBuilder("person.address", AddressFields.structure)
+    DeleteBuilder(""""person"."address"""", AddressFields.structure)
   }
   override def deleteById(addressid: AddressId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.address where "addressid" = ${ParameterValue(addressid, null, AddressId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "person"."address" where "addressid" = ${ParameterValue(addressid, null, AddressId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(addressids: Array[AddressId])(implicit c: Connection): Int = {
     SQL"""delete
-          from person.address
+          from "person"."address"
           where "addressid" = ANY(${addressids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
-    SQL"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
+    SQL"""insert into "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.addressid, null, AddressId.toStatement)}::int4, ${ParameterValue(unsaved.addressline1, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.addressline2, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.city, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.stateprovinceid, null, StateprovinceId.toStatement)}::int4, ${ParameterValue(unsaved.postalcode, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.spatiallocation, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))}::bytea, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
        """
@@ -73,12 +73,12 @@ class AddressRepoImpl extends AddressRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into person.address default values
+      SQL"""insert into "person"."address" default values
             returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
          """
         .executeInsert(AddressRow.rowParser(1).single)
     } else {
-      val q = s"""insert into person.address(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "person"."address"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
                """
@@ -88,29 +88,29 @@ class AddressRepoImpl extends AddressRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[AddressRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(AddressRow.text, c)
+    streamingInsert(s"""COPY "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(AddressRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[AddressRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.address("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(AddressRowUnsaved.text, c)
+    streamingInsert(s"""COPY "person"."address"("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(AddressRowUnsaved.text, c)
   }
   override def select: SelectBuilder[AddressFields, AddressRow] = {
-    SelectBuilderSql("person.address", AddressFields.structure, AddressRow.rowParser)
+    SelectBuilderSql(""""person"."address"""", AddressFields.structure, AddressRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[AddressRow] = {
     SQL"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
-          from person.address
+          from "person"."address"
        """.as(AddressRow.rowParser(1).*)
   }
   override def selectById(addressid: AddressId)(implicit c: Connection): Option[AddressRow] = {
     SQL"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
-          from person.address
+          from "person"."address"
           where "addressid" = ${ParameterValue(addressid, null, AddressId.toStatement)}
        """.as(AddressRow.rowParser(1).singleOpt)
   }
   override def selectByIds(addressids: Array[AddressId])(implicit c: Connection): List[AddressRow] = {
     SQL"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
-          from person.address
+          from "person"."address"
           where "addressid" = ANY(${addressids})
        """.as(AddressRow.rowParser(1).*)
     
@@ -120,11 +120,11 @@ class AddressRepoImpl extends AddressRepo {
     addressids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
-    UpdateBuilder("person.address", AddressFields.structure, AddressRow.rowParser)
+    UpdateBuilder(""""person"."address"""", AddressFields.structure, AddressRow.rowParser)
   }
   override def update(row: AddressRow)(implicit c: Connection): Boolean = {
     val addressid = row.addressid
-    SQL"""update person.address
+    SQL"""update "person"."address"
           set "addressline1" = ${ParameterValue(row.addressline1, null, ToStatement.stringToStatement)},
               "addressline2" = ${ParameterValue(row.addressline2, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
               "city" = ${ParameterValue(row.city, null, ToStatement.stringToStatement)},
@@ -137,7 +137,7 @@ class AddressRepoImpl extends AddressRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
-    SQL"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
+    SQL"""insert into "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.addressid, null, AddressId.toStatement)}::int4,
             ${ParameterValue(unsaved.addressline1, null, ToStatement.stringToStatement)},
@@ -181,7 +181,7 @@ class AddressRepoImpl extends AddressRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
+            s"""insert into "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
                 values ({addressid}::int4, {addressline1}, {addressline2}, {city}, {stateprovinceid}::int4, {postalcode}, {spatiallocation}::bytea, {rowguid}::uuid, {modifieddate}::timestamp)
                 on conflict ("addressid")
                 do update set
@@ -203,9 +203,9 @@ class AddressRepoImpl extends AddressRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[AddressRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table address_TEMP (like person.address) on commit drop".execute(): @nowarn
+    SQL"""create temporary table address_TEMP (like "person"."address") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy address_TEMP("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(AddressRow.text, c): @nowarn
-    SQL"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
+    SQL"""insert into "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
           select * from address_TEMP
           on conflict ("addressid")
           do update set

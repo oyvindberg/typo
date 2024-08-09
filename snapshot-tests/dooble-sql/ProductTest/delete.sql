@@ -1,1 +1,1 @@
-delete from production.product  where  coalesce((productid = ? ) , ? ) 
+delete from "production"."product"  where  coalesce((productid = ? ) , ? ) 

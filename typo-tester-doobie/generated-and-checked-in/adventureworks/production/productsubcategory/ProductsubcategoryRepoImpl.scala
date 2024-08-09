@@ -28,16 +28,16 @@ import typo.dsl.UpdateBuilder
 
 class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def delete: DeleteBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    DeleteBuilder("production.productsubcategory", ProductsubcategoryFields.structure)
+    DeleteBuilder(""""production"."productsubcategory"""", ProductsubcategoryFields.structure)
   }
   override def deleteById(productsubcategoryid: ProductsubcategoryId): ConnectionIO[Boolean] = {
-    sql"""delete from production.productsubcategory where "productsubcategoryid" = ${fromWrite(productsubcategoryid)(Write.fromPut(ProductsubcategoryId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."productsubcategory" where "productsubcategoryid" = ${fromWrite(productsubcategoryid)(Write.fromPut(ProductsubcategoryId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(productsubcategoryids: Array[ProductsubcategoryId]): ConnectionIO[Int] = {
-    sql"""delete from production.productsubcategory where "productsubcategoryid" = ANY(${productsubcategoryids})""".update.run
+    sql"""delete from "production"."productsubcategory" where "productsubcategoryid" = ANY(${productsubcategoryids})""".update.run
   }
   override def insert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow] = {
-    sql"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
+    sql"""insert into "production"."productsubcategory"("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.productsubcategoryid)(Write.fromPut(ProductsubcategoryId.put))}::int4, ${fromWrite(unsaved.productcategoryid)(Write.fromPut(ProductcategoryId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text
        """.query(using ProductsubcategoryRow.read).unique
@@ -61,12 +61,12 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.productsubcategory default values
+      sql"""insert into "production"."productsubcategory" default values
             returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into production.productsubcategory(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "production"."productsubcategory"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text
          """
@@ -75,23 +75,23 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductsubcategoryRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductsubcategoryRow.text)
+    new FragmentOps(sql"""COPY "production"."productsubcategory"("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductsubcategoryRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductsubcategoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productsubcategory("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductsubcategoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY "production"."productsubcategory"("productcategoryid", "name", "productsubcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductsubcategoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    SelectBuilderSql("production.productsubcategory", ProductsubcategoryFields.structure, ProductsubcategoryRow.read)
+    SelectBuilderSql(""""production"."productsubcategory"""", ProductsubcategoryFields.structure, ProductsubcategoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductsubcategoryRow] = {
-    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory""".query(using ProductsubcategoryRow.read).stream
+    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from "production"."productsubcategory"""".query(using ProductsubcategoryRow.read).stream
   }
   override def selectById(productsubcategoryid: ProductsubcategoryId): ConnectionIO[Option[ProductsubcategoryRow]] = {
-    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory where "productsubcategoryid" = ${fromWrite(productsubcategoryid)(Write.fromPut(ProductsubcategoryId.put))}""".query(using ProductsubcategoryRow.read).option
+    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from "production"."productsubcategory" where "productsubcategoryid" = ${fromWrite(productsubcategoryid)(Write.fromPut(ProductsubcategoryId.put))}""".query(using ProductsubcategoryRow.read).option
   }
   override def selectByIds(productsubcategoryids: Array[ProductsubcategoryId]): Stream[ConnectionIO, ProductsubcategoryRow] = {
-    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productsubcategory where "productsubcategoryid" = ANY(${productsubcategoryids})""".query(using ProductsubcategoryRow.read).stream
+    sql"""select "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text from "production"."productsubcategory" where "productsubcategoryid" = ANY(${productsubcategoryids})""".query(using ProductsubcategoryRow.read).stream
   }
   override def selectByIdsTracked(productsubcategoryids: Array[ProductsubcategoryId]): ConnectionIO[Map[ProductsubcategoryId, ProductsubcategoryRow]] = {
     selectByIds(productsubcategoryids).compile.toList.map { rows =>
@@ -100,11 +100,11 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
     }
   }
   override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
-    UpdateBuilder("production.productsubcategory", ProductsubcategoryFields.structure, ProductsubcategoryRow.read)
+    UpdateBuilder(""""production"."productsubcategory"""", ProductsubcategoryFields.structure, ProductsubcategoryRow.read)
   }
   override def update(row: ProductsubcategoryRow): ConnectionIO[Boolean] = {
     val productsubcategoryid = row.productsubcategoryid
-    sql"""update production.productsubcategory
+    sql"""update "production"."productsubcategory"
           set "productcategoryid" = ${fromWrite(row.productcategoryid)(Write.fromPut(ProductcategoryId.put))}::int4,
               "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
@@ -115,7 +115,7 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow] = {
-    sql"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
+    sql"""insert into "production"."productsubcategory"("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
           values (
             ${fromWrite(unsaved.productsubcategoryid)(Write.fromPut(ProductsubcategoryId.put))}::int4,
             ${fromWrite(unsaved.productcategoryid)(Write.fromPut(ProductcategoryId.put))}::int4,
@@ -134,7 +134,7 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   }
   override def upsertBatch(unsaved: List[ProductsubcategoryRow]): Stream[ConnectionIO, ProductsubcategoryRow] = {
     Update[ProductsubcategoryRow](
-      s"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
+      s"""insert into "production"."productsubcategory"("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
           values (?::int4,?::int4,?::varchar,?::uuid,?::timestamp)
           on conflict ("productsubcategoryid")
           do update set
@@ -149,9 +149,9 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductsubcategoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table productsubcategory_TEMP (like production.productsubcategory) on commit drop".update.run
+      _ <- sql"""create temporary table productsubcategory_TEMP (like "production"."productsubcategory") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy productsubcategory_TEMP("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductsubcategoryRow.text)
-      res <- sql"""insert into production.productsubcategory("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
+      res <- sql"""insert into "production"."productsubcategory"("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")
                    select * from productsubcategory_TEMP
                    on conflict ("productsubcategoryid")
                    do update set

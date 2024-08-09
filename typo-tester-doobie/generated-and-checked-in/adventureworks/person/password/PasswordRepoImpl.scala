@@ -28,16 +28,16 @@ import typo.dsl.UpdateBuilder
 
 class PasswordRepoImpl extends PasswordRepo {
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
-    DeleteBuilder("person.password", PasswordFields.structure)
+    DeleteBuilder(""""person"."password"""", PasswordFields.structure)
   }
   override def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"""delete from person.password where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "person"."password" where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
-    sql"""delete from person.password where "businessentityid" = ANY(${businessentityids})""".update.run
+    sql"""delete from "person"."password" where "businessentityid" = ANY(${businessentityids})""".update.run
   }
   override def insert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
-    sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+    sql"""insert into "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.passwordhash)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.passwordsalt)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
        """.query(using PasswordRow.read).unique
@@ -58,12 +58,12 @@ class PasswordRepoImpl extends PasswordRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into person.password default values
+      sql"""insert into "person"."password" default values
             returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into person.password(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "person"."password"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
          """
@@ -72,23 +72,23 @@ class PasswordRepoImpl extends PasswordRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PasswordRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PasswordRow.text)
+    new FragmentOps(sql"""COPY "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PasswordRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PasswordRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PasswordRowUnsaved.text)
+    new FragmentOps(sql"""COPY "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PasswordRowUnsaved.text)
   }
   override def select: SelectBuilder[PasswordFields, PasswordRow] = {
-    SelectBuilderSql("person.password", PasswordFields.structure, PasswordRow.read)
+    SelectBuilderSql(""""person"."password"""", PasswordFields.structure, PasswordRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PasswordRow] = {
-    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password""".query(using PasswordRow.read).stream
+    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from "person"."password"""".query(using PasswordRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PasswordRow]] = {
-    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using PasswordRow.read).option
+    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from "person"."password" where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using PasswordRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PasswordRow] = {
-    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from person.password where "businessentityid" = ANY(${businessentityids})""".query(using PasswordRow.read).stream
+    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from "person"."password" where "businessentityid" = ANY(${businessentityids})""".query(using PasswordRow.read).stream
   }
   override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, PasswordRow]] = {
     selectByIds(businessentityids).compile.toList.map { rows =>
@@ -97,11 +97,11 @@ class PasswordRepoImpl extends PasswordRepo {
     }
   }
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
-    UpdateBuilder("person.password", PasswordFields.structure, PasswordRow.read)
+    UpdateBuilder(""""person"."password"""", PasswordFields.structure, PasswordRow.read)
   }
   override def update(row: PasswordRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
-    sql"""update person.password
+    sql"""update "person"."password"
           set "passwordhash" = ${fromWrite(row.passwordhash)(Write.fromPut(Meta.StringMeta.put))},
               "passwordsalt" = ${fromWrite(row.passwordsalt)(Write.fromPut(Meta.StringMeta.put))},
               "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
@@ -112,7 +112,7 @@ class PasswordRepoImpl extends PasswordRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
-    sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+    sql"""insert into "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           values (
             ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
             ${fromWrite(unsaved.passwordhash)(Write.fromPut(Meta.StringMeta.put))},
@@ -131,7 +131,7 @@ class PasswordRepoImpl extends PasswordRepo {
   }
   override def upsertBatch(unsaved: List[PasswordRow]): Stream[ConnectionIO, PasswordRow] = {
     Update[PasswordRow](
-      s"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+      s"""insert into "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           values (?::int4,?,?,?::uuid,?::timestamp)
           on conflict ("businessentityid")
           do update set
@@ -146,9 +146,9 @@ class PasswordRepoImpl extends PasswordRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, PasswordRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table password_TEMP (like person.password) on commit drop".update.run
+      _ <- sql"""create temporary table password_TEMP (like "person"."password") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy password_TEMP("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using PasswordRow.text)
-      res <- sql"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+      res <- sql"""insert into "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
                    select * from password_TEMP
                    on conflict ("businessentityid")
                    do update set

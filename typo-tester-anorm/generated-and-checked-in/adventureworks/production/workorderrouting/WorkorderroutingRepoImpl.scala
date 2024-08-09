@@ -30,24 +30,24 @@ import typo.dsl.UpdateBuilder
 
 class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def delete: DeleteBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    DeleteBuilder("production.workorderrouting", WorkorderroutingFields.structure)
+    DeleteBuilder(""""production"."workorderrouting"""", WorkorderroutingFields.structure)
   }
   override def deleteById(compositeId: WorkorderroutingId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.workorderrouting where "workorderid" = ${ParameterValue(compositeId.workorderid, null, WorkorderId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ToStatement.intToStatement)} AND "operationsequence" = ${ParameterValue(compositeId.operationsequence, null, TypoShort.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "production"."workorderrouting" where "workorderid" = ${ParameterValue(compositeId.workorderid, null, WorkorderId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ToStatement.intToStatement)} AND "operationsequence" = ${ParameterValue(compositeId.operationsequence, null, TypoShort.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): Int = {
     val workorderid = compositeIds.map(_.workorderid)
     val productid = compositeIds.map(_.productid)
     val operationsequence = compositeIds.map(_.operationsequence)
     SQL"""delete
-          from production.workorderrouting
+          from "production"."workorderrouting"
           where ("workorderid", "productid", "operationsequence")
           in (select unnest(${workorderid}), unnest(${productid}), unnest(${operationsequence}))
        """.executeUpdate()
     
   }
   override def insert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow = {
-    SQL"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
+    SQL"""insert into "production"."workorderrouting"("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
           values (${ParameterValue(unsaved.workorderid, null, WorkorderId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.operationsequence, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.locationid, null, LocationId.toStatement)}::int2, ${ParameterValue(unsaved.scheduledstartdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.scheduledenddate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.actualstartdate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.actualenddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp, ${ParameterValue(unsaved.actualresourcehrs, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric, ${ParameterValue(unsaved.plannedcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.actualcost, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
        """
@@ -74,12 +74,12 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into production.workorderrouting default values
+      SQL"""insert into "production"."workorderrouting" default values
             returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
          """
         .executeInsert(WorkorderroutingRow.rowParser(1).single)
     } else {
-      val q = s"""insert into production.workorderrouting(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "production"."workorderrouting"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
                """
@@ -89,23 +89,23 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN""", batchSize, unsaved)(WorkorderroutingRow.text, c)
+    streamingInsert(s"""COPY "production"."workorderrouting"("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN""", batchSize, unsaved)(WorkorderroutingRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[WorkorderroutingRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(WorkorderroutingRowUnsaved.text, c)
+    streamingInsert(s"""COPY "production"."workorderrouting"("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(WorkorderroutingRowUnsaved.text, c)
   }
   override def select: SelectBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    SelectBuilderSql("production.workorderrouting", WorkorderroutingFields.structure, WorkorderroutingRow.rowParser)
+    SelectBuilderSql(""""production"."workorderrouting"""", WorkorderroutingFields.structure, WorkorderroutingRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[WorkorderroutingRow] = {
     SQL"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
-          from production.workorderrouting
+          from "production"."workorderrouting"
        """.as(WorkorderroutingRow.rowParser(1).*)
   }
   override def selectById(compositeId: WorkorderroutingId)(implicit c: Connection): Option[WorkorderroutingRow] = {
     SQL"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
-          from production.workorderrouting
+          from "production"."workorderrouting"
           where "workorderid" = ${ParameterValue(compositeId.workorderid, null, WorkorderId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ToStatement.intToStatement)} AND "operationsequence" = ${ParameterValue(compositeId.operationsequence, null, TypoShort.toStatement)}
        """.as(WorkorderroutingRow.rowParser(1).singleOpt)
   }
@@ -114,7 +114,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     val productid = compositeIds.map(_.productid)
     val operationsequence = compositeIds.map(_.operationsequence)
     SQL"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
-          from production.workorderrouting
+          from "production"."workorderrouting"
           where ("workorderid", "productid", "operationsequence") 
           in (select unnest(${workorderid}), unnest(${productid}), unnest(${operationsequence}))
        """.as(WorkorderroutingRow.rowParser(1).*)
@@ -125,11 +125,11 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
-    UpdateBuilder("production.workorderrouting", WorkorderroutingFields.structure, WorkorderroutingRow.rowParser)
+    UpdateBuilder(""""production"."workorderrouting"""", WorkorderroutingFields.structure, WorkorderroutingRow.rowParser)
   }
   override def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
-    SQL"""update production.workorderrouting
+    SQL"""update "production"."workorderrouting"
           set "locationid" = ${ParameterValue(row.locationid, null, LocationId.toStatement)}::int2,
               "scheduledstartdate" = ${ParameterValue(row.scheduledstartdate, null, TypoLocalDateTime.toStatement)}::timestamp,
               "scheduledenddate" = ${ParameterValue(row.scheduledenddate, null, TypoLocalDateTime.toStatement)}::timestamp,
@@ -143,7 +143,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow = {
-    SQL"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
+    SQL"""insert into "production"."workorderrouting"("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
           values (
             ${ParameterValue(unsaved.workorderid, null, WorkorderId.toStatement)}::int4,
             ${ParameterValue(unsaved.productid, null, ToStatement.intToStatement)}::int4,
@@ -194,7 +194,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
+            s"""insert into "production"."workorderrouting"("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
                 values ({workorderid}::int4, {productid}::int4, {operationsequence}::int2, {locationid}::int2, {scheduledstartdate}::timestamp, {scheduledenddate}::timestamp, {actualstartdate}::timestamp, {actualenddate}::timestamp, {actualresourcehrs}::numeric, {plannedcost}::numeric, {actualcost}::numeric, {modifieddate}::timestamp)
                 on conflict ("workorderid", "productid", "operationsequence")
                 do update set
@@ -217,9 +217,9 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[WorkorderroutingRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table workorderrouting_TEMP (like production.workorderrouting) on commit drop".execute(): @nowarn
+    SQL"""create temporary table workorderrouting_TEMP (like "production"."workorderrouting") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy workorderrouting_TEMP("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate") from stdin""", batchSize, unsaved)(WorkorderroutingRow.text, c): @nowarn
-    SQL"""insert into production.workorderrouting("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
+    SQL"""insert into "production"."workorderrouting"("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")
           select * from workorderrouting_TEMP
           on conflict ("workorderid", "productid", "operationsequence")
           do update set

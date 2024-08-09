@@ -32,20 +32,20 @@ import typo.dsl.UpdateBuilder
 
 class VendorRepoImpl extends VendorRepo {
   override def delete: DeleteBuilder[VendorFields, VendorRow] = {
-    DeleteBuilder("purchasing.vendor", VendorFields.structure)
+    DeleteBuilder(""""purchasing"."vendor"""", VendorFields.structure)
   }
   override def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"""delete from purchasing.vendor where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "purchasing"."vendor" where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
     SQL"""delete
-          from purchasing.vendor
+          from "purchasing"."vendor"
           where "businessentityid" = ANY(${businessentityids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
-    SQL"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
+    SQL"""insert into "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.accountnumber, null, AccountNumber.toStatement)}::varchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.creditrating, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.preferredvendorstatus, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.activeflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.purchasingwebserviceurl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
        """
@@ -74,12 +74,12 @@ class VendorRepoImpl extends VendorRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into purchasing.vendor default values
+      SQL"""insert into "purchasing"."vendor" default values
             returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
          """
         .executeInsert(VendorRow.rowParser(1).single)
     } else {
-      val q = s"""insert into purchasing.vendor(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "purchasing"."vendor"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
                """
@@ -89,29 +89,29 @@ class VendorRepoImpl extends VendorRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[VendorRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") FROM STDIN""", batchSize, unsaved)(VendorRow.text, c)
+    streamingInsert(s"""COPY "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") FROM STDIN""", batchSize, unsaved)(VendorRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[VendorRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(VendorRowUnsaved.text, c)
+    streamingInsert(s"""COPY "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(VendorRowUnsaved.text, c)
   }
   override def select: SelectBuilder[VendorFields, VendorRow] = {
-    SelectBuilderSql("purchasing.vendor", VendorFields.structure, VendorRow.rowParser)
+    SelectBuilderSql(""""purchasing"."vendor"""", VendorFields.structure, VendorRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VendorRow] = {
     SQL"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
-          from purchasing.vendor
+          from "purchasing"."vendor"
        """.as(VendorRow.rowParser(1).*)
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[VendorRow] = {
     SQL"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
-          from purchasing.vendor
+          from "purchasing"."vendor"
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.as(VendorRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[VendorRow] = {
     SQL"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
-          from purchasing.vendor
+          from "purchasing"."vendor"
           where "businessentityid" = ANY(${businessentityids})
        """.as(VendorRow.rowParser(1).*)
     
@@ -121,11 +121,11 @@ class VendorRepoImpl extends VendorRepo {
     businessentityids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
-    UpdateBuilder("purchasing.vendor", VendorFields.structure, VendorRow.rowParser)
+    UpdateBuilder(""""purchasing"."vendor"""", VendorFields.structure, VendorRow.rowParser)
   }
   override def update(row: VendorRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
-    SQL"""update purchasing.vendor
+    SQL"""update "purchasing"."vendor"
           set "accountnumber" = ${ParameterValue(row.accountnumber, null, AccountNumber.toStatement)}::varchar,
               "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "creditrating" = ${ParameterValue(row.creditrating, null, TypoShort.toStatement)}::int2,
@@ -137,7 +137,7 @@ class VendorRepoImpl extends VendorRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
-    SQL"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
+    SQL"""insert into "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.accountnumber, null, AccountNumber.toStatement)}::varchar,
@@ -178,7 +178,7 @@ class VendorRepoImpl extends VendorRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
+            s"""insert into "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
                 values ({businessentityid}::int4, {accountnumber}::varchar, {name}::varchar, {creditrating}::int2, {preferredvendorstatus}::bool, {activeflag}::bool, {purchasingwebserviceurl}, {modifieddate}::timestamp)
                 on conflict ("businessentityid")
                 do update set
@@ -199,9 +199,9 @@ class VendorRepoImpl extends VendorRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[VendorRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table vendor_TEMP (like purchasing.vendor) on commit drop".execute(): @nowarn
+    SQL"""create temporary table vendor_TEMP (like "purchasing"."vendor") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy vendor_TEMP("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") from stdin""", batchSize, unsaved)(VendorRow.text, c): @nowarn
-    SQL"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
+    SQL"""insert into "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
           select * from vendor_TEMP
           on conflict ("businessentityid")
           do update set

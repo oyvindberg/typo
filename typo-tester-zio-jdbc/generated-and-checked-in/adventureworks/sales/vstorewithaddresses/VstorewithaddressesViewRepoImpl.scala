@@ -15,9 +15,9 @@ import zio.stream.ZStream
 
 class VstorewithaddressesViewRepoImpl extends VstorewithaddressesViewRepo {
   override def select: SelectBuilder[VstorewithaddressesViewFields, VstorewithaddressesViewRow] = {
-    SelectBuilderSql("sales.vstorewithaddresses", VstorewithaddressesViewFields.structure, VstorewithaddressesViewRow.jdbcDecoder)
+    SelectBuilderSql(""""sales"."vstorewithaddresses"""", VstorewithaddressesViewFields.structure, VstorewithaddressesViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VstorewithaddressesViewRow] = {
-    sql"""select "businessentityid", "name", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname" from sales.vstorewithaddresses""".query(using VstorewithaddressesViewRow.jdbcDecoder).selectStream()
+    sql"""select "businessentityid", "name", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname" from "sales"."vstorewithaddresses"""".query(using VstorewithaddressesViewRow.jdbcDecoder).selectStream()
   }
 }

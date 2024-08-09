@@ -24,16 +24,16 @@ import zio.stream.ZStream
 
 class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   override def delete: DeleteBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    DeleteBuilder("production.transactionhistoryarchive", TransactionhistoryarchiveFields.structure)
+    DeleteBuilder(""""production"."transactionhistoryarchive"""", TransactionhistoryarchiveFields.structure)
   }
   override def deleteById(transactionid: TransactionhistoryarchiveId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.transactionhistoryarchive where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryarchiveId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "production"."transactionhistoryarchive" where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryarchiveId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(transactionids: Array[TransactionhistoryarchiveId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from production.transactionhistoryarchive where "transactionid" = ANY(${transactionids})""".delete
+    sql"""delete from "production"."transactionhistoryarchive" where "transactionid" = ANY(${transactionids})""".delete
   }
   override def insert(unsaved: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, TransactionhistoryarchiveRow] = {
-    sql"""insert into production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
+    sql"""insert into "production"."transactionhistoryarchive"("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (${Segment.paramSegment(unsaved.transactionid)(TransactionhistoryarchiveId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.referenceorderid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.referenceorderlineid)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.transactiondate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.transactiontype)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.quantity)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.actualcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
        """.insertReturning(using TransactionhistoryarchiveRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -61,35 +61,35 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.transactionhistoryarchive default values
+      sql"""insert into "production"."transactionhistoryarchive" default values
             returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into production.transactionhistoryarchive($names) values ($values) returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text"""
+      sql"""insert into "production"."transactionhistoryarchive"($names) values ($values) returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text"""
     }
     q.insertReturning(using TransactionhistoryarchiveRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, TransactionhistoryarchiveRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""", batchSize, unsaved)(TransactionhistoryarchiveRow.text)
+    streamingInsert(s"""COPY "production"."transactionhistoryarchive"("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") FROM STDIN""", batchSize, unsaved)(TransactionhistoryarchiveRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, TransactionhistoryarchiveRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(TransactionhistoryarchiveRowUnsaved.text)
+    streamingInsert(s"""COPY "production"."transactionhistoryarchive"("transactionid", "productid", "referenceorderid", "transactiontype", "quantity", "actualcost", "referenceorderlineid", "transactiondate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(TransactionhistoryarchiveRowUnsaved.text)
   }
   override def select: SelectBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    SelectBuilderSql("production.transactionhistoryarchive", TransactionhistoryarchiveFields.structure, TransactionhistoryarchiveRow.jdbcDecoder)
+    SelectBuilderSql(""""production"."transactionhistoryarchive"""", TransactionhistoryarchiveFields.structure, TransactionhistoryarchiveRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, TransactionhistoryarchiveRow] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistoryarchive""".query(using TransactionhistoryarchiveRow.jdbcDecoder).selectStream()
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from "production"."transactionhistoryarchive"""".query(using TransactionhistoryarchiveRow.jdbcDecoder).selectStream()
   }
   override def selectById(transactionid: TransactionhistoryarchiveId): ZIO[ZConnection, Throwable, Option[TransactionhistoryarchiveRow]] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistoryarchive where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryarchiveId.setter)}""".query(using TransactionhistoryarchiveRow.jdbcDecoder).selectOne
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from "production"."transactionhistoryarchive" where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryarchiveId.setter)}""".query(using TransactionhistoryarchiveRow.jdbcDecoder).selectOne
   }
   override def selectByIds(transactionids: Array[TransactionhistoryarchiveId]): ZStream[ZConnection, Throwable, TransactionhistoryarchiveRow] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from production.transactionhistoryarchive where "transactionid" = ANY(${Segment.paramSegment(transactionids)(TransactionhistoryarchiveId.arraySetter)})""".query(using TransactionhistoryarchiveRow.jdbcDecoder).selectStream()
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from "production"."transactionhistoryarchive" where "transactionid" = ANY(${Segment.paramSegment(transactionids)(TransactionhistoryarchiveId.arraySetter)})""".query(using TransactionhistoryarchiveRow.jdbcDecoder).selectStream()
   }
   override def selectByIdsTracked(transactionids: Array[TransactionhistoryarchiveId]): ZIO[ZConnection, Throwable, Map[TransactionhistoryarchiveId, TransactionhistoryarchiveRow]] = {
     selectByIds(transactionids).runCollect.map { rows =>
@@ -98,11 +98,11 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
     }
   }
   override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
-    UpdateBuilder("production.transactionhistoryarchive", TransactionhistoryarchiveFields.structure, TransactionhistoryarchiveRow.jdbcDecoder)
+    UpdateBuilder(""""production"."transactionhistoryarchive"""", TransactionhistoryarchiveFields.structure, TransactionhistoryarchiveRow.jdbcDecoder)
   }
   override def update(row: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, Boolean] = {
     val transactionid = row.transactionid
-    sql"""update production.transactionhistoryarchive
+    sql"""update "production"."transactionhistoryarchive"
           set "productid" = ${Segment.paramSegment(row.productid)(Setter.intSetter)}::int4,
               "referenceorderid" = ${Segment.paramSegment(row.referenceorderid)(Setter.intSetter)}::int4,
               "referenceorderlineid" = ${Segment.paramSegment(row.referenceorderlineid)(Setter.intSetter)}::int4,
@@ -114,7 +114,7 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
           where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryarchiveId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, UpdateResult[TransactionhistoryarchiveRow]] = {
-    sql"""insert into production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
+    sql"""insert into "production"."transactionhistoryarchive"("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.transactionid)(TransactionhistoryarchiveId.setter)}::int4,
             ${Segment.paramSegment(unsaved.productid)(Setter.intSetter)}::int4,
@@ -140,9 +140,9 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, TransactionhistoryarchiveRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table transactionhistoryarchive_TEMP (like production.transactionhistoryarchive) on commit drop".execute
+    val created = sql"""create temporary table transactionhistoryarchive_TEMP (like "production"."transactionhistoryarchive") on commit drop""".execute
     val copied = streamingInsert(s"""copy transactionhistoryarchive_TEMP("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate") from stdin""", batchSize, unsaved)(TransactionhistoryarchiveRow.text)
-    val merged = sql"""insert into production.transactionhistoryarchive("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
+    val merged = sql"""insert into "production"."transactionhistoryarchive"("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
                        select * from transactionhistoryarchive_TEMP
                        on conflict ("transactionid")
                        do update set

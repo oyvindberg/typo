@@ -28,20 +28,20 @@ import typo.dsl.UpdateBuilder
 
 class PasswordRepoImpl extends PasswordRepo {
   override def delete: DeleteBuilder[PasswordFields, PasswordRow] = {
-    DeleteBuilder("person.password", PasswordFields.structure)
+    DeleteBuilder(""""person"."password"""", PasswordFields.structure)
   }
   override def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.password where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "person"."password" where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
     SQL"""delete
-          from person.password
+          from "person"."password"
           where "businessentityid" = ANY(${businessentityids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
-    SQL"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+    SQL"""insert into "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.passwordhash, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.passwordsalt, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
        """
@@ -64,12 +64,12 @@ class PasswordRepoImpl extends PasswordRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into person.password default values
+      SQL"""insert into "person"."password" default values
             returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
          """
         .executeInsert(PasswordRow.rowParser(1).single)
     } else {
-      val q = s"""insert into person.password(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "person"."password"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
                """
@@ -79,29 +79,29 @@ class PasswordRepoImpl extends PasswordRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[PasswordRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PasswordRow.text, c)
+    streamingInsert(s"""COPY "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(PasswordRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[PasswordRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PasswordRowUnsaved.text, c)
+    streamingInsert(s"""COPY "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PasswordRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PasswordFields, PasswordRow] = {
-    SelectBuilderSql("person.password", PasswordFields.structure, PasswordRow.rowParser)
+    SelectBuilderSql(""""person"."password"""", PasswordFields.structure, PasswordRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PasswordRow] = {
     SQL"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
-          from person.password
+          from "person"."password"
        """.as(PasswordRow.rowParser(1).*)
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[PasswordRow] = {
     SQL"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
-          from person.password
+          from "person"."password"
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.as(PasswordRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PasswordRow] = {
     SQL"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
-          from person.password
+          from "person"."password"
           where "businessentityid" = ANY(${businessentityids})
        """.as(PasswordRow.rowParser(1).*)
     
@@ -111,11 +111,11 @@ class PasswordRepoImpl extends PasswordRepo {
     businessentityids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
-    UpdateBuilder("person.password", PasswordFields.structure, PasswordRow.rowParser)
+    UpdateBuilder(""""person"."password"""", PasswordFields.structure, PasswordRow.rowParser)
   }
   override def update(row: PasswordRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
-    SQL"""update person.password
+    SQL"""update "person"."password"
           set "passwordhash" = ${ParameterValue(row.passwordhash, null, ToStatement.stringToStatement)},
               "passwordsalt" = ${ParameterValue(row.passwordsalt, null, ToStatement.stringToStatement)},
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
@@ -124,7 +124,7 @@ class PasswordRepoImpl extends PasswordRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
-    SQL"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+    SQL"""insert into "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.passwordhash, null, ToStatement.stringToStatement)},
@@ -156,7 +156,7 @@ class PasswordRepoImpl extends PasswordRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+            s"""insert into "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
                 values ({businessentityid}::int4, {passwordhash}, {passwordsalt}, {rowguid}::uuid, {modifieddate}::timestamp)
                 on conflict ("businessentityid")
                 do update set
@@ -174,9 +174,9 @@ class PasswordRepoImpl extends PasswordRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[PasswordRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table password_TEMP (like person.password) on commit drop".execute(): @nowarn
+    SQL"""create temporary table password_TEMP (like "person"."password") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy password_TEMP("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(PasswordRow.text, c): @nowarn
-    SQL"""insert into person.password("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
+    SQL"""insert into "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           select * from password_TEMP
           on conflict ("businessentityid")
           do update set

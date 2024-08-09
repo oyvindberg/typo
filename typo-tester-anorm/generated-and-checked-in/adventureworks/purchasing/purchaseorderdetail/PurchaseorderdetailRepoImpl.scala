@@ -17,16 +17,16 @@ import typo.dsl.SelectBuilderSql
 
 class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
   override def select: SelectBuilder[PurchaseorderdetailFields, PurchaseorderdetailRow] = {
-    SelectBuilderSql("purchasing.purchaseorderdetail", PurchaseorderdetailFields.structure, PurchaseorderdetailRow.rowParser)
+    SelectBuilderSql(""""purchasing"."purchaseorderdetail"""", PurchaseorderdetailFields.structure, PurchaseorderdetailRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PurchaseorderdetailRow] = {
     SQL"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text
-          from purchasing.purchaseorderdetail
+          from "purchasing"."purchaseorderdetail"
        """.as(PurchaseorderdetailRow.rowParser(1).*)
   }
   override def selectById(compositeId: PurchaseorderdetailId)(implicit c: Connection): Option[PurchaseorderdetailRow] = {
     SQL"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text
-          from purchasing.purchaseorderdetail
+          from "purchasing"."purchaseorderdetail"
           where "purchaseorderid" = ${ParameterValue(compositeId.purchaseorderid, null, PurchaseorderheaderId.toStatement)} AND "purchaseorderdetailid" = ${ParameterValue(compositeId.purchaseorderdetailid, null, ToStatement.intToStatement)}
        """.as(PurchaseorderdetailRow.rowParser(1).singleOpt)
   }
@@ -34,7 +34,7 @@ class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     val purchaseorderid = compositeIds.map(_.purchaseorderid)
     val purchaseorderdetailid = compositeIds.map(_.purchaseorderdetailid)
     SQL"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text
-          from purchasing.purchaseorderdetail
+          from "purchasing"."purchaseorderdetail"
           where ("purchaseorderid", "purchaseorderdetailid") 
           in (select unnest(${purchaseorderid}), unnest(${purchaseorderdetailid}))
        """.as(PurchaseorderdetailRow.rowParser(1).*)

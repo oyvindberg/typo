@@ -40,7 +40,7 @@ jobs:
       - name: Start up Postgres
         env:
           PG_MAJOR: ${{ matrix.postgres-version }}
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Run tests
         env:
@@ -77,7 +77,7 @@ jobs:
           extraFiles: bleep.yaml
 
       - name: Start up Postgres
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Build docs
         run: |

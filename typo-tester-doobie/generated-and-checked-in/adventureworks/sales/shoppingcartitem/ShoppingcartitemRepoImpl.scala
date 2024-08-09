@@ -27,16 +27,16 @@ import typo.dsl.UpdateBuilder
 
 class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def delete: DeleteBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    DeleteBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure)
+    DeleteBuilder(""""sales"."shoppingcartitem"""", ShoppingcartitemFields.structure)
   }
   override def deleteById(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Boolean] = {
-    sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."shoppingcartitem" where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(shoppingcartitemids: Array[ShoppingcartitemId]): ConnectionIO[Int] = {
-    sql"""delete from sales.shoppingcartitem where "shoppingcartitemid" = ANY(${shoppingcartitemids})""".update.run
+    sql"""delete from "sales"."shoppingcartitem" where "shoppingcartitemid" = ANY(${shoppingcartitemids})""".update.run
   }
   override def insert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
-    sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
+    sql"""insert into "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
           values (${fromWrite(unsaved.shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}::int4, ${fromWrite(unsaved.shoppingcartid)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.datecreated)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
        """.query(using ShoppingcartitemRow.read).unique
@@ -64,12 +64,12 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into sales.shoppingcartitem default values
+      sql"""insert into "sales"."shoppingcartitem" default values
             returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into sales.shoppingcartitem(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "sales"."shoppingcartitem"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
          """
@@ -78,23 +78,23 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ShoppingcartitemRow.text)
+    new FragmentOps(sql"""COPY "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ShoppingcartitemRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.shoppingcartitem("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ShoppingcartitemRowUnsaved.text)
+    new FragmentOps(sql"""COPY "sales"."shoppingcartitem"("shoppingcartid", "productid", "shoppingcartitemid", "quantity", "datecreated", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ShoppingcartitemRowUnsaved.text)
   }
   override def select: SelectBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    SelectBuilderSql("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.read)
+    SelectBuilderSql(""""sales"."shoppingcartitem"""", ShoppingcartitemFields.structure, ShoppingcartitemRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ShoppingcartitemRow] = {
-    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem""".query(using ShoppingcartitemRow.read).stream
+    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from "sales"."shoppingcartitem"""".query(using ShoppingcartitemRow.read).stream
   }
   override def selectById(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Option[ShoppingcartitemRow]] = {
-    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}""".query(using ShoppingcartitemRow.read).option
+    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from "sales"."shoppingcartitem" where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}""".query(using ShoppingcartitemRow.read).option
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): Stream[ConnectionIO, ShoppingcartitemRow] = {
-    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from sales.shoppingcartitem where "shoppingcartitemid" = ANY(${shoppingcartitemids})""".query(using ShoppingcartitemRow.read).stream
+    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from "sales"."shoppingcartitem" where "shoppingcartitemid" = ANY(${shoppingcartitemids})""".query(using ShoppingcartitemRow.read).stream
   }
   override def selectByIdsTracked(shoppingcartitemids: Array[ShoppingcartitemId]): ConnectionIO[Map[ShoppingcartitemId, ShoppingcartitemRow]] = {
     selectByIds(shoppingcartitemids).compile.toList.map { rows =>
@@ -103,11 +103,11 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     }
   }
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
-    UpdateBuilder("sales.shoppingcartitem", ShoppingcartitemFields.structure, ShoppingcartitemRow.read)
+    UpdateBuilder(""""sales"."shoppingcartitem"""", ShoppingcartitemFields.structure, ShoppingcartitemRow.read)
   }
   override def update(row: ShoppingcartitemRow): ConnectionIO[Boolean] = {
     val shoppingcartitemid = row.shoppingcartitemid
-    sql"""update sales.shoppingcartitem
+    sql"""update "sales"."shoppingcartitem"
           set "shoppingcartid" = ${fromWrite(row.shoppingcartid)(Write.fromPut(Meta.StringMeta.put))},
               "quantity" = ${fromWrite(row.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4,
               "productid" = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
@@ -119,7 +119,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
-    sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
+    sql"""insert into "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
           values (
             ${fromWrite(unsaved.shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}::int4,
             ${fromWrite(unsaved.shoppingcartid)(Write.fromPut(Meta.StringMeta.put))},
@@ -140,7 +140,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   }
   override def upsertBatch(unsaved: List[ShoppingcartitemRow]): Stream[ConnectionIO, ShoppingcartitemRow] = {
     Update[ShoppingcartitemRow](
-      s"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
+      s"""insert into "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
           values (?::int4,?,?::int4,?::int4,?::timestamp,?::timestamp)
           on conflict ("shoppingcartitemid")
           do update set
@@ -156,9 +156,9 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ShoppingcartitemRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table shoppingcartitem_TEMP (like sales.shoppingcartitem) on commit drop".update.run
+      _ <- sql"""create temporary table shoppingcartitem_TEMP (like "sales"."shoppingcartitem") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy shoppingcartitem_TEMP("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ShoppingcartitemRow.text)
-      res <- sql"""insert into sales.shoppingcartitem("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
+      res <- sql"""insert into "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
                    select * from shoppingcartitem_TEMP
                    on conflict ("shoppingcartitemid")
                    do update set

@@ -25,13 +25,13 @@ import zio.stream.ZStream
 
 class PersonRepoImpl extends PersonRepo {
   override def delete: DeleteBuilder[PersonFields, PersonRow] = {
-    DeleteBuilder("compositepk.person", PersonFields.structure)
+    DeleteBuilder(""""compositepk"."person"""", PersonFields.structure)
   }
   override def deleteById(compositeId: PersonId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from compositepk.person where "one" = ${Segment.paramSegment(compositeId.one)(Setter.longSetter)} AND "two" = ${Segment.paramSegment(compositeId.two)(Setter.optionParamSetter(Setter.stringSetter))}""".delete.map(_ > 0)
+    sql"""delete from "compositepk"."person" where "one" = ${Segment.paramSegment(compositeId.one)(Setter.longSetter)} AND "two" = ${Segment.paramSegment(compositeId.two)(Setter.optionParamSetter(Setter.stringSetter))}""".delete.map(_ > 0)
   }
   override def insert(unsaved: PersonRow): ZIO[ZConnection, Throwable, PersonRow] = {
-    sql"""insert into compositepk.person("one", "two", "name")
+    sql"""insert into "compositepk"."person"("one", "two", "name")
           values (${Segment.paramSegment(unsaved.one)(Setter.longSetter)}::int8, ${Segment.paramSegment(unsaved.two)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.name)(Setter.optionParamSetter(Setter.stringSetter))})
           returning "one", "two", "name"
        """.insertReturning(using PersonRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -50,29 +50,29 @@ class PersonRepoImpl extends PersonRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into compositepk.person default values
+      sql"""insert into "compositepk"."person" default values
             returning "one", "two", "name"
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into compositepk.person($names) values ($values) returning "one", "two", "name""""
+      sql"""insert into "compositepk"."person"($names) values ($values) returning "one", "two", "name""""
     }
     q.insertReturning(using PersonRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY compositepk.person("one", "two", "name") FROM STDIN""", batchSize, unsaved)(PersonRow.text)
+    streamingInsert(s"""COPY "compositepk"."person"("one", "two", "name") FROM STDIN""", batchSize, unsaved)(PersonRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY compositepk.person("name", "one", "two") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text)
+    streamingInsert(s"""COPY "compositepk"."person"("name", "one", "two") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PersonRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonFields, PersonRow] = {
-    SelectBuilderSql("compositepk.person", PersonFields.structure, PersonRow.jdbcDecoder)
+    SelectBuilderSql(""""compositepk"."person"""", PersonFields.structure, PersonRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, PersonRow] = {
-    sql"""select "one", "two", "name" from compositepk.person""".query(using PersonRow.jdbcDecoder).selectStream()
+    sql"""select "one", "two", "name" from "compositepk"."person"""".query(using PersonRow.jdbcDecoder).selectStream()
   }
   override def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, PersonRow] = {
     fieldValues match {
@@ -85,18 +85,18 @@ class PersonRepoImpl extends PersonRepo {
             case PersonFieldValue.name(value) => sql""""name" = ${Segment.paramSegment(value)(Setter.optionParamSetter(Setter.stringSetter))}"""
           }
         )
-        sql"""select "one", "two", "name" from compositepk.person where $wheres""".query(using PersonRow.jdbcDecoder).selectStream()
+        sql"""select "one", "two", "name" from "compositepk"."person" where $wheres""".query(using PersonRow.jdbcDecoder).selectStream()
     }
   }
   override def selectById(compositeId: PersonId): ZIO[ZConnection, Throwable, Option[PersonRow]] = {
-    sql"""select "one", "two", "name" from compositepk.person where "one" = ${Segment.paramSegment(compositeId.one)(Setter.longSetter)} AND "two" = ${Segment.paramSegment(compositeId.two)(Setter.optionParamSetter(Setter.stringSetter))}""".query(using PersonRow.jdbcDecoder).selectOne
+    sql"""select "one", "two", "name" from "compositepk"."person" where "one" = ${Segment.paramSegment(compositeId.one)(Setter.longSetter)} AND "two" = ${Segment.paramSegment(compositeId.two)(Setter.optionParamSetter(Setter.stringSetter))}""".query(using PersonRow.jdbcDecoder).selectOne
   }
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
-    UpdateBuilder("compositepk.person", PersonFields.structure, PersonRow.jdbcDecoder)
+    UpdateBuilder(""""compositepk"."person"""", PersonFields.structure, PersonRow.jdbcDecoder)
   }
   override def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
-    sql"""update compositepk.person
+    sql"""update "compositepk"."person"
           set "name" = ${Segment.paramSegment(row.name)(Setter.optionParamSetter(Setter.stringSetter))}
           where "one" = ${Segment.paramSegment(compositeId.one)(Setter.longSetter)} AND "two" = ${Segment.paramSegment(compositeId.two)(Setter.optionParamSetter(Setter.stringSetter))}""".update.map(_ > 0)
   }
@@ -105,14 +105,14 @@ class PersonRepoImpl extends PersonRepo {
       case None           => ZIO.succeed(false)
       case Some(nonEmpty) =>
         val updates = nonEmpty.map { case PersonFieldValue.name(value) => sql""""name" = ${Segment.paramSegment(value)(Setter.optionParamSetter(Setter.stringSetter))}""" }.mkFragment(SqlFragment(", "))
-        sql"""update compositepk.person
+        sql"""update "compositepk"."person"
               set $updates
               where "one" = ${Segment.paramSegment(compositeId.one)(Setter.longSetter)} AND "two" = ${Segment.paramSegment(compositeId.two)(Setter.optionParamSetter(Setter.stringSetter))}
            """.update.map(_ > 0)
     }
   }
   override def upsert(unsaved: PersonRow): ZIO[ZConnection, Throwable, UpdateResult[PersonRow]] = {
-    sql"""insert into compositepk.person("one", "two", "name")
+    sql"""insert into "compositepk"."person"("one", "two", "name")
           values (
             ${Segment.paramSegment(unsaved.one)(Setter.longSetter)}::int8,
             ${Segment.paramSegment(unsaved.two)(Setter.optionParamSetter(Setter.stringSetter))},
@@ -125,9 +125,9 @@ class PersonRepoImpl extends PersonRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, PersonRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table person_TEMP (like compositepk.person) on commit drop".execute
+    val created = sql"""create temporary table person_TEMP (like "compositepk"."person") on commit drop""".execute
     val copied = streamingInsert(s"""copy person_TEMP("one", "two", "name") from stdin""", batchSize, unsaved)(PersonRow.text)
-    val merged = sql"""insert into compositepk.person("one", "two", "name")
+    val merged = sql"""insert into "compositepk"."person"("one", "two", "name")
                        select * from person_TEMP
                        on conflict ("one", "two")
                        do update set

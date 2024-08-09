@@ -22,28 +22,28 @@ import zio.stream.ZStream
 
 class MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilder("myschema.marital_status", MaritalStatusFields.structure)
+    DeleteBuilder(""""myschema"."marital_status"""", MaritalStatusFields.structure)
   }
   override def deleteById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from myschema.marital_status where "id" = ${Segment.paramSegment(id)(MaritalStatusId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "myschema"."marital_status" where "id" = ${Segment.paramSegment(id)(MaritalStatusId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from myschema.marital_status where "id" = ANY(${ids})""".delete
+    sql"""delete from "myschema"."marital_status" where "id" = ANY(${ids})""".delete
   }
   override def insert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, MaritalStatusRow] = {
-    sql"""insert into myschema.marital_status("id")
+    sql"""insert into "myschema"."marital_status"("id")
           values (${Segment.paramSegment(unsaved.id)(MaritalStatusId.setter)}::int8)
           returning "id"
        """.insertReturning(using MaritalStatusRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, MaritalStatusRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY myschema.marital_status("id") FROM STDIN""", batchSize, unsaved)(MaritalStatusRow.text)
+    streamingInsert(s"""COPY "myschema"."marital_status"("id") FROM STDIN""", batchSize, unsaved)(MaritalStatusRow.text)
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    SelectBuilderSql("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.jdbcDecoder)
+    SelectBuilderSql(""""myschema"."marital_status"""", MaritalStatusFields.structure, MaritalStatusRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, MaritalStatusRow] = {
-    sql"""select "id" from myschema.marital_status""".query(using MaritalStatusRow.jdbcDecoder).selectStream()
+    sql"""select "id" from "myschema"."marital_status"""".query(using MaritalStatusRow.jdbcDecoder).selectStream()
   }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, MaritalStatusRow] = {
     fieldValues match {
@@ -54,14 +54,14 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
             case MaritalStatusFieldValue.id(value) => sql""""id" = ${Segment.paramSegment(value)(MaritalStatusId.setter)}"""
           }
         )
-        sql"""select "id" from myschema.marital_status where $wheres""".query(using MaritalStatusRow.jdbcDecoder).selectStream()
+        sql"""select "id" from "myschema"."marital_status" where $wheres""".query(using MaritalStatusRow.jdbcDecoder).selectStream()
     }
   }
   override def selectById(id: MaritalStatusId): ZIO[ZConnection, Throwable, Option[MaritalStatusRow]] = {
-    sql"""select "id" from myschema.marital_status where "id" = ${Segment.paramSegment(id)(MaritalStatusId.setter)}""".query(using MaritalStatusRow.jdbcDecoder).selectOne
+    sql"""select "id" from "myschema"."marital_status" where "id" = ${Segment.paramSegment(id)(MaritalStatusId.setter)}""".query(using MaritalStatusRow.jdbcDecoder).selectOne
   }
   override def selectByIds(ids: Array[MaritalStatusId]): ZStream[ZConnection, Throwable, MaritalStatusRow] = {
-    sql"""select "id" from myschema.marital_status where "id" = ANY(${Segment.paramSegment(ids)(MaritalStatusId.arraySetter)})""".query(using MaritalStatusRow.jdbcDecoder).selectStream()
+    sql"""select "id" from "myschema"."marital_status" where "id" = ANY(${Segment.paramSegment(ids)(MaritalStatusId.arraySetter)})""".query(using MaritalStatusRow.jdbcDecoder).selectStream()
   }
   override def selectByIdsTracked(ids: Array[MaritalStatusId]): ZIO[ZConnection, Throwable, Map[MaritalStatusId, MaritalStatusRow]] = {
     selectByIds(ids).runCollect.map { rows =>
@@ -70,10 +70,10 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     }
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    UpdateBuilder("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.jdbcDecoder)
+    UpdateBuilder(""""myschema"."marital_status"""", MaritalStatusFields.structure, MaritalStatusRow.jdbcDecoder)
   }
   override def upsert(unsaved: MaritalStatusRow): ZIO[ZConnection, Throwable, UpdateResult[MaritalStatusRow]] = {
-    sql"""insert into myschema.marital_status("id")
+    sql"""insert into "myschema"."marital_status"("id")
           values (
             ${Segment.paramSegment(unsaved.id)(MaritalStatusId.setter)}::int8
           )
@@ -83,9 +83,9 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, MaritalStatusRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table marital_status_TEMP (like myschema.marital_status) on commit drop".execute
+    val created = sql"""create temporary table marital_status_TEMP (like "myschema"."marital_status") on commit drop""".execute
     val copied = streamingInsert(s"""copy marital_status_TEMP("id") from stdin""", batchSize, unsaved)(MaritalStatusRow.text)
-    val merged = sql"""insert into myschema.marital_status("id")
+    val merged = sql"""insert into "myschema"."marital_status"("id")
                        select * from marital_status_TEMP
                        on conflict ("id")
                        do nothing

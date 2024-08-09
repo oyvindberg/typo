@@ -15,9 +15,9 @@ import zio.stream.ZStream
 
 class VproductanddescriptionMVRepoImpl extends VproductanddescriptionMVRepo {
   override def select: SelectBuilder[VproductanddescriptionMVFields, VproductanddescriptionMVRow] = {
-    SelectBuilderSql("production.vproductanddescription", VproductanddescriptionMVFields.structure, VproductanddescriptionMVRow.jdbcDecoder)
+    SelectBuilderSql(""""production"."vproductanddescription"""", VproductanddescriptionMVFields.structure, VproductanddescriptionMVRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VproductanddescriptionMVRow] = {
-    sql"""select "productid", "name", "productmodel", "cultureid", "description" from production.vproductanddescription""".query(using VproductanddescriptionMVRow.jdbcDecoder).selectStream()
+    sql"""select "productid", "name", "productmodel", "cultureid", "description" from "production"."vproductanddescription"""".query(using VproductanddescriptionMVRow.jdbcDecoder).selectStream()
   }
 }

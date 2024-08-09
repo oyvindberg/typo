@@ -28,16 +28,16 @@ import typo.dsl.UpdateBuilder
 
 class ProductreviewRepoImpl extends ProductreviewRepo {
   override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
-    DeleteBuilder("production.productreview", ProductreviewFields.structure)
+    DeleteBuilder(""""production"."productreview"""", ProductreviewFields.structure)
   }
   override def deleteById(productreviewid: ProductreviewId): ConnectionIO[Boolean] = {
-    sql"""delete from production.productreview where "productreviewid" = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."productreview" where "productreviewid" = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(productreviewids: Array[ProductreviewId]): ConnectionIO[Int] = {
-    sql"""delete from production.productreview where "productreviewid" = ANY(${productreviewids})""".update.run
+    sql"""delete from "production"."productreview" where "productreviewid" = ANY(${productreviewids})""".update.run
   }
   override def insert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
-    sql"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+    sql"""insert into "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
           values (${fromWrite(unsaved.productreviewid)(Write.fromPut(ProductreviewId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.reviewername)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.reviewdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.emailaddress)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.rating)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.comments)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
        """.query(using ProductreviewRow.read).unique
@@ -64,12 +64,12 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.productreview default values
+      sql"""insert into "production"."productreview" default values
             returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into production.productreview(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "production"."productreview"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
          """
@@ -78,23 +78,23 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductreviewRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductreviewRow.text)
+    new FragmentOps(sql"""COPY "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductreviewRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductreviewRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productreview("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductreviewRowUnsaved.text)
+    new FragmentOps(sql"""COPY "production"."productreview"("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductreviewRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductreviewFields, ProductreviewRow] = {
-    SelectBuilderSql("production.productreview", ProductreviewFields.structure, ProductreviewRow.read)
+    SelectBuilderSql(""""production"."productreview"""", ProductreviewFields.structure, ProductreviewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductreviewRow] = {
-    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview""".query(using ProductreviewRow.read).stream
+    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from "production"."productreview"""".query(using ProductreviewRow.read).stream
   }
   override def selectById(productreviewid: ProductreviewId): ConnectionIO[Option[ProductreviewRow]] = {
-    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview where "productreviewid" = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}""".query(using ProductreviewRow.read).option
+    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from "production"."productreview" where "productreviewid" = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}""".query(using ProductreviewRow.read).option
   }
   override def selectByIds(productreviewids: Array[ProductreviewId]): Stream[ConnectionIO, ProductreviewRow] = {
-    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from production.productreview where "productreviewid" = ANY(${productreviewids})""".query(using ProductreviewRow.read).stream
+    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from "production"."productreview" where "productreviewid" = ANY(${productreviewids})""".query(using ProductreviewRow.read).stream
   }
   override def selectByIdsTracked(productreviewids: Array[ProductreviewId]): ConnectionIO[Map[ProductreviewId, ProductreviewRow]] = {
     selectByIds(productreviewids).compile.toList.map { rows =>
@@ -103,11 +103,11 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     }
   }
   override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
-    UpdateBuilder("production.productreview", ProductreviewFields.structure, ProductreviewRow.read)
+    UpdateBuilder(""""production"."productreview"""", ProductreviewFields.structure, ProductreviewRow.read)
   }
   override def update(row: ProductreviewRow): ConnectionIO[Boolean] = {
     val productreviewid = row.productreviewid
-    sql"""update production.productreview
+    sql"""update "production"."productreview"
           set "productid" = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
               "reviewername" = ${fromWrite(row.reviewername)(Write.fromPut(Name.put))}::varchar,
               "reviewdate" = ${fromWrite(row.reviewdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
@@ -121,7 +121,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
-    sql"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+    sql"""insert into "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
           values (
             ${fromWrite(unsaved.productreviewid)(Write.fromPut(ProductreviewId.put))}::int4,
             ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
@@ -146,7 +146,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
   }
   override def upsertBatch(unsaved: List[ProductreviewRow]): Stream[ConnectionIO, ProductreviewRow] = {
     Update[ProductreviewRow](
-      s"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+      s"""insert into "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
           values (?::int4,?::int4,?::varchar,?::timestamp,?,?::int4,?,?::timestamp)
           on conflict ("productreviewid")
           do update set
@@ -164,9 +164,9 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductreviewRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table productreview_TEMP (like production.productreview) on commit drop".update.run
+      _ <- sql"""create temporary table productreview_TEMP (like "production"."productreview") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy productreview_TEMP("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductreviewRow.text)
-      res <- sql"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+      res <- sql"""insert into "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
                    select * from productreview_TEMP
                    on conflict ("productreviewid")
                    do update set

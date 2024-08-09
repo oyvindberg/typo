@@ -15,9 +15,9 @@ import zio.stream.ZStream
 
 class SohViewRepoImpl extends SohViewRepo {
   override def select: SelectBuilder[SohViewFields, SohViewRow] = {
-    SelectBuilderSql("sa.soh", SohViewFields.structure, SohViewRow.jdbcDecoder)
+    SelectBuilderSql(""""sa"."soh"""", SohViewFields.structure, SohViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SohViewRow] = {
-    sql"""select "id", "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text from sa.soh""".query(using SohViewRow.jdbcDecoder).selectStream()
+    sql"""select "id", "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text from "sa"."soh"""".query(using SohViewRow.jdbcDecoder).selectStream()
   }
 }

@@ -27,16 +27,16 @@ import typo.dsl.UpdateBuilder
 
 class ShiftRepoImpl extends ShiftRepo {
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilder("humanresources.shift", ShiftFields.structure)
+    DeleteBuilder(""""humanresources"."shift"""", ShiftFields.structure)
   }
   override def deleteById(shiftid: ShiftId): ConnectionIO[Boolean] = {
-    sql"""delete from humanresources.shift where "shiftid" = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "humanresources"."shift" where "shiftid" = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(shiftids: Array[ShiftId]): ConnectionIO[Int] = {
-    sql"""delete from humanresources.shift where "shiftid" = ANY(${shiftids})""".update.run
+    sql"""delete from "humanresources"."shift" where "shiftid" = ANY(${shiftids})""".update.run
   }
   override def insert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
-    sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
+    sql"""insert into "humanresources"."shift"("shiftid", "name", "starttime", "endtime", "modifieddate")
           values (${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.starttime)(Write.fromPut(TypoLocalTime.put))}::time, ${fromWrite(unsaved.endtime)(Write.fromPut(TypoLocalTime.put))}::time, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
        """.query(using ShiftRow.read).unique
@@ -57,12 +57,12 @@ class ShiftRepoImpl extends ShiftRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into humanresources.shift default values
+      sql"""insert into "humanresources"."shift" default values
             returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into humanresources.shift(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "humanresources"."shift"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
          """
@@ -71,23 +71,23 @@ class ShiftRepoImpl extends ShiftRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ShiftRow.text)
+    new FragmentOps(sql"""COPY "humanresources"."shift"("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ShiftRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ShiftRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY humanresources.shift("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ShiftRowUnsaved.text)
+    new FragmentOps(sql"""COPY "humanresources"."shift"("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ShiftRowUnsaved.text)
   }
   override def select: SelectBuilder[ShiftFields, ShiftRow] = {
-    SelectBuilderSql("humanresources.shift", ShiftFields.structure, ShiftRow.read)
+    SelectBuilderSql(""""humanresources"."shift"""", ShiftFields.structure, ShiftRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ShiftRow] = {
-    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift""".query(using ShiftRow.read).stream
+    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from "humanresources"."shift"""".query(using ShiftRow.read).stream
   }
   override def selectById(shiftid: ShiftId): ConnectionIO[Option[ShiftRow]] = {
-    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}""".query(using ShiftRow.read).option
+    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from "humanresources"."shift" where "shiftid" = ${fromWrite(shiftid)(Write.fromPut(ShiftId.put))}""".query(using ShiftRow.read).option
   }
   override def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow] = {
-    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ANY(${shiftids})""".query(using ShiftRow.read).stream
+    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from "humanresources"."shift" where "shiftid" = ANY(${shiftids})""".query(using ShiftRow.read).stream
   }
   override def selectByIdsTracked(shiftids: Array[ShiftId]): ConnectionIO[Map[ShiftId, ShiftRow]] = {
     selectByIds(shiftids).compile.toList.map { rows =>
@@ -96,11 +96,11 @@ class ShiftRepoImpl extends ShiftRepo {
     }
   }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilder("humanresources.shift", ShiftFields.structure, ShiftRow.read)
+    UpdateBuilder(""""humanresources"."shift"""", ShiftFields.structure, ShiftRow.read)
   }
   override def update(row: ShiftRow): ConnectionIO[Boolean] = {
     val shiftid = row.shiftid
-    sql"""update humanresources.shift
+    sql"""update "humanresources"."shift"
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               "starttime" = ${fromWrite(row.starttime)(Write.fromPut(TypoLocalTime.put))}::time,
               "endtime" = ${fromWrite(row.endtime)(Write.fromPut(TypoLocalTime.put))}::time,
@@ -111,7 +111,7 @@ class ShiftRepoImpl extends ShiftRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
-    sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
+    sql"""insert into "humanresources"."shift"("shiftid", "name", "starttime", "endtime", "modifieddate")
           values (
             ${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int4,
             ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
@@ -130,7 +130,7 @@ class ShiftRepoImpl extends ShiftRepo {
   }
   override def upsertBatch(unsaved: List[ShiftRow]): Stream[ConnectionIO, ShiftRow] = {
     Update[ShiftRow](
-      s"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
+      s"""insert into "humanresources"."shift"("shiftid", "name", "starttime", "endtime", "modifieddate")
           values (?::int4,?::varchar,?::time,?::time,?::timestamp)
           on conflict ("shiftid")
           do update set
@@ -145,9 +145,9 @@ class ShiftRepoImpl extends ShiftRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ShiftRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table shift_TEMP (like humanresources.shift) on commit drop".update.run
+      _ <- sql"""create temporary table shift_TEMP (like "humanresources"."shift") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy shift_TEMP("shiftid", "name", "starttime", "endtime", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ShiftRow.text)
-      res <- sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
+      res <- sql"""insert into "humanresources"."shift"("shiftid", "name", "starttime", "endtime", "modifieddate")
                    select * from shift_TEMP
                    on conflict ("shiftid")
                    do update set
