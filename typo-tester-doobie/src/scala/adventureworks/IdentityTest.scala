@@ -2,23 +2,23 @@ package adventureworks
 
 import adventureworks.customtypes.*
 import adventureworks.public.identity_test.*
+import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
-
-import scala.annotation.nowarn
 
 class IdentityTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val repo = new IdentityTestRepoImpl()
 
   test("works") {
-    withConnection { implicit c =>
+    withConnection {
       val unsaved = IdentityTestRowUnsaved(IdentityTestId("a"), Defaulted.UseDefault)
-      val inserted = repo.insert(unsaved)
-      val upserted = repo.upsert(inserted)
-      assert(inserted === upserted): @nowarn
-      repo.select.orderBy(_.name.asc).toList === List(
-        IdentityTestRow(1, 1, IdentityTestId("a"))
-      )
+      for {
+        inserted <- repo.insert(unsaved)
+        upserted <- repo.upsert(inserted)
+        _ <- delay(assert(inserted === upserted))
+        rows <- repo.select.orderBy(_.name.asc).toList
+        _ <- delay(rows === List(IdentityTestRow(1, 1, IdentityTestId("a"))))
+      } yield ()
     }
   }
 }

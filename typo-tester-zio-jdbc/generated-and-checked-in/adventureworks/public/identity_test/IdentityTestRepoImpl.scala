@@ -93,7 +93,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
           where "name" = ${Segment.paramSegment(name)(IdentityTestId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, UpdateResult[IdentityTestRow]] = {
-    sql"""insert into "public"."identity-test"("always_generated", "default_generated", "name")
+    sql"""insert into "public"."identity-test"("default_generated", "name")
           values (
             ${Segment.paramSegment(unsaved.defaultGenerated)(Setter.intSetter)}::int4,
             ${Segment.paramSegment(unsaved.name)(IdentityTestId.setter)}

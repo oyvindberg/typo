@@ -413,7 +413,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         }
 
         val sql = SQL {
-          code"""|insert into $relName(${dbNames(cols, isRead = false)})
+          code"""|insert into $relName(${dbNames(writeableColumnsWithId, isRead = false)})
                  |values (
                  |  ${values.mkCode(",\n")}
                  |)

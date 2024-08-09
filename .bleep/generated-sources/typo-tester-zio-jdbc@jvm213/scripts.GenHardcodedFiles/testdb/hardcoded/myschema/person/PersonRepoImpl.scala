@@ -165,7 +165,7 @@ class PersonRepoImpl extends PersonRepo {
     }
   }
   override def upsert(unsaved: PersonRow): ZIO[ZConnection, Throwable, UpdateResult[PersonRow]] = {
-    sql"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number")
+    sql"""insert into "myschema"."person"("id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "favorite_number")
           values (
             ${Segment.paramSegment(unsaved.id)(PersonId.setter)}::int8,
             ${Segment.paramSegment(unsaved.favouriteFootballClubId)(FootballClubId.setter)},

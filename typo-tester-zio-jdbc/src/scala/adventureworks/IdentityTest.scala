@@ -4,21 +4,21 @@ import adventureworks.customtypes.*
 import adventureworks.public.identity_test.*
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
-
-import scala.annotation.nowarn
+import zio.{Chunk, ZIO}
 
 class IdentityTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val repo = new IdentityTestRepoImpl()
 
   test("works") {
-    withConnection { implicit c =>
+    withConnection {
       val unsaved = IdentityTestRowUnsaved(IdentityTestId("a"), Defaulted.UseDefault)
-      val inserted = repo.insert(unsaved)
-      val upserted = repo.upsert(inserted)
-      assert(inserted === upserted): @nowarn
-      repo.select.orderBy(_.name.asc).toList === List(
-        IdentityTestRow(1, 1, IdentityTestId("a"))
-      )
+      for {
+        inserted <- repo.insert(unsaved)
+        upserted <- repo.upsert(inserted)
+        _ <- ZIO.succeed(assert(inserted === upserted.updatedKeys.head))
+        rows <- repo.select.orderBy(_.name.asc).toChunk
+        _ <- ZIO.succeed(rows === Chunk(IdentityTestRow(1, 1, IdentityTestId("a"))))
+      } yield ()
     }
   }
 }
