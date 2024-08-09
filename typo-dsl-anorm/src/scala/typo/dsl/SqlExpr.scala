@@ -111,7 +111,7 @@ object SqlExpr {
     val sqlWriteCast: Option[String]
 
     final def value(ctx: RenderCtx): String = ctx.alias.get(path).fold("")(alias => s"($alias).") + name
-    final def render(ctx: RenderCtx, counter: AtomicInteger): Fragment = Fragment(value(ctx))
+    final def render(ctx: RenderCtx, counter: AtomicInteger): Fragment = Fragment(value(ctx)) ++ Fragment(" ")
   }
 
   sealed trait FieldLikeNotIdNoHkt[NT, R] extends FieldLikeNoHkt[NT, R]

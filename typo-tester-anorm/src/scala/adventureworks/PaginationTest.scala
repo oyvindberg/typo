@@ -75,7 +75,7 @@ class PaginationTest extends AnyFunSuite with TypeCheckedTripleEquals {
             ClientCursor(
               Map(
                 SortOrderRepr("(personbusinessentity0).modifieddate") -> JsString("2020-12-29T00:00:00"),
-                SortOrderRepr("((personbusinessentity0).businessentityid - {param1}::INTEGER):2") -> JsNumber(BigDecimal(1))
+                SortOrderRepr("((personbusinessentity0).businessentityid  - {param1}::INTEGER):2") -> JsNumber(BigDecimal(1))
               )
             )
           )
@@ -91,7 +91,7 @@ class PaginationTest extends AnyFunSuite with TypeCheckedTripleEquals {
             ClientCursor(
               Map(
                 SortOrderRepr("(personbusinessentity0).modifieddate") -> JsString("2020-12-25T00:00:00"),
-                SortOrderRepr("((personbusinessentity0).businessentityid - {param1}::INTEGER):2") -> JsNumber(BigDecimal(15))
+                SortOrderRepr("((personbusinessentity0).businessentityid  - {param1}::INTEGER):2") -> JsNumber(BigDecimal(15))
               )
             )
           )
