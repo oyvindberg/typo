@@ -5,6 +5,7 @@ import adventureworks.humanresources.employee.EmployeeRepoImpl
 import adventureworks.person.businessentity.BusinessentityRepoImpl
 import adventureworks.person.emailaddress.EmailaddressRepoImpl
 import adventureworks.person.person.PersonRepoImpl
+import adventureworks.public.pgtest.PgtestRepoImpl
 import adventureworks.sales.salesperson.SalespersonRepoImpl
 import adventureworks.userdefined.FirstName
 import doobie.free.connection.delay
@@ -43,6 +44,13 @@ class DSLTest extends SnapshotTest {
         _ <- doubled.count.map(v => assert(v == 1))
         _ <- delay(compareFragment("doubled")(doubled.sql))
       } yield ()
+    }
+  }
+
+  test("fix #129") {
+    withConnection {
+      val repo = new PgtestRepoImpl
+      repo.select.where(_.bool).orderBy(_.bool.asc).toList.map(res => assert(res.length === 0))
     }
   }
 }

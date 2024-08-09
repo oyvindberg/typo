@@ -1,1 +1,1 @@
-delete from "production"."product" where coalesce((productid = ?::INTEGER), ?::BOOLEAN)
+delete from "production"."product" where coalesce((productid  = ?::INTEGER), ?::BOOLEAN)

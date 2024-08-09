@@ -66,7 +66,7 @@ class PaginationTest extends AnyFunSuite with TypeCheckedTripleEquals {
                 ClientCursor(
                   Map(
                     SortOrderRepr("(personbusinessentity0).modifieddate") -> new Json.Str("2020-12-29T00:00:00"),
-                    SortOrderRepr("((personbusinessentity0).businessentityid - 2::int4)") -> new Json.Num(java.math.BigDecimal.valueOf(1))
+                    SortOrderRepr("((personbusinessentity0).businessentityid  - 2::int4)") -> new Json.Num(java.math.BigDecimal.valueOf(1))
                   )
                 )
               )
@@ -84,7 +84,7 @@ class PaginationTest extends AnyFunSuite with TypeCheckedTripleEquals {
                 ClientCursor(
                   Map(
                     SortOrderRepr("(personbusinessentity0).modifieddate") -> new Json.Str("2020-12-25T00:00:00"),
-                    SortOrderRepr("((personbusinessentity0).businessentityid - 2::int4)") -> new Json.Num(java.math.BigDecimal.valueOf(15))
+                    SortOrderRepr("((personbusinessentity0).businessentityid  - 2::int4)") -> new Json.Num(java.math.BigDecimal.valueOf(15))
                   )
                 )
               )
