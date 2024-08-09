@@ -18,7 +18,7 @@ object RenderCtx {
 
     val nameForPathsMap: Map[List[Path], String] =
       findPathsAndTableNames(s)
-        .groupMap { case (_, name) => name} { case (path, _) => path }
+        .groupMap { case (_, name) => name } { case (path, _) => path }
         .flatMap { case (sameName, paths) =>
           paths.sorted.zipWithIndex.map { case (path, idx) => path -> s"$sameName$idx" }
         }
