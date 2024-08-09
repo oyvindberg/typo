@@ -41,13 +41,14 @@ case class PersonRow(
       Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: MaritalStatusId,
   workEmail: Option[/* max 254 chars */ String],
-  /** Default: PUBLIC */
+  /** Default: PUBLIC
+      Identity ALWAYS */
   sector: Sector,
   /** Default: one */
   favoriteNumber: Number
 ){
-   def toUnsavedRow(id: Defaulted[PersonId], maritalStatusId: Defaulted[MaritalStatusId] = Defaulted.Provided(this.maritalStatusId), sector: Defaulted[Sector] = Defaulted.Provided(this.sector), favoriteNumber: Defaulted[Number] = Defaulted.Provided(this.favoriteNumber)): PersonRowUnsaved =
-     PersonRowUnsaved(favouriteFootballClubId, name, nickName, blogUrl, email, phone, likesPizza, workEmail, id, maritalStatusId, sector, favoriteNumber)
+   def toUnsavedRow(id: Defaulted[PersonId], maritalStatusId: Defaulted[MaritalStatusId] = Defaulted.Provided(this.maritalStatusId), favoriteNumber: Defaulted[Number] = Defaulted.Provided(this.favoriteNumber)): PersonRowUnsaved =
+     PersonRowUnsaved(favouriteFootballClubId, name, nickName, blogUrl, email, phone, likesPizza, workEmail, id, maritalStatusId, favoriteNumber)
  }
 
 object PersonRow {
@@ -108,8 +109,6 @@ object PersonRow {
     MaritalStatusId.text.unsafeEncode(row.maritalStatusId, sb)
     sb.append(Text.DELIMETER)
     Text.option(Text.stringInstance).unsafeEncode(row.workEmail, sb)
-    sb.append(Text.DELIMETER)
-    Sector.text.unsafeEncode(row.sector, sb)
     sb.append(Text.DELIMETER)
     Number.text.unsafeEncode(row.favoriteNumber, sb)
   }

@@ -38,8 +38,8 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     
   }
   override def insert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow = {
-    SQL"""insert into "public"."identity-test"("always_generated", "default_generated", "name")
-          values (${ParameterValue(unsaved.alwaysGenerated, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.defaultGenerated, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.name, null, IdentityTestId.toStatement)})
+    SQL"""insert into "public"."identity-test"("default_generated", "name")
+          values (${ParameterValue(unsaved.defaultGenerated, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.name, null, IdentityTestId.toStatement)})
           returning "always_generated", "default_generated", "name"
        """
       .executeInsert(IdentityTestRow.rowParser(1).single)
@@ -70,7 +70,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[IdentityTestRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY "public"."identity-test"("always_generated", "default_generated", "name") FROM STDIN""", batchSize, unsaved)(IdentityTestRow.text, c)
+    streamingInsert(s"""COPY "public"."identity-test"("default_generated", "name") FROM STDIN""", batchSize, unsaved)(IdentityTestRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[IdentityTestRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
@@ -107,21 +107,18 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
   override def update(row: IdentityTestRow)(implicit c: Connection): Boolean = {
     val name = row.name
     SQL"""update "public"."identity-test"
-          set "always_generated" = ${ParameterValue(row.alwaysGenerated, null, ToStatement.intToStatement)}::int4,
-              "default_generated" = ${ParameterValue(row.defaultGenerated, null, ToStatement.intToStatement)}::int4
+          set "default_generated" = ${ParameterValue(row.defaultGenerated, null, ToStatement.intToStatement)}::int4
           where "name" = ${ParameterValue(name, null, IdentityTestId.toStatement)}
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow = {
-    SQL"""insert into "public"."identity-test"("always_generated", "default_generated", "name")
+    SQL"""insert into "public"."identity-test"("default_generated", "name")
           values (
-            ${ParameterValue(unsaved.alwaysGenerated, null, ToStatement.intToStatement)}::int4,
             ${ParameterValue(unsaved.defaultGenerated, null, ToStatement.intToStatement)}::int4,
             ${ParameterValue(unsaved.name, null, IdentityTestId.toStatement)}
           )
           on conflict ("name")
           do update set
-            "always_generated" = EXCLUDED."always_generated",
             "default_generated" = EXCLUDED."default_generated"
           returning "always_generated", "default_generated", "name"
        """
@@ -130,7 +127,6 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
   }
   override def upsertBatch(unsaved: Iterable[IdentityTestRow])(implicit c: Connection): List[IdentityTestRow] = {
     def toNamedParameter(row: IdentityTestRow): List[NamedParameter] = List(
-      NamedParameter("always_generated", ParameterValue(row.alwaysGenerated, null, ToStatement.intToStatement)),
       NamedParameter("default_generated", ParameterValue(row.defaultGenerated, null, ToStatement.intToStatement)),
       NamedParameter("name", ParameterValue(row.name, null, IdentityTestId.toStatement))
     )
@@ -139,11 +135,10 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into "public"."identity-test"("always_generated", "default_generated", "name")
-                values ({always_generated}::int4, {default_generated}::int4, {name})
+            s"""insert into "public"."identity-test"("default_generated", "name")
+                values ({default_generated}::int4, {name})
                 on conflict ("name")
                 do update set
-                  "always_generated" = EXCLUDED."always_generated",
                   "default_generated" = EXCLUDED."default_generated"
                 returning "always_generated", "default_generated", "name"
              """,
@@ -156,12 +151,11 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[IdentityTestRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
     SQL"""create temporary table identity-test_TEMP (like "public"."identity-test") on commit drop""".execute(): @nowarn
-    streamingInsert(s"""copy identity-test_TEMP("always_generated", "default_generated", "name") from stdin""", batchSize, unsaved)(IdentityTestRow.text, c): @nowarn
-    SQL"""insert into "public"."identity-test"("always_generated", "default_generated", "name")
+    streamingInsert(s"""copy identity-test_TEMP("default_generated", "name") from stdin""", batchSize, unsaved)(IdentityTestRow.text, c): @nowarn
+    SQL"""insert into "public"."identity-test"("default_generated", "name")
           select * from identity-test_TEMP
           on conflict ("name")
           do update set
-            "always_generated" = EXCLUDED."always_generated",
             "default_generated" = EXCLUDED."default_generated"
           ;
           drop table identity-test_TEMP;""".executeUpdate()

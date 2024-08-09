@@ -216,24 +216,24 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         Right(code"def $name(${id.param}, $varargs): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}")
       case RepoMethod.Update(_, _, _, param, _) =>
         Right(code"def $name($param): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}")
-      case RepoMethod.Insert(_, _, unsavedParam, rowType) =>
+      case RepoMethod.Insert(_, _, unsavedParam, rowType, _) =>
         Right(code"def $name($unsavedParam): ${ZIO.of(ZConnection, Throwable, rowType)}")
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
         Right(code"def $name($unsavedParam): ${ZIO.of(ZConnection, Throwable, rowType)}")
-      case RepoMethod.InsertStreaming(_, _, rowType) =>
+      case RepoMethod.InsertStreaming(_, rowType, _) =>
         val in = ZStream.of(ZConnection, TypesJava.Throwable, rowType)
         val out = ZIO.of(ZConnection, TypesJava.Throwable, TypesScala.Long)
         Right(code"def $name(unsaved: $in, batchSize: Int = 10000): $out")
-      case RepoMethod.UpsertBatch(_, _, _, _) =>
+      case RepoMethod.UpsertBatch(_, _, _, _, _) =>
 //        val in = TypesScala.List.of(rowType)
 //        val out = ZIO.of(ZConnection, TypesJava.Throwable, TypesScala.List.of(rowType))
 //        Right(code"def $name(unsaved: $in): $out")
         Left(DbLib.NotImplementedFor("zio-jdbc"))
-      case RepoMethod.UpsertStreaming(_, _, _, rowType) =>
+      case RepoMethod.UpsertStreaming(_, _, rowType, _) =>
         val in = ZStream.of(ZConnection, TypesJava.Throwable, rowType)
         val out = ZIO.of(ZConnection, TypesJava.Throwable, TypesScala.Long)
         Right(code"def $name(unsaved: $in, batchSize: Int = 10000): $out")
-      case RepoMethod.Upsert(_, _, _, unsavedParam, rowType) =>
+      case RepoMethod.Upsert(_, _, _, unsavedParam, rowType, _) =>
         Right(code"def $name($unsavedParam): ${ZIO.of(ZConnection, Throwable, UpdateResult.of(rowType))}")
       case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
         val in = ZStream.of(ZConnection, TypesJava.Throwable, unsaved.tpe)
@@ -357,10 +357,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
         code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.quotedValue)}, $fieldsType.structure, ${lookupJdbcDecoder(rowType)})"
 
-      case RepoMethod.Update(relName, _, id, param, colsNotId) =>
+      case RepoMethod.Update(relName, _, id, param, writeableCols) =>
         val sql = SQL(
           code"""update $relName
-                |set ${colsNotId.map { col => code"${col.dbName} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${SqlCast.toPgCode(col)}" }.mkCode(",\n")}
+                |set ${writeableCols.map { col => code"${col.dbName} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${SqlCast.toPgCode(col)}" }.mkCode(",\n")}
                 |where ${matchId(id)}""".stripMargin
         )
         code"""|val ${id.paramName} = ${param.name}.${id.paramName}
@@ -398,12 +398,14 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
                |}
                |q.insertReturning(using ${lookupJdbcDecoder(rowType)}).map(_.updatedKeys.head)
                |"""
-      case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType) =>
-        val values = cols.map { c =>
+      case RepoMethod.Upsert(relName, cols, id, unsavedParam, rowType, writeableColumnsWithId) =>
+        val writeableColumnsNotId = writeableColumnsWithId.toList.filterNot(c => id.cols.exists(_.name == c.name))
+
+        val values = writeableColumnsWithId.map { c =>
           code"${runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}", c.tpe)}${SqlCast.toPgCode(c)}"
         }
 
-        val conflictAction = cols.toList.filterNot(c => id.cols.exists(_.name == c.name)) match {
+        val conflictAction = writeableColumnsNotId match {
           case Nil => code"do nothing"
           case nonEmpty =>
             code"""|do update set
@@ -422,10 +424,12 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
 
         code"$sql.insertReturning(using ${lookupJdbcDecoder(rowType)})"
 
-      case RepoMethod.UpsertBatch(_, _, _, _) =>
+      case RepoMethod.UpsertBatch(_, _, _, _, _) =>
         "???"
-      case RepoMethod.UpsertStreaming(relName, cols, id, rowType) =>
-        val conflictAction = cols.toList.filterNot(c => id.cols.exists(_.name == c.name)) match {
+      case RepoMethod.UpsertStreaming(relName, id, rowType, writeableColumnsWithId) =>
+        val writeableColumnsNotId = writeableColumnsWithId.toList.filterNot(c => id.cols.exists(_.name == c.name))
+
+        val conflictAction = writeableColumnsNotId match {
           case Nil => code"do nothing"
           case nonEmpty =>
             code"""|do update set
@@ -433,10 +437,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         }
         val tempTablename = s"${relName.name}_TEMP"
 
-        val copySql = sc.s(code"copy $tempTablename(${dbNames(cols, isRead = false)}) from stdin")
+        val copySql = sc.s(code"copy $tempTablename(${dbNames(writeableColumnsWithId, isRead = false)}) from stdin")
 
         val mergeSql = SQL {
-          code"""|insert into $relName(${dbNames(cols, isRead = false)})
+          code"""|insert into $relName(${dbNames(writeableColumnsWithId, isRead = false)})
                  |select * from $tempTablename
                  |on conflict (${dbNames(id.cols, isRead = false)})
                  |$conflictAction
@@ -448,20 +452,20 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
                |val merged = $mergeSql.update
                |created *> copied *> merged""".stripMargin
 
-      case RepoMethod.Insert(relName, cols, unsavedParam, rowType) =>
-        val values = cols.map { c =>
+      case RepoMethod.Insert(relName, cols, unsavedParam, rowType, writeableColumnsWithId) =>
+        val values = writeableColumnsWithId.map { c =>
           code"${runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}", c.tpe)}${SqlCast.toPgCode(c)}"
         }
         val sql = SQL {
-          code"""|insert into $relName(${dbNames(cols, isRead = false)})
+          code"""|insert into $relName(${dbNames(writeableColumnsWithId, isRead = false)})
                  |values (${values.mkCode(", ")})
                  |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
         }
 
         code"$sql.insertReturning(using ${lookupJdbcDecoder(rowType)}).map(_.updatedKeys.head)"
-      case RepoMethod.InsertStreaming(relName, cols, rowType) =>
-        val sql = sc.s(code"COPY $relName(${dbNames(cols, isRead = false)}) FROM STDIN")
+      case RepoMethod.InsertStreaming(relName, rowType, writeableColumnsWithId) =>
+        val sql = sc.s(code"COPY $relName(${dbNames(writeableColumnsWithId, isRead = false)}) FROM STDIN")
         code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.lookupTextFor(rowType)})"
       case RepoMethod.InsertUnsavedStreaming(relName, unsaved) =>
         val sql = sc.s(code"COPY $relName(${dbNames(unsaved.allCols, isRead = false)}) FROM STDIN (DEFAULT '${textSupport.get.DefaultValue}')")
@@ -587,7 +591,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
               |    case ${TypesScala.None} => false
               |  }
               |}""".stripMargin
-      case RepoMethod.Insert(_, _, unsavedParam, _) =>
+      case RepoMethod.Insert(_, _, unsavedParam, _, _) =>
         code"""|$ZIO.succeed {
                |  val _ =
                |    if (map.contains(${unsavedParam.name}.${id.paramName}))
@@ -597,12 +601,12 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
                |
                |  ${unsavedParam.name}
                |}"""
-      case RepoMethod.Upsert(_, _, _, unsavedParam, _) =>
+      case RepoMethod.Upsert(_, _, _, unsavedParam, _, _) =>
         code"""|$ZIO.succeed {
                |  map.put(${unsavedParam.name}.${id.paramName}, ${unsavedParam.name}): @${TypesScala.nowarn}
                |  $UpdateResult(1, $Chunk.single(${unsavedParam.name}))
                |}""".stripMargin
-      case RepoMethod.UpsertBatch(_, _, id, _) =>
+      case RepoMethod.UpsertBatch(_, _, id, _, _) =>
         code"""|ZIO.succeed {
                |  unsaved.map{ row =>
                |    map += (row.${id.paramName} -> row)

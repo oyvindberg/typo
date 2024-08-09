@@ -38,13 +38,14 @@ case class PersonRow(
       Points to [[marital_status.MaritalStatusRow.id]] */
   maritalStatusId: MaritalStatusId,
   workEmail: Option[/* max 254 chars */ String],
-  /** Default: PUBLIC */
+  /** Default: PUBLIC
+      Identity ALWAYS */
   sector: Sector,
   /** Default: one */
   favoriteNumber: Number
 ){
-   def toUnsavedRow(id: Defaulted[PersonId], maritalStatusId: Defaulted[MaritalStatusId] = Defaulted.Provided(this.maritalStatusId), sector: Defaulted[Sector] = Defaulted.Provided(this.sector), favoriteNumber: Defaulted[Number] = Defaulted.Provided(this.favoriteNumber)): PersonRowUnsaved =
-     PersonRowUnsaved(favouriteFootballClubId, name, nickName, blogUrl, email, phone, likesPizza, workEmail, id, maritalStatusId, sector, favoriteNumber)
+   def toUnsavedRow(id: Defaulted[PersonId], maritalStatusId: Defaulted[MaritalStatusId] = Defaulted.Provided(this.maritalStatusId), favoriteNumber: Defaulted[Number] = Defaulted.Provided(this.favoriteNumber)): PersonRowUnsaved =
+     PersonRowUnsaved(favouriteFootballClubId, name, nickName, blogUrl, email, phone, likesPizza, workEmail, id, maritalStatusId, favoriteNumber)
  }
 
 object PersonRow {
@@ -101,8 +102,6 @@ object PersonRow {
     sb.append(Text.DELIMETER)
     Text.option(Text.stringInstance).unsafeEncode(row.workEmail, sb)
     sb.append(Text.DELIMETER)
-    Sector.text.unsafeEncode(row.sector, sb)
-    sb.append(Text.DELIMETER)
     Number.text.unsafeEncode(row.favoriteNumber, sb)
   }
   implicit lazy val write: Write[PersonRow] = new Write[PersonRow](
@@ -116,9 +115,8 @@ object PersonRow {
                 (Meta.BooleanMeta.put, Nullability.NoNulls),
                 (MaritalStatusId.put, Nullability.NoNulls),
                 (Meta.StringMeta.put, Nullability.Nullable),
-                (Sector.put, Nullability.NoNulls),
                 (Number.put, Nullability.NoNulls)),
-    toList = x => List(x.id, x.favouriteFootballClubId, x.name, x.nickName, x.blogUrl, x.email, x.phone, x.likesPizza, x.maritalStatusId, x.workEmail, x.sector, x.favoriteNumber),
+    toList = x => List(x.id, x.favouriteFootballClubId, x.name, x.nickName, x.blogUrl, x.email, x.phone, x.likesPizza, x.maritalStatusId, x.workEmail, x.favoriteNumber),
     unsafeSet = (rs, i, a) => {
                   PersonId.put.unsafeSetNonNullable(rs, i + 0, a.id)
                   FootballClubId.put.unsafeSetNonNullable(rs, i + 1, a.favouriteFootballClubId)
@@ -130,8 +128,7 @@ object PersonRow {
                   Meta.BooleanMeta.put.unsafeSetNonNullable(rs, i + 7, a.likesPizza)
                   MaritalStatusId.put.unsafeSetNonNullable(rs, i + 8, a.maritalStatusId)
                   Meta.StringMeta.put.unsafeSetNullable(rs, i + 9, a.workEmail)
-                  Sector.put.unsafeSetNonNullable(rs, i + 10, a.sector)
-                  Number.put.unsafeSetNonNullable(rs, i + 11, a.favoriteNumber)
+                  Number.put.unsafeSetNonNullable(rs, i + 10, a.favoriteNumber)
                 },
     unsafeUpdate = (ps, i, a) => {
                      PersonId.put.unsafeUpdateNonNullable(ps, i + 0, a.id)
@@ -144,8 +141,7 @@ object PersonRow {
                      Meta.BooleanMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.likesPizza)
                      MaritalStatusId.put.unsafeUpdateNonNullable(ps, i + 8, a.maritalStatusId)
                      Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 9, a.workEmail)
-                     Sector.put.unsafeUpdateNonNullable(ps, i + 10, a.sector)
-                     Number.put.unsafeUpdateNonNullable(ps, i + 11, a.favoriteNumber)
+                     Number.put.unsafeUpdateNonNullable(ps, i + 10, a.favoriteNumber)
                    }
   )
 }
