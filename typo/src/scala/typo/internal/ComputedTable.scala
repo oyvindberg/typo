@@ -192,12 +192,12 @@ case class ComputedTable(
         },
         for {
           writeableColumnsWithId <- writeableColumnsWithId
-          if options.enableStreamingInserts
+          _ <- if (options.enableStreamingInserts) Some(()) else None // weird syntax because of scala 2.13
         } yield RepoMethod.InsertStreaming(dbTable.name, names.RowName, writeableColumnsWithId),
         for {
           id <- maybeId
           writeableColumnsWithId <- writeableColumnsWithId
-          if options.enableStreamingInserts
+          _ <- if (options.enableStreamingInserts) Some(()) else None // weird syntax because of scala 2.13
         } yield RepoMethod.UpsertStreaming(dbTable.name, id, names.RowName, writeableColumnsWithId),
         for {
           id <- maybeId
