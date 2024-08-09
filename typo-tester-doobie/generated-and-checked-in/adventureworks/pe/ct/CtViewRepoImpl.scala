@@ -15,9 +15,9 @@ import typo.dsl.SelectBuilderSql
 
 class CtViewRepoImpl extends CtViewRepo {
   override def select: SelectBuilder[CtViewFields, CtViewRow] = {
-    SelectBuilderSql("pe.ct", CtViewFields.structure, CtViewRow.read)
+    SelectBuilderSql(""""pe"."ct"""", CtViewFields.structure, CtViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CtViewRow] = {
-    sql"""select "id", "contacttypeid", "name", "modifieddate"::text from pe.ct""".query(using CtViewRow.read).stream
+    sql"""select "id", "contacttypeid", "name", "modifieddate"::text from "pe"."ct"""".query(using CtViewRow.read).stream
   }
 }

@@ -29,16 +29,16 @@ import zio.stream.ZStream
 
 class StateprovinceRepoImpl extends StateprovinceRepo {
   override def delete: DeleteBuilder[StateprovinceFields, StateprovinceRow] = {
-    DeleteBuilder("person.stateprovince", StateprovinceFields.structure)
+    DeleteBuilder(""""person"."stateprovince"""", StateprovinceFields.structure)
   }
   override def deleteById(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from person.stateprovince where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "person"."stateprovince" where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(stateprovinceids: Array[StateprovinceId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from person.stateprovince where "stateprovinceid" = ANY(${stateprovinceids})""".delete
+    sql"""delete from "person"."stateprovince" where "stateprovinceid" = ANY(${stateprovinceids})""".delete
   }
   override def insert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, StateprovinceRow] = {
-    sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
+    sql"""insert into "person"."stateprovince"("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4, ${Segment.paramSegment(unsaved.stateprovincecode)(Setter.stringSetter)}::bpchar, ${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}, ${Segment.paramSegment(unsaved.isonlystateprovinceflag)(Flag.setter)}::bool, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.territoryid)(SalesterritoryId.setter)}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
        """.insertReturning(using StateprovinceRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -68,35 +68,35 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into person.stateprovince default values
+      sql"""insert into "person"."stateprovince" default values
             returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into person.stateprovince($names) values ($values) returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text"""
+      sql"""insert into "person"."stateprovince"($names) values ($values) returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text"""
     }
     q.insertReturning(using StateprovinceRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StateprovinceRow.text)
+    streamingInsert(s"""COPY "person"."stateprovince"("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(StateprovinceRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY person.stateprovince("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StateprovinceRowUnsaved.text)
+    streamingInsert(s"""COPY "person"."stateprovince"("stateprovincecode", "countryregioncode", "name", "territoryid", "stateprovinceid", "isonlystateprovinceflag", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(StateprovinceRowUnsaved.text)
   }
   override def select: SelectBuilder[StateprovinceFields, StateprovinceRow] = {
-    SelectBuilderSql("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.jdbcDecoder)
+    SelectBuilderSql(""""person"."stateprovince"""", StateprovinceFields.structure, StateprovinceRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, StateprovinceRow] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince""".query(using StateprovinceRow.jdbcDecoder).selectStream()
+    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from "person"."stateprovince"""".query(using StateprovinceRow.jdbcDecoder).selectStream()
   }
   override def selectById(stateprovinceid: StateprovinceId): ZIO[ZConnection, Throwable, Option[StateprovinceRow]] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".query(using StateprovinceRow.jdbcDecoder).selectOne
+    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from "person"."stateprovince" where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".query(using StateprovinceRow.jdbcDecoder).selectOne
   }
   override def selectByIds(stateprovinceids: Array[StateprovinceId]): ZStream[ZConnection, Throwable, StateprovinceRow] = {
-    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from person.stateprovince where "stateprovinceid" = ANY(${Segment.paramSegment(stateprovinceids)(StateprovinceId.arraySetter)})""".query(using StateprovinceRow.jdbcDecoder).selectStream()
+    sql"""select "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text from "person"."stateprovince" where "stateprovinceid" = ANY(${Segment.paramSegment(stateprovinceids)(StateprovinceId.arraySetter)})""".query(using StateprovinceRow.jdbcDecoder).selectStream()
   }
   override def selectByIdsTracked(stateprovinceids: Array[StateprovinceId]): ZIO[ZConnection, Throwable, Map[StateprovinceId, StateprovinceRow]] = {
     selectByIds(stateprovinceids).runCollect.map { rows =>
@@ -105,11 +105,11 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
     }
   }
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
-    UpdateBuilder("person.stateprovince", StateprovinceFields.structure, StateprovinceRow.jdbcDecoder)
+    UpdateBuilder(""""person"."stateprovince"""", StateprovinceFields.structure, StateprovinceRow.jdbcDecoder)
   }
   override def update(row: StateprovinceRow): ZIO[ZConnection, Throwable, Boolean] = {
     val stateprovinceid = row.stateprovinceid
-    sql"""update person.stateprovince
+    sql"""update "person"."stateprovince"
           set "stateprovincecode" = ${Segment.paramSegment(row.stateprovincecode)(Setter.stringSetter)}::bpchar,
               "countryregioncode" = ${Segment.paramSegment(row.countryregioncode)(CountryregionId.setter)},
               "isonlystateprovinceflag" = ${Segment.paramSegment(row.isonlystateprovinceflag)(Flag.setter)}::bool,
@@ -120,7 +120,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
           where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, UpdateResult[StateprovinceRow]] = {
-    sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
+    sql"""insert into "person"."stateprovince"("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4,
             ${Segment.paramSegment(unsaved.stateprovincecode)(Setter.stringSetter)}::bpchar,
@@ -144,9 +144,9 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, StateprovinceRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table stateprovince_TEMP (like person.stateprovince) on commit drop".execute
+    val created = sql"""create temporary table stateprovince_TEMP (like "person"."stateprovince") on commit drop""".execute
     val copied = streamingInsert(s"""copy stateprovince_TEMP("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(StateprovinceRow.text)
-    val merged = sql"""insert into person.stateprovince("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
+    val merged = sql"""insert into "person"."stateprovince"("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")
                        select * from stateprovince_TEMP
                        on conflict ("stateprovinceid")
                        do update set

@@ -15,9 +15,9 @@ import typo.dsl.SelectBuilderSql
 
 class SrViewRepoImpl extends SrViewRepo {
   override def select: SelectBuilder[SrViewFields, SrViewRow] = {
-    SelectBuilderSql("pr.sr", SrViewFields.structure, SrViewRow.read)
+    SelectBuilderSql(""""pr"."sr"""", SrViewFields.structure, SrViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SrViewRow] = {
-    sql"""select "id", "scrapreasonid", "name", "modifieddate"::text from pr.sr""".query(using SrViewRow.read).stream
+    sql"""select "id", "scrapreasonid", "name", "modifieddate"::text from "pr"."sr"""".query(using SrViewRow.read).stream
   }
 }

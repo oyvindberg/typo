@@ -27,16 +27,16 @@ import typo.dsl.UpdateBuilder
 
 class AddresstypeRepoImpl extends AddresstypeRepo {
   override def delete: DeleteBuilder[AddresstypeFields, AddresstypeRow] = {
-    DeleteBuilder("person.addresstype", AddresstypeFields.structure)
+    DeleteBuilder(""""person"."addresstype"""", AddresstypeFields.structure)
   }
   override def deleteById(addresstypeid: AddresstypeId): ConnectionIO[Boolean] = {
-    sql"""delete from person.addresstype where "addresstypeid" = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "person"."addresstype" where "addresstypeid" = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(addresstypeids: Array[AddresstypeId]): ConnectionIO[Int] = {
-    sql"""delete from person.addresstype where "addresstypeid" = ANY(${addresstypeids})""".update.run
+    sql"""delete from "person"."addresstype" where "addresstypeid" = ANY(${addresstypeids})""".update.run
   }
   override def insert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
-    sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
+    sql"""insert into "person"."addresstype"("addresstypeid", "name", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.addresstypeid)(Write.fromPut(AddresstypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "addresstypeid", "name", "rowguid", "modifieddate"::text
        """.query(using AddresstypeRow.read).unique
@@ -59,12 +59,12 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into person.addresstype default values
+      sql"""insert into "person"."addresstype" default values
             returning "addresstypeid", "name", "rowguid", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into person.addresstype(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "person"."addresstype"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "addresstypeid", "name", "rowguid", "modifieddate"::text
          """
@@ -73,23 +73,23 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, AddresstypeRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.addresstype("addresstypeid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using AddresstypeRow.text)
+    new FragmentOps(sql"""COPY "person"."addresstype"("addresstypeid", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using AddresstypeRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, AddresstypeRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.addresstype("name", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using AddresstypeRowUnsaved.text)
+    new FragmentOps(sql"""COPY "person"."addresstype"("name", "addresstypeid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using AddresstypeRowUnsaved.text)
   }
   override def select: SelectBuilder[AddresstypeFields, AddresstypeRow] = {
-    SelectBuilderSql("person.addresstype", AddresstypeFields.structure, AddresstypeRow.read)
+    SelectBuilderSql(""""person"."addresstype"""", AddresstypeFields.structure, AddresstypeRow.read)
   }
   override def selectAll: Stream[ConnectionIO, AddresstypeRow] = {
-    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype""".query(using AddresstypeRow.read).stream
+    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from "person"."addresstype"""".query(using AddresstypeRow.read).stream
   }
   override def selectById(addresstypeid: AddresstypeId): ConnectionIO[Option[AddresstypeRow]] = {
-    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype where "addresstypeid" = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}""".query(using AddresstypeRow.read).option
+    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from "person"."addresstype" where "addresstypeid" = ${fromWrite(addresstypeid)(Write.fromPut(AddresstypeId.put))}""".query(using AddresstypeRow.read).option
   }
   override def selectByIds(addresstypeids: Array[AddresstypeId]): Stream[ConnectionIO, AddresstypeRow] = {
-    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from person.addresstype where "addresstypeid" = ANY(${addresstypeids})""".query(using AddresstypeRow.read).stream
+    sql"""select "addresstypeid", "name", "rowguid", "modifieddate"::text from "person"."addresstype" where "addresstypeid" = ANY(${addresstypeids})""".query(using AddresstypeRow.read).stream
   }
   override def selectByIdsTracked(addresstypeids: Array[AddresstypeId]): ConnectionIO[Map[AddresstypeId, AddresstypeRow]] = {
     selectByIds(addresstypeids).compile.toList.map { rows =>
@@ -98,11 +98,11 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
     }
   }
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
-    UpdateBuilder("person.addresstype", AddresstypeFields.structure, AddresstypeRow.read)
+    UpdateBuilder(""""person"."addresstype"""", AddresstypeFields.structure, AddresstypeRow.read)
   }
   override def update(row: AddresstypeRow): ConnectionIO[Boolean] = {
     val addresstypeid = row.addresstypeid
-    sql"""update person.addresstype
+    sql"""update "person"."addresstype"
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
@@ -112,7 +112,7 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
-    sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
+    sql"""insert into "person"."addresstype"("addresstypeid", "name", "rowguid", "modifieddate")
           values (
             ${fromWrite(unsaved.addresstypeid)(Write.fromPut(AddresstypeId.put))}::int4,
             ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
@@ -129,7 +129,7 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
   }
   override def upsertBatch(unsaved: List[AddresstypeRow]): Stream[ConnectionIO, AddresstypeRow] = {
     Update[AddresstypeRow](
-      s"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
+      s"""insert into "person"."addresstype"("addresstypeid", "name", "rowguid", "modifieddate")
           values (?::int4,?::varchar,?::uuid,?::timestamp)
           on conflict ("addresstypeid")
           do update set
@@ -143,9 +143,9 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, AddresstypeRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table addresstype_TEMP (like person.addresstype) on commit drop".update.run
+      _ <- sql"""create temporary table addresstype_TEMP (like "person"."addresstype") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy addresstype_TEMP("addresstypeid", "name", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using AddresstypeRow.text)
-      res <- sql"""insert into person.addresstype("addresstypeid", "name", "rowguid", "modifieddate")
+      res <- sql"""insert into "person"."addresstype"("addresstypeid", "name", "rowguid", "modifieddate")
                    select * from addresstype_TEMP
                    on conflict ("addresstypeid")
                    do update set

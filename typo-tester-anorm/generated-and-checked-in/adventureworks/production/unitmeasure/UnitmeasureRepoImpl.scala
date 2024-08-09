@@ -26,20 +26,20 @@ import typo.dsl.UpdateBuilder
 
 class UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def delete: DeleteBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    DeleteBuilder("production.unitmeasure", UnitmeasureFields.structure)
+    DeleteBuilder(""""production"."unitmeasure"""", UnitmeasureFields.structure)
   }
   override def deleteById(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.unitmeasure where "unitmeasurecode" = ${ParameterValue(unitmeasurecode, null, UnitmeasureId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "production"."unitmeasure" where "unitmeasurecode" = ${ParameterValue(unitmeasurecode, null, UnitmeasureId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): Int = {
     SQL"""delete
-          from production.unitmeasure
+          from "production"."unitmeasure"
           where "unitmeasurecode" = ANY(${unitmeasurecodes})
        """.executeUpdate()
     
   }
   override def insert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
-    SQL"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
+    SQL"""insert into "production"."unitmeasure"("unitmeasurecode", "name", "modifieddate")
           values (${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "unitmeasurecode", "name", "modifieddate"::text
        """
@@ -57,12 +57,12 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into production.unitmeasure default values
+      SQL"""insert into "production"."unitmeasure" default values
             returning "unitmeasurecode", "name", "modifieddate"::text
          """
         .executeInsert(UnitmeasureRow.rowParser(1).single)
     } else {
-      val q = s"""insert into production.unitmeasure(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "production"."unitmeasure"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "unitmeasurecode", "name", "modifieddate"::text
                """
@@ -72,29 +72,29 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[UnitmeasureRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(UnitmeasureRow.text, c)
+    streamingInsert(s"""COPY "production"."unitmeasure"("unitmeasurecode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(UnitmeasureRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[UnitmeasureRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.unitmeasure("unitmeasurecode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UnitmeasureRowUnsaved.text, c)
+    streamingInsert(s"""COPY "production"."unitmeasure"("unitmeasurecode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UnitmeasureRowUnsaved.text, c)
   }
   override def select: SelectBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    SelectBuilderSql("production.unitmeasure", UnitmeasureFields.structure, UnitmeasureRow.rowParser)
+    SelectBuilderSql(""""production"."unitmeasure"""", UnitmeasureFields.structure, UnitmeasureRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[UnitmeasureRow] = {
     SQL"""select "unitmeasurecode", "name", "modifieddate"::text
-          from production.unitmeasure
+          from "production"."unitmeasure"
        """.as(UnitmeasureRow.rowParser(1).*)
   }
   override def selectById(unitmeasurecode: UnitmeasureId)(implicit c: Connection): Option[UnitmeasureRow] = {
     SQL"""select "unitmeasurecode", "name", "modifieddate"::text
-          from production.unitmeasure
+          from "production"."unitmeasure"
           where "unitmeasurecode" = ${ParameterValue(unitmeasurecode, null, UnitmeasureId.toStatement)}
        """.as(UnitmeasureRow.rowParser(1).singleOpt)
   }
   override def selectByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow] = {
     SQL"""select "unitmeasurecode", "name", "modifieddate"::text
-          from production.unitmeasure
+          from "production"."unitmeasure"
           where "unitmeasurecode" = ANY(${unitmeasurecodes})
        """.as(UnitmeasureRow.rowParser(1).*)
     
@@ -104,18 +104,18 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
     unitmeasurecodes.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
-    UpdateBuilder("production.unitmeasure", UnitmeasureFields.structure, UnitmeasureRow.rowParser)
+    UpdateBuilder(""""production"."unitmeasure"""", UnitmeasureFields.structure, UnitmeasureRow.rowParser)
   }
   override def update(row: UnitmeasureRow)(implicit c: Connection): Boolean = {
     val unitmeasurecode = row.unitmeasurecode
-    SQL"""update production.unitmeasure
+    SQL"""update "production"."unitmeasure"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "unitmeasurecode" = ${ParameterValue(unitmeasurecode, null, UnitmeasureId.toStatement)}
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {
-    SQL"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
+    SQL"""insert into "production"."unitmeasure"("unitmeasurecode", "name", "modifieddate")
           values (
             ${ParameterValue(unsaved.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
@@ -141,7 +141,7 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
+            s"""insert into "production"."unitmeasure"("unitmeasurecode", "name", "modifieddate")
                 values ({unitmeasurecode}::bpchar, {name}::varchar, {modifieddate}::timestamp)
                 on conflict ("unitmeasurecode")
                 do update set
@@ -157,9 +157,9 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[UnitmeasureRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table unitmeasure_TEMP (like production.unitmeasure) on commit drop".execute(): @nowarn
+    SQL"""create temporary table unitmeasure_TEMP (like "production"."unitmeasure") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy unitmeasure_TEMP("unitmeasurecode", "name", "modifieddate") from stdin""", batchSize, unsaved)(UnitmeasureRow.text, c): @nowarn
-    SQL"""insert into production.unitmeasure("unitmeasurecode", "name", "modifieddate")
+    SQL"""insert into "production"."unitmeasure"("unitmeasurecode", "name", "modifieddate")
           select * from unitmeasure_TEMP
           on conflict ("unitmeasurecode")
           do update set

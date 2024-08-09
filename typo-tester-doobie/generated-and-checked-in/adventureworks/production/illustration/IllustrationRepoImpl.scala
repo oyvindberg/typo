@@ -26,16 +26,16 @@ import typo.dsl.UpdateBuilder
 
 class IllustrationRepoImpl extends IllustrationRepo {
   override def delete: DeleteBuilder[IllustrationFields, IllustrationRow] = {
-    DeleteBuilder("production.illustration", IllustrationFields.structure)
+    DeleteBuilder(""""production"."illustration"""", IllustrationFields.structure)
   }
   override def deleteById(illustrationid: IllustrationId): ConnectionIO[Boolean] = {
-    sql"""delete from production.illustration where "illustrationid" = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."illustration" where "illustrationid" = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(illustrationids: Array[IllustrationId]): ConnectionIO[Int] = {
-    sql"""delete from production.illustration where "illustrationid" = ANY(${illustrationids})""".update.run
+    sql"""delete from "production"."illustration" where "illustrationid" = ANY(${illustrationids})""".update.run
   }
   override def insert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
-    sql"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+    sql"""insert into "production"."illustration"("illustrationid", "diagram", "modifieddate")
           values (${fromWrite(unsaved.illustrationid)(Write.fromPut(IllustrationId.put))}::int4, ${fromWrite(unsaved.diagram)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "illustrationid", "diagram", "modifieddate"::text
        """.query(using IllustrationRow.read).unique
@@ -54,12 +54,12 @@ class IllustrationRepoImpl extends IllustrationRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.illustration default values
+      sql"""insert into "production"."illustration" default values
             returning "illustrationid", "diagram", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into production.illustration(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "production"."illustration"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "illustrationid", "diagram", "modifieddate"::text
          """
@@ -68,23 +68,23 @@ class IllustrationRepoImpl extends IllustrationRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.illustration("illustrationid", "diagram", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using IllustrationRow.text)
+    new FragmentOps(sql"""COPY "production"."illustration"("illustrationid", "diagram", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using IllustrationRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, IllustrationRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.illustration("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using IllustrationRowUnsaved.text)
+    new FragmentOps(sql"""COPY "production"."illustration"("diagram", "illustrationid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using IllustrationRowUnsaved.text)
   }
   override def select: SelectBuilder[IllustrationFields, IllustrationRow] = {
-    SelectBuilderSql("production.illustration", IllustrationFields.structure, IllustrationRow.read)
+    SelectBuilderSql(""""production"."illustration"""", IllustrationFields.structure, IllustrationRow.read)
   }
   override def selectAll: Stream[ConnectionIO, IllustrationRow] = {
-    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration""".query(using IllustrationRow.read).stream
+    sql"""select "illustrationid", "diagram", "modifieddate"::text from "production"."illustration"""".query(using IllustrationRow.read).stream
   }
   override def selectById(illustrationid: IllustrationId): ConnectionIO[Option[IllustrationRow]] = {
-    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}""".query(using IllustrationRow.read).option
+    sql"""select "illustrationid", "diagram", "modifieddate"::text from "production"."illustration" where "illustrationid" = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}""".query(using IllustrationRow.read).option
   }
   override def selectByIds(illustrationids: Array[IllustrationId]): Stream[ConnectionIO, IllustrationRow] = {
-    sql"""select "illustrationid", "diagram", "modifieddate"::text from production.illustration where "illustrationid" = ANY(${illustrationids})""".query(using IllustrationRow.read).stream
+    sql"""select "illustrationid", "diagram", "modifieddate"::text from "production"."illustration" where "illustrationid" = ANY(${illustrationids})""".query(using IllustrationRow.read).stream
   }
   override def selectByIdsTracked(illustrationids: Array[IllustrationId]): ConnectionIO[Map[IllustrationId, IllustrationRow]] = {
     selectByIds(illustrationids).compile.toList.map { rows =>
@@ -93,11 +93,11 @@ class IllustrationRepoImpl extends IllustrationRepo {
     }
   }
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
-    UpdateBuilder("production.illustration", IllustrationFields.structure, IllustrationRow.read)
+    UpdateBuilder(""""production"."illustration"""", IllustrationFields.structure, IllustrationRow.read)
   }
   override def update(row: IllustrationRow): ConnectionIO[Boolean] = {
     val illustrationid = row.illustrationid
-    sql"""update production.illustration
+    sql"""update "production"."illustration"
           set "diagram" = ${fromWrite(row.diagram)(Write.fromPutOption(TypoXml.put))}::xml,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where "illustrationid" = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}"""
@@ -106,7 +106,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
-    sql"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+    sql"""insert into "production"."illustration"("illustrationid", "diagram", "modifieddate")
           values (
             ${fromWrite(unsaved.illustrationid)(Write.fromPut(IllustrationId.put))}::int4,
             ${fromWrite(unsaved.diagram)(Write.fromPutOption(TypoXml.put))}::xml,
@@ -121,7 +121,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
   }
   override def upsertBatch(unsaved: List[IllustrationRow]): Stream[ConnectionIO, IllustrationRow] = {
     Update[IllustrationRow](
-      s"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+      s"""insert into "production"."illustration"("illustrationid", "diagram", "modifieddate")
           values (?::int4,?::xml,?::timestamp)
           on conflict ("illustrationid")
           do update set
@@ -134,9 +134,9 @@ class IllustrationRepoImpl extends IllustrationRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, IllustrationRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table illustration_TEMP (like production.illustration) on commit drop".update.run
+      _ <- sql"""create temporary table illustration_TEMP (like "production"."illustration") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy illustration_TEMP("illustrationid", "diagram", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using IllustrationRow.text)
-      res <- sql"""insert into production.illustration("illustrationid", "diagram", "modifieddate")
+      res <- sql"""insert into "production"."illustration"("illustrationid", "diagram", "modifieddate")
                    select * from illustration_TEMP
                    on conflict ("illustrationid")
                    do update set

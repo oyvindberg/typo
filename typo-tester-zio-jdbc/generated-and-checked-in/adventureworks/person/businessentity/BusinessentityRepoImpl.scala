@@ -24,16 +24,16 @@ import zio.stream.ZStream
 
 class BusinessentityRepoImpl extends BusinessentityRepo {
   override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
-    DeleteBuilder("person.businessentity", BusinessentityFields.structure)
+    DeleteBuilder(""""person"."businessentity"""", BusinessentityFields.structure)
   }
   override def deleteById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from person.businessentity where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "person"."businessentity" where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from person.businessentity where "businessentityid" = ANY(${businessentityids})""".delete
+    sql"""delete from "person"."businessentity" where "businessentityid" = ANY(${businessentityids})""".delete
   }
   override def insert(unsaved: BusinessentityRow): ZIO[ZConnection, Throwable, BusinessentityRow] = {
-    sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
+    sql"""insert into "person"."businessentity"("businessentityid", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "rowguid", "modifieddate"::text
        """.insertReturning(using BusinessentityRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -55,35 +55,35 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into person.businessentity default values
+      sql"""insert into "person"."businessentity" default values
             returning "businessentityid", "rowguid", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into person.businessentity($names) values ($values) returning "businessentityid", "rowguid", "modifieddate"::text"""
+      sql"""insert into "person"."businessentity"($names) values ($values) returning "businessentityid", "rowguid", "modifieddate"::text"""
     }
     q.insertReturning(using BusinessentityRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(BusinessentityRow.text)
+    streamingInsert(s"""COPY "person"."businessentity"("businessentityid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(BusinessentityRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BusinessentityRowUnsaved.text)
+    streamingInsert(s"""COPY "person"."businessentity"("businessentityid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(BusinessentityRowUnsaved.text)
   }
   override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
-    SelectBuilderSql("person.businessentity", BusinessentityFields.structure, BusinessentityRow.jdbcDecoder)
+    SelectBuilderSql(""""person"."businessentity"""", BusinessentityFields.structure, BusinessentityRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, BusinessentityRow] = {
-    sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity""".query(using BusinessentityRow.jdbcDecoder).selectStream()
+    sql"""select "businessentityid", "rowguid", "modifieddate"::text from "person"."businessentity"""".query(using BusinessentityRow.jdbcDecoder).selectStream()
   }
   override def selectById(businessentityid: BusinessentityId): ZIO[ZConnection, Throwable, Option[BusinessentityRow]] = {
-    sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".query(using BusinessentityRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "rowguid", "modifieddate"::text from "person"."businessentity" where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".query(using BusinessentityRow.jdbcDecoder).selectOne
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, BusinessentityRow] = {
-    sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(using BusinessentityRow.jdbcDecoder).selectStream()
+    sql"""select "businessentityid", "rowguid", "modifieddate"::text from "person"."businessentity" where "businessentityid" = ANY(${Segment.paramSegment(businessentityids)(BusinessentityId.arraySetter)})""".query(using BusinessentityRow.jdbcDecoder).selectStream()
   }
   override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, BusinessentityRow]] = {
     selectByIds(businessentityids).runCollect.map { rows =>
@@ -92,17 +92,17 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     }
   }
   override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
-    UpdateBuilder("person.businessentity", BusinessentityFields.structure, BusinessentityRow.jdbcDecoder)
+    UpdateBuilder(""""person"."businessentity"""", BusinessentityFields.structure, BusinessentityRow.jdbcDecoder)
   }
   override def update(row: BusinessentityRow): ZIO[ZConnection, Throwable, Boolean] = {
     val businessentityid = row.businessentityid
-    sql"""update person.businessentity
+    sql"""update "person"."businessentity"
           set "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: BusinessentityRow): ZIO[ZConnection, Throwable, UpdateResult[BusinessentityRow]] = {
-    sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
+    sql"""insert into "person"."businessentity"("businessentityid", "rowguid", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4,
             ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid,
@@ -116,9 +116,9 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, BusinessentityRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table businessentity_TEMP (like person.businessentity) on commit drop".execute
+    val created = sql"""create temporary table businessentity_TEMP (like "person"."businessentity") on commit drop""".execute
     val copied = streamingInsert(s"""copy businessentity_TEMP("businessentityid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(BusinessentityRow.text)
-    val merged = sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
+    val merged = sql"""insert into "person"."businessentity"("businessentityid", "rowguid", "modifieddate")
                        select * from businessentity_TEMP
                        on conflict ("businessentityid")
                        do update set

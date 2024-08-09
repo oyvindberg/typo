@@ -15,9 +15,9 @@ import typo.dsl.SelectBuilderSql
 
 class VindividualcustomerViewRepoImpl extends VindividualcustomerViewRepo {
   override def select: SelectBuilder[VindividualcustomerViewFields, VindividualcustomerViewRow] = {
-    SelectBuilderSql("sales.vindividualcustomer", VindividualcustomerViewFields.structure, VindividualcustomerViewRow.read)
+    SelectBuilderSql(""""sales"."vindividualcustomer"""", VindividualcustomerViewFields.structure, VindividualcustomerViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VindividualcustomerViewRow] = {
-    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "demographics" from sales.vindividualcustomer""".query(using VindividualcustomerViewRow.read).stream
+    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "demographics" from "sales"."vindividualcustomer"""".query(using VindividualcustomerViewRow.read).stream
   }
 }

@@ -31,16 +31,16 @@ import typo.dsl.UpdateBuilder
 
 class VendorRepoImpl extends VendorRepo {
   override def delete: DeleteBuilder[VendorFields, VendorRow] = {
-    DeleteBuilder("purchasing.vendor", VendorFields.structure)
+    DeleteBuilder(""""purchasing"."vendor"""", VendorFields.structure)
   }
   override def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"""delete from purchasing.vendor where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "purchasing"."vendor" where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
-    sql"""delete from purchasing.vendor where "businessentityid" = ANY(${businessentityids})""".update.run
+    sql"""delete from "purchasing"."vendor" where "businessentityid" = ANY(${businessentityids})""".update.run
   }
   override def insert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
-    sql"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
+    sql"""insert into "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.accountnumber)(Write.fromPut(AccountNumber.put))}::varchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.creditrating)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.preferredvendorstatus)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.activeflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.purchasingwebserviceurl)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
        """.query(using VendorRow.read).unique
@@ -67,12 +67,12 @@ class VendorRepoImpl extends VendorRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into purchasing.vendor default values
+      sql"""insert into "purchasing"."vendor" default values
             returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into purchasing.vendor(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "purchasing"."vendor"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
          """
@@ -81,23 +81,23 @@ class VendorRepoImpl extends VendorRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, VendorRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using VendorRow.text)
+    new FragmentOps(sql"""COPY "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using VendorRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, VendorRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using VendorRowUnsaved.text)
+    new FragmentOps(sql"""COPY "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "purchasingwebserviceurl", "preferredvendorstatus", "activeflag", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using VendorRowUnsaved.text)
   }
   override def select: SelectBuilder[VendorFields, VendorRow] = {
-    SelectBuilderSql("purchasing.vendor", VendorFields.structure, VendorRow.read)
+    SelectBuilderSql(""""purchasing"."vendor"""", VendorFields.structure, VendorRow.read)
   }
   override def selectAll: Stream[ConnectionIO, VendorRow] = {
-    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor""".query(using VendorRow.read).stream
+    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from "purchasing"."vendor"""".query(using VendorRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[VendorRow]] = {
-    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using VendorRow.read).option
+    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from "purchasing"."vendor" where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using VendorRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, VendorRow] = {
-    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from purchasing.vendor where "businessentityid" = ANY(${businessentityids})""".query(using VendorRow.read).stream
+    sql"""select "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text from "purchasing"."vendor" where "businessentityid" = ANY(${businessentityids})""".query(using VendorRow.read).stream
   }
   override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, VendorRow]] = {
     selectByIds(businessentityids).compile.toList.map { rows =>
@@ -106,11 +106,11 @@ class VendorRepoImpl extends VendorRepo {
     }
   }
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
-    UpdateBuilder("purchasing.vendor", VendorFields.structure, VendorRow.read)
+    UpdateBuilder(""""purchasing"."vendor"""", VendorFields.structure, VendorRow.read)
   }
   override def update(row: VendorRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
-    sql"""update purchasing.vendor
+    sql"""update "purchasing"."vendor"
           set "accountnumber" = ${fromWrite(row.accountnumber)(Write.fromPut(AccountNumber.put))}::varchar,
               "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               "creditrating" = ${fromWrite(row.creditrating)(Write.fromPut(TypoShort.put))}::int2,
@@ -124,7 +124,7 @@ class VendorRepoImpl extends VendorRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
-    sql"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
+    sql"""insert into "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
           values (
             ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
             ${fromWrite(unsaved.accountnumber)(Write.fromPut(AccountNumber.put))}::varchar,
@@ -149,7 +149,7 @@ class VendorRepoImpl extends VendorRepo {
   }
   override def upsertBatch(unsaved: List[VendorRow]): Stream[ConnectionIO, VendorRow] = {
     Update[VendorRow](
-      s"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
+      s"""insert into "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
           values (?::int4,?::varchar,?::varchar,?::int2,?::bool,?::bool,?,?::timestamp)
           on conflict ("businessentityid")
           do update set
@@ -167,9 +167,9 @@ class VendorRepoImpl extends VendorRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, VendorRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table vendor_TEMP (like purchasing.vendor) on commit drop".update.run
+      _ <- sql"""create temporary table vendor_TEMP (like "purchasing"."vendor") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy vendor_TEMP("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using VendorRow.text)
-      res <- sql"""insert into purchasing.vendor("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
+      res <- sql"""insert into "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")
                    select * from vendor_TEMP
                    on conflict ("businessentityid")
                    do update set

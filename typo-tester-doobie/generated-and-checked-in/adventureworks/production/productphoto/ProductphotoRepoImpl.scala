@@ -27,16 +27,16 @@ import typo.dsl.UpdateBuilder
 
 class ProductphotoRepoImpl extends ProductphotoRepo {
   override def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow] = {
-    DeleteBuilder("production.productphoto", ProductphotoFields.structure)
+    DeleteBuilder(""""production"."productphoto"""", ProductphotoFields.structure)
   }
   override def deleteById(productphotoid: ProductphotoId): ConnectionIO[Boolean] = {
-    sql"""delete from production.productphoto where "productphotoid" = ${fromWrite(productphotoid)(Write.fromPut(ProductphotoId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."productphoto" where "productphotoid" = ${fromWrite(productphotoid)(Write.fromPut(ProductphotoId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(productphotoids: Array[ProductphotoId]): ConnectionIO[Int] = {
-    sql"""delete from production.productphoto where "productphotoid" = ANY(${productphotoids})""".update.run
+    sql"""delete from "production"."productphoto" where "productphotoid" = ANY(${productphotoids})""".update.run
   }
   override def insert(unsaved: ProductphotoRow): ConnectionIO[ProductphotoRow] = {
-    sql"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+    sql"""insert into "production"."productphoto"("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
           values (${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4, ${fromWrite(unsaved.thumbnailphoto)(Write.fromPutOption(TypoBytea.put))}::bytea, ${fromWrite(unsaved.thumbnailphotofilename)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.largephoto)(Write.fromPutOption(TypoBytea.put))}::bytea, ${fromWrite(unsaved.largephotofilename)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
        """.query(using ProductphotoRow.read).unique
@@ -58,12 +58,12 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.productphoto default values
+      sql"""insert into "production"."productphoto" default values
             returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into production.productphoto(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "production"."productphoto"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
          """
@@ -72,23 +72,23 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductphotoRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductphotoRow.text)
+    new FragmentOps(sql"""COPY "production"."productphoto"("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductphotoRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductphotoRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productphoto("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductphotoRowUnsaved.text)
+    new FragmentOps(sql"""COPY "production"."productphoto"("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductphotoRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductphotoFields, ProductphotoRow] = {
-    SelectBuilderSql("production.productphoto", ProductphotoFields.structure, ProductphotoRow.read)
+    SelectBuilderSql(""""production"."productphoto"""", ProductphotoFields.structure, ProductphotoRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductphotoRow] = {
-    sql"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text from production.productphoto""".query(using ProductphotoRow.read).stream
+    sql"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text from "production"."productphoto"""".query(using ProductphotoRow.read).stream
   }
   override def selectById(productphotoid: ProductphotoId): ConnectionIO[Option[ProductphotoRow]] = {
-    sql"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text from production.productphoto where "productphotoid" = ${fromWrite(productphotoid)(Write.fromPut(ProductphotoId.put))}""".query(using ProductphotoRow.read).option
+    sql"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text from "production"."productphoto" where "productphotoid" = ${fromWrite(productphotoid)(Write.fromPut(ProductphotoId.put))}""".query(using ProductphotoRow.read).option
   }
   override def selectByIds(productphotoids: Array[ProductphotoId]): Stream[ConnectionIO, ProductphotoRow] = {
-    sql"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text from production.productphoto where "productphotoid" = ANY(${productphotoids})""".query(using ProductphotoRow.read).stream
+    sql"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text from "production"."productphoto" where "productphotoid" = ANY(${productphotoids})""".query(using ProductphotoRow.read).stream
   }
   override def selectByIdsTracked(productphotoids: Array[ProductphotoId]): ConnectionIO[Map[ProductphotoId, ProductphotoRow]] = {
     selectByIds(productphotoids).compile.toList.map { rows =>
@@ -97,11 +97,11 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
     }
   }
   override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
-    UpdateBuilder("production.productphoto", ProductphotoFields.structure, ProductphotoRow.read)
+    UpdateBuilder(""""production"."productphoto"""", ProductphotoFields.structure, ProductphotoRow.read)
   }
   override def update(row: ProductphotoRow): ConnectionIO[Boolean] = {
     val productphotoid = row.productphotoid
-    sql"""update production.productphoto
+    sql"""update "production"."productphoto"
           set "thumbnailphoto" = ${fromWrite(row.thumbnailphoto)(Write.fromPutOption(TypoBytea.put))}::bytea,
               "thumbnailphotofilename" = ${fromWrite(row.thumbnailphotofilename)(Write.fromPutOption(Meta.StringMeta.put))},
               "largephoto" = ${fromWrite(row.largephoto)(Write.fromPutOption(TypoBytea.put))}::bytea,
@@ -113,7 +113,7 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: ProductphotoRow): ConnectionIO[ProductphotoRow] = {
-    sql"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+    sql"""insert into "production"."productphoto"("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
           values (
             ${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4,
             ${fromWrite(unsaved.thumbnailphoto)(Write.fromPutOption(TypoBytea.put))}::bytea,
@@ -134,7 +134,7 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
   }
   override def upsertBatch(unsaved: List[ProductphotoRow]): Stream[ConnectionIO, ProductphotoRow] = {
     Update[ProductphotoRow](
-      s"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+      s"""insert into "production"."productphoto"("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
           values (?::int4,?::bytea,?,?::bytea,?,?::timestamp)
           on conflict ("productphotoid")
           do update set
@@ -150,9 +150,9 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductphotoRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table productphoto_TEMP (like production.productphoto) on commit drop".update.run
+      _ <- sql"""create temporary table productphoto_TEMP (like "production"."productphoto") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy productphoto_TEMP("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductphotoRow.text)
-      res <- sql"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+      res <- sql"""insert into "production"."productphoto"("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
                    select * from productphoto_TEMP
                    on conflict ("productphotoid")
                    do update set

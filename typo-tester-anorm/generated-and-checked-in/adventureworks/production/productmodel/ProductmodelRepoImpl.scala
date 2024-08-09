@@ -29,20 +29,20 @@ import typo.dsl.UpdateBuilder
 
 class ProductmodelRepoImpl extends ProductmodelRepo {
   override def delete: DeleteBuilder[ProductmodelFields, ProductmodelRow] = {
-    DeleteBuilder("production.productmodel", ProductmodelFields.structure)
+    DeleteBuilder(""""production"."productmodel"""", ProductmodelFields.structure)
   }
   override def deleteById(productmodelid: ProductmodelId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productmodel where "productmodelid" = ${ParameterValue(productmodelid, null, ProductmodelId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "production"."productmodel" where "productmodelid" = ${ParameterValue(productmodelid, null, ProductmodelId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(productmodelids: Array[ProductmodelId])(implicit c: Connection): Int = {
     SQL"""delete
-          from production.productmodel
+          from "production"."productmodel"
           where "productmodelid" = ANY(${productmodelids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
-    SQL"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
+    SQL"""insert into "production"."productmodel"("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.catalogdescription, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.instructions, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
        """
@@ -69,12 +69,12 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into production.productmodel default values
+      SQL"""insert into "production"."productmodel" default values
             returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
          """
         .executeInsert(ProductmodelRow.rowParser(1).single)
     } else {
-      val q = s"""insert into production.productmodel(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "production"."productmodel"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
                """
@@ -84,29 +84,29 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[ProductmodelRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelRow.text, c)
+    streamingInsert(s"""COPY "production"."productmodel"("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductmodelRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productmodel("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductmodelRowUnsaved.text, c)
+    streamingInsert(s"""COPY "production"."productmodel"("name", "catalogdescription", "instructions", "productmodelid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductmodelRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductmodelFields, ProductmodelRow] = {
-    SelectBuilderSql("production.productmodel", ProductmodelFields.structure, ProductmodelRow.rowParser)
+    SelectBuilderSql(""""production"."productmodel"""", ProductmodelFields.structure, ProductmodelRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductmodelRow] = {
     SQL"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
-          from production.productmodel
+          from "production"."productmodel"
        """.as(ProductmodelRow.rowParser(1).*)
   }
   override def selectById(productmodelid: ProductmodelId)(implicit c: Connection): Option[ProductmodelRow] = {
     SQL"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
-          from production.productmodel
+          from "production"."productmodel"
           where "productmodelid" = ${ParameterValue(productmodelid, null, ProductmodelId.toStatement)}
        """.as(ProductmodelRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productmodelids: Array[ProductmodelId])(implicit c: Connection): List[ProductmodelRow] = {
     SQL"""select "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
-          from production.productmodel
+          from "production"."productmodel"
           where "productmodelid" = ANY(${productmodelids})
        """.as(ProductmodelRow.rowParser(1).*)
     
@@ -116,11 +116,11 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
     productmodelids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[ProductmodelFields, ProductmodelRow] = {
-    UpdateBuilder("production.productmodel", ProductmodelFields.structure, ProductmodelRow.rowParser)
+    UpdateBuilder(""""production"."productmodel"""", ProductmodelFields.structure, ProductmodelRow.rowParser)
   }
   override def update(row: ProductmodelRow)(implicit c: Connection): Boolean = {
     val productmodelid = row.productmodelid
-    SQL"""update production.productmodel
+    SQL"""update "production"."productmodel"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "catalogdescription" = ${ParameterValue(row.catalogdescription, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
               "instructions" = ${ParameterValue(row.instructions, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
@@ -130,7 +130,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
-    SQL"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
+    SQL"""insert into "production"."productmodel"("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
@@ -165,7 +165,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
+            s"""insert into "production"."productmodel"("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
                 values ({productmodelid}::int4, {name}::varchar, {catalogdescription}::xml, {instructions}::xml, {rowguid}::uuid, {modifieddate}::timestamp)
                 on conflict ("productmodelid")
                 do update set
@@ -184,9 +184,9 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductmodelRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table productmodel_TEMP (like production.productmodel) on commit drop".execute(): @nowarn
+    SQL"""create temporary table productmodel_TEMP (like "production"."productmodel") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy productmodel_TEMP("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(ProductmodelRow.text, c): @nowarn
-    SQL"""insert into production.productmodel("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
+    SQL"""insert into "production"."productmodel"("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")
           select * from productmodel_TEMP
           on conflict ("productmodelid")
           do update set

@@ -28,20 +28,20 @@ import typo.dsl.UpdateBuilder
 
 class SpecialofferRepoImpl extends SpecialofferRepo {
   override def delete: DeleteBuilder[SpecialofferFields, SpecialofferRow] = {
-    DeleteBuilder("sales.specialoffer", SpecialofferFields.structure)
+    DeleteBuilder(""""sales"."specialoffer"""", SpecialofferFields.structure)
   }
   override def deleteById(specialofferid: SpecialofferId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.specialoffer where "specialofferid" = ${ParameterValue(specialofferid, null, SpecialofferId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "sales"."specialoffer" where "specialofferid" = ${ParameterValue(specialofferid, null, SpecialofferId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(specialofferids: Array[SpecialofferId])(implicit c: Connection): Int = {
     SQL"""delete
-          from sales.specialoffer
+          from "sales"."specialoffer"
           where "specialofferid" = ANY(${specialofferids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
-    SQL"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."specialoffer"("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.specialofferid, null, SpecialofferId.toStatement)}::int4, ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.discountpct, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.`type`, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.category, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.startdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.enddate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.minqty, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.maxqty, null, ToStatement.optionToStatement(ToStatement.intToStatement, ParameterMetaData.IntParameterMetaData))}::int4, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
        """
@@ -79,12 +79,12 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into sales.specialoffer default values
+      SQL"""insert into "sales"."specialoffer" default values
             returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
          """
         .executeInsert(SpecialofferRow.rowParser(1).single)
     } else {
-      val q = s"""insert into sales.specialoffer(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "sales"."specialoffer"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
                """
@@ -94,29 +94,29 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[SpecialofferRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SpecialofferRow.text, c)
+    streamingInsert(s"""COPY "sales"."specialoffer"("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SpecialofferRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SpecialofferRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.specialoffer("description", "type", "category", "startdate", "enddate", "maxqty", "specialofferid", "discountpct", "minqty", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SpecialofferRowUnsaved.text, c)
+    streamingInsert(s"""COPY "sales"."specialoffer"("description", "type", "category", "startdate", "enddate", "maxqty", "specialofferid", "discountpct", "minqty", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SpecialofferRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SpecialofferFields, SpecialofferRow] = {
-    SelectBuilderSql("sales.specialoffer", SpecialofferFields.structure, SpecialofferRow.rowParser)
+    SelectBuilderSql(""""sales"."specialoffer"""", SpecialofferFields.structure, SpecialofferRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SpecialofferRow] = {
     SQL"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
-          from sales.specialoffer
+          from "sales"."specialoffer"
        """.as(SpecialofferRow.rowParser(1).*)
   }
   override def selectById(specialofferid: SpecialofferId)(implicit c: Connection): Option[SpecialofferRow] = {
     SQL"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
-          from sales.specialoffer
+          from "sales"."specialoffer"
           where "specialofferid" = ${ParameterValue(specialofferid, null, SpecialofferId.toStatement)}
        """.as(SpecialofferRow.rowParser(1).singleOpt)
   }
   override def selectByIds(specialofferids: Array[SpecialofferId])(implicit c: Connection): List[SpecialofferRow] = {
     SQL"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
-          from sales.specialoffer
+          from "sales"."specialoffer"
           where "specialofferid" = ANY(${specialofferids})
        """.as(SpecialofferRow.rowParser(1).*)
     
@@ -126,11 +126,11 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
     specialofferids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
-    UpdateBuilder("sales.specialoffer", SpecialofferFields.structure, SpecialofferRow.rowParser)
+    UpdateBuilder(""""sales"."specialoffer"""", SpecialofferFields.structure, SpecialofferRow.rowParser)
   }
   override def update(row: SpecialofferRow)(implicit c: Connection): Boolean = {
     val specialofferid = row.specialofferid
-    SQL"""update sales.specialoffer
+    SQL"""update "sales"."specialoffer"
           set "description" = ${ParameterValue(row.description, null, ToStatement.stringToStatement)},
               "discountpct" = ${ParameterValue(row.discountpct, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "type" = ${ParameterValue(row.`type`, null, ToStatement.stringToStatement)},
@@ -145,7 +145,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
-    SQL"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."specialoffer"("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.specialofferid, null, SpecialofferId.toStatement)}::int4,
             ${ParameterValue(unsaved.description, null, ToStatement.stringToStatement)},
@@ -195,7 +195,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
+            s"""insert into "sales"."specialoffer"("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
                 values ({specialofferid}::int4, {description}, {discountpct}::numeric, {type}, {category}, {startdate}::timestamp, {enddate}::timestamp, {minqty}::int4, {maxqty}::int4, {rowguid}::uuid, {modifieddate}::timestamp)
                 on conflict ("specialofferid")
                 do update set
@@ -219,9 +219,9 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[SpecialofferRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table specialoffer_TEMP (like sales.specialoffer) on commit drop".execute(): @nowarn
+    SQL"""create temporary table specialoffer_TEMP (like "sales"."specialoffer") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy specialoffer_TEMP("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SpecialofferRow.text, c): @nowarn
-    SQL"""insert into sales.specialoffer("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."specialoffer"("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
           select * from specialoffer_TEMP
           on conflict ("specialofferid")
           do update set

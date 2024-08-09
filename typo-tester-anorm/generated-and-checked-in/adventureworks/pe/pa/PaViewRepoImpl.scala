@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class PaViewRepoImpl extends PaViewRepo {
   override def select: SelectBuilder[PaViewFields, PaViewRow] = {
-    SelectBuilderSql("pe.pa", PaViewFields.structure, PaViewRow.rowParser)
+    SelectBuilderSql(""""pe"."pa"""", PaViewFields.structure, PaViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PaViewRow] = {
     SQL"""select "id", "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
-          from pe.pa
+          from "pe"."pa"
        """.as(PaViewRow.rowParser(1).*)
   }
 }

@@ -15,9 +15,9 @@ import zio.stream.ZStream
 
 class BeaViewRepoImpl extends BeaViewRepo {
   override def select: SelectBuilder[BeaViewFields, BeaViewRow] = {
-    SelectBuilderSql("pe.bea", BeaViewFields.structure, BeaViewRow.jdbcDecoder)
+    SelectBuilderSql(""""pe"."bea"""", BeaViewFields.structure, BeaViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, BeaViewRow] = {
-    sql"""select "id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from pe.bea""".query(using BeaViewRow.jdbcDecoder).selectStream()
+    sql"""select "id", "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from "pe"."bea"""".query(using BeaViewRow.jdbcDecoder).selectStream()
   }
 }

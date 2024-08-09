@@ -28,16 +28,16 @@ import zio.stream.ZStream
 
 class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    DeleteBuilder("sales.salestaxrate", SalestaxrateFields.structure)
+    DeleteBuilder(""""sales"."salestaxrate"""", SalestaxrateFields.structure)
   }
   override def deleteById(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.salestaxrate where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "sales"."salestaxrate" where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(salestaxrateids: Array[SalestaxrateId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from sales.salestaxrate where "salestaxrateid" = ANY(${salestaxrateids})""".delete
+    sql"""delete from "sales"."salestaxrate" where "salestaxrateid" = ANY(${salestaxrateids})""".delete
   }
   override def insert(unsaved: SalestaxrateRow): ZIO[ZConnection, Throwable, SalestaxrateRow] = {
-    sql"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+    sql"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.salestaxrateid)(SalestaxrateId.setter)}::int4, ${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4, ${Segment.paramSegment(unsaved.taxtype)(TypoShort.setter)}::int2, ${Segment.paramSegment(unsaved.taxrate)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
        """.insertReturning(using SalestaxrateRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -66,35 +66,35 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into sales.salestaxrate default values
+      sql"""insert into "sales"."salestaxrate" default values
             returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into sales.salestaxrate($names) values ($values) returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text"""
+      sql"""insert into "sales"."salestaxrate"($names) values ($values) returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text"""
     }
     q.insertReturning(using SalestaxrateRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalestaxrateRow.text)
+    streamingInsert(s"""COPY "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalestaxrateRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.salestaxrate("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalestaxrateRowUnsaved.text)
+    streamingInsert(s"""COPY "sales"."salestaxrate"("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalestaxrateRowUnsaved.text)
   }
   override def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    SelectBuilderSql("sales.salestaxrate", SalestaxrateFields.structure, SalestaxrateRow.jdbcDecoder)
+    SelectBuilderSql(""""sales"."salestaxrate"""", SalestaxrateFields.structure, SalestaxrateRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalestaxrateRow] = {
-    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate""".query(using SalestaxrateRow.jdbcDecoder).selectStream()
+    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from "sales"."salestaxrate"""".query(using SalestaxrateRow.jdbcDecoder).selectStream()
   }
   override def selectById(salestaxrateid: SalestaxrateId): ZIO[ZConnection, Throwable, Option[SalestaxrateRow]] = {
-    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}""".query(using SalestaxrateRow.jdbcDecoder).selectOne
+    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from "sales"."salestaxrate" where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}""".query(using SalestaxrateRow.jdbcDecoder).selectOne
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId]): ZStream[ZConnection, Throwable, SalestaxrateRow] = {
-    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate where "salestaxrateid" = ANY(${Segment.paramSegment(salestaxrateids)(SalestaxrateId.arraySetter)})""".query(using SalestaxrateRow.jdbcDecoder).selectStream()
+    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from "sales"."salestaxrate" where "salestaxrateid" = ANY(${Segment.paramSegment(salestaxrateids)(SalestaxrateId.arraySetter)})""".query(using SalestaxrateRow.jdbcDecoder).selectStream()
   }
   override def selectByIdsTracked(salestaxrateids: Array[SalestaxrateId]): ZIO[ZConnection, Throwable, Map[SalestaxrateId, SalestaxrateRow]] = {
     selectByIds(salestaxrateids).runCollect.map { rows =>
@@ -103,11 +103,11 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     }
   }
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    UpdateBuilder("sales.salestaxrate", SalestaxrateFields.structure, SalestaxrateRow.jdbcDecoder)
+    UpdateBuilder(""""sales"."salestaxrate"""", SalestaxrateFields.structure, SalestaxrateRow.jdbcDecoder)
   }
   override def update(row: SalestaxrateRow): ZIO[ZConnection, Throwable, Boolean] = {
     val salestaxrateid = row.salestaxrateid
-    sql"""update sales.salestaxrate
+    sql"""update "sales"."salestaxrate"
           set "stateprovinceid" = ${Segment.paramSegment(row.stateprovinceid)(StateprovinceId.setter)}::int4,
               "taxtype" = ${Segment.paramSegment(row.taxtype)(TypoShort.setter)}::int2,
               "taxrate" = ${Segment.paramSegment(row.taxrate)(Setter.bigDecimalScalaSetter)}::numeric,
@@ -117,7 +117,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
           where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: SalestaxrateRow): ZIO[ZConnection, Throwable, UpdateResult[SalestaxrateRow]] = {
-    sql"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+    sql"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.salestaxrateid)(SalestaxrateId.setter)}::int4,
             ${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4,
@@ -139,9 +139,9 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SalestaxrateRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table salestaxrate_TEMP (like sales.salestaxrate) on commit drop".execute
+    val created = sql"""create temporary table salestaxrate_TEMP (like "sales"."salestaxrate") on commit drop""".execute
     val copied = streamingInsert(s"""copy salestaxrate_TEMP("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalestaxrateRow.text)
-    val merged = sql"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+    val merged = sql"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
                        select * from salestaxrate_TEMP
                        on conflict ("salestaxrateid")
                        do update set

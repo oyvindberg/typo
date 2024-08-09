@@ -15,9 +15,9 @@ import typo.dsl.SelectBuilderSql
 
 class AtViewRepoImpl extends AtViewRepo {
   override def select: SelectBuilder[AtViewFields, AtViewRow] = {
-    SelectBuilderSql("pe.at", AtViewFields.structure, AtViewRow.read)
+    SelectBuilderSql(""""pe"."at"""", AtViewFields.structure, AtViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, AtViewRow] = {
-    sql"""select "id", "addresstypeid", "name", "rowguid", "modifieddate"::text from pe.at""".query(using AtViewRow.read).stream
+    sql"""select "id", "addresstypeid", "name", "rowguid", "modifieddate"::text from "pe"."at"""".query(using AtViewRow.read).stream
   }
 }

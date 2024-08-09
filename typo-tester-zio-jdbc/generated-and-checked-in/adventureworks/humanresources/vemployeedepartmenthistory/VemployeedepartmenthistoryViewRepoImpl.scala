@@ -15,9 +15,9 @@ import zio.stream.ZStream
 
 class VemployeedepartmenthistoryViewRepoImpl extends VemployeedepartmenthistoryViewRepo {
   override def select: SelectBuilder[VemployeedepartmenthistoryViewFields, VemployeedepartmenthistoryViewRow] = {
-    SelectBuilderSql("humanresources.vemployeedepartmenthistory", VemployeedepartmenthistoryViewFields.structure, VemployeedepartmenthistoryViewRow.jdbcDecoder)
+    SelectBuilderSql(""""humanresources"."vemployeedepartmenthistory"""", VemployeedepartmenthistoryViewFields.structure, VemployeedepartmenthistoryViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VemployeedepartmenthistoryViewRow] = {
-    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "shift", "department", "groupname", "startdate"::text, "enddate"::text from humanresources.vemployeedepartmenthistory""".query(using VemployeedepartmenthistoryViewRow.jdbcDecoder).selectStream()
+    sql"""select "businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "shift", "department", "groupname", "startdate"::text, "enddate"::text from "humanresources"."vemployeedepartmenthistory"""".query(using VemployeedepartmenthistoryViewRow.jdbcDecoder).selectStream()
   }
 }

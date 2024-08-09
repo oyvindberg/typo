@@ -25,23 +25,23 @@ import zio.stream.ZStream
 
 class ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def delete: DeleteBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    DeleteBuilder("production.productdocument", ProductdocumentFields.structure)
+    DeleteBuilder(""""production"."productdocument"""", ProductdocumentFields.structure)
   }
   override def deleteById(compositeId: ProductdocumentId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.productdocument where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "production"."productdocument" where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductdocumentId]): ZIO[ZConnection, Throwable, Long] = {
     val productid = compositeIds.map(_.productid)
     val documentnode = compositeIds.map(_.documentnode)
     sql"""delete
-          from production.productdocument
+          from "production"."productdocument"
           where ("productid", "documentnode")
           in (select unnest(${productid}), unnest(${documentnode}))
        """.delete
     
   }
   override def insert(unsaved: ProductdocumentRow): ZIO[ZConnection, Throwable, ProductdocumentRow] = {
-    sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")
+    sql"""insert into "production"."productdocument"("productid", "modifieddate", "documentnode")
           values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.documentnode)(DocumentId.setter)})
           returning "productid", "modifieddate"::text, "documentnode"
        """.insertReturning(using ProductdocumentRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -60,38 +60,38 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.productdocument default values
+      sql"""insert into "production"."productdocument" default values
             returning "productid", "modifieddate"::text, "documentnode"
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into production.productdocument($names) values ($values) returning "productid", "modifieddate"::text, "documentnode""""
+      sql"""insert into "production"."productdocument"($names) values ($values) returning "productid", "modifieddate"::text, "documentnode""""
     }
     q.insertReturning(using ProductdocumentRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductdocumentRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN""", batchSize, unsaved)(ProductdocumentRow.text)
+    streamingInsert(s"""COPY "production"."productdocument"("productid", "modifieddate", "documentnode") FROM STDIN""", batchSize, unsaved)(ProductdocumentRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductdocumentRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.productdocument("productid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductdocumentRowUnsaved.text)
+    streamingInsert(s"""COPY "production"."productdocument"("productid", "modifieddate", "documentnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductdocumentRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    SelectBuilderSql("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.jdbcDecoder)
+    SelectBuilderSql(""""production"."productdocument"""", ProductdocumentFields.structure, ProductdocumentRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductdocumentRow] = {
-    sql"""select "productid", "modifieddate"::text, "documentnode" from production.productdocument""".query(using ProductdocumentRow.jdbcDecoder).selectStream()
+    sql"""select "productid", "modifieddate"::text, "documentnode" from "production"."productdocument"""".query(using ProductdocumentRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: ProductdocumentId): ZIO[ZConnection, Throwable, Option[ProductdocumentRow]] = {
-    sql"""select "productid", "modifieddate"::text, "documentnode" from production.productdocument where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".query(using ProductdocumentRow.jdbcDecoder).selectOne
+    sql"""select "productid", "modifieddate"::text, "documentnode" from "production"."productdocument" where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".query(using ProductdocumentRow.jdbcDecoder).selectOne
   }
   override def selectByIds(compositeIds: Array[ProductdocumentId]): ZStream[ZConnection, Throwable, ProductdocumentRow] = {
     val productid = compositeIds.map(_.productid)
     val documentnode = compositeIds.map(_.documentnode)
     sql"""select "productid", "modifieddate"::text, "documentnode"
-          from production.productdocument
+          from "production"."productdocument"
           where ("productid", "documentnode")
           in (select unnest(${productid}), unnest(${documentnode}))
        """.query(using ProductdocumentRow.jdbcDecoder).selectStream()
@@ -104,16 +104,16 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     }
   }
   override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
-    UpdateBuilder("production.productdocument", ProductdocumentFields.structure, ProductdocumentRow.jdbcDecoder)
+    UpdateBuilder(""""production"."productdocument"""", ProductdocumentFields.structure, ProductdocumentRow.jdbcDecoder)
   }
   override def update(row: ProductdocumentRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
-    sql"""update production.productdocument
+    sql"""update "production"."productdocument"
           set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: ProductdocumentRow): ZIO[ZConnection, Throwable, UpdateResult[ProductdocumentRow]] = {
-    sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")
+    sql"""insert into "production"."productdocument"("productid", "modifieddate", "documentnode")
           values (
             ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
             ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp,
@@ -126,9 +126,9 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductdocumentRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table productdocument_TEMP (like production.productdocument) on commit drop".execute
+    val created = sql"""create temporary table productdocument_TEMP (like "production"."productdocument") on commit drop""".execute
     val copied = streamingInsert(s"""copy productdocument_TEMP("productid", "modifieddate", "documentnode") from stdin""", batchSize, unsaved)(ProductdocumentRow.text)
-    val merged = sql"""insert into production.productdocument("productid", "modifieddate", "documentnode")
+    val merged = sql"""insert into "production"."productdocument"("productid", "modifieddate", "documentnode")
                        select * from productdocument_TEMP
                        on conflict ("productid", "documentnode")
                        do update set

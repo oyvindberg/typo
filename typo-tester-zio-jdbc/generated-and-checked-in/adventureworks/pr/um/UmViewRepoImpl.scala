@@ -15,9 +15,9 @@ import zio.stream.ZStream
 
 class UmViewRepoImpl extends UmViewRepo {
   override def select: SelectBuilder[UmViewFields, UmViewRow] = {
-    SelectBuilderSql("pr.um", UmViewFields.structure, UmViewRow.jdbcDecoder)
+    SelectBuilderSql(""""pr"."um"""", UmViewFields.structure, UmViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, UmViewRow] = {
-    sql"""select "id", "unitmeasurecode", "name", "modifieddate"::text from pr.um""".query(using UmViewRow.jdbcDecoder).selectStream()
+    sql"""select "id", "unitmeasurecode", "name", "modifieddate"::text from "pr"."um"""".query(using UmViewRow.jdbcDecoder).selectStream()
   }
 }

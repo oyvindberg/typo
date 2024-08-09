@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class VsalespersonsalesbyfiscalyearsViewRepoImpl extends VsalespersonsalesbyfiscalyearsViewRepo {
   override def select: SelectBuilder[VsalespersonsalesbyfiscalyearsViewFields, VsalespersonsalesbyfiscalyearsViewRow] = {
-    SelectBuilderSql("sales.vsalespersonsalesbyfiscalyears", VsalespersonsalesbyfiscalyearsViewFields.structure, VsalespersonsalesbyfiscalyearsViewRow.rowParser)
+    SelectBuilderSql(""""sales"."vsalespersonsalesbyfiscalyears"""", VsalespersonsalesbyfiscalyearsViewFields.structure, VsalespersonsalesbyfiscalyearsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VsalespersonsalesbyfiscalyearsViewRow] = {
     SQL"""select "SalesPersonID", "FullName", "JobTitle", "SalesTerritory", "2012", "2013", "2014"
-          from sales.vsalespersonsalesbyfiscalyears
+          from "sales"."vsalespersonsalesbyfiscalyears"
        """.as(VsalespersonsalesbyfiscalyearsViewRow.rowParser(1).*)
   }
 }

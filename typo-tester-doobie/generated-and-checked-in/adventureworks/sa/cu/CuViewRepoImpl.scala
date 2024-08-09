@@ -15,9 +15,9 @@ import typo.dsl.SelectBuilderSql
 
 class CuViewRepoImpl extends CuViewRepo {
   override def select: SelectBuilder[CuViewFields, CuViewRow] = {
-    SelectBuilderSql("sa.cu", CuViewFields.structure, CuViewRow.read)
+    SelectBuilderSql(""""sa"."cu"""", CuViewFields.structure, CuViewRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CuViewRow] = {
-    sql"""select "id", "currencycode", "name", "modifieddate"::text from sa.cu""".query(using CuViewRow.read).stream
+    sql"""select "id", "currencycode", "name", "modifieddate"::text from "sa"."cu"""".query(using CuViewRow.read).stream
   }
 }

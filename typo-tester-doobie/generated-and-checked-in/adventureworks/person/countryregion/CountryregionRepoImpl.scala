@@ -26,16 +26,16 @@ import typo.dsl.UpdateBuilder
 
 class CountryregionRepoImpl extends CountryregionRepo {
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
-    DeleteBuilder("person.countryregion", CountryregionFields.structure)
+    DeleteBuilder(""""person"."countryregion"""", CountryregionFields.structure)
   }
   override def deleteById(countryregioncode: CountryregionId): ConnectionIO[Boolean] = {
-    sql"""delete from person.countryregion where "countryregioncode" = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "person"."countryregion" where "countryregioncode" = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(countryregioncodes: Array[CountryregionId]): ConnectionIO[Int] = {
-    sql"""delete from person.countryregion where "countryregioncode" = ANY(${countryregioncodes})""".update.run
+    sql"""delete from "person"."countryregion" where "countryregioncode" = ANY(${countryregioncodes})""".update.run
   }
   override def insert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
-    sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+    sql"""insert into "person"."countryregion"("countryregioncode", "name", "modifieddate")
           values (${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "countryregioncode", "name", "modifieddate"::text
        """.query(using CountryregionRow.read).unique
@@ -51,12 +51,12 @@ class CountryregionRepoImpl extends CountryregionRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into person.countryregion default values
+      sql"""insert into "person"."countryregion" default values
             returning "countryregioncode", "name", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into person.countryregion(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "person"."countryregion"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "countryregioncode", "name", "modifieddate"::text
          """
@@ -65,23 +65,23 @@ class CountryregionRepoImpl extends CountryregionRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CountryregionRow.text)
+    new FragmentOps(sql"""COPY "person"."countryregion"("countryregioncode", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using CountryregionRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, CountryregionRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using CountryregionRowUnsaved.text)
+    new FragmentOps(sql"""COPY "person"."countryregion"("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using CountryregionRowUnsaved.text)
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
-    SelectBuilderSql("person.countryregion", CountryregionFields.structure, CountryregionRow.read)
+    SelectBuilderSql(""""person"."countryregion"""", CountryregionFields.structure, CountryregionRow.read)
   }
   override def selectAll: Stream[ConnectionIO, CountryregionRow] = {
-    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion""".query(using CountryregionRow.read).stream
+    sql"""select "countryregioncode", "name", "modifieddate"::text from "person"."countryregion"""".query(using CountryregionRow.read).stream
   }
   override def selectById(countryregioncode: CountryregionId): ConnectionIO[Option[CountryregionRow]] = {
-    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}""".query(using CountryregionRow.read).option
+    sql"""select "countryregioncode", "name", "modifieddate"::text from "person"."countryregion" where "countryregioncode" = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}""".query(using CountryregionRow.read).option
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow] = {
-    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ANY(${countryregioncodes})""".query(using CountryregionRow.read).stream
+    sql"""select "countryregioncode", "name", "modifieddate"::text from "person"."countryregion" where "countryregioncode" = ANY(${countryregioncodes})""".query(using CountryregionRow.read).stream
   }
   override def selectByIdsTracked(countryregioncodes: Array[CountryregionId]): ConnectionIO[Map[CountryregionId, CountryregionRow]] = {
     selectByIds(countryregioncodes).compile.toList.map { rows =>
@@ -90,11 +90,11 @@ class CountryregionRepoImpl extends CountryregionRepo {
     }
   }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
-    UpdateBuilder("person.countryregion", CountryregionFields.structure, CountryregionRow.read)
+    UpdateBuilder(""""person"."countryregion"""", CountryregionFields.structure, CountryregionRow.read)
   }
   override def update(row: CountryregionRow): ConnectionIO[Boolean] = {
     val countryregioncode = row.countryregioncode
-    sql"""update person.countryregion
+    sql"""update "person"."countryregion"
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where "countryregioncode" = ${fromWrite(countryregioncode)(Write.fromPut(CountryregionId.put))}"""
@@ -103,7 +103,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
-    sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+    sql"""insert into "person"."countryregion"("countryregioncode", "name", "modifieddate")
           values (
             ${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))},
             ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
@@ -118,7 +118,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
   }
   override def upsertBatch(unsaved: List[CountryregionRow]): Stream[ConnectionIO, CountryregionRow] = {
     Update[CountryregionRow](
-      s"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+      s"""insert into "person"."countryregion"("countryregioncode", "name", "modifieddate")
           values (?,?::varchar,?::timestamp)
           on conflict ("countryregioncode")
           do update set
@@ -131,9 +131,9 @@ class CountryregionRepoImpl extends CountryregionRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, CountryregionRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table countryregion_TEMP (like person.countryregion) on commit drop".update.run
+      _ <- sql"""create temporary table countryregion_TEMP (like "person"."countryregion") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy countryregion_TEMP("countryregioncode", "name", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using CountryregionRow.text)
-      res <- sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+      res <- sql"""insert into "person"."countryregion"("countryregioncode", "name", "modifieddate")
                    select * from countryregion_TEMP
                    on conflict ("countryregioncode")
                    do update set

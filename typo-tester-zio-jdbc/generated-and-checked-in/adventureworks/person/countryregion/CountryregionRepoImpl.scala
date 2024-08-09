@@ -24,16 +24,16 @@ import zio.stream.ZStream
 
 class CountryregionRepoImpl extends CountryregionRepo {
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
-    DeleteBuilder("person.countryregion", CountryregionFields.structure)
+    DeleteBuilder(""""person"."countryregion"""", CountryregionFields.structure)
   }
   override def deleteById(countryregioncode: CountryregionId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from person.countryregion where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(CountryregionId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "person"."countryregion" where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(CountryregionId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(countryregioncodes: Array[CountryregionId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from person.countryregion where "countryregioncode" = ANY(${countryregioncodes})""".delete
+    sql"""delete from "person"."countryregion" where "countryregioncode" = ANY(${countryregioncodes})""".delete
   }
   override def insert(unsaved: CountryregionRow): ZIO[ZConnection, Throwable, CountryregionRow] = {
-    sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+    sql"""insert into "person"."countryregion"("countryregioncode", "name", "modifieddate")
           values (${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)}, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "countryregioncode", "name", "modifieddate"::text
        """.insertReturning(using CountryregionRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -49,35 +49,35 @@ class CountryregionRepoImpl extends CountryregionRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into person.countryregion default values
+      sql"""insert into "person"."countryregion" default values
             returning "countryregioncode", "name", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into person.countryregion($names) values ($values) returning "countryregioncode", "name", "modifieddate"::text"""
+      sql"""insert into "person"."countryregion"($names) values ($values) returning "countryregioncode", "name", "modifieddate"::text"""
     }
     q.insertReturning(using CountryregionRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregionRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CountryregionRow.text)
+    streamingInsert(s"""COPY "person"."countryregion"("countryregioncode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CountryregionRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregionRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregionRowUnsaved.text)
+    streamingInsert(s"""COPY "person"."countryregion"("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregionRowUnsaved.text)
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
-    SelectBuilderSql("person.countryregion", CountryregionFields.structure, CountryregionRow.jdbcDecoder)
+    SelectBuilderSql(""""person"."countryregion"""", CountryregionFields.structure, CountryregionRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, CountryregionRow] = {
-    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion""".query(using CountryregionRow.jdbcDecoder).selectStream()
+    sql"""select "countryregioncode", "name", "modifieddate"::text from "person"."countryregion"""".query(using CountryregionRow.jdbcDecoder).selectStream()
   }
   override def selectById(countryregioncode: CountryregionId): ZIO[ZConnection, Throwable, Option[CountryregionRow]] = {
-    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(CountryregionId.setter)}""".query(using CountryregionRow.jdbcDecoder).selectOne
+    sql"""select "countryregioncode", "name", "modifieddate"::text from "person"."countryregion" where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(CountryregionId.setter)}""".query(using CountryregionRow.jdbcDecoder).selectOne
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId]): ZStream[ZConnection, Throwable, CountryregionRow] = {
-    sql"""select "countryregioncode", "name", "modifieddate"::text from person.countryregion where "countryregioncode" = ANY(${Segment.paramSegment(countryregioncodes)(CountryregionId.arraySetter)})""".query(using CountryregionRow.jdbcDecoder).selectStream()
+    sql"""select "countryregioncode", "name", "modifieddate"::text from "person"."countryregion" where "countryregioncode" = ANY(${Segment.paramSegment(countryregioncodes)(CountryregionId.arraySetter)})""".query(using CountryregionRow.jdbcDecoder).selectStream()
   }
   override def selectByIdsTracked(countryregioncodes: Array[CountryregionId]): ZIO[ZConnection, Throwable, Map[CountryregionId, CountryregionRow]] = {
     selectByIds(countryregioncodes).runCollect.map { rows =>
@@ -86,17 +86,17 @@ class CountryregionRepoImpl extends CountryregionRepo {
     }
   }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
-    UpdateBuilder("person.countryregion", CountryregionFields.structure, CountryregionRow.jdbcDecoder)
+    UpdateBuilder(""""person"."countryregion"""", CountryregionFields.structure, CountryregionRow.jdbcDecoder)
   }
   override def update(row: CountryregionRow): ZIO[ZConnection, Throwable, Boolean] = {
     val countryregioncode = row.countryregioncode
-    sql"""update person.countryregion
+    sql"""update "person"."countryregion"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(CountryregionId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: CountryregionRow): ZIO[ZConnection, Throwable, UpdateResult[CountryregionRow]] = {
-    sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+    sql"""insert into "person"."countryregion"("countryregioncode", "name", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.countryregioncode)(CountryregionId.setter)},
             ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
@@ -110,9 +110,9 @@ class CountryregionRepoImpl extends CountryregionRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, CountryregionRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table countryregion_TEMP (like person.countryregion) on commit drop".execute
+    val created = sql"""create temporary table countryregion_TEMP (like "person"."countryregion") on commit drop""".execute
     val copied = streamingInsert(s"""copy countryregion_TEMP("countryregioncode", "name", "modifieddate") from stdin""", batchSize, unsaved)(CountryregionRow.text)
-    val merged = sql"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+    val merged = sql"""insert into "person"."countryregion"("countryregioncode", "name", "modifieddate")
                        select * from countryregion_TEMP
                        on conflict ("countryregioncode")
                        do update set

@@ -28,24 +28,24 @@ import typo.dsl.UpdateBuilder
 
 class ProductmodelproductdescriptioncultureRepoImpl extends ProductmodelproductdescriptioncultureRepo {
   override def delete: DeleteBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
-    DeleteBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure)
+    DeleteBuilder(""""production"."productmodelproductdescriptionculture"""", ProductmodelproductdescriptioncultureFields.structure)
   }
   override def deleteById(compositeId: ProductmodelproductdescriptioncultureId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productmodelproductdescriptionculture where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "productdescriptionid" = ${ParameterValue(compositeId.productdescriptionid, null, ProductdescriptionId.toStatement)} AND "cultureid" = ${ParameterValue(compositeId.cultureid, null, CultureId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "production"."productmodelproductdescriptionculture" where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "productdescriptionid" = ${ParameterValue(compositeId.productdescriptionid, null, ProductdescriptionId.toStatement)} AND "cultureid" = ${ParameterValue(compositeId.cultureid, null, CultureId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[ProductmodelproductdescriptioncultureId])(implicit c: Connection): Int = {
     val productmodelid = compositeIds.map(_.productmodelid)
     val productdescriptionid = compositeIds.map(_.productdescriptionid)
     val cultureid = compositeIds.map(_.cultureid)
     SQL"""delete
-          from production.productmodelproductdescriptionculture
+          from "production"."productmodelproductdescriptionculture"
           where ("productmodelid", "productdescriptionid", "cultureid")
           in (select unnest(${productmodelid}), unnest(${productdescriptionid}), unnest(${cultureid}))
        """.executeUpdate()
     
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
-    SQL"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
+    SQL"""insert into "production"."productmodelproductdescriptionculture"("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
           values (${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4, ${ParameterValue(unsaved.productdescriptionid, null, ProductdescriptionId.toStatement)}::int4, ${ParameterValue(unsaved.cultureid, null, CultureId.toStatement)}::bpchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
        """
@@ -64,12 +64,12 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into production.productmodelproductdescriptionculture default values
+      SQL"""insert into "production"."productmodelproductdescriptionculture" default values
             returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
          """
         .executeInsert(ProductmodelproductdescriptioncultureRow.rowParser(1).single)
     } else {
-      val q = s"""insert into production.productmodelproductdescriptionculture(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "production"."productmodelproductdescriptionculture"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
                """
@@ -79,23 +79,23 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     
   }
   override def insertStreaming(unsaved: Iterator[ProductmodelproductdescriptioncultureRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelproductdescriptioncultureRow.text, c)
+    streamingInsert(s"""COPY "production"."productmodelproductdescriptionculture"("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductmodelproductdescriptioncultureRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductmodelproductdescriptioncultureRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductmodelproductdescriptioncultureRowUnsaved.text, c)
+    streamingInsert(s"""COPY "production"."productmodelproductdescriptionculture"("productmodelid", "productdescriptionid", "cultureid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductmodelproductdescriptioncultureRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
-    SelectBuilderSql("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.rowParser)
+    SelectBuilderSql(""""production"."productmodelproductdescriptionculture"""", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow] = {
     SQL"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
-          from production.productmodelproductdescriptionculture
+          from "production"."productmodelproductdescriptionculture"
        """.as(ProductmodelproductdescriptioncultureRow.rowParser(1).*)
   }
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId)(implicit c: Connection): Option[ProductmodelproductdescriptioncultureRow] = {
     SQL"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
-          from production.productmodelproductdescriptionculture
+          from "production"."productmodelproductdescriptionculture"
           where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "productdescriptionid" = ${ParameterValue(compositeId.productdescriptionid, null, ProductdescriptionId.toStatement)} AND "cultureid" = ${ParameterValue(compositeId.cultureid, null, CultureId.toStatement)}
        """.as(ProductmodelproductdescriptioncultureRow.rowParser(1).singleOpt)
   }
@@ -104,7 +104,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     val productdescriptionid = compositeIds.map(_.productdescriptionid)
     val cultureid = compositeIds.map(_.cultureid)
     SQL"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
-          from production.productmodelproductdescriptionculture
+          from "production"."productmodelproductdescriptionculture"
           where ("productmodelid", "productdescriptionid", "cultureid") 
           in (select unnest(${productmodelid}), unnest(${productdescriptionid}), unnest(${cultureid}))
        """.as(ProductmodelproductdescriptioncultureRow.rowParser(1).*)
@@ -115,17 +115,17 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
-    UpdateBuilder("production.productmodelproductdescriptionculture", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.rowParser)
+    UpdateBuilder(""""production"."productmodelproductdescriptionculture"""", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.rowParser)
   }
   override def update(row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
-    SQL"""update production.productmodelproductdescriptionculture
+    SQL"""update "production"."productmodelproductdescriptionculture"
           set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "productdescriptionid" = ${ParameterValue(compositeId.productdescriptionid, null, ProductdescriptionId.toStatement)} AND "cultureid" = ${ParameterValue(compositeId.cultureid, null, CultureId.toStatement)}
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
-    SQL"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
+    SQL"""insert into "production"."productmodelproductdescriptionculture"("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
           values (
             ${ParameterValue(unsaved.productmodelid, null, ProductmodelId.toStatement)}::int4,
             ${ParameterValue(unsaved.productdescriptionid, null, ProductdescriptionId.toStatement)}::int4,
@@ -152,7 +152,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
+            s"""insert into "production"."productmodelproductdescriptionculture"("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
                 values ({productmodelid}::int4, {productdescriptionid}::int4, {cultureid}::bpchar, {modifieddate}::timestamp)
                 on conflict ("productmodelid", "productdescriptionid", "cultureid")
                 do update set
@@ -167,9 +167,9 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductmodelproductdescriptioncultureRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table productmodelproductdescriptionculture_TEMP (like production.productmodelproductdescriptionculture) on commit drop".execute(): @nowarn
+    SQL"""create temporary table productmodelproductdescriptionculture_TEMP (like "production"."productmodelproductdescriptionculture") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy productmodelproductdescriptionculture_TEMP("productmodelid", "productdescriptionid", "cultureid", "modifieddate") from stdin""", batchSize, unsaved)(ProductmodelproductdescriptioncultureRow.text, c): @nowarn
-    SQL"""insert into production.productmodelproductdescriptionculture("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
+    SQL"""insert into "production"."productmodelproductdescriptionculture"("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
           select * from productmodelproductdescriptionculture_TEMP
           on conflict ("productmodelid", "productdescriptionid", "cultureid")
           do update set

@@ -29,20 +29,20 @@ import typo.dsl.UpdateBuilder
 
 class SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def delete: DeleteBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    DeleteBuilder("sales.salesterritory", SalesterritoryFields.structure)
+    DeleteBuilder(""""sales"."salesterritory"""", SalesterritoryFields.structure)
   }
   override def deleteById(territoryid: SalesterritoryId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.salesterritory where "territoryid" = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "sales"."salesterritory" where "territoryid" = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): Int = {
     SQL"""delete
-          from sales.salesterritory
+          from "sales"."salesterritory"
           where "territoryid" = ANY(${territoryids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
-    SQL"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."salesterritory"("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.territoryid, null, SalesterritoryId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)}, ${ParameterValue(unsaved.group, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.salesytd, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.saleslastyear, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.costytd, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.costlastyear, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
        """
@@ -85,12 +85,12 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into sales.salesterritory default values
+      SQL"""insert into "sales"."salesterritory" default values
             returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
          """
         .executeInsert(SalesterritoryRow.rowParser(1).single)
     } else {
-      val q = s"""insert into sales.salesterritory(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "sales"."salesterritory"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
                """
@@ -100,29 +100,29 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[SalesterritoryRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesterritoryRow.text, c)
+    streamingInsert(s"""COPY "sales"."salesterritory"("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesterritoryRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SalesterritoryRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salesterritory("name", "countryregioncode", "group", "territoryid", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesterritoryRowUnsaved.text, c)
+    streamingInsert(s"""COPY "sales"."salesterritory"("name", "countryregioncode", "group", "territoryid", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesterritoryRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    SelectBuilderSql("sales.salesterritory", SalesterritoryFields.structure, SalesterritoryRow.rowParser)
+    SelectBuilderSql(""""sales"."salesterritory"""", SalesterritoryFields.structure, SalesterritoryRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SalesterritoryRow] = {
     SQL"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
-          from sales.salesterritory
+          from "sales"."salesterritory"
        """.as(SalesterritoryRow.rowParser(1).*)
   }
   override def selectById(territoryid: SalesterritoryId)(implicit c: Connection): Option[SalesterritoryRow] = {
     SQL"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
-          from sales.salesterritory
+          from "sales"."salesterritory"
           where "territoryid" = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}
        """.as(SalesterritoryRow.rowParser(1).singleOpt)
   }
   override def selectByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow] = {
     SQL"""select "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
-          from sales.salesterritory
+          from "sales"."salesterritory"
           where "territoryid" = ANY(${territoryids})
        """.as(SalesterritoryRow.rowParser(1).*)
     
@@ -132,11 +132,11 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
     territoryids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
-    UpdateBuilder("sales.salesterritory", SalesterritoryFields.structure, SalesterritoryRow.rowParser)
+    UpdateBuilder(""""sales"."salesterritory"""", SalesterritoryFields.structure, SalesterritoryRow.rowParser)
   }
   override def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
     val territoryid = row.territoryid
-    SQL"""update sales.salesterritory
+    SQL"""update "sales"."salesterritory"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "countryregioncode" = ${ParameterValue(row.countryregioncode, null, CountryregionId.toStatement)},
               "group" = ${ParameterValue(row.group, null, ToStatement.stringToStatement)},
@@ -150,7 +150,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
-    SQL"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."salesterritory"("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.territoryid, null, SalesterritoryId.toStatement)}::int4,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
@@ -197,7 +197,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
+            s"""insert into "sales"."salesterritory"("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
                 values ({territoryid}::int4, {name}::varchar, {countryregioncode}, {group}, {salesytd}::numeric, {saleslastyear}::numeric, {costytd}::numeric, {costlastyear}::numeric, {rowguid}::uuid, {modifieddate}::timestamp)
                 on conflict ("territoryid")
                 do update set
@@ -220,9 +220,9 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[SalesterritoryRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table salesterritory_TEMP (like sales.salesterritory) on commit drop".execute(): @nowarn
+    SQL"""create temporary table salesterritory_TEMP (like "sales"."salesterritory") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy salesterritory_TEMP("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalesterritoryRow.text, c): @nowarn
-    SQL"""insert into sales.salesterritory("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."salesterritory"("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")
           select * from salesterritory_TEMP
           on conflict ("territoryid")
           do update set

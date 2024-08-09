@@ -15,9 +15,9 @@ import zio.stream.ZStream
 
 class VpersondemographicsViewRepoImpl extends VpersondemographicsViewRepo {
   override def select: SelectBuilder[VpersondemographicsViewFields, VpersondemographicsViewRow] = {
-    SelectBuilderSql("sales.vpersondemographics", VpersondemographicsViewFields.structure, VpersondemographicsViewRow.jdbcDecoder)
+    SelectBuilderSql(""""sales"."vpersondemographics"""", VpersondemographicsViewFields.structure, VpersondemographicsViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, VpersondemographicsViewRow] = {
-    sql"""select "businessentityid", "totalpurchaseytd"::numeric, "datefirstpurchase"::text, "birthdate"::text, "maritalstatus", "yearlyincome", "gender", "totalchildren", "numberchildrenathome", "education", "occupation", "homeownerflag", "numbercarsowned" from sales.vpersondemographics""".query(using VpersondemographicsViewRow.jdbcDecoder).selectStream()
+    sql"""select "businessentityid", "totalpurchaseytd"::numeric, "datefirstpurchase"::text, "birthdate"::text, "maritalstatus", "yearlyincome", "gender", "totalchildren", "numberchildrenathome", "education", "occupation", "homeownerflag", "numbercarsowned" from "sales"."vpersondemographics"""".query(using VpersondemographicsViewRow.jdbcDecoder).selectStream()
   }
 }

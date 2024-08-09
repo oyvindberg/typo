@@ -26,20 +26,20 @@ import typo.dsl.UpdateBuilder
 
 class CountryregionRepoImpl extends CountryregionRepo {
   override def delete: DeleteBuilder[CountryregionFields, CountryregionRow] = {
-    DeleteBuilder("person.countryregion", CountryregionFields.structure)
+    DeleteBuilder(""""person"."countryregion"""", CountryregionFields.structure)
   }
   override def deleteById(countryregioncode: CountryregionId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.countryregion where "countryregioncode" = ${ParameterValue(countryregioncode, null, CountryregionId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "person"."countryregion" where "countryregioncode" = ${ParameterValue(countryregioncode, null, CountryregionId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): Int = {
     SQL"""delete
-          from person.countryregion
+          from "person"."countryregion"
           where "countryregioncode" = ANY(${countryregioncodes})
        """.executeUpdate()
     
   }
   override def insert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
-    SQL"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+    SQL"""insert into "person"."countryregion"("countryregioncode", "name", "modifieddate")
           values (${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)}, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "countryregioncode", "name", "modifieddate"::text
        """
@@ -57,12 +57,12 @@ class CountryregionRepoImpl extends CountryregionRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into person.countryregion default values
+      SQL"""insert into "person"."countryregion" default values
             returning "countryregioncode", "name", "modifieddate"::text
          """
         .executeInsert(CountryregionRow.rowParser(1).single)
     } else {
-      val q = s"""insert into person.countryregion(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "person"."countryregion"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "countryregioncode", "name", "modifieddate"::text
                """
@@ -72,29 +72,29 @@ class CountryregionRepoImpl extends CountryregionRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[CountryregionRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CountryregionRow.text, c)
+    streamingInsert(s"""COPY "person"."countryregion"("countryregioncode", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(CountryregionRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[CountryregionRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.countryregion("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregionRowUnsaved.text, c)
+    streamingInsert(s"""COPY "person"."countryregion"("countryregioncode", "name", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CountryregionRowUnsaved.text, c)
   }
   override def select: SelectBuilder[CountryregionFields, CountryregionRow] = {
-    SelectBuilderSql("person.countryregion", CountryregionFields.structure, CountryregionRow.rowParser)
+    SelectBuilderSql(""""person"."countryregion"""", CountryregionFields.structure, CountryregionRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CountryregionRow] = {
     SQL"""select "countryregioncode", "name", "modifieddate"::text
-          from person.countryregion
+          from "person"."countryregion"
        """.as(CountryregionRow.rowParser(1).*)
   }
   override def selectById(countryregioncode: CountryregionId)(implicit c: Connection): Option[CountryregionRow] = {
     SQL"""select "countryregioncode", "name", "modifieddate"::text
-          from person.countryregion
+          from "person"."countryregion"
           where "countryregioncode" = ${ParameterValue(countryregioncode, null, CountryregionId.toStatement)}
        """.as(CountryregionRow.rowParser(1).singleOpt)
   }
   override def selectByIds(countryregioncodes: Array[CountryregionId])(implicit c: Connection): List[CountryregionRow] = {
     SQL"""select "countryregioncode", "name", "modifieddate"::text
-          from person.countryregion
+          from "person"."countryregion"
           where "countryregioncode" = ANY(${countryregioncodes})
        """.as(CountryregionRow.rowParser(1).*)
     
@@ -104,18 +104,18 @@ class CountryregionRepoImpl extends CountryregionRepo {
     countryregioncodes.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
-    UpdateBuilder("person.countryregion", CountryregionFields.structure, CountryregionRow.rowParser)
+    UpdateBuilder(""""person"."countryregion"""", CountryregionFields.structure, CountryregionRow.rowParser)
   }
   override def update(row: CountryregionRow)(implicit c: Connection): Boolean = {
     val countryregioncode = row.countryregioncode
-    SQL"""update person.countryregion
+    SQL"""update "person"."countryregion"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "countryregioncode" = ${ParameterValue(countryregioncode, null, CountryregionId.toStatement)}
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: CountryregionRow)(implicit c: Connection): CountryregionRow = {
-    SQL"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+    SQL"""insert into "person"."countryregion"("countryregioncode", "name", "modifieddate")
           values (
             ${ParameterValue(unsaved.countryregioncode, null, CountryregionId.toStatement)},
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
@@ -141,7 +141,7 @@ class CountryregionRepoImpl extends CountryregionRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+            s"""insert into "person"."countryregion"("countryregioncode", "name", "modifieddate")
                 values ({countryregioncode}, {name}::varchar, {modifieddate}::timestamp)
                 on conflict ("countryregioncode")
                 do update set
@@ -157,9 +157,9 @@ class CountryregionRepoImpl extends CountryregionRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[CountryregionRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table countryregion_TEMP (like person.countryregion) on commit drop".execute(): @nowarn
+    SQL"""create temporary table countryregion_TEMP (like "person"."countryregion") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy countryregion_TEMP("countryregioncode", "name", "modifieddate") from stdin""", batchSize, unsaved)(CountryregionRow.text, c): @nowarn
-    SQL"""insert into person.countryregion("countryregioncode", "name", "modifieddate")
+    SQL"""insert into "person"."countryregion"("countryregioncode", "name", "modifieddate")
           select * from countryregion_TEMP
           on conflict ("countryregioncode")
           do update set

@@ -28,24 +28,24 @@ import typo.dsl.UpdateBuilder
 
 class PersonphoneRepoImpl extends PersonphoneRepo {
   override def delete: DeleteBuilder[PersonphoneFields, PersonphoneRow] = {
-    DeleteBuilder("person.personphone", PersonphoneFields.structure)
+    DeleteBuilder(""""person"."personphone"""", PersonphoneFields.structure)
   }
   override def deleteById(compositeId: PersonphoneId): ConnectionIO[Boolean] = {
-    sql"""delete from person.personphone where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "person"."personphone" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[PersonphoneId]): ConnectionIO[Int] = {
     val businessentityid = compositeIds.map(_.businessentityid)
     val phonenumber = compositeIds.map(_.phonenumber)
     val phonenumbertypeid = compositeIds.map(_.phonenumbertypeid)
     sql"""delete
-          from person.personphone
+          from "person"."personphone"
           where ("businessentityid", "phonenumber", "phonenumbertypeid")
           in (select unnest(${businessentityid}), unnest(${phonenumber}), unnest(${phonenumbertypeid}))
        """.update.run
     
   }
   override def insert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
-    sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
+    sql"""insert into "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.phonenumber)(Write.fromPut(Phone.put))}::varchar, ${fromWrite(unsaved.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}::int4, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
        """.query(using PersonphoneRow.read).unique
@@ -62,12 +62,12 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into person.personphone default values
+      sql"""insert into "person"."personphone" default values
             returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into person.personphone(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "person"."personphone"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
          """
@@ -76,27 +76,27 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, PersonphoneRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PersonphoneRow.text)
+    new FragmentOps(sql"""COPY "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using PersonphoneRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, PersonphoneRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PersonphoneRowUnsaved.text)
+    new FragmentOps(sql"""COPY "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using PersonphoneRowUnsaved.text)
   }
   override def select: SelectBuilder[PersonphoneFields, PersonphoneRow] = {
-    SelectBuilderSql("person.personphone", PersonphoneFields.structure, PersonphoneRow.read)
+    SelectBuilderSql(""""person"."personphone"""", PersonphoneFields.structure, PersonphoneRow.read)
   }
   override def selectAll: Stream[ConnectionIO, PersonphoneRow] = {
-    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone""".query(using PersonphoneRow.read).stream
+    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from "person"."personphone"""".query(using PersonphoneRow.read).stream
   }
   override def selectById(compositeId: PersonphoneId): ConnectionIO[Option[PersonphoneRow]] = {
-    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from person.personphone where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".query(using PersonphoneRow.read).option
+    sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text from "person"."personphone" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}""".query(using PersonphoneRow.read).option
   }
   override def selectByIds(compositeIds: Array[PersonphoneId]): Stream[ConnectionIO, PersonphoneRow] = {
     val businessentityid = compositeIds.map(_.businessentityid)
     val phonenumber = compositeIds.map(_.phonenumber)
     val phonenumbertypeid = compositeIds.map(_.phonenumbertypeid)
     sql"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
-          from person.personphone
+          from "person"."personphone"
           where ("businessentityid", "phonenumber", "phonenumbertypeid") 
           in (select unnest(${businessentityid}), unnest(${phonenumber}), unnest(${phonenumbertypeid}))
        """.query(using PersonphoneRow.read).stream
@@ -109,11 +109,11 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     }
   }
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
-    UpdateBuilder("person.personphone", PersonphoneFields.structure, PersonphoneRow.read)
+    UpdateBuilder(""""person"."personphone"""", PersonphoneFields.structure, PersonphoneRow.read)
   }
   override def update(row: PersonphoneRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
-    sql"""update person.personphone
+    sql"""update "person"."personphone"
           set "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(Write.fromPut(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(Write.fromPut(PhonenumbertypeId.put))}"""
       .update
@@ -121,7 +121,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
-    sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
+    sql"""insert into "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
           values (
             ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
             ${fromWrite(unsaved.phonenumber)(Write.fromPut(Phone.put))}::varchar,
@@ -136,7 +136,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
   }
   override def upsertBatch(unsaved: List[PersonphoneRow]): Stream[ConnectionIO, PersonphoneRow] = {
     Update[PersonphoneRow](
-      s"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
+      s"""insert into "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
           values (?::int4,?::varchar,?::int4,?::timestamp)
           on conflict ("businessentityid", "phonenumber", "phonenumbertypeid")
           do update set
@@ -148,9 +148,9 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, PersonphoneRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table personphone_TEMP (like person.personphone) on commit drop".update.run
+      _ <- sql"""create temporary table personphone_TEMP (like "person"."personphone") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy personphone_TEMP("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using PersonphoneRow.text)
-      res <- sql"""insert into person.personphone("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
+      res <- sql"""insert into "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")
                    select * from personphone_TEMP
                    on conflict ("businessentityid", "phonenumber", "phonenumbertypeid")
                    do update set

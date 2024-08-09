@@ -26,23 +26,23 @@ import zio.stream.ZStream
 
 class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def delete: DeleteBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    DeleteBuilder("sales.specialofferproduct", SpecialofferproductFields.structure)
+    DeleteBuilder(""""sales"."specialofferproduct"""", SpecialofferproductFields.structure)
   }
   override def deleteById(compositeId: SpecialofferproductId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.specialofferproduct where "specialofferid" = ${Segment.paramSegment(compositeId.specialofferid)(SpecialofferId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "sales"."specialofferproduct" where "specialofferid" = ${Segment.paramSegment(compositeId.specialofferid)(SpecialofferId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[SpecialofferproductId]): ZIO[ZConnection, Throwable, Long] = {
     val specialofferid = compositeIds.map(_.specialofferid)
     val productid = compositeIds.map(_.productid)
     sql"""delete
-          from sales.specialofferproduct
+          from "sales"."specialofferproduct"
           where ("specialofferid", "productid")
           in (select unnest(${specialofferid}), unnest(${productid}))
        """.delete
     
   }
   override def insert(unsaved: SpecialofferproductRow): ZIO[ZConnection, Throwable, SpecialofferproductRow] = {
-    sql"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")
+    sql"""insert into "sales"."specialofferproduct"("specialofferid", "productid", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.specialofferid)(SpecialofferId.setter)}::int4, ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "specialofferid", "productid", "rowguid", "modifieddate"::text
        """.insertReturning(using SpecialofferproductRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -62,38 +62,38 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into sales.specialofferproduct default values
+      sql"""insert into "sales"."specialofferproduct" default values
             returning "specialofferid", "productid", "rowguid", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into sales.specialofferproduct($names) values ($values) returning "specialofferid", "productid", "rowguid", "modifieddate"::text"""
+      sql"""insert into "sales"."specialofferproduct"($names) values ($values) returning "specialofferid", "productid", "rowguid", "modifieddate"::text"""
     }
     q.insertReturning(using SpecialofferproductRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferproductRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SpecialofferproductRow.text)
+    streamingInsert(s"""COPY "sales"."specialofferproduct"("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SpecialofferproductRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferproductRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SpecialofferproductRowUnsaved.text)
+    streamingInsert(s"""COPY "sales"."specialofferproduct"("specialofferid", "productid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SpecialofferproductRowUnsaved.text)
   }
   override def select: SelectBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    SelectBuilderSql("sales.specialofferproduct", SpecialofferproductFields.structure, SpecialofferproductRow.jdbcDecoder)
+    SelectBuilderSql(""""sales"."specialofferproduct"""", SpecialofferproductFields.structure, SpecialofferproductRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SpecialofferproductRow] = {
-    sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text from sales.specialofferproduct""".query(using SpecialofferproductRow.jdbcDecoder).selectStream()
+    sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text from "sales"."specialofferproduct"""".query(using SpecialofferproductRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: SpecialofferproductId): ZIO[ZConnection, Throwable, Option[SpecialofferproductRow]] = {
-    sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text from sales.specialofferproduct where "specialofferid" = ${Segment.paramSegment(compositeId.specialofferid)(SpecialofferId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)}""".query(using SpecialofferproductRow.jdbcDecoder).selectOne
+    sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text from "sales"."specialofferproduct" where "specialofferid" = ${Segment.paramSegment(compositeId.specialofferid)(SpecialofferId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)}""".query(using SpecialofferproductRow.jdbcDecoder).selectOne
   }
   override def selectByIds(compositeIds: Array[SpecialofferproductId]): ZStream[ZConnection, Throwable, SpecialofferproductRow] = {
     val specialofferid = compositeIds.map(_.specialofferid)
     val productid = compositeIds.map(_.productid)
     sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text
-          from sales.specialofferproduct
+          from "sales"."specialofferproduct"
           where ("specialofferid", "productid")
           in (select unnest(${specialofferid}), unnest(${productid}))
        """.query(using SpecialofferproductRow.jdbcDecoder).selectStream()
@@ -106,17 +106,17 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     }
   }
   override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
-    UpdateBuilder("sales.specialofferproduct", SpecialofferproductFields.structure, SpecialofferproductRow.jdbcDecoder)
+    UpdateBuilder(""""sales"."specialofferproduct"""", SpecialofferproductFields.structure, SpecialofferproductRow.jdbcDecoder)
   }
   override def update(row: SpecialofferproductRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
-    sql"""update sales.specialofferproduct
+    sql"""update "sales"."specialofferproduct"
           set "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "specialofferid" = ${Segment.paramSegment(compositeId.specialofferid)(SpecialofferId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: SpecialofferproductRow): ZIO[ZConnection, Throwable, UpdateResult[SpecialofferproductRow]] = {
-    sql"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")
+    sql"""insert into "sales"."specialofferproduct"("specialofferid", "productid", "rowguid", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.specialofferid)(SpecialofferId.setter)}::int4,
             ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
@@ -131,9 +131,9 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SpecialofferproductRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table specialofferproduct_TEMP (like sales.specialofferproduct) on commit drop".execute
+    val created = sql"""create temporary table specialofferproduct_TEMP (like "sales"."specialofferproduct") on commit drop""".execute
     val copied = streamingInsert(s"""copy specialofferproduct_TEMP("specialofferid", "productid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SpecialofferproductRow.text)
-    val merged = sql"""insert into sales.specialofferproduct("specialofferid", "productid", "rowguid", "modifieddate")
+    val merged = sql"""insert into "sales"."specialofferproduct"("specialofferid", "productid", "rowguid", "modifieddate")
                        select * from specialofferproduct_TEMP
                        on conflict ("specialofferid", "productid")
                        do update set

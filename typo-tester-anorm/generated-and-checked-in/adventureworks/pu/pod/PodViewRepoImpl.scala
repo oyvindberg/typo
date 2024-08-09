@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class PodViewRepoImpl extends PodViewRepo {
   override def select: SelectBuilder[PodViewFields, PodViewRow] = {
-    SelectBuilderSql("pu.pod", PodViewFields.structure, PodViewRow.rowParser)
+    SelectBuilderSql(""""pu"."pod"""", PodViewFields.structure, PodViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PodViewRow] = {
     SQL"""select "id", "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text
-          from pu.pod
+          from "pu"."pod"
        """.as(PodViewRow.rowParser(1).*)
   }
 }

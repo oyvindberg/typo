@@ -30,16 +30,16 @@ import typo.dsl.UpdateBuilder
 
 class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def delete: DeleteBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    DeleteBuilder("sales.salestaxrate", SalestaxrateFields.structure)
+    DeleteBuilder(""""sales"."salestaxrate"""", SalestaxrateFields.structure)
   }
   override def deleteById(salestaxrateid: SalestaxrateId): ConnectionIO[Boolean] = {
-    sql"""delete from sales.salestaxrate where "salestaxrateid" = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."salestaxrate" where "salestaxrateid" = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(salestaxrateids: Array[SalestaxrateId]): ConnectionIO[Int] = {
-    sql"""delete from sales.salestaxrate where "salestaxrateid" = ANY(${salestaxrateids})""".update.run
+    sql"""delete from "sales"."salestaxrate" where "salestaxrateid" = ANY(${salestaxrateids})""".update.run
   }
   override def insert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
-    sql"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+    sql"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.salestaxrateid)(Write.fromPut(SalestaxrateId.put))}::int4, ${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4, ${fromWrite(unsaved.taxtype)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.taxrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
        """.query(using SalestaxrateRow.read).unique
@@ -68,12 +68,12 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into sales.salestaxrate default values
+      sql"""insert into "sales"."salestaxrate" default values
             returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into sales.salestaxrate(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "sales"."salestaxrate"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
          """
@@ -82,23 +82,23 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalestaxrateRow.text)
+    new FragmentOps(sql"""COPY "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using SalestaxrateRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY sales.salestaxrate("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalestaxrateRowUnsaved.text)
+    new FragmentOps(sql"""COPY "sales"."salestaxrate"("stateprovinceid", "taxtype", "name", "salestaxrateid", "taxrate", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using SalestaxrateRowUnsaved.text)
   }
   override def select: SelectBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    SelectBuilderSql("sales.salestaxrate", SalestaxrateFields.structure, SalestaxrateRow.read)
+    SelectBuilderSql(""""sales"."salestaxrate"""", SalestaxrateFields.structure, SalestaxrateRow.read)
   }
   override def selectAll: Stream[ConnectionIO, SalestaxrateRow] = {
-    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate""".query(using SalestaxrateRow.read).stream
+    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from "sales"."salestaxrate"""".query(using SalestaxrateRow.read).stream
   }
   override def selectById(salestaxrateid: SalestaxrateId): ConnectionIO[Option[SalestaxrateRow]] = {
-    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate where "salestaxrateid" = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}""".query(using SalestaxrateRow.read).option
+    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from "sales"."salestaxrate" where "salestaxrateid" = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}""".query(using SalestaxrateRow.read).option
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId]): Stream[ConnectionIO, SalestaxrateRow] = {
-    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from sales.salestaxrate where "salestaxrateid" = ANY(${salestaxrateids})""".query(using SalestaxrateRow.read).stream
+    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from "sales"."salestaxrate" where "salestaxrateid" = ANY(${salestaxrateids})""".query(using SalestaxrateRow.read).stream
   }
   override def selectByIdsTracked(salestaxrateids: Array[SalestaxrateId]): ConnectionIO[Map[SalestaxrateId, SalestaxrateRow]] = {
     selectByIds(salestaxrateids).compile.toList.map { rows =>
@@ -107,11 +107,11 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     }
   }
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
-    UpdateBuilder("sales.salestaxrate", SalestaxrateFields.structure, SalestaxrateRow.read)
+    UpdateBuilder(""""sales"."salestaxrate"""", SalestaxrateFields.structure, SalestaxrateRow.read)
   }
   override def update(row: SalestaxrateRow): ConnectionIO[Boolean] = {
     val salestaxrateid = row.salestaxrateid
-    sql"""update sales.salestaxrate
+    sql"""update "sales"."salestaxrate"
           set "stateprovinceid" = ${fromWrite(row.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4,
               "taxtype" = ${fromWrite(row.taxtype)(Write.fromPut(TypoShort.put))}::int2,
               "taxrate" = ${fromWrite(row.taxrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
@@ -124,7 +124,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
-    sql"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+    sql"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           values (
             ${fromWrite(unsaved.salestaxrateid)(Write.fromPut(SalestaxrateId.put))}::int4,
             ${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4,
@@ -147,7 +147,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   }
   override def upsertBatch(unsaved: List[SalestaxrateRow]): Stream[ConnectionIO, SalestaxrateRow] = {
     Update[SalestaxrateRow](
-      s"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+      s"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           values (?::int4,?::int4,?::int2,?::numeric,?::varchar,?::uuid,?::timestamp)
           on conflict ("salestaxrateid")
           do update set
@@ -164,9 +164,9 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, SalestaxrateRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table salestaxrate_TEMP (like sales.salestaxrate) on commit drop".update.run
+      _ <- sql"""create temporary table salestaxrate_TEMP (like "sales"."salestaxrate") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy salestaxrate_TEMP("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using SalestaxrateRow.text)
-      res <- sql"""insert into sales.salestaxrate("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
+      res <- sql"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
                    select * from salestaxrate_TEMP
                    on conflict ("salestaxrateid")
                    do update set

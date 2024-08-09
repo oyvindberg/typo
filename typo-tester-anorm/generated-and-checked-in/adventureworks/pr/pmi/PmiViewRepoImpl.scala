@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class PmiViewRepoImpl extends PmiViewRepo {
   override def select: SelectBuilder[PmiViewFields, PmiViewRow] = {
-    SelectBuilderSql("pr.pmi", PmiViewFields.structure, PmiViewRow.rowParser)
+    SelectBuilderSql(""""pr"."pmi"""", PmiViewFields.structure, PmiViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PmiViewRow] = {
     SQL"""select "productmodelid", "illustrationid", "modifieddate"::text
-          from pr.pmi
+          from "pr"."pmi"
        """.as(PmiViewRow.rowParser(1).*)
   }
 }

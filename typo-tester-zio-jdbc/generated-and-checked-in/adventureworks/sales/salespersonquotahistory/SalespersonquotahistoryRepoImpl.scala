@@ -26,23 +26,23 @@ import zio.stream.ZStream
 
 class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def delete: DeleteBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    DeleteBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure)
+    DeleteBuilder(""""sales"."salespersonquotahistory"""", SalespersonquotahistoryFields.structure)
   }
   override def deleteById(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from sales.salespersonquotahistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "quotadate" = ${Segment.paramSegment(compositeId.quotadate)(TypoLocalDateTime.setter)}""".delete.map(_ > 0)
+    sql"""delete from "sales"."salespersonquotahistory" where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "quotadate" = ${Segment.paramSegment(compositeId.quotadate)(TypoLocalDateTime.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[SalespersonquotahistoryId]): ZIO[ZConnection, Throwable, Long] = {
     val businessentityid = compositeIds.map(_.businessentityid)
     val quotadate = compositeIds.map(_.quotadate)
     sql"""delete
-          from sales.salespersonquotahistory
+          from "sales"."salespersonquotahistory"
           where ("businessentityid", "quotadate")
           in (select unnest(${businessentityid}), unnest(${quotadate}))
        """.delete
     
   }
   override def insert(unsaved: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, SalespersonquotahistoryRow] = {
-    sql"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
+    sql"""insert into "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4, ${Segment.paramSegment(unsaved.quotadate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.salesquota)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
        """.insertReturning(using SalespersonquotahistoryRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -63,38 +63,38 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into sales.salespersonquotahistory default values
+      sql"""insert into "sales"."salespersonquotahistory" default values
             returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into sales.salespersonquotahistory($names) values ($values) returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text"""
+      sql"""insert into "sales"."salespersonquotahistory"($names) values ($values) returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text"""
     }
     q.insertReturning(using SalespersonquotahistoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalespersonquotahistoryRow.text)
+    streamingInsert(s"""COPY "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalespersonquotahistoryRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonquotahistoryRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalespersonquotahistoryRowUnsaved.text)
+    streamingInsert(s"""COPY "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalespersonquotahistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    SelectBuilderSql("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.jdbcDecoder)
+    SelectBuilderSql(""""sales"."salespersonquotahistory"""", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow] = {
-    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory""".query(using SalespersonquotahistoryRow.jdbcDecoder).selectStream()
+    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from "sales"."salespersonquotahistory"""".query(using SalespersonquotahistoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: SalespersonquotahistoryId): ZIO[ZConnection, Throwable, Option[SalespersonquotahistoryRow]] = {
-    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from sales.salespersonquotahistory where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "quotadate" = ${Segment.paramSegment(compositeId.quotadate)(TypoLocalDateTime.setter)}""".query(using SalespersonquotahistoryRow.jdbcDecoder).selectOne
+    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from "sales"."salespersonquotahistory" where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "quotadate" = ${Segment.paramSegment(compositeId.quotadate)(TypoLocalDateTime.setter)}""".query(using SalespersonquotahistoryRow.jdbcDecoder).selectOne
   }
   override def selectByIds(compositeIds: Array[SalespersonquotahistoryId]): ZStream[ZConnection, Throwable, SalespersonquotahistoryRow] = {
     val businessentityid = compositeIds.map(_.businessentityid)
     val quotadate = compositeIds.map(_.quotadate)
     sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
-          from sales.salespersonquotahistory
+          from "sales"."salespersonquotahistory"
           where ("businessentityid", "quotadate")
           in (select unnest(${businessentityid}), unnest(${quotadate}))
        """.query(using SalespersonquotahistoryRow.jdbcDecoder).selectStream()
@@ -107,18 +107,18 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     }
   }
   override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
-    UpdateBuilder("sales.salespersonquotahistory", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.jdbcDecoder)
+    UpdateBuilder(""""sales"."salespersonquotahistory"""", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.jdbcDecoder)
   }
   override def update(row: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
-    sql"""update sales.salespersonquotahistory
+    sql"""update "sales"."salespersonquotahistory"
           set "salesquota" = ${Segment.paramSegment(row.salesquota)(Setter.bigDecimalScalaSetter)}::numeric,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "quotadate" = ${Segment.paramSegment(compositeId.quotadate)(TypoLocalDateTime.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, UpdateResult[SalespersonquotahistoryRow]] = {
-    sql"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
+    sql"""insert into "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.businessentityid)(BusinessentityId.setter)}::int4,
             ${Segment.paramSegment(unsaved.quotadate)(TypoLocalDateTime.setter)}::timestamp,
@@ -135,9 +135,9 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, SalespersonquotahistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table salespersonquotahistory_TEMP (like sales.salespersonquotahistory) on commit drop".execute
+    val created = sql"""create temporary table salespersonquotahistory_TEMP (like "sales"."salespersonquotahistory") on commit drop""".execute
     val copied = streamingInsert(s"""copy salespersonquotahistory_TEMP("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalespersonquotahistoryRow.text)
-    val merged = sql"""insert into sales.salespersonquotahistory("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
+    val merged = sql"""insert into "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
                        select * from salespersonquotahistory_TEMP
                        on conflict ("businessentityid", "quotadate")
                        do update set

@@ -25,16 +25,16 @@ import zio.stream.ZStream
 
 class ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def delete: DeleteBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    DeleteBuilder("production.productcategory", ProductcategoryFields.structure)
+    DeleteBuilder(""""production"."productcategory"""", ProductcategoryFields.structure)
   }
   override def deleteById(productcategoryid: ProductcategoryId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.productcategory where "productcategoryid" = ${Segment.paramSegment(productcategoryid)(ProductcategoryId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "production"."productcategory" where "productcategoryid" = ${Segment.paramSegment(productcategoryid)(ProductcategoryId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(productcategoryids: Array[ProductcategoryId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from production.productcategory where "productcategoryid" = ANY(${productcategoryids})""".delete
+    sql"""delete from "production"."productcategory" where "productcategoryid" = ANY(${productcategoryids})""".delete
   }
   override def insert(unsaved: ProductcategoryRow): ZIO[ZConnection, Throwable, ProductcategoryRow] = {
-    sql"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")
+    sql"""insert into "production"."productcategory"("productcategoryid", "name", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.productcategoryid)(ProductcategoryId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productcategoryid", "name", "rowguid", "modifieddate"::text
        """.insertReturning(using ProductcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -57,35 +57,35 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.productcategory default values
+      sql"""insert into "production"."productcategory" default values
             returning "productcategoryid", "name", "rowguid", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into production.productcategory($names) values ($values) returning "productcategoryid", "name", "rowguid", "modifieddate"::text"""
+      sql"""insert into "production"."productcategory"($names) values ($values) returning "productcategoryid", "name", "rowguid", "modifieddate"::text"""
     }
     q.insertReturning(using ProductcategoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductcategoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.productcategory("productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductcategoryRow.text)
+    streamingInsert(s"""COPY "production"."productcategory"("productcategoryid", "name", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductcategoryRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductcategoryRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.productcategory("name", "productcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductcategoryRowUnsaved.text)
+    streamingInsert(s"""COPY "production"."productcategory"("name", "productcategoryid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductcategoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    SelectBuilderSql("production.productcategory", ProductcategoryFields.structure, ProductcategoryRow.jdbcDecoder)
+    SelectBuilderSql(""""production"."productcategory"""", ProductcategoryFields.structure, ProductcategoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductcategoryRow] = {
-    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory""".query(using ProductcategoryRow.jdbcDecoder).selectStream()
+    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from "production"."productcategory"""".query(using ProductcategoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(productcategoryid: ProductcategoryId): ZIO[ZConnection, Throwable, Option[ProductcategoryRow]] = {
-    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory where "productcategoryid" = ${Segment.paramSegment(productcategoryid)(ProductcategoryId.setter)}""".query(using ProductcategoryRow.jdbcDecoder).selectOne
+    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from "production"."productcategory" where "productcategoryid" = ${Segment.paramSegment(productcategoryid)(ProductcategoryId.setter)}""".query(using ProductcategoryRow.jdbcDecoder).selectOne
   }
   override def selectByIds(productcategoryids: Array[ProductcategoryId]): ZStream[ZConnection, Throwable, ProductcategoryRow] = {
-    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from production.productcategory where "productcategoryid" = ANY(${Segment.paramSegment(productcategoryids)(ProductcategoryId.arraySetter)})""".query(using ProductcategoryRow.jdbcDecoder).selectStream()
+    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from "production"."productcategory" where "productcategoryid" = ANY(${Segment.paramSegment(productcategoryids)(ProductcategoryId.arraySetter)})""".query(using ProductcategoryRow.jdbcDecoder).selectStream()
   }
   override def selectByIdsTracked(productcategoryids: Array[ProductcategoryId]): ZIO[ZConnection, Throwable, Map[ProductcategoryId, ProductcategoryRow]] = {
     selectByIds(productcategoryids).runCollect.map { rows =>
@@ -94,18 +94,18 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     }
   }
   override def update: UpdateBuilder[ProductcategoryFields, ProductcategoryRow] = {
-    UpdateBuilder("production.productcategory", ProductcategoryFields.structure, ProductcategoryRow.jdbcDecoder)
+    UpdateBuilder(""""production"."productcategory"""", ProductcategoryFields.structure, ProductcategoryRow.jdbcDecoder)
   }
   override def update(row: ProductcategoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val productcategoryid = row.productcategoryid
-    sql"""update production.productcategory
+    sql"""update "production"."productcategory"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "productcategoryid" = ${Segment.paramSegment(productcategoryid)(ProductcategoryId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: ProductcategoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductcategoryRow]] = {
-    sql"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")
+    sql"""insert into "production"."productcategory"("productcategoryid", "name", "rowguid", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.productcategoryid)(ProductcategoryId.setter)}::int4,
             ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
@@ -121,9 +121,9 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductcategoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table productcategory_TEMP (like production.productcategory) on commit drop".execute
+    val created = sql"""create temporary table productcategory_TEMP (like "production"."productcategory") on commit drop""".execute
     val copied = streamingInsert(s"""copy productcategory_TEMP("productcategoryid", "name", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(ProductcategoryRow.text)
-    val merged = sql"""insert into production.productcategory("productcategoryid", "name", "rowguid", "modifieddate")
+    val merged = sql"""insert into "production"."productcategory"("productcategoryid", "name", "rowguid", "modifieddate")
                        select * from productcategory_TEMP
                        on conflict ("productcategoryid")
                        do update set

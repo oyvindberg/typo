@@ -28,20 +28,20 @@ import typo.dsl.UpdateBuilder
 
 class UsersRepoImpl extends UsersRepo {
   override def delete: DeleteBuilder[UsersFields, UsersRow] = {
-    DeleteBuilder("public.users", UsersFields.structure)
+    DeleteBuilder(""""public"."users"""", UsersFields.structure)
   }
   override def deleteById(userId: UsersId)(implicit c: Connection): Boolean = {
-    SQL"""delete from public.users where "user_id" = ${ParameterValue(userId, null, UsersId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "public"."users" where "user_id" = ${ParameterValue(userId, null, UsersId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(userIds: Array[UsersId])(implicit c: Connection): Int = {
     SQL"""delete
-          from public.users
+          from "public"."users"
           where "user_id" = ANY(${userIds})
        """.executeUpdate()
     
   }
   override def insert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
-    SQL"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
+    SQL"""insert into "public"."users"("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
           values (${ParameterValue(unsaved.userId, null, UsersId.toStatement)}::uuid, ${ParameterValue(unsaved.name, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.lastName, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.email, null, TypoUnknownCitext.toStatement)}::citext, ${ParameterValue(unsaved.password, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.createdAt, null, TypoInstant.toStatement)}::timestamptz, ${ParameterValue(unsaved.verifiedOn, null, ToStatement.optionToStatement(TypoInstant.toStatement, TypoInstant.parameterMetadata))}::timestamptz)
           returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
        """
@@ -63,12 +63,12 @@ class UsersRepoImpl extends UsersRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into public.users default values
+      SQL"""insert into "public"."users" default values
             returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
          """
         .executeInsert(UsersRow.rowParser(1).single)
     } else {
-      val q = s"""insert into public.users(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "public"."users"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
                """
@@ -78,29 +78,29 @@ class UsersRepoImpl extends UsersRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[UsersRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""", batchSize, unsaved)(UsersRow.text, c)
+    streamingInsert(s"""COPY "public"."users"("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") FROM STDIN""", batchSize, unsaved)(UsersRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[UsersRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY public.users("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UsersRowUnsaved.text, c)
+    streamingInsert(s"""COPY "public"."users"("user_id", "name", "last_name", "email", "password", "verified_on", "created_at") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(UsersRowUnsaved.text, c)
   }
   override def select: SelectBuilder[UsersFields, UsersRow] = {
-    SelectBuilderSql("public.users", UsersFields.structure, UsersRow.rowParser)
+    SelectBuilderSql(""""public"."users"""", UsersFields.structure, UsersRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[UsersRow] = {
     SQL"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
-          from public.users
+          from "public"."users"
        """.as(UsersRow.rowParser(1).*)
   }
   override def selectById(userId: UsersId)(implicit c: Connection): Option[UsersRow] = {
     SQL"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
-          from public.users
+          from "public"."users"
           where "user_id" = ${ParameterValue(userId, null, UsersId.toStatement)}
        """.as(UsersRow.rowParser(1).singleOpt)
   }
   override def selectByIds(userIds: Array[UsersId])(implicit c: Connection): List[UsersRow] = {
     SQL"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
-          from public.users
+          from "public"."users"
           where "user_id" = ANY(${userIds})
        """.as(UsersRow.rowParser(1).*)
     
@@ -111,17 +111,17 @@ class UsersRepoImpl extends UsersRepo {
   }
   override def selectByUniqueEmail(email: TypoUnknownCitext)(implicit c: Connection): Option[UsersRow] = {
     SQL"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
-          from public.users
+          from "public"."users"
           where "email" = ${ParameterValue(email, null, TypoUnknownCitext.toStatement)}
        """.as(UsersRow.rowParser(1).singleOpt)
     
   }
   override def update: UpdateBuilder[UsersFields, UsersRow] = {
-    UpdateBuilder("public.users", UsersFields.structure, UsersRow.rowParser)
+    UpdateBuilder(""""public"."users"""", UsersFields.structure, UsersRow.rowParser)
   }
   override def update(row: UsersRow)(implicit c: Connection): Boolean = {
     val userId = row.userId
-    SQL"""update public.users
+    SQL"""update "public"."users"
           set "name" = ${ParameterValue(row.name, null, ToStatement.stringToStatement)},
               "last_name" = ${ParameterValue(row.lastName, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
               "email" = ${ParameterValue(row.email, null, TypoUnknownCitext.toStatement)}::citext,
@@ -132,7 +132,7 @@ class UsersRepoImpl extends UsersRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
-    SQL"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
+    SQL"""insert into "public"."users"("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
           values (
             ${ParameterValue(unsaved.userId, null, UsersId.toStatement)}::uuid,
             ${ParameterValue(unsaved.name, null, ToStatement.stringToStatement)},
@@ -170,7 +170,7 @@ class UsersRepoImpl extends UsersRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
+            s"""insert into "public"."users"("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
                 values ({user_id}::uuid, {name}, {last_name}, {email}::citext, {password}, {created_at}::timestamptz, {verified_on}::timestamptz)
                 on conflict ("user_id")
                 do update set
@@ -190,9 +190,9 @@ class UsersRepoImpl extends UsersRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[UsersRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table users_TEMP (like public.users) on commit drop".execute(): @nowarn
+    SQL"""create temporary table users_TEMP (like "public"."users") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy users_TEMP("user_id", "name", "last_name", "email", "password", "created_at", "verified_on") from stdin""", batchSize, unsaved)(UsersRow.text, c): @nowarn
-    SQL"""insert into public.users("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
+    SQL"""insert into "public"."users"("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
           select * from users_TEMP
           on conflict ("user_id")
           do update set

@@ -28,23 +28,23 @@ import typo.dsl.UpdateBuilder
 
 class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def delete: DeleteBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    DeleteBuilder("production.productproductphoto", ProductproductphotoFields.structure)
+    DeleteBuilder(""""production"."productproductphoto"""", ProductproductphotoFields.structure)
   }
   override def deleteById(compositeId: ProductproductphotoId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productproductphoto where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "productphotoid" = ${ParameterValue(compositeId.productphotoid, null, ProductphotoId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "production"."productproductphoto" where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "productphotoid" = ${ParameterValue(compositeId.productphotoid, null, ProductphotoId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[ProductproductphotoId])(implicit c: Connection): Int = {
     val productid = compositeIds.map(_.productid)
     val productphotoid = compositeIds.map(_.productphotoid)
     SQL"""delete
-          from production.productproductphoto
+          from "production"."productproductphoto"
           where ("productid", "productphotoid")
           in (select unnest(${productid}), unnest(${productphotoid}))
        """.executeUpdate()
     
   }
   override def insert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
-    SQL"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
+    SQL"""insert into "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate")
           values (${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)}::int4, ${ParameterValue(unsaved.primary, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "productid", "productphotoid", "primary", "modifieddate"::text
        """
@@ -66,12 +66,12 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into production.productproductphoto default values
+      SQL"""insert into "production"."productproductphoto" default values
             returning "productid", "productphotoid", "primary", "modifieddate"::text
          """
         .executeInsert(ProductproductphotoRow.rowParser(1).single)
     } else {
-      val q = s"""insert into production.productproductphoto(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "production"."productproductphoto"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "productid", "productphotoid", "primary", "modifieddate"::text
                """
@@ -81,23 +81,23 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[ProductproductphotoRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductproductphotoRow.text, c)
+    streamingInsert(s"""COPY "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductproductphotoRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductproductphotoRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productproductphoto("productid", "productphotoid", "primary", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductproductphotoRowUnsaved.text, c)
+    streamingInsert(s"""COPY "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductproductphotoRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    SelectBuilderSql("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.rowParser)
+    SelectBuilderSql(""""production"."productproductphoto"""", ProductproductphotoFields.structure, ProductproductphotoRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductproductphotoRow] = {
     SQL"""select "productid", "productphotoid", "primary", "modifieddate"::text
-          from production.productproductphoto
+          from "production"."productproductphoto"
        """.as(ProductproductphotoRow.rowParser(1).*)
   }
   override def selectById(compositeId: ProductproductphotoId)(implicit c: Connection): Option[ProductproductphotoRow] = {
     SQL"""select "productid", "productphotoid", "primary", "modifieddate"::text
-          from production.productproductphoto
+          from "production"."productproductphoto"
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "productphotoid" = ${ParameterValue(compositeId.productphotoid, null, ProductphotoId.toStatement)}
        """.as(ProductproductphotoRow.rowParser(1).singleOpt)
   }
@@ -105,7 +105,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     val productid = compositeIds.map(_.productid)
     val productphotoid = compositeIds.map(_.productphotoid)
     SQL"""select "productid", "productphotoid", "primary", "modifieddate"::text
-          from production.productproductphoto
+          from "production"."productproductphoto"
           where ("productid", "productphotoid") 
           in (select unnest(${productid}), unnest(${productphotoid}))
        """.as(ProductproductphotoRow.rowParser(1).*)
@@ -116,18 +116,18 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
-    UpdateBuilder("production.productproductphoto", ProductproductphotoFields.structure, ProductproductphotoRow.rowParser)
+    UpdateBuilder(""""production"."productproductphoto"""", ProductproductphotoFields.structure, ProductproductphotoRow.rowParser)
   }
   override def update(row: ProductproductphotoRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
-    SQL"""update production.productproductphoto
+    SQL"""update "production"."productproductphoto"
           set "primary" = ${ParameterValue(row.primary, null, Flag.toStatement)}::bool,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "productphotoid" = ${ParameterValue(compositeId.productphotoid, null, ProductphotoId.toStatement)}
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
-    SQL"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
+    SQL"""insert into "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate")
           values (
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
             ${ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)}::int4,
@@ -155,7 +155,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
+            s"""insert into "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate")
                 values ({productid}::int4, {productphotoid}::int4, {primary}::bool, {modifieddate}::timestamp)
                 on conflict ("productid", "productphotoid")
                 do update set
@@ -171,9 +171,9 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductproductphotoRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table productproductphoto_TEMP (like production.productproductphoto) on commit drop".execute(): @nowarn
+    SQL"""create temporary table productproductphoto_TEMP (like "production"."productproductphoto") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy productproductphoto_TEMP("productid", "productphotoid", "primary", "modifieddate") from stdin""", batchSize, unsaved)(ProductproductphotoRow.text, c): @nowarn
-    SQL"""insert into production.productproductphoto("productid", "productphotoid", "primary", "modifieddate")
+    SQL"""insert into "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate")
           select * from productproductphoto_TEMP
           on conflict ("productid", "productphotoid")
           do update set

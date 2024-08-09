@@ -27,23 +27,23 @@ import typo.dsl.UpdateBuilder
 
 class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    DeleteBuilder("production.productcosthistory", ProductcosthistoryFields.structure)
+    DeleteBuilder(""""production"."productcosthistory"""", ProductcosthistoryFields.structure)
   }
   override def deleteById(compositeId: ProductcosthistoryId): ConnectionIO[Boolean] = {
-    sql"""delete from production.productcosthistory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."productcosthistory" where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductcosthistoryId]): ConnectionIO[Int] = {
     val productid = compositeIds.map(_.productid)
     val startdate = compositeIds.map(_.startdate)
     sql"""delete
-          from production.productcosthistory
+          from "production"."productcosthistory"
           where ("productid", "startdate")
           in (select unnest(${productid}), unnest(${startdate}))
        """.update.run
     
   }
   override def insert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
-    sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
+    sql"""insert into "production"."productcosthistory"("productid", "startdate", "enddate", "standardcost", "modifieddate")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
        """.query(using ProductcosthistoryRow.read).unique
@@ -61,12 +61,12 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.productcosthistory default values
+      sql"""insert into "production"."productcosthistory" default values
             returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into production.productcosthistory(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "production"."productcosthistory"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
          """
@@ -75,26 +75,26 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductcosthistoryRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductcosthistoryRow.text)
+    new FragmentOps(sql"""COPY "production"."productcosthistory"("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductcosthistoryRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductcosthistoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductcosthistoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY "production"."productcosthistory"("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductcosthistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.read)
+    SelectBuilderSql(""""production"."productcosthistory"""", ProductcosthistoryFields.structure, ProductcosthistoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductcosthistoryRow] = {
-    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory""".query(using ProductcosthistoryRow.read).stream
+    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from "production"."productcosthistory"""".query(using ProductcosthistoryRow.read).stream
   }
   override def selectById(compositeId: ProductcosthistoryId): ConnectionIO[Option[ProductcosthistoryRow]] = {
-    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".query(using ProductcosthistoryRow.read).option
+    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from "production"."productcosthistory" where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".query(using ProductcosthistoryRow.read).option
   }
   override def selectByIds(compositeIds: Array[ProductcosthistoryId]): Stream[ConnectionIO, ProductcosthistoryRow] = {
     val productid = compositeIds.map(_.productid)
     val startdate = compositeIds.map(_.startdate)
     sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
-          from production.productcosthistory
+          from "production"."productcosthistory"
           where ("productid", "startdate") 
           in (select unnest(${productid}), unnest(${startdate}))
        """.query(using ProductcosthistoryRow.read).stream
@@ -107,11 +107,11 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     }
   }
   override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    UpdateBuilder("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.read)
+    UpdateBuilder(""""production"."productcosthistory"""", ProductcosthistoryFields.structure, ProductcosthistoryRow.read)
   }
   override def update(row: ProductcosthistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
-    sql"""update production.productcosthistory
+    sql"""update "production"."productcosthistory"
           set "enddate" = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
               "standardcost" = ${fromWrite(row.standardcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
@@ -121,7 +121,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: ProductcosthistoryRow): ConnectionIO[ProductcosthistoryRow] = {
-    sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
+    sql"""insert into "production"."productcosthistory"("productid", "startdate", "enddate", "standardcost", "modifieddate")
           values (
             ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
             ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
@@ -139,7 +139,7 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   }
   override def upsertBatch(unsaved: List[ProductcosthistoryRow]): Stream[ConnectionIO, ProductcosthistoryRow] = {
     Update[ProductcosthistoryRow](
-      s"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
+      s"""insert into "production"."productcosthistory"("productid", "startdate", "enddate", "standardcost", "modifieddate")
           values (?::int4,?::timestamp,?::timestamp,?::numeric,?::timestamp)
           on conflict ("productid", "startdate")
           do update set
@@ -153,9 +153,9 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductcosthistoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table productcosthistory_TEMP (like production.productcosthistory) on commit drop".update.run
+      _ <- sql"""create temporary table productcosthistory_TEMP (like "production"."productcosthistory") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy productcosthistory_TEMP("productid", "startdate", "enddate", "standardcost", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductcosthistoryRow.text)
-      res <- sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
+      res <- sql"""insert into "production"."productcosthistory"("productid", "startdate", "enddate", "standardcost", "modifieddate")
                    select * from productcosthistory_TEMP
                    on conflict ("productid", "startdate")
                    do update set

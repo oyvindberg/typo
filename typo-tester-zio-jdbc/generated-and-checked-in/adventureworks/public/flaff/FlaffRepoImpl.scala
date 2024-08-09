@@ -21,10 +21,10 @@ import zio.stream.ZStream
 
 class FlaffRepoImpl extends FlaffRepo {
   override def delete: DeleteBuilder[FlaffFields, FlaffRow] = {
-    DeleteBuilder("public.flaff", FlaffFields.structure)
+    DeleteBuilder(""""public"."flaff"""", FlaffFields.structure)
   }
   override def deleteById(compositeId: FlaffId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from public.flaff where "code" = ${Segment.paramSegment(compositeId.code)(ShortText.setter)} AND "another_code" = ${Segment.paramSegment(compositeId.anotherCode)(Setter.stringSetter)} AND "some_number" = ${Segment.paramSegment(compositeId.someNumber)(Setter.intSetter)} AND "specifier" = ${Segment.paramSegment(compositeId.specifier)(ShortText.setter)}""".delete.map(_ > 0)
+    sql"""delete from "public"."flaff" where "code" = ${Segment.paramSegment(compositeId.code)(ShortText.setter)} AND "another_code" = ${Segment.paramSegment(compositeId.anotherCode)(Setter.stringSetter)} AND "some_number" = ${Segment.paramSegment(compositeId.someNumber)(Setter.intSetter)} AND "specifier" = ${Segment.paramSegment(compositeId.specifier)(ShortText.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Long] = {
     val code = compositeIds.map(_.code)
@@ -32,29 +32,29 @@ class FlaffRepoImpl extends FlaffRepo {
     val someNumber = compositeIds.map(_.someNumber)
     val specifier = compositeIds.map(_.specifier)
     sql"""delete
-          from public.flaff
+          from "public"."flaff"
           where ("code", "another_code", "some_number", "specifier")
           in (select unnest(${code}), unnest(${anotherCode}), unnest(${someNumber}), unnest(${specifier}))
        """.delete
     
   }
   override def insert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, FlaffRow] = {
-    sql"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")
+    sql"""insert into "public"."flaff"("code", "another_code", "some_number", "specifier", "parentspecifier")
           values (${Segment.paramSegment(unsaved.code)(ShortText.setter)}::text, ${Segment.paramSegment(unsaved.anotherCode)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.someNumber)(Setter.intSetter)}::int4, ${Segment.paramSegment(unsaved.specifier)(ShortText.setter)}::text, ${Segment.paramSegment(unsaved.parentspecifier)(Setter.optionParamSetter(ShortText.setter))}::text)
           returning "code", "another_code", "some_number", "specifier", "parentspecifier"
        """.insertReturning(using FlaffRow.jdbcDecoder).map(_.updatedKeys.head)
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, FlaffRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier") FROM STDIN""", batchSize, unsaved)(FlaffRow.text)
+    streamingInsert(s"""COPY "public"."flaff"("code", "another_code", "some_number", "specifier", "parentspecifier") FROM STDIN""", batchSize, unsaved)(FlaffRow.text)
   }
   override def select: SelectBuilder[FlaffFields, FlaffRow] = {
-    SelectBuilderSql("public.flaff", FlaffFields.structure, FlaffRow.jdbcDecoder)
+    SelectBuilderSql(""""public"."flaff"""", FlaffFields.structure, FlaffRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, FlaffRow] = {
-    sql"""select "code", "another_code", "some_number", "specifier", "parentspecifier" from public.flaff""".query(using FlaffRow.jdbcDecoder).selectStream()
+    sql"""select "code", "another_code", "some_number", "specifier", "parentspecifier" from "public"."flaff"""".query(using FlaffRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: FlaffId): ZIO[ZConnection, Throwable, Option[FlaffRow]] = {
-    sql"""select "code", "another_code", "some_number", "specifier", "parentspecifier" from public.flaff where "code" = ${Segment.paramSegment(compositeId.code)(ShortText.setter)} AND "another_code" = ${Segment.paramSegment(compositeId.anotherCode)(Setter.stringSetter)} AND "some_number" = ${Segment.paramSegment(compositeId.someNumber)(Setter.intSetter)} AND "specifier" = ${Segment.paramSegment(compositeId.specifier)(ShortText.setter)}""".query(using FlaffRow.jdbcDecoder).selectOne
+    sql"""select "code", "another_code", "some_number", "specifier", "parentspecifier" from "public"."flaff" where "code" = ${Segment.paramSegment(compositeId.code)(ShortText.setter)} AND "another_code" = ${Segment.paramSegment(compositeId.anotherCode)(Setter.stringSetter)} AND "some_number" = ${Segment.paramSegment(compositeId.someNumber)(Setter.intSetter)} AND "specifier" = ${Segment.paramSegment(compositeId.specifier)(ShortText.setter)}""".query(using FlaffRow.jdbcDecoder).selectOne
   }
   override def selectByIds(compositeIds: Array[FlaffId]): ZStream[ZConnection, Throwable, FlaffRow] = {
     val code = compositeIds.map(_.code)
@@ -62,7 +62,7 @@ class FlaffRepoImpl extends FlaffRepo {
     val someNumber = compositeIds.map(_.someNumber)
     val specifier = compositeIds.map(_.specifier)
     sql"""select "code", "another_code", "some_number", "specifier", "parentspecifier"
-          from public.flaff
+          from "public"."flaff"
           where ("code", "another_code", "some_number", "specifier")
           in (select unnest(${code}), unnest(${anotherCode}), unnest(${someNumber}), unnest(${specifier}))
        """.query(using FlaffRow.jdbcDecoder).selectStream()
@@ -75,16 +75,16 @@ class FlaffRepoImpl extends FlaffRepo {
     }
   }
   override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
-    UpdateBuilder("public.flaff", FlaffFields.structure, FlaffRow.jdbcDecoder)
+    UpdateBuilder(""""public"."flaff"""", FlaffFields.structure, FlaffRow.jdbcDecoder)
   }
   override def update(row: FlaffRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
-    sql"""update public.flaff
+    sql"""update "public"."flaff"
           set "parentspecifier" = ${Segment.paramSegment(row.parentspecifier)(Setter.optionParamSetter(ShortText.setter))}::text
           where "code" = ${Segment.paramSegment(compositeId.code)(ShortText.setter)} AND "another_code" = ${Segment.paramSegment(compositeId.anotherCode)(Setter.stringSetter)} AND "some_number" = ${Segment.paramSegment(compositeId.someNumber)(Setter.intSetter)} AND "specifier" = ${Segment.paramSegment(compositeId.specifier)(ShortText.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, UpdateResult[FlaffRow]] = {
-    sql"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")
+    sql"""insert into "public"."flaff"("code", "another_code", "some_number", "specifier", "parentspecifier")
           values (
             ${Segment.paramSegment(unsaved.code)(ShortText.setter)}::text,
             ${Segment.paramSegment(unsaved.anotherCode)(Setter.stringSetter)},
@@ -99,9 +99,9 @@ class FlaffRepoImpl extends FlaffRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, FlaffRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table flaff_TEMP (like public.flaff) on commit drop".execute
+    val created = sql"""create temporary table flaff_TEMP (like "public"."flaff") on commit drop""".execute
     val copied = streamingInsert(s"""copy flaff_TEMP("code", "another_code", "some_number", "specifier", "parentspecifier") from stdin""", batchSize, unsaved)(FlaffRow.text)
-    val merged = sql"""insert into public.flaff("code", "another_code", "some_number", "specifier", "parentspecifier")
+    val merged = sql"""insert into "public"."flaff"("code", "another_code", "some_number", "specifier", "parentspecifier")
                        select * from flaff_TEMP
                        on conflict ("code", "another_code", "some_number", "specifier")
                        do update set

@@ -26,16 +26,16 @@ import typo.dsl.UpdateBuilder
 
 class BusinessentityRepoImpl extends BusinessentityRepo {
   override def delete: DeleteBuilder[BusinessentityFields, BusinessentityRow] = {
-    DeleteBuilder("person.businessentity", BusinessentityFields.structure)
+    DeleteBuilder(""""person"."businessentity"""", BusinessentityFields.structure)
   }
   override def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"""delete from person.businessentity where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "person"."businessentity" where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
-    sql"""delete from person.businessentity where "businessentityid" = ANY(${businessentityids})""".update.run
+    sql"""delete from "person"."businessentity" where "businessentityid" = ANY(${businessentityids})""".update.run
   }
   override def insert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
-    sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
+    sql"""insert into "person"."businessentity"("businessentityid", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "rowguid", "modifieddate"::text
        """.query(using BusinessentityRow.read).unique
@@ -57,12 +57,12 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into person.businessentity default values
+      sql"""insert into "person"."businessentity" default values
             returning "businessentityid", "rowguid", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into person.businessentity(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "person"."businessentity"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "businessentityid", "rowguid", "modifieddate"::text
          """
@@ -71,23 +71,23 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, BusinessentityRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using BusinessentityRow.text)
+    new FragmentOps(sql"""COPY "person"."businessentity"("businessentityid", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using BusinessentityRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, BusinessentityRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.businessentity("businessentityid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using BusinessentityRowUnsaved.text)
+    new FragmentOps(sql"""COPY "person"."businessentity"("businessentityid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using BusinessentityRowUnsaved.text)
   }
   override def select: SelectBuilder[BusinessentityFields, BusinessentityRow] = {
-    SelectBuilderSql("person.businessentity", BusinessentityFields.structure, BusinessentityRow.read)
+    SelectBuilderSql(""""person"."businessentity"""", BusinessentityFields.structure, BusinessentityRow.read)
   }
   override def selectAll: Stream[ConnectionIO, BusinessentityRow] = {
-    sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity""".query(using BusinessentityRow.read).stream
+    sql"""select "businessentityid", "rowguid", "modifieddate"::text from "person"."businessentity"""".query(using BusinessentityRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[BusinessentityRow]] = {
-    sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using BusinessentityRow.read).option
+    sql"""select "businessentityid", "rowguid", "modifieddate"::text from "person"."businessentity" where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using BusinessentityRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, BusinessentityRow] = {
-    sql"""select "businessentityid", "rowguid", "modifieddate"::text from person.businessentity where "businessentityid" = ANY(${businessentityids})""".query(using BusinessentityRow.read).stream
+    sql"""select "businessentityid", "rowguid", "modifieddate"::text from "person"."businessentity" where "businessentityid" = ANY(${businessentityids})""".query(using BusinessentityRow.read).stream
   }
   override def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, BusinessentityRow]] = {
     selectByIds(businessentityids).compile.toList.map { rows =>
@@ -96,11 +96,11 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     }
   }
   override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
-    UpdateBuilder("person.businessentity", BusinessentityFields.structure, BusinessentityRow.read)
+    UpdateBuilder(""""person"."businessentity"""", BusinessentityFields.structure, BusinessentityRow.read)
   }
   override def update(row: BusinessentityRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
-    sql"""update person.businessentity
+    sql"""update "person"."businessentity"
           set "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}"""
@@ -109,7 +109,7 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
-    sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
+    sql"""insert into "person"."businessentity"("businessentityid", "rowguid", "modifieddate")
           values (
             ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
             ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
@@ -124,7 +124,7 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
   }
   override def upsertBatch(unsaved: List[BusinessentityRow]): Stream[ConnectionIO, BusinessentityRow] = {
     Update[BusinessentityRow](
-      s"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
+      s"""insert into "person"."businessentity"("businessentityid", "rowguid", "modifieddate")
           values (?::int4,?::uuid,?::timestamp)
           on conflict ("businessentityid")
           do update set
@@ -137,9 +137,9 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, BusinessentityRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table businessentity_TEMP (like person.businessentity) on commit drop".update.run
+      _ <- sql"""create temporary table businessentity_TEMP (like "person"."businessentity") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy businessentity_TEMP("businessentityid", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using BusinessentityRow.text)
-      res <- sql"""insert into person.businessentity("businessentityid", "rowguid", "modifieddate")
+      res <- sql"""insert into "person"."businessentity"("businessentityid", "rowguid", "modifieddate")
                    select * from businessentity_TEMP
                    on conflict ("businessentityid")
                    do update set

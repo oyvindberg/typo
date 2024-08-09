@@ -26,16 +26,16 @@ import typo.dsl.UpdateBuilder
 
 class ContacttypeRepoImpl extends ContacttypeRepo {
   override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
-    DeleteBuilder("person.contacttype", ContacttypeFields.structure)
+    DeleteBuilder(""""person"."contacttype"""", ContacttypeFields.structure)
   }
   override def deleteById(contacttypeid: ContacttypeId): ConnectionIO[Boolean] = {
-    sql"""delete from person.contacttype where "contacttypeid" = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "person"."contacttype" where "contacttypeid" = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(contacttypeids: Array[ContacttypeId]): ConnectionIO[Int] = {
-    sql"""delete from person.contacttype where "contacttypeid" = ANY(${contacttypeids})""".update.run
+    sql"""delete from "person"."contacttype" where "contacttypeid" = ANY(${contacttypeids})""".update.run
   }
   override def insert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
-    sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+    sql"""insert into "person"."contacttype"("contacttypeid", "name", "modifieddate")
           values (${fromWrite(unsaved.contacttypeid)(Write.fromPut(ContacttypeId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "contacttypeid", "name", "modifieddate"::text
        """.query(using ContacttypeRow.read).unique
@@ -54,12 +54,12 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into person.contacttype default values
+      sql"""insert into "person"."contacttype" default values
             returning "contacttypeid", "name", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into person.contacttype(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "person"."contacttype"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "contacttypeid", "name", "modifieddate"::text
          """
@@ -68,23 +68,23 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ContacttypeRow.text)
+    new FragmentOps(sql"""COPY "person"."contacttype"("contacttypeid", "name", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ContacttypeRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ContacttypeRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY person.contacttype("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ContacttypeRowUnsaved.text)
+    new FragmentOps(sql"""COPY "person"."contacttype"("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ContacttypeRowUnsaved.text)
   }
   override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
-    SelectBuilderSql("person.contacttype", ContacttypeFields.structure, ContacttypeRow.read)
+    SelectBuilderSql(""""person"."contacttype"""", ContacttypeFields.structure, ContacttypeRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ContacttypeRow] = {
-    sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype""".query(using ContacttypeRow.read).stream
+    sql"""select "contacttypeid", "name", "modifieddate"::text from "person"."contacttype"""".query(using ContacttypeRow.read).stream
   }
   override def selectById(contacttypeid: ContacttypeId): ConnectionIO[Option[ContacttypeRow]] = {
-    sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype where "contacttypeid" = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}""".query(using ContacttypeRow.read).option
+    sql"""select "contacttypeid", "name", "modifieddate"::text from "person"."contacttype" where "contacttypeid" = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}""".query(using ContacttypeRow.read).option
   }
   override def selectByIds(contacttypeids: Array[ContacttypeId]): Stream[ConnectionIO, ContacttypeRow] = {
-    sql"""select "contacttypeid", "name", "modifieddate"::text from person.contacttype where "contacttypeid" = ANY(${contacttypeids})""".query(using ContacttypeRow.read).stream
+    sql"""select "contacttypeid", "name", "modifieddate"::text from "person"."contacttype" where "contacttypeid" = ANY(${contacttypeids})""".query(using ContacttypeRow.read).stream
   }
   override def selectByIdsTracked(contacttypeids: Array[ContacttypeId]): ConnectionIO[Map[ContacttypeId, ContacttypeRow]] = {
     selectByIds(contacttypeids).compile.toList.map { rows =>
@@ -93,11 +93,11 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     }
   }
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
-    UpdateBuilder("person.contacttype", ContacttypeFields.structure, ContacttypeRow.read)
+    UpdateBuilder(""""person"."contacttype"""", ContacttypeFields.structure, ContacttypeRow.read)
   }
   override def update(row: ContacttypeRow): ConnectionIO[Boolean] = {
     val contacttypeid = row.contacttypeid
-    sql"""update person.contacttype
+    sql"""update "person"."contacttype"
           set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
               "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
           where "contacttypeid" = ${fromWrite(contacttypeid)(Write.fromPut(ContacttypeId.put))}"""
@@ -106,7 +106,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
-    sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+    sql"""insert into "person"."contacttype"("contacttypeid", "name", "modifieddate")
           values (
             ${fromWrite(unsaved.contacttypeid)(Write.fromPut(ContacttypeId.put))}::int4,
             ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
@@ -121,7 +121,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
   }
   override def upsertBatch(unsaved: List[ContacttypeRow]): Stream[ConnectionIO, ContacttypeRow] = {
     Update[ContacttypeRow](
-      s"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+      s"""insert into "person"."contacttype"("contacttypeid", "name", "modifieddate")
           values (?::int4,?::varchar,?::timestamp)
           on conflict ("contacttypeid")
           do update set
@@ -134,9 +134,9 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ContacttypeRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table contacttype_TEMP (like person.contacttype) on commit drop".update.run
+      _ <- sql"""create temporary table contacttype_TEMP (like "person"."contacttype") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy contacttype_TEMP("contacttypeid", "name", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ContacttypeRow.text)
-      res <- sql"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+      res <- sql"""insert into "person"."contacttype"("contacttypeid", "name", "modifieddate")
                    select * from contacttype_TEMP
                    on conflict ("contacttypeid")
                    do update set

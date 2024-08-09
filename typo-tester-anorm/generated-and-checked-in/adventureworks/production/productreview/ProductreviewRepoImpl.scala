@@ -29,20 +29,20 @@ import typo.dsl.UpdateBuilder
 
 class ProductreviewRepoImpl extends ProductreviewRepo {
   override def delete: DeleteBuilder[ProductreviewFields, ProductreviewRow] = {
-    DeleteBuilder("production.productreview", ProductreviewFields.structure)
+    DeleteBuilder(""""production"."productreview"""", ProductreviewFields.structure)
   }
   override def deleteById(productreviewid: ProductreviewId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productreview where "productreviewid" = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "production"."productreview" where "productreviewid" = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(productreviewids: Array[ProductreviewId])(implicit c: Connection): Int = {
     SQL"""delete
-          from production.productreview
+          from "production"."productreview"
           where "productreviewid" = ANY(${productreviewids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
-    SQL"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+    SQL"""insert into "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
           values (${ParameterValue(unsaved.productreviewid, null, ProductreviewId.toStatement)}::int4, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.reviewername, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.reviewdate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.emailaddress, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.rating, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.comments, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
        """
@@ -71,12 +71,12 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into production.productreview default values
+      SQL"""insert into "production"."productreview" default values
             returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
          """
         .executeInsert(ProductreviewRow.rowParser(1).single)
     } else {
-      val q = s"""insert into production.productreview(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "production"."productreview"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
                """
@@ -86,29 +86,29 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[ProductreviewRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductreviewRow.text, c)
+    streamingInsert(s"""COPY "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductreviewRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductreviewRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productreview("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductreviewRowUnsaved.text, c)
+    streamingInsert(s"""COPY "production"."productreview"("productid", "reviewername", "emailaddress", "rating", "comments", "productreviewid", "reviewdate", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductreviewRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductreviewFields, ProductreviewRow] = {
-    SelectBuilderSql("production.productreview", ProductreviewFields.structure, ProductreviewRow.rowParser)
+    SelectBuilderSql(""""production"."productreview"""", ProductreviewFields.structure, ProductreviewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductreviewRow] = {
     SQL"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
-          from production.productreview
+          from "production"."productreview"
        """.as(ProductreviewRow.rowParser(1).*)
   }
   override def selectById(productreviewid: ProductreviewId)(implicit c: Connection): Option[ProductreviewRow] = {
     SQL"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
-          from production.productreview
+          from "production"."productreview"
           where "productreviewid" = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}
        """.as(ProductreviewRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productreviewids: Array[ProductreviewId])(implicit c: Connection): List[ProductreviewRow] = {
     SQL"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
-          from production.productreview
+          from "production"."productreview"
           where "productreviewid" = ANY(${productreviewids})
        """.as(ProductreviewRow.rowParser(1).*)
     
@@ -118,11 +118,11 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     productreviewids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
-    UpdateBuilder("production.productreview", ProductreviewFields.structure, ProductreviewRow.rowParser)
+    UpdateBuilder(""""production"."productreview"""", ProductreviewFields.structure, ProductreviewRow.rowParser)
   }
   override def update(row: ProductreviewRow)(implicit c: Connection): Boolean = {
     val productreviewid = row.productreviewid
-    SQL"""update production.productreview
+    SQL"""update "production"."productreview"
           set "productid" = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
               "reviewername" = ${ParameterValue(row.reviewername, null, Name.toStatement)}::varchar,
               "reviewdate" = ${ParameterValue(row.reviewdate, null, TypoLocalDateTime.toStatement)}::timestamp,
@@ -134,7 +134,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
-    SQL"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+    SQL"""insert into "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
           values (
             ${ParameterValue(unsaved.productreviewid, null, ProductreviewId.toStatement)}::int4,
             ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4,
@@ -175,7 +175,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+            s"""insert into "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
                 values ({productreviewid}::int4, {productid}::int4, {reviewername}::varchar, {reviewdate}::timestamp, {emailaddress}, {rating}::int4, {comments}, {modifieddate}::timestamp)
                 on conflict ("productreviewid")
                 do update set
@@ -196,9 +196,9 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductreviewRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table productreview_TEMP (like production.productreview) on commit drop".execute(): @nowarn
+    SQL"""create temporary table productreview_TEMP (like "production"."productreview") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy productreview_TEMP("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate") from stdin""", batchSize, unsaved)(ProductreviewRow.text, c): @nowarn
-    SQL"""insert into production.productreview("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
+    SQL"""insert into "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
           select * from productreview_TEMP
           on conflict ("productreviewid")
           do update set

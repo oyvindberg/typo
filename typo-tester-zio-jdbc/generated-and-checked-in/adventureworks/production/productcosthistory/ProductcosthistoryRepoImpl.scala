@@ -25,23 +25,23 @@ import zio.stream.ZStream
 
 class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def delete: DeleteBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    DeleteBuilder("production.productcosthistory", ProductcosthistoryFields.structure)
+    DeleteBuilder(""""production"."productcosthistory"""", ProductcosthistoryFields.structure)
   }
   override def deleteById(compositeId: ProductcosthistoryId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from production.productcosthistory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".delete.map(_ > 0)
+    sql"""delete from "production"."productcosthistory" where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductcosthistoryId]): ZIO[ZConnection, Throwable, Long] = {
     val productid = compositeIds.map(_.productid)
     val startdate = compositeIds.map(_.startdate)
     sql"""delete
-          from production.productcosthistory
+          from "production"."productcosthistory"
           where ("productid", "startdate")
           in (select unnest(${productid}), unnest(${startdate}))
        """.delete
     
   }
   override def insert(unsaved: ProductcosthistoryRow): ZIO[ZConnection, Throwable, ProductcosthistoryRow] = {
-    sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
+    sql"""insert into "production"."productcosthistory"("productid", "startdate", "enddate", "standardcost", "modifieddate")
           values (${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4, ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp, ${Segment.paramSegment(unsaved.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp, ${Segment.paramSegment(unsaved.standardcost)(Setter.bigDecimalScalaSetter)}::numeric, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
        """.insertReturning(using ProductcosthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -59,38 +59,38 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.productcosthistory default values
+      sql"""insert into "production"."productcosthistory" default values
             returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into production.productcosthistory($names) values ($values) returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text"""
+      sql"""insert into "production"."productcosthistory"($names) values ($values) returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text"""
     }
     q.insertReturning(using ProductcosthistoryRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductcosthistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductcosthistoryRow.text)
+    streamingInsert(s"""COPY "production"."productcosthistory"("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductcosthistoryRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ProductcosthistoryRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductcosthistoryRowUnsaved.text)
+    streamingInsert(s"""COPY "production"."productcosthistory"("productid", "startdate", "enddate", "standardcost", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductcosthistoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    SelectBuilderSql("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.jdbcDecoder)
+    SelectBuilderSql(""""production"."productcosthistory"""", ProductcosthistoryFields.structure, ProductcosthistoryRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ProductcosthistoryRow] = {
-    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory""".query(using ProductcosthistoryRow.jdbcDecoder).selectStream()
+    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from "production"."productcosthistory"""".query(using ProductcosthistoryRow.jdbcDecoder).selectStream()
   }
   override def selectById(compositeId: ProductcosthistoryId): ZIO[ZConnection, Throwable, Option[ProductcosthistoryRow]] = {
-    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from production.productcosthistory where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".query(using ProductcosthistoryRow.jdbcDecoder).selectOne
+    sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text from "production"."productcosthistory" where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".query(using ProductcosthistoryRow.jdbcDecoder).selectOne
   }
   override def selectByIds(compositeIds: Array[ProductcosthistoryId]): ZStream[ZConnection, Throwable, ProductcosthistoryRow] = {
     val productid = compositeIds.map(_.productid)
     val startdate = compositeIds.map(_.startdate)
     sql"""select "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
-          from production.productcosthistory
+          from "production"."productcosthistory"
           where ("productid", "startdate")
           in (select unnest(${productid}), unnest(${startdate}))
        """.query(using ProductcosthistoryRow.jdbcDecoder).selectStream()
@@ -103,18 +103,18 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
     }
   }
   override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
-    UpdateBuilder("production.productcosthistory", ProductcosthistoryFields.structure, ProductcosthistoryRow.jdbcDecoder)
+    UpdateBuilder(""""production"."productcosthistory"""", ProductcosthistoryFields.structure, ProductcosthistoryRow.jdbcDecoder)
   }
   override def update(row: ProductcosthistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
     val compositeId = row.compositeId
-    sql"""update production.productcosthistory
+    sql"""update "production"."productcosthistory"
           set "enddate" = ${Segment.paramSegment(row.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
               "standardcost" = ${Segment.paramSegment(row.standardcost)(Setter.bigDecimalScalaSetter)}::numeric,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
           where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: ProductcosthistoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductcosthistoryRow]] = {
-    sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
+    sql"""insert into "production"."productcosthistory"("productid", "startdate", "enddate", "standardcost", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.productid)(ProductId.setter)}::int4,
             ${Segment.paramSegment(unsaved.startdate)(TypoLocalDateTime.setter)}::timestamp,
@@ -131,9 +131,9 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ProductcosthistoryRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table productcosthistory_TEMP (like production.productcosthistory) on commit drop".execute
+    val created = sql"""create temporary table productcosthistory_TEMP (like "production"."productcosthistory") on commit drop""".execute
     val copied = streamingInsert(s"""copy productcosthistory_TEMP("productid", "startdate", "enddate", "standardcost", "modifieddate") from stdin""", batchSize, unsaved)(ProductcosthistoryRow.text)
-    val merged = sql"""insert into production.productcosthistory("productid", "startdate", "enddate", "standardcost", "modifieddate")
+    val merged = sql"""insert into "production"."productcosthistory"("productid", "startdate", "enddate", "standardcost", "modifieddate")
                        select * from productcosthistory_TEMP
                        on conflict ("productid", "startdate")
                        do update set

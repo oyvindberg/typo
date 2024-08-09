@@ -15,9 +15,9 @@ import zio.stream.ZStream
 
 class BomViewRepoImpl extends BomViewRepo {
   override def select: SelectBuilder[BomViewFields, BomViewRow] = {
-    SelectBuilderSql("pr.bom", BomViewFields.structure, BomViewRow.jdbcDecoder)
+    SelectBuilderSql(""""pr"."bom"""", BomViewFields.structure, BomViewRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, BomViewRow] = {
-    sql"""select "id", "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from pr.bom""".query(using BomViewRow.jdbcDecoder).selectStream()
+    sql"""select "id", "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from "pr"."bom"""".query(using BomViewRow.jdbcDecoder).selectStream()
   }
 }

@@ -28,20 +28,20 @@ import typo.dsl.UpdateBuilder
 
 class ProductphotoRepoImpl extends ProductphotoRepo {
   override def delete: DeleteBuilder[ProductphotoFields, ProductphotoRow] = {
-    DeleteBuilder("production.productphoto", ProductphotoFields.structure)
+    DeleteBuilder(""""production"."productphoto"""", ProductphotoFields.structure)
   }
   override def deleteById(productphotoid: ProductphotoId)(implicit c: Connection): Boolean = {
-    SQL"""delete from production.productphoto where "productphotoid" = ${ParameterValue(productphotoid, null, ProductphotoId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "production"."productphoto" where "productphotoid" = ${ParameterValue(productphotoid, null, ProductphotoId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(productphotoids: Array[ProductphotoId])(implicit c: Connection): Int = {
     SQL"""delete
-          from production.productphoto
+          from "production"."productphoto"
           where "productphotoid" = ANY(${productphotoids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
-    SQL"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+    SQL"""insert into "production"."productphoto"("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
           values (${ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)}::int4, ${ParameterValue(unsaved.thumbnailphoto, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))}::bytea, ${ParameterValue(unsaved.thumbnailphotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.largephoto, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))}::bytea, ${ParameterValue(unsaved.largephotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
        """
@@ -65,12 +65,12 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into production.productphoto default values
+      SQL"""insert into "production"."productphoto" default values
             returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
          """
         .executeInsert(ProductphotoRow.rowParser(1).single)
     } else {
-      val q = s"""insert into production.productphoto(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "production"."productphoto"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
                """
@@ -80,29 +80,29 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[ProductphotoRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductphotoRow.text, c)
+    streamingInsert(s"""COPY "production"."productphoto"("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate") FROM STDIN""", batchSize, unsaved)(ProductphotoRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ProductphotoRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY production.productphoto("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductphotoRowUnsaved.text, c)
+    streamingInsert(s"""COPY "production"."productphoto"("thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "productphotoid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ProductphotoRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ProductphotoFields, ProductphotoRow] = {
-    SelectBuilderSql("production.productphoto", ProductphotoFields.structure, ProductphotoRow.rowParser)
+    SelectBuilderSql(""""production"."productphoto"""", ProductphotoFields.structure, ProductphotoRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ProductphotoRow] = {
     SQL"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
-          from production.productphoto
+          from "production"."productphoto"
        """.as(ProductphotoRow.rowParser(1).*)
   }
   override def selectById(productphotoid: ProductphotoId)(implicit c: Connection): Option[ProductphotoRow] = {
     SQL"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
-          from production.productphoto
+          from "production"."productphoto"
           where "productphotoid" = ${ParameterValue(productphotoid, null, ProductphotoId.toStatement)}
        """.as(ProductphotoRow.rowParser(1).singleOpt)
   }
   override def selectByIds(productphotoids: Array[ProductphotoId])(implicit c: Connection): List[ProductphotoRow] = {
     SQL"""select "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
-          from production.productphoto
+          from "production"."productphoto"
           where "productphotoid" = ANY(${productphotoids})
        """.as(ProductphotoRow.rowParser(1).*)
     
@@ -112,11 +112,11 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
     productphotoids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
-    UpdateBuilder("production.productphoto", ProductphotoFields.structure, ProductphotoRow.rowParser)
+    UpdateBuilder(""""production"."productphoto"""", ProductphotoFields.structure, ProductphotoRow.rowParser)
   }
   override def update(row: ProductphotoRow)(implicit c: Connection): Boolean = {
     val productphotoid = row.productphotoid
-    SQL"""update production.productphoto
+    SQL"""update "production"."productphoto"
           set "thumbnailphoto" = ${ParameterValue(row.thumbnailphoto, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))}::bytea,
               "thumbnailphotofilename" = ${ParameterValue(row.thumbnailphotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
               "largephoto" = ${ParameterValue(row.largephoto, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))}::bytea,
@@ -126,7 +126,7 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
-    SQL"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+    SQL"""insert into "production"."productphoto"("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
           values (
             ${ParameterValue(unsaved.productphotoid, null, ProductphotoId.toStatement)}::int4,
             ${ParameterValue(unsaved.thumbnailphoto, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))}::bytea,
@@ -161,7 +161,7 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+            s"""insert into "production"."productphoto"("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
                 values ({productphotoid}::int4, {thumbnailphoto}::bytea, {thumbnailphotofilename}, {largephoto}::bytea, {largephotofilename}, {modifieddate}::timestamp)
                 on conflict ("productphotoid")
                 do update set
@@ -180,9 +180,9 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ProductphotoRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table productphoto_TEMP (like production.productphoto) on commit drop".execute(): @nowarn
+    SQL"""create temporary table productphoto_TEMP (like "production"."productphoto") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy productphoto_TEMP("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate") from stdin""", batchSize, unsaved)(ProductphotoRow.text, c): @nowarn
-    SQL"""insert into production.productphoto("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
+    SQL"""insert into "production"."productphoto"("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")
           select * from productphoto_TEMP
           on conflict ("productphotoid")
           do update set

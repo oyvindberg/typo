@@ -29,20 +29,20 @@ import typo.dsl.UpdateBuilder
 
 class CustomerRepoImpl extends CustomerRepo {
   override def delete: DeleteBuilder[CustomerFields, CustomerRow] = {
-    DeleteBuilder("sales.customer", CustomerFields.structure)
+    DeleteBuilder(""""sales"."customer"""", CustomerFields.structure)
   }
   override def deleteById(customerid: CustomerId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.customer where "customerid" = ${ParameterValue(customerid, null, CustomerId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "sales"."customer" where "customerid" = ${ParameterValue(customerid, null, CustomerId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(customerids: Array[CustomerId])(implicit c: Connection): Int = {
     SQL"""delete
-          from sales.customer
+          from "sales"."customer"
           where "customerid" = ANY(${customerids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
-    SQL"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."customer"("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.customerid, null, CustomerId.toStatement)}::int4, ${ParameterValue(unsaved.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4, ${ParameterValue(unsaved.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
        """
@@ -69,12 +69,12 @@ class CustomerRepoImpl extends CustomerRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into sales.customer default values
+      SQL"""insert into "sales"."customer" default values
             returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
          """
         .executeInsert(CustomerRow.rowParser(1).single)
     } else {
-      val q = s"""insert into sales.customer(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "sales"."customer"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
                """
@@ -84,29 +84,29 @@ class CustomerRepoImpl extends CustomerRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[CustomerRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(CustomerRow.text, c)
+    streamingInsert(s"""COPY "sales"."customer"("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(CustomerRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[CustomerRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.customer("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CustomerRowUnsaved.text, c)
+    streamingInsert(s"""COPY "sales"."customer"("personid", "storeid", "territoryid", "customerid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(CustomerRowUnsaved.text, c)
   }
   override def select: SelectBuilder[CustomerFields, CustomerRow] = {
-    SelectBuilderSql("sales.customer", CustomerFields.structure, CustomerRow.rowParser)
+    SelectBuilderSql(""""sales"."customer"""", CustomerFields.structure, CustomerRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[CustomerRow] = {
     SQL"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
-          from sales.customer
+          from "sales"."customer"
        """.as(CustomerRow.rowParser(1).*)
   }
   override def selectById(customerid: CustomerId)(implicit c: Connection): Option[CustomerRow] = {
     SQL"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
-          from sales.customer
+          from "sales"."customer"
           where "customerid" = ${ParameterValue(customerid, null, CustomerId.toStatement)}
        """.as(CustomerRow.rowParser(1).singleOpt)
   }
   override def selectByIds(customerids: Array[CustomerId])(implicit c: Connection): List[CustomerRow] = {
     SQL"""select "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
-          from sales.customer
+          from "sales"."customer"
           where "customerid" = ANY(${customerids})
        """.as(CustomerRow.rowParser(1).*)
     
@@ -116,11 +116,11 @@ class CustomerRepoImpl extends CustomerRepo {
     customerids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
-    UpdateBuilder("sales.customer", CustomerFields.structure, CustomerRow.rowParser)
+    UpdateBuilder(""""sales"."customer"""", CustomerFields.structure, CustomerRow.rowParser)
   }
   override def update(row: CustomerRow)(implicit c: Connection): Boolean = {
     val customerid = row.customerid
-    SQL"""update sales.customer
+    SQL"""update "sales"."customer"
           set "personid" = ${ParameterValue(row.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
               "storeid" = ${ParameterValue(row.storeid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
               "territoryid" = ${ParameterValue(row.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4,
@@ -130,7 +130,7 @@ class CustomerRepoImpl extends CustomerRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
-    SQL"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."customer"("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.customerid, null, CustomerId.toStatement)}::int4,
             ${ParameterValue(unsaved.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
@@ -165,7 +165,7 @@ class CustomerRepoImpl extends CustomerRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
+            s"""insert into "sales"."customer"("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
                 values ({customerid}::int4, {personid}::int4, {storeid}::int4, {territoryid}::int4, {rowguid}::uuid, {modifieddate}::timestamp)
                 on conflict ("customerid")
                 do update set
@@ -184,9 +184,9 @@ class CustomerRepoImpl extends CustomerRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[CustomerRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table customer_TEMP (like sales.customer) on commit drop".execute(): @nowarn
+    SQL"""create temporary table customer_TEMP (like "sales"."customer") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy customer_TEMP("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(CustomerRow.text, c): @nowarn
-    SQL"""insert into sales.customer("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."customer"("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")
           select * from customer_TEMP
           on conflict ("customerid")
           do update set

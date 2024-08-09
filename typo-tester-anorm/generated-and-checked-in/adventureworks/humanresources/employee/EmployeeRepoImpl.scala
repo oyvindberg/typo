@@ -32,20 +32,20 @@ import typo.dsl.UpdateBuilder
 
 class EmployeeRepoImpl extends EmployeeRepo {
   override def delete: DeleteBuilder[EmployeeFields, EmployeeRow] = {
-    DeleteBuilder("humanresources.employee", EmployeeFields.structure)
+    DeleteBuilder(""""humanresources"."employee"""", EmployeeFields.structure)
   }
   override def deleteById(businessentityid: BusinessentityId)(implicit c: Connection): Boolean = {
-    SQL"""delete from humanresources.employee where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "humanresources"."employee" where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): Int = {
     SQL"""delete
-          from humanresources.employee
+          from "humanresources"."employee"
           where "businessentityid" = ANY(${businessentityids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow = {
-    SQL"""insert into humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
+    SQL"""insert into "humanresources"."employee"("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
           values (${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4, ${ParameterValue(unsaved.nationalidnumber, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.loginid, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.jobtitle, null, ToStatement.stringToStatement)}, ${ParameterValue(unsaved.birthdate, null, TypoLocalDate.toStatement)}::date, ${ParameterValue(unsaved.maritalstatus, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.gender, null, ToStatement.stringToStatement)}::bpchar, ${ParameterValue(unsaved.hiredate, null, TypoLocalDate.toStatement)}::date, ${ParameterValue(unsaved.salariedflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.vacationhours, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.sickleavehours, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.currentflag, null, Flag.toStatement)}::bool, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp, ${ParameterValue(unsaved.organizationnode, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))})
           returning "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode"
        """
@@ -93,12 +93,12 @@ class EmployeeRepoImpl extends EmployeeRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into humanresources.employee default values
+      SQL"""insert into "humanresources"."employee" default values
             returning "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode"
          """
         .executeInsert(EmployeeRow.rowParser(1).single)
     } else {
-      val q = s"""insert into humanresources.employee(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "humanresources"."employee"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode"
                """
@@ -108,29 +108,29 @@ class EmployeeRepoImpl extends EmployeeRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[EmployeeRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") FROM STDIN""", batchSize, unsaved)(EmployeeRow.text, c)
+    streamingInsert(s"""COPY "humanresources"."employee"("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") FROM STDIN""", batchSize, unsaved)(EmployeeRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[EmployeeRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmployeeRowUnsaved.text, c)
+    streamingInsert(s"""COPY "humanresources"."employee"("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(EmployeeRowUnsaved.text, c)
   }
   override def select: SelectBuilder[EmployeeFields, EmployeeRow] = {
-    SelectBuilderSql("humanresources.employee", EmployeeFields.structure, EmployeeRow.rowParser)
+    SelectBuilderSql(""""humanresources"."employee"""", EmployeeFields.structure, EmployeeRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[EmployeeRow] = {
     SQL"""select "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode"
-          from humanresources.employee
+          from "humanresources"."employee"
        """.as(EmployeeRow.rowParser(1).*)
   }
   override def selectById(businessentityid: BusinessentityId)(implicit c: Connection): Option[EmployeeRow] = {
     SQL"""select "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode"
-          from humanresources.employee
+          from "humanresources"."employee"
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
        """.as(EmployeeRow.rowParser(1).singleOpt)
   }
   override def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[EmployeeRow] = {
     SQL"""select "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode"
-          from humanresources.employee
+          from "humanresources"."employee"
           where "businessentityid" = ANY(${businessentityids})
        """.as(EmployeeRow.rowParser(1).*)
     
@@ -140,11 +140,11 @@ class EmployeeRepoImpl extends EmployeeRepo {
     businessentityids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
-    UpdateBuilder("humanresources.employee", EmployeeFields.structure, EmployeeRow.rowParser)
+    UpdateBuilder(""""humanresources"."employee"""", EmployeeFields.structure, EmployeeRow.rowParser)
   }
   override def update(row: EmployeeRow)(implicit c: Connection): Boolean = {
     val businessentityid = row.businessentityid
-    SQL"""update humanresources.employee
+    SQL"""update "humanresources"."employee"
           set "nationalidnumber" = ${ParameterValue(row.nationalidnumber, null, ToStatement.stringToStatement)},
               "loginid" = ${ParameterValue(row.loginid, null, ToStatement.stringToStatement)},
               "jobtitle" = ${ParameterValue(row.jobtitle, null, ToStatement.stringToStatement)},
@@ -163,7 +163,7 @@ class EmployeeRepoImpl extends EmployeeRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow = {
-    SQL"""insert into humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
+    SQL"""insert into "humanresources"."employee"("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
           values (
             ${ParameterValue(unsaved.businessentityid, null, BusinessentityId.toStatement)}::int4,
             ${ParameterValue(unsaved.nationalidnumber, null, ToStatement.stringToStatement)},
@@ -225,7 +225,7 @@ class EmployeeRepoImpl extends EmployeeRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
+            s"""insert into "humanresources"."employee"("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
                 values ({businessentityid}::int4, {nationalidnumber}, {loginid}, {jobtitle}, {birthdate}::date, {maritalstatus}::bpchar, {gender}::bpchar, {hiredate}::date, {salariedflag}::bool, {vacationhours}::int2, {sickleavehours}::int2, {currentflag}::bool, {rowguid}::uuid, {modifieddate}::timestamp, {organizationnode})
                 on conflict ("businessentityid")
                 do update set
@@ -253,9 +253,9 @@ class EmployeeRepoImpl extends EmployeeRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[EmployeeRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table employee_TEMP (like humanresources.employee) on commit drop".execute(): @nowarn
+    SQL"""create temporary table employee_TEMP (like "humanresources"."employee") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy employee_TEMP("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode") from stdin""", batchSize, unsaved)(EmployeeRow.text, c): @nowarn
-    SQL"""insert into humanresources.employee("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
+    SQL"""insert into "humanresources"."employee"("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")
           select * from employee_TEMP
           on conflict ("businessentityid")
           do update set

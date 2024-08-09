@@ -25,16 +25,16 @@ import zio.stream.ZStream
 
 class ShiftRepoImpl extends ShiftRepo {
   override def delete: DeleteBuilder[ShiftFields, ShiftRow] = {
-    DeleteBuilder("humanresources.shift", ShiftFields.structure)
+    DeleteBuilder(""""humanresources"."shift"""", ShiftFields.structure)
   }
   override def deleteById(shiftid: ShiftId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from humanresources.shift where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "humanresources"."shift" where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(shiftids: Array[ShiftId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from humanresources.shift where "shiftid" = ANY(${shiftids})""".delete
+    sql"""delete from "humanresources"."shift" where "shiftid" = ANY(${shiftids})""".delete
   }
   override def insert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, ShiftRow] = {
-    sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
+    sql"""insert into "humanresources"."shift"("shiftid", "name", "starttime", "endtime", "modifieddate")
           values (${Segment.paramSegment(unsaved.shiftid)(ShiftId.setter)}::int4, ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar, ${Segment.paramSegment(unsaved.starttime)(TypoLocalTime.setter)}::time, ${Segment.paramSegment(unsaved.endtime)(TypoLocalTime.setter)}::time, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
        """.insertReturning(using ShiftRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -55,35 +55,35 @@ class ShiftRepoImpl extends ShiftRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into humanresources.shift default values
+      sql"""insert into "humanresources"."shift" default values
             returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into humanresources.shift($names) values ($values) returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text"""
+      sql"""insert into "humanresources"."shift"($names) values ($values) returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text"""
     }
     q.insertReturning(using ShiftRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShiftRow.text)
+    streamingInsert(s"""COPY "humanresources"."shift"("shiftid", "name", "starttime", "endtime", "modifieddate") FROM STDIN""", batchSize, unsaved)(ShiftRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY humanresources.shift("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShiftRowUnsaved.text)
+    streamingInsert(s"""COPY "humanresources"."shift"("name", "starttime", "endtime", "shiftid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ShiftRowUnsaved.text)
   }
   override def select: SelectBuilder[ShiftFields, ShiftRow] = {
-    SelectBuilderSql("humanresources.shift", ShiftFields.structure, ShiftRow.jdbcDecoder)
+    SelectBuilderSql(""""humanresources"."shift"""", ShiftFields.structure, ShiftRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, ShiftRow] = {
-    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift""".query(using ShiftRow.jdbcDecoder).selectStream()
+    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from "humanresources"."shift"""".query(using ShiftRow.jdbcDecoder).selectStream()
   }
   override def selectById(shiftid: ShiftId): ZIO[ZConnection, Throwable, Option[ShiftRow]] = {
-    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".query(using ShiftRow.jdbcDecoder).selectOne
+    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from "humanresources"."shift" where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".query(using ShiftRow.jdbcDecoder).selectOne
   }
   override def selectByIds(shiftids: Array[ShiftId]): ZStream[ZConnection, Throwable, ShiftRow] = {
-    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from humanresources.shift where "shiftid" = ANY(${Segment.paramSegment(shiftids)(ShiftId.arraySetter)})""".query(using ShiftRow.jdbcDecoder).selectStream()
+    sql"""select "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text from "humanresources"."shift" where "shiftid" = ANY(${Segment.paramSegment(shiftids)(ShiftId.arraySetter)})""".query(using ShiftRow.jdbcDecoder).selectStream()
   }
   override def selectByIdsTracked(shiftids: Array[ShiftId]): ZIO[ZConnection, Throwable, Map[ShiftId, ShiftRow]] = {
     selectByIds(shiftids).runCollect.map { rows =>
@@ -92,11 +92,11 @@ class ShiftRepoImpl extends ShiftRepo {
     }
   }
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
-    UpdateBuilder("humanresources.shift", ShiftFields.structure, ShiftRow.jdbcDecoder)
+    UpdateBuilder(""""humanresources"."shift"""", ShiftFields.structure, ShiftRow.jdbcDecoder)
   }
   override def update(row: ShiftRow): ZIO[ZConnection, Throwable, Boolean] = {
     val shiftid = row.shiftid
-    sql"""update humanresources.shift
+    sql"""update "humanresources"."shift"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "starttime" = ${Segment.paramSegment(row.starttime)(TypoLocalTime.setter)}::time,
               "endtime" = ${Segment.paramSegment(row.endtime)(TypoLocalTime.setter)}::time,
@@ -104,7 +104,7 @@ class ShiftRepoImpl extends ShiftRepo {
           where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, UpdateResult[ShiftRow]] = {
-    sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
+    sql"""insert into "humanresources"."shift"("shiftid", "name", "starttime", "endtime", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.shiftid)(ShiftId.setter)}::int4,
             ${Segment.paramSegment(unsaved.name)(Name.setter)}::varchar,
@@ -122,9 +122,9 @@ class ShiftRepoImpl extends ShiftRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, ShiftRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table shift_TEMP (like humanresources.shift) on commit drop".execute
+    val created = sql"""create temporary table shift_TEMP (like "humanresources"."shift") on commit drop""".execute
     val copied = streamingInsert(s"""copy shift_TEMP("shiftid", "name", "starttime", "endtime", "modifieddate") from stdin""", batchSize, unsaved)(ShiftRow.text)
-    val merged = sql"""insert into humanresources.shift("shiftid", "name", "starttime", "endtime", "modifieddate")
+    val merged = sql"""insert into "humanresources"."shift"("shiftid", "name", "starttime", "endtime", "modifieddate")
                        select * from shift_TEMP
                        on conflict ("shiftid")
                        do update set

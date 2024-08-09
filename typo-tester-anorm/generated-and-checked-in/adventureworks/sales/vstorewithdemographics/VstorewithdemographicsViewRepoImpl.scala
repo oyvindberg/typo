@@ -14,11 +14,11 @@ import typo.dsl.SelectBuilderSql
 
 class VstorewithdemographicsViewRepoImpl extends VstorewithdemographicsViewRepo {
   override def select: SelectBuilder[VstorewithdemographicsViewFields, VstorewithdemographicsViewRow] = {
-    SelectBuilderSql("sales.vstorewithdemographics", VstorewithdemographicsViewFields.structure, VstorewithdemographicsViewRow.rowParser)
+    SelectBuilderSql(""""sales"."vstorewithdemographics"""", VstorewithdemographicsViewFields.structure, VstorewithdemographicsViewRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[VstorewithdemographicsViewRow] = {
     SQL"""select "businessentityid", "name", "AnnualSales"::numeric, "AnnualRevenue"::numeric, "BankName", "BusinessType", "YearOpened", "Specialty", "SquareFeet", "Brands", "Internet", "NumberEmployees"
-          from sales.vstorewithdemographics
+          from "sales"."vstorewithdemographics"
        """.as(VstorewithdemographicsViewRow.rowParser(1).*)
   }
 }

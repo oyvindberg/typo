@@ -27,16 +27,16 @@ import zio.stream.ZStream
 
 class AddressRepoImpl extends AddressRepo {
   override def delete: DeleteBuilder[AddressFields, AddressRow] = {
-    DeleteBuilder("person.address", AddressFields.structure)
+    DeleteBuilder(""""person"."address"""", AddressFields.structure)
   }
   override def deleteById(addressid: AddressId): ZIO[ZConnection, Throwable, Boolean] = {
-    sql"""delete from person.address where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}""".delete.map(_ > 0)
+    sql"""delete from "person"."address" where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}""".delete.map(_ > 0)
   }
   override def deleteByIds(addressids: Array[AddressId]): ZIO[ZConnection, Throwable, Long] = {
-    sql"""delete from person.address where "addressid" = ANY(${addressids})""".delete
+    sql"""delete from "person"."address" where "addressid" = ANY(${addressids})""".delete
   }
   override def insert(unsaved: AddressRow): ZIO[ZConnection, Throwable, AddressRow] = {
-    sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
+    sql"""insert into "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
           values (${Segment.paramSegment(unsaved.addressid)(AddressId.setter)}::int4, ${Segment.paramSegment(unsaved.addressline1)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.addressline2)(Setter.optionParamSetter(Setter.stringSetter))}, ${Segment.paramSegment(unsaved.city)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.stateprovinceid)(StateprovinceId.setter)}::int4, ${Segment.paramSegment(unsaved.postalcode)(Setter.stringSetter)}, ${Segment.paramSegment(unsaved.spatiallocation)(Setter.optionParamSetter(TypoBytea.setter))}::bytea, ${Segment.paramSegment(unsaved.rowguid)(TypoUUID.setter)}::uuid, ${Segment.paramSegment(unsaved.modifieddate)(TypoLocalDateTime.setter)}::timestamp)
           returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
        """.insertReturning(using AddressRow.jdbcDecoder).map(_.updatedKeys.head)
@@ -64,35 +64,35 @@ class AddressRepoImpl extends AddressRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into person.address default values
+      sql"""insert into "person"."address" default values
             returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
          """
     } else {
       val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
       val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
-      sql"""insert into person.address($names) values ($values) returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text"""
+      sql"""insert into "person"."address"($names) values ($values) returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text"""
     }
     q.insertReturning(using AddressRow.jdbcDecoder).map(_.updatedKeys.head)
     
   }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, AddressRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(AddressRow.text)
+    streamingInsert(s"""COPY "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(AddressRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, AddressRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    streamingInsert(s"""COPY person.address("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(AddressRowUnsaved.text)
+    streamingInsert(s"""COPY "person"."address"("addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "addressid", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(AddressRowUnsaved.text)
   }
   override def select: SelectBuilder[AddressFields, AddressRow] = {
-    SelectBuilderSql("person.address", AddressFields.structure, AddressRow.jdbcDecoder)
+    SelectBuilderSql(""""person"."address"""", AddressFields.structure, AddressRow.jdbcDecoder)
   }
   override def selectAll: ZStream[ZConnection, Throwable, AddressRow] = {
-    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address""".query(using AddressRow.jdbcDecoder).selectStream()
+    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from "person"."address"""".query(using AddressRow.jdbcDecoder).selectStream()
   }
   override def selectById(addressid: AddressId): ZIO[ZConnection, Throwable, Option[AddressRow]] = {
-    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}""".query(using AddressRow.jdbcDecoder).selectOne
+    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from "person"."address" where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}""".query(using AddressRow.jdbcDecoder).selectOne
   }
   override def selectByIds(addressids: Array[AddressId]): ZStream[ZConnection, Throwable, AddressRow] = {
-    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from person.address where "addressid" = ANY(${Segment.paramSegment(addressids)(AddressId.arraySetter)})""".query(using AddressRow.jdbcDecoder).selectStream()
+    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from "person"."address" where "addressid" = ANY(${Segment.paramSegment(addressids)(AddressId.arraySetter)})""".query(using AddressRow.jdbcDecoder).selectStream()
   }
   override def selectByIdsTracked(addressids: Array[AddressId]): ZIO[ZConnection, Throwable, Map[AddressId, AddressRow]] = {
     selectByIds(addressids).runCollect.map { rows =>
@@ -101,11 +101,11 @@ class AddressRepoImpl extends AddressRepo {
     }
   }
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
-    UpdateBuilder("person.address", AddressFields.structure, AddressRow.jdbcDecoder)
+    UpdateBuilder(""""person"."address"""", AddressFields.structure, AddressRow.jdbcDecoder)
   }
   override def update(row: AddressRow): ZIO[ZConnection, Throwable, Boolean] = {
     val addressid = row.addressid
-    sql"""update person.address
+    sql"""update "person"."address"
           set "addressline1" = ${Segment.paramSegment(row.addressline1)(Setter.stringSetter)},
               "addressline2" = ${Segment.paramSegment(row.addressline2)(Setter.optionParamSetter(Setter.stringSetter))},
               "city" = ${Segment.paramSegment(row.city)(Setter.stringSetter)},
@@ -117,7 +117,7 @@ class AddressRepoImpl extends AddressRepo {
           where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}""".update.map(_ > 0)
   }
   override def upsert(unsaved: AddressRow): ZIO[ZConnection, Throwable, UpdateResult[AddressRow]] = {
-    sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
+    sql"""insert into "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
           values (
             ${Segment.paramSegment(unsaved.addressid)(AddressId.setter)}::int4,
             ${Segment.paramSegment(unsaved.addressline1)(Setter.stringSetter)},
@@ -143,9 +143,9 @@ class AddressRepoImpl extends AddressRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: ZStream[ZConnection, Throwable, AddressRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
-    val created = sql"create temporary table address_TEMP (like person.address) on commit drop".execute
+    val created = sql"""create temporary table address_TEMP (like "person"."address") on commit drop""".execute
     val copied = streamingInsert(s"""copy address_TEMP("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(AddressRow.text)
-    val merged = sql"""insert into person.address("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
+    val merged = sql"""insert into "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
                        select * from address_TEMP
                        on conflict ("addressid")
                        do update set

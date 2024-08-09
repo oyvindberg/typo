@@ -24,20 +24,20 @@ import typo.dsl.UpdateBuilder
 
 class MaritalStatusRepoImpl extends MaritalStatusRepo {
   override def delete: DeleteBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    DeleteBuilder("myschema.marital_status", MaritalStatusFields.structure)
+    DeleteBuilder(""""myschema"."marital_status"""", MaritalStatusFields.structure)
   }
   override def deleteById(id: MaritalStatusId)(implicit c: Connection): Boolean = {
-    SQL"""delete from myschema.marital_status where "id" = ${ParameterValue(id, null, MaritalStatusId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "myschema"."marital_status" where "id" = ${ParameterValue(id, null, MaritalStatusId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(ids: Array[MaritalStatusId])(implicit c: Connection): Int = {
     SQL"""delete
-          from myschema.marital_status
+          from "myschema"."marital_status"
           where "id" = ANY(${ids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
-    SQL"""insert into myschema.marital_status("id")
+    SQL"""insert into "myschema"."marital_status"("id")
           values (${ParameterValue(unsaved.id, null, MaritalStatusId.toStatement)}::int8)
           returning "id"
        """
@@ -45,14 +45,14 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[MaritalStatusRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY myschema.marital_status("id") FROM STDIN""", batchSize, unsaved)(MaritalStatusRow.text, c)
+    streamingInsert(s"""COPY "myschema"."marital_status"("id") FROM STDIN""", batchSize, unsaved)(MaritalStatusRow.text, c)
   }
   override def select: SelectBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    SelectBuilderSql("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.rowParser)
+    SelectBuilderSql(""""myschema"."marital_status"""", MaritalStatusFields.structure, MaritalStatusRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[MaritalStatusRow] = {
     SQL"""select "id"
-          from myschema.marital_status
+          from "myschema"."marital_status"
        """.as(MaritalStatusRow.rowParser(1).*)
   }
   override def selectByFieldValues(fieldValues: List[MaritalStatusFieldOrIdValue[?]])(implicit c: Connection): List[MaritalStatusRow] = {
@@ -64,7 +64,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
         }
         val quote = '"'.toString
         val q = s"""select "id"
-                    from myschema.marital_status
+                    from "myschema"."marital_status"
                     where ${namedParameters.map(x => s"$quote${x.name}$quote = {${x.name}}").mkString(" AND ")}
                  """
         SimpleSql(SQL(q), namedParameters.map(_.tupled).toMap, RowParser.successful)
@@ -74,13 +74,13 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
   }
   override def selectById(id: MaritalStatusId)(implicit c: Connection): Option[MaritalStatusRow] = {
     SQL"""select "id"
-          from myschema.marital_status
+          from "myschema"."marital_status"
           where "id" = ${ParameterValue(id, null, MaritalStatusId.toStatement)}
        """.as(MaritalStatusRow.rowParser(1).singleOpt)
   }
   override def selectByIds(ids: Array[MaritalStatusId])(implicit c: Connection): List[MaritalStatusRow] = {
     SQL"""select "id"
-          from myschema.marital_status
+          from "myschema"."marital_status"
           where "id" = ANY(${ids})
        """.as(MaritalStatusRow.rowParser(1).*)
     
@@ -90,10 +90,10 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
     ids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[MaritalStatusFields, MaritalStatusRow] = {
-    UpdateBuilder("myschema.marital_status", MaritalStatusFields.structure, MaritalStatusRow.rowParser)
+    UpdateBuilder(""""myschema"."marital_status"""", MaritalStatusFields.structure, MaritalStatusRow.rowParser)
   }
   override def upsert(unsaved: MaritalStatusRow)(implicit c: Connection): MaritalStatusRow = {
-    SQL"""insert into myschema.marital_status("id")
+    SQL"""insert into "myschema"."marital_status"("id")
           values (
             ${ParameterValue(unsaved.id, null, MaritalStatusId.toStatement)}::int8
           )
@@ -113,7 +113,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
       case head :: rest =>
         new anorm.testdb.hardcoded.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into myschema.marital_status("id")
+            s"""insert into "myschema"."marital_status"("id")
                 values ({id}::int8)
                 on conflict ("id")
                 do nothing
@@ -127,9 +127,9 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[MaritalStatusRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table marital_status_TEMP (like myschema.marital_status) on commit drop".execute(): @nowarn
+    SQL"""create temporary table marital_status_TEMP (like "myschema"."marital_status") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy marital_status_TEMP("id") from stdin""", batchSize, unsaved)(MaritalStatusRow.text, c): @nowarn
-    SQL"""insert into myschema.marital_status("id")
+    SQL"""insert into "myschema"."marital_status"("id")
           select * from marital_status_TEMP
           on conflict ("id")
           do nothing

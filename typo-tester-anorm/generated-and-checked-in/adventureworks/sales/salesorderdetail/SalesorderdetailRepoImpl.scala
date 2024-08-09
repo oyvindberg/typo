@@ -32,23 +32,23 @@ import typo.dsl.UpdateBuilder
 
 class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def delete: DeleteBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    DeleteBuilder("sales.salesorderdetail", SalesorderdetailFields.structure)
+    DeleteBuilder(""""sales"."salesorderdetail"""", SalesorderdetailFields.structure)
   }
   override def deleteById(compositeId: SalesorderdetailId)(implicit c: Connection): Boolean = {
-    SQL"""delete from sales.salesorderdetail where "salesorderid" = ${ParameterValue(compositeId.salesorderid, null, SalesorderheaderId.toStatement)} AND "salesorderdetailid" = ${ParameterValue(compositeId.salesorderdetailid, null, ToStatement.intToStatement)}""".executeUpdate() > 0
+    SQL"""delete from "sales"."salesorderdetail" where "salesorderid" = ${ParameterValue(compositeId.salesorderid, null, SalesorderheaderId.toStatement)} AND "salesorderdetailid" = ${ParameterValue(compositeId.salesorderdetailid, null, ToStatement.intToStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(compositeIds: Array[SalesorderdetailId])(implicit c: Connection): Int = {
     val salesorderid = compositeIds.map(_.salesorderid)
     val salesorderdetailid = compositeIds.map(_.salesorderdetailid)
     SQL"""delete
-          from sales.salesorderdetail
+          from "sales"."salesorderdetail"
           where ("salesorderid", "salesorderdetailid")
           in (select unnest(${salesorderid}), unnest(${salesorderdetailid}))
        """.executeUpdate()
     
   }
   override def insert(unsaved: SalesorderdetailRow)(implicit c: Connection): SalesorderdetailRow = {
-    SQL"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
           values (${ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)}::int4, ${ParameterValue(unsaved.salesorderdetailid, null, ToStatement.intToStatement)}::int4, ${ParameterValue(unsaved.carriertrackingnumber, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}, ${ParameterValue(unsaved.orderqty, null, TypoShort.toStatement)}::int2, ${ParameterValue(unsaved.productid, null, ProductId.toStatement)}::int4, ${ParameterValue(unsaved.specialofferid, null, SpecialofferId.toStatement)}::int4, ${ParameterValue(unsaved.unitprice, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.unitpricediscount, null, ToStatement.scalaBigDecimalToStatement)}::numeric, ${ParameterValue(unsaved.rowguid, null, TypoUUID.toStatement)}::uuid, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
        """
@@ -82,12 +82,12 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into sales.salesorderdetail default values
+      SQL"""insert into "sales"."salesorderdetail" default values
             returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
          """
         .executeInsert(SalesorderdetailRow.rowParser(1).single)
     } else {
-      val q = s"""insert into sales.salesorderdetail(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "sales"."salesorderdetail"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
                """
@@ -97,23 +97,23 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[SalesorderdetailRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderdetailRow.text, c)
+    streamingInsert(s"""COPY "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN""", batchSize, unsaved)(SalesorderdetailRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[SalesorderdetailRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY sales.salesorderdetail("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesorderdetailRowUnsaved.text, c)
+    streamingInsert(s"""COPY "sales"."salesorderdetail"("salesorderid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "salesorderdetailid", "unitpricediscount", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(SalesorderdetailRowUnsaved.text, c)
   }
   override def select: SelectBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    SelectBuilderSql("sales.salesorderdetail", SalesorderdetailFields.structure, SalesorderdetailRow.rowParser)
+    SelectBuilderSql(""""sales"."salesorderdetail"""", SalesorderdetailFields.structure, SalesorderdetailRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[SalesorderdetailRow] = {
     SQL"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
-          from sales.salesorderdetail
+          from "sales"."salesorderdetail"
        """.as(SalesorderdetailRow.rowParser(1).*)
   }
   override def selectById(compositeId: SalesorderdetailId)(implicit c: Connection): Option[SalesorderdetailRow] = {
     SQL"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
-          from sales.salesorderdetail
+          from "sales"."salesorderdetail"
           where "salesorderid" = ${ParameterValue(compositeId.salesorderid, null, SalesorderheaderId.toStatement)} AND "salesorderdetailid" = ${ParameterValue(compositeId.salesorderdetailid, null, ToStatement.intToStatement)}
        """.as(SalesorderdetailRow.rowParser(1).singleOpt)
   }
@@ -121,7 +121,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     val salesorderid = compositeIds.map(_.salesorderid)
     val salesorderdetailid = compositeIds.map(_.salesorderdetailid)
     SQL"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
-          from sales.salesorderdetail
+          from "sales"."salesorderdetail"
           where ("salesorderid", "salesorderdetailid") 
           in (select unnest(${salesorderid}), unnest(${salesorderdetailid}))
        """.as(SalesorderdetailRow.rowParser(1).*)
@@ -132,11 +132,11 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     compositeIds.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
-    UpdateBuilder("sales.salesorderdetail", SalesorderdetailFields.structure, SalesorderdetailRow.rowParser)
+    UpdateBuilder(""""sales"."salesorderdetail"""", SalesorderdetailFields.structure, SalesorderdetailRow.rowParser)
   }
   override def update(row: SalesorderdetailRow)(implicit c: Connection): Boolean = {
     val compositeId = row.compositeId
-    SQL"""update sales.salesorderdetail
+    SQL"""update "sales"."salesorderdetail"
           set "carriertrackingnumber" = ${ParameterValue(row.carriertrackingnumber, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
               "orderqty" = ${ParameterValue(row.orderqty, null, TypoShort.toStatement)}::int2,
               "productid" = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
@@ -149,7 +149,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: SalesorderdetailRow)(implicit c: Connection): SalesorderdetailRow = {
-    SQL"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
           values (
             ${ParameterValue(unsaved.salesorderid, null, SalesorderheaderId.toStatement)}::int4,
             ${ParameterValue(unsaved.salesorderdetailid, null, ToStatement.intToStatement)}::int4,
@@ -195,7 +195,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+            s"""insert into "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
                 values ({salesorderid}::int4, {salesorderdetailid}::int4, {carriertrackingnumber}, {orderqty}::int2, {productid}::int4, {specialofferid}::int4, {unitprice}::numeric, {unitpricediscount}::numeric, {rowguid}::uuid, {modifieddate}::timestamp)
                 on conflict ("salesorderid", "salesorderdetailid")
                 do update set
@@ -217,9 +217,9 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[SalesorderdetailRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table salesorderdetail_TEMP (like sales.salesorderdetail) on commit drop".execute(): @nowarn
+    SQL"""create temporary table salesorderdetail_TEMP (like "sales"."salesorderdetail") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy salesorderdetail_TEMP("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate") from stdin""", batchSize, unsaved)(SalesorderdetailRow.text, c): @nowarn
-    SQL"""insert into sales.salesorderdetail("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
+    SQL"""insert into "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
           select * from salesorderdetail_TEMP
           on conflict ("salesorderid", "salesorderdetailid")
           do update set

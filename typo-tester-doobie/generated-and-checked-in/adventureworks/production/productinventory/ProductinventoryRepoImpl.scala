@@ -30,23 +30,23 @@ import typo.dsl.UpdateBuilder
 
 class ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def delete: DeleteBuilder[ProductinventoryFields, ProductinventoryRow] = {
-    DeleteBuilder("production.productinventory", ProductinventoryFields.structure)
+    DeleteBuilder(""""production"."productinventory"""", ProductinventoryFields.structure)
   }
   override def deleteById(compositeId: ProductinventoryId): ConnectionIO[Boolean] = {
-    sql"""delete from production.productinventory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."productinventory" where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductinventoryId]): ConnectionIO[Int] = {
     val productid = compositeIds.map(_.productid)
     val locationid = compositeIds.map(_.locationid)
     sql"""delete
-          from production.productinventory
+          from "production"."productinventory"
           where ("productid", "locationid")
           in (select unnest(${productid}), unnest(${locationid}))
        """.update.run
     
   }
   override def insert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow] = {
-    sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
+    sql"""insert into "production"."productinventory"("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
           values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int2, ${fromWrite(unsaved.shelf)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.bin)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.quantity)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
        """.query(using ProductinventoryRow.read).unique
@@ -72,12 +72,12 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     ).flatten
     
     val q = if (fs.isEmpty) {
-      sql"""insert into production.productinventory default values
+      sql"""insert into "production"."productinventory" default values
             returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
          """
     } else {
       val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
-      sql"""insert into production.productinventory(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+      sql"""insert into "production"."productinventory"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
             values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
             returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
          """
@@ -86,26 +86,26 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     
   }
   override def insertStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRow], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductinventoryRow.text)
+    new FragmentOps(sql"""COPY "production"."productinventory"("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN""").copyIn(unsaved, batchSize)(using ProductinventoryRow.text)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
-    new FragmentOps(sql"""COPY production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductinventoryRowUnsaved.text)
+    new FragmentOps(sql"""COPY "production"."productinventory"("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using ProductinventoryRowUnsaved.text)
   }
   override def select: SelectBuilder[ProductinventoryFields, ProductinventoryRow] = {
-    SelectBuilderSql("production.productinventory", ProductinventoryFields.structure, ProductinventoryRow.read)
+    SelectBuilderSql(""""production"."productinventory"""", ProductinventoryFields.structure, ProductinventoryRow.read)
   }
   override def selectAll: Stream[ConnectionIO, ProductinventoryRow] = {
-    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory""".query(using ProductinventoryRow.read).stream
+    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from "production"."productinventory"""".query(using ProductinventoryRow.read).stream
   }
   override def selectById(compositeId: ProductinventoryId): ConnectionIO[Option[ProductinventoryRow]] = {
-    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from production.productinventory where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}""".query(using ProductinventoryRow.read).option
+    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from "production"."productinventory" where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}""".query(using ProductinventoryRow.read).option
   }
   override def selectByIds(compositeIds: Array[ProductinventoryId]): Stream[ConnectionIO, ProductinventoryRow] = {
     val productid = compositeIds.map(_.productid)
     val locationid = compositeIds.map(_.locationid)
     sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
-          from production.productinventory
+          from "production"."productinventory"
           where ("productid", "locationid") 
           in (select unnest(${productid}), unnest(${locationid}))
        """.query(using ProductinventoryRow.read).stream
@@ -118,11 +118,11 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     }
   }
   override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
-    UpdateBuilder("production.productinventory", ProductinventoryFields.structure, ProductinventoryRow.read)
+    UpdateBuilder(""""production"."productinventory"""", ProductinventoryFields.structure, ProductinventoryRow.read)
   }
   override def update(row: ProductinventoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
-    sql"""update production.productinventory
+    sql"""update "production"."productinventory"
           set "shelf" = ${fromWrite(row.shelf)(Write.fromPut(Meta.StringMeta.put))},
               "bin" = ${fromWrite(row.bin)(Write.fromPut(TypoShort.put))}::int2,
               "quantity" = ${fromWrite(row.quantity)(Write.fromPut(TypoShort.put))}::int2,
@@ -134,7 +134,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
       .map(_ > 0)
   }
   override def upsert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow] = {
-    sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
+    sql"""insert into "production"."productinventory"("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
           values (
             ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
             ${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int2,
@@ -156,7 +156,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
   }
   override def upsertBatch(unsaved: List[ProductinventoryRow]): Stream[ConnectionIO, ProductinventoryRow] = {
     Update[ProductinventoryRow](
-      s"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
+      s"""insert into "production"."productinventory"("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
           values (?::int4,?::int2,?,?::int2,?::int2,?::uuid,?::timestamp)
           on conflict ("productid", "locationid")
           do update set
@@ -172,9 +172,9 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Stream[ConnectionIO, ProductinventoryRow], batchSize: Int = 10000): ConnectionIO[Int] = {
     for {
-      _ <- sql"create temporary table productinventory_TEMP (like production.productinventory) on commit drop".update.run
+      _ <- sql"""create temporary table productinventory_TEMP (like "production"."productinventory") on commit drop""".update.run
       _ <- new FragmentOps(sql"""copy productinventory_TEMP("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate") from stdin""").copyIn(unsaved, batchSize)(using ProductinventoryRow.text)
-      res <- sql"""insert into production.productinventory("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
+      res <- sql"""insert into "production"."productinventory"("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
                    select * from productinventory_TEMP
                    on conflict ("productid", "locationid")
                    do update set

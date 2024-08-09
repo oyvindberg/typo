@@ -26,20 +26,20 @@ import typo.dsl.UpdateBuilder
 
 class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def delete: DeleteBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    DeleteBuilder("person.phonenumbertype", PhonenumbertypeFields.structure)
+    DeleteBuilder(""""person"."phonenumbertype"""", PhonenumbertypeFields.structure)
   }
   override def deleteById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.phonenumbertype where "phonenumbertypeid" = ${ParameterValue(phonenumbertypeid, null, PhonenumbertypeId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "person"."phonenumbertype" where "phonenumbertypeid" = ${ParameterValue(phonenumbertypeid, null, PhonenumbertypeId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(phonenumbertypeids: Array[PhonenumbertypeId])(implicit c: Connection): Int = {
     SQL"""delete
-          from person.phonenumbertype
+          from "person"."phonenumbertype"
           where "phonenumbertypeid" = ANY(${phonenumbertypeids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
-    SQL"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
+    SQL"""insert into "person"."phonenumbertype"("phonenumbertypeid", "name", "modifieddate")
           values (${ParameterValue(unsaved.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "phonenumbertypeid", "name", "modifieddate"::text
        """
@@ -60,12 +60,12 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into person.phonenumbertype default values
+      SQL"""insert into "person"."phonenumbertype" default values
             returning "phonenumbertypeid", "name", "modifieddate"::text
          """
         .executeInsert(PhonenumbertypeRow.rowParser(1).single)
     } else {
-      val q = s"""insert into person.phonenumbertype(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "person"."phonenumbertype"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "phonenumbertypeid", "name", "modifieddate"::text
                """
@@ -75,29 +75,29 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[PhonenumbertypeRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.phonenumbertype("phonenumbertypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(PhonenumbertypeRow.text, c)
+    streamingInsert(s"""COPY "person"."phonenumbertype"("phonenumbertypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(PhonenumbertypeRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[PhonenumbertypeRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.phonenumbertype("name", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PhonenumbertypeRowUnsaved.text, c)
+    streamingInsert(s"""COPY "person"."phonenumbertype"("name", "phonenumbertypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(PhonenumbertypeRowUnsaved.text, c)
   }
   override def select: SelectBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    SelectBuilderSql("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.rowParser)
+    SelectBuilderSql(""""person"."phonenumbertype"""", PhonenumbertypeFields.structure, PhonenumbertypeRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[PhonenumbertypeRow] = {
     SQL"""select "phonenumbertypeid", "name", "modifieddate"::text
-          from person.phonenumbertype
+          from "person"."phonenumbertype"
        """.as(PhonenumbertypeRow.rowParser(1).*)
   }
   override def selectById(phonenumbertypeid: PhonenumbertypeId)(implicit c: Connection): Option[PhonenumbertypeRow] = {
     SQL"""select "phonenumbertypeid", "name", "modifieddate"::text
-          from person.phonenumbertype
+          from "person"."phonenumbertype"
           where "phonenumbertypeid" = ${ParameterValue(phonenumbertypeid, null, PhonenumbertypeId.toStatement)}
        """.as(PhonenumbertypeRow.rowParser(1).singleOpt)
   }
   override def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId])(implicit c: Connection): List[PhonenumbertypeRow] = {
     SQL"""select "phonenumbertypeid", "name", "modifieddate"::text
-          from person.phonenumbertype
+          from "person"."phonenumbertype"
           where "phonenumbertypeid" = ANY(${phonenumbertypeids})
        """.as(PhonenumbertypeRow.rowParser(1).*)
     
@@ -107,18 +107,18 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
     phonenumbertypeids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
-    UpdateBuilder("person.phonenumbertype", PhonenumbertypeFields.structure, PhonenumbertypeRow.rowParser)
+    UpdateBuilder(""""person"."phonenumbertype"""", PhonenumbertypeFields.structure, PhonenumbertypeRow.rowParser)
   }
   override def update(row: PhonenumbertypeRow)(implicit c: Connection): Boolean = {
     val phonenumbertypeid = row.phonenumbertypeid
-    SQL"""update person.phonenumbertype
+    SQL"""update "person"."phonenumbertype"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "phonenumbertypeid" = ${ParameterValue(phonenumbertypeid, null, PhonenumbertypeId.toStatement)}
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
-    SQL"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
+    SQL"""insert into "person"."phonenumbertype"("phonenumbertypeid", "name", "modifieddate")
           values (
             ${ParameterValue(unsaved.phonenumbertypeid, null, PhonenumbertypeId.toStatement)}::int4,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
@@ -144,7 +144,7 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
+            s"""insert into "person"."phonenumbertype"("phonenumbertypeid", "name", "modifieddate")
                 values ({phonenumbertypeid}::int4, {name}::varchar, {modifieddate}::timestamp)
                 on conflict ("phonenumbertypeid")
                 do update set
@@ -160,9 +160,9 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[PhonenumbertypeRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table phonenumbertype_TEMP (like person.phonenumbertype) on commit drop".execute(): @nowarn
+    SQL"""create temporary table phonenumbertype_TEMP (like "person"."phonenumbertype") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy phonenumbertype_TEMP("phonenumbertypeid", "name", "modifieddate") from stdin""", batchSize, unsaved)(PhonenumbertypeRow.text, c): @nowarn
-    SQL"""insert into person.phonenumbertype("phonenumbertypeid", "name", "modifieddate")
+    SQL"""insert into "person"."phonenumbertype"("phonenumbertypeid", "name", "modifieddate")
           select * from phonenumbertype_TEMP
           on conflict ("phonenumbertypeid")
           do update set

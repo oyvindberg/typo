@@ -26,20 +26,20 @@ import typo.dsl.UpdateBuilder
 
 class ContacttypeRepoImpl extends ContacttypeRepo {
   override def delete: DeleteBuilder[ContacttypeFields, ContacttypeRow] = {
-    DeleteBuilder("person.contacttype", ContacttypeFields.structure)
+    DeleteBuilder(""""person"."contacttype"""", ContacttypeFields.structure)
   }
   override def deleteById(contacttypeid: ContacttypeId)(implicit c: Connection): Boolean = {
-    SQL"""delete from person.contacttype where "contacttypeid" = ${ParameterValue(contacttypeid, null, ContacttypeId.toStatement)}""".executeUpdate() > 0
+    SQL"""delete from "person"."contacttype" where "contacttypeid" = ${ParameterValue(contacttypeid, null, ContacttypeId.toStatement)}""".executeUpdate() > 0
   }
   override def deleteByIds(contacttypeids: Array[ContacttypeId])(implicit c: Connection): Int = {
     SQL"""delete
-          from person.contacttype
+          from "person"."contacttype"
           where "contacttypeid" = ANY(${contacttypeids})
        """.executeUpdate()
     
   }
   override def insert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
-    SQL"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+    SQL"""insert into "person"."contacttype"("contacttypeid", "name", "modifieddate")
           values (${ParameterValue(unsaved.contacttypeid, null, ContacttypeId.toStatement)}::int4, ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar, ${ParameterValue(unsaved.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp)
           returning "contacttypeid", "name", "modifieddate"::text
        """
@@ -60,12 +60,12 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     ).flatten
     val quote = '"'.toString
     if (namedParameters.isEmpty) {
-      SQL"""insert into person.contacttype default values
+      SQL"""insert into "person"."contacttype" default values
             returning "contacttypeid", "name", "modifieddate"::text
          """
         .executeInsert(ContacttypeRow.rowParser(1).single)
     } else {
-      val q = s"""insert into person.contacttype(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+      val q = s"""insert into "person"."contacttype"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
                   values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
                   returning "contacttypeid", "name", "modifieddate"::text
                """
@@ -75,29 +75,29 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[ContacttypeRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.contacttype("contacttypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ContacttypeRow.text, c)
+    streamingInsert(s"""COPY "person"."contacttype"("contacttypeid", "name", "modifieddate") FROM STDIN""", batchSize, unsaved)(ContacttypeRow.text, c)
   }
   /* NOTE: this functionality requires PostgreSQL 16 or later! */
   override def insertUnsavedStreaming(unsaved: Iterator[ContacttypeRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY person.contacttype("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ContacttypeRowUnsaved.text, c)
+    streamingInsert(s"""COPY "person"."contacttype"("name", "contacttypeid", "modifieddate") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(ContacttypeRowUnsaved.text, c)
   }
   override def select: SelectBuilder[ContacttypeFields, ContacttypeRow] = {
-    SelectBuilderSql("person.contacttype", ContacttypeFields.structure, ContacttypeRow.rowParser)
+    SelectBuilderSql(""""person"."contacttype"""", ContacttypeFields.structure, ContacttypeRow.rowParser)
   }
   override def selectAll(implicit c: Connection): List[ContacttypeRow] = {
     SQL"""select "contacttypeid", "name", "modifieddate"::text
-          from person.contacttype
+          from "person"."contacttype"
        """.as(ContacttypeRow.rowParser(1).*)
   }
   override def selectById(contacttypeid: ContacttypeId)(implicit c: Connection): Option[ContacttypeRow] = {
     SQL"""select "contacttypeid", "name", "modifieddate"::text
-          from person.contacttype
+          from "person"."contacttype"
           where "contacttypeid" = ${ParameterValue(contacttypeid, null, ContacttypeId.toStatement)}
        """.as(ContacttypeRow.rowParser(1).singleOpt)
   }
   override def selectByIds(contacttypeids: Array[ContacttypeId])(implicit c: Connection): List[ContacttypeRow] = {
     SQL"""select "contacttypeid", "name", "modifieddate"::text
-          from person.contacttype
+          from "person"."contacttype"
           where "contacttypeid" = ANY(${contacttypeids})
        """.as(ContacttypeRow.rowParser(1).*)
     
@@ -107,18 +107,18 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
     contacttypeids.view.flatMap(id => byId.get(id).map(x => (id, x))).toMap
   }
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
-    UpdateBuilder("person.contacttype", ContacttypeFields.structure, ContacttypeRow.rowParser)
+    UpdateBuilder(""""person"."contacttype"""", ContacttypeFields.structure, ContacttypeRow.rowParser)
   }
   override def update(row: ContacttypeRow)(implicit c: Connection): Boolean = {
     val contacttypeid = row.contacttypeid
-    SQL"""update person.contacttype
+    SQL"""update "person"."contacttype"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "contacttypeid" = ${ParameterValue(contacttypeid, null, ContacttypeId.toStatement)}
        """.executeUpdate() > 0
   }
   override def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
-    SQL"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+    SQL"""insert into "person"."contacttype"("contacttypeid", "name", "modifieddate")
           values (
             ${ParameterValue(unsaved.contacttypeid, null, ContacttypeId.toStatement)}::int4,
             ${ParameterValue(unsaved.name, null, Name.toStatement)}::varchar,
@@ -144,7 +144,7 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
       case head :: rest =>
         new anorm.adventureworks.ExecuteReturningSyntax.Ops(
           BatchSql(
-            s"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+            s"""insert into "person"."contacttype"("contacttypeid", "name", "modifieddate")
                 values ({contacttypeid}::int4, {name}::varchar, {modifieddate}::timestamp)
                 on conflict ("contacttypeid")
                 do update set
@@ -160,9 +160,9 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
   override def upsertStreaming(unsaved: Iterator[ContacttypeRow], batchSize: Int = 10000)(implicit c: Connection): Int = {
-    SQL"create temporary table contacttype_TEMP (like person.contacttype) on commit drop".execute(): @nowarn
+    SQL"""create temporary table contacttype_TEMP (like "person"."contacttype") on commit drop""".execute(): @nowarn
     streamingInsert(s"""copy contacttype_TEMP("contacttypeid", "name", "modifieddate") from stdin""", batchSize, unsaved)(ContacttypeRow.text, c): @nowarn
-    SQL"""insert into person.contacttype("contacttypeid", "name", "modifieddate")
+    SQL"""insert into "person"."contacttype"("contacttypeid", "name", "modifieddate")
           select * from contacttype_TEMP
           on conflict ("contacttypeid")
           do update set
