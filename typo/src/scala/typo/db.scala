@@ -78,23 +78,42 @@ object db {
 
   case class Constraint(name: String, columns: SortedSet[ColName], checkClause: String)
 
-  case class Identity(
-      identityGeneration: String,
-      identityStart: Option[String],
-      identityIncrement: Option[String],
-      identityMaximum: Option[String],
-      identityMinimum: Option[String]
-  ) {
-    def ALWAYS = identityGeneration == "ALWAYS"
-    def `BY DEFAULT` = identityGeneration == "BY DEFAULT"
-    def asString: String =
-      List(
-        Some(s"Identity $identityGeneration"),
-        identityStart.map("identityStart: " + _),
-        identityIncrement.map("identityIncrement: " + _),
-        identityMaximum.map("identityMaximum: " + _),
-        identityMinimum.map("identityMinimum: " + _)
-      ).flatten.mkString(", ")
+  sealed trait Generated {
+    def ALWAYS: Boolean
+    def `BY DEFAULT`: Boolean
+    def asString: String
+  }
+
+  object Generated {
+    case class IsGenerated(generation: String, expression: Option[String]) extends Generated {
+      override def ALWAYS: Boolean = generation == "ALWAYS"
+      override def `BY DEFAULT`: Boolean = generation == "BY DEFAULT"
+
+      override def asString: String =
+        List(
+          Some(s"Generated $generation"),
+          expression.map("expression: " + _)
+        ).flatten.mkString(", ")
+    }
+
+    case class Identity(
+        identityGeneration: String,
+        identityStart: Option[String],
+        identityIncrement: Option[String],
+        identityMaximum: Option[String],
+        identityMinimum: Option[String]
+    ) extends Generated {
+      override def ALWAYS: Boolean = identityGeneration == "ALWAYS"
+      override def `BY DEFAULT`: Boolean = identityGeneration == "BY DEFAULT"
+      override def asString: String =
+        List(
+          Some(s"Identity $identityGeneration"),
+          identityStart.map("identityStart: " + _),
+          identityIncrement.map("identityIncrement: " + _),
+          identityMaximum.map("identityMaximum: " + _),
+          identityMinimum.map("identityMinimum: " + _)
+        ).flatten.mkString(", ")
+    }
   }
 
   case class Col(
@@ -103,12 +122,12 @@ object db {
       udtName: Option[String],
       nullability: Nullability,
       columnDefault: Option[String],
-      identity: Option[Identity],
+      maybeGenerated: Option[Generated],
       comment: Option[String],
       constraints: List[Constraint],
       jsonDescription: DebugJson
   ) {
-    def isDefaulted = columnDefault.nonEmpty || identity.exists(_.`BY DEFAULT`)
+    def isDefaulted = columnDefault.nonEmpty || maybeGenerated.exists(_.`BY DEFAULT`)
     def name = parsedName.name
   }
   case class RelationName(schema: Option[String], name: String) {

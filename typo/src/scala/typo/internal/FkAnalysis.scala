@@ -8,7 +8,7 @@ class FkAnalysis(table: ComputedTable, candidateFks: List[FkAnalysis.CandidateFk
   lazy val createWithFkIdsRow: Option[FkAnalysis.CreateWithFkIds] =
     FkAnalysis.CreateWithFkIds.compute(candidateFks, table.cols)
   lazy val createWithFkIdsUnsavedRow: Option[FkAnalysis.CreateWithFkIds] =
-    table.maybeUnsavedRow.flatMap(unsaved => FkAnalysis.CreateWithFkIds.compute(candidateFks, unsaved.allCols))
+    table.maybeUnsavedRow.flatMap(unsaved => FkAnalysis.CreateWithFkIds.compute(candidateFks, unsaved.unsavedCols))
   lazy val createWithFkIdsUnsavedRowOrRow: Option[FkAnalysis.CreateWithFkIds] =
     createWithFkIdsUnsavedRow.orElse(createWithFkIdsRow)
 

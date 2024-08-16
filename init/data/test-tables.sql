@@ -217,11 +217,25 @@ create table flaff
     constraint flaff_parent_fk foreign key (code, another_code, some_number, parentSpecifier) references flaff
 );
 
-create table title (code text primary key);
-insert into title (code) values ('mr'), ('ms'), ('dr'), ('phd');
+create table title
+(
+    code text primary key
+);
+insert into title (code)
+values ('mr'),
+       ('ms'),
+       ('dr'),
+       ('phd');
 
-create table title_domain (code short_text primary key);
-insert into title_domain (code) values ('mr'), ('ms'), ('dr'), ('phd');
+create table title_domain
+(
+    code short_text primary key
+);
+insert into title_domain (code)
+values ('mr'),
+       ('ms'),
+       ('dr'),
+       ('phd');
 
 create table titledperson
 (
@@ -229,3 +243,14 @@ create table titledperson
     title       text       not null references title,
     name        text       not null
 );
+
+create table "table-with-generated-columns"
+(
+    name               text primary key,
+    "name-type-always" text NOT NULL GENERATED ALWAYS AS
+        (CASE
+             WHEN name IS NOT NULL THEN 'no-name'
+             WHEN name = 'a' THEN 'a-name'
+             ELSE 'some-name'
+            END) STORED
+)

@@ -178,7 +178,7 @@ object ComputedTestInserts {
             case None =>
               val cols: List[ComputedColumn] =
                 table.maybeUnsavedRow match {
-                  case Some(unsaved) => unsaved.allCols.toList
+                  case Some(unsaved) => unsaved.unsavedCols.toList
                   case None          => table.cols.toList
                 }
               val params: List[sc.Param] = defaultedParametersFor(cols)

@@ -46,7 +46,7 @@ case class FilesRelation(
           }
           val params = partOfIdParams ++ restParams
           code"""|def toUnsavedRow(${params.map(_.code).mkCode(", ")}): ${unsaved.tpe} =
-                 |  ${unsaved.tpe}(${unsaved.allCols.map(col => col.name.code).mkCode(", ")})""".stripMargin
+                 |  ${unsaved.tpe}(${unsaved.unsavedCols.map(col => col.name.code).mkCode(", ")})""".stripMargin
         }
       )
       val formattedMembers = members.flatten match {
@@ -60,7 +60,7 @@ case class FilesRelation(
         val commentPieces = List[Iterable[String]](
           col.dbCol.comment,
           col.dbCol.columnDefault.map(x => s"Default: $x"),
-          col.dbCol.identity.map(_.asString),
+          col.dbCol.maybeGenerated.map(_.asString),
           col.pointsTo.map { case (relationName, columnName) =>
             val shortened = sc.QIdent(dropCommonPrefix(naming.rowName(relationName).idents, names.RowName.value.idents))
             s"Points to [[${shortened.dotName}.${naming.field(columnName).value}]]"

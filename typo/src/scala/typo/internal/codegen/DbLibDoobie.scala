@@ -294,7 +294,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
         else code"new $FragmentOps($sql).copyIn[$rowType](unsaved, batchSize)"
 
       case RepoMethod.InsertUnsavedStreaming(relName, unsaved) =>
-        val sql = SQL(code"COPY $relName(${dbNames(unsaved.allCols, isRead = false)}) FROM STDIN (DEFAULT '${textSupport.get.DefaultValue}')")
+        val sql = SQL(code"COPY $relName(${dbNames(unsaved.unsavedCols, isRead = false)}) FROM STDIN (DEFAULT '${textSupport.get.DefaultValue}')")
 
         if (fixVerySlowImplicit) code"new $FragmentOps($sql).copyIn(unsaved, batchSize)(using ${textSupport.get.lookupTextFor(unsaved.tpe)})"
         else code"new $FragmentOps($sql).copyIn[${unsaved.tpe}](unsaved, batchSize)"
@@ -811,7 +811,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
     }
 
     val write = {
-      val writeableColumnsWithId = cols.toList.filterNot(_.dbCol.identity.exists(_.ALWAYS))
+      val writeableColumnsWithId = cols.toList.filterNot(_.dbCol.maybeGenerated.exists(_.ALWAYS))
       val puts = {
         val all = writeableColumnsWithId.map { c =>
           c.tpe match {
