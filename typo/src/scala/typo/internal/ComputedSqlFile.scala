@@ -54,7 +54,7 @@ case class ComputedSqlFile(
           udtName = None,
           nullability = nullability,
           columnDefault = None,
-          identity = None,
+          maybeGenerated = None,
           comment = None,
           constraints = Nil,
           jsonDescription = DebugJson(col)

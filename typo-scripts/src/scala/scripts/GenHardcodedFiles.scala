@@ -24,7 +24,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         udtName = Some("varchar"),
         nullability = Nullability.NoNulls,
         columnDefault = None,
-        identity = None,
+        maybeGenerated = None,
         comment = None,
         constraints = Nil,
         jsonDescription = DebugJson.Empty
@@ -41,7 +41,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         udtName = Some("varchar"),
         nullability = Nullability.NoNulls,
         columnDefault = Some("some-value"),
-        identity = None,
+        maybeGenerated = None,
         comment = None,
         constraints = Nil,
         jsonDescription = DebugJson.Empty
@@ -53,7 +53,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         udtName = Some("myschema.sector"),
         nullability = Nullability.NoNulls,
         columnDefault = Some("PUBLIC"),
-        identity = Some(db.Identity("ALWAYS", None, None, None, None)),
+        maybeGenerated = Some(db.Generated.Identity("ALWAYS", None, None, None, None)),
         comment = None,
         constraints = Nil,
         jsonDescription = DebugJson.Empty
@@ -64,7 +64,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
         udtName = Some("myschema.number"),
         nullability = Nullability.NoNulls,
         columnDefault = Some("one"),
-        identity = None,
+        maybeGenerated = None,
         comment = None,
         constraints = Nil,
         jsonDescription = DebugJson.Empty

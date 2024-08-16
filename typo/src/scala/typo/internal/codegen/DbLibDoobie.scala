@@ -811,7 +811,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
     }
 
     val write = {
-      val writeableColumnsWithId = cols.toList.filterNot(_.dbCol.identity.exists(_.ALWAYS))
+      val writeableColumnsWithId = cols.toList.filterNot(_.dbCol.maybeGenerated.exists(_.ALWAYS))
       val puts = {
         val all = writeableColumnsWithId.map { c =>
           c.tpe match {

@@ -56,7 +56,7 @@ case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: Int
       val formattedCols = unsaved.allCols.map { col =>
         val commentPieces = List[Iterable[String]](
           col.dbCol.columnDefault.map(x => s"Default: $x"),
-          col.dbCol.identity.map(_.asString),
+          col.dbCol.maybeGenerated.map(_.asString),
           col.dbCol.comment,
           col.pointsTo map { case (relationName, columnName) =>
             val shortened = sc.QIdent(relation.dropCommonPrefix(table.naming.rowName(relationName).idents, rowFile.tpe.value.idents))

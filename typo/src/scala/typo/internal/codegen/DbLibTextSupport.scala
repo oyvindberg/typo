@@ -70,7 +70,7 @@ class DbLibTextSupport(pkg: sc.QIdent, inlineImplicits: Boolean, externalText: O
     val row = sc.Ident("row")
     val sb = sc.Ident("sb")
     val textCols = cols.toList
-      .filterNot(_.dbCol.identity.exists(_.ALWAYS))
+      .filterNot(_.dbCol.maybeGenerated.exists(_.ALWAYS))
       .map { col => code"${lookupTextFor(col.tpe)}.unsafeEncode($row.${col.name}, $sb)" }
     val body =
       code"""|$Text.instance[$tpe]{ ($row, $sb) =>

@@ -130,12 +130,12 @@ case class ComputedTable(
   val writeableColumnsNotId: Option[NonEmptyList[ComputedColumn]] =
     colsNotId.flatMap { colsNotId =>
       NonEmptyList.fromList(
-        colsNotId.toList.filterNot(_.dbCol.identity.exists(_.ALWAYS))
+        colsNotId.toList.filterNot(_.dbCol.maybeGenerated.exists(_.ALWAYS))
       )
     }
 
   val writeableColumnsWithId: Option[NonEmptyList[ComputedColumn]] =
-    NonEmptyList.fromList(cols.toList.filterNot(c => c.dbCol.identity.exists(_.ALWAYS)))
+    NonEmptyList.fromList(cols.toList.filterNot(c => c.dbCol.maybeGenerated.exists(_.ALWAYS)))
 
   val maybeUnsavedRow: Option[ComputedRowUnsaved] =
     ComputedRowUnsaved(source, cols, default, naming)

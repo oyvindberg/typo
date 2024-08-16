@@ -3,7 +3,7 @@ package internal
 
 object ComputedRowUnsaved {
   def apply(source: Source, cols: NonEmptyList[ComputedColumn], default: ComputedDefault, naming: Naming): Option[ComputedRowUnsaved] = {
-    val (alwaysGenerated, notAlwaysGenerated) = cols.toList.partition(c => c.dbCol.identity.exists(_.ALWAYS))
+    val (alwaysGenerated, notAlwaysGenerated) = cols.toList.partition(c => c.dbCol.maybeGenerated.exists(_.ALWAYS))
     val (defaultCols, restCols) = notAlwaysGenerated.partition(c => c.dbCol.isDefaulted)
 
     NonEmptyList.fromList(defaultCols).map { nonEmpty =>
