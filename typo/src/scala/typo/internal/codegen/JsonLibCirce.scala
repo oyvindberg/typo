@@ -114,14 +114,16 @@ case class JsonLibCirce(pkg: sc.QIdent, default: ComputedDefault, inlineImplicit
     )
   }
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.Given] =
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, openEnum: Boolean): List[sc.Given] =
     List(
       sc.Given(
         tparams = Nil,
         name = decoderName,
         implicitParams = Nil,
         tpe = Decoder.of(wrapperType),
-        body = code"""${lookupDecoderFor(underlying)}.emap($wrapperType.apply)"""
+        body =
+          if (openEnum: Boolean) code"""${lookupDecoderFor(underlying)}.map($wrapperType.apply)"""
+          else code"""${lookupDecoderFor(underlying)}.emap($wrapperType.apply)"""
       ),
       sc.Given(
         tparams = Nil,

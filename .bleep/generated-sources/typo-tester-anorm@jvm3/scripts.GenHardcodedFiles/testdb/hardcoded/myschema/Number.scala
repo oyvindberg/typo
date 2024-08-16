@@ -40,7 +40,7 @@ object Number {
   val Names: String = All.map(_.value).mkString(", ")
   val ByName: Map[String, Number] = All.map(x => (x.value, x)).toMap
               
-  implicit lazy val arrayColumn: Column[Array[Number]] = Column.columnToArray(column, implicitly)
+  implicit lazy val arrayColumn: Column[Array[Number]] = Column.columnToArray[String](Column.columnToString, implicitly).map(_.map(Number.force))
   implicit lazy val arrayToStatement: ToStatement[Array[Number]] = ToStatement[Array[Number]]((ps, i, arr) => ps.setArray(i, ps.getConnection.createArrayOf("myschema.number", arr.map[AnyRef](_.value))))
   implicit lazy val column: Column[Number] = Column.columnToString.mapResult(str => Number(str).left.map(SqlMappingError.apply))
   implicit lazy val ordering: Ordering[Number] = Ordering.by(_.value)

@@ -128,14 +128,19 @@ case class JsonLibPlay(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits
     List(reader, readerOpt, writer)
   }
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.Given] =
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, openEnum: Boolean): List[sc.Given] =
     List(
       sc.Given(
         tparams = Nil,
         name = readsName,
         implicitParams = Nil,
         tpe = Reads.of(wrapperType),
-        body = code"""${Reads.of(wrapperType)}{(value: $JsValue) => value.validate(${lookupReadsFor(underlying)}).flatMap(str => $wrapperType(str).fold($JsError.apply, $JsSuccess(_)))}"""
+        body = {
+          if (openEnum)
+            code"${Reads.of(wrapperType)}{(value: $JsValue) => value.validate(${lookupReadsFor(underlying)}).map($wrapperType.apply)}"
+          else
+            code"${Reads.of(wrapperType)}{(value: $JsValue) => value.validate(${lookupReadsFor(underlying)}).flatMap(str => $wrapperType(str).fold($JsError.apply, $JsSuccess(_)))}"
+        }
       ),
       sc.Given(
         tparams = Nil,

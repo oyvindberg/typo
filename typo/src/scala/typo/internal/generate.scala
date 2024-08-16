@@ -2,6 +2,7 @@ package typo
 package internal
 
 import typo.internal.codegen.*
+import typo.internal.metadb.OpenEnum
 import typo.internal.sqlfiles.SqlFile
 
 import scala.collection.immutable
@@ -11,7 +12,12 @@ object generate {
   private type Files = Map[sc.Type.Qualified, sc.File]
 
   // use this constructor if you need to run `typo` multiple times with different options but same database/scripts
-  def apply(publicOptions: Options, metaDb0: MetaDb, graph: ProjectGraph[Selector, List[SqlFile]]): List[Generated] = {
+  def apply(
+      publicOptions: Options,
+      metaDb0: MetaDb,
+      graph: ProjectGraph[Selector, List[SqlFile]],
+      openEnumsByTable: Map[db.RelationName, OpenEnum]
+  ): List[Generated] = {
     Banner.maybePrint(publicOptions)
     val metaDb = publicOptions.rewriteDatabase(metaDb0)
     val pkg = sc.Type.Qualified(publicOptions.pkg).value
@@ -21,7 +27,6 @@ object generate {
       ComputedDefault(publicOptions.naming(customTypesPackage))
 
     val naming = publicOptions.naming(pkg)
-
     val options = InternalOptions(
       dbLib = publicOptions.dbLib.map {
         case DbLibName.Anorm   => new DbLibAnorm(pkg, publicOptions.inlineImplicits, default, publicOptions.enableStreamingInserts)
@@ -63,7 +68,7 @@ object generate {
         val computedLazyRelations: SortedMap[db.RelationName, Lazy[HasSource]] =
           rewriteDependentData(metaDb.relations).apply[HasSource] {
             case (_, dbTable: db.Table, eval) =>
-              ComputedTable(options, default, dbTable, naming, scalaTypeMapper, eval)
+              ComputedTable(options, default, dbTable, naming, scalaTypeMapper, eval, openEnumsByTable)
             case (_, dbView: db.View, eval) =>
               ComputedView(options.logger, dbView, naming, metaDb.typeMapperDb, scalaTypeMapper, eval, options.enableFieldValue.include(dbView.name), options.enableDsl)
           }

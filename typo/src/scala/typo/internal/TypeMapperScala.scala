@@ -101,7 +101,7 @@ case class TypeMapperScala(
       case db.Type.regrole               => customTypes.TypoRegrole.typoType
       case db.Type.regtype               => customTypes.TypoRegtype.typoType
       case db.Type.xid                   => customTypes.TypoXid.typoType
-      case db.Type.EnumRef(name)         => sc.Type.Qualified(naming.enumName(name))
+      case db.Type.EnumRef(enm)          => sc.Type.Qualified(naming.enumName(enm.name))
       case db.Type.Text                  => TypesJava.String
       case db.Type.Time                  => customTypes.TypoLocalTime.typoType
       case db.Type.TimeTz                => customTypes.TypoOffsetTime.typoType

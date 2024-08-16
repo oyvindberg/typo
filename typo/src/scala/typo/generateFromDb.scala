@@ -1,5 +1,6 @@
 package typo
 
+import typo.internal.metadb.OpenEnum
 import typo.internal.sqlfiles.readSqlFileDirectories
 
 import java.nio.file.Path
@@ -34,10 +35,13 @@ object generateFromDb {
     val viewSelector = graph.toList.map(_.value).foldLeft(Selector.None)(_.or(_))
     val eventualMetaDb = MetaDb.fromDb(options.logger, dataSource, viewSelector, options.schemaMode)
     val eventualScripts = graph.mapScripts(paths => Future.sequence(paths.map(p => readSqlFileDirectories(options.logger, p, dataSource))).map(_.flatten))
+
     val combined = for {
       metaDb <- eventualMetaDb
+      eventualOpenEnums = OpenEnum.find(dataSource, options.logger, viewSelector, openEnumSelector = options.openEnums, metaDb = metaDb)
+      openEnums <- eventualOpenEnums
       scripts <- eventualScripts
-    } yield internal.generate(options, metaDb, scripts)
+    } yield internal.generate(options, metaDb, scripts, openEnums)
 
     Await.result(combined, Duration.Inf)
   }

@@ -4,6 +4,7 @@ package codegen
 
 import play.api.libs.json.Json
 import typo.internal.codegen.DbLib.RowType
+import typo.internal.metadb.OpenEnum
 
 case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: InternalOptions, genOrdering: GenOrdering, domainsByName: Map[db.RelationName, ComputedDomain]) {
   val relation = FilesRelation(table.naming, table.names, Some(table.cols), Some(fkAnalysis), options, table.dbTable.foreignKeys)
@@ -147,6 +148,72 @@ case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: Int
             scope = Scope.Main
           )
         )
+      case x: IdComputed.UnaryOpenEnum =>
+        val comments = scaladoc(s"Type for the primary key of table `${table.dbTable.name.value}`. It has some known values: ")(x.openEnum.values.toList.map { v => " - " + v })
+        val Underlying: sc.Type.Qualified =
+          x.openEnum match {
+            case OpenEnum.Text(_) =>
+              TypesJava.String
+            case OpenEnum.TextDomain(domainRef, _) =>
+              sc.Type.Qualified(options.naming.domainName(domainRef.name))
+          }
+        val underlying = sc.Ident("underlying")
+
+        val members = x.openEnum.values.map { value =>
+          val name = options.naming.enumValue(value)
+          x.openEnum match {
+            case OpenEnum.Text(_) =>
+              (name, code"case object $name extends ${x.tpe.name}(${sc.StrLit(value)})")
+            case OpenEnum.TextDomain(_, _) =>
+              (name, code"case object $name extends ${x.tpe.name}(${Underlying}(${sc.StrLit(value)}))")
+          }
+        }
+
+        // shortcut for id files wrapping a domain
+        val maybeFromString: Option[sc.Value] =
+          x.openEnum match {
+            case OpenEnum.Text(_) => None
+            case OpenEnum.TextDomain(db.Type.DomainRef(name, _, _), _) =>
+              domainsByName.get(name).map { domain =>
+                val name = domain.underlying.constraintDefinition match {
+                  case Some(_) => domain.tpe.name.map(Naming.camelCase)
+                  case None    => sc.Ident("apply")
+                }
+                val value = sc.Ident("value")
+                sc.Value(Nil, name, List(sc.Param(value, domain.underlyingType, None)), Nil, x.tpe, code"${x.tpe}(${domain.tpe}($value))")
+              }
+          }
+
+        val sqlType = x.openEnum match {
+          case OpenEnum.Text(_)                  => "text"
+          case OpenEnum.TextDomain(domainRef, _) => domainRef.name.quotedValue
+        }
+
+        val instances = List(
+          options.dbLib.toList.flatMap(_.stringEnumInstances(x.tpe, x.underlying, sqlType, openEnum = true)),
+          options.jsonLibs.flatMap(_.stringEnumInstances(x.tpe, x.underlying, openEnum = true)),
+          List(
+            genOrdering.ordering(x.tpe, NonEmptyList(sc.Param(sc.Ident("value"), TypesJava.String, None)))
+          )
+        ).flatten
+
+        val obj = genObject.withBody(x.tpe.value, instances)(
+          code"""|def apply($underlying: $Underlying): ${x.tpe} =
+                 |  ByName.getOrElse($underlying, Unknown($underlying))
+                 |${(maybeFromString.map(_.code).toList ++ members.toList.map { case (_, definition) => definition }).mkCode("\n")}
+                 |case class Unknown(override val value: $Underlying) extends ${x.tpe}(value)
+                 |val All: ${TypesScala.List.of(x.tpe)} = ${TypesScala.List}(${members.map { case (ident, _) => ident.code }.mkCode(", ")})
+                 |val ByName: ${TypesScala.Map.of(Underlying, x.tpe)} = All.map(x => (x.value, x)).toMap
+            """.stripMargin
+        )
+        val body =
+          code"""|$comments
+                 |sealed abstract class ${x.tpe.name}(val value: ${Underlying})
+                 |
+                 |$obj
+                 |""".stripMargin
+
+        Some(sc.File(x.tpe, body, secondaryTypes = Nil, scope = Scope.Main))
 
       case _: IdComputed.UnaryUserSpecified | _: IdComputed.UnaryNoIdType | _: IdComputed.UnaryInherited =>
         None

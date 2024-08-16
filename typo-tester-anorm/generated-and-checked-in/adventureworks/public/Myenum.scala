@@ -39,7 +39,7 @@ object Myenum {
   val Names: String = All.map(_.value).mkString(", ")
   val ByName: Map[String, Myenum] = All.map(x => (x.value, x)).toMap
               
-  implicit lazy val arrayColumn: Column[Array[Myenum]] = Column.columnToArray(column, implicitly)
+  implicit lazy val arrayColumn: Column[Array[Myenum]] = Column.columnToArray[String](Column.columnToString, implicitly).map(_.map(Myenum.force))
   implicit lazy val arrayToStatement: ToStatement[Array[Myenum]] = ToStatement[Array[Myenum]]((ps, i, arr) => ps.setArray(i, ps.getConnection.createArrayOf("public.myenum", arr.map[AnyRef](_.value))))
   implicit lazy val column: Column[Myenum] = Column.columnToString.mapResult(str => Myenum(str).left.map(SqlMappingError.apply))
   implicit lazy val ordering: Ordering[Myenum] = Ordering.by(_.value)

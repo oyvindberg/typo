@@ -108,14 +108,16 @@ final case class JsonLibZioJson(pkg: sc.QIdent, default: ComputedDefault, inline
     )
   }
 
-  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type): List[sc.Given] =
+  override def stringEnumInstances(wrapperType: sc.Type, underlying: sc.Type, openEnum: Boolean): List[sc.Given] =
     List(
       sc.Given(
         tparams = Nil,
         name = decoderName,
         implicitParams = Nil,
         tpe = JsonDecoder.of(wrapperType),
-        body = code"""${lookupDecoderFor(underlying)}.mapOrFail($wrapperType.apply)"""
+        body =
+          if (openEnum) code"""${lookupDecoderFor(underlying)}.map($wrapperType.apply)"""
+          else code"""${lookupDecoderFor(underlying)}.mapOrFail($wrapperType.apply)"""
       ),
       sc.Given(
         tparams = Nil,

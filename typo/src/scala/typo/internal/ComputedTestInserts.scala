@@ -4,6 +4,7 @@ package internal
 import typo.db.Type
 import typo.internal.codegen.*
 import typo.internal.compat.*
+import typo.internal.metadb.OpenEnum
 
 case class ComputedTestInserts(tpe: sc.Type.Qualified, methods: List[ComputedTestInserts.InsertMethod], maybeDomainMethods: Option[ComputedTestInserts.GenerateDomainMethods])
 
@@ -24,6 +25,9 @@ object ComputedTestInserts {
   ): ComputedTestInserts = {
     val enumsByName: Map[sc.Type, ComputedStringEnum] =
       enums.iterator.map(x => x.tpe -> x).toMap
+
+    val openEnumsByType: Map[sc.Type, OpenEnum] =
+      tables.flatMap { table => table.maybeId.collect { case x: IdComputed.UnaryOpenEnum => (x.tpe, x.openEnum) } }.toMap
 
     val maybeDomainMethods: Option[GenerateDomainMethods] =
       GenerateDomainMethod
@@ -46,8 +50,12 @@ object ComputedTestInserts {
               case x: IdComputed.UnaryNormal        => go(x.underlying, x.col.dbCol.tpe, None).map(default => code"${x.tpe}($default)")
               case x: IdComputed.UnaryInherited     => go(x.underlying, x.col.dbCol.tpe, None).map(default => code"${x.tpe}($default)")
               case x: IdComputed.UnaryNoIdType      => go(x.underlying, x.col.dbCol.tpe, None)
+              case x: IdComputed.UnaryOpenEnum      => go(x.underlying, x.col.dbCol.tpe, None).map(default => code"${x.tpe}($default)")
               case _: IdComputed.UnaryUserSpecified => None
             }
+          case tpe if openEnumsByType.contains(tpe) =>
+            val openEnum = openEnumsByType(tpe)
+            Some(code"${tpe}.All($random.nextInt(${openEnum.values.length}))")
           case TypesJava.String =>
             val max: Int =
               Option(dbType)
@@ -129,7 +137,8 @@ object ComputedTestInserts {
           def defaultedParametersFor(cols: List[ComputedColumn]): List[sc.Param] = {
             val params = cols.map { col =>
               val isMeaningful = hasConstraints(col.dbName) || appearsInFkButNotPk(col.dbName)
-              val default = if (isMeaningful && !col.dbCol.isDefaulted) {
+              val isOpenEnum = openEnumsByType.contains(col.tpe)
+              val default = if (isMeaningful && !col.dbCol.isDefaulted && !isOpenEnum) {
                 if (col.dbCol.nullability == Nullability.NoNulls) None else Some(TypesScala.None.code)
               } else defaultFor(table, col.tpe, col.dbCol.tpe)
               sc.Param(col.name, col.tpe, default)

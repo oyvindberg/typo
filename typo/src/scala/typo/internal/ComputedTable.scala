@@ -1,6 +1,7 @@
 package typo
 package internal
 
+import typo.internal.metadb.OpenEnum
 import typo.internal.rewriteDependentData.Eval
 
 case class ComputedTable(
@@ -9,7 +10,8 @@ case class ComputedTable(
     dbTable: db.Table,
     naming: Naming,
     scalaTypeMapper: TypeMapperScala,
-    eval: Eval[db.RelationName, HasSource]
+    eval: Eval[db.RelationName, HasSource],
+    openEnumsByTable: Map[db.RelationName, OpenEnum]
 ) extends HasSource {
   override val source: Source.Table = Source.Table(dbTable.name)
 
@@ -47,22 +49,32 @@ case class ComputedTable(
         case NonEmptyList(colName, Nil) =>
           val dbCol = dbColsByName(colName)
           val pointsTo = deps.getOrElse(dbCol.name, Nil)
+          lazy val underlying = scalaTypeMapper.col(dbTable.name, dbCol, None)
 
-          findTypeFromFk(options.logger, source, dbCol.name, pointsTo, eval.asMaybe)(_ => None) match {
-            case Some(tpe) =>
+          val fromFk: Option[IdComputed.UnaryInherited] =
+            findTypeFromFk(options.logger, source, dbCol.name, pointsTo, eval.asMaybe)(_ => None).map { tpe =>
               val col = ComputedColumn(pointsTo = pointsTo, name = naming.field(dbCol.name), tpe = tpe, dbCol = dbCol)
-              Some(IdComputed.UnaryInherited(col, tpe))
-            case None =>
-              val underlying = scalaTypeMapper.col(dbTable.name, dbCol, None)
-              val col = ComputedColumn(pointsTo = pointsTo, name = naming.field(dbCol.name), tpe = underlying, dbCol = dbCol)
-              if (sc.Type.containsUserDefined(underlying))
-                Some(IdComputed.UnaryUserSpecified(col, underlying))
-              else if (!options.enablePrimaryKeyType.include(dbTable.name))
-                Some(IdComputed.UnaryNoIdType(col, underlying))
-              else {
-                val tpe = sc.Type.Qualified(naming.idName(source, List(col.dbCol)))
-                Some(IdComputed.UnaryNormal(col, tpe))
-              }
+              IdComputed.UnaryInherited(col, tpe)
+            }
+
+          val fromOpenEnum: Option[IdComputed.UnaryOpenEnum] =
+            openEnumsByTable.get(dbTable.name).map { values =>
+              val tpe = sc.Type.Qualified(naming.idName(source, List(dbCol)))
+              val col = ComputedColumn(pointsTo = pointsTo, name = naming.field(dbCol.name), tpe = tpe, dbCol = dbCol)
+              IdComputed.UnaryOpenEnum(col, tpe, underlying, values)
+            }
+
+          fromFk.orElse(fromOpenEnum).orElse {
+            val underlying = scalaTypeMapper.col(dbTable.name, dbCol, None)
+            val col = ComputedColumn(pointsTo = pointsTo, name = naming.field(dbCol.name), tpe = underlying, dbCol = dbCol)
+            if (sc.Type.containsUserDefined(underlying))
+              Some(IdComputed.UnaryUserSpecified(col, underlying))
+            else if (!options.enablePrimaryKeyType.include(dbTable.name))
+              Some(IdComputed.UnaryNoIdType(col, underlying))
+            else {
+              val tpe = sc.Type.Qualified(naming.idName(source, List(col.dbCol)))
+              Some(IdComputed.UnaryNormal(col, tpe))
+            }
           }
 
         case colNames =>
