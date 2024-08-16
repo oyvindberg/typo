@@ -21,7 +21,8 @@ import typo.dsl.UpdateBuilder
 import typo.dsl.UpdateBuilder.UpdateBuilderMock
 import typo.dsl.UpdateParams
 
-class TableWithGeneratedColumnsRepoMock(map: scala.collection.mutable.Map[TableWithGeneratedColumnsId, TableWithGeneratedColumnsRow] = scala.collection.mutable.Map.empty) extends TableWithGeneratedColumnsRepo {
+class TableWithGeneratedColumnsRepoMock(toRow: Function1[TableWithGeneratedColumnsRowUnsaved, TableWithGeneratedColumnsRow],
+                                        map: scala.collection.mutable.Map[TableWithGeneratedColumnsId, TableWithGeneratedColumnsRow] = scala.collection.mutable.Map.empty) extends TableWithGeneratedColumnsRepo {
   override def delete: DeleteBuilder[TableWithGeneratedColumnsFields, TableWithGeneratedColumnsRow] = {
     DeleteBuilderMock(DeleteParams.empty, TableWithGeneratedColumnsFields.structure, map)
   }
@@ -41,10 +42,25 @@ class TableWithGeneratedColumnsRepoMock(map: scala.collection.mutable.Map[TableW
       unsaved
     }
   }
+  override def insert(unsaved: TableWithGeneratedColumnsRowUnsaved): ConnectionIO[TableWithGeneratedColumnsRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, TableWithGeneratedColumnsRow], batchSize: Int = 10000): ConnectionIO[Long] = {
     unsaved.compile.toList.map { rows =>
       var num = 0L
       rows.foreach { row =>
+        map += (row.name -> row)
+        num += 1
+      }
+      num
+    }
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TableWithGeneratedColumnsRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
+    unsaved.compile.toList.map { unsavedRows =>
+      var num = 0L
+      unsavedRows.foreach { unsavedRow =>
+        val row = toRow(unsavedRow)
         map += (row.name -> row)
         num += 1
       }

@@ -27,6 +27,8 @@ case class TableWithGeneratedColumnsRow(
   nameTypeAlways: String
 ){
    val id = name
+   def toUnsavedRow(): TableWithGeneratedColumnsRowUnsaved =
+     TableWithGeneratedColumnsRowUnsaved(name)
  }
 
 object TableWithGeneratedColumnsRow {

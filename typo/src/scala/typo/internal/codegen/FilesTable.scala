@@ -21,7 +21,7 @@ case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: Int
         def mkDefaultParamName(col: ComputedColumn): sc.Ident =
           sc.Ident(col.name.value).appended("Default")
 
-        val params: NonEmptyList[sc.Param] =
+        val params: List[sc.Param] =
           unsaved.defaultCols.map { case (col, originalType) => sc.Param(mkDefaultParamName(col), sc.Type.ByName(originalType), None) } ++
             unsaved.alwaysGeneratedCols.map(col => sc.Param(mkDefaultParamName(col), sc.Type.ByName(col.tpe), None))
 
@@ -53,7 +53,7 @@ case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: Int
              |  )""".stripMargin
       }
 
-      val formattedCols = unsaved.allCols.map { col =>
+      val formattedCols = unsaved.unsavedCols.map { col =>
         val commentPieces = List[Iterable[String]](
           col.dbCol.columnDefault.map(x => s"Default: $x"),
           col.dbCol.maybeGenerated.map(_.asString),
@@ -84,8 +84,8 @@ case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: Int
       }
 
       val instances =
-        options.jsonLibs.flatMap(_.instances(unsaved.tpe, unsaved.allCols)) ++
-          options.dbLib.toList.flatMap(_.rowInstances(unsaved.tpe, unsaved.allCols, rowType = DbLib.RowType.Writable))
+        options.jsonLibs.flatMap(_.instances(unsaved.tpe, unsaved.unsavedCols)) ++
+          options.dbLib.toList.flatMap(_.rowInstances(unsaved.tpe, unsaved.unsavedCols, rowType = DbLib.RowType.Writable))
 
       sc.File(
         unsaved.tpe,

@@ -17,7 +17,10 @@ trait TableWithGeneratedColumnsRepo {
   def deleteById(name: TableWithGeneratedColumnsId)(implicit c: Connection): Boolean
   def deleteByIds(names: Array[TableWithGeneratedColumnsId])(implicit c: Connection): Int
   def insert(unsaved: TableWithGeneratedColumnsRow)(implicit c: Connection): TableWithGeneratedColumnsRow
+  def insert(unsaved: TableWithGeneratedColumnsRowUnsaved)(implicit c: Connection): TableWithGeneratedColumnsRow
   def insertStreaming(unsaved: Iterator[TableWithGeneratedColumnsRow], batchSize: Int = 10000)(implicit c: Connection): Long
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: Iterator[TableWithGeneratedColumnsRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long
   def select: SelectBuilder[TableWithGeneratedColumnsFields, TableWithGeneratedColumnsRow]
   def selectAll(implicit c: Connection): List[TableWithGeneratedColumnsRow]
   def selectById(name: TableWithGeneratedColumnsId)(implicit c: Connection): Option[TableWithGeneratedColumnsRow]

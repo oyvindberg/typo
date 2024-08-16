@@ -23,7 +23,8 @@ import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
 import zio.stream.ZStream
 
-class TableWithGeneratedColumnsRepoMock(map: scala.collection.mutable.Map[TableWithGeneratedColumnsId, TableWithGeneratedColumnsRow] = scala.collection.mutable.Map.empty) extends TableWithGeneratedColumnsRepo {
+class TableWithGeneratedColumnsRepoMock(toRow: Function1[TableWithGeneratedColumnsRowUnsaved, TableWithGeneratedColumnsRow],
+                                        map: scala.collection.mutable.Map[TableWithGeneratedColumnsId, TableWithGeneratedColumnsRow] = scala.collection.mutable.Map.empty) extends TableWithGeneratedColumnsRepo {
   override def delete: DeleteBuilder[TableWithGeneratedColumnsFields, TableWithGeneratedColumnsRow] = {
     DeleteBuilderMock(DeleteParams.empty, TableWithGeneratedColumnsFields.structure, map)
   }
@@ -44,9 +45,22 @@ class TableWithGeneratedColumnsRepoMock(map: scala.collection.mutable.Map[TableW
       unsaved
     }
   }
+  override def insert(unsaved: TableWithGeneratedColumnsRowUnsaved): ZIO[ZConnection, Throwable, TableWithGeneratedColumnsRow] = {
+    insert(toRow(unsaved))
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, TableWithGeneratedColumnsRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     unsaved.scanZIO(0L) { case (acc, row) =>
       ZIO.succeed {
+        map += (row.name -> row)
+        acc + 1
+      }
+    }.runLast.map(_.getOrElse(0L))
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, TableWithGeneratedColumnsRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    unsaved.scanZIO(0L) { case (acc, unsavedRow) =>
+      ZIO.succeed {
+        val row = toRow(unsavedRow)
         map += (row.name -> row)
         acc + 1
       }

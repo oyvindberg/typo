@@ -20,7 +20,10 @@ trait TableWithGeneratedColumnsRepo {
   def deleteById(name: TableWithGeneratedColumnsId): ZIO[ZConnection, Throwable, Boolean]
   def deleteByIds(names: Array[TableWithGeneratedColumnsId]): ZIO[ZConnection, Throwable, Long]
   def insert(unsaved: TableWithGeneratedColumnsRow): ZIO[ZConnection, Throwable, TableWithGeneratedColumnsRow]
+  def insert(unsaved: TableWithGeneratedColumnsRowUnsaved): ZIO[ZConnection, Throwable, TableWithGeneratedColumnsRow]
   def insertStreaming(unsaved: ZStream[ZConnection, Throwable, TableWithGeneratedColumnsRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, TableWithGeneratedColumnsRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long]
   def select: SelectBuilder[TableWithGeneratedColumnsFields, TableWithGeneratedColumnsRow]
   def selectAll: ZStream[ZConnection, Throwable, TableWithGeneratedColumnsRow]
   def selectById(name: TableWithGeneratedColumnsId): ZIO[ZConnection, Throwable, Option[TableWithGeneratedColumnsRow]]

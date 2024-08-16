@@ -13,6 +13,7 @@ import doobie.postgres.syntax.FragmentOps
 import doobie.syntax.SqlInterpolator.SingleFragment.fromWrite
 import doobie.syntax.string.toSqlInterpolator
 import doobie.util.Write
+import doobie.util.fragment.Fragment
 import doobie.util.update.Update
 import fs2.Stream
 import typo.dsl.DeleteBuilder
@@ -36,8 +37,31 @@ class TableWithGeneratedColumnsRepoImpl extends TableWithGeneratedColumnsRepo {
           returning "name", "name-type-always"
        """.query(using TableWithGeneratedColumnsRow.read).unique
   }
+  override def insert(unsaved: TableWithGeneratedColumnsRowUnsaved): ConnectionIO[TableWithGeneratedColumnsRow] = {
+    val fs = List(
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(TableWithGeneratedColumnsId.put))}"))
+    ).flatten
+    
+    val q = if (fs.isEmpty) {
+      sql"""insert into "public"."table-with-generated-columns" default values
+            returning "name", "name-type-always"
+         """
+    } else {
+      val CommaSeparate = Fragment.FragmentMonoid.intercalate(fr", ")
+      sql"""insert into "public"."table-with-generated-columns"(${CommaSeparate.combineAllOption(fs.map { case (n, _) => n }).get})
+            values (${CommaSeparate.combineAllOption(fs.map { case (_, f) => f }).get})
+            returning "name", "name-type-always"
+         """
+    }
+    q.query(using TableWithGeneratedColumnsRow.read).unique
+    
+  }
   override def insertStreaming(unsaved: Stream[ConnectionIO, TableWithGeneratedColumnsRow], batchSize: Int = 10000): ConnectionIO[Long] = {
     new FragmentOps(sql"""COPY "public"."table-with-generated-columns"("name") FROM STDIN""").copyIn(unsaved, batchSize)(using TableWithGeneratedColumnsRow.text)
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Stream[ConnectionIO, TableWithGeneratedColumnsRowUnsaved], batchSize: Int = 10000): ConnectionIO[Long] = {
+    new FragmentOps(sql"""COPY "public"."table-with-generated-columns"("name") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""").copyIn(unsaved, batchSize)(using TableWithGeneratedColumnsRowUnsaved.text)
   }
   override def select: SelectBuilder[TableWithGeneratedColumnsFields, TableWithGeneratedColumnsRow] = {
     SelectBuilderSql(""""public"."table-with-generated-columns"""", TableWithGeneratedColumnsFields.structure, TableWithGeneratedColumnsRow.read)

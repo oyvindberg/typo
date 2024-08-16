@@ -10,6 +10,9 @@ package table_with_generated_columns
 import anorm.BatchSql
 import anorm.NamedParameter
 import anorm.ParameterValue
+import anorm.RowParser
+import anorm.SQL
+import anorm.SimpleSql
 import anorm.SqlStringInterpolation
 import java.sql.Connection
 import scala.annotation.nowarn
@@ -40,8 +43,32 @@ class TableWithGeneratedColumnsRepoImpl extends TableWithGeneratedColumnsRepo {
       .executeInsert(TableWithGeneratedColumnsRow.rowParser(1).single)
     
   }
+  override def insert(unsaved: TableWithGeneratedColumnsRowUnsaved)(implicit c: Connection): TableWithGeneratedColumnsRow = {
+    val namedParameters = List(
+      Some((NamedParameter("name", ParameterValue(unsaved.name, null, TableWithGeneratedColumnsId.toStatement)), ""))
+    ).flatten
+    val quote = '"'.toString
+    if (namedParameters.isEmpty) {
+      SQL"""insert into "public"."table-with-generated-columns" default values
+            returning "name", "name-type-always"
+         """
+        .executeInsert(TableWithGeneratedColumnsRow.rowParser(1).single)
+    } else {
+      val q = s"""insert into "public"."table-with-generated-columns"(${namedParameters.map{case (x, _) => quote + x.name + quote}.mkString(", ")})
+                  values (${namedParameters.map{ case (np, cast) => s"{${np.name}}$cast"}.mkString(", ")})
+                  returning "name", "name-type-always"
+               """
+      SimpleSql(SQL(q), namedParameters.map { case (np, _) => np.tupled }.toMap, RowParser.successful)
+        .executeInsert(TableWithGeneratedColumnsRow.rowParser(1).single)
+    }
+    
+  }
   override def insertStreaming(unsaved: Iterator[TableWithGeneratedColumnsRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
     streamingInsert(s"""COPY "public"."table-with-generated-columns"("name") FROM STDIN""", batchSize, unsaved)(TableWithGeneratedColumnsRow.text, c)
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: Iterator[TableWithGeneratedColumnsRowUnsaved], batchSize: Int = 10000)(implicit c: Connection): Long = {
+    streamingInsert(s"""COPY "public"."table-with-generated-columns"("name") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(TableWithGeneratedColumnsRowUnsaved.text, c)
   }
   override def select: SelectBuilder[TableWithGeneratedColumnsFields, TableWithGeneratedColumnsRow] = {
     SelectBuilderSql(""""public"."table-with-generated-columns"""", TableWithGeneratedColumnsFields.structure, TableWithGeneratedColumnsRow.rowParser)

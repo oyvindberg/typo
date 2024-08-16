@@ -46,7 +46,7 @@ case class FilesRelation(
           }
           val params = partOfIdParams ++ restParams
           code"""|def toUnsavedRow(${params.map(_.code).mkCode(", ")}): ${unsaved.tpe} =
-                 |  ${unsaved.tpe}(${unsaved.allCols.map(col => col.name.code).mkCode(", ")})""".stripMargin
+                 |  ${unsaved.tpe}(${unsaved.unsavedCols.map(col => col.name.code).mkCode(", ")})""".stripMargin
         }
       )
       val formattedMembers = members.flatten match {

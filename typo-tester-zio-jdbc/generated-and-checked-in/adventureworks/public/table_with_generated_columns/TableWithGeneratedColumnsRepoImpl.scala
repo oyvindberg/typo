@@ -12,6 +12,7 @@ import typo.dsl.SelectBuilder
 import typo.dsl.SelectBuilderSql
 import typo.dsl.UpdateBuilder
 import zio.ZIO
+import zio.jdbc.SqlFragment
 import zio.jdbc.SqlFragment.Segment
 import zio.jdbc.UpdateResult
 import zio.jdbc.ZConnection
@@ -34,8 +35,29 @@ class TableWithGeneratedColumnsRepoImpl extends TableWithGeneratedColumnsRepo {
           returning "name", "name-type-always"
        """.insertReturning(using TableWithGeneratedColumnsRow.jdbcDecoder).map(_.updatedKeys.head)
   }
+  override def insert(unsaved: TableWithGeneratedColumnsRowUnsaved): ZIO[ZConnection, Throwable, TableWithGeneratedColumnsRow] = {
+    val fs = List(
+      Some((sql""""name"""", sql"${Segment.paramSegment(unsaved.name)(TableWithGeneratedColumnsId.setter)}"))
+    ).flatten
+    
+    val q = if (fs.isEmpty) {
+      sql"""insert into "public"."table-with-generated-columns" default values
+            returning "name", "name-type-always"
+         """
+    } else {
+      val names  = fs.map { case (n, _) => n }.mkFragment(SqlFragment(", "))
+      val values = fs.map { case (_, f) => f }.mkFragment(SqlFragment(", "))
+      sql"""insert into "public"."table-with-generated-columns"($names) values ($values) returning "name", "name-type-always""""
+    }
+    q.insertReturning(using TableWithGeneratedColumnsRow.jdbcDecoder).map(_.updatedKeys.head)
+    
+  }
   override def insertStreaming(unsaved: ZStream[ZConnection, Throwable, TableWithGeneratedColumnsRow], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
     streamingInsert(s"""COPY "public"."table-with-generated-columns"("name") FROM STDIN""", batchSize, unsaved)(TableWithGeneratedColumnsRow.text)
+  }
+  /* NOTE: this functionality requires PostgreSQL 16 or later! */
+  override def insertUnsavedStreaming(unsaved: ZStream[ZConnection, Throwable, TableWithGeneratedColumnsRowUnsaved], batchSize: Int = 10000): ZIO[ZConnection, Throwable, Long] = {
+    streamingInsert(s"""COPY "public"."table-with-generated-columns"("name") FROM STDIN (DEFAULT '__DEFAULT_VALUE__')""", batchSize, unsaved)(TableWithGeneratedColumnsRowUnsaved.text)
   }
   override def select: SelectBuilder[TableWithGeneratedColumnsFields, TableWithGeneratedColumnsRow] = {
     SelectBuilderSql(""""public"."table-with-generated-columns"""", TableWithGeneratedColumnsFields.structure, TableWithGeneratedColumnsRow.jdbcDecoder)

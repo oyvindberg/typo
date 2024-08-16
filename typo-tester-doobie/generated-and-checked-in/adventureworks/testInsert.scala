@@ -211,6 +211,7 @@ import adventureworks.public.pgtestnull.PgtestnullRow
 import adventureworks.public.table_with_generated_columns.TableWithGeneratedColumnsId
 import adventureworks.public.table_with_generated_columns.TableWithGeneratedColumnsRepoImpl
 import adventureworks.public.table_with_generated_columns.TableWithGeneratedColumnsRow
+import adventureworks.public.table_with_generated_columns.TableWithGeneratedColumnsRowUnsaved
 import adventureworks.public.title.TitleId
 import adventureworks.public.title.TitleRepoImpl
 import adventureworks.public.title.TitleRow
@@ -784,7 +785,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                        varchares: Option[Array[String]] = if (random.nextBoolean()) None else Some(Array.fill(random.nextInt(3))(random.alphanumeric.take(20).mkString)),
                        xmles: Option[Array[TypoXml]] = None
                       ): ConnectionIO[PgtestnullRow] = (new PgtestnullRepoImpl).insert(new PgtestnullRow(bool = bool, box = box, bpchar = bpchar, bytea = bytea, char = char, circle = circle, date = date, float4 = float4, float8 = float8, hstore = hstore, inet = inet, int2 = int2, int2vector = int2vector, int4 = int4, int8 = int8, interval = interval, json = json, jsonb = jsonb, line = line, lseg = lseg, money = money, mydomain = mydomain, myenum = myenum, name = name, numeric = numeric, path = path, point = point, polygon = polygon, text = text, time = time, timestamp = timestamp, timestampz = timestampz, timez = timez, uuid = uuid, varchar = varchar, vector = vector, xml = xml, boxes = boxes, bpchares = bpchares, chares = chares, circlees = circlees, datees = datees, float4es = float4es, float8es = float8es, inetes = inetes, int2es = int2es, int2vectores = int2vectores, int4es = int4es, int8es = int8es, intervales = intervales, jsones = jsones, jsonbes = jsonbes, linees = linees, lseges = lseges, moneyes = moneyes, mydomaines = mydomaines, myenumes = myenumes, namees = namees, numerices = numerices, pathes = pathes, pointes = pointes, polygones = polygones, textes = textes, timees = timees, timestampes = timestampes, timestampzes = timestampzes, timezes = timezes, uuides = uuides, varchares = varchares, xmles = xmles))
-  def publicTableWithGeneratedColumns(name: TableWithGeneratedColumnsId = TableWithGeneratedColumnsId(random.alphanumeric.take(20).mkString), nameTypeAlways: String = random.alphanumeric.take(20).mkString): ConnectionIO[TableWithGeneratedColumnsRow] = (new TableWithGeneratedColumnsRepoImpl).insert(new TableWithGeneratedColumnsRow(name = name, nameTypeAlways = nameTypeAlways))
+  def publicTableWithGeneratedColumns(name: TableWithGeneratedColumnsId = TableWithGeneratedColumnsId(random.alphanumeric.take(20).mkString)): ConnectionIO[TableWithGeneratedColumnsRow] = (new TableWithGeneratedColumnsRepoImpl).insert(new TableWithGeneratedColumnsRowUnsaved(name = name))
   def publicTitle(code: TitleId = TitleId(random.alphanumeric.take(20).mkString)): ConnectionIO[TitleRow] = (new TitleRepoImpl).insert(new TitleRow(code = code))
   def publicTitleDomain(code: TitleDomainId = TitleDomainId(domainInsert.publicShortText(random))): ConnectionIO[TitleDomainRow] = (new TitleDomainRepoImpl).insert(new TitleDomainRow(code = code))
   def publicTitledperson(titleShort: TitleDomainId = TitleDomainId.All(random.nextInt(4)),
