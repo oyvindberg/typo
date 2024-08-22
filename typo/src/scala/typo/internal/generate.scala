@@ -51,7 +51,8 @@ object generate {
       naming = naming,
       pkg = pkg,
       readonlyRepo = publicOptions.readonlyRepo,
-      typeOverride = publicOptions.typeOverride
+      typeOverride = publicOptions.typeOverride,
+      concreteRepo = publicOptions.concreteRepo
     )
     val customTypes = new CustomTypes(customTypesPackage)
     val genOrdering = new GenOrdering(customTypes, options.pkg)

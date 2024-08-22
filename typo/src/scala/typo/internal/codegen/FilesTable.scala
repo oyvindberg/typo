@@ -275,20 +275,28 @@ case class FilesTable(table: ComputedTable, fkAnalysis: FkAnalysis, options: Int
       } yield relation.RepoMockFile(dbLib, id, repoMethods)
     else None
 
-  val all: List[sc.File] = List(
+  val all: List[sc.File] = List[Iterable[sc.File]](
     RowFile,
     relation.FieldsFile,
     UnsavedRowFile,
-    for {
-      repoMethods <- table.repoMethods
-      dbLib <- options.dbLib
-    } yield relation.RepoTraitFile(dbLib, repoMethods),
-    for {
-      repoMethods <- table.repoMethods
-      dbLib <- options.dbLib
-    } yield relation.RepoImplFile(dbLib, repoMethods),
+    if (options.concreteRepo)
+      for {
+        repoMethods <- table.repoMethods
+        dbLib <- options.dbLib
+      } yield relation.ConcreteRepoImplFile(dbLib, repoMethods)
+    else
+      List(
+        for {
+          repoMethods <- table.repoMethods
+          dbLib <- options.dbLib
+        } yield relation.RepoTraitFile(dbLib, repoMethods),
+        for {
+          repoMethods <- table.repoMethods
+          dbLib <- options.dbLib
+        } yield relation.RepoImplFile(dbLib, repoMethods),
+        maybeMockRepo
+      ).flatten,
     relation.FieldValueFile,
-    maybeMockRepo,
     IdFile
   ).flatten
 }
