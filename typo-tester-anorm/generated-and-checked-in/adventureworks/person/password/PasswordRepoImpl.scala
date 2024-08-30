@@ -113,7 +113,7 @@ class PasswordRepoImpl extends PasswordRepo {
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
     UpdateBuilder(""""person"."password"""", PasswordFields.structure, PasswordRow.rowParser)
   }
-  override def update(row: PasswordRow)(implicit c: Connection): Boolean = {
+  override def update(row: PasswordRow)(implicit c: Connection): Option[PasswordRow] = {
     val businessentityid = row.businessentityid
     SQL"""update "person"."password"
           set "passwordhash" = ${ParameterValue(row.passwordhash, null, ToStatement.stringToStatement)},
@@ -121,7 +121,8 @@ class PasswordRepoImpl extends PasswordRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
-       """.executeUpdate() > 0
+          returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
+       """.executeInsert(PasswordRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {
     SQL"""insert into "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")

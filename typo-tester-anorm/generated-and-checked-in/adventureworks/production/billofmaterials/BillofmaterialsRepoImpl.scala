@@ -124,7 +124,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     UpdateBuilder(""""production"."billofmaterials"""", BillofmaterialsFields.structure, BillofmaterialsRow.rowParser)
   }
-  override def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean = {
+  override def update(row: BillofmaterialsRow)(implicit c: Connection): Option[BillofmaterialsRow] = {
     val billofmaterialsid = row.billofmaterialsid
     SQL"""update "production"."billofmaterials"
           set "productassemblyid" = ${ParameterValue(row.productassemblyid, null, ToStatement.optionToStatement(ProductId.toStatement, ProductId.parameterMetadata))}::int4,
@@ -136,7 +136,8 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
               "perassemblyqty" = ${ParameterValue(row.perassemblyqty, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "billofmaterialsid" = ${ParameterValue(billofmaterialsid, null, ToStatement.intToStatement)}
-       """.executeUpdate() > 0
+          returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
+       """.executeInsert(BillofmaterialsRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {
     SQL"""insert into "production"."billofmaterials"("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")

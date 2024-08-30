@@ -139,7 +139,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
     UpdateBuilder(""""purchasing"."purchaseorderheader"""", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.rowParser)
   }
-  override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {
+  override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Option[PurchaseorderheaderRow] = {
     val purchaseorderid = row.purchaseorderid
     SQL"""update "purchasing"."purchaseorderheader"
           set "revisionnumber" = ${ParameterValue(row.revisionnumber, null, TypoShort.toStatement)}::int2,
@@ -154,7 +154,8 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
               "freight" = ${ParameterValue(row.freight, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "purchaseorderid" = ${ParameterValue(purchaseorderid, null, PurchaseorderheaderId.toStatement)}
-       """.executeUpdate() > 0
+          returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text
+       """.executeInsert(PurchaseorderheaderRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {
     SQL"""insert into "purchasing"."purchaseorderheader"("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")

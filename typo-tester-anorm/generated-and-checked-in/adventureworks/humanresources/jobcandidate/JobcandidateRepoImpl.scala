@@ -112,14 +112,15 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
     UpdateBuilder(""""humanresources"."jobcandidate"""", JobcandidateFields.structure, JobcandidateRow.rowParser)
   }
-  override def update(row: JobcandidateRow)(implicit c: Connection): Boolean = {
+  override def update(row: JobcandidateRow)(implicit c: Connection): Option[JobcandidateRow] = {
     val jobcandidateid = row.jobcandidateid
     SQL"""update "humanresources"."jobcandidate"
           set "businessentityid" = ${ParameterValue(row.businessentityid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
               "resume" = ${ParameterValue(row.resume, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "jobcandidateid" = ${ParameterValue(jobcandidateid, null, JobcandidateId.toStatement)}
-       """.executeUpdate() > 0
+          returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
+       """.executeInsert(JobcandidateRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: JobcandidateRow)(implicit c: Connection): JobcandidateRow = {
     SQL"""insert into "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate")

@@ -29,7 +29,7 @@ trait DocumentRepo {
   def selectByIdsTracked(documentnodes: Array[DocumentId])(implicit c: Connection): Map[DocumentId, DocumentRow]
   def selectByUniqueRowguid(rowguid: TypoUUID)(implicit c: Connection): Option[DocumentRow]
   def update: UpdateBuilder[DocumentFields, DocumentRow]
-  def update(row: DocumentRow)(implicit c: Connection): Boolean
+  def update(row: DocumentRow)(implicit c: Connection): Option[DocumentRow]
   def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow
   def upsertBatch(unsaved: Iterable[DocumentRow])(implicit c: Connection): List[DocumentRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

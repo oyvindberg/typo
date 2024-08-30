@@ -119,7 +119,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     UpdateBuilder(""""sales"."shoppingcartitem"""", ShoppingcartitemFields.structure, ShoppingcartitemRow.rowParser)
   }
-  override def update(row: ShoppingcartitemRow)(implicit c: Connection): Boolean = {
+  override def update(row: ShoppingcartitemRow)(implicit c: Connection): Option[ShoppingcartitemRow] = {
     val shoppingcartitemid = row.shoppingcartitemid
     SQL"""update "sales"."shoppingcartitem"
           set "shoppingcartid" = ${ParameterValue(row.shoppingcartid, null, ToStatement.stringToStatement)},
@@ -128,7 +128,8 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
               "datecreated" = ${ParameterValue(row.datecreated, null, TypoLocalDateTime.toStatement)}::timestamp,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "shoppingcartitemid" = ${ParameterValue(shoppingcartitemid, null, ShoppingcartitemId.toStatement)}
-       """.executeUpdate() > 0
+          returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
+       """.executeInsert(ShoppingcartitemRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ShoppingcartitemRow)(implicit c: Connection): ShoppingcartitemRow = {
     SQL"""insert into "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")

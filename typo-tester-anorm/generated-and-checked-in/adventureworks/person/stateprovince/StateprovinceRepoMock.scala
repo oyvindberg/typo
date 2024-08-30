@@ -74,13 +74,10 @@ class StateprovinceRepoMock(toRow: Function1[StateprovinceRowUnsaved, Stateprovi
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
     UpdateBuilderMock(UpdateParams.empty, StateprovinceFields.structure, map)
   }
-  override def update(row: StateprovinceRow)(implicit c: Connection): Boolean = {
-    map.get(row.stateprovinceid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.stateprovinceid, row): @nowarn
-        true
-      case None => false
+  override def update(row: StateprovinceRow)(implicit c: Connection): Option[StateprovinceRow] = {
+    map.get(row.stateprovinceid).map { _ =>
+      map.put(row.stateprovinceid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {

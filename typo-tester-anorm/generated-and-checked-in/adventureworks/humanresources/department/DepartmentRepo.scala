@@ -27,7 +27,7 @@ trait DepartmentRepo {
   def selectByIds(departmentids: Array[DepartmentId])(implicit c: Connection): List[DepartmentRow]
   def selectByIdsTracked(departmentids: Array[DepartmentId])(implicit c: Connection): Map[DepartmentId, DepartmentRow]
   def update: UpdateBuilder[DepartmentFields, DepartmentRow]
-  def update(row: DepartmentRow)(implicit c: Connection): Boolean
+  def update(row: DepartmentRow)(implicit c: Connection): Option[DepartmentRow]
   def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow
   def upsertBatch(unsaved: Iterable[DepartmentRow])(implicit c: Connection): List[DepartmentRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

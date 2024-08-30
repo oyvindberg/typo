@@ -110,14 +110,15 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
     UpdateBuilder(""""sales"."salesreason"""", SalesreasonFields.structure, SalesreasonRow.rowParser)
   }
-  override def update(row: SalesreasonRow)(implicit c: Connection): Boolean = {
+  override def update(row: SalesreasonRow)(implicit c: Connection): Option[SalesreasonRow] = {
     val salesreasonid = row.salesreasonid
     SQL"""update "sales"."salesreason"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "reasontype" = ${ParameterValue(row.reasontype, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "salesreasonid" = ${ParameterValue(salesreasonid, null, SalesreasonId.toStatement)}
-       """.executeUpdate() > 0
+          returning "salesreasonid", "name", "reasontype", "modifieddate"::text
+       """.executeInsert(SalesreasonRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: SalesreasonRow)(implicit c: Connection): SalesreasonRow = {
     SQL"""insert into "sales"."salesreason"("salesreasonid", "name", "reasontype", "modifieddate")

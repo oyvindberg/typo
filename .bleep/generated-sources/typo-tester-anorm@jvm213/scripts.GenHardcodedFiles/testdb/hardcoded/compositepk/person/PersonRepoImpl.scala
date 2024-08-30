@@ -111,12 +111,13 @@ class PersonRepoImpl extends PersonRepo {
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder(""""compositepk"."person"""", PersonFields.structure, PersonRow.rowParser)
   }
-  override def update(row: PersonRow)(implicit c: Connection): Boolean = {
+  override def update(row: PersonRow)(implicit c: Connection): Option[PersonRow] = {
     val compositeId = row.compositeId
     SQL"""update "compositepk"."person"
           set "name" = ${ParameterValue(row.name, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
           where "one" = ${ParameterValue(compositeId.one, null, ToStatement.longToStatement)} AND "two" = ${ParameterValue(compositeId.two, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
-       """.executeUpdate() > 0
+          returning "one", "two", "name"
+       """.executeInsert(PersonRow.rowParser(1).singleOpt)
   }
   override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean = {
     fieldValues match {

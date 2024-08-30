@@ -27,7 +27,7 @@ trait UnitmeasureRepo {
   def selectByIds(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): List[UnitmeasureRow]
   def selectByIdsTracked(unitmeasurecodes: Array[UnitmeasureId])(implicit c: Connection): Map[UnitmeasureId, UnitmeasureRow]
   def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow]
-  def update(row: UnitmeasureRow)(implicit c: Connection): Boolean
+  def update(row: UnitmeasureRow)(implicit c: Connection): Option[UnitmeasureRow]
   def upsert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow
   def upsertBatch(unsaved: Iterable[UnitmeasureRow])(implicit c: Connection): List[UnitmeasureRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

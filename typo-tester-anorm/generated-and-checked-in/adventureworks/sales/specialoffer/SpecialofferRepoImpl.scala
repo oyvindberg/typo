@@ -128,7 +128,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
     UpdateBuilder(""""sales"."specialoffer"""", SpecialofferFields.structure, SpecialofferRow.rowParser)
   }
-  override def update(row: SpecialofferRow)(implicit c: Connection): Boolean = {
+  override def update(row: SpecialofferRow)(implicit c: Connection): Option[SpecialofferRow] = {
     val specialofferid = row.specialofferid
     SQL"""update "sales"."specialoffer"
           set "description" = ${ParameterValue(row.description, null, ToStatement.stringToStatement)},
@@ -142,7 +142,8 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "specialofferid" = ${ParameterValue(specialofferid, null, SpecialofferId.toStatement)}
-       """.executeUpdate() > 0
+          returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
+       """.executeInsert(SpecialofferRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {
     SQL"""insert into "sales"."specialoffer"("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")

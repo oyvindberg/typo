@@ -74,13 +74,10 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
     UpdateBuilderMock(UpdateParams.empty, PurchaseorderheaderFields.structure, map)
   }
-  override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean = {
-    map.get(row.purchaseorderid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.purchaseorderid, row): @nowarn
-        true
-      case None => false
+  override def update(row: PurchaseorderheaderRow)(implicit c: Connection): Option[PurchaseorderheaderRow] = {
+    map.get(row.purchaseorderid).map { _ =>
+      map.put(row.purchaseorderid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow = {

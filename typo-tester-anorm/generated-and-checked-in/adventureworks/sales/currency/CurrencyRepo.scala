@@ -27,7 +27,7 @@ trait CurrencyRepo {
   def selectByIds(currencycodes: Array[CurrencyId])(implicit c: Connection): List[CurrencyRow]
   def selectByIdsTracked(currencycodes: Array[CurrencyId])(implicit c: Connection): Map[CurrencyId, CurrencyRow]
   def update: UpdateBuilder[CurrencyFields, CurrencyRow]
-  def update(row: CurrencyRow)(implicit c: Connection): Boolean
+  def update(row: CurrencyRow)(implicit c: Connection): Option[CurrencyRow]
   def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow
   def upsertBatch(unsaved: Iterable[CurrencyRow])(implicit c: Connection): List[CurrencyRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

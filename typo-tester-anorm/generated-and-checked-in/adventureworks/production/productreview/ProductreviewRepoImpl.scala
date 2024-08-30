@@ -120,7 +120,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
   override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
     UpdateBuilder(""""production"."productreview"""", ProductreviewFields.structure, ProductreviewRow.rowParser)
   }
-  override def update(row: ProductreviewRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductreviewRow)(implicit c: Connection): Option[ProductreviewRow] = {
     val productreviewid = row.productreviewid
     SQL"""update "production"."productreview"
           set "productid" = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
@@ -131,7 +131,8 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
               "comments" = ${ParameterValue(row.comments, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productreviewid" = ${ParameterValue(productreviewid, null, ProductreviewId.toStatement)}
-       """.executeUpdate() > 0
+          returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
+       """.executeInsert(ProductreviewRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductreviewRow)(implicit c: Connection): ProductreviewRow = {
     SQL"""insert into "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")

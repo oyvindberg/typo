@@ -114,7 +114,7 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
     UpdateBuilder(""""sales"."currencyrate"""", CurrencyrateFields.structure, CurrencyrateRow.rowParser)
   }
-  override def update(row: CurrencyrateRow)(implicit c: Connection): Boolean = {
+  override def update(row: CurrencyrateRow)(implicit c: Connection): Option[CurrencyrateRow] = {
     val currencyrateid = row.currencyrateid
     SQL"""update "sales"."currencyrate"
           set "currencyratedate" = ${ParameterValue(row.currencyratedate, null, TypoLocalDateTime.toStatement)}::timestamp,
@@ -124,7 +124,8 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
               "endofdayrate" = ${ParameterValue(row.endofdayrate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "currencyrateid" = ${ParameterValue(currencyrateid, null, CurrencyrateId.toStatement)}
-       """.executeUpdate() > 0
+          returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
+       """.executeInsert(CurrencyrateRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: CurrencyrateRow)(implicit c: Connection): CurrencyrateRow = {
     SQL"""insert into "sales"."currencyrate"("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")

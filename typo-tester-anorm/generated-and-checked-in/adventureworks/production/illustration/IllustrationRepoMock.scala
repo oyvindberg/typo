@@ -74,13 +74,10 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
     UpdateBuilderMock(UpdateParams.empty, IllustrationFields.structure, map)
   }
-  override def update(row: IllustrationRow)(implicit c: Connection): Boolean = {
-    map.get(row.illustrationid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.illustrationid, row): @nowarn
-        true
-      case None => false
+  override def update(row: IllustrationRow)(implicit c: Connection): Option[IllustrationRow] = {
+    map.get(row.illustrationid).map { _ =>
+      map.put(row.illustrationid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {

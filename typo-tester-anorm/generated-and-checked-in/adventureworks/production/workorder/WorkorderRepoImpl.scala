@@ -118,7 +118,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
     UpdateBuilder(""""production"."workorder"""", WorkorderFields.structure, WorkorderRow.rowParser)
   }
-  override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
+  override def update(row: WorkorderRow)(implicit c: Connection): Option[WorkorderRow] = {
     val workorderid = row.workorderid
     SQL"""update "production"."workorder"
           set "productid" = ${ParameterValue(row.productid, null, ProductId.toStatement)}::int4,
@@ -130,7 +130,8 @@ class WorkorderRepoImpl extends WorkorderRepo {
               "scrapreasonid" = ${ParameterValue(row.scrapreasonid, null, ToStatement.optionToStatement(ScrapreasonId.toStatement, ScrapreasonId.parameterMetadata))}::int2,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "workorderid" = ${ParameterValue(workorderid, null, WorkorderId.toStatement)}
-       """.executeUpdate() > 0
+          returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
+       """.executeInsert(WorkorderRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {
     SQL"""insert into "production"."workorder"("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")

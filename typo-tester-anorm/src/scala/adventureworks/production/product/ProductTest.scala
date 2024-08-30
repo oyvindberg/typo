@@ -121,7 +121,7 @@ class ProductTest extends SnapshotTest {
       productRepo.update(saved1.copy(modifieddate = newModifiedDate)): @nowarn
       val List(saved3) = productRepo.selectAll: @unchecked
       assert(saved3.modifieddate == newModifiedDate): @nowarn
-      assert(productRepo.update(saved3.copy(size = None))): @nowarn
+      assert(productRepo.update(saved3.copy(size = None)).isDefined): @nowarn
 
       val query0 = productRepo.select
         .joinFk(_.fkProductmodel)(projectModelRepo.select)

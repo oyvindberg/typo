@@ -132,7 +132,7 @@ class PersonRepoImpl extends PersonRepo {
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder(""""person"."person"""", PersonFields.structure, PersonRow.rowParser)
   }
-  override def update(row: PersonRow)(implicit c: Connection): Boolean = {
+  override def update(row: PersonRow)(implicit c: Connection): Option[PersonRow] = {
     val businessentityid = row.businessentityid
     SQL"""update "person"."person"
           set "persontype" = ${ParameterValue(row.persontype, null, ToStatement.stringToStatement)}::bpchar,
@@ -148,7 +148,8 @@ class PersonRepoImpl extends PersonRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
-       """.executeUpdate() > 0
+          returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
+       """.executeInsert(PersonRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow = {
     SQL"""insert into "person"."person"("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")

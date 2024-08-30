@@ -114,7 +114,7 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
   override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
     UpdateBuilder(""""production"."productphoto"""", ProductphotoFields.structure, ProductphotoRow.rowParser)
   }
-  override def update(row: ProductphotoRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductphotoRow)(implicit c: Connection): Option[ProductphotoRow] = {
     val productphotoid = row.productphotoid
     SQL"""update "production"."productphoto"
           set "thumbnailphoto" = ${ParameterValue(row.thumbnailphoto, null, ToStatement.optionToStatement(TypoBytea.toStatement, TypoBytea.parameterMetadata))}::bytea,
@@ -123,7 +123,8 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
               "largephotofilename" = ${ParameterValue(row.largephotofilename, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productphotoid" = ${ParameterValue(productphotoid, null, ProductphotoId.toStatement)}
-       """.executeUpdate() > 0
+          returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text
+       """.executeInsert(ProductphotoRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductphotoRow)(implicit c: Connection): ProductphotoRow = {
     SQL"""insert into "production"."productphoto"("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")

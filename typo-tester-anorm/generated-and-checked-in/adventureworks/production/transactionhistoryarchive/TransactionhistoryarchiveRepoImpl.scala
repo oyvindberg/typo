@@ -118,7 +118,7 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
     UpdateBuilder(""""production"."transactionhistoryarchive"""", TransactionhistoryarchiveFields.structure, TransactionhistoryarchiveRow.rowParser)
   }
-  override def update(row: TransactionhistoryarchiveRow)(implicit c: Connection): Boolean = {
+  override def update(row: TransactionhistoryarchiveRow)(implicit c: Connection): Option[TransactionhistoryarchiveRow] = {
     val transactionid = row.transactionid
     SQL"""update "production"."transactionhistoryarchive"
           set "productid" = ${ParameterValue(row.productid, null, ToStatement.intToStatement)}::int4,
@@ -130,7 +130,8 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
               "actualcost" = ${ParameterValue(row.actualcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "transactionid" = ${ParameterValue(transactionid, null, TransactionhistoryarchiveId.toStatement)}
-       """.executeUpdate() > 0
+          returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
+       """.executeInsert(TransactionhistoryarchiveRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow = {
     SQL"""insert into "production"."transactionhistoryarchive"("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
