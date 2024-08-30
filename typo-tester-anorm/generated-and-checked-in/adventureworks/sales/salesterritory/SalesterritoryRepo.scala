@@ -27,7 +27,7 @@ trait SalesterritoryRepo {
   def selectByIds(territoryids: Array[SalesterritoryId])(implicit c: Connection): List[SalesterritoryRow]
   def selectByIdsTracked(territoryids: Array[SalesterritoryId])(implicit c: Connection): Map[SalesterritoryId, SalesterritoryRow]
   def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow]
-  def update(row: SalesterritoryRow)(implicit c: Connection): Boolean
+  def update(row: SalesterritoryRow)(implicit c: Connection): Option[SalesterritoryRow]
   def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow
   def upsertBatch(unsaved: Iterable[SalesterritoryRow])(implicit c: Connection): List[SalesterritoryRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

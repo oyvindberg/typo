@@ -74,13 +74,10 @@ class WorkorderRepoMock(toRow: Function1[WorkorderRowUnsaved, WorkorderRow],
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
     UpdateBuilderMock(UpdateParams.empty, WorkorderFields.structure, map)
   }
-  override def update(row: WorkorderRow)(implicit c: Connection): Boolean = {
-    map.get(row.workorderid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.workorderid, row): @nowarn
-        true
-      case None => false
+  override def update(row: WorkorderRow)(implicit c: Connection): Option[WorkorderRow] = {
+    map.get(row.workorderid).map { _ =>
+      map.put(row.workorderid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow = {

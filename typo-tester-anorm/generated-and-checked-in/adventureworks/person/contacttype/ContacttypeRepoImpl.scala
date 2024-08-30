@@ -109,13 +109,14 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
     UpdateBuilder(""""person"."contacttype"""", ContacttypeFields.structure, ContacttypeRow.rowParser)
   }
-  override def update(row: ContacttypeRow)(implicit c: Connection): Boolean = {
+  override def update(row: ContacttypeRow)(implicit c: Connection): Option[ContacttypeRow] = {
     val contacttypeid = row.contacttypeid
     SQL"""update "person"."contacttype"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "contacttypeid" = ${ParameterValue(contacttypeid, null, ContacttypeId.toStatement)}
-       """.executeUpdate() > 0
+          returning "contacttypeid", "name", "modifieddate"::text
+       """.executeInsert(ContacttypeRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {
     SQL"""insert into "person"."contacttype"("contacttypeid", "name", "modifieddate")

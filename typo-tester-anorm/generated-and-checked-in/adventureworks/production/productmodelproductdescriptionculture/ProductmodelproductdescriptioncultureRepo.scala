@@ -27,7 +27,7 @@ trait ProductmodelproductdescriptioncultureRepo {
   def selectByIds(compositeIds: Array[ProductmodelproductdescriptioncultureId])(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow]
   def selectByIdsTracked(compositeIds: Array[ProductmodelproductdescriptioncultureId])(implicit c: Connection): Map[ProductmodelproductdescriptioncultureId, ProductmodelproductdescriptioncultureRow]
   def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow]
-  def update(row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Boolean
+  def update(row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Option[ProductmodelproductdescriptioncultureRow]
   def upsert(unsaved: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): ProductmodelproductdescriptioncultureRow
   def upsertBatch(unsaved: Iterable[ProductmodelproductdescriptioncultureRow])(implicit c: Connection): List[ProductmodelproductdescriptioncultureRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

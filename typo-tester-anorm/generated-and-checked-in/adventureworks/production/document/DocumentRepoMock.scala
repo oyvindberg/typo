@@ -78,13 +78,10 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
     UpdateBuilderMock(UpdateParams.empty, DocumentFields.structure, map)
   }
-  override def update(row: DocumentRow)(implicit c: Connection): Boolean = {
-    map.get(row.documentnode) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.documentnode, row): @nowarn
-        true
-      case None => false
+  override def update(row: DocumentRow)(implicit c: Connection): Option[DocumentRow] = {
+    map.get(row.documentnode).map { _ =>
+      map.put(row.documentnode, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {

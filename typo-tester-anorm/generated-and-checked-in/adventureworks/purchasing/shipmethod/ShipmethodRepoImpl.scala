@@ -123,7 +123,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
     UpdateBuilder(""""purchasing"."shipmethod"""", ShipmethodFields.structure, ShipmethodRow.rowParser)
   }
-  override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
+  override def update(row: ShipmethodRow)(implicit c: Connection): Option[ShipmethodRow] = {
     val shipmethodid = row.shipmethodid
     SQL"""update "purchasing"."shipmethod"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
@@ -132,7 +132,8 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "shipmethodid" = ${ParameterValue(shipmethodid, null, ShipmethodId.toStatement)}
-       """.executeUpdate() > 0
+          returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
+       """.executeInsert(ShipmethodRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {
     SQL"""insert into "purchasing"."shipmethod"("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")

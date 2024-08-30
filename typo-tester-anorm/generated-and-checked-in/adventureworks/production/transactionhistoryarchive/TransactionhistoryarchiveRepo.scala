@@ -27,7 +27,7 @@ trait TransactionhistoryarchiveRepo {
   def selectByIds(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): List[TransactionhistoryarchiveRow]
   def selectByIdsTracked(transactionids: Array[TransactionhistoryarchiveId])(implicit c: Connection): Map[TransactionhistoryarchiveId, TransactionhistoryarchiveRow]
   def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow]
-  def update(row: TransactionhistoryarchiveRow)(implicit c: Connection): Boolean
+  def update(row: TransactionhistoryarchiveRow)(implicit c: Connection): Option[TransactionhistoryarchiveRow]
   def upsert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow
   def upsertBatch(unsaved: Iterable[TransactionhistoryarchiveRow])(implicit c: Connection): List[TransactionhistoryarchiveRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

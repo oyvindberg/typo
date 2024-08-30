@@ -131,7 +131,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
   override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
     UpdateBuilder(""""sales"."salesperson"""", SalespersonFields.structure, SalespersonRow.rowParser)
   }
-  override def update(row: SalespersonRow)(implicit c: Connection): Boolean = {
+  override def update(row: SalespersonRow)(implicit c: Connection): Option[SalespersonRow] = {
     val businessentityid = row.businessentityid
     SQL"""update "sales"."salesperson"
           set "territoryid" = ${ParameterValue(row.territoryid, null, ToStatement.optionToStatement(SalesterritoryId.toStatement, SalesterritoryId.parameterMetadata))}::int4,
@@ -143,7 +143,8 @@ class SalespersonRepoImpl extends SalespersonRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
-       """.executeUpdate() > 0
+          returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text
+       """.executeInsert(SalespersonRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: SalespersonRow)(implicit c: Connection): SalespersonRow = {
     SQL"""insert into "sales"."salesperson"("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")

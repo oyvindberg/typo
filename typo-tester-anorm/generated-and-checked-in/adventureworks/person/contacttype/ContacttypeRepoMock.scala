@@ -74,13 +74,10 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
     UpdateBuilderMock(UpdateParams.empty, ContacttypeFields.structure, map)
   }
-  override def update(row: ContacttypeRow)(implicit c: Connection): Boolean = {
-    map.get(row.contacttypeid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.contacttypeid, row): @nowarn
-        true
-      case None => false
+  override def update(row: ContacttypeRow)(implicit c: Connection): Option[ContacttypeRow] = {
+    map.get(row.contacttypeid).map { _ =>
+      map.put(row.contacttypeid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow = {

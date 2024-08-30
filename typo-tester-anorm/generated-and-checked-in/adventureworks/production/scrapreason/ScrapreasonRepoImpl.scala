@@ -109,13 +109,14 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
     UpdateBuilder(""""production"."scrapreason"""", ScrapreasonFields.structure, ScrapreasonRow.rowParser)
   }
-  override def update(row: ScrapreasonRow)(implicit c: Connection): Boolean = {
+  override def update(row: ScrapreasonRow)(implicit c: Connection): Option[ScrapreasonRow] = {
     val scrapreasonid = row.scrapreasonid
     SQL"""update "production"."scrapreason"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "scrapreasonid" = ${ParameterValue(scrapreasonid, null, ScrapreasonId.toStatement)}
-       """.executeUpdate() > 0
+          returning "scrapreasonid", "name", "modifieddate"::text
+       """.executeInsert(ScrapreasonRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {
     SQL"""insert into "production"."scrapreason"("scrapreasonid", "name", "modifieddate")

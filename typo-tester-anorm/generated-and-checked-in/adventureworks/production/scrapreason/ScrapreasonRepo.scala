@@ -27,7 +27,7 @@ trait ScrapreasonRepo {
   def selectByIds(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): List[ScrapreasonRow]
   def selectByIdsTracked(scrapreasonids: Array[ScrapreasonId])(implicit c: Connection): Map[ScrapreasonId, ScrapreasonRow]
   def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow]
-  def update(row: ScrapreasonRow)(implicit c: Connection): Boolean
+  def update(row: ScrapreasonRow)(implicit c: Connection): Option[ScrapreasonRow]
   def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow
   def upsertBatch(unsaved: Iterable[ScrapreasonRow])(implicit c: Connection): List[ScrapreasonRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

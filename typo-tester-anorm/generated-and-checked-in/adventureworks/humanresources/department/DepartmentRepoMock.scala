@@ -74,13 +74,10 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
     UpdateBuilderMock(UpdateParams.empty, DepartmentFields.structure, map)
   }
-  override def update(row: DepartmentRow)(implicit c: Connection): Boolean = {
-    map.get(row.departmentid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.departmentid, row): @nowarn
-        true
-      case None => false
+  override def update(row: DepartmentRow)(implicit c: Connection): Option[DepartmentRow] = {
+    map.get(row.departmentid).map { _ =>
+      map.put(row.departmentid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
