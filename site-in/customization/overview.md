@@ -28,7 +28,7 @@ val options = Options(
 | `naming`                 | Configures naming conventions for generated code. See section below                                                                                                                                           |
 | `typeOverride`           | Defines type overrides for specific database types See section below.                                                                                                                                         |
 | `nullabilityOverride`    | Defines nullability overrides for specific columns See section below.                                                                                                                                         |
-| `generateMockRepos`      | Specifies which repositories to generate mock versions for (default is all).                                                                                                                                  |
+| `generateMockRepos`      | Specifies which repositories to generate mock versions for (default is all). This only works if `concreteRepo=false` (which it is by default)                                                                 | 
 | `enableFieldValue`       | Controls whether to enable `FieldValue` code generation for specific repositories (default is disabled).                                                                                                      |
 | `enableStreamingInserts` | Controls whether to enable [streaming inserts](../other-features/streaming-inserts.md)                                                                                                                        |
 | `enableTestInserts`      | Controls whether to enable [test inserts](../other-features/testing-with-random-values.md) for specific repositories (default is none).                                                                       |
@@ -38,6 +38,7 @@ val options = Options(
 | `keepDependencies`       | Specifies whether to generate [table dependencies](../type-safety/type-flow.md) in generated code even if you didn't select them (default is `false`).                                                        |
 | `rewriteDatabase`        | Let's you perform arbitrary rewrites of database schema snapshot. you can add/remove rows, foreign keys and so on.                                                                                            |
 | `openEnums`              | Controls if you want to tag tables ids as [open string enums](../type-safety/open-string-enums.md)                                                                                                            |
+| `concreteRepo`           | Controls if you want repositories be generated as just a class (if true) or an interface and class (if false)                                                                                                 |
 
 ## Development options
 
