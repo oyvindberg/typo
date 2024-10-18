@@ -64,7 +64,7 @@ object GeneratedAdventureWorks {
               enablePrimaryKeyType = !Selector.relationNames("billofmaterials"),
               enableTestInserts = Selector.All,
               readonlyRepo = Selector.relationNames("purchaseorderdetail"),
-              enableDsl = true,
+              enableDsl = true
             )
             val targetSources = buildDir.resolve(s"$projectPath/generated-and-checked-in")
 
