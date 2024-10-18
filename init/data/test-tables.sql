@@ -253,4 +253,23 @@ create table "table-with-generated-columns"
              WHEN name = 'a' THEN 'a-name'
              ELSE 'some-name'
             END) STORED
-)
+);
+
+
+CREATE TABLE issue142
+(
+    tabellkode TEXT NOT NULL ,
+    CONSTRAINT tabell_pk PRIMARY KEY (tabellkode)
+);
+
+CREATE TABLE issue142_2
+(
+    tabellkode TEXT NOT NULL,
+    CONSTRAINT tabell2_pk PRIMARY KEY (tabellkode),
+    CONSTRAINT tabell2_tabell_fk FOREIGN KEY (tabellkode) REFERENCES issue142 (tabellkode)
+);
+
+INSERT INTO issue142 (tabellkode)
+VALUES  ('aa'),
+        ('bb')
+;
