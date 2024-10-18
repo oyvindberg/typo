@@ -48,7 +48,7 @@ object ComputedTestInserts {
           case tpe if tableUnaryId.exists(_.tpe == tpe) =>
             tableUnaryId.get match {
               case x: IdComputed.UnaryNormal        => go(x.underlying, x.col.dbCol.tpe, None).map(default => code"${x.tpe}($default)")
-              case x: IdComputed.UnaryInherited     => go(x.underlying, x.col.dbCol.tpe, None).map(default => code"${x.tpe}($default)")
+              case x: IdComputed.UnaryInherited     => go(x.underlying, x.col.dbCol.tpe, None)
               case x: IdComputed.UnaryNoIdType      => go(x.underlying, x.col.dbCol.tpe, None)
               case x: IdComputed.UnaryOpenEnum      => go(x.underlying, x.col.dbCol.tpe, None).map(default => code"${x.tpe}($default)")
               case _: IdComputed.UnaryUserSpecified => None

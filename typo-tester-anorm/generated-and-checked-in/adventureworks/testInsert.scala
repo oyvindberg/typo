@@ -649,7 +649,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                  )(implicit c: Connection): FlaffRow = (new FlaffRepoImpl).insert(new FlaffRow(code = code, anotherCode = anotherCode, someNumber = someNumber, specifier = specifier, parentspecifier = parentspecifier))
   def publicIdentityTest(name: IdentityTestId, defaultGenerated: Defaulted[Int] = Defaulted.UseDefault)(implicit c: Connection): IdentityTestRow = (new IdentityTestRepoImpl).insert(new IdentityTestRowUnsaved(name = name, defaultGenerated = defaultGenerated))
   def publicIssue142(tabellkode: Issue142Id = Issue142Id(random.alphanumeric.take(20).mkString))(implicit c: Connection): Issue142Row = (new Issue142RepoImpl).insert(new Issue142Row(tabellkode = tabellkode))
-  def publicIssue1422(tabellkode: Issue142Id = Issue142Id(Issue142Id.All(random.nextInt(2))))(implicit c: Connection): Issue1422Row = (new Issue1422RepoImpl).insert(new Issue1422Row(tabellkode = tabellkode))
+  def publicIssue1422(tabellkode: Issue142Id = Issue142Id.All(random.nextInt(2)))(implicit c: Connection): Issue1422Row = (new Issue1422RepoImpl).insert(new Issue1422Row(tabellkode = tabellkode))
   def publicPgtest(box: TypoBox,
                    bytea: TypoBytea,
                    circle: TypoCircle,
