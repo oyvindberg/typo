@@ -30,12 +30,13 @@ object GeneratedAdventureWorks {
         val selector = Selector.ExcludePostgresInternal
         val typoLogger = TypoLogger.Console
         val metadb = Await.result(MetaDb.fromDb(typoLogger, ds, selector, schemaMode = SchemaMode.MultiSchema), Duration.Inf)
+        val openEnumSelector = Selector.relationNames("title", "title_domain", "issue142")
         val relationNameToOpenEnum = Await.result(
           OpenEnum.find(
             ds,
             typoLogger,
             Selector.All,
-            openEnumSelector = Selector.relationNames("title", "title_domain"),
+            openEnumSelector = openEnumSelector,
             metaDb = metadb
           ),
           Duration.Inf
@@ -58,7 +59,7 @@ object GeneratedAdventureWorks {
                 case (_, "firstname")                     => "adventureworks.userdefined.FirstName"
                 case ("sales.creditcard", "creditcardid") => "adventureworks.userdefined.CustomCreditcardId"
               },
-              openEnums = Selector.relationNames("title", "title_domain"),
+              openEnums = openEnumSelector,
               generateMockRepos = !Selector.relationNames("purchaseorderdetail"),
               enablePrimaryKeyType = !Selector.relationNames("billofmaterials"),
               enableTestInserts = Selector.All,

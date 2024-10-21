@@ -204,6 +204,11 @@ import adventureworks.public.identity_test.IdentityTestId
 import adventureworks.public.identity_test.IdentityTestRepoImpl
 import adventureworks.public.identity_test.IdentityTestRow
 import adventureworks.public.identity_test.IdentityTestRowUnsaved
+import adventureworks.public.issue142.Issue142Id
+import adventureworks.public.issue142.Issue142RepoImpl
+import adventureworks.public.issue142.Issue142Row
+import adventureworks.public.issue142_2.Issue1422RepoImpl
+import adventureworks.public.issue142_2.Issue1422Row
 import adventureworks.public.pgtest.PgtestRepoImpl
 import adventureworks.public.pgtest.PgtestRow
 import adventureworks.public.pgtestnull.PgtestnullRepoImpl
@@ -643,6 +648,8 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                   parentspecifier: Option[ShortText] = None
                  )(implicit c: Connection): FlaffRow = (new FlaffRepoImpl).insert(new FlaffRow(code = code, anotherCode = anotherCode, someNumber = someNumber, specifier = specifier, parentspecifier = parentspecifier))
   def publicIdentityTest(name: IdentityTestId, defaultGenerated: Defaulted[Int] = Defaulted.UseDefault)(implicit c: Connection): IdentityTestRow = (new IdentityTestRepoImpl).insert(new IdentityTestRowUnsaved(name = name, defaultGenerated = defaultGenerated))
+  def publicIssue142(tabellkode: Issue142Id = Issue142Id(random.alphanumeric.take(20).mkString))(implicit c: Connection): Issue142Row = (new Issue142RepoImpl).insert(new Issue142Row(tabellkode = tabellkode))
+  def publicIssue1422(tabellkode: Issue142Id = Issue142Id.All(random.nextInt(2)))(implicit c: Connection): Issue1422Row = (new Issue1422RepoImpl).insert(new Issue1422Row(tabellkode = tabellkode))
   def publicPgtest(box: TypoBox,
                    bytea: TypoBytea,
                    circle: TypoCircle,
