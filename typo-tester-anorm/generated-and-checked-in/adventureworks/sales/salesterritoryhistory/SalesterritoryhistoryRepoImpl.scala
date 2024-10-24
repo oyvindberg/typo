@@ -111,7 +111,7 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     val territoryid = compositeIds.map(_.territoryid)
     SQL"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
           from "sales"."salesterritoryhistory"
-          where ("businessentityid", "startdate", "territoryid") 
+          where ("businessentityid", "startdate", "territoryid")
           in (select unnest(${businessentityid}), unnest(${startdate}), unnest(${territoryid}))
        """.as(SalesterritoryhistoryRow.rowParser(1).*)
     
@@ -123,14 +123,15 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
     UpdateBuilder(""""sales"."salesterritoryhistory"""", SalesterritoryhistoryFields.structure, SalesterritoryhistoryRow.rowParser)
   }
-  override def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Option[SalesterritoryhistoryRow] = {
     val compositeId = row.compositeId
     SQL"""update "sales"."salesterritoryhistory"
           set "enddate" = ${ParameterValue(row.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)} AND "territoryid" = ${ParameterValue(compositeId.territoryid, null, SalesterritoryId.toStatement)}
-       """.executeUpdate() > 0
+          returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
+       """.executeInsert(SalesterritoryhistoryRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow = {
     SQL"""insert into "sales"."salesterritoryhistory"("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")

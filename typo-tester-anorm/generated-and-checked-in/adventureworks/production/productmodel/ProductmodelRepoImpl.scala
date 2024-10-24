@@ -118,7 +118,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
   override def update: UpdateBuilder[ProductmodelFields, ProductmodelRow] = {
     UpdateBuilder(""""production"."productmodel"""", ProductmodelFields.structure, ProductmodelRow.rowParser)
   }
-  override def update(row: ProductmodelRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductmodelRow)(implicit c: Connection): Option[ProductmodelRow] = {
     val productmodelid = row.productmodelid
     SQL"""update "production"."productmodel"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
@@ -127,7 +127,8 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productmodelid" = ${ParameterValue(productmodelid, null, ProductmodelId.toStatement)}
-       """.executeUpdate() > 0
+          returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text
+       """.executeInsert(ProductmodelRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductmodelRow)(implicit c: Connection): ProductmodelRow = {
     SQL"""insert into "production"."productmodel"("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")

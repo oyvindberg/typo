@@ -27,7 +27,7 @@ trait ContacttypeRepo {
   def selectByIds(contacttypeids: Array[ContacttypeId])(implicit c: Connection): List[ContacttypeRow]
   def selectByIdsTracked(contacttypeids: Array[ContacttypeId])(implicit c: Connection): Map[ContacttypeId, ContacttypeRow]
   def update: UpdateBuilder[ContacttypeFields, ContacttypeRow]
-  def update(row: ContacttypeRow)(implicit c: Connection): Boolean
+  def update(row: ContacttypeRow)(implicit c: Connection): Option[ContacttypeRow]
   def upsert(unsaved: ContacttypeRow)(implicit c: Connection): ContacttypeRow
   def upsertBatch(unsaved: Iterable[ContacttypeRow])(implicit c: Connection): List[ContacttypeRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

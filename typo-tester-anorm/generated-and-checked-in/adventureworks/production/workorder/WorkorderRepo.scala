@@ -27,7 +27,7 @@ trait WorkorderRepo {
   def selectByIds(workorderids: Array[WorkorderId])(implicit c: Connection): List[WorkorderRow]
   def selectByIdsTracked(workorderids: Array[WorkorderId])(implicit c: Connection): Map[WorkorderId, WorkorderRow]
   def update: UpdateBuilder[WorkorderFields, WorkorderRow]
-  def update(row: WorkorderRow)(implicit c: Connection): Boolean
+  def update(row: WorkorderRow)(implicit c: Connection): Option[WorkorderRow]
   def upsert(unsaved: WorkorderRow)(implicit c: Connection): WorkorderRow
   def upsertBatch(unsaved: Iterable[WorkorderRow])(implicit c: Connection): List[WorkorderRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

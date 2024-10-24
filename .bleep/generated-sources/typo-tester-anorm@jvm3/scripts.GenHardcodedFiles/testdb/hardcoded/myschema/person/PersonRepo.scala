@@ -29,7 +29,7 @@ trait PersonRepo {
   def selectByIds(ids: Array[PersonId])(implicit c: Connection): List[PersonRow]
   def selectByIdsTracked(ids: Array[PersonId])(implicit c: Connection): Map[PersonId, PersonRow]
   def update: UpdateBuilder[PersonFields, PersonRow]
-  def update(row: PersonRow)(implicit c: Connection): Boolean
+  def update(row: PersonRow)(implicit c: Connection): Option[PersonRow]
   def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean
   def upsert(unsaved: PersonRow)(implicit c: Connection): PersonRow
   def upsertBatch(unsaved: Iterable[PersonRow])(implicit c: Connection): List[PersonRow]

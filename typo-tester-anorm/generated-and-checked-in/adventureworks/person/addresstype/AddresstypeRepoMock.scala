@@ -74,13 +74,10 @@ class AddresstypeRepoMock(toRow: Function1[AddresstypeRowUnsaved, AddresstypeRow
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
     UpdateBuilderMock(UpdateParams.empty, AddresstypeFields.structure, map)
   }
-  override def update(row: AddresstypeRow)(implicit c: Connection): Boolean = {
-    map.get(row.addresstypeid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.addresstypeid, row): @nowarn
-        true
-      case None => false
+  override def update(row: AddresstypeRow)(implicit c: Connection): Option[AddresstypeRow] = {
+    map.get(row.addresstypeid).map { _ =>
+      map.put(row.addresstypeid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {

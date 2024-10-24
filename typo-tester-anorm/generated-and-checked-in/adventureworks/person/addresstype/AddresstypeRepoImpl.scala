@@ -114,14 +114,15 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
     UpdateBuilder(""""person"."addresstype"""", AddresstypeFields.structure, AddresstypeRow.rowParser)
   }
-  override def update(row: AddresstypeRow)(implicit c: Connection): Boolean = {
+  override def update(row: AddresstypeRow)(implicit c: Connection): Option[AddresstypeRow] = {
     val addresstypeid = row.addresstypeid
     SQL"""update "person"."addresstype"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "addresstypeid" = ${ParameterValue(addresstypeid, null, AddresstypeId.toStatement)}
-       """.executeUpdate() > 0
+          returning "addresstypeid", "name", "rowguid", "modifieddate"::text
+       """.executeInsert(AddresstypeRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: AddresstypeRow)(implicit c: Connection): AddresstypeRow = {
     SQL"""insert into "person"."addresstype"("addresstypeid", "name", "rowguid", "modifieddate")

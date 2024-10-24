@@ -112,7 +112,7 @@ class ShiftRepoImpl extends ShiftRepo {
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
     UpdateBuilder(""""humanresources"."shift"""", ShiftFields.structure, ShiftRow.rowParser)
   }
-  override def update(row: ShiftRow)(implicit c: Connection): Boolean = {
+  override def update(row: ShiftRow)(implicit c: Connection): Option[ShiftRow] = {
     val shiftid = row.shiftid
     SQL"""update "humanresources"."shift"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
@@ -120,7 +120,8 @@ class ShiftRepoImpl extends ShiftRepo {
               "endtime" = ${ParameterValue(row.endtime, null, TypoLocalTime.toStatement)}::time,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "shiftid" = ${ParameterValue(shiftid, null, ShiftId.toStatement)}
-       """.executeUpdate() > 0
+          returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text
+       """.executeInsert(ShiftRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ShiftRow)(implicit c: Connection): ShiftRow = {
     SQL"""insert into "humanresources"."shift"("shiftid", "name", "starttime", "endtime", "modifieddate")

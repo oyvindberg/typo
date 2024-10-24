@@ -109,13 +109,14 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     UpdateBuilder(""""person"."phonenumbertype"""", PhonenumbertypeFields.structure, PhonenumbertypeRow.rowParser)
   }
-  override def update(row: PhonenumbertypeRow)(implicit c: Connection): Boolean = {
+  override def update(row: PhonenumbertypeRow)(implicit c: Connection): Option[PhonenumbertypeRow] = {
     val phonenumbertypeid = row.phonenumbertypeid
     SQL"""update "person"."phonenumbertype"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "phonenumbertypeid" = ${ParameterValue(phonenumbertypeid, null, PhonenumbertypeId.toStatement)}
-       """.executeUpdate() > 0
+          returning "phonenumbertypeid", "name", "modifieddate"::text
+       """.executeInsert(PhonenumbertypeRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: PhonenumbertypeRow)(implicit c: Connection): PhonenumbertypeRow = {
     SQL"""insert into "person"."phonenumbertype"("phonenumbertypeid", "name", "modifieddate")

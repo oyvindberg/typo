@@ -148,7 +148,7 @@ class ProductRepoImpl extends ProductRepo {
   override def update: UpdateBuilder[ProductFields, ProductRow] = {
     UpdateBuilder(""""production"."product"""", ProductFields.structure, ProductRow.rowParser)
   }
-  override def update(row: ProductRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductRow)(implicit c: Connection): Option[ProductRow] = {
     val productid = row.productid
     SQL"""update "production"."product"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
@@ -176,7 +176,8 @@ class ProductRepoImpl extends ProductRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productid" = ${ParameterValue(productid, null, ProductId.toStatement)}
-       """.executeUpdate() > 0
+          returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text
+       """.executeInsert(ProductRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductRow)(implicit c: Connection): ProductRow = {
     SQL"""insert into "production"."product"("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")

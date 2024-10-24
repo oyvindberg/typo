@@ -125,7 +125,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
     UpdateBuilder(""""person"."stateprovince"""", StateprovinceFields.structure, StateprovinceRow.rowParser)
   }
-  override def update(row: StateprovinceRow)(implicit c: Connection): Boolean = {
+  override def update(row: StateprovinceRow)(implicit c: Connection): Option[StateprovinceRow] = {
     val stateprovinceid = row.stateprovinceid
     SQL"""update "person"."stateprovince"
           set "stateprovincecode" = ${ParameterValue(row.stateprovincecode, null, ToStatement.stringToStatement)}::bpchar,
@@ -136,7 +136,8 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "stateprovinceid" = ${ParameterValue(stateprovinceid, null, StateprovinceId.toStatement)}
-       """.executeUpdate() > 0
+          returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text
+       """.executeInsert(StateprovinceRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: StateprovinceRow)(implicit c: Connection): StateprovinceRow = {
     SQL"""insert into "person"."stateprovince"("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")

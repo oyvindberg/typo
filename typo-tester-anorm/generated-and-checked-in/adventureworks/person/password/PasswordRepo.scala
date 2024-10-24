@@ -28,7 +28,7 @@ trait PasswordRepo {
   def selectByIds(businessentityids: Array[BusinessentityId])(implicit c: Connection): List[PasswordRow]
   def selectByIdsTracked(businessentityids: Array[BusinessentityId])(implicit c: Connection): Map[BusinessentityId, PasswordRow]
   def update: UpdateBuilder[PasswordFields, PasswordRow]
-  def update(row: PasswordRow)(implicit c: Connection): Boolean
+  def update(row: PasswordRow)(implicit c: Connection): Option[PasswordRow]
   def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow
   def upsertBatch(unsaved: Iterable[PasswordRow])(implicit c: Connection): List[PasswordRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

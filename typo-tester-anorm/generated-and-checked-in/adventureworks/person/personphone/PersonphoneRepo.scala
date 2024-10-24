@@ -27,7 +27,7 @@ trait PersonphoneRepo {
   def selectByIds(compositeIds: Array[PersonphoneId])(implicit c: Connection): List[PersonphoneRow]
   def selectByIdsTracked(compositeIds: Array[PersonphoneId])(implicit c: Connection): Map[PersonphoneId, PersonphoneRow]
   def update: UpdateBuilder[PersonphoneFields, PersonphoneRow]
-  def update(row: PersonphoneRow)(implicit c: Connection): Boolean
+  def update(row: PersonphoneRow)(implicit c: Connection): Option[PersonphoneRow]
   def upsert(unsaved: PersonphoneRow)(implicit c: Connection): PersonphoneRow
   def upsertBatch(unsaved: Iterable[PersonphoneRow])(implicit c: Connection): List[PersonphoneRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

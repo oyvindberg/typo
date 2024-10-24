@@ -74,13 +74,10 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
     UpdateBuilderMock(UpdateParams.empty, ShipmethodFields.structure, map)
   }
-  override def update(row: ShipmethodRow)(implicit c: Connection): Boolean = {
-    map.get(row.shipmethodid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.shipmethodid, row): @nowarn
-        true
-      case None => false
+  override def update(row: ShipmethodRow)(implicit c: Connection): Option[ShipmethodRow] = {
+    map.get(row.shipmethodid).map { _ =>
+      map.put(row.shipmethodid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: ShipmethodRow)(implicit c: Connection): ShipmethodRow = {

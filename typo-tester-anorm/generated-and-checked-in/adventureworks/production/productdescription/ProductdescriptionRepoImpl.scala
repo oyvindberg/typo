@@ -114,14 +114,15 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
     UpdateBuilder(""""production"."productdescription"""", ProductdescriptionFields.structure, ProductdescriptionRow.rowParser)
   }
-  override def update(row: ProductdescriptionRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductdescriptionRow)(implicit c: Connection): Option[ProductdescriptionRow] = {
     val productdescriptionid = row.productdescriptionid
     SQL"""update "production"."productdescription"
           set "description" = ${ParameterValue(row.description, null, ToStatement.stringToStatement)},
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productdescriptionid" = ${ParameterValue(productdescriptionid, null, ProductdescriptionId.toStatement)}
-       """.executeUpdate() > 0
+          returning "productdescriptionid", "description", "rowguid", "modifieddate"::text
+       """.executeInsert(ProductdescriptionRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductdescriptionRow)(implicit c: Connection): ProductdescriptionRow = {
     SQL"""insert into "production"."productdescription"("productdescriptionid", "description", "rowguid", "modifieddate")

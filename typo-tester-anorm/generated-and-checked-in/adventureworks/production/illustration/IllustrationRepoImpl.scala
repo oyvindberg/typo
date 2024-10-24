@@ -110,13 +110,14 @@ class IllustrationRepoImpl extends IllustrationRepo {
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
     UpdateBuilder(""""production"."illustration"""", IllustrationFields.structure, IllustrationRow.rowParser)
   }
-  override def update(row: IllustrationRow)(implicit c: Connection): Boolean = {
+  override def update(row: IllustrationRow)(implicit c: Connection): Option[IllustrationRow] = {
     val illustrationid = row.illustrationid
     SQL"""update "production"."illustration"
           set "diagram" = ${ParameterValue(row.diagram, null, ToStatement.optionToStatement(TypoXml.toStatement, TypoXml.parameterMetadata))}::xml,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "illustrationid" = ${ParameterValue(illustrationid, null, IllustrationId.toStatement)}
-       """.executeUpdate() > 0
+          returning "illustrationid", "diagram", "modifieddate"::text
+       """.executeInsert(IllustrationRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow = {
     SQL"""insert into "production"."illustration"("illustrationid", "diagram", "modifieddate")
