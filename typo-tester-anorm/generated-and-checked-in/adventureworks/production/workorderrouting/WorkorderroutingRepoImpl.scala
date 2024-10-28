@@ -115,7 +115,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
     val operationsequence = compositeIds.map(_.operationsequence)
     SQL"""select "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
           from "production"."workorderrouting"
-          where ("workorderid", "productid", "operationsequence") 
+          where ("workorderid", "productid", "operationsequence")
           in (select unnest(${workorderid}), unnest(${productid}), unnest(${operationsequence}))
        """.as(WorkorderroutingRow.rowParser(1).*)
     

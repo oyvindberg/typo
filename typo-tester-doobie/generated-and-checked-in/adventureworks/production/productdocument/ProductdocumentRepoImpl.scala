@@ -96,7 +96,7 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
     val documentnode = compositeIds.map(_.documentnode)
     sql"""select "productid", "modifieddate"::text, "documentnode"
           from "production"."productdocument"
-          where ("productid", "documentnode") 
+          where ("productid", "documentnode")
           in (select unnest(${productid}), unnest(${documentnode}))
        """.query(using ProductdocumentRow.read).stream
     

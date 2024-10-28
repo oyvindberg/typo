@@ -76,7 +76,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
             ${fromWrite(unsaved.id)(Write.fromPut(MaritalStatusId.put))}::int8
           )
           on conflict ("id")
-          do nothing
+          do update set "id" = EXCLUDED."id"
           returning "id"
        """.query(using MaritalStatusRow.read).unique
   }

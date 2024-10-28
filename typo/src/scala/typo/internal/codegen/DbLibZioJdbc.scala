@@ -406,7 +406,9 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         }
 
         val conflictAction = writeableColumnsNotId match {
-          case Nil => code"do nothing"
+          case Nil =>
+            val arbitraryColumn = id.cols.head
+            code"do update set ${arbitraryColumn.dbName.code} = EXCLUDED.${arbitraryColumn.dbName.code}"
           case nonEmpty =>
             code"""|do update set
                    |  ${nonEmpty.map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }.mkCode(",\n")}""".stripMargin

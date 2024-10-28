@@ -78,7 +78,7 @@ class Issue1422RepoImpl extends Issue1422Repo {
             ${ParameterValue(unsaved.tabellkode, null, Issue142Id.toStatement)}
           )
           on conflict ("tabellkode")
-          do nothing
+          do update set "tabellkode" = EXCLUDED."tabellkode"
           returning "tabellkode"
        """
       .executeInsert(Issue1422Row.rowParser(1).single)

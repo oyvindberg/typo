@@ -102,7 +102,7 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     val shiftid = compositeIds.map(_.shiftid)
     sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
           from "humanresources"."employeedepartmenthistory"
-          where ("businessentityid", "startdate", "departmentid", "shiftid") 
+          where ("businessentityid", "startdate", "departmentid", "shiftid")
           in (select unnest(${businessentityid}), unnest(${startdate}), unnest(${departmentid}), unnest(${shiftid}))
        """.query(using EmployeedepartmenthistoryRow.read).stream
     

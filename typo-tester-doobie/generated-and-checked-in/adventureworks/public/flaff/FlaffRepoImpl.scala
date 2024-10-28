@@ -65,7 +65,7 @@ class FlaffRepoImpl extends FlaffRepo {
     val specifier = compositeIds.map(_.specifier)
     sql"""select "code", "another_code", "some_number", "specifier", "parentspecifier"
           from "public"."flaff"
-          where ("code", "another_code", "some_number", "specifier") 
+          where ("code", "another_code", "some_number", "specifier")
           in (select unnest(${code}), unnest(${anotherCode}), unnest(${someNumber}), unnest(${specifier}))
        """.query(using FlaffRow.read).stream
     

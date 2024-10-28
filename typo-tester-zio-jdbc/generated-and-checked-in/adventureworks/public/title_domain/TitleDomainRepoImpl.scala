@@ -64,7 +64,7 @@ class TitleDomainRepoImpl extends TitleDomainRepo {
             ${Segment.paramSegment(unsaved.code)(TitleDomainId.setter)}::text
           )
           on conflict ("code")
-          do nothing
+          do update set "code" = EXCLUDED."code"
           returning "code"""".insertReturning(using TitleDomainRow.jdbcDecoder)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

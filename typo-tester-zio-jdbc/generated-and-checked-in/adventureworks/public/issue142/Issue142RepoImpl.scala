@@ -64,7 +64,7 @@ class Issue142RepoImpl extends Issue142Repo {
             ${Segment.paramSegment(unsaved.tabellkode)(Issue142Id.setter)}
           )
           on conflict ("tabellkode")
-          do nothing
+          do update set "tabellkode" = EXCLUDED."tabellkode"
           returning "tabellkode"""".insertReturning(using Issue142Row.jdbcDecoder)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

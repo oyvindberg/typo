@@ -93,7 +93,7 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     val currencycode = compositeIds.map(_.currencycode)
     sql"""select "countryregioncode", "currencycode", "modifieddate"::text
           from "sales"."countryregioncurrency"
-          where ("countryregioncode", "currencycode") 
+          where ("countryregioncode", "currencycode")
           in (select unnest(${countryregioncode}), unnest(${currencycode}))
        """.query(using CountryregioncurrencyRow.read).stream
     

@@ -104,7 +104,7 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
     val ratechangedate = compositeIds.map(_.ratechangedate)
     SQL"""select "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
           from "humanresources"."employeepayhistory"
-          where ("businessentityid", "ratechangedate") 
+          where ("businessentityid", "ratechangedate")
           in (select unnest(${businessentityid}), unnest(${ratechangedate}))
        """.as(EmployeepayhistoryRow.rowParser(1).*)
     

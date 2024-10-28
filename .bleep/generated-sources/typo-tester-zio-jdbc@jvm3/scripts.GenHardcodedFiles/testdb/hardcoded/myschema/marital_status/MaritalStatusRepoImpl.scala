@@ -78,7 +78,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
             ${Segment.paramSegment(unsaved.id)(MaritalStatusId.setter)}::int8
           )
           on conflict ("id")
-          do nothing
+          do update set "id" = EXCLUDED."id"
           returning "id"""".insertReturning(using MaritalStatusRow.jdbcDecoder)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

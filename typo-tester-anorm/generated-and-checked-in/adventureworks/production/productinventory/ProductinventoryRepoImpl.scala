@@ -114,7 +114,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     val locationid = compositeIds.map(_.locationid)
     SQL"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
           from "production"."productinventory"
-          where ("productid", "locationid") 
+          where ("productid", "locationid")
           in (select unnest(${productid}), unnest(${locationid}))
        """.as(ProductinventoryRow.rowParser(1).*)
     

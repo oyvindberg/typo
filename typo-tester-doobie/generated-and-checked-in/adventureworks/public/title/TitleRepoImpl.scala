@@ -66,7 +66,7 @@ class TitleRepoImpl extends TitleRepo {
             ${fromWrite(unsaved.code)(Write.fromPut(TitleId.put))}
           )
           on conflict ("code")
-          do nothing
+          do update set "code" = EXCLUDED."code"
           returning "code"
        """.query(using TitleRow.read).unique
   }

@@ -113,7 +113,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     val salesorderdetailid = compositeIds.map(_.salesorderdetailid)
     sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
           from "sales"."salesorderdetail"
-          where ("salesorderid", "salesorderdetailid") 
+          where ("salesorderid", "salesorderdetailid")
           in (select unnest(${salesorderid}), unnest(${salesorderdetailid}))
        """.query(using SalesorderdetailRow.read).stream
     

@@ -111,7 +111,7 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
     val territoryid = compositeIds.map(_.territoryid)
     SQL"""select "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text
           from "sales"."salesterritoryhistory"
-          where ("businessentityid", "startdate", "territoryid") 
+          where ("businessentityid", "startdate", "territoryid")
           in (select unnest(${businessentityid}), unnest(${startdate}), unnest(${territoryid}))
        """.as(SalesterritoryhistoryRow.rowParser(1).*)
     

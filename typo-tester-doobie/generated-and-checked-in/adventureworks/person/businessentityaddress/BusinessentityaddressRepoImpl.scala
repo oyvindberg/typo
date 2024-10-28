@@ -102,7 +102,7 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     val addresstypeid = compositeIds.map(_.addresstypeid)
     sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
           from "person"."businessentityaddress"
-          where ("businessentityid", "addressid", "addresstypeid") 
+          where ("businessentityid", "addressid", "addresstypeid")
           in (select unnest(${businessentityid}), unnest(${addressid}), unnest(${addresstypeid}))
        """.query(using BusinessentityaddressRow.read).stream
     

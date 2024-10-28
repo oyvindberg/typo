@@ -106,7 +106,7 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     val productid = compositeIds.map(_.productid)
     SQL"""select "specialofferid", "productid", "rowguid", "modifieddate"::text
           from "sales"."specialofferproduct"
-          where ("specialofferid", "productid") 
+          where ("specialofferid", "productid")
           in (select unnest(${specialofferid}), unnest(${productid}))
        """.as(SpecialofferproductRow.rowParser(1).*)
     

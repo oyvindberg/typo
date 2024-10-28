@@ -101,7 +101,7 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
     val salesreasonid = compositeIds.map(_.salesreasonid)
     SQL"""select "salesorderid", "salesreasonid", "modifieddate"::text
           from "sales"."salesorderheadersalesreason"
-          where ("salesorderid", "salesreasonid") 
+          where ("salesorderid", "salesreasonid")
           in (select unnest(${salesorderid}), unnest(${salesreasonid}))
        """.as(SalesorderheadersalesreasonRow.rowParser(1).*)
     
