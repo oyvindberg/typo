@@ -329,6 +329,23 @@ case class FilesRelation(
     sc.File(names.RepoImplName, str, secondaryTypes = Nil, scope = Scope.Main)
   }
 
+  def ConcreteRepoImplFile(dbLib: DbLib, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
+    val renderedMethods: List[sc.Code] = repoMethods.toList.flatMap { repoMethod =>
+      dbLib.repoSig(repoMethod).toOption.map { sig =>
+        code"""|${repoMethod.comment.fold("")(c => c + "\n")}$sig = {
+               |  ${dbLib.repoImpl(repoMethod)}
+               |}""".stripMargin
+      }
+    }
+    val str =
+      code"""|class ${names.RepoName} {
+             |  ${renderedMethods.mkCode("\n")}
+             |}
+             |""".stripMargin
+
+    sc.File(names.RepoName, str, secondaryTypes = Nil, scope = Scope.Main)
+  }
+
   def RepoMockFile(dbLib: DbLib, idComputed: IdComputed, repoMethods: NonEmptyList[RepoMethod]): sc.File = {
     val maybeToRowParam: Option[sc.Param] =
       repoMethods.toList.collectFirst { case RepoMethod.InsertUnsaved(_, _, unsaved, _, _, _) =>
