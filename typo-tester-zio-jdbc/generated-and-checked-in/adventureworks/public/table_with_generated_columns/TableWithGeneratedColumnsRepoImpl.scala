@@ -86,7 +86,7 @@ class TableWithGeneratedColumnsRepoImpl extends TableWithGeneratedColumnsRepo {
             ${Segment.paramSegment(unsaved.name)(TableWithGeneratedColumnsId.setter)}
           )
           on conflict ("name")
-          do nothing
+          do update set "name" = EXCLUDED."name"
           returning "name", "name-type-always"""".insertReturning(using TableWithGeneratedColumnsRow.jdbcDecoder)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

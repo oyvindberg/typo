@@ -66,7 +66,7 @@ class Issue142RepoImpl extends Issue142Repo {
             ${fromWrite(unsaved.tabellkode)(Write.fromPut(Issue142Id.put))}
           )
           on conflict ("tabellkode")
-          do nothing
+          do update set "tabellkode" = EXCLUDED."tabellkode"
           returning "tabellkode"
        """.query(using Issue142Row.read).unique
   }

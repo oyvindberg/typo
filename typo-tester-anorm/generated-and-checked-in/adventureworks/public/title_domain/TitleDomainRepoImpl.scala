@@ -77,7 +77,7 @@ class TitleDomainRepoImpl extends TitleDomainRepo {
             ${ParameterValue(unsaved.code, null, TitleDomainId.toStatement)}::text
           )
           on conflict ("code")
-          do nothing
+          do update set "code" = EXCLUDED."code"
           returning "code"
        """
       .executeInsert(TitleDomainRow.rowParser(1).single)

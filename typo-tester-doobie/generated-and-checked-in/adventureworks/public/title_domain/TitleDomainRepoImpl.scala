@@ -66,7 +66,7 @@ class TitleDomainRepoImpl extends TitleDomainRepo {
             ${fromWrite(unsaved.code)(Write.fromPut(TitleDomainId.put))}::text
           )
           on conflict ("code")
-          do nothing
+          do update set "code" = EXCLUDED."code"
           returning "code"
        """.query(using TitleDomainRow.read).unique
   }

@@ -104,7 +104,7 @@ class TableWithGeneratedColumnsRepoImpl extends TableWithGeneratedColumnsRepo {
             ${ParameterValue(unsaved.name, null, TableWithGeneratedColumnsId.toStatement)}
           )
           on conflict ("name")
-          do nothing
+          do update set "name" = EXCLUDED."name"
           returning "name", "name-type-always"
        """
       .executeInsert(TableWithGeneratedColumnsRow.rowParser(1).single)

@@ -99,7 +99,7 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     val quotadate = compositeIds.map(_.quotadate)
     sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
           from "sales"."salespersonquotahistory"
-          where ("businessentityid", "quotadate") 
+          where ("businessentityid", "quotadate")
           in (select unnest(${businessentityid}), unnest(${quotadate}))
        """.query(using SalespersonquotahistoryRow.read).stream
     

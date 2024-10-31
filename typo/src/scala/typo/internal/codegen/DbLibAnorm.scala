@@ -280,7 +280,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
             val sql = SQL {
               code"""|select ${joinedColNames}
                      |from $relName
-                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")}) 
+                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")})
                      |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, col.tpe, forbidInline = true)})").mkCode(", ")})
                      |""".stripMargin
             }
@@ -416,7 +416,9 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         }
 
         val conflictAction = writeableColumnsNotId match {
-          case Nil => code"do nothing"
+          case Nil =>
+            val arbitraryColumn = id.cols.head
+            code"do update set ${arbitraryColumn.dbName.code} = EXCLUDED.${arbitraryColumn.dbName.code}"
           case nonEmpty =>
             code"""|do update set
                    |  ${nonEmpty.map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }.mkCode(",\n")}""".stripMargin
@@ -889,7 +891,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                |      case "VARCHAR" => "text[]"
                |      case other => s"$${other}[]"
                |    }
-               |  
+               |
                |  override def jdbcType: ${TypesScala.Int} = ${TypesJava.SqlTypes}.ARRAY
                |}""".stripMargin
       )

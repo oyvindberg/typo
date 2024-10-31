@@ -105,7 +105,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     val cultureid = compositeIds.map(_.cultureid)
     SQL"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
           from "production"."productmodelproductdescriptionculture"
-          where ("productmodelid", "productdescriptionid", "cultureid") 
+          where ("productmodelid", "productdescriptionid", "cultureid")
           in (select unnest(${productmodelid}), unnest(${productdescriptionid}), unnest(${cultureid}))
        """.as(ProductmodelproductdescriptioncultureRow.rowParser(1).*)
     

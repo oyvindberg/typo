@@ -105,7 +105,7 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
     val phonenumbertypeid = compositeIds.map(_.phonenumbertypeid)
     SQL"""select "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text
           from "person"."personphone"
-          where ("businessentityid", "phonenumber", "phonenumbertypeid") 
+          where ("businessentityid", "phonenumber", "phonenumbertypeid")
           in (select unnest(${businessentityid}), unnest(${phonenumber}), unnest(${phonenumbertypeid}))
        """.as(PersonphoneRow.rowParser(1).*)
     

@@ -32,7 +32,7 @@ class PurchaseorderdetailRepoImpl extends PurchaseorderdetailRepo {
     val purchaseorderdetailid = compositeIds.map(_.purchaseorderdetailid)
     sql"""select "purchaseorderid", "purchaseorderdetailid", "duedate"::text, "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate"::text
           from "purchasing"."purchaseorderdetail"
-          where ("purchaseorderid", "purchaseorderdetailid") 
+          where ("purchaseorderid", "purchaseorderdetailid")
           in (select unnest(${purchaseorderid}), unnest(${purchaseorderdetailid}))
        """.query(using PurchaseorderdetailRow.read).stream
     

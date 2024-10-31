@@ -101,7 +101,7 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
     val illustrationid = compositeIds.map(_.illustrationid)
     SQL"""select "productmodelid", "illustrationid", "modifieddate"::text
           from "production"."productmodelillustration"
-          where ("productmodelid", "illustrationid") 
+          where ("productmodelid", "illustrationid")
           in (select unnest(${productmodelid}), unnest(${illustrationid}))
        """.as(ProductmodelillustrationRow.rowParser(1).*)
     

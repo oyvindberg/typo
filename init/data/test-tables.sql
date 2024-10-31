@@ -273,3 +273,9 @@ INSERT INTO issue142 (tabellkode)
 VALUES  ('aa'),
         ('bb')
 ;
+
+create table only_pk_columns(
+    key_column_1 text not null,
+    key_column_2 int not null,
+    constraint only_pk_columns_pk primary key (key_column_1, key_column_2)
+);

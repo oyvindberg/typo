@@ -109,7 +109,7 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
     val contacttypeid = compositeIds.map(_.contacttypeid)
     SQL"""select "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
           from "person"."businessentitycontact"
-          where ("businessentityid", "personid", "contacttypeid") 
+          where ("businessentityid", "personid", "contacttypeid")
           in (select unnest(${businessentityid}), unnest(${personid}), unnest(${contacttypeid}))
        """.as(BusinessentitycontactRow.rowParser(1).*)
     

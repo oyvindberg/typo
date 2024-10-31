@@ -64,7 +64,7 @@ class TitleRepoImpl extends TitleRepo {
             ${Segment.paramSegment(unsaved.code)(TitleId.setter)}
           )
           on conflict ("code")
-          do nothing
+          do update set "code" = EXCLUDED."code"
           returning "code"""".insertReturning(using TitleRow.jdbcDecoder)
   }
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

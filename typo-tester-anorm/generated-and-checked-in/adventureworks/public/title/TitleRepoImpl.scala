@@ -77,7 +77,7 @@ class TitleRepoImpl extends TitleRepo {
             ${ParameterValue(unsaved.code, null, TitleId.toStatement)}
           )
           on conflict ("code")
-          do nothing
+          do update set "code" = EXCLUDED."code"
           returning "code"
        """
       .executeInsert(TitleRow.rowParser(1).single)

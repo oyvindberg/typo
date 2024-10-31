@@ -112,7 +112,7 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
     val businessentityid = compositeIds.map(_.businessentityid)
     SQL"""select "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
           from "purchasing"."productvendor"
-          where ("productid", "businessentityid") 
+          where ("productid", "businessentityid")
           in (select unnest(${productid}), unnest(${businessentityid}))
        """.as(ProductvendorRow.rowParser(1).*)
     

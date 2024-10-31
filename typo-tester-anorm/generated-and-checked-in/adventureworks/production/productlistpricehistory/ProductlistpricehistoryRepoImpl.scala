@@ -103,7 +103,7 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
     val startdate = compositeIds.map(_.startdate)
     SQL"""select "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text
           from "production"."productlistpricehistory"
-          where ("productid", "startdate") 
+          where ("productid", "startdate")
           in (select unnest(${productid}), unnest(${startdate}))
        """.as(ProductlistpricehistoryRow.rowParser(1).*)
     

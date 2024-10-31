@@ -94,7 +94,7 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
     val creditcardid = compositeIds.map(_.creditcardid)
     sql"""select "businessentityid", "creditcardid", "modifieddate"::text
           from "sales"."personcreditcard"
-          where ("businessentityid", "creditcardid") 
+          where ("businessentityid", "creditcardid")
           in (select unnest(${businessentityid}), unnest(${creditcardid}))
        """.query(using PersoncreditcardRow.read).stream
     

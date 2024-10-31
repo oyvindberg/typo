@@ -122,7 +122,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     val salesorderdetailid = compositeIds.map(_.salesorderdetailid)
     SQL"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
           from "sales"."salesorderdetail"
-          where ("salesorderid", "salesorderdetailid") 
+          where ("salesorderid", "salesorderdetailid")
           in (select unnest(${salesorderid}), unnest(${salesorderdetailid}))
        """.as(SalesorderdetailRow.rowParser(1).*)
     

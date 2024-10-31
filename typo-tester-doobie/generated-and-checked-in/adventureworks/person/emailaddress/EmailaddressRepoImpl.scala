@@ -102,7 +102,7 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
     val emailaddressid = compositeIds.map(_.emailaddressid)
     sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
           from "person"."emailaddress"
-          where ("businessentityid", "emailaddressid") 
+          where ("businessentityid", "emailaddressid")
           in (select unnest(${businessentityid}), unnest(${emailaddressid}))
        """.query(using EmailaddressRow.read).stream
     

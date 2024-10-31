@@ -166,7 +166,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
             val sql = SQL {
               code"""|select ${dbNames(cols, isRead = true)}
                      |from $relName
-                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")}) 
+                     |where (${x.cols.map(col => col.dbCol.name.code).mkCode(", ")})
                      |in (select ${x.cols.map(col => code"unnest(${runtimeInterpolateValue(col.name, col.tpe, forbidInline = true)})").mkCode(", ")})
                      |""".stripMargin
             }
@@ -306,7 +306,9 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           code"${runtimeInterpolateValue(code"${unsavedParam.name}.${c.name}", c.tpe)}${SqlCast.toPgCode(c)}"
         }
         val conflictAction = writeableColumnsNotId match {
-          case Nil => code"do nothing"
+          case Nil =>
+            val arbitraryColumn = id.cols.head
+            code"do update set ${arbitraryColumn.dbName.code} = EXCLUDED.${arbitraryColumn.dbName.code}"
           case nonEmpty =>
             code"""|do update set
                    |  ${nonEmpty.map { c => code"${c.dbName.code} = EXCLUDED.${c.dbName.code}" }.mkCode(",\n")}""".stripMargin

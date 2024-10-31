@@ -98,7 +98,7 @@ class MaritalStatusRepoImpl extends MaritalStatusRepo {
             ${ParameterValue(unsaved.id, null, MaritalStatusId.toStatement)}::int8
           )
           on conflict ("id")
-          do nothing
+          do update set "id" = EXCLUDED."id"
           returning "id"
        """
       .executeInsert(MaritalStatusRow.rowParser(1).single)

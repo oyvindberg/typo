@@ -90,7 +90,7 @@ class TableWithGeneratedColumnsRepoImpl extends TableWithGeneratedColumnsRepo {
             ${fromWrite(unsaved.name)(Write.fromPut(TableWithGeneratedColumnsId.put))}
           )
           on conflict ("name")
-          do nothing
+          do update set "name" = EXCLUDED."name"
           returning "name", "name-type-always"
        """.query(using TableWithGeneratedColumnsRow.read).unique
   }
