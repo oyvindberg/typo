@@ -4,7 +4,8 @@ package codegen
 
 import typo.internal.analysis.MaybeReturnsRows
 
-class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean, fixVerySlowImplicit: Boolean) extends DbLib {
+class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean, fixVerySlowImplicit: Boolean, implicitOrUsing: "implicit" | "using")
+    extends DbLib {
 
   val SqlInterpolator = sc.Type.Qualified("doobie.syntax.string.toSqlInterpolator")
   def SQL(content: sc.Code) =
@@ -78,7 +79,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           case Nil =>
             Right(code"def $name($idsParam): ${fs2Stream.of(ConnectionIO, rowType)}")
           case nonEmpty =>
-            Right(code"def $name($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${fs2Stream.of(ConnectionIO, rowType)}")
+            Right(code"def $name($idsParam)($implicitOrUsing ${nonEmpty.map(_.code).mkCode(", ")}): ${fs2Stream.of(ConnectionIO, rowType)}")
         }
       case RepoMethod.SelectByIdsTracked(x) =>
         val usedDefineds = x.idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"puts$i"), Put.of(sc.Type.ArrayOf(colType)), None) }
@@ -87,7 +88,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           case Nil =>
             Right(code"def $name(${x.idsParam}): $returnType")
           case nonEmpty =>
-            Right(code"def $name(${x.idsParam})(implicit ${nonEmpty.map(_.code).mkCode(", ")}): $returnType")
+            Right(code"def $name(${x.idsParam})($implicitOrUsing ${nonEmpty.map(_.code).mkCode(", ")}): $returnType")
         }
 
       case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
@@ -124,7 +125,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           case Nil =>
             Right(code"def $name($idsParam): ${ConnectionIO.of(TypesScala.Int)}")
           case nonEmpty =>
-            Right(code"def $name($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Int)}")
+            Right(code"def $name($idsParam)($implicitOrUsing ${nonEmpty.map(_.code).mkCode(", ")}): ${ConnectionIO.of(TypesScala.Int)}")
         }
 
       case RepoMethod.SqlFile(sqlScript) =>

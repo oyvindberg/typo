@@ -4,7 +4,7 @@ package codegen
 
 import typo.internal.analysis.MaybeReturnsRows
 
-class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean) extends DbLib {
+class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean, implicitOrUsing: "implicit" | "using") extends DbLib {
 
   val BatchSql = sc.Type.Qualified("anorm.BatchSql")
   val Column = sc.Type.Qualified("anorm.Column")
@@ -204,11 +204,11 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       case RepoMethod.SelectByIds(_, _, idComputed, idsParam, rowType) =>
         val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(colType)), None) }
         val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
-        Right(code"def $name($idsParam)(implicit ${params.map(_.code).mkCode(", ")}): ${TypesScala.List.of(rowType)}")
+        Right(code"def $name($idsParam)($implicitOrUsing ${params.map(_.code).mkCode(", ")}): ${TypesScala.List.of(rowType)}")
       case RepoMethod.SelectByIdsTracked(x) =>
         val usedDefineds = x.idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(colType)), None) }
         val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
-        Right(code"def $name(${x.idsParam})(implicit ${params.map(_.code).mkCode(", ")}): ${TypesScala.Map.of(x.idComputed.tpe, x.rowType)}")
+        Right(code"def $name(${x.idsParam})($implicitOrUsing ${params.map(_.code).mkCode(", ")}): ${TypesScala.Map.of(x.idComputed.tpe, x.rowType)}")
       case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
         Right(code"def $name(${keyColumns.map(_.param.code).mkCode(", ")})(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}")
       case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
@@ -240,7 +240,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
         val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(colType)), None) }
         val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
-        Right(code"def $name($idsParam)(implicit ${params.map(_.code).mkCode(", ")}): ${TypesScala.Int}")
+        Right(code"def $name($idsParam)($implicitOrUsing ${params.map(_.code).mkCode(", ")}): ${TypesScala.Int}")
       case RepoMethod.SqlFile(sqlScript) =>
         val params = sc.Params(sqlScript.params.map(p => sc.Param(p.name, p.tpe, None)))
         val retType = sqlScript.maybeRowName match {

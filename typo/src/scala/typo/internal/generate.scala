@@ -29,9 +29,9 @@ object generate {
     val naming = publicOptions.naming(pkg)
     val options = InternalOptions(
       dbLib = publicOptions.dbLib.map {
-        case DbLibName.Anorm   => new DbLibAnorm(pkg, publicOptions.inlineImplicits, default, publicOptions.enableStreamingInserts)
-        case DbLibName.Doobie  => new DbLibDoobie(pkg, publicOptions.inlineImplicits, default, publicOptions.enableStreamingInserts, publicOptions.fixVerySlowImplicit)
-        case DbLibName.ZioJdbc => new DbLibZioJdbc(pkg, publicOptions.inlineImplicits, dslEnabled = publicOptions.enableDsl, default, publicOptions.enableStreamingInserts)
+        case DbLibName.Anorm   => new DbLibAnorm(pkg, publicOptions.inlineImplicits, default, publicOptions.enableStreamingInserts, publicOptions.implicitOrUsing)
+        case DbLibName.Doobie  => new DbLibDoobie(pkg, publicOptions.inlineImplicits, default, publicOptions.enableStreamingInserts, publicOptions.fixVerySlowImplicit, publicOptions.implicitOrUsing)
+        case DbLibName.ZioJdbc => new DbLibZioJdbc(pkg, publicOptions.inlineImplicits, dslEnabled = publicOptions.enableDsl, default, publicOptions.enableStreamingInserts, publicOptions.implicitOrUsing)
       },
       debugTypes = publicOptions.debugTypes,
       enableDsl = publicOptions.enableDsl,

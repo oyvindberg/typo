@@ -4,7 +4,7 @@ package codegen
 
 import typo.internal.analysis.MaybeReturnsRows
 
-class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean) extends DbLib {
+class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean, implicitOrUsing: "implicit" | "using") extends DbLib {
   private val ZConnection = sc.Type.Qualified("zio.jdbc.ZConnection")
   private val Throwable = sc.Type.Qualified("java.lang.Throwable")
   private val ZStream = sc.Type.Qualified("zio.stream.ZStream")
@@ -194,7 +194,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
           case Nil =>
             Right(code"def $name($idsParam): ${ZStream.of(ZConnection, Throwable, rowType)}")
           case nonEmpty =>
-            Right(code"def $name($idsParam)(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ZStream.of(ZConnection, Throwable, rowType)}")
+            Right(code"def $name($idsParam)($implicitOrUsing ${nonEmpty.map(_.code).mkCode(", ")}): ${ZStream.of(ZConnection, Throwable, rowType)}")
         }
       case RepoMethod.SelectByIdsTracked(x) =>
         val usedDefineds = x.idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"encoder$i"), JdbcEncoder.of(sc.Type.ArrayOf(colType)), None) }
@@ -203,7 +203,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
           case Nil =>
             Right(code"def $name(${x.idsParam}): $returnType")
           case nonEmpty =>
-            Right(code"def $name(${x.idsParam})(implicit ${nonEmpty.map(_.code).mkCode(", ")}): $returnType")
+            Right(code"def $name(${x.idsParam})($implicitOrUsing ${nonEmpty.map(_.code).mkCode(", ")}): $returnType")
         }
 
       case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
@@ -249,7 +249,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
           case Nil =>
             Right(code"def $name(${idsParam}): ${ZIO.of(ZConnection, Throwable, TypesScala.Long)}")
           case nonEmpty =>
-            Right(code"def $name(${idsParam})(implicit ${nonEmpty.map(_.code).mkCode(", ")}): ${ZIO.of(ZConnection, Throwable, TypesScala.Long)}")
+            Right(code"def $name(${idsParam})($implicitOrUsing ${nonEmpty.map(_.code).mkCode(", ")}): ${ZIO.of(ZConnection, Throwable, TypesScala.Long)}")
         }
       case RepoMethod.SqlFile(sqlScript) =>
         val params = sc.Params(sqlScript.params.map(p => sc.Param(p.name, p.tpe, None)))
