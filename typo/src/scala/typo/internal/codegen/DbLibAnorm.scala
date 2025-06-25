@@ -4,7 +4,7 @@ package codegen
 
 import typo.internal.analysis.MaybeReturnsRows
 
-class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean, implicitOrUsing: "implicit" | "using") extends DbLib {
+class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean, implicitOrUsing: ImplicitOrUsing) extends DbLib {
 
   val BatchSql = sc.Type.Qualified("anorm.BatchSql")
   val Column = sc.Type.Qualified("anorm.Column")

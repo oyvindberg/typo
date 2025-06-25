@@ -4,7 +4,7 @@ package codegen
 
 import typo.internal.analysis.MaybeReturnsRows
 
-class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean, implicitOrUsing: "implicit" | "using") extends DbLib {
+class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean, implicitOrUsing: ImplicitOrUsing) extends DbLib {
   private val ZConnection = sc.Type.Qualified("zio.jdbc.ZConnection")
   private val Throwable = sc.Type.Qualified("java.lang.Throwable")
   private val ZStream = sc.Type.Qualified("zio.stream.ZStream")

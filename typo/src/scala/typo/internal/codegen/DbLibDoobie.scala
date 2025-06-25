@@ -4,7 +4,7 @@ package codegen
 
 import typo.internal.analysis.MaybeReturnsRows
 
-class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean, fixVerySlowImplicit: Boolean, implicitOrUsing: "implicit" | "using")
+class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean, fixVerySlowImplicit: Boolean, implicitOrUsing: ImplicitOrUsing)
     extends DbLib {
 
   val SqlInterpolator = sc.Type.Qualified("doobie.syntax.string.toSqlInterpolator")
