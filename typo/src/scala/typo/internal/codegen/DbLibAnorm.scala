@@ -2,6 +2,7 @@ package typo
 package internal
 package codegen
 
+import typo.ImplicitOrUsing.{Implicit, Using}
 import typo.internal.analysis.MaybeReturnsRows
 
 class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefault, enableStreamingInserts: Boolean, implicitOrUsing: ImplicitOrUsing) extends DbLib {
@@ -49,7 +50,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
             code"""|object ${ExecuteReturningSyntax.name} {
                    |  /* add executeReturning to anorm. it needs to be inside the package, because everything is hidden */
                    |  implicit class Ops(batchSql: BatchSql) {
-                   |    def executeReturning[T](parser: ResultSetParser[T])(implicit c: ${TypesJava.Connection}): T =
+                   |    def executeReturning[T](parser: ResultSetParser[T])($implicitOrUsing c: ${TypesJava.Connection}): T =
                    |      $managed(batchSql.getFilledStatement(c, getGeneratedKeys = true))(using StatementResource, statementClassTag).acquireAndGet { ps =>
                    |        ps.executeBatch()
                    |        Sql
@@ -198,9 +199,9 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       case RepoMethod.SelectBuilder(_, fieldsType, rowType) =>
         Right(code"def $name: ${sc.Type.dsl.SelectBuilder.of(fieldsType, rowType)}")
       case RepoMethod.SelectAll(_, _, rowType) =>
-        Right(code"def $name(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}")
+        Right(code"def $name($implicitOrUsing c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}")
       case RepoMethod.SelectById(_, _, id, rowType) =>
-        Right(code"def $name(${id.param})(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}")
+        Right(code"def $name(${id.param})($implicitOrUsing c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}")
       case RepoMethod.SelectByIds(_, _, idComputed, idsParam, rowType) =>
         val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(colType)), None) }
         val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
@@ -210,33 +211,33 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
         Right(code"def $name(${x.idsParam})($implicitOrUsing ${params.map(_.code).mkCode(", ")}): ${TypesScala.Map.of(x.idComputed.tpe, x.rowType)}")
       case RepoMethod.SelectByUnique(_, keyColumns, _, rowType) =>
-        Right(code"def $name(${keyColumns.map(_.param.code).mkCode(", ")})(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}")
+        Right(code"def $name(${keyColumns.map(_.param.code).mkCode(", ")})($implicitOrUsing c: ${TypesJava.Connection}): ${TypesScala.Option.of(rowType)}")
       case RepoMethod.SelectByFieldValues(_, _, _, fieldValueOrIdsParam, rowType) =>
-        Right(code"def $name($fieldValueOrIdsParam)(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}")
+        Right(code"def $name($fieldValueOrIdsParam)($implicitOrUsing c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}")
       case RepoMethod.UpdateBuilder(_, fieldsType, rowType) =>
         Right(code"def $name: ${sc.Type.dsl.UpdateBuilder.of(fieldsType, rowType)}")
       case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
-        Right(code"def $name(${id.param}, $varargs)(implicit c: ${TypesJava.Connection}): ${TypesScala.Boolean}")
+        Right(code"def $name(${id.param}, $varargs)($implicitOrUsing c: ${TypesJava.Connection}): ${TypesScala.Boolean}")
       case RepoMethod.Update(_, _, _, param, _) =>
-        Right(code"def $name($param)(implicit c: ${TypesJava.Connection}): ${TypesScala.Boolean}")
+        Right(code"def $name($param)($implicitOrUsing c: ${TypesJava.Connection}): ${TypesScala.Boolean}")
       case RepoMethod.Insert(_, _, unsavedParam, rowType, _) =>
-        Right(code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType")
+        Right(code"def $name($unsavedParam)($implicitOrUsing c: ${TypesJava.Connection}): $rowType")
       case RepoMethod.InsertStreaming(_, rowType, _) =>
-        Right(code"def $name(unsaved: ${TypesScala.Iterator.of(rowType)}, batchSize: ${TypesScala.Int} = 10000)(implicit c: ${TypesJava.Connection}): ${TypesScala.Long}")
+        Right(code"def $name(unsaved: ${TypesScala.Iterator.of(rowType)}, batchSize: ${TypesScala.Int} = 10000)($implicitOrUsing c: ${TypesJava.Connection}): ${TypesScala.Long}")
       case RepoMethod.Upsert(_, _, _, unsavedParam, rowType, _) =>
-        Right(code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType")
+        Right(code"def $name($unsavedParam)($implicitOrUsing c: ${TypesJava.Connection}): $rowType")
       case RepoMethod.UpsertBatch(_, _, _, rowType, _) =>
-        Right(code"def $name(unsaved: ${TypesScala.Iterable.of(rowType)})(implicit c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}")
+        Right(code"def $name(unsaved: ${TypesScala.Iterable.of(rowType)})($implicitOrUsing c: ${TypesJava.Connection}): ${TypesScala.List.of(rowType)}")
       case RepoMethod.UpsertStreaming(_, _, rowType, _) =>
-        Right(code"def $name(unsaved: ${TypesScala.Iterator.of(rowType)}, batchSize: ${TypesScala.Int} = 10000)(implicit c: ${TypesJava.Connection}): ${TypesScala.Int}")
+        Right(code"def $name(unsaved: ${TypesScala.Iterator.of(rowType)}, batchSize: ${TypesScala.Int} = 10000)($implicitOrUsing c: ${TypesJava.Connection}): ${TypesScala.Int}")
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
-        Right(code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType")
+        Right(code"def $name($unsavedParam)($implicitOrUsing c: ${TypesJava.Connection}): $rowType")
       case RepoMethod.InsertUnsavedStreaming(_, unsaved) =>
-        Right(code"def $name(unsaved: ${TypesScala.Iterator.of(unsaved.tpe)}, batchSize: ${TypesScala.Int} = 10000)(implicit c: ${TypesJava.Connection}): ${TypesScala.Long}")
+        Right(code"def $name(unsaved: ${TypesScala.Iterator.of(unsaved.tpe)}, batchSize: ${TypesScala.Int} = 10000)($implicitOrUsing c: ${TypesJava.Connection}): ${TypesScala.Long}")
       case RepoMethod.DeleteBuilder(_, fieldsType, rowType) =>
         Right(code"def $name: ${sc.Type.dsl.DeleteBuilder.of(fieldsType, rowType)}")
       case RepoMethod.Delete(_, id) =>
-        Right(code"def $name(${id.param})(implicit c: ${TypesJava.Connection}): ${TypesScala.Boolean}")
+        Right(code"def $name(${id.param})($implicitOrUsing c: ${TypesJava.Connection}): ${TypesScala.Boolean}")
       case RepoMethod.DeleteByIds(_, idComputed, idsParam) =>
         val usedDefineds = idComputed.userDefinedColTypes.zipWithIndex.map { case (colType, i) => sc.Param(sc.Ident(s"toStatement$i"), ToStatement.of(sc.Type.ArrayOf(colType)), None) }
         val params = sc.Param(sc.Ident("c"), TypesJava.Connection, None) :: usedDefineds
@@ -247,7 +248,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           case MaybeReturnsRows.Query(rowName) => TypesScala.List.of(rowName)
           case MaybeReturnsRows.Update         => TypesScala.Int
         }
-        Right(code"def $name$params(implicit c: ${TypesJava.Connection}): $retType")
+        Right(code"def $name$params($implicitOrUsing c: ${TypesJava.Connection}): $retType")
     }
   }
 
@@ -907,7 +908,12 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
 
     val text = textSupport.map(_.rowInstance(tpe, cols))
     val rowParser = {
-      val mappedValues = cols.zipWithIndex.map { case (x, num) => code"${x.name} = row(idx + $num)(${lookupColumnFor(x.tpe)})" }
+      val mappedValues = cols.zipWithIndex.map { case (x, num) =>
+        implicitOrUsing match {
+          case Implicit => code"${x.name} = row(idx + $num)(${lookupColumnFor(x.tpe)})"
+          case Using    => code"${x.name} = row(idx + $num)(using ${lookupColumnFor(x.tpe)})"
+        }
+      }
       sc.Value(
         Nil,
         rowParserName,
