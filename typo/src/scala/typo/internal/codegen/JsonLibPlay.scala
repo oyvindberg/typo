@@ -38,8 +38,8 @@ case class JsonLibPlay(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits
         case TypesJava.String                                                   => code"$Reads.StringReads"
         case TypesJava.UUID                                                     => code"$Reads.uuidReads"
         case sc.Type.ArrayOf(targ)                                              => code"$Reads.ArrayReads[$targ](using ${go(targ)}, implicitly)"
-        case sc.Type.TApply(default.Defaulted, List(TypesScala.Optional(targ))) => code"${default.Defaulted}.$readsOptName(${go(targ)})"
-        case sc.Type.TApply(default.Defaulted, List(targ))                      => code"${default.Defaulted}.$readsName(${go(targ)})"
+        case sc.Type.TApply(default.Defaulted, List(TypesScala.Optional(targ))) => code"${default.Defaulted}.$readsOptName(${implicitOrUsing.callImplicitOrUsing}${go(targ)})"
+        case sc.Type.TApply(default.Defaulted, List(targ))                      => code"${default.Defaulted}.$readsName(${implicitOrUsing.callImplicitOrUsing}${go(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents)      => code"$tpe.$readsName"
         case x if missingInstancesByType.contains(Reads.of(x)) =>
           code"${missingInstancesByType(Reads.of(x))}"
@@ -67,9 +67,9 @@ case class JsonLibPlay(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits
         case TypesJava.OffsetDateTime                                      => code"$Writes.DefaultOffsetDateTimeWrites"
         case TypesJava.String                                              => code"$Writes.StringWrites"
         case TypesJava.UUID                                                => code"$Writes.UuidWrites"
-        case sc.Type.ArrayOf(targ)                                         => code"$Writes.arrayWrites[$targ](using implicitly, ${go(targ)})"
-        case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$writesName(${go(targ)})"
-        case TypesScala.Optional(targ)                                     => code"$Writes.OptionWrites(${go(targ)})"
+        case sc.Type.ArrayOf(targ)                                         => code"$Writes.arrayWrites[$targ](${implicitOrUsing.callImplicitOrUsing}implicitly, ${go(targ)})"
+        case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$writesName(${implicitOrUsing.callImplicitOrUsing}${go(targ)})"
+        case TypesScala.Optional(targ)                                     => code"$Writes.OptionWrites(${implicitOrUsing.callImplicitOrUsing}${go(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) => code"$tpe.$writesName"
         case x if missingInstancesByType.contains(Writes.of(x)) =>
           code"${missingInstancesByType(Writes.of(x))}"
@@ -230,10 +230,10 @@ case class JsonLibPlay(pkg: sc.QIdent, default: ComputedDefault, inlineImplicits
         implicitParams = Nil,
         tpe = Reads.of(TypesJava.OffsetTime),
         body = code"""|${lookupReadsFor(TypesJava.String)}.flatMapResult { str =>
-                      |    try $JsSuccess(${TypesJava.OffsetTime}.parse(str)) catch {
-                      |      case x: ${TypesJava.DateTimeParseException} => $JsError(s"must follow $${${TypesJava.DateTimeFormatter}.ISO_OFFSET_TIME}: $${x.getMessage}")
-                      |    }
-                      |  }""".stripMargin,
+                      |  try $JsSuccess(${TypesJava.OffsetTime}.parse(str)) catch {
+                      |    case x: ${TypesJava.DateTimeParseException} => $JsError(s"must follow $${${TypesJava.DateTimeFormatter}.ISO_OFFSET_TIME}: $${x.getMessage}")
+                      |  }
+                      |}""".stripMargin,
         implicitOrUsing
       ),
       sc.Given(

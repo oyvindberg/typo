@@ -113,7 +113,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         case TypesScala.Long           => code"$Column.columnToLong"
         case TypesJava.String          => code"$Column.columnToString"
         case TypesJava.UUID            => code"$Column.columnToUUID"
-        case TypesScala.Optional(targ) => code"$Column.columnToOption(${textSupport.get.callImplicitOrUsing}${lookupColumnFor(targ)})"
+        case TypesScala.Optional(targ) => code"$Column.columnToOption(${implicitOrUsing.callImplicitOrUsing}${lookupColumnFor(targ)})"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
           code"$tpe.$columnName"
@@ -125,7 +125,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           code"$targ.$arrayColumnName"
         case sc.Type.ArrayOf(TypesScala.Byte) => code"$Column.columnToByteArray"
         // fallback array case. implementation looks loco, but I guess it works
-        case sc.Type.ArrayOf(targ) => code"$Column.columnToArray[$targ](${textSupport.get.callImplicitOrUsing}${lookupColumnFor(targ)}, implicitly)"
+        case sc.Type.ArrayOf(targ) => code"$Column.columnToArray[$targ](${implicitOrUsing.callImplicitOrUsing}${lookupColumnFor(targ)}, implicitly)"
         case other                 => sc.Summon(Column.of(other), implicitOrUsing).code
       }
 
@@ -155,7 +155,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
 //          code"$targ.$arrayColumnName"
         case sc.Type.ArrayOf(TypesScala.Byte) => code"$ParameterMetaData.ByteArrayParameterMetaData"
         // fallback array case.
-        case sc.Type.ArrayOf(targ) => code"${pkg / arrayParameterMetaDataName}(${textSupport.get.callImplicitOrUsing}${lookupParameterMetaDataFor(targ)})"
+        case sc.Type.ArrayOf(targ) => code"${pkg / arrayParameterMetaDataName}(${implicitOrUsing.callImplicitOrUsing}${lookupParameterMetaDataFor(targ)})"
         case other                 => sc.Summon(ParameterMetaData.of(other), implicitOrUsing).code
       }
 
@@ -173,7 +173,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         case TypesScala.Long           => code"$ToStatement.longToStatement"
         case TypesJava.String          => code"$ToStatement.stringToStatement"
         case TypesJava.UUID            => code"$ToStatement.uuidToStatement"
-        case TypesScala.Optional(targ) => code"$ToStatement.optionToStatement(${textSupport.get.callImplicitOrUsing}${lookupToStatementFor(targ)}, ${lookupParameterMetaDataFor(targ)})"
+        case TypesScala.Optional(targ) => code"$ToStatement.optionToStatement(${implicitOrUsing.callImplicitOrUsing}${lookupToStatementFor(targ)}, ${lookupParameterMetaDataFor(targ)})"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
           code"$tpe.$toStatementName"
@@ -189,7 +189,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           // `ToStatement.arrayToParameter` does not work for arbitrary types. if it's a user-defined type, user needs to provide this too
           if (sc.Type.containsUserDefined(tpe)) // should be `targ`, but this information is stripped in `sc.Type.base` above
             code"$targ.arrayToStatement"
-          else code"$ToStatement.arrayToParameter(${textSupport.get.callImplicitOrUsing}${lookupParameterMetaDataFor(targ)})"
+          else code"$ToStatement.arrayToParameter(${implicitOrUsing.callImplicitOrUsing}${lookupParameterMetaDataFor(targ)})"
         case other => sc.Summon(ToStatement.of(other), implicitOrUsing).code
       }
 
@@ -495,7 +495,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                  |drop table $tempTablename;""".stripMargin
         }
         code"""|${SQL(code"create temporary table $tempTablename (like $relName) on commit drop")}.execute(): @${TypesScala.nowarn}
-               |${textSupport.get.streamingInsert}($copySql, batchSize, unsaved)(${textSupport.get.callImplicitOrUsing}${textSupport.get.lookupTextFor(rowType)}, c): @${TypesScala.nowarn}
+               |${textSupport.get.streamingInsert}($copySql, batchSize, unsaved)(${implicitOrUsing.callImplicitOrUsing}${textSupport.get.lookupTextFor(rowType)}, c): @${TypesScala.nowarn}
                |$mergeSql.executeUpdate()""".stripMargin
 
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
@@ -541,10 +541,10 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                |"""
       case RepoMethod.InsertStreaming(relName, rowType, writeableColumnsWithId) =>
         val sql = sc.s(code"COPY $relName(${dbNames(writeableColumnsWithId, isRead = false)}) FROM STDIN")
-        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.callImplicitOrUsing}${textSupport.get.lookupTextFor(rowType)}, c)"
+        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${implicitOrUsing.callImplicitOrUsing}${textSupport.get.lookupTextFor(rowType)}, c)"
       case RepoMethod.InsertUnsavedStreaming(relName, unsaved) =>
         val sql = sc.s(code"COPY $relName(${dbNames(unsaved.unsavedCols, isRead = false)}) FROM STDIN (DEFAULT '${textSupport.get.DefaultValue}')")
-        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.callImplicitOrUsing}${textSupport.get.lookupTextFor(unsaved.tpe)}, c)"
+        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${implicitOrUsing.callImplicitOrUsing}${textSupport.get.lookupTextFor(unsaved.tpe)}, c)"
 
       case RepoMethod.DeleteBuilder(relName, fieldsType, _) =>
         code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.quotedValue)}, $fieldsType.structure)"
@@ -817,7 +817,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           name = arrayColumnName,
           implicitParams = Nil,
           tpe = Column.of(sc.Type.ArrayOf(wrapperType)),
-          body = code"$Column.columnToArray(${textSupport.get.callImplicitOrUsing}$columnName, implicitly)",
+          body = code"$Column.columnToArray(${implicitOrUsing.callImplicitOrUsing}$columnName, implicitly)",
           implicitOrUsing
         )
       ),

@@ -450,7 +450,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
                  |drop table $tempTablename;""".stripMargin
         }
         code"""|val created = ${SQL(code"create temporary table $tempTablename (like $relName) on commit drop")}.execute
-               |val copied = ${textSupport.get.streamingInsert}($copySql, batchSize, unsaved)(${textSupport.get.callImplicitOrUsing}${textSupport.get.lookupTextFor(rowType)})
+               |val copied = ${textSupport.get.streamingInsert}($copySql, batchSize, unsaved)(${implicitOrUsing.callImplicitOrUsing}${textSupport.get.lookupTextFor(rowType)})
                |val merged = $mergeSql.update
                |created *> copied *> merged""".stripMargin
 
@@ -468,10 +468,10 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
         code"$sql.insertReturning(using ${lookupJdbcDecoder(rowType)}).map(_.updatedKeys.head)"
       case RepoMethod.InsertStreaming(relName, rowType, writeableColumnsWithId) =>
         val sql = sc.s(code"COPY $relName(${dbNames(writeableColumnsWithId, isRead = false)}) FROM STDIN")
-        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.callImplicitOrUsing}${textSupport.get.lookupTextFor(rowType)})"
+        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${implicitOrUsing.callImplicitOrUsing}${textSupport.get.lookupTextFor(rowType)})"
       case RepoMethod.InsertUnsavedStreaming(relName, unsaved) =>
         val sql = sc.s(code"COPY $relName(${dbNames(unsaved.unsavedCols, isRead = false)}) FROM STDIN (DEFAULT '${textSupport.get.DefaultValue}')")
-        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.callImplicitOrUsing}${textSupport.get.lookupTextFor(unsaved.tpe)})"
+        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${implicitOrUsing.callImplicitOrUsing}${textSupport.get.lookupTextFor(unsaved.tpe)})"
 
       case RepoMethod.DeleteBuilder(relName, fieldsType, _) =>
         code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.quotedValue)}, $fieldsType.structure)"

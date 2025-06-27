@@ -2,8 +2,6 @@ package typo
 package internal
 package codegen
 
-import typo.ImplicitOrUsing.{Implicit, Using}
-
 class DbLibTextSupport(pkg: sc.QIdent, inlineImplicits: Boolean, externalText: Option[sc.Type.Qualified], default: ComputedDefault, implicitOrUsing: ImplicitOrUsing) {
   // name of type class instance
   val textName = sc.Ident("text")
@@ -13,11 +11,6 @@ class DbLibTextSupport(pkg: sc.QIdent, inlineImplicits: Boolean, externalText: O
   val Text = externalText.getOrElse(sc.Type.Qualified(pkg / sc.Ident("Text")))
   // boilerplate for streaming insert we generate for non-doobie libraries
   val streamingInsert = sc.Type.Qualified(pkg / sc.Ident("streamingInsert"))
-
-  val callImplicitOrUsing: sc.Code = implicitOrUsing match {
-    case Implicit => sc.Code.Empty
-    case Using    => sc.Code.Str("using ")
-  }
 
   /** Resolve known implicits at generation-time instead of at compile-time */
   def lookupTextFor(tpe: sc.Type): sc.Code =
@@ -32,8 +25,8 @@ class DbLibTextSupport(pkg: sc.QIdent, inlineImplicits: Boolean, externalText: O
         case TypesScala.Long                                               => code"$Text.longInstance"
         case TypesJava.String                                              => code"$Text.stringInstance"
         case sc.Type.ArrayOf(TypesScala.Byte)                              => code"$Text.byteArrayInstance"
-        case TypesScala.Optional(targ)                                     => code"$Text.option($callImplicitOrUsing${lookupTextFor(targ)})"
-        case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$textName($callImplicitOrUsing${lookupTextFor(targ)})"
+        case TypesScala.Optional(targ)                                     => code"$Text.option(${implicitOrUsing.callImplicitOrUsing}${lookupTextFor(targ)})"
+        case sc.Type.TApply(default.Defaulted, List(targ))                 => code"${default.Defaulted}.$textName(${implicitOrUsing.callImplicitOrUsing}${lookupTextFor(targ)})"
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) => code"$tpe.$textName"
         case sc.Type.ArrayOf(targ: sc.Type.Qualified) if targ.value.idents.startsWith(pkg.idents) =>
           code"$Text.iterableInstance[${TypesScala.Array}, $targ](${lookupTextFor(targ)}, implicitly)"
