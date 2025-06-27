@@ -38,7 +38,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
   val writeName = sc.Ident("write")
 
   val textSupport: Option[DbLibTextSupport] =
-    if (enableStreamingInserts) Some(new DbLibTextSupport(pkg, inlineImplicits, Some(sc.Type.Qualified("doobie.postgres.Text")), default)) else None
+    if (enableStreamingInserts) Some(new DbLibTextSupport(pkg, inlineImplicits, Some(sc.Type.Qualified("doobie.postgres.Text")), default, implicitOrUsing)) else None
 
   def dbNames(cols: NonEmptyList[ComputedColumn], isRead: Boolean): sc.Code =
     cols
@@ -607,7 +607,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           tpe = Put.of(wrapperType),
           body =
             if (openEnum) code"${lookupPutFor(underlying)}.contramap(_.value)"
-            else code"$Put.Advanced.one[$wrapperType]($JdbcType.Other, $NonEmptyList.one($sqlTypeLit), (ps, i, a) => ps.setString(i, a.value), (rs, i, a) => rs.updateString(i, a.value))"
+            else code"$Put.Advanced.one[$wrapperType]($JdbcType.Other, $NonEmptyList.one($sqlTypeLit), (ps, i, a) => ps.setString(i, a.value), (rs, i, a) => rs.updateString(i, a.value))",
+          implicitOrUsing
         )
       ),
       Some(
@@ -618,7 +619,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           tpe = Put.of(sc.Type.ArrayOf(wrapperType)),
           body =
             if (openEnum) code"${lookupPutFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"
-            else code"$Put.Advanced.array[${TypesScala.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit), $sqlTypeLit).contramap(_.map(_.value))"
+            else code"$Put.Advanced.array[${TypesScala.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit), $sqlTypeLit).contramap(_.map(_.value))",
+          implicitOrUsing
         )
       ),
       Some(
@@ -629,7 +631,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           tpe = Get.of(wrapperType),
           body =
             if (openEnum) code"""${lookupGetFor(underlying)}.map($wrapperType.apply)"""
-            else code"""${lookupGetFor(underlying)}.temap($wrapperType.apply)"""
+            else code"""${lookupGetFor(underlying)}.temap($wrapperType.apply)""",
+          implicitOrUsing
         )
       ),
       Some(
@@ -642,7 +645,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
             val get = lookupGetFor(sc.Type.ArrayOf(underlying))
             if (openEnum) code"""$get.map(_.map($wrapperType.apply))"""
             else code"$get.map(_.map(force))"
-          }
+          },
+          implicitOrUsing
         )
       ),
       Some(
@@ -651,7 +655,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = writeName,
           implicitParams = Nil,
           tpe = Write.of(wrapperType),
-          body = code"$Write.fromPut($putName)"
+          body = code"$Write.fromPut($putName)",
+          implicitOrUsing
         )
       ),
       Some(
@@ -660,7 +665,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = readName,
           implicitParams = Nil,
           tpe = Read.of(wrapperType),
-          body = code"$Read.fromGet($getName)"
+          body = code"$Read.fromGet($getName)",
+          implicitOrUsing
         )
       ),
       textSupport.map(_.anyValInstance(wrapperType, underlying))
@@ -675,7 +681,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = putName,
           implicitParams = Nil,
           tpe = Put.of(wrapperType),
-          body = code"${lookupPutFor(underlying)}.contramap(_.value)"
+          body = code"${lookupPutFor(underlying)}.contramap(_.value)",
+          implicitOrUsing
         )
       ),
       Some(
@@ -684,7 +691,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = getName,
           implicitParams = Nil,
           tpe = Get.of(wrapperType),
-          body = code"${lookupGetFor(underlying)}.map($wrapperType.apply)"
+          body = code"${lookupGetFor(underlying)}.map($wrapperType.apply)",
+          implicitOrUsing
         )
       ),
       Some(
@@ -693,7 +701,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = arrayPutName,
           implicitParams = Nil,
           tpe = Put.of(sc.Type.ArrayOf(wrapperType)),
-          body = code"${lookupPutFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"
+          body = code"${lookupPutFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))",
+          implicitOrUsing
         )
       ),
       Some(
@@ -702,7 +711,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = arrayGetName,
           implicitParams = Nil,
           tpe = Get.of(sc.Type.ArrayOf(wrapperType)),
-          body = code"${lookupGetFor(sc.Type.ArrayOf(underlying))}.map(_.map($wrapperType.apply))"
+          body = code"${lookupGetFor(sc.Type.ArrayOf(underlying))}.map(_.map($wrapperType.apply))",
+          implicitOrUsing
         )
       ),
       textSupport.map(_.anyValInstance(wrapperType, underlying))
@@ -710,7 +720,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
 
   override val missingInstances: List[sc.ClassMember] = {
     def i(name: String, metaType: sc.Type, qident: String) =
-      sc.Given(Nil, sc.Ident(name), Nil, Meta.of(metaType), sc.QIdent(qident))
+      sc.Given(Nil, sc.Ident(name), Nil, Meta.of(metaType), sc.QIdent(qident), implicitOrUsing)
 
     List(
       i("UUIDMeta", TypesJava.UUID, "doobie.postgres.implicits.UuidType"),
@@ -809,7 +819,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
                |)
                |""".stripMargin
 
-      sc.Given(tparams = Nil, name = readName, implicitParams = Nil, tpe = Read.of(tpe), body = body)
+      sc.Given(tparams = Nil, name = readName, implicitParams = Nil, tpe = Read.of(tpe), body = body, implicitOrUsing)
     }
 
     val write = {
@@ -861,7 +871,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
                |)
                |""".stripMargin
 
-      sc.Given(tparams = Nil, name = writeName, implicitParams = Nil, tpe = Write.of(tpe), body = body)
+      sc.Given(tparams = Nil, name = writeName, implicitParams = Nil, tpe = Write.of(tpe), body = body, implicitOrUsing)
     }
     rowType match {
       case DbLib.RowType.Writable      => text.toList
@@ -883,7 +893,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
             implicitParams = Nil,
             tpe = Get.of(ct.typoType),
             body = code"""|$Get.Advanced.other[${ct.toTypo.jdbcType}]($NonEmptyList.one($sqlTypeLit))
-                          |  .map($v => ${ct.toTypo0(v)})""".stripMargin
+                          |  .map($v => ${ct.toTypo0(v)})""".stripMargin,
+            implicitOrUsing
           )
         ),
         Some(
@@ -892,7 +903,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
             name = putName,
             implicitParams = Nil,
             tpe = Put.of(ct.typoType),
-            body = code"$Put.Advanced.other[${ct.fromTypo.jdbcType}]($NonEmptyList.one($sqlTypeLit)).contramap($v => ${ct.fromTypo0(v)})"
+            body = code"$Put.Advanced.other[${ct.fromTypo.jdbcType}]($NonEmptyList.one($sqlTypeLit)).contramap($v => ${ct.fromTypo0(v)})",
+            implicitOrUsing
           )
         ),
         textSupport.map(_.customTypeInstance(ct))
@@ -912,7 +924,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
             implicitParams = Nil,
             tpe = Get.of(arrayType),
             body = code"""|$Get.Advanced.array[${TypesScala.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit))
-                          |  .map(_.map($v => ${toTypo.toTypo(code"$v.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)}))""".stripMargin
+                          |  .map(_.map($v => ${toTypo.toTypo(code"$v.asInstanceOf[${toTypo.jdbcType}]", ct.typoType)}))""".stripMargin,
+            implicitOrUsing
           ),
           sc.Given(
             tparams = Nil,
@@ -920,7 +933,8 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
             implicitParams = Nil,
             tpe = Put.of(arrayType),
             body = code"""|$Put.Advanced.array[${TypesScala.AnyRef}]($NonEmptyList.one($sqlArrayTypeLit), $sqlTypeLit)
-                          |  .contramap(_.map($v => ${fromTypo.fromTypo0(v)}))""".stripMargin
+                          |  .contramap(_.map($v => ${fromTypo.fromTypo0(v)}))""".stripMargin,
+            implicitOrUsing
           )
         )
       }

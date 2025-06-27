@@ -37,7 +37,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
   val toStatementName: sc.Ident = sc.Ident("toStatement")
   val arrayParameterMetaDataName = sc.Ident("arrayParameterMetaData")
   val textSupport: Option[DbLibTextSupport] =
-    if (enableStreamingInserts) Some(new DbLibTextSupport(pkg, inlineImplicits, None, default)) else None
+    if (enableStreamingInserts) Some(new DbLibTextSupport(pkg, inlineImplicits, None, default, implicitOrUsing)) else None
   val ExecuteReturningSyntax = sc.QIdent(List[List[sc.Ident]](List(sc.Ident("anorm")), pkg.idents, List(sc.Ident("ExecuteReturningSyntax"))).flatten)
 
   override val additionalFiles: List[typo.sc.File] = {
@@ -73,8 +73,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       textSupport match {
         case Some(textSupport) =>
           List(
-            sc.File(textSupport.Text, DbLibTextImplementations.Text, Nil, scope = Scope.Main),
-            sc.File(textSupport.streamingInsert, DbLibTextImplementations.streamingInsertAnorm(textSupport.Text), Nil, scope = Scope.Main)
+            sc.File(textSupport.Text, DbLibTextImplementations.Text(implicitOrUsing), Nil, scope = Scope.Main),
+            sc.File(textSupport.streamingInsert, DbLibTextImplementations.streamingInsertAnorm(textSupport.Text, implicitOrUsing), Nil, scope = Scope.Main)
           )
         case None => Nil
       }
@@ -101,7 +101,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
 
   /** Resolve known implicits at generation-time instead of at compile-time */
   def lookupColumnFor(tpe: sc.Type): sc.Code =
-    if (!inlineImplicits) sc.Summon(Column.of(tpe)).code
+    if (!inlineImplicits) sc.Summon(Column.of(tpe), implicitOrUsing).code
     else
       sc.Type.base(tpe) match {
         case TypesScala.BigDecimal     => code"$Column.columnToScalaBigDecimal"
@@ -113,7 +113,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         case TypesScala.Long           => code"$Column.columnToLong"
         case TypesJava.String          => code"$Column.columnToString"
         case TypesJava.UUID            => code"$Column.columnToUUID"
-        case TypesScala.Optional(targ) => code"$Column.columnToOption(${lookupColumnFor(targ)})"
+        case TypesScala.Optional(targ) => code"$Column.columnToOption(${textSupport.get.callImplicitOrUsing}${lookupColumnFor(targ)})"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
           code"$tpe.$columnName"
@@ -125,13 +125,13 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           code"$targ.$arrayColumnName"
         case sc.Type.ArrayOf(TypesScala.Byte) => code"$Column.columnToByteArray"
         // fallback array case. implementation looks loco, but I guess it works
-        case sc.Type.ArrayOf(targ) => code"$Column.columnToArray[$targ](${lookupColumnFor(targ)}, implicitly)"
-        case other                 => sc.Summon(Column.of(other)).code
+        case sc.Type.ArrayOf(targ) => code"$Column.columnToArray[$targ](${textSupport.get.callImplicitOrUsing}${lookupColumnFor(targ)}, implicitly)"
+        case other                 => sc.Summon(Column.of(other), implicitOrUsing).code
       }
 
   /** Resolve known implicits at generation-time instead of at compile-time */
   def lookupParameterMetaDataFor(tpe: sc.Type): sc.Code =
-    if (!inlineImplicits) sc.Summon(ParameterMetaData.of(tpe)).code
+    if (!inlineImplicits) sc.Summon(ParameterMetaData.of(tpe), implicitOrUsing).code
     else
       sc.Type.base(tpe) match {
         case TypesScala.BigDecimal => code"$ParameterMetaData.BigDecimalParameterMetaData"
@@ -155,13 +155,13 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
 //          code"$targ.$arrayColumnName"
         case sc.Type.ArrayOf(TypesScala.Byte) => code"$ParameterMetaData.ByteArrayParameterMetaData"
         // fallback array case.
-        case sc.Type.ArrayOf(targ) => code"${pkg / arrayParameterMetaDataName}(${lookupParameterMetaDataFor(targ)})"
-        case other                 => sc.Summon(ParameterMetaData.of(other)).code
+        case sc.Type.ArrayOf(targ) => code"${pkg / arrayParameterMetaDataName}(${textSupport.get.callImplicitOrUsing}${lookupParameterMetaDataFor(targ)})"
+        case other                 => sc.Summon(ParameterMetaData.of(other), implicitOrUsing).code
       }
 
   /** Resolve known implicits at generation-time instead of at compile-time */
   def lookupToStatementFor(tpe: sc.Type): sc.Code =
-    if (!inlineImplicits) sc.Summon(ToStatement.of(tpe)).code
+    if (!inlineImplicits) sc.Summon(ToStatement.of(tpe), implicitOrUsing).code
     else
       sc.Type.base(tpe) match {
         case TypesScala.BigDecimal     => code"$ToStatement.scalaBigDecimalToStatement"
@@ -173,7 +173,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         case TypesScala.Long           => code"$ToStatement.longToStatement"
         case TypesJava.String          => code"$ToStatement.stringToStatement"
         case TypesJava.UUID            => code"$ToStatement.uuidToStatement"
-        case TypesScala.Optional(targ) => code"$ToStatement.optionToStatement(${lookupToStatementFor(targ)}, ${lookupParameterMetaDataFor(targ)})"
+        case TypesScala.Optional(targ) => code"$ToStatement.optionToStatement(${textSupport.get.callImplicitOrUsing}${lookupToStatementFor(targ)}, ${lookupParameterMetaDataFor(targ)})"
         // generated type
         case x: sc.Type.Qualified if x.value.idents.startsWith(pkg.idents) =>
           code"$tpe.$toStatementName"
@@ -189,8 +189,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           // `ToStatement.arrayToParameter` does not work for arbitrary types. if it's a user-defined type, user needs to provide this too
           if (sc.Type.containsUserDefined(tpe)) // should be `targ`, but this information is stripped in `sc.Type.base` above
             code"$targ.arrayToStatement"
-          else code"$ToStatement.arrayToParameter(${lookupParameterMetaDataFor(targ)})"
-        case other => sc.Summon(ToStatement.of(other)).code
+          else code"$ToStatement.arrayToParameter(${textSupport.get.callImplicitOrUsing}${lookupParameterMetaDataFor(targ)})"
+        case other => sc.Summon(ToStatement.of(other), implicitOrUsing).code
       }
 
   override def repoSig(repoMethod: RepoMethod): Right[Nothing, sc.Code] = {
@@ -495,7 +495,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                  |drop table $tempTablename;""".stripMargin
         }
         code"""|${SQL(code"create temporary table $tempTablename (like $relName) on commit drop")}.execute(): @${TypesScala.nowarn}
-               |${textSupport.get.streamingInsert}($copySql, batchSize, unsaved)(${textSupport.get.lookupTextFor(rowType)}, c): @${TypesScala.nowarn}
+               |${textSupport.get.streamingInsert}($copySql, batchSize, unsaved)(${textSupport.get.callImplicitOrUsing}${textSupport.get.lookupTextFor(rowType)}, c): @${TypesScala.nowarn}
                |$mergeSql.executeUpdate()""".stripMargin
 
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
@@ -541,10 +541,10 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                |"""
       case RepoMethod.InsertStreaming(relName, rowType, writeableColumnsWithId) =>
         val sql = sc.s(code"COPY $relName(${dbNames(writeableColumnsWithId, isRead = false)}) FROM STDIN")
-        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.lookupTextFor(rowType)}, c)"
+        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.callImplicitOrUsing}${textSupport.get.lookupTextFor(rowType)}, c)"
       case RepoMethod.InsertUnsavedStreaming(relName, unsaved) =>
         val sql = sc.s(code"COPY $relName(${dbNames(unsaved.unsavedCols, isRead = false)}) FROM STDIN (DEFAULT '${textSupport.get.DefaultValue}')")
-        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.lookupTextFor(unsaved.tpe)}, c)"
+        code"${textSupport.get.streamingInsert}($sql, batchSize, unsaved)(${textSupport.get.callImplicitOrUsing}${textSupport.get.lookupTextFor(unsaved.tpe)}, c)"
 
       case RepoMethod.DeleteBuilder(relName, fieldsType, _) =>
         code"${sc.Type.dsl.DeleteBuilder}(${sc.StrLit(relName.quotedValue)}, $fieldsType.structure)"
@@ -734,7 +734,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           tpe = Column.of(arrayWrapper),
           body =
             if (openEnum) code"${lookupColumnFor(sc.Type.ArrayOf(underlying))}.map(_.map($wrapperType.apply))"
-            else code"${lookupColumnFor(sc.Type.ArrayOf(underlying))}.map(_.map($wrapperType.force))"
+            else code"${lookupColumnFor(sc.Type.ArrayOf(underlying))}.map(_.map($wrapperType.force))",
+          implicitOrUsing
         )
       ),
       Some(
@@ -745,7 +746,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           tpe = Column.of(wrapperType),
           body =
             if (openEnum) code"${lookupColumnFor(underlying)}.map($wrapperType.apply)"
-            else code"${lookupColumnFor(underlying)}.mapResult(str => $wrapperType(str).left.map($SqlMappingError.apply))"
+            else code"${lookupColumnFor(underlying)}.mapResult(str => $wrapperType(str).left.map($SqlMappingError.apply))",
+          implicitOrUsing
         )
       ),
       Some(
@@ -754,7 +756,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           name = toStatementName,
           implicitParams = Nil,
           tpe = ToStatement.of(wrapperType),
-          body = code"${lookupToStatementFor(underlying)}.contramap(_.value)"
+          body = code"${lookupToStatementFor(underlying)}.contramap(_.value)",
+          implicitOrUsing
         )
       ),
       Some(
@@ -765,7 +768,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           tpe = ToStatement.of(arrayWrapper),
           body =
             if (openEnum) code"${lookupToStatementFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"
-            else code"$ToStatement[$arrayWrapper]((ps, i, arr) => ps.setArray(i, ps.getConnection.createArrayOf($sqlTypeLit, arr.map[AnyRef](_.value))))"
+            else code"$ToStatement[$arrayWrapper]((ps, i, arr) => ps.setArray(i, ps.getConnection.createArrayOf($sqlTypeLit, arr.map[AnyRef](_.value))))",
+          implicitOrUsing
         )
       ),
       Some(
@@ -777,7 +781,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           body = code"""|new $ParameterMetaData[$wrapperType] {
                         |  override def sqlType: ${TypesJava.String} = $sqlTypeLit
                         |  override def jdbcType: ${TypesScala.Int} = ${TypesJava.SqlTypes}.OTHER
-                        |}""".stripMargin
+                        |}""".stripMargin,
+          implicitOrUsing
         )
       ),
       textSupport.map(_.anyValInstance(wrapperType, underlying))
@@ -792,7 +797,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           name = toStatementName,
           implicitParams = Nil,
           tpe = ToStatement.of(wrapperType),
-          body = code"${lookupToStatementFor(underlying)}.contramap(_.value)"
+          body = code"${lookupToStatementFor(underlying)}.contramap(_.value)",
+          implicitOrUsing
         )
       ),
       Some(
@@ -801,7 +807,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           name = arrayToStatementName,
           implicitParams = Nil,
           tpe = ToStatement.of(sc.Type.ArrayOf(wrapperType)),
-          body = code"${lookupToStatementFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))"
+          body = code"${lookupToStatementFor(sc.Type.ArrayOf(underlying))}.contramap(_.map(_.value))",
+          implicitOrUsing
         )
       ),
       Some(
@@ -810,7 +817,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           name = arrayColumnName,
           implicitParams = Nil,
           tpe = Column.of(sc.Type.ArrayOf(wrapperType)),
-          body = code"$Column.columnToArray($columnName, implicitly)"
+          body = code"$Column.columnToArray(${textSupport.get.callImplicitOrUsing}$columnName, implicitly)",
+          implicitOrUsing
         )
       ),
       Some(
@@ -819,7 +827,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           name = columnName,
           implicitParams = Nil,
           tpe = Column.of(wrapperType),
-          body = code"${lookupColumnFor(underlying)}.map($wrapperType.apply)"
+          body = code"${lookupColumnFor(underlying)}.map($wrapperType.apply)",
+          implicitOrUsing
         )
       ),
       Some(
@@ -839,7 +848,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                      |  override def sqlType: String = ${lookupParameterMetaDataFor(underlying)}.sqlType
                      |  override def jdbcType: Int = ${lookupParameterMetaDataFor(underlying)}.jdbcType
                      |}""".stripMargin
-          }
+          },
+          implicitOrUsing
         )
       ),
       textSupport.map(_.anyValInstance(wrapperType, underlying))
@@ -862,7 +872,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           tpe.value.name.appended("ArrayToStatement"),
           Nil,
           ToStatement.of(arrayType),
-          code"${ToStatement.of(arrayType)}((ps, index, v) => ps.setArray(index, ps.getConnection.createArrayOf($elemType, v.map(v => v: $boxedType))))"
+          code"${ToStatement.of(arrayType)}((ps, index, v) => ps.setArray(index, ps.getConnection.createArrayOf($elemType, v.map(v => v: $boxedType))))",
+          implicitOrUsing
         )
       )
     }
@@ -872,7 +883,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
         sc.Ident("BigDecimalArrayToStatement"),
         Nil,
         ToStatement.of(sc.Type.ArrayOf(TypesScala.BigDecimal)),
-        code"${ToStatement.of(sc.Type.ArrayOf(TypesScala.BigDecimal))}((ps, index, v) => ps.setArray(index, ps.getConnection.createArrayOf(${sc.StrLit("numeric")}, v.map(v => v.bigDecimal))))"
+        code"${ToStatement.of(sc.Type.ArrayOf(TypesScala.BigDecimal))}((ps, index, v) => ps.setArray(index, ps.getConnection.createArrayOf(${sc.StrLit("numeric")}, v.map(v => v.bigDecimal))))",
+        implicitOrUsing
       )
 
     val arrayParameterMetaData = {
@@ -894,7 +906,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                |    }
                |
                |  override def jdbcType: ${TypesScala.Int} = ${TypesJava.SqlTypes}.ARRAY
-               |}""".stripMargin
+               |}""".stripMargin,
+        implicitOrUsing
       )
     }
 
@@ -946,7 +959,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           toStatementName,
           Nil,
           ToStatement.of(tpe),
-          code"${ToStatement.of(tpe)}((s, index, v) => s.setObject(index, ${ct.fromTypo0(v)}))"
+          code"${ToStatement.of(tpe)}((s, index, v) => s.setObject(index, ${ct.fromTypo0(v)}))",
+          implicitOrUsing
         )
       ),
       Some(
@@ -958,7 +972,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           code"""|new ${ParameterMetaData.of(tpe)} {
                |  override def sqlType: ${TypesJava.String} = ${sc.StrLit(ct.sqlType)}
                |  override def jdbcType: ${TypesScala.Int} = ${TypesJava.SqlTypes}.OTHER
-               |}""".stripMargin
+               |}""".stripMargin,
+          implicitOrUsing
         )
       ),
       Some(
@@ -972,7 +987,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                |    case $v: ${ct.toTypo.jdbcType} => ${TypesScala.Right}(${ct.toTypo0(v)})
                |    case other => ${TypesScala.Left}($TypeDoesNotMatch(s"Expected instance of ${ct.toTypo.jdbcType.render.asString}, got $${other.getClass.getName}"))
                |  }
-               |)""".stripMargin
+               |)""".stripMargin,
+          implicitOrUsing
         )
       ),
       textSupport.map(_.customTypeInstance(ct))
@@ -990,7 +1006,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
             arrayToStatementName,
             Nil,
             ToStatement.of(sc.Type.ArrayOf(tpe)),
-            code"${ToStatement.of(sc.Type.ArrayOf(tpe))}((s, index, v) => s.setArray(index, s.getConnection.createArrayOf(${sc.StrLit(ct.sqlType)}, $v.map(v => ${fromTypo.fromTypo0(v)}))))"
+            code"${ToStatement.of(sc.Type.ArrayOf(tpe))}((s, index, v) => s.setArray(index, s.getConnection.createArrayOf(${sc.StrLit(ct.sqlType)}, $v.map(v => ${fromTypo.fromTypo0(v)}))))",
+            implicitOrUsing
           ),
           sc.Given(
             Nil,
@@ -1007,7 +1024,8 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
                  |       }
                  |    case other => ${TypesScala.Left}($TypeDoesNotMatch(s"Expected instance of ${TypesJava.PgArray.render.asString}, got $${other.getClass.getName}"))
                  |  }
-                 |)""".stripMargin
+                 |)""".stripMargin,
+            implicitOrUsing
           )
         )
       }
