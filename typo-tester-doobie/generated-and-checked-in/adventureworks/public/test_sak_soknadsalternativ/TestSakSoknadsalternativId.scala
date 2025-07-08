@@ -21,7 +21,7 @@ object TestSakSoknadsalternativId {
   implicit lazy val encoder: Encoder[TestSakSoknadsalternativId] = Encoder.forProduct2[TestSakSoknadsalternativId, String, String]("organisasjonskode_saksbehandler", "utdanningsmulighet_kode")(x => (x.organisasjonskodeSaksbehandler, x.utdanningsmulighetKode))(Encoder.encodeString, Encoder.encodeString)
   def from(TestUtdanningstilbudId: TestUtdanningstilbudId, organisasjonskodeSaksbehandler: String): TestSakSoknadsalternativId = TestSakSoknadsalternativId(
     organisasjonskodeSaksbehandler = organisasjonskodeSaksbehandler,
-    utdanningsmulighetKode = TestUtdanningstilbudId.organisasjonskode
+    utdanningsmulighetKode = TestUtdanningstilbudId.utdanningsmulighetKode
   )
   implicit lazy val ordering: Ordering[TestSakSoknadsalternativId] = Ordering.by(x => (x.organisasjonskodeSaksbehandler, x.utdanningsmulighetKode))
 }
