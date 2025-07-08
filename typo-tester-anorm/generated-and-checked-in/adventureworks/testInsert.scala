@@ -219,6 +219,14 @@ import adventureworks.public.table_with_generated_columns.TableWithGeneratedColu
 import adventureworks.public.table_with_generated_columns.TableWithGeneratedColumnsRepoImpl
 import adventureworks.public.table_with_generated_columns.TableWithGeneratedColumnsRow
 import adventureworks.public.table_with_generated_columns.TableWithGeneratedColumnsRowUnsaved
+import adventureworks.public.test_organisasjon.TestOrganisasjonId
+import adventureworks.public.test_organisasjon.TestOrganisasjonRepoImpl
+import adventureworks.public.test_organisasjon.TestOrganisasjonRow
+import adventureworks.public.test_sak_soknadsalternativ.TestSakSoknadsalternativRepoImpl
+import adventureworks.public.test_sak_soknadsalternativ.TestSakSoknadsalternativRow
+import adventureworks.public.test_utdanningstilbud.TestUtdanningstilbudId
+import adventureworks.public.test_utdanningstilbud.TestUtdanningstilbudRepoImpl
+import adventureworks.public.test_utdanningstilbud.TestUtdanningstilbudRow
 import adventureworks.public.title.TitleId
 import adventureworks.public.title.TitleRepoImpl
 import adventureworks.public.title.TitleRow
@@ -796,6 +804,9 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                        xmles: Option[Array[TypoXml]] = None
                       )(implicit c: Connection): PgtestnullRow = (new PgtestnullRepoImpl).insert(new PgtestnullRow(bool = bool, box = box, bpchar = bpchar, bytea = bytea, char = char, circle = circle, date = date, float4 = float4, float8 = float8, hstore = hstore, inet = inet, int2 = int2, int2vector = int2vector, int4 = int4, int8 = int8, interval = interval, json = json, jsonb = jsonb, line = line, lseg = lseg, money = money, mydomain = mydomain, myenum = myenum, name = name, numeric = numeric, path = path, point = point, polygon = polygon, text = text, time = time, timestamp = timestamp, timestampz = timestampz, timez = timez, uuid = uuid, varchar = varchar, vector = vector, xml = xml, boxes = boxes, bpchares = bpchares, chares = chares, circlees = circlees, datees = datees, float4es = float4es, float8es = float8es, inetes = inetes, int2es = int2es, int2vectores = int2vectores, int4es = int4es, int8es = int8es, intervales = intervales, jsones = jsones, jsonbes = jsonbes, linees = linees, lseges = lseges, moneyes = moneyes, mydomaines = mydomaines, myenumes = myenumes, namees = namees, numerices = numerices, pathes = pathes, pointes = pointes, polygones = polygones, textes = textes, timees = timees, timestampes = timestampes, timestampzes = timestampzes, timezes = timezes, uuides = uuides, varchares = varchares, xmles = xmles))
   def publicTableWithGeneratedColumns(name: TableWithGeneratedColumnsId = TableWithGeneratedColumnsId(random.alphanumeric.take(20).mkString))(implicit c: Connection): TableWithGeneratedColumnsRow = (new TableWithGeneratedColumnsRepoImpl).insert(new TableWithGeneratedColumnsRowUnsaved(name = name))
+  def publicTestOrganisasjon(organisasjonskode: TestOrganisasjonId = TestOrganisasjonId(random.alphanumeric.take(20).mkString))(implicit c: Connection): TestOrganisasjonRow = (new TestOrganisasjonRepoImpl).insert(new TestOrganisasjonRow(organisasjonskode = organisasjonskode))
+  def publicTestSakSoknadsalternativ(TestUtdanningstilbudId: TestUtdanningstilbudId, organisasjonskodeSaksbehandler: String = random.alphanumeric.take(20).mkString)(implicit c: Connection): TestSakSoknadsalternativRow = (new TestSakSoknadsalternativRepoImpl).insert(new TestSakSoknadsalternativRow(organisasjonskodeSaksbehandler = organisasjonskodeSaksbehandler, utdanningsmulighetKode = TestUtdanningstilbudId.utdanningsmulighetKode, organisasjonskodeTilbyder = TestUtdanningstilbudId.organisasjonskode))
+  def publicTestUtdanningstilbud(organisasjonskode: TestOrganisasjonId, utdanningsmulighetKode: String = random.alphanumeric.take(20).mkString)(implicit c: Connection): TestUtdanningstilbudRow = (new TestUtdanningstilbudRepoImpl).insert(new TestUtdanningstilbudRow(organisasjonskode = organisasjonskode, utdanningsmulighetKode = utdanningsmulighetKode))
   def publicTitle(code: TitleId = TitleId(random.alphanumeric.take(20).mkString))(implicit c: Connection): TitleRow = (new TitleRepoImpl).insert(new TitleRow(code = code))
   def publicTitleDomain(code: TitleDomainId = TitleDomainId(domainInsert.publicShortText(random)))(implicit c: Connection): TitleDomainRow = (new TitleDomainRepoImpl).insert(new TitleDomainRow(code = code))
   def publicTitledperson(titleShort: TitleDomainId = TitleDomainId.All(random.nextInt(4)),

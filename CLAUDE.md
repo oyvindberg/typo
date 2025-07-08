@@ -278,7 +278,7 @@ This project represents a sophisticated approach to type-safe database access in
 When working on Typo issues, follow this workflow:
 
 1. **Create Test Case**: Add a minimal reproduction SQL file in `init/data/issueNNN.sql`
-2. **Update Install Script**: Add the SQL file to `init/install.sh`
+2. **Update Install Script**: Add the SQL file to `init/install.sh`  
 3. **Restart Database**: Run `docker-compose down && docker-compose up -d`
 4. **Generate Code**: Run `bleep generate-adventureworks` to generate test code
 5. **Trace Issue**: Examine generated code to understand the problem
