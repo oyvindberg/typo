@@ -1,7 +1,7 @@
 package scripts
 
 import bleep.*
-import bleep.logging.Logger
+import ryddig.TypedLogger
 import typo.*
 import typo.internal.FileSync.SoftWrite
 import typo.internal.analysis.ParsedName
@@ -171,7 +171,7 @@ object GenHardcodedFiles extends BleepCodegenScript("GenHardcodedFiles") {
           softWrite = SoftWrite.No
         )
       )
-      cli("add to git", target.sources, List("git", "add", "-f", target.sources.toString), Logger.DevNull, cli.Out.Raw)
+      cli("add to git", target.sources, List("git", "add", "-f", target.sources.toString), TypedLogger.DevNull, cli.Out.Raw)
     }
   }
 }

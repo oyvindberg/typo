@@ -23,7 +23,7 @@ object GenDocumentation extends BleepScript("GenDocumentation") {
 
     val nodeBinPath = started.pre.fetchNode("20.5.0").getParent
 
-    started.logger.withContext(nodeBinPath).info("Using node")
+    started.logger.withContext("nodeBinPath", nodeBinPath).info("Using node")
 
     val env = sys.env.collect {
       case x @ ("SSH_AUTH_SOCK", _) => x

@@ -1,7 +1,7 @@
 package scripts
 
-import bleep.logging.{Formatter, LogLevel, Loggers}
-import bleep.{FileWatching, LogPatterns, cli}
+import bleep.{FileWatching, cli}
+import ryddig.{Formatter, LogLevel, LogPatterns, Loggers}
 import typo.*
 import typo.internal.metadb.OpenEnum
 import typo.internal.sqlfiles.readSqlFileDirectories
@@ -22,8 +22,7 @@ object GeneratedAdventureWorks {
   def main(args: Array[String]): Unit =
     Loggers
       .stdout(LogPatterns.interface(None, noColor = false), disableProgress = true)
-      .map(_.minLogLevel(LogLevel.info))
-      .untyped
+      .map(_.withMinLogLevel(LogLevel.info))
       .use { logger =>
         val ds = TypoDataSource.hikari(server = "localhost", port = 6432, databaseName = "Adventureworks", username = "postgres", password = "password")
         val scriptsPath = buildDir.resolve("adventureworks_sql")
@@ -80,7 +79,7 @@ object GeneratedAdventureWorks {
             newFiles
               .overwriteFolder(softWrite = FileSync.SoftWrite.Yes(knownUnchanged))
               .filter { case (_, synced) => synced != FileSync.Synced.Unchanged }
-              .foreach { case (path, synced) => logger.withContext(path).warn(synced.toString) }
+              .foreach { case (path, synced) => logger.withContext("path", path).warn(synced.toString) }
 
             cli(
               "add files to git",
