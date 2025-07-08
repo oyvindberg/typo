@@ -32,8 +32,8 @@ class PersonDetailSqlRepoImpl extends PersonDetailSqlRepo {
                      JOIN person.person p ON p.businessentityid = s.businessentityid
                      JOIN person.businessentityaddress bea ON bea.businessentityid = s.businessentityid
                      LEFT JOIN person.address a ON a.addressid = bea.addressid
-            where s.businessentityid = ${fromWrite(businessentityid)(Write.fromPut(/* user-picked */ BusinessentityId.put))}::int4
-              and p.modifieddate > ${fromWrite(modifiedAfter)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"""
+            where s.businessentityid = ${fromWrite(businessentityid)(new Write.Single(/* user-picked */ BusinessentityId.put))}::int4
+              and p.modifieddate > ${fromWrite(modifiedAfter)(new Write.Single(TypoLocalDateTime.put))}::timestamp"""
     sql.query(using PersonDetailSqlRow.read).stream
   }
 }

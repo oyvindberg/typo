@@ -12,13 +12,11 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: sales.customer
     Current customer information. Also see the Person and Store tables.
@@ -49,24 +47,23 @@ case class CustomerRow(
 object CustomerRow {
   implicit lazy val decoder: Decoder[CustomerRow] = Decoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], TypoUUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(CustomerRow.apply)(CustomerId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(SalesterritoryId.decoder), TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[CustomerRow] = Encoder.forProduct6[CustomerRow, CustomerId, Option[BusinessentityId], Option[BusinessentityId], Option[SalesterritoryId], TypoUUID, TypoLocalDateTime]("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")(x => (x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate))(CustomerId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(SalesterritoryId.encoder), TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[CustomerRow] = new Read[CustomerRow](
-    gets = List(
-      (CustomerId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.Nullable),
-      (BusinessentityId.get, Nullability.Nullable),
-      (SalesterritoryId.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => CustomerRow(
-      customerid = CustomerId.get.unsafeGetNonNullable(rs, i + 0),
-      personid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
-      storeid = BusinessentityId.get.unsafeGetNullable(rs, i + 2),
-      territoryid = SalesterritoryId.get.unsafeGetNullable(rs, i + 3),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[CustomerRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(CustomerId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(SalesterritoryId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    CustomerRow(
+      customerid = arr(0).asInstanceOf[CustomerId],
+          personid = arr(1).asInstanceOf[Option[BusinessentityId]],
+          storeid = arr(2).asInstanceOf[Option[BusinessentityId]],
+          territoryid = arr(3).asInstanceOf[Option[SalesterritoryId]],
+          rowguid = arr(4).asInstanceOf[TypoUUID],
+          modifieddate = arr(5).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[CustomerRow] = Text.instance[CustomerRow]{ (row, sb) =>
     CustomerId.text.unsafeEncode(row.customerid, sb)
     sb.append(Text.DELIMETER)
@@ -80,29 +77,13 @@ object CustomerRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[CustomerRow] = new Write[CustomerRow](
-    puts = List((CustomerId.put, Nullability.NoNulls),
-                (BusinessentityId.put, Nullability.Nullable),
-                (BusinessentityId.put, Nullability.Nullable),
-                (SalesterritoryId.put, Nullability.Nullable),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.customerid, x.personid, x.storeid, x.territoryid, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  CustomerId.put.unsafeSetNonNullable(rs, i + 0, a.customerid)
-                  BusinessentityId.put.unsafeSetNullable(rs, i + 1, a.personid)
-                  BusinessentityId.put.unsafeSetNullable(rs, i + 2, a.storeid)
-                  SalesterritoryId.put.unsafeSetNullable(rs, i + 3, a.territoryid)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 4, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     CustomerId.put.unsafeUpdateNonNullable(ps, i + 0, a.customerid)
-                     BusinessentityId.put.unsafeUpdateNullable(ps, i + 1, a.personid)
-                     BusinessentityId.put.unsafeUpdateNullable(ps, i + 2, a.storeid)
-                     SalesterritoryId.put.unsafeUpdateNullable(ps, i + 3, a.territoryid)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 4, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
-                   }
+  implicit lazy val write: Write[CustomerRow] = new Write.Composite[CustomerRow](
+    List(new Write.Single(CustomerId.put),
+         new Write.Single(BusinessentityId.put).toOpt,
+         new Write.Single(BusinessentityId.put).toOpt,
+         new Write.Single(SalesterritoryId.put).toOpt,
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.customerid, a.personid, a.storeid, a.territoryid, a.rowguid, a.modifieddate)
   )
 }

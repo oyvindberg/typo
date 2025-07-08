@@ -34,7 +34,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     DeleteBuilder(""""sales"."salesorderdetail"""", SalesorderdetailFields.structure)
   }
   override def deleteById(compositeId: SalesorderdetailId): ConnectionIO[Boolean] = {
-    sql"""delete from "sales"."salesorderdetail" where "salesorderid" = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND "salesorderdetailid" = ${fromWrite(compositeId.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."salesorderdetail" where "salesorderid" = ${fromWrite(compositeId.salesorderid)(new Write.Single(SalesorderheaderId.put))} AND "salesorderdetailid" = ${fromWrite(compositeId.salesorderdetailid)(new Write.Single(Meta.IntMeta.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[SalesorderdetailId]): ConnectionIO[Int] = {
     val salesorderid = compositeIds.map(_.salesorderid)
@@ -48,33 +48,33 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   }
   override def insert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow] = {
     sql"""insert into "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4, ${fromWrite(unsaved.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.carriertrackingnumber)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.orderqty)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4, ${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.unitpricediscount)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.salesorderid)(new Write.Single(SalesorderheaderId.put))}::int4, ${fromWrite(unsaved.salesorderdetailid)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.carriertrackingnumber)(new Write.SingleOpt(Meta.StringMeta.put))}, ${fromWrite(unsaved.orderqty)(new Write.Single(TypoShort.put))}::int2, ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4, ${fromWrite(unsaved.specialofferid)(new Write.Single(SpecialofferId.put))}::int4, ${fromWrite(unsaved.unitprice)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.unitpricediscount)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
        """.query(using SalesorderdetailRow.read).unique
   }
   override def insert(unsaved: SalesorderdetailRowUnsaved): ConnectionIO[SalesorderdetailRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""salesorderid""""), fr"${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4")),
-      Some((Fragment.const0(s""""carriertrackingnumber""""), fr"${fromWrite(unsaved.carriertrackingnumber)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""orderqty""""), fr"${fromWrite(unsaved.orderqty)(Write.fromPut(TypoShort.put))}::int2")),
-      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
-      Some((Fragment.const0(s""""specialofferid""""), fr"${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4")),
-      Some((Fragment.const0(s""""unitprice""""), fr"${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const0(s""""salesorderid""""), fr"${fromWrite(unsaved.salesorderid)(new Write.Single(SalesorderheaderId.put))}::int4")),
+      Some((Fragment.const0(s""""carriertrackingnumber""""), fr"${fromWrite(unsaved.carriertrackingnumber)(new Write.SingleOpt(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""orderqty""""), fr"${fromWrite(unsaved.orderqty)(new Write.Single(TypoShort.put))}::int2")),
+      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4")),
+      Some((Fragment.const0(s""""specialofferid""""), fr"${fromWrite(unsaved.specialofferid)(new Write.Single(SpecialofferId.put))}::int4")),
+      Some((Fragment.const0(s""""unitprice""""), fr"${fromWrite(unsaved.unitprice)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric")),
       unsaved.salesorderdetailid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""salesorderdetailid""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""salesorderdetailid""""), fr"${fromWrite(value: Int)(new Write.Single(Meta.IntMeta.put))}::int4"))
       },
       unsaved.unitpricediscount match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""unitpricediscount""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""unitpricediscount""""), fr"${fromWrite(value: BigDecimal)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -106,7 +106,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
     sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from "sales"."salesorderdetail"""".query(using SalesorderdetailRow.read).stream
   }
   override def selectById(compositeId: SalesorderdetailId): ConnectionIO[Option[SalesorderdetailRow]] = {
-    sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from "sales"."salesorderdetail" where "salesorderid" = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND "salesorderdetailid" = ${fromWrite(compositeId.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}""".query(using SalesorderdetailRow.read).option
+    sql"""select "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text from "sales"."salesorderdetail" where "salesorderid" = ${fromWrite(compositeId.salesorderid)(new Write.Single(SalesorderheaderId.put))} AND "salesorderdetailid" = ${fromWrite(compositeId.salesorderdetailid)(new Write.Single(Meta.IntMeta.put))}""".query(using SalesorderdetailRow.read).option
   }
   override def selectByIds(compositeIds: Array[SalesorderdetailId]): Stream[ConnectionIO, SalesorderdetailRow] = {
     val salesorderid = compositeIds.map(_.salesorderid)
@@ -130,15 +130,15 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def update(row: SalesorderdetailRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update "sales"."salesorderdetail"
-          set "carriertrackingnumber" = ${fromWrite(row.carriertrackingnumber)(Write.fromPutOption(Meta.StringMeta.put))},
-              "orderqty" = ${fromWrite(row.orderqty)(Write.fromPut(TypoShort.put))}::int2,
-              "productid" = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
-              "specialofferid" = ${fromWrite(row.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4,
-              "unitprice" = ${fromWrite(row.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "unitpricediscount" = ${fromWrite(row.unitpricediscount)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "salesorderid" = ${fromWrite(compositeId.salesorderid)(Write.fromPut(SalesorderheaderId.put))} AND "salesorderdetailid" = ${fromWrite(compositeId.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}"""
+          set "carriertrackingnumber" = ${fromWrite(row.carriertrackingnumber)(new Write.SingleOpt(Meta.StringMeta.put))},
+              "orderqty" = ${fromWrite(row.orderqty)(new Write.Single(TypoShort.put))}::int2,
+              "productid" = ${fromWrite(row.productid)(new Write.Single(ProductId.put))}::int4,
+              "specialofferid" = ${fromWrite(row.specialofferid)(new Write.Single(SpecialofferId.put))}::int4,
+              "unitprice" = ${fromWrite(row.unitprice)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "unitpricediscount" = ${fromWrite(row.unitpricediscount)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "salesorderid" = ${fromWrite(compositeId.salesorderid)(new Write.Single(SalesorderheaderId.put))} AND "salesorderdetailid" = ${fromWrite(compositeId.salesorderdetailid)(new Write.Single(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -146,16 +146,16 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def upsert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow] = {
     sql"""insert into "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.salesorderid)(Write.fromPut(SalesorderheaderId.put))}::int4,
-            ${fromWrite(unsaved.salesorderdetailid)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.carriertrackingnumber)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.orderqty)(Write.fromPut(TypoShort.put))}::int2,
-            ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
-            ${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4,
-            ${fromWrite(unsaved.unitprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.unitpricediscount)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.salesorderid)(new Write.Single(SalesorderheaderId.put))}::int4,
+            ${fromWrite(unsaved.salesorderdetailid)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.carriertrackingnumber)(new Write.SingleOpt(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.orderqty)(new Write.Single(TypoShort.put))}::int2,
+            ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4,
+            ${fromWrite(unsaved.specialofferid)(new Write.Single(SpecialofferId.put))}::int4,
+            ${fromWrite(unsaved.unitprice)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.unitpricediscount)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("salesorderid", "salesorderdetailid")
           do update set

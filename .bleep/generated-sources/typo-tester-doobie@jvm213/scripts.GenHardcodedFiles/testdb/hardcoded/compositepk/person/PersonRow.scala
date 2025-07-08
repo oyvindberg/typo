@@ -8,14 +8,12 @@ package hardcoded
 package compositepk
 package person
 
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 import testdb.hardcoded.customtypes.Defaulted
 
 /** Table: compositepk.person
@@ -38,18 +36,17 @@ object PersonRow {
     new PersonRow(compositeId.one, compositeId.two, name)
   implicit lazy val decoder: Decoder[PersonRow] = Decoder.forProduct3[PersonRow, Long, Option[String], Option[String]]("one", "two", "name")(PersonRow.apply)(Decoder.decodeLong, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString))
   implicit lazy val encoder: Encoder[PersonRow] = Encoder.forProduct3[PersonRow, Long, Option[String], Option[String]]("one", "two", "name")(x => (x.one, x.two, x.name))(Encoder.encodeLong, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString))
-  implicit lazy val read: Read[PersonRow] = new Read[PersonRow](
-    gets = List(
-      (Meta.LongMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
-      one = Meta.LongMeta.get.unsafeGetNonNullable(rs, i + 0),
-      two = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
-      name = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2)
+  implicit lazy val read: Read[PersonRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(Meta.LongMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    PersonRow(
+      one = arr(0).asInstanceOf[Long],
+          two = arr(1).asInstanceOf[Option[String]],
+          name = arr(2).asInstanceOf[Option[String]]
     )
-  )
+  }
   implicit lazy val text: Text[PersonRow] = Text.instance[PersonRow]{ (row, sb) =>
     Text.longInstance.unsafeEncode(row.one, sb)
     sb.append(Text.DELIMETER)
@@ -57,20 +54,10 @@ object PersonRow {
     sb.append(Text.DELIMETER)
     Text.option(Text.stringInstance).unsafeEncode(row.name, sb)
   }
-  implicit lazy val write: Write[PersonRow] = new Write[PersonRow](
-    puts = List((Meta.LongMeta.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (Meta.StringMeta.put, Nullability.Nullable)),
-    toList = x => List(x.one, x.two, x.name),
-    unsafeSet = (rs, i, a) => {
-                  Meta.LongMeta.put.unsafeSetNonNullable(rs, i + 0, a.one)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 1, a.two)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 2, a.name)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     Meta.LongMeta.put.unsafeUpdateNonNullable(ps, i + 0, a.one)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 1, a.two)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 2, a.name)
-                   }
+  implicit lazy val write: Write[PersonRow] = new Write.Composite[PersonRow](
+    List(new Write.Single(Meta.LongMeta.put),
+         new Write.Single(Meta.StringMeta.put).toOpt,
+         new Write.Single(Meta.StringMeta.put).toOpt),
+    a => List(a.one, a.two, a.name)
   )
 }

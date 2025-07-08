@@ -31,7 +31,7 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     DeleteBuilder(""""sales"."specialofferproduct"""", SpecialofferproductFields.structure)
   }
   override def deleteById(compositeId: SpecialofferproductId): ConnectionIO[Boolean] = {
-    sql"""delete from "sales"."specialofferproduct" where "specialofferid" = ${fromWrite(compositeId.specialofferid)(Write.fromPut(SpecialofferId.put))} AND "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."specialofferproduct" where "specialofferid" = ${fromWrite(compositeId.specialofferid)(new Write.Single(SpecialofferId.put))} AND "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[SpecialofferproductId]): ConnectionIO[Int] = {
     val specialofferid = compositeIds.map(_.specialofferid)
@@ -45,21 +45,21 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   }
   override def insert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow] = {
     sql"""insert into "sales"."specialofferproduct"("specialofferid", "productid", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.specialofferid)(new Write.Single(SpecialofferId.put))}::int4, ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "specialofferid", "productid", "rowguid", "modifieddate"::text
        """.query(using SpecialofferproductRow.read).unique
   }
   override def insert(unsaved: SpecialofferproductRowUnsaved): ConnectionIO[SpecialofferproductRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""specialofferid""""), fr"${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4")),
-      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
+      Some((Fragment.const0(s""""specialofferid""""), fr"${fromWrite(unsaved.specialofferid)(new Write.Single(SpecialofferId.put))}::int4")),
+      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -91,7 +91,7 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
     sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text from "sales"."specialofferproduct"""".query(using SpecialofferproductRow.read).stream
   }
   override def selectById(compositeId: SpecialofferproductId): ConnectionIO[Option[SpecialofferproductRow]] = {
-    sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text from "sales"."specialofferproduct" where "specialofferid" = ${fromWrite(compositeId.specialofferid)(Write.fromPut(SpecialofferId.put))} AND "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))}""".query(using SpecialofferproductRow.read).option
+    sql"""select "specialofferid", "productid", "rowguid", "modifieddate"::text from "sales"."specialofferproduct" where "specialofferid" = ${fromWrite(compositeId.specialofferid)(new Write.Single(SpecialofferId.put))} AND "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))}""".query(using SpecialofferproductRow.read).option
   }
   override def selectByIds(compositeIds: Array[SpecialofferproductId]): Stream[ConnectionIO, SpecialofferproductRow] = {
     val specialofferid = compositeIds.map(_.specialofferid)
@@ -115,9 +115,9 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def update(row: SpecialofferproductRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update "sales"."specialofferproduct"
-          set "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "specialofferid" = ${fromWrite(compositeId.specialofferid)(Write.fromPut(SpecialofferId.put))} AND "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))}"""
+          set "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "specialofferid" = ${fromWrite(compositeId.specialofferid)(new Write.Single(SpecialofferId.put))} AND "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -125,10 +125,10 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def upsert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow] = {
     sql"""insert into "sales"."specialofferproduct"("specialofferid", "productid", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4,
-            ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.specialofferid)(new Write.Single(SpecialofferId.put))}::int4,
+            ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4,
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("specialofferid", "productid")
           do update set

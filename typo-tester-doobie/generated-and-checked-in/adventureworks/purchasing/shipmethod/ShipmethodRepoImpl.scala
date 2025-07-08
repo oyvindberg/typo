@@ -31,39 +31,39 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
     DeleteBuilder(""""purchasing"."shipmethod"""", ShipmethodFields.structure)
   }
   override def deleteById(shipmethodid: ShipmethodId): ConnectionIO[Boolean] = {
-    sql"""delete from "purchasing"."shipmethod" where "shipmethodid" = ${fromWrite(shipmethodid)(Write.fromPut(ShipmethodId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "purchasing"."shipmethod" where "shipmethodid" = ${fromWrite(shipmethodid)(new Write.Single(ShipmethodId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(shipmethodids: Array[ShipmethodId]): ConnectionIO[Int] = {
     sql"""delete from "purchasing"."shipmethod" where "shipmethodid" = ANY(${shipmethodids})""".update.run
   }
   override def insert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     sql"""insert into "purchasing"."shipmethod"("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.shipbase)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.shiprate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.shipmethodid)(new Write.Single(ShipmethodId.put))}::int4, ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar, ${fromWrite(unsaved.shipbase)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.shiprate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text
        """.query(using ShipmethodRow.read).unique
   }
   override def insert(unsaved: ShipmethodRowUnsaved): ConnectionIO[ShipmethodRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar")),
       unsaved.shipmethodid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""shipmethodid""""), fr"${fromWrite(value: ShipmethodId)(Write.fromPut(ShipmethodId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""shipmethodid""""), fr"${fromWrite(value: ShipmethodId)(new Write.Single(ShipmethodId.put))}::int4"))
       },
       unsaved.shipbase match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""shipbase""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""shipbase""""), fr"${fromWrite(value: BigDecimal)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.shiprate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""shiprate""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""shiprate""""), fr"${fromWrite(value: BigDecimal)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -95,7 +95,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
     sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from "purchasing"."shipmethod"""".query(using ShipmethodRow.read).stream
   }
   override def selectById(shipmethodid: ShipmethodId): ConnectionIO[Option[ShipmethodRow]] = {
-    sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from "purchasing"."shipmethod" where "shipmethodid" = ${fromWrite(shipmethodid)(Write.fromPut(ShipmethodId.put))}""".query(using ShipmethodRow.read).option
+    sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from "purchasing"."shipmethod" where "shipmethodid" = ${fromWrite(shipmethodid)(new Write.Single(ShipmethodId.put))}""".query(using ShipmethodRow.read).option
   }
   override def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow] = {
     sql"""select "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text from "purchasing"."shipmethod" where "shipmethodid" = ANY(${shipmethodids})""".query(using ShipmethodRow.read).stream
@@ -112,12 +112,12 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
   override def update(row: ShipmethodRow): ConnectionIO[Boolean] = {
     val shipmethodid = row.shipmethodid
     sql"""update "purchasing"."shipmethod"
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              "shipbase" = ${fromWrite(row.shipbase)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "shiprate" = ${fromWrite(row.shiprate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "shipmethodid" = ${fromWrite(shipmethodid)(Write.fromPut(ShipmethodId.put))}"""
+          set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
+              "shipbase" = ${fromWrite(row.shipbase)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "shiprate" = ${fromWrite(row.shiprate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "shipmethodid" = ${fromWrite(shipmethodid)(new Write.Single(ShipmethodId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -125,12 +125,12 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
   override def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     sql"""insert into "purchasing"."shipmethod"("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.shipmethodid)(Write.fromPut(ShipmethodId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
-            ${fromWrite(unsaved.shipbase)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.shiprate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.shipmethodid)(new Write.Single(ShipmethodId.put))}::int4,
+            ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar,
+            ${fromWrite(unsaved.shipbase)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.shiprate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("shipmethodid")
           do update set

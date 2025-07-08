@@ -11,13 +11,11 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: humanresources.jobcandidate
     RÃ©sumÃ©s submitted to Human Resources by job applicants.
@@ -42,20 +40,19 @@ case class JobcandidateRow(
 object JobcandidateRow {
   implicit lazy val decoder: Decoder[JobcandidateRow] = Decoder.forProduct4[JobcandidateRow, JobcandidateId, Option[BusinessentityId], Option[TypoXml], TypoLocalDateTime]("jobcandidateid", "businessentityid", "resume", "modifieddate")(JobcandidateRow.apply)(JobcandidateId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoXml.decoder), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[JobcandidateRow] = Encoder.forProduct4[JobcandidateRow, JobcandidateId, Option[BusinessentityId], Option[TypoXml], TypoLocalDateTime]("jobcandidateid", "businessentityid", "resume", "modifieddate")(x => (x.jobcandidateid, x.businessentityid, x.resume, x.modifieddate))(JobcandidateId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoXml.encoder), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[JobcandidateRow] = new Read[JobcandidateRow](
-    gets = List(
-      (JobcandidateId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => JobcandidateRow(
-      jobcandidateid = JobcandidateId.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
-      resume = TypoXml.get.unsafeGetNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[JobcandidateRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(JobcandidateId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoXml.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    JobcandidateRow(
+      jobcandidateid = arr(0).asInstanceOf[JobcandidateId],
+          businessentityid = arr(1).asInstanceOf[Option[BusinessentityId]],
+          resume = arr(2).asInstanceOf[Option[TypoXml]],
+          modifieddate = arr(3).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[JobcandidateRow] = Text.instance[JobcandidateRow]{ (row, sb) =>
     JobcandidateId.text.unsafeEncode(row.jobcandidateid, sb)
     sb.append(Text.DELIMETER)
@@ -65,23 +62,11 @@ object JobcandidateRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[JobcandidateRow] = new Write[JobcandidateRow](
-    puts = List((JobcandidateId.put, Nullability.NoNulls),
-                (BusinessentityId.put, Nullability.Nullable),
-                (TypoXml.put, Nullability.Nullable),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.jobcandidateid, x.businessentityid, x.resume, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  JobcandidateId.put.unsafeSetNonNullable(rs, i + 0, a.jobcandidateid)
-                  BusinessentityId.put.unsafeSetNullable(rs, i + 1, a.businessentityid)
-                  TypoXml.put.unsafeSetNullable(rs, i + 2, a.resume)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     JobcandidateId.put.unsafeUpdateNonNullable(ps, i + 0, a.jobcandidateid)
-                     BusinessentityId.put.unsafeUpdateNullable(ps, i + 1, a.businessentityid)
-                     TypoXml.put.unsafeUpdateNullable(ps, i + 2, a.resume)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
-                   }
+  implicit lazy val write: Write[JobcandidateRow] = new Write.Composite[JobcandidateRow](
+    List(new Write.Single(JobcandidateId.put),
+         new Write.Single(BusinessentityId.put).toOpt,
+         new Write.Single(TypoXml.put).toOpt,
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.jobcandidateid, a.businessentityid, a.resume, a.modifieddate)
   )
 }

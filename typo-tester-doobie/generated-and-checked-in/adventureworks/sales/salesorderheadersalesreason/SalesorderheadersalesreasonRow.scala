@@ -11,13 +11,11 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesreason.SalesreasonId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: sales.salesorderheadersalesreason
     Cross-reference table mapping sales orders to sales reason codes.
@@ -43,18 +41,17 @@ object SalesorderheadersalesreasonRow {
     new SalesorderheadersalesreasonRow(compositeId.salesorderid, compositeId.salesreasonid, modifieddate)
   implicit lazy val decoder: Decoder[SalesorderheadersalesreasonRow] = Decoder.forProduct3[SalesorderheadersalesreasonRow, SalesorderheaderId, SalesreasonId, TypoLocalDateTime]("salesorderid", "salesreasonid", "modifieddate")(SalesorderheadersalesreasonRow.apply)(SalesorderheaderId.decoder, SalesreasonId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SalesorderheadersalesreasonRow] = Encoder.forProduct3[SalesorderheadersalesreasonRow, SalesorderheaderId, SalesreasonId, TypoLocalDateTime]("salesorderid", "salesreasonid", "modifieddate")(x => (x.salesorderid, x.salesreasonid, x.modifieddate))(SalesorderheaderId.encoder, SalesreasonId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SalesorderheadersalesreasonRow] = new Read[SalesorderheadersalesreasonRow](
-    gets = List(
-      (SalesorderheaderId.get, Nullability.NoNulls),
-      (SalesreasonId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SalesorderheadersalesreasonRow(
-      salesorderid = SalesorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
-      salesreasonid = SalesreasonId.get.unsafeGetNonNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[SalesorderheadersalesreasonRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(SalesorderheaderId.get).asInstanceOf[Read[Any]],
+      new Read.Single(SalesreasonId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    SalesorderheadersalesreasonRow(
+      salesorderid = arr(0).asInstanceOf[SalesorderheaderId],
+          salesreasonid = arr(1).asInstanceOf[SalesreasonId],
+          modifieddate = arr(2).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[SalesorderheadersalesreasonRow] = Text.instance[SalesorderheadersalesreasonRow]{ (row, sb) =>
     SalesorderheaderId.text.unsafeEncode(row.salesorderid, sb)
     sb.append(Text.DELIMETER)
@@ -62,20 +59,10 @@ object SalesorderheadersalesreasonRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[SalesorderheadersalesreasonRow] = new Write[SalesorderheadersalesreasonRow](
-    puts = List((SalesorderheaderId.put, Nullability.NoNulls),
-                (SalesreasonId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.salesorderid, x.salesreasonid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  SalesorderheaderId.put.unsafeSetNonNullable(rs, i + 0, a.salesorderid)
-                  SalesreasonId.put.unsafeSetNonNullable(rs, i + 1, a.salesreasonid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     SalesorderheaderId.put.unsafeUpdateNonNullable(ps, i + 0, a.salesorderid)
-                     SalesreasonId.put.unsafeUpdateNonNullable(ps, i + 1, a.salesreasonid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
-                   }
+  implicit lazy val write: Write[SalesorderheadersalesreasonRow] = new Write.Composite[SalesorderheadersalesreasonRow](
+    List(new Write.Single(SalesorderheaderId.put),
+         new Write.Single(SalesreasonId.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.salesorderid, a.salesreasonid, a.modifieddate)
   )
 }

@@ -29,27 +29,27 @@ class IllustrationRepoImpl extends IllustrationRepo {
     DeleteBuilder(""""production"."illustration"""", IllustrationFields.structure)
   }
   override def deleteById(illustrationid: IllustrationId): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."illustration" where "illustrationid" = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."illustration" where "illustrationid" = ${fromWrite(illustrationid)(new Write.Single(IllustrationId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(illustrationids: Array[IllustrationId]): ConnectionIO[Int] = {
     sql"""delete from "production"."illustration" where "illustrationid" = ANY(${illustrationids})""".update.run
   }
   override def insert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     sql"""insert into "production"."illustration"("illustrationid", "diagram", "modifieddate")
-          values (${fromWrite(unsaved.illustrationid)(Write.fromPut(IllustrationId.put))}::int4, ${fromWrite(unsaved.diagram)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.illustrationid)(new Write.Single(IllustrationId.put))}::int4, ${fromWrite(unsaved.diagram)(new Write.SingleOpt(TypoXml.put))}::xml, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "illustrationid", "diagram", "modifieddate"::text
        """.query(using IllustrationRow.read).unique
   }
   override def insert(unsaved: IllustrationRowUnsaved): ConnectionIO[IllustrationRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""diagram""""), fr"${fromWrite(unsaved.diagram)(Write.fromPutOption(TypoXml.put))}::xml")),
+      Some((Fragment.const0(s""""diagram""""), fr"${fromWrite(unsaved.diagram)(new Write.SingleOpt(TypoXml.put))}::xml")),
       unsaved.illustrationid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""illustrationid""""), fr"${fromWrite(value: IllustrationId)(Write.fromPut(IllustrationId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""illustrationid""""), fr"${fromWrite(value: IllustrationId)(new Write.Single(IllustrationId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -81,7 +81,7 @@ class IllustrationRepoImpl extends IllustrationRepo {
     sql"""select "illustrationid", "diagram", "modifieddate"::text from "production"."illustration"""".query(using IllustrationRow.read).stream
   }
   override def selectById(illustrationid: IllustrationId): ConnectionIO[Option[IllustrationRow]] = {
-    sql"""select "illustrationid", "diagram", "modifieddate"::text from "production"."illustration" where "illustrationid" = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}""".query(using IllustrationRow.read).option
+    sql"""select "illustrationid", "diagram", "modifieddate"::text from "production"."illustration" where "illustrationid" = ${fromWrite(illustrationid)(new Write.Single(IllustrationId.put))}""".query(using IllustrationRow.read).option
   }
   override def selectByIds(illustrationids: Array[IllustrationId]): Stream[ConnectionIO, IllustrationRow] = {
     sql"""select "illustrationid", "diagram", "modifieddate"::text from "production"."illustration" where "illustrationid" = ANY(${illustrationids})""".query(using IllustrationRow.read).stream
@@ -98,9 +98,9 @@ class IllustrationRepoImpl extends IllustrationRepo {
   override def update(row: IllustrationRow): ConnectionIO[Boolean] = {
     val illustrationid = row.illustrationid
     sql"""update "production"."illustration"
-          set "diagram" = ${fromWrite(row.diagram)(Write.fromPutOption(TypoXml.put))}::xml,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "illustrationid" = ${fromWrite(illustrationid)(Write.fromPut(IllustrationId.put))}"""
+          set "diagram" = ${fromWrite(row.diagram)(new Write.SingleOpt(TypoXml.put))}::xml,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "illustrationid" = ${fromWrite(illustrationid)(new Write.Single(IllustrationId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -108,9 +108,9 @@ class IllustrationRepoImpl extends IllustrationRepo {
   override def upsert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     sql"""insert into "production"."illustration"("illustrationid", "diagram", "modifieddate")
           values (
-            ${fromWrite(unsaved.illustrationid)(Write.fromPut(IllustrationId.put))}::int4,
-            ${fromWrite(unsaved.diagram)(Write.fromPutOption(TypoXml.put))}::xml,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.illustrationid)(new Write.Single(IllustrationId.put))}::int4,
+            ${fromWrite(unsaved.diagram)(new Write.SingleOpt(TypoXml.put))}::xml,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("illustrationid")
           do update set

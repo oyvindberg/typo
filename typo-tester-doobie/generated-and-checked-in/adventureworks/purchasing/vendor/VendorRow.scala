@@ -14,14 +14,12 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: purchasing.vendor
     Companies from whom Adventure Works Cycles purchases parts or other goods.
@@ -56,28 +54,27 @@ case class VendorRow(
 object VendorRow {
   implicit lazy val decoder: Decoder[VendorRow] = Decoder.forProduct8[VendorRow, BusinessentityId, AccountNumber, Name, TypoShort, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(VendorRow.apply)(BusinessentityId.decoder, AccountNumber.decoder, Name.decoder, TypoShort.decoder, Flag.decoder, Flag.decoder, Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[VendorRow] = Encoder.forProduct8[VendorRow, BusinessentityId, AccountNumber, Name, TypoShort, Flag, Flag, Option[/* max 1024 chars */ String], TypoLocalDateTime]("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")(x => (x.businessentityid, x.accountnumber, x.name, x.creditrating, x.preferredvendorstatus, x.activeflag, x.purchasingwebserviceurl, x.modifieddate))(BusinessentityId.encoder, AccountNumber.encoder, Name.encoder, TypoShort.encoder, Flag.encoder, Flag.encoder, Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[VendorRow] = new Read[VendorRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (AccountNumber.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => VendorRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      accountnumber = AccountNumber.get.unsafeGetNonNullable(rs, i + 1),
-      name = Name.get.unsafeGetNonNullable(rs, i + 2),
-      creditrating = TypoShort.get.unsafeGetNonNullable(rs, i + 3),
-      preferredvendorstatus = Flag.get.unsafeGetNonNullable(rs, i + 4),
-      activeflag = Flag.get.unsafeGetNonNullable(rs, i + 5),
-      purchasingwebserviceurl = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7)
+  implicit lazy val read: Read[VendorRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(AccountNumber.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(Flag.get).asInstanceOf[Read[Any]],
+      new Read.Single(Flag.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    VendorRow(
+      businessentityid = arr(0).asInstanceOf[BusinessentityId],
+          accountnumber = arr(1).asInstanceOf[AccountNumber],
+          name = arr(2).asInstanceOf[Name],
+          creditrating = arr(3).asInstanceOf[TypoShort],
+          preferredvendorstatus = arr(4).asInstanceOf[Flag],
+          activeflag = arr(5).asInstanceOf[Flag],
+          purchasingwebserviceurl = arr(6).asInstanceOf[Option[/* max 1024 chars */ String]],
+          modifieddate = arr(7).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[VendorRow] = Text.instance[VendorRow]{ (row, sb) =>
     BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
     sb.append(Text.DELIMETER)
@@ -95,35 +92,15 @@ object VendorRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[VendorRow] = new Write[VendorRow](
-    puts = List((BusinessentityId.put, Nullability.NoNulls),
-                (AccountNumber.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (Flag.put, Nullability.NoNulls),
-                (Flag.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.businessentityid, x.accountnumber, x.name, x.creditrating, x.preferredvendorstatus, x.activeflag, x.purchasingwebserviceurl, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
-                  AccountNumber.put.unsafeSetNonNullable(rs, i + 1, a.accountnumber)
-                  Name.put.unsafeSetNonNullable(rs, i + 2, a.name)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 3, a.creditrating)
-                  Flag.put.unsafeSetNonNullable(rs, i + 4, a.preferredvendorstatus)
-                  Flag.put.unsafeSetNonNullable(rs, i + 5, a.activeflag)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 6, a.purchasingwebserviceurl)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 7, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
-                     AccountNumber.put.unsafeUpdateNonNullable(ps, i + 1, a.accountnumber)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 2, a.name)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 3, a.creditrating)
-                     Flag.put.unsafeUpdateNonNullable(ps, i + 4, a.preferredvendorstatus)
-                     Flag.put.unsafeUpdateNonNullable(ps, i + 5, a.activeflag)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 6, a.purchasingwebserviceurl)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 7, a.modifieddate)
-                   }
+  implicit lazy val write: Write[VendorRow] = new Write.Composite[VendorRow](
+    List(new Write.Single(BusinessentityId.put),
+         new Write.Single(AccountNumber.put),
+         new Write.Single(Name.put),
+         new Write.Single(TypoShort.put),
+         new Write.Single(Flag.put),
+         new Write.Single(Flag.put),
+         new Write.Single(Meta.StringMeta.put).toOpt,
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.businessentityid, a.accountnumber, a.name, a.creditrating, a.preferredvendorstatus, a.activeflag, a.purchasingwebserviceurl, a.modifieddate)
   )
 }

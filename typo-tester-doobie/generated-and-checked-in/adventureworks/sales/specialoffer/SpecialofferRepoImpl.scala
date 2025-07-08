@@ -30,44 +30,44 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
     DeleteBuilder(""""sales"."specialoffer"""", SpecialofferFields.structure)
   }
   override def deleteById(specialofferid: SpecialofferId): ConnectionIO[Boolean] = {
-    sql"""delete from "sales"."specialoffer" where "specialofferid" = ${fromWrite(specialofferid)(Write.fromPut(SpecialofferId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."specialoffer" where "specialofferid" = ${fromWrite(specialofferid)(new Write.Single(SpecialofferId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(specialofferids: Array[SpecialofferId]): ConnectionIO[Int] = {
     sql"""delete from "sales"."specialoffer" where "specialofferid" = ANY(${specialofferids})""".update.run
   }
   override def insert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow] = {
     sql"""insert into "sales"."specialoffer"("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4, ${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.discountpct)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.`type`)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.category)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.minqty)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.maxqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.specialofferid)(new Write.Single(SpecialofferId.put))}::int4, ${fromWrite(unsaved.description)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.discountpct)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.`type`)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.category)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.minqty)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.maxqty)(new Write.SingleOpt(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text
        """.query(using SpecialofferRow.read).unique
   }
   override def insert(unsaved: SpecialofferRowUnsaved): ConnectionIO[SpecialofferRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""description""""), fr"${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""type""""), fr"${fromWrite(unsaved.`type`)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""category""""), fr"${fromWrite(unsaved.category)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const0(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const0(s""""maxqty""""), fr"${fromWrite(unsaved.maxqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4")),
+      Some((Fragment.const0(s""""description""""), fr"${fromWrite(unsaved.description)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""type""""), fr"${fromWrite(unsaved.`type`)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""category""""), fr"${fromWrite(unsaved.category)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""maxqty""""), fr"${fromWrite(unsaved.maxqty)(new Write.SingleOpt(Meta.IntMeta.put))}::int4")),
       unsaved.specialofferid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""specialofferid""""), fr"${fromWrite(value: SpecialofferId)(Write.fromPut(SpecialofferId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""specialofferid""""), fr"${fromWrite(value: SpecialofferId)(new Write.Single(SpecialofferId.put))}::int4"))
       },
       unsaved.discountpct match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""discountpct""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""discountpct""""), fr"${fromWrite(value: BigDecimal)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.minqty match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""minqty""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""minqty""""), fr"${fromWrite(value: Int)(new Write.Single(Meta.IntMeta.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -99,7 +99,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
     sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from "sales"."specialoffer"""".query(using SpecialofferRow.read).stream
   }
   override def selectById(specialofferid: SpecialofferId): ConnectionIO[Option[SpecialofferRow]] = {
-    sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from "sales"."specialoffer" where "specialofferid" = ${fromWrite(specialofferid)(Write.fromPut(SpecialofferId.put))}""".query(using SpecialofferRow.read).option
+    sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from "sales"."specialoffer" where "specialofferid" = ${fromWrite(specialofferid)(new Write.Single(SpecialofferId.put))}""".query(using SpecialofferRow.read).option
   }
   override def selectByIds(specialofferids: Array[SpecialofferId]): Stream[ConnectionIO, SpecialofferRow] = {
     sql"""select "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text from "sales"."specialoffer" where "specialofferid" = ANY(${specialofferids})""".query(using SpecialofferRow.read).stream
@@ -116,17 +116,17 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
   override def update(row: SpecialofferRow): ConnectionIO[Boolean] = {
     val specialofferid = row.specialofferid
     sql"""update "sales"."specialoffer"
-          set "description" = ${fromWrite(row.description)(Write.fromPut(Meta.StringMeta.put))},
-              "discountpct" = ${fromWrite(row.discountpct)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "type" = ${fromWrite(row.`type`)(Write.fromPut(Meta.StringMeta.put))},
-              "category" = ${fromWrite(row.category)(Write.fromPut(Meta.StringMeta.put))},
-              "startdate" = ${fromWrite(row.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-              "enddate" = ${fromWrite(row.enddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-              "minqty" = ${fromWrite(row.minqty)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "maxqty" = ${fromWrite(row.maxqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4,
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "specialofferid" = ${fromWrite(specialofferid)(Write.fromPut(SpecialofferId.put))}"""
+          set "description" = ${fromWrite(row.description)(new Write.Single(Meta.StringMeta.put))},
+              "discountpct" = ${fromWrite(row.discountpct)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "type" = ${fromWrite(row.`type`)(new Write.Single(Meta.StringMeta.put))},
+              "category" = ${fromWrite(row.category)(new Write.Single(Meta.StringMeta.put))},
+              "startdate" = ${fromWrite(row.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+              "enddate" = ${fromWrite(row.enddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+              "minqty" = ${fromWrite(row.minqty)(new Write.Single(Meta.IntMeta.put))}::int4,
+              "maxqty" = ${fromWrite(row.maxqty)(new Write.SingleOpt(Meta.IntMeta.put))}::int4,
+              "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "specialofferid" = ${fromWrite(specialofferid)(new Write.Single(SpecialofferId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -134,17 +134,17 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
   override def upsert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow] = {
     sql"""insert into "sales"."specialoffer"("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.specialofferid)(Write.fromPut(SpecialofferId.put))}::int4,
-            ${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.discountpct)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.`type`)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.category)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.enddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.minqty)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.maxqty)(Write.fromPutOption(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.specialofferid)(new Write.Single(SpecialofferId.put))}::int4,
+            ${fromWrite(unsaved.description)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.discountpct)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.`type`)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.category)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.enddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.minqty)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.maxqty)(new Write.SingleOpt(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("specialofferid")
           do update set

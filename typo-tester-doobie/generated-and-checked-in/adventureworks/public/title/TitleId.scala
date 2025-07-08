@@ -42,10 +42,10 @@ object TitleId {
   implicit lazy val get: Get[TitleId] = Meta.StringMeta.get.map(TitleId.apply)
   implicit lazy val ordering: Ordering[TitleId] = Ordering.by(_.value)
   implicit lazy val put: Put[TitleId] = Meta.StringMeta.put.contramap(_.value)
-  implicit lazy val read: Read[TitleId] = Read.fromGet(get)
+  implicit lazy val read: Read[TitleId] = new Read.Single(get)
   implicit lazy val text: Text[TitleId] = new Text[TitleId] {
     override def unsafeEncode(v: TitleId, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
     override def unsafeArrayEncode(v: TitleId, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
   }
-  implicit lazy val write: Write[TitleId] = Write.fromPut(put)
+  implicit lazy val write: Write[TitleId] = new Write.Single(put)
 }

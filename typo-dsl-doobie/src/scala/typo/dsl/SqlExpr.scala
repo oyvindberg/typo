@@ -138,9 +138,9 @@ object SqlExpr {
 
   case class Const[T, N[_]](value: N[T], P: Put[T], W: Write[N[T]]) extends SqlExpr[T, N] {
     override def render(ctx: RenderCtx): Fragment = {
-      val cast = P match {
-        case _: Put.Basic[_]    => Fragment.empty
-        case p: Put.Advanced[_] => Fragment.const0(s"::${p.schemaTypes.head}")
+      val cast = P.vendorTypeNames match {
+        case Nil       => Fragment.empty
+        case head :: _ => Fragment.const0(s"::${head}")
       }
       fr"${W.toFragment(value)}$cast"
     }
@@ -200,7 +200,7 @@ object SqlExpr {
 
   case class In[T, N[_]](expr: SqlExpr[T, N], values: Array[T], ev: Put[Array[T]], N: Nullability[N]) extends SqlExpr[Boolean, N] {
     override def render(ctx: RenderCtx): Fragment =
-      fr"${expr.render(ctx)} = ANY(${Write.fromPut(ev).toFragment(values)})"
+      fr"${expr.render(ctx)} = ANY(${new Write.Single(ev).toFragment(values)})"
   }
 
   case class CompositeIn[Tuple, Row](tuples: Array[Tuple])(val parts: CompositeIn.TuplePart[Tuple, ?, Row]*) extends SqlExpr[Boolean, Required] {
@@ -243,10 +243,10 @@ object SqlExpr {
 
   // automatically put values in a constant expression
   implicit def asConstOpt[T](t: Option[T])(implicit P: Put[T]): SqlExpr.Const[T, Option] =
-    Const(t, P, Write.fromPutOption(using P))
+    Const(t, P, new Write.SingleOpt(P))
 
   implicit def asConstRequired[T](t: T)(implicit P: Put[T]): SqlExpr.Const[T, Required] =
-    Const[T, Required](t, P, Write.fromPut(using P))
+    Const[T, Required](t, P, new Write.Single(P))
 
   // some syntax to construct field sort order
   implicit class SqlExprSortSyntax[T, N[_]](private val expr: SqlExpr[T, N]) extends AnyVal {
@@ -274,5 +274,6 @@ object SqlExpr {
       SqlExpr.IsNull(expr)
     def coalesce(orElse: SqlExpr[T, Required]): SqlExpr[T, Required] =
       SqlExpr.Coalesce(expr, orElse)
+
   }
 }

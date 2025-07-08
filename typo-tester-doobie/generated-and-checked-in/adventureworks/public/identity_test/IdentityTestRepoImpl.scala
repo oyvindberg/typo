@@ -28,23 +28,23 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     DeleteBuilder(""""public"."identity-test"""", IdentityTestFields.structure)
   }
   override def deleteById(name: IdentityTestId): ConnectionIO[Boolean] = {
-    sql"""delete from "public"."identity-test" where "name" = ${fromWrite(name)(Write.fromPut(IdentityTestId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "public"."identity-test" where "name" = ${fromWrite(name)(new Write.Single(IdentityTestId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(names: Array[IdentityTestId]): ConnectionIO[Int] = {
     sql"""delete from "public"."identity-test" where "name" = ANY(${names})""".update.run
   }
   override def insert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow] = {
     sql"""insert into "public"."identity-test"("default_generated", "name")
-          values (${fromWrite(unsaved.defaultGenerated)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(IdentityTestId.put))})
+          values (${fromWrite(unsaved.defaultGenerated)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.name)(new Write.Single(IdentityTestId.put))})
           returning "always_generated", "default_generated", "name"
        """.query(using IdentityTestRow.read).unique
   }
   override def insert(unsaved: IdentityTestRowUnsaved): ConnectionIO[IdentityTestRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(IdentityTestId.put))}")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(new Write.Single(IdentityTestId.put))}")),
       unsaved.defaultGenerated match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""default_generated""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""default_generated""""), fr"${fromWrite(value: Int)(new Write.Single(Meta.IntMeta.put))}::int4"))
       }
     ).flatten
     
@@ -76,7 +76,7 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
     sql"""select "always_generated", "default_generated", "name" from "public"."identity-test"""".query(using IdentityTestRow.read).stream
   }
   override def selectById(name: IdentityTestId): ConnectionIO[Option[IdentityTestRow]] = {
-    sql"""select "always_generated", "default_generated", "name" from "public"."identity-test" where "name" = ${fromWrite(name)(Write.fromPut(IdentityTestId.put))}""".query(using IdentityTestRow.read).option
+    sql"""select "always_generated", "default_generated", "name" from "public"."identity-test" where "name" = ${fromWrite(name)(new Write.Single(IdentityTestId.put))}""".query(using IdentityTestRow.read).option
   }
   override def selectByIds(names: Array[IdentityTestId]): Stream[ConnectionIO, IdentityTestRow] = {
     sql"""select "always_generated", "default_generated", "name" from "public"."identity-test" where "name" = ANY(${names})""".query(using IdentityTestRow.read).stream
@@ -93,8 +93,8 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
   override def update(row: IdentityTestRow): ConnectionIO[Boolean] = {
     val name = row.name
     sql"""update "public"."identity-test"
-          set "default_generated" = ${fromWrite(row.defaultGenerated)(Write.fromPut(Meta.IntMeta.put))}::int4
-          where "name" = ${fromWrite(name)(Write.fromPut(IdentityTestId.put))}"""
+          set "default_generated" = ${fromWrite(row.defaultGenerated)(new Write.Single(Meta.IntMeta.put))}::int4
+          where "name" = ${fromWrite(name)(new Write.Single(IdentityTestId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -102,8 +102,8 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
   override def upsert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow] = {
     sql"""insert into "public"."identity-test"("default_generated", "name")
           values (
-            ${fromWrite(unsaved.defaultGenerated)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(IdentityTestId.put))}
+            ${fromWrite(unsaved.defaultGenerated)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.name)(new Write.Single(IdentityTestId.put))}
           )
           on conflict ("name")
           do update set

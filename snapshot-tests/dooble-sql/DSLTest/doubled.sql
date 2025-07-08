@@ -1,6 +1,6 @@
 with 
 salessalesperson0 as (
-  (select salessalesperson0 from "sales"."salesperson" salessalesperson0 WHERE ((salessalesperson0).rowguid  = ?::uuid ) ) 
+  (select salessalesperson0 from "sales"."salesperson" salessalesperson0 WHERE (((salessalesperson0).rowguid  = ?::uuid ) )) 
 ) ,
 humanresourcesemployee0 as (
   (select humanresourcesemployee0 from "humanresources"."employee" humanresourcesemployee0 ) 
@@ -53,7 +53,7 @@ join_cte1 as (
    
 ) ,
 salessalesperson2 as (
-  (select salessalesperson2 from "sales"."salesperson" salessalesperson2 WHERE ((salessalesperson2).rowguid  = ?::uuid ) ) 
+  (select salessalesperson2 from "sales"."salesperson" salessalesperson2 WHERE (((salessalesperson2).rowguid  = ?::uuid ) )) 
 ) ,
 humanresourcesemployee1 as (
   (select humanresourcesemployee1 from "humanresources"."employee" humanresourcesemployee1 ) 

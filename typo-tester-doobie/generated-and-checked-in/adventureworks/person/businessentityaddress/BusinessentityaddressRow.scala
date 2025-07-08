@@ -13,13 +13,11 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.address.AddressId
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: person.businessentityaddress
     Cross-reference table mapping customers, vendors, and employees to their addresses.
@@ -50,22 +48,21 @@ object BusinessentityaddressRow {
     new BusinessentityaddressRow(compositeId.businessentityid, compositeId.addressid, compositeId.addresstypeid, rowguid, modifieddate)
   implicit lazy val decoder: Decoder[BusinessentityaddressRow] = Decoder.forProduct5[BusinessentityaddressRow, BusinessentityId, AddressId, AddresstypeId, TypoUUID, TypoLocalDateTime]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(BusinessentityaddressRow.apply)(BusinessentityId.decoder, AddressId.decoder, AddresstypeId.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[BusinessentityaddressRow] = Encoder.forProduct5[BusinessentityaddressRow, BusinessentityId, AddressId, AddresstypeId, TypoUUID, TypoLocalDateTime]("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")(x => (x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, AddressId.encoder, AddresstypeId.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[BusinessentityaddressRow] = new Read[BusinessentityaddressRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (AddressId.get, Nullability.NoNulls),
-      (AddresstypeId.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => BusinessentityaddressRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      addressid = AddressId.get.unsafeGetNonNullable(rs, i + 1),
-      addresstypeid = AddresstypeId.get.unsafeGetNonNullable(rs, i + 2),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+  implicit lazy val read: Read[BusinessentityaddressRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(AddressId.get).asInstanceOf[Read[Any]],
+      new Read.Single(AddresstypeId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    BusinessentityaddressRow(
+      businessentityid = arr(0).asInstanceOf[BusinessentityId],
+          addressid = arr(1).asInstanceOf[AddressId],
+          addresstypeid = arr(2).asInstanceOf[AddresstypeId],
+          rowguid = arr(3).asInstanceOf[TypoUUID],
+          modifieddate = arr(4).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[BusinessentityaddressRow] = Text.instance[BusinessentityaddressRow]{ (row, sb) =>
     BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
     sb.append(Text.DELIMETER)
@@ -77,26 +74,12 @@ object BusinessentityaddressRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[BusinessentityaddressRow] = new Write[BusinessentityaddressRow](
-    puts = List((BusinessentityId.put, Nullability.NoNulls),
-                (AddressId.put, Nullability.NoNulls),
-                (AddresstypeId.put, Nullability.NoNulls),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.businessentityid, x.addressid, x.addresstypeid, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
-                  AddressId.put.unsafeSetNonNullable(rs, i + 1, a.addressid)
-                  AddresstypeId.put.unsafeSetNonNullable(rs, i + 2, a.addresstypeid)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 3, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
-                     AddressId.put.unsafeUpdateNonNullable(ps, i + 1, a.addressid)
-                     AddresstypeId.put.unsafeUpdateNonNullable(ps, i + 2, a.addresstypeid)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 3, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
-                   }
+  implicit lazy val write: Write[BusinessentityaddressRow] = new Write.Composite[BusinessentityaddressRow](
+    List(new Write.Single(BusinessentityId.put),
+         new Write.Single(AddressId.put),
+         new Write.Single(AddresstypeId.put),
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.businessentityid, a.addressid, a.addresstypeid, a.rowguid, a.modifieddate)
   )
 }

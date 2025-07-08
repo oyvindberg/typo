@@ -10,14 +10,12 @@ package currencyrate
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.sales.currency.CurrencyId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: sales.currencyrate
     Currency exchange rates.
@@ -49,26 +47,25 @@ case class CurrencyrateRow(
 object CurrencyrateRow {
   implicit lazy val decoder: Decoder[CurrencyrateRow] = Decoder.forProduct7[CurrencyrateRow, CurrencyrateId, TypoLocalDateTime, CurrencyId, CurrencyId, BigDecimal, BigDecimal, TypoLocalDateTime]("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")(CurrencyrateRow.apply)(CurrencyrateId.decoder, TypoLocalDateTime.decoder, CurrencyId.decoder, CurrencyId.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[CurrencyrateRow] = Encoder.forProduct7[CurrencyrateRow, CurrencyrateId, TypoLocalDateTime, CurrencyId, CurrencyId, BigDecimal, BigDecimal, TypoLocalDateTime]("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")(x => (x.currencyrateid, x.currencyratedate, x.fromcurrencycode, x.tocurrencycode, x.averagerate, x.endofdayrate, x.modifieddate))(CurrencyrateId.encoder, TypoLocalDateTime.encoder, CurrencyId.encoder, CurrencyId.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[CurrencyrateRow] = new Read[CurrencyrateRow](
-    gets = List(
-      (CurrencyrateId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (CurrencyId.get, Nullability.NoNulls),
-      (CurrencyId.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => CurrencyrateRow(
-      currencyrateid = CurrencyrateId.get.unsafeGetNonNullable(rs, i + 0),
-      currencyratedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 1),
-      fromcurrencycode = CurrencyId.get.unsafeGetNonNullable(rs, i + 2),
-      tocurrencycode = CurrencyId.get.unsafeGetNonNullable(rs, i + 3),
-      averagerate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 4),
-      endofdayrate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+  implicit lazy val read: Read[CurrencyrateRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(CurrencyrateId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(CurrencyId.get).asInstanceOf[Read[Any]],
+      new Read.Single(CurrencyId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    CurrencyrateRow(
+      currencyrateid = arr(0).asInstanceOf[CurrencyrateId],
+          currencyratedate = arr(1).asInstanceOf[TypoLocalDateTime],
+          fromcurrencycode = arr(2).asInstanceOf[CurrencyId],
+          tocurrencycode = arr(3).asInstanceOf[CurrencyId],
+          averagerate = arr(4).asInstanceOf[BigDecimal],
+          endofdayrate = arr(5).asInstanceOf[BigDecimal],
+          modifieddate = arr(6).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[CurrencyrateRow] = Text.instance[CurrencyrateRow]{ (row, sb) =>
     CurrencyrateId.text.unsafeEncode(row.currencyrateid, sb)
     sb.append(Text.DELIMETER)
@@ -84,32 +81,14 @@ object CurrencyrateRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[CurrencyrateRow] = new Write[CurrencyrateRow](
-    puts = List((CurrencyrateId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (CurrencyId.put, Nullability.NoNulls),
-                (CurrencyId.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.currencyrateid, x.currencyratedate, x.fromcurrencycode, x.tocurrencycode, x.averagerate, x.endofdayrate, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  CurrencyrateId.put.unsafeSetNonNullable(rs, i + 0, a.currencyrateid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 1, a.currencyratedate)
-                  CurrencyId.put.unsafeSetNonNullable(rs, i + 2, a.fromcurrencycode)
-                  CurrencyId.put.unsafeSetNonNullable(rs, i + 3, a.tocurrencycode)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 4, a.averagerate)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 5, a.endofdayrate)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 6, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     CurrencyrateId.put.unsafeUpdateNonNullable(ps, i + 0, a.currencyrateid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 1, a.currencyratedate)
-                     CurrencyId.put.unsafeUpdateNonNullable(ps, i + 2, a.fromcurrencycode)
-                     CurrencyId.put.unsafeUpdateNonNullable(ps, i + 3, a.tocurrencycode)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 4, a.averagerate)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.endofdayrate)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 6, a.modifieddate)
-                   }
+  implicit lazy val write: Write[CurrencyrateRow] = new Write.Composite[CurrencyrateRow](
+    List(new Write.Single(CurrencyrateId.put),
+         new Write.Single(TypoLocalDateTime.put),
+         new Write.Single(CurrencyId.put),
+         new Write.Single(CurrencyId.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.currencyrateid, a.currencyratedate, a.fromcurrencycode, a.tocurrencycode, a.averagerate, a.endofdayrate, a.modifieddate)
   )
 }

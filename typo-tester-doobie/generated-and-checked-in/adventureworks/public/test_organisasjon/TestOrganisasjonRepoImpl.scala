@@ -25,14 +25,14 @@ class TestOrganisasjonRepoImpl extends TestOrganisasjonRepo {
     DeleteBuilder(""""public"."test_organisasjon"""", TestOrganisasjonFields.structure)
   }
   override def deleteById(organisasjonskode: TestOrganisasjonId): ConnectionIO[Boolean] = {
-    sql"""delete from "public"."test_organisasjon" where "organisasjonskode" = ${fromWrite(organisasjonskode)(Write.fromPut(TestOrganisasjonId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "public"."test_organisasjon" where "organisasjonskode" = ${fromWrite(organisasjonskode)(new Write.Single(TestOrganisasjonId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(organisasjonskodes: Array[TestOrganisasjonId]): ConnectionIO[Int] = {
     sql"""delete from "public"."test_organisasjon" where "organisasjonskode" = ANY(${organisasjonskodes})""".update.run
   }
   override def insert(unsaved: TestOrganisasjonRow): ConnectionIO[TestOrganisasjonRow] = {
     sql"""insert into "public"."test_organisasjon"("organisasjonskode")
-          values (${fromWrite(unsaved.organisasjonskode)(Write.fromPut(TestOrganisasjonId.put))})
+          values (${fromWrite(unsaved.organisasjonskode)(new Write.Single(TestOrganisasjonId.put))})
           returning "organisasjonskode"
        """.query(using TestOrganisasjonRow.read).unique
   }
@@ -46,7 +46,7 @@ class TestOrganisasjonRepoImpl extends TestOrganisasjonRepo {
     sql"""select "organisasjonskode" from "public"."test_organisasjon"""".query(using TestOrganisasjonRow.read).stream
   }
   override def selectById(organisasjonskode: TestOrganisasjonId): ConnectionIO[Option[TestOrganisasjonRow]] = {
-    sql"""select "organisasjonskode" from "public"."test_organisasjon" where "organisasjonskode" = ${fromWrite(organisasjonskode)(Write.fromPut(TestOrganisasjonId.put))}""".query(using TestOrganisasjonRow.read).option
+    sql"""select "organisasjonskode" from "public"."test_organisasjon" where "organisasjonskode" = ${fromWrite(organisasjonskode)(new Write.Single(TestOrganisasjonId.put))}""".query(using TestOrganisasjonRow.read).option
   }
   override def selectByIds(organisasjonskodes: Array[TestOrganisasjonId]): Stream[ConnectionIO, TestOrganisasjonRow] = {
     sql"""select "organisasjonskode" from "public"."test_organisasjon" where "organisasjonskode" = ANY(${organisasjonskodes})""".query(using TestOrganisasjonRow.read).stream
@@ -63,7 +63,7 @@ class TestOrganisasjonRepoImpl extends TestOrganisasjonRepo {
   override def upsert(unsaved: TestOrganisasjonRow): ConnectionIO[TestOrganisasjonRow] = {
     sql"""insert into "public"."test_organisasjon"("organisasjonskode")
           values (
-            ${fromWrite(unsaved.organisasjonskode)(Write.fromPut(TestOrganisasjonId.put))}
+            ${fromWrite(unsaved.organisasjonskode)(new Write.Single(TestOrganisasjonId.put))}
           )
           on conflict ("organisasjonskode")
           do update set "organisasjonskode" = EXCLUDED."organisasjonskode"

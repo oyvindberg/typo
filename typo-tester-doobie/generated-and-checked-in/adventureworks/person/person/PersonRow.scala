@@ -15,14 +15,12 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.NameStyle
 import adventureworks.userdefined.FirstName
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: person.person
     Human beings involved with AdventureWorks: employees, customer contacts, and vendor contacts.
@@ -68,38 +66,37 @@ case class PersonRow(
 object PersonRow {
   implicit lazy val decoder: Decoder[PersonRow] = Decoder.forProduct13[PersonRow, BusinessentityId, /* bpchar, max 2 chars */ String, NameStyle, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, Option[/* max 10 chars */ String], Int, Option[TypoXml], Option[TypoXml], TypoUUID, TypoLocalDateTime]("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")(PersonRow.apply)(BusinessentityId.decoder, Decoder.decodeString, NameStyle.decoder, Decoder.decodeOption(Decoder.decodeString), FirstName.decoder, Decoder.decodeOption(Name.decoder), Name.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeInt, Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PersonRow] = Encoder.forProduct13[PersonRow, BusinessentityId, /* bpchar, max 2 chars */ String, NameStyle, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, Option[/* max 10 chars */ String], Int, Option[TypoXml], Option[TypoXml], TypoUUID, TypoLocalDateTime]("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")(x => (x.businessentityid, x.persontype, x.namestyle, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.emailpromotion, x.additionalcontactinfo, x.demographics, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeString, NameStyle.encoder, Encoder.encodeOption(Encoder.encodeString), FirstName.encoder, Encoder.encodeOption(Name.encoder), Name.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeInt, Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PersonRow] = new Read[PersonRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (NameStyle.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (/* user-picked */ FirstName.get, Nullability.NoNulls),
-      (Name.get, Nullability.Nullable),
-      (Name.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PersonRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      persontype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      namestyle = NameStyle.get.unsafeGetNonNullable(rs, i + 2),
-      title = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      firstname = /* user-picked */ FirstName.get.unsafeGetNonNullable(rs, i + 4),
-      middlename = Name.get.unsafeGetNullable(rs, i + 5),
-      lastname = Name.get.unsafeGetNonNullable(rs, i + 6),
-      suffix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
-      emailpromotion = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 8),
-      additionalcontactinfo = TypoXml.get.unsafeGetNullable(rs, i + 9),
-      demographics = TypoXml.get.unsafeGetNullable(rs, i + 10),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 11),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 12)
+  implicit lazy val read: Read[PersonRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(NameStyle.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(/* user-picked */ FirstName.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoXml.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoXml.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    PersonRow(
+      businessentityid = arr(0).asInstanceOf[BusinessentityId],
+          persontype = arr(1).asInstanceOf[/* bpchar, max 2 chars */ String],
+          namestyle = arr(2).asInstanceOf[NameStyle],
+          title = arr(3).asInstanceOf[Option[/* max 8 chars */ String]],
+          firstname = arr(4).asInstanceOf[/* user-picked */ FirstName],
+          middlename = arr(5).asInstanceOf[Option[Name]],
+          lastname = arr(6).asInstanceOf[Name],
+          suffix = arr(7).asInstanceOf[Option[/* max 10 chars */ String]],
+          emailpromotion = arr(8).asInstanceOf[Int],
+          additionalcontactinfo = arr(9).asInstanceOf[Option[TypoXml]],
+          demographics = arr(10).asInstanceOf[Option[TypoXml]],
+          rowguid = arr(11).asInstanceOf[TypoUUID],
+          modifieddate = arr(12).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[PersonRow] = Text.instance[PersonRow]{ (row, sb) =>
     BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
     sb.append(Text.DELIMETER)
@@ -127,50 +124,20 @@ object PersonRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[PersonRow] = new Write[PersonRow](
-    puts = List((BusinessentityId.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (NameStyle.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (/* user-picked */ FirstName.put, Nullability.NoNulls),
-                (Name.put, Nullability.Nullable),
-                (Name.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (TypoXml.put, Nullability.Nullable),
-                (TypoXml.put, Nullability.Nullable),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.businessentityid, x.persontype, x.namestyle, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.emailpromotion, x.additionalcontactinfo, x.demographics, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.persontype)
-                  NameStyle.put.unsafeSetNonNullable(rs, i + 2, a.namestyle)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 3, a.title)
-                  /* user-picked */ FirstName.put.unsafeSetNonNullable(rs, i + 4, a.firstname)
-                  Name.put.unsafeSetNullable(rs, i + 5, a.middlename)
-                  Name.put.unsafeSetNonNullable(rs, i + 6, a.lastname)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 7, a.suffix)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 8, a.emailpromotion)
-                  TypoXml.put.unsafeSetNullable(rs, i + 9, a.additionalcontactinfo)
-                  TypoXml.put.unsafeSetNullable(rs, i + 10, a.demographics)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 11, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 12, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.persontype)
-                     NameStyle.put.unsafeUpdateNonNullable(ps, i + 2, a.namestyle)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 3, a.title)
-                     /* user-picked */ FirstName.put.unsafeUpdateNonNullable(ps, i + 4, a.firstname)
-                     Name.put.unsafeUpdateNullable(ps, i + 5, a.middlename)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 6, a.lastname)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 7, a.suffix)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 8, a.emailpromotion)
-                     TypoXml.put.unsafeUpdateNullable(ps, i + 9, a.additionalcontactinfo)
-                     TypoXml.put.unsafeUpdateNullable(ps, i + 10, a.demographics)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 11, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 12, a.modifieddate)
-                   }
+  implicit lazy val write: Write[PersonRow] = new Write.Composite[PersonRow](
+    List(new Write.Single(BusinessentityId.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(NameStyle.put),
+         new Write.Single(Meta.StringMeta.put).toOpt,
+         new Write.Single(/* user-picked */ FirstName.put),
+         new Write.Single(Name.put).toOpt,
+         new Write.Single(Name.put),
+         new Write.Single(Meta.StringMeta.put).toOpt,
+         new Write.Single(Meta.IntMeta.put),
+         new Write.Single(TypoXml.put).toOpt,
+         new Write.Single(TypoXml.put).toOpt,
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.businessentityid, a.persontype, a.namestyle, a.title, a.firstname, a.middlename, a.lastname, a.suffix, a.emailpromotion, a.additionalcontactinfo, a.demographics, a.rowguid, a.modifieddate)
   )
 }

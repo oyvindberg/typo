@@ -8,8 +8,6 @@ import doobie.util.Read
 import doobie.util.fragment.Fragment
 import typo.dsl.internal.mkFragment.*
 
-import scala.util.Try
-
 sealed trait SelectBuilderSql[Fields, Row] extends SelectBuilder[Fields, Row] {
   def withPath(path: Path): SelectBuilderSql[Fields, Row]
   def instantiate(ctx: RenderCtx): SelectBuilderSql.Instantiated[Fields, Row]
@@ -155,13 +153,6 @@ object SelectBuilderSql {
     override def withParams(sqlParams: SelectParams[Fields1 ~ OuterJoined[Fields2], Row1 ~ Option[Row2]]): SelectBuilder[Fields1 ~ OuterJoined[Fields2], Row1 ~ Option[Row2]] =
       copy(params = sqlParams)
 
-    def opt[A](read: Read[A]): Read[Option[A]] = {
-      new Read[Option[A]](
-        read.gets.map { case (get, _) => (get, doobie.enumerated.Nullability.Nullable) },
-        (rs, i) => Try(read.unsafeGet(rs, i)).toOption
-      )
-    }
-
     override def instantiate(ctx: RenderCtx): Instantiated[Fields1 ~ OuterJoined[Fields2], Row1 ~ Option[Row2]] = {
       val alias = ctx.alias(structure._path)
       val leftInstance = left.instantiate(ctx)
@@ -184,7 +175,7 @@ object SelectBuilderSql {
         sqlFrag = sql,
         upstreamCTEs = ctes,
         structure = newStructure,
-        read = (leftInstance.read, opt(rightInstance.read)).tupled
+        read = (leftInstance.read, rightInstance.read.toOpt).tupled
       )
     }
   }

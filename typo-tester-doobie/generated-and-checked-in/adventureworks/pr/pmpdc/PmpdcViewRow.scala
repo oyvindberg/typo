@@ -11,11 +11,9 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pr.pmpdc */
 case class PmpdcViewRow(
@@ -32,18 +30,17 @@ case class PmpdcViewRow(
 object PmpdcViewRow {
   implicit lazy val decoder: Decoder[PmpdcViewRow] = Decoder.forProduct4[PmpdcViewRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(PmpdcViewRow.apply)(ProductmodelId.decoder, ProductdescriptionId.decoder, CultureId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PmpdcViewRow] = Encoder.forProduct4[PmpdcViewRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))(ProductmodelId.encoder, ProductdescriptionId.encoder, CultureId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PmpdcViewRow] = new Read[PmpdcViewRow](
-    gets = List(
-      (ProductmodelId.get, Nullability.NoNulls),
-      (ProductdescriptionId.get, Nullability.NoNulls),
-      (CultureId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PmpdcViewRow(
-      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
-      productdescriptionid = ProductdescriptionId.get.unsafeGetNonNullable(rs, i + 1),
-      cultureid = CultureId.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[PmpdcViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ProductmodelId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductdescriptionId.get).asInstanceOf[Read[Any]],
+      new Read.Single(CultureId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    PmpdcViewRow(
+      productmodelid = arr(0).asInstanceOf[ProductmodelId],
+          productdescriptionid = arr(1).asInstanceOf[ProductdescriptionId],
+          cultureid = arr(2).asInstanceOf[CultureId],
+          modifieddate = arr(3).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

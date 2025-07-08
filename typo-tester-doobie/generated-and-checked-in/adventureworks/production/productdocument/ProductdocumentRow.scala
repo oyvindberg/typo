@@ -11,13 +11,11 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.document.DocumentId
 import adventureworks.production.product.ProductId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: production.productdocument
     Cross-reference table mapping products to related product documents.
@@ -44,18 +42,17 @@ object ProductdocumentRow {
     new ProductdocumentRow(compositeId.productid, modifieddate, compositeId.documentnode)
   implicit lazy val decoder: Decoder[ProductdocumentRow] = Decoder.forProduct3[ProductdocumentRow, ProductId, TypoLocalDateTime, DocumentId]("productid", "modifieddate", "documentnode")(ProductdocumentRow.apply)(ProductId.decoder, TypoLocalDateTime.decoder, DocumentId.decoder)
   implicit lazy val encoder: Encoder[ProductdocumentRow] = Encoder.forProduct3[ProductdocumentRow, ProductId, TypoLocalDateTime, DocumentId]("productid", "modifieddate", "documentnode")(x => (x.productid, x.modifieddate, x.documentnode))(ProductId.encoder, TypoLocalDateTime.encoder, DocumentId.encoder)
-  implicit lazy val read: Read[ProductdocumentRow] = new Read[ProductdocumentRow](
-    gets = List(
-      (ProductId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (DocumentId.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ProductdocumentRow(
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 0),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 1),
-      documentnode = DocumentId.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[ProductdocumentRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(DocumentId.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    ProductdocumentRow(
+      productid = arr(0).asInstanceOf[ProductId],
+          modifieddate = arr(1).asInstanceOf[TypoLocalDateTime],
+          documentnode = arr(2).asInstanceOf[DocumentId]
     )
-  )
+  }
   implicit lazy val text: Text[ProductdocumentRow] = Text.instance[ProductdocumentRow]{ (row, sb) =>
     ProductId.text.unsafeEncode(row.productid, sb)
     sb.append(Text.DELIMETER)
@@ -63,20 +60,10 @@ object ProductdocumentRow {
     sb.append(Text.DELIMETER)
     DocumentId.text.unsafeEncode(row.documentnode, sb)
   }
-  implicit lazy val write: Write[ProductdocumentRow] = new Write[ProductdocumentRow](
-    puts = List((ProductId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (DocumentId.put, Nullability.NoNulls)),
-    toList = x => List(x.productid, x.modifieddate, x.documentnode),
-    unsafeSet = (rs, i, a) => {
-                  ProductId.put.unsafeSetNonNullable(rs, i + 0, a.productid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 1, a.modifieddate)
-                  DocumentId.put.unsafeSetNonNullable(rs, i + 2, a.documentnode)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ProductId.put.unsafeUpdateNonNullable(ps, i + 0, a.productid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 1, a.modifieddate)
-                     DocumentId.put.unsafeUpdateNonNullable(ps, i + 2, a.documentnode)
-                   }
+  implicit lazy val write: Write[ProductdocumentRow] = new Write.Composite[ProductdocumentRow](
+    List(new Write.Single(ProductId.put),
+         new Write.Single(TypoLocalDateTime.put),
+         new Write.Single(DocumentId.put)),
+    a => List(a.productid, a.modifieddate, a.documentnode)
   )
 }

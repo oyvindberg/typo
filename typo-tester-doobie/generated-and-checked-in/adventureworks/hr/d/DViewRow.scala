@@ -10,11 +10,9 @@ package d
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: hr.d */
 case class DViewRow(
@@ -33,20 +31,19 @@ case class DViewRow(
 object DViewRow {
   implicit lazy val decoder: Decoder[DViewRow] = Decoder.forProduct5[DViewRow, DepartmentId, DepartmentId, Name, Name, TypoLocalDateTime]("id", "departmentid", "name", "groupname", "modifieddate")(DViewRow.apply)(DepartmentId.decoder, DepartmentId.decoder, Name.decoder, Name.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[DViewRow] = Encoder.forProduct5[DViewRow, DepartmentId, DepartmentId, Name, Name, TypoLocalDateTime]("id", "departmentid", "name", "groupname", "modifieddate")(x => (x.id, x.departmentid, x.name, x.groupname, x.modifieddate))(DepartmentId.encoder, DepartmentId.encoder, Name.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[DViewRow] = new Read[DViewRow](
-    gets = List(
-      (DepartmentId.get, Nullability.NoNulls),
-      (DepartmentId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => DViewRow(
-      id = DepartmentId.get.unsafeGetNonNullable(rs, i + 0),
-      departmentid = DepartmentId.get.unsafeGetNonNullable(rs, i + 1),
-      name = Name.get.unsafeGetNonNullable(rs, i + 2),
-      groupname = Name.get.unsafeGetNonNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+  implicit lazy val read: Read[DViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(DepartmentId.get).asInstanceOf[Read[Any]],
+      new Read.Single(DepartmentId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    DViewRow(
+      id = arr(0).asInstanceOf[DepartmentId],
+          departmentid = arr(1).asInstanceOf[DepartmentId],
+          name = arr(2).asInstanceOf[Name],
+          groupname = arr(3).asInstanceOf[Name],
+          modifieddate = arr(4).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

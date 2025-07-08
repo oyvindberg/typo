@@ -29,24 +29,24 @@ class CurrencyRepoImpl extends CurrencyRepo {
     DeleteBuilder(""""sales"."currency"""", CurrencyFields.structure)
   }
   override def deleteById(currencycode: CurrencyId): ConnectionIO[Boolean] = {
-    sql"""delete from "sales"."currency" where "currencycode" = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."currency" where "currencycode" = ${fromWrite(currencycode)(new Write.Single(CurrencyId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(currencycodes: Array[CurrencyId]): ConnectionIO[Int] = {
     sql"""delete from "sales"."currency" where "currencycode" = ANY(${currencycodes})""".update.run
   }
   override def insert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     sql"""insert into "sales"."currency"("currencycode", "name", "modifieddate")
-          values (${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.currencycode)(new Write.Single(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "currencycode", "name", "modifieddate"::text
        """.query(using CurrencyRow.read).unique
   }
   override def insert(unsaved: CurrencyRowUnsaved): ConnectionIO[CurrencyRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""currencycode""""), fr"${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar")),
-      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""currencycode""""), fr"${fromWrite(unsaved.currencycode)(new Write.Single(CurrencyId.put))}::bpchar")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -78,7 +78,7 @@ class CurrencyRepoImpl extends CurrencyRepo {
     sql"""select "currencycode", "name", "modifieddate"::text from "sales"."currency"""".query(using CurrencyRow.read).stream
   }
   override def selectById(currencycode: CurrencyId): ConnectionIO[Option[CurrencyRow]] = {
-    sql"""select "currencycode", "name", "modifieddate"::text from "sales"."currency" where "currencycode" = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}""".query(using CurrencyRow.read).option
+    sql"""select "currencycode", "name", "modifieddate"::text from "sales"."currency" where "currencycode" = ${fromWrite(currencycode)(new Write.Single(CurrencyId.put))}""".query(using CurrencyRow.read).option
   }
   override def selectByIds(currencycodes: Array[CurrencyId]): Stream[ConnectionIO, CurrencyRow] = {
     sql"""select "currencycode", "name", "modifieddate"::text from "sales"."currency" where "currencycode" = ANY(${currencycodes})""".query(using CurrencyRow.read).stream
@@ -95,9 +95,9 @@ class CurrencyRepoImpl extends CurrencyRepo {
   override def update(row: CurrencyRow): ConnectionIO[Boolean] = {
     val currencycode = row.currencycode
     sql"""update "sales"."currency"
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "currencycode" = ${fromWrite(currencycode)(Write.fromPut(CurrencyId.put))}"""
+          set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "currencycode" = ${fromWrite(currencycode)(new Write.Single(CurrencyId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -105,9 +105,9 @@ class CurrencyRepoImpl extends CurrencyRepo {
   override def upsert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     sql"""insert into "sales"."currency"("currencycode", "name", "modifieddate")
           values (
-            ${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.currencycode)(new Write.Single(CurrencyId.put))}::bpchar,
+            ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("currencycode")
           do update set

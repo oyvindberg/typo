@@ -10,14 +10,12 @@ package transactionhistory
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: production.transactionhistory
     Record of each purchase order, sales order, or work order transaction year to date.
@@ -55,30 +53,29 @@ case class TransactionhistoryRow(
 object TransactionhistoryRow {
   implicit lazy val decoder: Decoder[TransactionhistoryRow] = Decoder.forProduct9[TransactionhistoryRow, TransactionhistoryId, ProductId, Int, Int, TypoLocalDateTime, /* bpchar, max 1 chars */ String, Int, BigDecimal, TypoLocalDateTime]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(TransactionhistoryRow.apply)(TransactionhistoryId.decoder, ProductId.decoder, Decoder.decodeInt, Decoder.decodeInt, TypoLocalDateTime.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[TransactionhistoryRow] = Encoder.forProduct9[TransactionhistoryRow, TransactionhistoryId, ProductId, Int, Int, TypoLocalDateTime, /* bpchar, max 1 chars */ String, Int, BigDecimal, TypoLocalDateTime]("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")(x => (x.transactionid, x.productid, x.referenceorderid, x.referenceorderlineid, x.transactiondate, x.transactiontype, x.quantity, x.actualcost, x.modifieddate))(TransactionhistoryId.encoder, ProductId.encoder, Encoder.encodeInt, Encoder.encodeInt, TypoLocalDateTime.encoder, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[TransactionhistoryRow] = new Read[TransactionhistoryRow](
-    gets = List(
-      (TransactionhistoryId.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => TransactionhistoryRow(
-      transactionid = TransactionhistoryId.get.unsafeGetNonNullable(rs, i + 0),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
-      referenceorderid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
-      referenceorderlineid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
-      transactiondate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
-      transactiontype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
-      quantity = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 6),
-      actualcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 7),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
+  implicit lazy val read: Read[TransactionhistoryRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(TransactionhistoryId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    TransactionhistoryRow(
+      transactionid = arr(0).asInstanceOf[TransactionhistoryId],
+          productid = arr(1).asInstanceOf[ProductId],
+          referenceorderid = arr(2).asInstanceOf[Int],
+          referenceorderlineid = arr(3).asInstanceOf[Int],
+          transactiondate = arr(4).asInstanceOf[TypoLocalDateTime],
+          transactiontype = arr(5).asInstanceOf[/* bpchar, max 1 chars */ String],
+          quantity = arr(6).asInstanceOf[Int],
+          actualcost = arr(7).asInstanceOf[BigDecimal],
+          modifieddate = arr(8).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[TransactionhistoryRow] = Text.instance[TransactionhistoryRow]{ (row, sb) =>
     TransactionhistoryId.text.unsafeEncode(row.transactionid, sb)
     sb.append(Text.DELIMETER)
@@ -98,38 +95,16 @@ object TransactionhistoryRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[TransactionhistoryRow] = new Write[TransactionhistoryRow](
-    puts = List((TransactionhistoryId.put, Nullability.NoNulls),
-                (ProductId.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.transactionid, x.productid, x.referenceorderid, x.referenceorderlineid, x.transactiondate, x.transactiontype, x.quantity, x.actualcost, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  TransactionhistoryId.put.unsafeSetNonNullable(rs, i + 0, a.transactionid)
-                  ProductId.put.unsafeSetNonNullable(rs, i + 1, a.productid)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 2, a.referenceorderid)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 3, a.referenceorderlineid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.transactiondate)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 5, a.transactiontype)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 6, a.quantity)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 7, a.actualcost)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 8, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     TransactionhistoryId.put.unsafeUpdateNonNullable(ps, i + 0, a.transactionid)
-                     ProductId.put.unsafeUpdateNonNullable(ps, i + 1, a.productid)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.referenceorderid)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.referenceorderlineid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.transactiondate)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.transactiontype)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.quantity)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.actualcost)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 8, a.modifieddate)
-                   }
+  implicit lazy val write: Write[TransactionhistoryRow] = new Write.Composite[TransactionhistoryRow](
+    List(new Write.Single(TransactionhistoryId.put),
+         new Write.Single(ProductId.put),
+         new Write.Single(Meta.IntMeta.put),
+         new Write.Single(Meta.IntMeta.put),
+         new Write.Single(TypoLocalDateTime.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(Meta.IntMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.transactionid, a.productid, a.referenceorderid, a.referenceorderlineid, a.transactiondate, a.transactiontype, a.quantity, a.actualcost, a.modifieddate)
   )
 }

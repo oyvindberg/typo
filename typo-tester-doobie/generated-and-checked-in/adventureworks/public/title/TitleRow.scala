@@ -7,13 +7,11 @@ package adventureworks
 package public
 package title
 
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: public.title
     Primary key: code */
@@ -26,25 +24,18 @@ case class TitleRow(
 object TitleRow {
   implicit lazy val decoder: Decoder[TitleRow] = Decoder.forProduct1[TitleRow, TitleId]("code")(TitleRow.apply)(TitleId.decoder)
   implicit lazy val encoder: Encoder[TitleRow] = Encoder.forProduct1[TitleRow, TitleId]("code")(x => (x.code))(TitleId.encoder)
-  implicit lazy val read: Read[TitleRow] = new Read[TitleRow](
-    gets = List(
-      (TitleId.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => TitleRow(
-      code = TitleId.get.unsafeGetNonNullable(rs, i + 0)
+  implicit lazy val read: Read[TitleRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(TitleId.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    TitleRow(
+      code = arr(0).asInstanceOf[TitleId]
     )
-  )
+  }
   implicit lazy val text: Text[TitleRow] = Text.instance[TitleRow]{ (row, sb) =>
     TitleId.text.unsafeEncode(row.code, sb)
   }
-  implicit lazy val write: Write[TitleRow] = new Write[TitleRow](
-    puts = List((TitleId.put, Nullability.NoNulls)),
-    toList = x => List(x.code),
-    unsafeSet = (rs, i, a) => {
-                  TitleId.put.unsafeSetNonNullable(rs, i + 0, a.code)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     TitleId.put.unsafeUpdateNonNullable(ps, i + 0, a.code)
-                   }
+  implicit lazy val write: Write[TitleRow] = new Write.Composite[TitleRow](
+    List(new Write.Single(TitleId.put)),
+    a => List(a.code)
   )
 }

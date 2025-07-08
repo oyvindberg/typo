@@ -31,7 +31,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     DeleteBuilder(""""production"."productmodelproductdescriptionculture"""", ProductmodelproductdescriptioncultureFields.structure)
   }
   override def deleteById(compositeId: ProductmodelproductdescriptioncultureId): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."productmodelproductdescriptionculture" where "productmodelid" = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND "productdescriptionid" = ${fromWrite(compositeId.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))} AND "cultureid" = ${fromWrite(compositeId.cultureid)(Write.fromPut(CultureId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."productmodelproductdescriptionculture" where "productmodelid" = ${fromWrite(compositeId.productmodelid)(new Write.Single(ProductmodelId.put))} AND "productdescriptionid" = ${fromWrite(compositeId.productdescriptionid)(new Write.Single(ProductdescriptionId.put))} AND "cultureid" = ${fromWrite(compositeId.cultureid)(new Write.Single(CultureId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductmodelproductdescriptioncultureId]): ConnectionIO[Int] = {
     val productmodelid = compositeIds.map(_.productmodelid)
@@ -46,18 +46,18 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRow): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     sql"""insert into "production"."productmodelproductdescriptionculture"("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
-          values (${fromWrite(unsaved.productmodelid)(Write.fromPut(ProductmodelId.put))}::int4, ${fromWrite(unsaved.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}::int4, ${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.productmodelid)(new Write.Single(ProductmodelId.put))}::int4, ${fromWrite(unsaved.productdescriptionid)(new Write.Single(ProductdescriptionId.put))}::int4, ${fromWrite(unsaved.cultureid)(new Write.Single(CultureId.put))}::bpchar, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
        """.query(using ProductmodelproductdescriptioncultureRow.read).unique
   }
   override def insert(unsaved: ProductmodelproductdescriptioncultureRowUnsaved): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""productmodelid""""), fr"${fromWrite(unsaved.productmodelid)(Write.fromPut(ProductmodelId.put))}::int4")),
-      Some((Fragment.const0(s""""productdescriptionid""""), fr"${fromWrite(unsaved.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}::int4")),
-      Some((Fragment.const0(s""""cultureid""""), fr"${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar")),
+      Some((Fragment.const0(s""""productmodelid""""), fr"${fromWrite(unsaved.productmodelid)(new Write.Single(ProductmodelId.put))}::int4")),
+      Some((Fragment.const0(s""""productdescriptionid""""), fr"${fromWrite(unsaved.productdescriptionid)(new Write.Single(ProductdescriptionId.put))}::int4")),
+      Some((Fragment.const0(s""""cultureid""""), fr"${fromWrite(unsaved.cultureid)(new Write.Single(CultureId.put))}::bpchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -89,7 +89,7 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
     sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from "production"."productmodelproductdescriptionculture"""".query(using ProductmodelproductdescriptioncultureRow.read).stream
   }
   override def selectById(compositeId: ProductmodelproductdescriptioncultureId): ConnectionIO[Option[ProductmodelproductdescriptioncultureRow]] = {
-    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from "production"."productmodelproductdescriptionculture" where "productmodelid" = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND "productdescriptionid" = ${fromWrite(compositeId.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))} AND "cultureid" = ${fromWrite(compositeId.cultureid)(Write.fromPut(CultureId.put))}""".query(using ProductmodelproductdescriptioncultureRow.read).option
+    sql"""select "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text from "production"."productmodelproductdescriptionculture" where "productmodelid" = ${fromWrite(compositeId.productmodelid)(new Write.Single(ProductmodelId.put))} AND "productdescriptionid" = ${fromWrite(compositeId.productdescriptionid)(new Write.Single(ProductdescriptionId.put))} AND "cultureid" = ${fromWrite(compositeId.cultureid)(new Write.Single(CultureId.put))}""".query(using ProductmodelproductdescriptioncultureRow.read).option
   }
   override def selectByIds(compositeIds: Array[ProductmodelproductdescriptioncultureId]): Stream[ConnectionIO, ProductmodelproductdescriptioncultureRow] = {
     val productmodelid = compositeIds.map(_.productmodelid)
@@ -114,8 +114,8 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
   override def update(row: ProductmodelproductdescriptioncultureRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update "production"."productmodelproductdescriptionculture"
-          set "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "productmodelid" = ${fromWrite(compositeId.productmodelid)(Write.fromPut(ProductmodelId.put))} AND "productdescriptionid" = ${fromWrite(compositeId.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))} AND "cultureid" = ${fromWrite(compositeId.cultureid)(Write.fromPut(CultureId.put))}"""
+          set "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "productmodelid" = ${fromWrite(compositeId.productmodelid)(new Write.Single(ProductmodelId.put))} AND "productdescriptionid" = ${fromWrite(compositeId.productdescriptionid)(new Write.Single(ProductdescriptionId.put))} AND "cultureid" = ${fromWrite(compositeId.cultureid)(new Write.Single(CultureId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -123,10 +123,10 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
   override def upsert(unsaved: ProductmodelproductdescriptioncultureRow): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     sql"""insert into "production"."productmodelproductdescriptionculture"("productmodelid", "productdescriptionid", "cultureid", "modifieddate")
           values (
-            ${fromWrite(unsaved.productmodelid)(Write.fromPut(ProductmodelId.put))}::int4,
-            ${fromWrite(unsaved.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}::int4,
-            ${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.productmodelid)(new Write.Single(ProductmodelId.put))}::int4,
+            ${fromWrite(unsaved.productdescriptionid)(new Write.Single(ProductdescriptionId.put))}::int4,
+            ${fromWrite(unsaved.cultureid)(new Write.Single(CultureId.put))}::bpchar,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("productmodelid", "productdescriptionid", "cultureid")
           do update set

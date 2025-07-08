@@ -30,28 +30,28 @@ class UsersRepoImpl extends UsersRepo {
     DeleteBuilder(""""public"."users"""", UsersFields.structure)
   }
   override def deleteById(userId: UsersId): ConnectionIO[Boolean] = {
-    sql"""delete from "public"."users" where "user_id" = ${fromWrite(userId)(Write.fromPut(UsersId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "public"."users" where "user_id" = ${fromWrite(userId)(new Write.Single(UsersId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(userIds: Array[UsersId]): ConnectionIO[Int] = {
     sql"""delete from "public"."users" where "user_id" = ANY(${userIds})""".update.run
   }
   override def insert(unsaved: UsersRow): ConnectionIO[UsersRow] = {
     sql"""insert into "public"."users"("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
-          values (${fromWrite(unsaved.userId)(Write.fromPut(UsersId.put))}::uuid, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.lastName)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.email)(Write.fromPut(TypoUnknownCitext.put))}::citext, ${fromWrite(unsaved.password)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.createdAt)(Write.fromPut(TypoInstant.put))}::timestamptz, ${fromWrite(unsaved.verifiedOn)(Write.fromPutOption(TypoInstant.put))}::timestamptz)
+          values (${fromWrite(unsaved.userId)(new Write.Single(UsersId.put))}::uuid, ${fromWrite(unsaved.name)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.lastName)(new Write.SingleOpt(Meta.StringMeta.put))}, ${fromWrite(unsaved.email)(new Write.Single(TypoUnknownCitext.put))}::citext, ${fromWrite(unsaved.password)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.createdAt)(new Write.Single(TypoInstant.put))}::timestamptz, ${fromWrite(unsaved.verifiedOn)(new Write.SingleOpt(TypoInstant.put))}::timestamptz)
           returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
        """.query(using UsersRow.read).unique
   }
   override def insert(unsaved: UsersRowUnsaved): ConnectionIO[UsersRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""user_id""""), fr"${fromWrite(unsaved.userId)(Write.fromPut(UsersId.put))}::uuid")),
-      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""last_name""""), fr"${fromWrite(unsaved.lastName)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""email""""), fr"${fromWrite(unsaved.email)(Write.fromPut(TypoUnknownCitext.put))}::citext")),
-      Some((Fragment.const0(s""""password""""), fr"${fromWrite(unsaved.password)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""verified_on""""), fr"${fromWrite(unsaved.verifiedOn)(Write.fromPutOption(TypoInstant.put))}::timestamptz")),
+      Some((Fragment.const0(s""""user_id""""), fr"${fromWrite(unsaved.userId)(new Write.Single(UsersId.put))}::uuid")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""last_name""""), fr"${fromWrite(unsaved.lastName)(new Write.SingleOpt(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""email""""), fr"${fromWrite(unsaved.email)(new Write.Single(TypoUnknownCitext.put))}::citext")),
+      Some((Fragment.const0(s""""password""""), fr"${fromWrite(unsaved.password)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""verified_on""""), fr"${fromWrite(unsaved.verifiedOn)(new Write.SingleOpt(TypoInstant.put))}::timestamptz")),
       unsaved.createdAt match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""created_at""""), fr"${fromWrite(value: TypoInstant)(Write.fromPut(TypoInstant.put))}::timestamptz"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""created_at""""), fr"${fromWrite(value: TypoInstant)(new Write.Single(TypoInstant.put))}::timestamptz"))
       }
     ).flatten
     
@@ -83,7 +83,7 @@ class UsersRepoImpl extends UsersRepo {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from "public"."users"""".query(using UsersRow.read).stream
   }
   override def selectById(userId: UsersId): ConnectionIO[Option[UsersRow]] = {
-    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from "public"."users" where "user_id" = ${fromWrite(userId)(Write.fromPut(UsersId.put))}""".query(using UsersRow.read).option
+    sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from "public"."users" where "user_id" = ${fromWrite(userId)(new Write.Single(UsersId.put))}""".query(using UsersRow.read).option
   }
   override def selectByIds(userIds: Array[UsersId]): Stream[ConnectionIO, UsersRow] = {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text from "public"."users" where "user_id" = ANY(${userIds})""".query(using UsersRow.read).stream
@@ -97,7 +97,7 @@ class UsersRepoImpl extends UsersRepo {
   override def selectByUniqueEmail(email: TypoUnknownCitext): ConnectionIO[Option[UsersRow]] = {
     sql"""select "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
           from "public"."users"
-          where "email" = ${fromWrite(email)(Write.fromPut(TypoUnknownCitext.put))}
+          where "email" = ${fromWrite(email)(new Write.Single(TypoUnknownCitext.put))}
        """.query(using UsersRow.read).option
   }
   override def update: UpdateBuilder[UsersFields, UsersRow] = {
@@ -106,13 +106,13 @@ class UsersRepoImpl extends UsersRepo {
   override def update(row: UsersRow): ConnectionIO[Boolean] = {
     val userId = row.userId
     sql"""update "public"."users"
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Meta.StringMeta.put))},
-              "last_name" = ${fromWrite(row.lastName)(Write.fromPutOption(Meta.StringMeta.put))},
-              "email" = ${fromWrite(row.email)(Write.fromPut(TypoUnknownCitext.put))}::citext,
-              "password" = ${fromWrite(row.password)(Write.fromPut(Meta.StringMeta.put))},
-              "created_at" = ${fromWrite(row.createdAt)(Write.fromPut(TypoInstant.put))}::timestamptz,
-              "verified_on" = ${fromWrite(row.verifiedOn)(Write.fromPutOption(TypoInstant.put))}::timestamptz
-          where "user_id" = ${fromWrite(userId)(Write.fromPut(UsersId.put))}"""
+          set "name" = ${fromWrite(row.name)(new Write.Single(Meta.StringMeta.put))},
+              "last_name" = ${fromWrite(row.lastName)(new Write.SingleOpt(Meta.StringMeta.put))},
+              "email" = ${fromWrite(row.email)(new Write.Single(TypoUnknownCitext.put))}::citext,
+              "password" = ${fromWrite(row.password)(new Write.Single(Meta.StringMeta.put))},
+              "created_at" = ${fromWrite(row.createdAt)(new Write.Single(TypoInstant.put))}::timestamptz,
+              "verified_on" = ${fromWrite(row.verifiedOn)(new Write.SingleOpt(TypoInstant.put))}::timestamptz
+          where "user_id" = ${fromWrite(userId)(new Write.Single(UsersId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -120,13 +120,13 @@ class UsersRepoImpl extends UsersRepo {
   override def upsert(unsaved: UsersRow): ConnectionIO[UsersRow] = {
     sql"""insert into "public"."users"("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")
           values (
-            ${fromWrite(unsaved.userId)(Write.fromPut(UsersId.put))}::uuid,
-            ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.lastName)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.email)(Write.fromPut(TypoUnknownCitext.put))}::citext,
-            ${fromWrite(unsaved.password)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.createdAt)(Write.fromPut(TypoInstant.put))}::timestamptz,
-            ${fromWrite(unsaved.verifiedOn)(Write.fromPutOption(TypoInstant.put))}::timestamptz
+            ${fromWrite(unsaved.userId)(new Write.Single(UsersId.put))}::uuid,
+            ${fromWrite(unsaved.name)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.lastName)(new Write.SingleOpt(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.email)(new Write.Single(TypoUnknownCitext.put))}::citext,
+            ${fromWrite(unsaved.password)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.createdAt)(new Write.Single(TypoInstant.put))}::timestamptz,
+            ${fromWrite(unsaved.verifiedOn)(new Write.SingleOpt(TypoInstant.put))}::timestamptz
           )
           on conflict ("user_id")
           do update set

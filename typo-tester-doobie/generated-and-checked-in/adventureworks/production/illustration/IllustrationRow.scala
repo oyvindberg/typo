@@ -10,13 +10,11 @@ package illustration
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoXml
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: production.illustration
     Bicycle assembly diagrams.
@@ -38,18 +36,17 @@ case class IllustrationRow(
 object IllustrationRow {
   implicit lazy val decoder: Decoder[IllustrationRow] = Decoder.forProduct3[IllustrationRow, IllustrationId, Option[TypoXml], TypoLocalDateTime]("illustrationid", "diagram", "modifieddate")(IllustrationRow.apply)(IllustrationId.decoder, Decoder.decodeOption(TypoXml.decoder), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[IllustrationRow] = Encoder.forProduct3[IllustrationRow, IllustrationId, Option[TypoXml], TypoLocalDateTime]("illustrationid", "diagram", "modifieddate")(x => (x.illustrationid, x.diagram, x.modifieddate))(IllustrationId.encoder, Encoder.encodeOption(TypoXml.encoder), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[IllustrationRow] = new Read[IllustrationRow](
-    gets = List(
-      (IllustrationId.get, Nullability.NoNulls),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => IllustrationRow(
-      illustrationid = IllustrationId.get.unsafeGetNonNullable(rs, i + 0),
-      diagram = TypoXml.get.unsafeGetNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[IllustrationRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(IllustrationId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoXml.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    IllustrationRow(
+      illustrationid = arr(0).asInstanceOf[IllustrationId],
+          diagram = arr(1).asInstanceOf[Option[TypoXml]],
+          modifieddate = arr(2).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[IllustrationRow] = Text.instance[IllustrationRow]{ (row, sb) =>
     IllustrationId.text.unsafeEncode(row.illustrationid, sb)
     sb.append(Text.DELIMETER)
@@ -57,20 +54,10 @@ object IllustrationRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[IllustrationRow] = new Write[IllustrationRow](
-    puts = List((IllustrationId.put, Nullability.NoNulls),
-                (TypoXml.put, Nullability.Nullable),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.illustrationid, x.diagram, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  IllustrationId.put.unsafeSetNonNullable(rs, i + 0, a.illustrationid)
-                  TypoXml.put.unsafeSetNullable(rs, i + 1, a.diagram)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     IllustrationId.put.unsafeUpdateNonNullable(ps, i + 0, a.illustrationid)
-                     TypoXml.put.unsafeUpdateNullable(ps, i + 1, a.diagram)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
-                   }
+  implicit lazy val write: Write[IllustrationRow] = new Write.Composite[IllustrationRow](
+    List(new Write.Single(IllustrationId.put),
+         new Write.Single(TypoXml.put).toOpt,
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.illustrationid, a.diagram, a.modifieddate)
   )
 }

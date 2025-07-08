@@ -13,14 +13,12 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: sales.salestaxrate
     Tax rate lookup table.
@@ -53,26 +51,25 @@ case class SalestaxrateRow(
 object SalestaxrateRow {
   implicit lazy val decoder: Decoder[SalestaxrateRow] = Decoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, TypoShort, BigDecimal, Name, TypoUUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(SalestaxrateRow.apply)(SalestaxrateId.decoder, StateprovinceId.decoder, TypoShort.decoder, Decoder.decodeBigDecimal, Name.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SalestaxrateRow] = Encoder.forProduct7[SalestaxrateRow, SalestaxrateId, StateprovinceId, TypoShort, BigDecimal, Name, TypoUUID, TypoLocalDateTime]("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")(x => (x.salestaxrateid, x.stateprovinceid, x.taxtype, x.taxrate, x.name, x.rowguid, x.modifieddate))(SalestaxrateId.encoder, StateprovinceId.encoder, TypoShort.encoder, Encoder.encodeBigDecimal, Name.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SalestaxrateRow] = new Read[SalestaxrateRow](
-    gets = List(
-      (SalestaxrateId.get, Nullability.NoNulls),
-      (StateprovinceId.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SalestaxrateRow(
-      salestaxrateid = SalestaxrateId.get.unsafeGetNonNullable(rs, i + 0),
-      stateprovinceid = StateprovinceId.get.unsafeGetNonNullable(rs, i + 1),
-      taxtype = TypoShort.get.unsafeGetNonNullable(rs, i + 2),
-      taxrate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
-      name = Name.get.unsafeGetNonNullable(rs, i + 4),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+  implicit lazy val read: Read[SalestaxrateRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(SalestaxrateId.get).asInstanceOf[Read[Any]],
+      new Read.Single(StateprovinceId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    SalestaxrateRow(
+      salestaxrateid = arr(0).asInstanceOf[SalestaxrateId],
+          stateprovinceid = arr(1).asInstanceOf[StateprovinceId],
+          taxtype = arr(2).asInstanceOf[TypoShort],
+          taxrate = arr(3).asInstanceOf[BigDecimal],
+          name = arr(4).asInstanceOf[Name],
+          rowguid = arr(5).asInstanceOf[TypoUUID],
+          modifieddate = arr(6).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[SalestaxrateRow] = Text.instance[SalestaxrateRow]{ (row, sb) =>
     SalestaxrateId.text.unsafeEncode(row.salestaxrateid, sb)
     sb.append(Text.DELIMETER)
@@ -88,32 +85,14 @@ object SalestaxrateRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[SalestaxrateRow] = new Write[SalestaxrateRow](
-    puts = List((SalestaxrateId.put, Nullability.NoNulls),
-                (StateprovinceId.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.salestaxrateid, x.stateprovinceid, x.taxtype, x.taxrate, x.name, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  SalestaxrateId.put.unsafeSetNonNullable(rs, i + 0, a.salestaxrateid)
-                  StateprovinceId.put.unsafeSetNonNullable(rs, i + 1, a.stateprovinceid)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 2, a.taxtype)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 3, a.taxrate)
-                  Name.put.unsafeSetNonNullable(rs, i + 4, a.name)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 5, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 6, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     SalestaxrateId.put.unsafeUpdateNonNullable(ps, i + 0, a.salestaxrateid)
-                     StateprovinceId.put.unsafeUpdateNonNullable(ps, i + 1, a.stateprovinceid)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 2, a.taxtype)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.taxrate)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 4, a.name)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 5, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 6, a.modifieddate)
-                   }
+  implicit lazy val write: Write[SalestaxrateRow] = new Write.Composite[SalestaxrateRow](
+    List(new Write.Single(SalestaxrateId.put),
+         new Write.Single(StateprovinceId.put),
+         new Write.Single(TypoShort.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(Name.put),
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.salestaxrateid, a.stateprovinceid, a.taxtype, a.taxrate, a.name, a.rowguid, a.modifieddate)
   )
 }

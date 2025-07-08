@@ -18,7 +18,7 @@ class PersonDynamicSqlRepoImpl extends PersonDynamicSqlRepo {
     val sql =
       sql"""SELECT p.title, p.firstname, p.middlename, p.lastname
             FROM person.person p
-            WHERE ${fromWrite(firstName)(Write.fromPutOption(Meta.StringMeta.put))}::text IS NULL OR p.firstname = ${fromWrite(firstName)(Write.fromPutOption(Meta.StringMeta.put))}
+            WHERE ${fromWrite(firstName)(new Write.SingleOpt(Meta.StringMeta.put))}::text IS NULL OR p.firstname = ${fromWrite(firstName)(new Write.SingleOpt(Meta.StringMeta.put))}
       """
     sql.query(using PersonDynamicSqlRow.read).stream
   }

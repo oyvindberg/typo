@@ -319,3 +319,11 @@ When working on Typo issues, follow this workflow:
 - **Integration Tests**: Test full generation pipeline
 - **Regression Tests**: Ensure fixes don't break existing functionality
 - **Edge Case Coverage**: Test boundary conditions and unusual schemas
+
+## Project Memories and Notes
+
+### Code Generation and Development Workflow
+- You need to run `bleep generate-adventureworks` to see the effect on codegen based on what is in the test database. Do this before running tests
+
+### Development Philosophy
+- We should never generate code which relies on derivation. *we* are the deriver

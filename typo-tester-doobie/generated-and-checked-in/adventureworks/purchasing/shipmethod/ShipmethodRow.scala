@@ -11,14 +11,12 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: purchasing.shipmethod
     Shipping company lookup table.
@@ -50,24 +48,23 @@ case class ShipmethodRow(
 object ShipmethodRow {
   implicit lazy val decoder: Decoder[ShipmethodRow] = Decoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, TypoUUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(ShipmethodRow.apply)(ShipmethodId.decoder, Name.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ShipmethodRow] = Encoder.forProduct6[ShipmethodRow, ShipmethodId, Name, BigDecimal, BigDecimal, TypoUUID, TypoLocalDateTime]("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")(x => (x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate))(ShipmethodId.encoder, Name.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ShipmethodRow] = new Read[ShipmethodRow](
-    gets = List(
-      (ShipmethodId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ShipmethodRow(
-      shipmethodid = ShipmethodId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      shipbase = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 2),
-      shiprate = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[ShipmethodRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ShipmethodId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    ShipmethodRow(
+      shipmethodid = arr(0).asInstanceOf[ShipmethodId],
+          name = arr(1).asInstanceOf[Name],
+          shipbase = arr(2).asInstanceOf[BigDecimal],
+          shiprate = arr(3).asInstanceOf[BigDecimal],
+          rowguid = arr(4).asInstanceOf[TypoUUID],
+          modifieddate = arr(5).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[ShipmethodRow] = Text.instance[ShipmethodRow]{ (row, sb) =>
     ShipmethodId.text.unsafeEncode(row.shipmethodid, sb)
     sb.append(Text.DELIMETER)
@@ -81,29 +78,13 @@ object ShipmethodRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[ShipmethodRow] = new Write[ShipmethodRow](
-    puts = List((ShipmethodId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.shipmethodid, x.name, x.shipbase, x.shiprate, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ShipmethodId.put.unsafeSetNonNullable(rs, i + 0, a.shipmethodid)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 2, a.shipbase)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 3, a.shiprate)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 4, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ShipmethodId.put.unsafeUpdateNonNullable(ps, i + 0, a.shipmethodid)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.shipbase)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.shiprate)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 4, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
-                   }
+  implicit lazy val write: Write[ShipmethodRow] = new Write.Composite[ShipmethodRow](
+    List(new Write.Single(ShipmethodId.put),
+         new Write.Single(Name.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.shipmethodid, a.name, a.shipbase, a.shiprate, a.rowguid, a.modifieddate)
   )
 }

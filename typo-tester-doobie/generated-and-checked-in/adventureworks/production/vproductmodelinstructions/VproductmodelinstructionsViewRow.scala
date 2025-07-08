@@ -11,12 +11,10 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: production.vproductmodelinstructions */
 case class VproductmodelinstructionsViewRow(
@@ -40,32 +38,31 @@ case class VproductmodelinstructionsViewRow(
 object VproductmodelinstructionsViewRow {
   implicit lazy val decoder: Decoder[VproductmodelinstructionsViewRow] = Decoder.forProduct11[VproductmodelinstructionsViewRow, ProductmodelId, Name, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[/* max 1024 chars */ String], TypoUUID, TypoLocalDateTime]("productmodelid", "name", "instructions", "LocationID", "SetupHours", "MachineHours", "LaborHours", "LotSize", "Step", "rowguid", "modifieddate")(VproductmodelinstructionsViewRow.apply)(ProductmodelId.decoder, Name.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(Decoder.decodeInt), Decoder.decodeOption(Decoder.decodeString), TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[VproductmodelinstructionsViewRow] = Encoder.forProduct11[VproductmodelinstructionsViewRow, ProductmodelId, Name, /* nullability unknown */ Option[String], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[BigDecimal], /* nullability unknown */ Option[Int], /* nullability unknown */ Option[/* max 1024 chars */ String], TypoUUID, TypoLocalDateTime]("productmodelid", "name", "instructions", "LocationID", "SetupHours", "MachineHours", "LaborHours", "LotSize", "Step", "rowguid", "modifieddate")(x => (x.productmodelid, x.name, x.instructions, x.locationID, x.setupHours, x.machineHours, x.laborHours, x.lotSize, x.step, x.rowguid, x.modifieddate))(ProductmodelId.encoder, Name.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(Encoder.encodeInt), Encoder.encodeOption(Encoder.encodeString), TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[VproductmodelinstructionsViewRow] = new Read[VproductmodelinstructionsViewRow](
-    gets = List(
-      (ProductmodelId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => VproductmodelinstructionsViewRow(
-      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      instructions = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      locationID = Meta.IntMeta.get.unsafeGetNullable(rs, i + 3),
-      setupHours = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
-      machineHours = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 5),
-      laborHours = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 6),
-      lotSize = Meta.IntMeta.get.unsafeGetNullable(rs, i + 7),
-      step = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 9),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 10)
+  implicit lazy val read: Read[VproductmodelinstructionsViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ProductmodelId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    VproductmodelinstructionsViewRow(
+      productmodelid = arr(0).asInstanceOf[ProductmodelId],
+          name = arr(1).asInstanceOf[Name],
+          instructions = arr(2).asInstanceOf[/* nullability unknown */ Option[String]],
+          locationID = arr(3).asInstanceOf[/* nullability unknown */ Option[Int]],
+          setupHours = arr(4).asInstanceOf[/* nullability unknown */ Option[BigDecimal]],
+          machineHours = arr(5).asInstanceOf[/* nullability unknown */ Option[BigDecimal]],
+          laborHours = arr(6).asInstanceOf[/* nullability unknown */ Option[BigDecimal]],
+          lotSize = arr(7).asInstanceOf[/* nullability unknown */ Option[Int]],
+          step = arr(8).asInstanceOf[/* nullability unknown */ Option[/* max 1024 chars */ String]],
+          rowguid = arr(9).asInstanceOf[TypoUUID],
+          modifieddate = arr(10).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

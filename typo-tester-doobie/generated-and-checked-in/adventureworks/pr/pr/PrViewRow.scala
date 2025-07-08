@@ -11,12 +11,10 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
 import adventureworks.production.productreview.ProductreviewId
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pr.pr */
 case class PrViewRow(
@@ -43,28 +41,27 @@ case class PrViewRow(
 object PrViewRow {
   implicit lazy val decoder: Decoder[PrViewRow] = Decoder.forProduct9[PrViewRow, ProductreviewId, ProductreviewId, ProductId, Name, TypoLocalDateTime, /* max 50 chars */ String, Int, Option[/* max 3850 chars */ String], TypoLocalDateTime]("id", "productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")(PrViewRow.apply)(ProductreviewId.decoder, ProductreviewId.decoder, ProductId.decoder, Name.decoder, TypoLocalDateTime.decoder, Decoder.decodeString, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PrViewRow] = Encoder.forProduct9[PrViewRow, ProductreviewId, ProductreviewId, ProductId, Name, TypoLocalDateTime, /* max 50 chars */ String, Int, Option[/* max 3850 chars */ String], TypoLocalDateTime]("id", "productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")(x => (x.id, x.productreviewid, x.productid, x.reviewername, x.reviewdate, x.emailaddress, x.rating, x.comments, x.modifieddate))(ProductreviewId.encoder, ProductreviewId.encoder, ProductId.encoder, Name.encoder, TypoLocalDateTime.encoder, Encoder.encodeString, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PrViewRow] = new Read[PrViewRow](
-    gets = List(
-      (ProductreviewId.get, Nullability.NoNulls),
-      (ProductreviewId.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PrViewRow(
-      id = ProductreviewId.get.unsafeGetNonNullable(rs, i + 0),
-      productreviewid = ProductreviewId.get.unsafeGetNonNullable(rs, i + 1),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 2),
-      reviewername = Name.get.unsafeGetNonNullable(rs, i + 3),
-      reviewdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
-      emailaddress = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
-      rating = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 6),
-      comments = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
+  implicit lazy val read: Read[PrViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ProductreviewId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductreviewId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    PrViewRow(
+      id = arr(0).asInstanceOf[ProductreviewId],
+          productreviewid = arr(1).asInstanceOf[ProductreviewId],
+          productid = arr(2).asInstanceOf[ProductId],
+          reviewername = arr(3).asInstanceOf[Name],
+          reviewdate = arr(4).asInstanceOf[TypoLocalDateTime],
+          emailaddress = arr(5).asInstanceOf[/* max 50 chars */ String],
+          rating = arr(6).asInstanceOf[Int],
+          comments = arr(7).asInstanceOf[Option[/* max 3850 chars */ String]],
+          modifieddate = arr(8).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

@@ -8,14 +8,12 @@ package public
 package test_utdanningstilbud
 
 import adventureworks.public.test_organisasjon.TestOrganisasjonId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: public.test_utdanningstilbud
     Composite primary key: organisasjonskode, utdanningsmulighet_kode */
@@ -33,32 +31,23 @@ object TestUtdanningstilbudRow {
     new TestUtdanningstilbudRow(compositeId.organisasjonskode, compositeId.utdanningsmulighetKode)
   implicit lazy val decoder: Decoder[TestUtdanningstilbudRow] = Decoder.forProduct2[TestUtdanningstilbudRow, TestOrganisasjonId, String]("organisasjonskode", "utdanningsmulighet_kode")(TestUtdanningstilbudRow.apply)(TestOrganisasjonId.decoder, Decoder.decodeString)
   implicit lazy val encoder: Encoder[TestUtdanningstilbudRow] = Encoder.forProduct2[TestUtdanningstilbudRow, TestOrganisasjonId, String]("organisasjonskode", "utdanningsmulighet_kode")(x => (x.organisasjonskode, x.utdanningsmulighetKode))(TestOrganisasjonId.encoder, Encoder.encodeString)
-  implicit lazy val read: Read[TestUtdanningstilbudRow] = new Read[TestUtdanningstilbudRow](
-    gets = List(
-      (TestOrganisasjonId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => TestUtdanningstilbudRow(
-      organisasjonskode = TestOrganisasjonId.get.unsafeGetNonNullable(rs, i + 0),
-      utdanningsmulighetKode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1)
+  implicit lazy val read: Read[TestUtdanningstilbudRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(TestOrganisasjonId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    TestUtdanningstilbudRow(
+      organisasjonskode = arr(0).asInstanceOf[TestOrganisasjonId],
+          utdanningsmulighetKode = arr(1).asInstanceOf[String]
     )
-  )
+  }
   implicit lazy val text: Text[TestUtdanningstilbudRow] = Text.instance[TestUtdanningstilbudRow]{ (row, sb) =>
     TestOrganisasjonId.text.unsafeEncode(row.organisasjonskode, sb)
     sb.append(Text.DELIMETER)
     Text.stringInstance.unsafeEncode(row.utdanningsmulighetKode, sb)
   }
-  implicit lazy val write: Write[TestUtdanningstilbudRow] = new Write[TestUtdanningstilbudRow](
-    puts = List((TestOrganisasjonId.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls)),
-    toList = x => List(x.organisasjonskode, x.utdanningsmulighetKode),
-    unsafeSet = (rs, i, a) => {
-                  TestOrganisasjonId.put.unsafeSetNonNullable(rs, i + 0, a.organisasjonskode)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.utdanningsmulighetKode)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     TestOrganisasjonId.put.unsafeUpdateNonNullable(ps, i + 0, a.organisasjonskode)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.utdanningsmulighetKode)
-                   }
+  implicit lazy val write: Write[TestUtdanningstilbudRow] = new Write.Composite[TestUtdanningstilbudRow](
+    List(new Write.Single(TestOrganisasjonId.put),
+         new Write.Single(Meta.StringMeta.put)),
+    a => List(a.organisasjonskode, a.utdanningsmulighetKode)
   )
 }

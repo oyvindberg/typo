@@ -10,13 +10,11 @@ package salesreason
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: sales.salesreason
     Lookup table of customer purchase reasons.
@@ -40,20 +38,19 @@ case class SalesreasonRow(
 object SalesreasonRow {
   implicit lazy val decoder: Decoder[SalesreasonRow] = Decoder.forProduct4[SalesreasonRow, SalesreasonId, Name, Name, TypoLocalDateTime]("salesreasonid", "name", "reasontype", "modifieddate")(SalesreasonRow.apply)(SalesreasonId.decoder, Name.decoder, Name.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SalesreasonRow] = Encoder.forProduct4[SalesreasonRow, SalesreasonId, Name, Name, TypoLocalDateTime]("salesreasonid", "name", "reasontype", "modifieddate")(x => (x.salesreasonid, x.name, x.reasontype, x.modifieddate))(SalesreasonId.encoder, Name.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SalesreasonRow] = new Read[SalesreasonRow](
-    gets = List(
-      (SalesreasonId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SalesreasonRow(
-      salesreasonid = SalesreasonId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      reasontype = Name.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[SalesreasonRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(SalesreasonId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    SalesreasonRow(
+      salesreasonid = arr(0).asInstanceOf[SalesreasonId],
+          name = arr(1).asInstanceOf[Name],
+          reasontype = arr(2).asInstanceOf[Name],
+          modifieddate = arr(3).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[SalesreasonRow] = Text.instance[SalesreasonRow]{ (row, sb) =>
     SalesreasonId.text.unsafeEncode(row.salesreasonid, sb)
     sb.append(Text.DELIMETER)
@@ -63,23 +60,11 @@ object SalesreasonRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[SalesreasonRow] = new Write[SalesreasonRow](
-    puts = List((SalesreasonId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.salesreasonid, x.name, x.reasontype, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  SalesreasonId.put.unsafeSetNonNullable(rs, i + 0, a.salesreasonid)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  Name.put.unsafeSetNonNullable(rs, i + 2, a.reasontype)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     SalesreasonId.put.unsafeUpdateNonNullable(ps, i + 0, a.salesreasonid)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 2, a.reasontype)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
-                   }
+  implicit lazy val write: Write[SalesreasonRow] = new Write.Composite[SalesreasonRow](
+    List(new Write.Single(SalesreasonId.put),
+         new Write.Single(Name.put),
+         new Write.Single(Name.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.salesreasonid, a.name, a.reasontype, a.modifieddate)
   )
 }

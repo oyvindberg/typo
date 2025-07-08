@@ -12,14 +12,12 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: purchasing.purchaseorderdetail
     Individual products associated with a specific purchase order. See PurchaseOrderHeader.
@@ -62,30 +60,29 @@ object PurchaseorderdetailRow {
     new PurchaseorderdetailRow(compositeId.purchaseorderid, compositeId.purchaseorderdetailid, duedate, orderqty, productid, unitprice, receivedqty, rejectedqty, modifieddate)
   implicit lazy val decoder: Decoder[PurchaseorderdetailRow] = Decoder.forProduct9[PurchaseorderdetailRow, PurchaseorderheaderId, Int, TypoLocalDateTime, TypoShort, ProductId, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")(PurchaseorderdetailRow.apply)(PurchaseorderheaderId.decoder, Decoder.decodeInt, TypoLocalDateTime.decoder, TypoShort.decoder, ProductId.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PurchaseorderdetailRow] = Encoder.forProduct9[PurchaseorderdetailRow, PurchaseorderheaderId, Int, TypoLocalDateTime, TypoShort, ProductId, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")(x => (x.purchaseorderid, x.purchaseorderdetailid, x.duedate, x.orderqty, x.productid, x.unitprice, x.receivedqty, x.rejectedqty, x.modifieddate))(PurchaseorderheaderId.encoder, Encoder.encodeInt, TypoLocalDateTime.encoder, TypoShort.encoder, ProductId.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PurchaseorderdetailRow] = new Read[PurchaseorderdetailRow](
-    gets = List(
-      (PurchaseorderheaderId.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PurchaseorderdetailRow(
-      purchaseorderid = PurchaseorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
-      purchaseorderdetailid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
-      duedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2),
-      orderqty = TypoShort.get.unsafeGetNonNullable(rs, i + 3),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 4),
-      unitprice = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 5),
-      receivedqty = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 6),
-      rejectedqty = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 7),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
+  implicit lazy val read: Read[PurchaseorderdetailRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(PurchaseorderheaderId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    PurchaseorderdetailRow(
+      purchaseorderid = arr(0).asInstanceOf[PurchaseorderheaderId],
+          purchaseorderdetailid = arr(1).asInstanceOf[Int],
+          duedate = arr(2).asInstanceOf[TypoLocalDateTime],
+          orderqty = arr(3).asInstanceOf[TypoShort],
+          productid = arr(4).asInstanceOf[ProductId],
+          unitprice = arr(5).asInstanceOf[BigDecimal],
+          receivedqty = arr(6).asInstanceOf[BigDecimal],
+          rejectedqty = arr(7).asInstanceOf[BigDecimal],
+          modifieddate = arr(8).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[PurchaseorderdetailRow] = Text.instance[PurchaseorderdetailRow]{ (row, sb) =>
     PurchaseorderheaderId.text.unsafeEncode(row.purchaseorderid, sb)
     sb.append(Text.DELIMETER)
@@ -105,38 +102,16 @@ object PurchaseorderdetailRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[PurchaseorderdetailRow] = new Write[PurchaseorderdetailRow](
-    puts = List((PurchaseorderheaderId.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (ProductId.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.purchaseorderid, x.purchaseorderdetailid, x.duedate, x.orderqty, x.productid, x.unitprice, x.receivedqty, x.rejectedqty, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  PurchaseorderheaderId.put.unsafeSetNonNullable(rs, i + 0, a.purchaseorderid)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 1, a.purchaseorderdetailid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.duedate)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 3, a.orderqty)
-                  ProductId.put.unsafeSetNonNullable(rs, i + 4, a.productid)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 5, a.unitprice)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 6, a.receivedqty)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 7, a.rejectedqty)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 8, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     PurchaseorderheaderId.put.unsafeUpdateNonNullable(ps, i + 0, a.purchaseorderid)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.purchaseorderdetailid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.duedate)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 3, a.orderqty)
-                     ProductId.put.unsafeUpdateNonNullable(ps, i + 4, a.productid)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.unitprice)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.receivedqty)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.rejectedqty)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 8, a.modifieddate)
-                   }
+  implicit lazy val write: Write[PurchaseorderdetailRow] = new Write.Composite[PurchaseorderdetailRow](
+    List(new Write.Single(PurchaseorderheaderId.put),
+         new Write.Single(Meta.IntMeta.put),
+         new Write.Single(TypoLocalDateTime.put),
+         new Write.Single(TypoShort.put),
+         new Write.Single(ProductId.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.purchaseorderid, a.purchaseorderdetailid, a.duedate, a.orderqty, a.productid, a.unitprice, a.receivedqty, a.rejectedqty, a.modifieddate)
   )
 }

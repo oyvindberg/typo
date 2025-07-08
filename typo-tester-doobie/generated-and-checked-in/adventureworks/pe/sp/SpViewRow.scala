@@ -14,12 +14,10 @@ import adventureworks.person.stateprovince.StateprovinceId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pe.sp */
 case class SpViewRow(
@@ -46,28 +44,27 @@ case class SpViewRow(
 object SpViewRow {
   implicit lazy val decoder: Decoder[SpViewRow] = Decoder.forProduct9[SpViewRow, StateprovinceId, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, TypoUUID, TypoLocalDateTime]("id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(SpViewRow.apply)(StateprovinceId.decoder, StateprovinceId.decoder, Decoder.decodeString, CountryregionId.decoder, Flag.decoder, Name.decoder, SalesterritoryId.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SpViewRow] = Encoder.forProduct9[SpViewRow, StateprovinceId, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, TypoUUID, TypoLocalDateTime]("id", "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(x => (x.id, x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate))(StateprovinceId.encoder, StateprovinceId.encoder, Encoder.encodeString, CountryregionId.encoder, Flag.encoder, Name.encoder, SalesterritoryId.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SpViewRow] = new Read[SpViewRow](
-    gets = List(
-      (StateprovinceId.get, Nullability.NoNulls),
-      (StateprovinceId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (CountryregionId.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (SalesterritoryId.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SpViewRow(
-      id = StateprovinceId.get.unsafeGetNonNullable(rs, i + 0),
-      stateprovinceid = StateprovinceId.get.unsafeGetNonNullable(rs, i + 1),
-      stateprovincecode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 3),
-      isonlystateprovinceflag = Flag.get.unsafeGetNonNullable(rs, i + 4),
-      name = Name.get.unsafeGetNonNullable(rs, i + 5),
-      territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 6),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 7),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
+  implicit lazy val read: Read[SpViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(StateprovinceId.get).asInstanceOf[Read[Any]],
+      new Read.Single(StateprovinceId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(CountryregionId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Flag.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(SalesterritoryId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    SpViewRow(
+      id = arr(0).asInstanceOf[StateprovinceId],
+          stateprovinceid = arr(1).asInstanceOf[StateprovinceId],
+          stateprovincecode = arr(2).asInstanceOf[/* bpchar, max 3 chars */ String],
+          countryregioncode = arr(3).asInstanceOf[CountryregionId],
+          isonlystateprovinceflag = arr(4).asInstanceOf[Flag],
+          name = arr(5).asInstanceOf[Name],
+          territoryid = arr(6).asInstanceOf[SalesterritoryId],
+          rowguid = arr(7).asInstanceOf[TypoUUID],
+          modifieddate = arr(8).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

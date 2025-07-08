@@ -32,39 +32,39 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     DeleteBuilder(""""production"."billofmaterials"""", BillofmaterialsFields.structure)
   }
   override def deleteById(billofmaterialsid: Int): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."billofmaterials" where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."billofmaterials" where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(new Write.Single(Meta.IntMeta.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(billofmaterialsids: Array[Int]): ConnectionIO[Int] = {
     sql"""delete from "production"."billofmaterials" where "billofmaterialsid" = ANY(${billofmaterialsids})""".update.run
   }
   override def insert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     sql"""insert into "production"."billofmaterials"("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
-          values (${fromWrite(unsaved.billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.productassemblyid)(Write.fromPutOption(ProductId.put))}::int4, ${fromWrite(unsaved.componentid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.bomlevel)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.perassemblyqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.billofmaterialsid)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.productassemblyid)(new Write.SingleOpt(ProductId.put))}::int4, ${fromWrite(unsaved.componentid)(new Write.Single(ProductId.put))}::int4, ${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.unitmeasurecode)(new Write.Single(UnitmeasureId.put))}::bpchar, ${fromWrite(unsaved.bomlevel)(new Write.Single(TypoShort.put))}::int2, ${fromWrite(unsaved.perassemblyqty)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text
        """.query(using BillofmaterialsRow.read).unique
   }
   override def insert(unsaved: BillofmaterialsRowUnsaved): ConnectionIO[BillofmaterialsRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""productassemblyid""""), fr"${fromWrite(unsaved.productassemblyid)(Write.fromPutOption(ProductId.put))}::int4")),
-      Some((Fragment.const0(s""""componentid""""), fr"${fromWrite(unsaved.componentid)(Write.fromPut(ProductId.put))}::int4")),
-      Some((Fragment.const0(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const0(s""""unitmeasurecode""""), fr"${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar")),
-      Some((Fragment.const0(s""""bomlevel""""), fr"${fromWrite(unsaved.bomlevel)(Write.fromPut(TypoShort.put))}::int2")),
+      Some((Fragment.const0(s""""productassemblyid""""), fr"${fromWrite(unsaved.productassemblyid)(new Write.SingleOpt(ProductId.put))}::int4")),
+      Some((Fragment.const0(s""""componentid""""), fr"${fromWrite(unsaved.componentid)(new Write.Single(ProductId.put))}::int4")),
+      Some((Fragment.const0(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""unitmeasurecode""""), fr"${fromWrite(unsaved.unitmeasurecode)(new Write.Single(UnitmeasureId.put))}::bpchar")),
+      Some((Fragment.const0(s""""bomlevel""""), fr"${fromWrite(unsaved.bomlevel)(new Write.Single(TypoShort.put))}::int2")),
       unsaved.billofmaterialsid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""billofmaterialsid""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""billofmaterialsid""""), fr"${fromWrite(value: Int)(new Write.Single(Meta.IntMeta.put))}::int4"))
       },
       unsaved.startdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""startdate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""startdate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       },
       unsaved.perassemblyqty match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""perassemblyqty""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""perassemblyqty""""), fr"${fromWrite(value: BigDecimal)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -96,7 +96,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
     sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from "production"."billofmaterials"""".query(using BillofmaterialsRow.read).stream
   }
   override def selectById(billofmaterialsid: Int): ConnectionIO[Option[BillofmaterialsRow]] = {
-    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from "production"."billofmaterials" where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}""".query(using BillofmaterialsRow.read).option
+    sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from "production"."billofmaterials" where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(new Write.Single(Meta.IntMeta.put))}""".query(using BillofmaterialsRow.read).option
   }
   override def selectByIds(billofmaterialsids: Array[Int]): Stream[ConnectionIO, BillofmaterialsRow] = {
     sql"""select "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text from "production"."billofmaterials" where "billofmaterialsid" = ANY(${billofmaterialsids})""".query(using BillofmaterialsRow.read).stream
@@ -113,15 +113,15 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def update(row: BillofmaterialsRow): ConnectionIO[Boolean] = {
     val billofmaterialsid = row.billofmaterialsid
     sql"""update "production"."billofmaterials"
-          set "productassemblyid" = ${fromWrite(row.productassemblyid)(Write.fromPutOption(ProductId.put))}::int4,
-              "componentid" = ${fromWrite(row.componentid)(Write.fromPut(ProductId.put))}::int4,
-              "startdate" = ${fromWrite(row.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-              "enddate" = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
-              "unitmeasurecode" = ${fromWrite(row.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar,
-              "bomlevel" = ${fromWrite(row.bomlevel)(Write.fromPut(TypoShort.put))}::int2,
-              "perassemblyqty" = ${fromWrite(row.perassemblyqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}"""
+          set "productassemblyid" = ${fromWrite(row.productassemblyid)(new Write.SingleOpt(ProductId.put))}::int4,
+              "componentid" = ${fromWrite(row.componentid)(new Write.Single(ProductId.put))}::int4,
+              "startdate" = ${fromWrite(row.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+              "enddate" = ${fromWrite(row.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp,
+              "unitmeasurecode" = ${fromWrite(row.unitmeasurecode)(new Write.Single(UnitmeasureId.put))}::bpchar,
+              "bomlevel" = ${fromWrite(row.bomlevel)(new Write.Single(TypoShort.put))}::int2,
+              "perassemblyqty" = ${fromWrite(row.perassemblyqty)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(new Write.Single(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -129,15 +129,15 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def upsert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     sql"""insert into "production"."billofmaterials"("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")
           values (
-            ${fromWrite(unsaved.billofmaterialsid)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.productassemblyid)(Write.fromPutOption(ProductId.put))}::int4,
-            ${fromWrite(unsaved.componentid)(Write.fromPut(ProductId.put))}::int4,
-            ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.unitmeasurecode)(Write.fromPut(UnitmeasureId.put))}::bpchar,
-            ${fromWrite(unsaved.bomlevel)(Write.fromPut(TypoShort.put))}::int2,
-            ${fromWrite(unsaved.perassemblyqty)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.billofmaterialsid)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.productassemblyid)(new Write.SingleOpt(ProductId.put))}::int4,
+            ${fromWrite(unsaved.componentid)(new Write.Single(ProductId.put))}::int4,
+            ${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.unitmeasurecode)(new Write.Single(UnitmeasureId.put))}::bpchar,
+            ${fromWrite(unsaved.bomlevel)(new Write.Single(TypoShort.put))}::int2,
+            ${fromWrite(unsaved.perassemblyqty)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("billofmaterialsid")
           do update set

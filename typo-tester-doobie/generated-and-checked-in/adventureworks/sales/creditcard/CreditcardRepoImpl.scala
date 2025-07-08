@@ -32,30 +32,30 @@ class CreditcardRepoImpl extends CreditcardRepo {
     DeleteBuilder(""""sales"."creditcard"""", CreditcardFields.structure)
   }
   override def deleteById(creditcardid: /* user-picked */ CustomCreditcardId): ConnectionIO[Boolean] = {
-    sql"""delete from "sales"."creditcard" where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."creditcard" where "creditcardid" = ${fromWrite(creditcardid)(new Write.Single(/* user-picked */ CustomCreditcardId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit put0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Int] = {
     sql"""delete from "sales"."creditcard" where "creditcardid" = ANY(${creditcardids})""".update.run
   }
   override def insert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     sql"""insert into "sales"."creditcard"("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
-          values (${fromWrite(unsaved.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4, ${fromWrite(unsaved.cardtype)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.cardnumber)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.expmonth)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.expyear)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.creditcardid)(new Write.Single(/* user-picked */ CustomCreditcardId.put))}::int4, ${fromWrite(unsaved.cardtype)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.cardnumber)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.expmonth)(new Write.Single(TypoShort.put))}::int2, ${fromWrite(unsaved.expyear)(new Write.Single(TypoShort.put))}::int2, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text
        """.query(using CreditcardRow.read).unique
   }
   override def insert(unsaved: CreditcardRowUnsaved): ConnectionIO[CreditcardRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""cardtype""""), fr"${fromWrite(unsaved.cardtype)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""cardnumber""""), fr"${fromWrite(unsaved.cardnumber)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""expmonth""""), fr"${fromWrite(unsaved.expmonth)(Write.fromPut(TypoShort.put))}::int2")),
-      Some((Fragment.const0(s""""expyear""""), fr"${fromWrite(unsaved.expyear)(Write.fromPut(TypoShort.put))}::int2")),
+      Some((Fragment.const0(s""""cardtype""""), fr"${fromWrite(unsaved.cardtype)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""cardnumber""""), fr"${fromWrite(unsaved.cardnumber)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""expmonth""""), fr"${fromWrite(unsaved.expmonth)(new Write.Single(TypoShort.put))}::int2")),
+      Some((Fragment.const0(s""""expyear""""), fr"${fromWrite(unsaved.expyear)(new Write.Single(TypoShort.put))}::int2")),
       unsaved.creditcardid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""creditcardid""""), fr"${fromWrite(value: /* user-picked */ CustomCreditcardId)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""creditcardid""""), fr"${fromWrite(value: /* user-picked */ CustomCreditcardId)(new Write.Single(/* user-picked */ CustomCreditcardId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -87,7 +87,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
     sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from "sales"."creditcard"""".query(using CreditcardRow.read).stream
   }
   override def selectById(creditcardid: /* user-picked */ CustomCreditcardId): ConnectionIO[Option[CreditcardRow]] = {
-    sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from "sales"."creditcard" where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}""".query(using CreditcardRow.read).option
+    sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from "sales"."creditcard" where "creditcardid" = ${fromWrite(creditcardid)(new Write.Single(/* user-picked */ CustomCreditcardId.put))}""".query(using CreditcardRow.read).option
   }
   override def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): Stream[ConnectionIO, CreditcardRow] = {
     sql"""select "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text from "sales"."creditcard" where "creditcardid" = ANY(${creditcardids})""".query(using CreditcardRow.read).stream
@@ -104,12 +104,12 @@ class CreditcardRepoImpl extends CreditcardRepo {
   override def update(row: CreditcardRow): ConnectionIO[Boolean] = {
     val creditcardid = row.creditcardid
     sql"""update "sales"."creditcard"
-          set "cardtype" = ${fromWrite(row.cardtype)(Write.fromPut(Meta.StringMeta.put))},
-              "cardnumber" = ${fromWrite(row.cardnumber)(Write.fromPut(Meta.StringMeta.put))},
-              "expmonth" = ${fromWrite(row.expmonth)(Write.fromPut(TypoShort.put))}::int2,
-              "expyear" = ${fromWrite(row.expyear)(Write.fromPut(TypoShort.put))}::int2,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "creditcardid" = ${fromWrite(creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}"""
+          set "cardtype" = ${fromWrite(row.cardtype)(new Write.Single(Meta.StringMeta.put))},
+              "cardnumber" = ${fromWrite(row.cardnumber)(new Write.Single(Meta.StringMeta.put))},
+              "expmonth" = ${fromWrite(row.expmonth)(new Write.Single(TypoShort.put))}::int2,
+              "expyear" = ${fromWrite(row.expyear)(new Write.Single(TypoShort.put))}::int2,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "creditcardid" = ${fromWrite(creditcardid)(new Write.Single(/* user-picked */ CustomCreditcardId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -117,12 +117,12 @@ class CreditcardRepoImpl extends CreditcardRepo {
   override def upsert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     sql"""insert into "sales"."creditcard"("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")
           values (
-            ${fromWrite(unsaved.creditcardid)(Write.fromPut(/* user-picked */ CustomCreditcardId.put))}::int4,
-            ${fromWrite(unsaved.cardtype)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.cardnumber)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.expmonth)(Write.fromPut(TypoShort.put))}::int2,
-            ${fromWrite(unsaved.expyear)(Write.fromPut(TypoShort.put))}::int2,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.creditcardid)(new Write.Single(/* user-picked */ CustomCreditcardId.put))}::int4,
+            ${fromWrite(unsaved.cardtype)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.cardnumber)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.expmonth)(new Write.Single(TypoShort.put))}::int2,
+            ${fromWrite(unsaved.expyear)(new Write.Single(TypoShort.put))}::int2,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("creditcardid")
           do update set

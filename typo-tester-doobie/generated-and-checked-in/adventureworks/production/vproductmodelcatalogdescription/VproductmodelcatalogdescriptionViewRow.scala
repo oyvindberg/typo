@@ -11,7 +11,6 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productmodel.ProductmodelId
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
@@ -19,7 +18,6 @@ import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
-import java.sql.ResultSet
 import scala.util.Try
 
 /** View: production.vproductmodelcatalogdescription */
@@ -120,60 +118,59 @@ object VproductmodelcatalogdescriptionViewRow {
       "modifieddate" -> TypoLocalDateTime.encoder.apply(row.modifieddate)
     )
   )
-  implicit lazy val read: Read[VproductmodelcatalogdescriptionViewRow] = new Read[VproductmodelcatalogdescriptionViewRow](
-    gets = List(
-      (ProductmodelId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => VproductmodelcatalogdescriptionViewRow(
-      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      summary = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      manufacturer = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      copyright = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      producturl = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
-      warrantyperiod = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
-      warrantydescription = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
-      noofyears = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      maintenancedescription = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
-      wheel = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
-      saddle = Meta.StringMeta.get.unsafeGetNullable(rs, i + 11),
-      pedal = Meta.StringMeta.get.unsafeGetNullable(rs, i + 12),
-      bikeframe = Meta.StringMeta.get.unsafeGetNullable(rs, i + 13),
-      crankset = Meta.StringMeta.get.unsafeGetNullable(rs, i + 14),
-      pictureangle = Meta.StringMeta.get.unsafeGetNullable(rs, i + 15),
-      picturesize = Meta.StringMeta.get.unsafeGetNullable(rs, i + 16),
-      productphotoid = Meta.StringMeta.get.unsafeGetNullable(rs, i + 17),
-      material = Meta.StringMeta.get.unsafeGetNullable(rs, i + 18),
-      color = Meta.StringMeta.get.unsafeGetNullable(rs, i + 19),
-      productline = Meta.StringMeta.get.unsafeGetNullable(rs, i + 20),
-      style = Meta.StringMeta.get.unsafeGetNullable(rs, i + 21),
-      riderexperience = Meta.StringMeta.get.unsafeGetNullable(rs, i + 22),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 23),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 24)
+  implicit lazy val read: Read[VproductmodelcatalogdescriptionViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ProductmodelId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    VproductmodelcatalogdescriptionViewRow(
+      productmodelid = arr(0).asInstanceOf[ProductmodelId],
+          name = arr(1).asInstanceOf[Name],
+          summary = arr(2).asInstanceOf[/* nullability unknown */ Option[String]],
+          manufacturer = arr(3).asInstanceOf[/* nullability unknown */ Option[String]],
+          copyright = arr(4).asInstanceOf[/* nullability unknown */ Option[/* max 30 chars */ String]],
+          producturl = arr(5).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          warrantyperiod = arr(6).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          warrantydescription = arr(7).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          noofyears = arr(8).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          maintenancedescription = arr(9).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          wheel = arr(10).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          saddle = arr(11).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          pedal = arr(12).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          bikeframe = arr(13).asInstanceOf[/* nullability unknown */ Option[String]],
+          crankset = arr(14).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          pictureangle = arr(15).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          picturesize = arr(16).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          productphotoid = arr(17).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          material = arr(18).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          color = arr(19).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          productline = arr(20).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          style = arr(21).asInstanceOf[/* nullability unknown */ Option[/* max 256 chars */ String]],
+          riderexperience = arr(22).asInstanceOf[/* nullability unknown */ Option[/* max 1024 chars */ String]],
+          rowguid = arr(23).asInstanceOf[TypoUUID],
+          modifieddate = arr(24).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

@@ -32,7 +32,7 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     DeleteBuilder(""""person"."businessentityaddress"""", BusinessentityaddressFields.structure)
   }
   override def deleteById(compositeId: BusinessentityaddressId): ConnectionIO[Boolean] = {
-    sql"""delete from "person"."businessentityaddress" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "addressid" = ${fromWrite(compositeId.addressid)(Write.fromPut(AddressId.put))} AND "addresstypeid" = ${fromWrite(compositeId.addresstypeid)(Write.fromPut(AddresstypeId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "person"."businessentityaddress" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "addressid" = ${fromWrite(compositeId.addressid)(new Write.Single(AddressId.put))} AND "addresstypeid" = ${fromWrite(compositeId.addresstypeid)(new Write.Single(AddresstypeId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[BusinessentityaddressId]): ConnectionIO[Int] = {
     val businessentityid = compositeIds.map(_.businessentityid)
@@ -47,22 +47,22 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   }
   override def insert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow] = {
     sql"""insert into "person"."businessentityaddress"("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.addressid)(Write.fromPut(AddressId.put))}::int4, ${fromWrite(unsaved.addresstypeid)(Write.fromPut(AddresstypeId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4, ${fromWrite(unsaved.addressid)(new Write.Single(AddressId.put))}::int4, ${fromWrite(unsaved.addresstypeid)(new Write.Single(AddresstypeId.put))}::int4, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
        """.query(using BusinessentityaddressRow.read).unique
   }
   override def insert(unsaved: BusinessentityaddressRowUnsaved): ConnectionIO[BusinessentityaddressRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const0(s""""addressid""""), fr"${fromWrite(unsaved.addressid)(Write.fromPut(AddressId.put))}::int4")),
-      Some((Fragment.const0(s""""addresstypeid""""), fr"${fromWrite(unsaved.addresstypeid)(Write.fromPut(AddresstypeId.put))}::int4")),
+      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4")),
+      Some((Fragment.const0(s""""addressid""""), fr"${fromWrite(unsaved.addressid)(new Write.Single(AddressId.put))}::int4")),
+      Some((Fragment.const0(s""""addresstypeid""""), fr"${fromWrite(unsaved.addresstypeid)(new Write.Single(AddresstypeId.put))}::int4")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -94,7 +94,7 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
     sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from "person"."businessentityaddress"""".query(using BusinessentityaddressRow.read).stream
   }
   override def selectById(compositeId: BusinessentityaddressId): ConnectionIO[Option[BusinessentityaddressRow]] = {
-    sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from "person"."businessentityaddress" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "addressid" = ${fromWrite(compositeId.addressid)(Write.fromPut(AddressId.put))} AND "addresstypeid" = ${fromWrite(compositeId.addresstypeid)(Write.fromPut(AddresstypeId.put))}""".query(using BusinessentityaddressRow.read).option
+    sql"""select "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text from "person"."businessentityaddress" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "addressid" = ${fromWrite(compositeId.addressid)(new Write.Single(AddressId.put))} AND "addresstypeid" = ${fromWrite(compositeId.addresstypeid)(new Write.Single(AddresstypeId.put))}""".query(using BusinessentityaddressRow.read).option
   }
   override def selectByIds(compositeIds: Array[BusinessentityaddressId]): Stream[ConnectionIO, BusinessentityaddressRow] = {
     val businessentityid = compositeIds.map(_.businessentityid)
@@ -119,9 +119,9 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def update(row: BusinessentityaddressRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update "person"."businessentityaddress"
-          set "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "addressid" = ${fromWrite(compositeId.addressid)(Write.fromPut(AddressId.put))} AND "addresstypeid" = ${fromWrite(compositeId.addresstypeid)(Write.fromPut(AddresstypeId.put))}"""
+          set "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "addressid" = ${fromWrite(compositeId.addressid)(new Write.Single(AddressId.put))} AND "addresstypeid" = ${fromWrite(compositeId.addresstypeid)(new Write.Single(AddresstypeId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -129,11 +129,11 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def upsert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow] = {
     sql"""insert into "person"."businessentityaddress"("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
-            ${fromWrite(unsaved.addressid)(Write.fromPut(AddressId.put))}::int4,
-            ${fromWrite(unsaved.addresstypeid)(Write.fromPut(AddresstypeId.put))}::int4,
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.addressid)(new Write.Single(AddressId.put))}::int4,
+            ${fromWrite(unsaved.addresstypeid)(new Write.Single(AddresstypeId.put))}::int4,
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("businessentityid", "addressid", "addresstypeid")
           do update set

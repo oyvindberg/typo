@@ -35,43 +35,43 @@ class PersonRepoImpl extends PersonRepo {
     DeleteBuilder(""""person"."person"""", PersonFields.structure)
   }
   override def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"""delete from "person"."person" where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "person"."person" where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
     sql"""delete from "person"."person" where "businessentityid" = ANY(${businessentityids})""".update.run
   }
   override def insert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into "person"."person"("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.persontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.namestyle)(Write.fromPut(NameStyle.put))}::bool, ${fromWrite(unsaved.title)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.firstname)(Write.fromPut(/* user-picked */ FirstName.put))}::varchar, ${fromWrite(unsaved.middlename)(Write.fromPutOption(Name.put))}::varchar, ${fromWrite(unsaved.lastname)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.suffix)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.emailpromotion)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.additionalcontactinfo)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4, ${fromWrite(unsaved.persontype)(new Write.Single(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.namestyle)(new Write.Single(NameStyle.put))}::bool, ${fromWrite(unsaved.title)(new Write.SingleOpt(Meta.StringMeta.put))}, ${fromWrite(unsaved.firstname)(new Write.Single(/* user-picked */ FirstName.put))}::varchar, ${fromWrite(unsaved.middlename)(new Write.SingleOpt(Name.put))}::varchar, ${fromWrite(unsaved.lastname)(new Write.Single(Name.put))}::varchar, ${fromWrite(unsaved.suffix)(new Write.SingleOpt(Meta.StringMeta.put))}, ${fromWrite(unsaved.emailpromotion)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.additionalcontactinfo)(new Write.SingleOpt(TypoXml.put))}::xml, ${fromWrite(unsaved.demographics)(new Write.SingleOpt(TypoXml.put))}::xml, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text
        """.query(using PersonRow.read).unique
   }
   override def insert(unsaved: PersonRowUnsaved): ConnectionIO[PersonRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const0(s""""persontype""""), fr"${fromWrite(unsaved.persontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
-      Some((Fragment.const0(s""""title""""), fr"${fromWrite(unsaved.title)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""firstname""""), fr"${fromWrite(unsaved.firstname)(Write.fromPut(/* user-picked */ FirstName.put))}::varchar")),
-      Some((Fragment.const0(s""""middlename""""), fr"${fromWrite(unsaved.middlename)(Write.fromPutOption(Name.put))}::varchar")),
-      Some((Fragment.const0(s""""lastname""""), fr"${fromWrite(unsaved.lastname)(Write.fromPut(Name.put))}::varchar")),
-      Some((Fragment.const0(s""""suffix""""), fr"${fromWrite(unsaved.suffix)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""additionalcontactinfo""""), fr"${fromWrite(unsaved.additionalcontactinfo)(Write.fromPutOption(TypoXml.put))}::xml")),
-      Some((Fragment.const0(s""""demographics""""), fr"${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml")),
+      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4")),
+      Some((Fragment.const0(s""""persontype""""), fr"${fromWrite(unsaved.persontype)(new Write.Single(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const0(s""""title""""), fr"${fromWrite(unsaved.title)(new Write.SingleOpt(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""firstname""""), fr"${fromWrite(unsaved.firstname)(new Write.Single(/* user-picked */ FirstName.put))}::varchar")),
+      Some((Fragment.const0(s""""middlename""""), fr"${fromWrite(unsaved.middlename)(new Write.SingleOpt(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""lastname""""), fr"${fromWrite(unsaved.lastname)(new Write.Single(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""suffix""""), fr"${fromWrite(unsaved.suffix)(new Write.SingleOpt(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""additionalcontactinfo""""), fr"${fromWrite(unsaved.additionalcontactinfo)(new Write.SingleOpt(TypoXml.put))}::xml")),
+      Some((Fragment.const0(s""""demographics""""), fr"${fromWrite(unsaved.demographics)(new Write.SingleOpt(TypoXml.put))}::xml")),
       unsaved.namestyle match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""namestyle""""), fr"${fromWrite(value: NameStyle)(Write.fromPut(NameStyle.put))}::bool"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""namestyle""""), fr"${fromWrite(value: NameStyle)(new Write.Single(NameStyle.put))}::bool"))
       },
       unsaved.emailpromotion match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""emailpromotion""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""emailpromotion""""), fr"${fromWrite(value: Int)(new Write.Single(Meta.IntMeta.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -103,7 +103,7 @@ class PersonRepoImpl extends PersonRepo {
     sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from "person"."person"""".query(using PersonRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PersonRow]] = {
-    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from "person"."person" where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using PersonRow.read).option
+    sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from "person"."person" where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}""".query(using PersonRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PersonRow] = {
     sql"""select "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text from "person"."person" where "businessentityid" = ANY(${businessentityids})""".query(using PersonRow.read).stream
@@ -120,19 +120,19 @@ class PersonRepoImpl extends PersonRepo {
   override def update(row: PersonRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update "person"."person"
-          set "persontype" = ${fromWrite(row.persontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
-              "namestyle" = ${fromWrite(row.namestyle)(Write.fromPut(NameStyle.put))}::bool,
-              "title" = ${fromWrite(row.title)(Write.fromPutOption(Meta.StringMeta.put))},
-              "firstname" = ${fromWrite(row.firstname)(Write.fromPut(/* user-picked */ FirstName.put))}::varchar,
-              "middlename" = ${fromWrite(row.middlename)(Write.fromPutOption(Name.put))}::varchar,
-              "lastname" = ${fromWrite(row.lastname)(Write.fromPut(Name.put))}::varchar,
-              "suffix" = ${fromWrite(row.suffix)(Write.fromPutOption(Meta.StringMeta.put))},
-              "emailpromotion" = ${fromWrite(row.emailpromotion)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "additionalcontactinfo" = ${fromWrite(row.additionalcontactinfo)(Write.fromPutOption(TypoXml.put))}::xml,
-              "demographics" = ${fromWrite(row.demographics)(Write.fromPutOption(TypoXml.put))}::xml,
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}"""
+          set "persontype" = ${fromWrite(row.persontype)(new Write.Single(Meta.StringMeta.put))}::bpchar,
+              "namestyle" = ${fromWrite(row.namestyle)(new Write.Single(NameStyle.put))}::bool,
+              "title" = ${fromWrite(row.title)(new Write.SingleOpt(Meta.StringMeta.put))},
+              "firstname" = ${fromWrite(row.firstname)(new Write.Single(/* user-picked */ FirstName.put))}::varchar,
+              "middlename" = ${fromWrite(row.middlename)(new Write.SingleOpt(Name.put))}::varchar,
+              "lastname" = ${fromWrite(row.lastname)(new Write.Single(Name.put))}::varchar,
+              "suffix" = ${fromWrite(row.suffix)(new Write.SingleOpt(Meta.StringMeta.put))},
+              "emailpromotion" = ${fromWrite(row.emailpromotion)(new Write.Single(Meta.IntMeta.put))}::int4,
+              "additionalcontactinfo" = ${fromWrite(row.additionalcontactinfo)(new Write.SingleOpt(TypoXml.put))}::xml,
+              "demographics" = ${fromWrite(row.demographics)(new Write.SingleOpt(TypoXml.put))}::xml,
+              "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -140,19 +140,19 @@ class PersonRepoImpl extends PersonRepo {
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into "person"."person"("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
-            ${fromWrite(unsaved.persontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
-            ${fromWrite(unsaved.namestyle)(Write.fromPut(NameStyle.put))}::bool,
-            ${fromWrite(unsaved.title)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.firstname)(Write.fromPut(/* user-picked */ FirstName.put))}::varchar,
-            ${fromWrite(unsaved.middlename)(Write.fromPutOption(Name.put))}::varchar,
-            ${fromWrite(unsaved.lastname)(Write.fromPut(Name.put))}::varchar,
-            ${fromWrite(unsaved.suffix)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.emailpromotion)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.additionalcontactinfo)(Write.fromPutOption(TypoXml.put))}::xml,
-            ${fromWrite(unsaved.demographics)(Write.fromPutOption(TypoXml.put))}::xml,
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.persontype)(new Write.Single(Meta.StringMeta.put))}::bpchar,
+            ${fromWrite(unsaved.namestyle)(new Write.Single(NameStyle.put))}::bool,
+            ${fromWrite(unsaved.title)(new Write.SingleOpt(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.firstname)(new Write.Single(/* user-picked */ FirstName.put))}::varchar,
+            ${fromWrite(unsaved.middlename)(new Write.SingleOpt(Name.put))}::varchar,
+            ${fromWrite(unsaved.lastname)(new Write.Single(Name.put))}::varchar,
+            ${fromWrite(unsaved.suffix)(new Write.SingleOpt(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.emailpromotion)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.additionalcontactinfo)(new Write.SingleOpt(TypoXml.put))}::xml,
+            ${fromWrite(unsaved.demographics)(new Write.SingleOpt(TypoXml.put))}::xml,
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("businessentityid")
           do update set

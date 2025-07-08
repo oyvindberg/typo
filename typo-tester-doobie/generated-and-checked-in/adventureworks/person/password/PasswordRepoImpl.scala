@@ -31,29 +31,29 @@ class PasswordRepoImpl extends PasswordRepo {
     DeleteBuilder(""""person"."password"""", PasswordFields.structure)
   }
   override def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"""delete from "person"."password" where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "person"."password" where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
     sql"""delete from "person"."password" where "businessentityid" = ANY(${businessentityids})""".update.run
   }
   override def insert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     sql"""insert into "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.passwordhash)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.passwordsalt)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4, ${fromWrite(unsaved.passwordhash)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.passwordsalt)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text
        """.query(using PasswordRow.read).unique
   }
   override def insert(unsaved: PasswordRowUnsaved): ConnectionIO[PasswordRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const0(s""""passwordhash""""), fr"${fromWrite(unsaved.passwordhash)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""passwordsalt""""), fr"${fromWrite(unsaved.passwordsalt)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4")),
+      Some((Fragment.const0(s""""passwordhash""""), fr"${fromWrite(unsaved.passwordhash)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""passwordsalt""""), fr"${fromWrite(unsaved.passwordsalt)(new Write.Single(Meta.StringMeta.put))}")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -85,7 +85,7 @@ class PasswordRepoImpl extends PasswordRepo {
     sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from "person"."password"""".query(using PasswordRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[PasswordRow]] = {
-    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from "person"."password" where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using PasswordRow.read).option
+    sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from "person"."password" where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}""".query(using PasswordRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PasswordRow] = {
     sql"""select "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text from "person"."password" where "businessentityid" = ANY(${businessentityids})""".query(using PasswordRow.read).stream
@@ -102,11 +102,11 @@ class PasswordRepoImpl extends PasswordRepo {
   override def update(row: PasswordRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update "person"."password"
-          set "passwordhash" = ${fromWrite(row.passwordhash)(Write.fromPut(Meta.StringMeta.put))},
-              "passwordsalt" = ${fromWrite(row.passwordsalt)(Write.fromPut(Meta.StringMeta.put))},
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}"""
+          set "passwordhash" = ${fromWrite(row.passwordhash)(new Write.Single(Meta.StringMeta.put))},
+              "passwordsalt" = ${fromWrite(row.passwordsalt)(new Write.Single(Meta.StringMeta.put))},
+              "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -114,11 +114,11 @@ class PasswordRepoImpl extends PasswordRepo {
   override def upsert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     sql"""insert into "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
-            ${fromWrite(unsaved.passwordhash)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.passwordsalt)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.passwordhash)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.passwordsalt)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("businessentityid")
           do update set

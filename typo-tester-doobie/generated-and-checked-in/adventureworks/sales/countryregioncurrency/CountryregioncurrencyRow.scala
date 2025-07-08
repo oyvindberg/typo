@@ -11,13 +11,11 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: sales.countryregioncurrency
     Cross-reference table mapping ISO currency codes to a country or region.
@@ -43,18 +41,17 @@ object CountryregioncurrencyRow {
     new CountryregioncurrencyRow(compositeId.countryregioncode, compositeId.currencycode, modifieddate)
   implicit lazy val decoder: Decoder[CountryregioncurrencyRow] = Decoder.forProduct3[CountryregioncurrencyRow, CountryregionId, CurrencyId, TypoLocalDateTime]("countryregioncode", "currencycode", "modifieddate")(CountryregioncurrencyRow.apply)(CountryregionId.decoder, CurrencyId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[CountryregioncurrencyRow] = Encoder.forProduct3[CountryregioncurrencyRow, CountryregionId, CurrencyId, TypoLocalDateTime]("countryregioncode", "currencycode", "modifieddate")(x => (x.countryregioncode, x.currencycode, x.modifieddate))(CountryregionId.encoder, CurrencyId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[CountryregioncurrencyRow] = new Read[CountryregioncurrencyRow](
-    gets = List(
-      (CountryregionId.get, Nullability.NoNulls),
-      (CurrencyId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => CountryregioncurrencyRow(
-      countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 0),
-      currencycode = CurrencyId.get.unsafeGetNonNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[CountryregioncurrencyRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(CountryregionId.get).asInstanceOf[Read[Any]],
+      new Read.Single(CurrencyId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    CountryregioncurrencyRow(
+      countryregioncode = arr(0).asInstanceOf[CountryregionId],
+          currencycode = arr(1).asInstanceOf[CurrencyId],
+          modifieddate = arr(2).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[CountryregioncurrencyRow] = Text.instance[CountryregioncurrencyRow]{ (row, sb) =>
     CountryregionId.text.unsafeEncode(row.countryregioncode, sb)
     sb.append(Text.DELIMETER)
@@ -62,20 +59,10 @@ object CountryregioncurrencyRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[CountryregioncurrencyRow] = new Write[CountryregioncurrencyRow](
-    puts = List((CountryregionId.put, Nullability.NoNulls),
-                (CurrencyId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.countryregioncode, x.currencycode, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  CountryregionId.put.unsafeSetNonNullable(rs, i + 0, a.countryregioncode)
-                  CurrencyId.put.unsafeSetNonNullable(rs, i + 1, a.currencycode)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     CountryregionId.put.unsafeUpdateNonNullable(ps, i + 0, a.countryregioncode)
-                     CurrencyId.put.unsafeUpdateNonNullable(ps, i + 1, a.currencycode)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
-                   }
+  implicit lazy val write: Write[CountryregioncurrencyRow] = new Write.Composite[CountryregioncurrencyRow](
+    List(new Write.Single(CountryregionId.put),
+         new Write.Single(CurrencyId.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.countryregioncode, a.currencycode, a.modifieddate)
   )
 }

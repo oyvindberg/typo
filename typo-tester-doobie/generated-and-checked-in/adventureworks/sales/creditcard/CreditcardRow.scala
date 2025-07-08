@@ -11,14 +11,12 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.userdefined.CustomCreditcardId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: sales.creditcard
     Customer credit card information.
@@ -46,24 +44,23 @@ case class CreditcardRow(
 object CreditcardRow {
   implicit lazy val decoder: Decoder[CreditcardRow] = Decoder.forProduct6[CreditcardRow, /* user-picked */ CustomCreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, TypoShort, TypoShort, TypoLocalDateTime]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(CreditcardRow.apply)(CustomCreditcardId.decoder, Decoder.decodeString, Decoder.decodeString, TypoShort.decoder, TypoShort.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[CreditcardRow] = Encoder.forProduct6[CreditcardRow, /* user-picked */ CustomCreditcardId, /* max 50 chars */ String, /* max 25 chars */ String, TypoShort, TypoShort, TypoLocalDateTime]("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")(x => (x.creditcardid, x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.modifieddate))(CustomCreditcardId.encoder, Encoder.encodeString, Encoder.encodeString, TypoShort.encoder, TypoShort.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[CreditcardRow] = new Read[CreditcardRow](
-    gets = List(
-      (/* user-picked */ CustomCreditcardId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => CreditcardRow(
-      creditcardid = /* user-picked */ CustomCreditcardId.get.unsafeGetNonNullable(rs, i + 0),
-      cardtype = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      cardnumber = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      expmonth = TypoShort.get.unsafeGetNonNullable(rs, i + 3),
-      expyear = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[CreditcardRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(/* user-picked */ CustomCreditcardId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    CreditcardRow(
+      creditcardid = arr(0).asInstanceOf[/* user-picked */ CustomCreditcardId],
+          cardtype = arr(1).asInstanceOf[/* max 50 chars */ String],
+          cardnumber = arr(2).asInstanceOf[/* max 25 chars */ String],
+          expmonth = arr(3).asInstanceOf[TypoShort],
+          expyear = arr(4).asInstanceOf[TypoShort],
+          modifieddate = arr(5).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[CreditcardRow] = Text.instance[CreditcardRow]{ (row, sb) =>
     /* user-picked */ CustomCreditcardId.text.unsafeEncode(row.creditcardid, sb)
     sb.append(Text.DELIMETER)
@@ -77,29 +74,13 @@ object CreditcardRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[CreditcardRow] = new Write[CreditcardRow](
-    puts = List((/* user-picked */ CustomCreditcardId.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.creditcardid, x.cardtype, x.cardnumber, x.expmonth, x.expyear, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  /* user-picked */ CustomCreditcardId.put.unsafeSetNonNullable(rs, i + 0, a.creditcardid)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.cardtype)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 2, a.cardnumber)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 3, a.expmonth)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 4, a.expyear)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     /* user-picked */ CustomCreditcardId.put.unsafeUpdateNonNullable(ps, i + 0, a.creditcardid)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.cardtype)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.cardnumber)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 3, a.expmonth)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 4, a.expyear)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
-                   }
+  implicit lazy val write: Write[CreditcardRow] = new Write.Composite[CreditcardRow](
+    List(new Write.Single(/* user-picked */ CustomCreditcardId.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(TypoShort.put),
+         new Write.Single(TypoShort.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.creditcardid, a.cardtype, a.cardnumber, a.expmonth, a.expyear, a.modifieddate)
   )
 }

@@ -10,13 +10,11 @@ package culture
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: production.culture
     Lookup table containing the languages in which some AdventureWorks data is stored.
@@ -37,18 +35,17 @@ case class CultureRow(
 object CultureRow {
   implicit lazy val decoder: Decoder[CultureRow] = Decoder.forProduct3[CultureRow, CultureId, Name, TypoLocalDateTime]("cultureid", "name", "modifieddate")(CultureRow.apply)(CultureId.decoder, Name.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[CultureRow] = Encoder.forProduct3[CultureRow, CultureId, Name, TypoLocalDateTime]("cultureid", "name", "modifieddate")(x => (x.cultureid, x.name, x.modifieddate))(CultureId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[CultureRow] = new Read[CultureRow](
-    gets = List(
-      (CultureId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => CultureRow(
-      cultureid = CultureId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[CultureRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(CultureId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    CultureRow(
+      cultureid = arr(0).asInstanceOf[CultureId],
+          name = arr(1).asInstanceOf[Name],
+          modifieddate = arr(2).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[CultureRow] = Text.instance[CultureRow]{ (row, sb) =>
     CultureId.text.unsafeEncode(row.cultureid, sb)
     sb.append(Text.DELIMETER)
@@ -56,20 +53,10 @@ object CultureRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[CultureRow] = new Write[CultureRow](
-    puts = List((CultureId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.cultureid, x.name, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  CultureId.put.unsafeSetNonNullable(rs, i + 0, a.cultureid)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     CultureId.put.unsafeUpdateNonNullable(ps, i + 0, a.cultureid)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
-                   }
+  implicit lazy val write: Write[CultureRow] = new Write.Composite[CultureRow](
+    List(new Write.Single(CultureId.put),
+         new Write.Single(Name.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.cultureid, a.name, a.modifieddate)
   )
 }

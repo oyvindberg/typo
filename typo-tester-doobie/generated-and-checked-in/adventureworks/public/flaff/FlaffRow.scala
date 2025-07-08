@@ -7,14 +7,12 @@ package adventureworks
 package public
 package flaff
 
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: public.flaff
     Composite primary key: code, another_code, some_number, specifier */
@@ -38,22 +36,21 @@ object FlaffRow {
     new FlaffRow(compositeId.code, compositeId.anotherCode, compositeId.someNumber, compositeId.specifier, parentspecifier)
   implicit lazy val decoder: Decoder[FlaffRow] = Decoder.forProduct5[FlaffRow, ShortText, /* max 20 chars */ String, Int, ShortText, Option[ShortText]]("code", "another_code", "some_number", "specifier", "parentspecifier")(FlaffRow.apply)(ShortText.decoder, Decoder.decodeString, Decoder.decodeInt, ShortText.decoder, Decoder.decodeOption(ShortText.decoder))
   implicit lazy val encoder: Encoder[FlaffRow] = Encoder.forProduct5[FlaffRow, ShortText, /* max 20 chars */ String, Int, ShortText, Option[ShortText]]("code", "another_code", "some_number", "specifier", "parentspecifier")(x => (x.code, x.anotherCode, x.someNumber, x.specifier, x.parentspecifier))(ShortText.encoder, Encoder.encodeString, Encoder.encodeInt, ShortText.encoder, Encoder.encodeOption(ShortText.encoder))
-  implicit lazy val read: Read[FlaffRow] = new Read[FlaffRow](
-    gets = List(
-      (ShortText.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (ShortText.get, Nullability.NoNulls),
-      (ShortText.get, Nullability.Nullable)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => FlaffRow(
-      code = ShortText.get.unsafeGetNonNullable(rs, i + 0),
-      anotherCode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      someNumber = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
-      specifier = ShortText.get.unsafeGetNonNullable(rs, i + 3),
-      parentspecifier = ShortText.get.unsafeGetNullable(rs, i + 4)
+  implicit lazy val read: Read[FlaffRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ShortText.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(ShortText.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(ShortText.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    FlaffRow(
+      code = arr(0).asInstanceOf[ShortText],
+          anotherCode = arr(1).asInstanceOf[/* max 20 chars */ String],
+          someNumber = arr(2).asInstanceOf[Int],
+          specifier = arr(3).asInstanceOf[ShortText],
+          parentspecifier = arr(4).asInstanceOf[Option[ShortText]]
     )
-  )
+  }
   implicit lazy val text: Text[FlaffRow] = Text.instance[FlaffRow]{ (row, sb) =>
     ShortText.text.unsafeEncode(row.code, sb)
     sb.append(Text.DELIMETER)
@@ -65,26 +62,12 @@ object FlaffRow {
     sb.append(Text.DELIMETER)
     Text.option(ShortText.text).unsafeEncode(row.parentspecifier, sb)
   }
-  implicit lazy val write: Write[FlaffRow] = new Write[FlaffRow](
-    puts = List((ShortText.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (ShortText.put, Nullability.NoNulls),
-                (ShortText.put, Nullability.Nullable)),
-    toList = x => List(x.code, x.anotherCode, x.someNumber, x.specifier, x.parentspecifier),
-    unsafeSet = (rs, i, a) => {
-                  ShortText.put.unsafeSetNonNullable(rs, i + 0, a.code)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.anotherCode)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 2, a.someNumber)
-                  ShortText.put.unsafeSetNonNullable(rs, i + 3, a.specifier)
-                  ShortText.put.unsafeSetNullable(rs, i + 4, a.parentspecifier)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ShortText.put.unsafeUpdateNonNullable(ps, i + 0, a.code)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.anotherCode)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.someNumber)
-                     ShortText.put.unsafeUpdateNonNullable(ps, i + 3, a.specifier)
-                     ShortText.put.unsafeUpdateNullable(ps, i + 4, a.parentspecifier)
-                   }
+  implicit lazy val write: Write[FlaffRow] = new Write.Composite[FlaffRow](
+    List(new Write.Single(ShortText.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(Meta.IntMeta.put),
+         new Write.Single(ShortText.put),
+         new Write.Single(ShortText.put).toOpt),
+    a => List(a.code, a.anotherCode, a.someNumber, a.specifier, a.parentspecifier)
   )
 }

@@ -11,13 +11,11 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: person.addresstype
     Types of addresses stored in the Address table.
@@ -41,20 +39,19 @@ case class AddresstypeRow(
 object AddresstypeRow {
   implicit lazy val decoder: Decoder[AddresstypeRow] = Decoder.forProduct4[AddresstypeRow, AddresstypeId, Name, TypoUUID, TypoLocalDateTime]("addresstypeid", "name", "rowguid", "modifieddate")(AddresstypeRow.apply)(AddresstypeId.decoder, Name.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[AddresstypeRow] = Encoder.forProduct4[AddresstypeRow, AddresstypeId, Name, TypoUUID, TypoLocalDateTime]("addresstypeid", "name", "rowguid", "modifieddate")(x => (x.addresstypeid, x.name, x.rowguid, x.modifieddate))(AddresstypeId.encoder, Name.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[AddresstypeRow] = new Read[AddresstypeRow](
-    gets = List(
-      (AddresstypeId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => AddresstypeRow(
-      addresstypeid = AddresstypeId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[AddresstypeRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(AddresstypeId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    AddresstypeRow(
+      addresstypeid = arr(0).asInstanceOf[AddresstypeId],
+          name = arr(1).asInstanceOf[Name],
+          rowguid = arr(2).asInstanceOf[TypoUUID],
+          modifieddate = arr(3).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[AddresstypeRow] = Text.instance[AddresstypeRow]{ (row, sb) =>
     AddresstypeId.text.unsafeEncode(row.addresstypeid, sb)
     sb.append(Text.DELIMETER)
@@ -64,23 +61,11 @@ object AddresstypeRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[AddresstypeRow] = new Write[AddresstypeRow](
-    puts = List((AddresstypeId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.addresstypeid, x.name, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  AddresstypeId.put.unsafeSetNonNullable(rs, i + 0, a.addresstypeid)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 2, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     AddresstypeId.put.unsafeUpdateNonNullable(ps, i + 0, a.addresstypeid)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 2, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
-                   }
+  implicit lazy val write: Write[AddresstypeRow] = new Write.Composite[AddresstypeRow](
+    List(new Write.Single(AddresstypeId.put),
+         new Write.Single(Name.put),
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.addresstypeid, a.name, a.rowguid, a.modifieddate)
   )
 }

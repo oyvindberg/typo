@@ -10,12 +10,10 @@ package e
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pe.e */
 case class EViewRow(
@@ -36,22 +34,21 @@ case class EViewRow(
 object EViewRow {
   implicit lazy val decoder: Decoder[EViewRow] = Decoder.forProduct6[EViewRow, Int, BusinessentityId, Int, Option[/* max 50 chars */ String], TypoUUID, TypoLocalDateTime]("id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(EViewRow.apply)(Decoder.decodeInt, BusinessentityId.decoder, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeString), TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[EViewRow] = Encoder.forProduct6[EViewRow, Int, BusinessentityId, Int, Option[/* max 50 chars */ String], TypoUUID, TypoLocalDateTime]("id", "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.emailaddressid, x.emailaddress, x.rowguid, x.modifieddate))(Encoder.encodeInt, BusinessentityId.encoder, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeString), TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[EViewRow] = new Read[EViewRow](
-    gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => EViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      emailaddressid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
-      emailaddress = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[EViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    EViewRow(
+      id = arr(0).asInstanceOf[Int],
+          businessentityid = arr(1).asInstanceOf[BusinessentityId],
+          emailaddressid = arr(2).asInstanceOf[Int],
+          emailaddress = arr(3).asInstanceOf[Option[/* max 50 chars */ String]],
+          rowguid = arr(4).asInstanceOf[TypoUUID],
+          modifieddate = arr(5).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

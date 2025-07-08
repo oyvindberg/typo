@@ -34,46 +34,46 @@ class DocumentRepoImpl extends DocumentRepo {
     DeleteBuilder(""""production"."document"""", DocumentFields.structure)
   }
   override def deleteById(documentnode: DocumentId): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."document" where "documentnode" = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."document" where "documentnode" = ${fromWrite(documentnode)(new Write.Single(DocumentId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(documentnodes: Array[DocumentId]): ConnectionIO[Int] = {
     sql"""delete from "production"."document" where "documentnode" = ANY(${documentnodes})""".update.run
   }
   override def insert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     sql"""insert into "production"."document"("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
-          values (${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.owner)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.folderflag)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.filename)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.fileextension)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.changenumber)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.document)(Write.fromPutOption(TypoBytea.put))}::bytea, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.documentnode)(Write.fromPut(DocumentId.put))})
+          values (${fromWrite(unsaved.title)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.owner)(new Write.Single(BusinessentityId.put))}::int4, ${fromWrite(unsaved.folderflag)(new Write.Single(Flag.put))}::bool, ${fromWrite(unsaved.filename)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.fileextension)(new Write.SingleOpt(Meta.StringMeta.put))}, ${fromWrite(unsaved.revision)(new Write.Single(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.changenumber)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.status)(new Write.Single(TypoShort.put))}::int2, ${fromWrite(unsaved.documentsummary)(new Write.SingleOpt(Meta.StringMeta.put))}, ${fromWrite(unsaved.document)(new Write.SingleOpt(TypoBytea.put))}::bytea, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.documentnode)(new Write.Single(DocumentId.put))})
           returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
        """.query(using DocumentRow.read).unique
   }
   override def insert(unsaved: DocumentRowUnsaved): ConnectionIO[DocumentRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""title""""), fr"${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""owner""""), fr"${fromWrite(unsaved.owner)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const0(s""""filename""""), fr"${fromWrite(unsaved.filename)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""fileextension""""), fr"${fromWrite(unsaved.fileextension)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""revision""""), fr"${fromWrite(unsaved.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
-      Some((Fragment.const0(s""""status""""), fr"${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2")),
-      Some((Fragment.const0(s""""documentsummary""""), fr"${fromWrite(unsaved.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""document""""), fr"${fromWrite(unsaved.document)(Write.fromPutOption(TypoBytea.put))}::bytea")),
+      Some((Fragment.const0(s""""title""""), fr"${fromWrite(unsaved.title)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""owner""""), fr"${fromWrite(unsaved.owner)(new Write.Single(BusinessentityId.put))}::int4")),
+      Some((Fragment.const0(s""""filename""""), fr"${fromWrite(unsaved.filename)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""fileextension""""), fr"${fromWrite(unsaved.fileextension)(new Write.SingleOpt(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""revision""""), fr"${fromWrite(unsaved.revision)(new Write.Single(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const0(s""""status""""), fr"${fromWrite(unsaved.status)(new Write.Single(TypoShort.put))}::int2")),
+      Some((Fragment.const0(s""""documentsummary""""), fr"${fromWrite(unsaved.documentsummary)(new Write.SingleOpt(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""document""""), fr"${fromWrite(unsaved.document)(new Write.SingleOpt(TypoBytea.put))}::bytea")),
       unsaved.folderflag match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""folderflag""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""folderflag""""), fr"${fromWrite(value: Flag)(new Write.Single(Flag.put))}::bool"))
       },
       unsaved.changenumber match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""changenumber""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""changenumber""""), fr"${fromWrite(value: Int)(new Write.Single(Meta.IntMeta.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       },
       unsaved.documentnode match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""documentnode""""), fr"${fromWrite(value: DocumentId)(Write.fromPut(DocumentId.put))}"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""documentnode""""), fr"${fromWrite(value: DocumentId)(new Write.Single(DocumentId.put))}"))
       }
     ).flatten
     
@@ -105,7 +105,7 @@ class DocumentRepoImpl extends DocumentRepo {
     sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from "production"."document"""".query(using DocumentRow.read).stream
   }
   override def selectById(documentnode: DocumentId): ConnectionIO[Option[DocumentRow]] = {
-    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from "production"."document" where "documentnode" = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}""".query(using DocumentRow.read).option
+    sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from "production"."document" where "documentnode" = ${fromWrite(documentnode)(new Write.Single(DocumentId.put))}""".query(using DocumentRow.read).option
   }
   override def selectByIds(documentnodes: Array[DocumentId]): Stream[ConnectionIO, DocumentRow] = {
     sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode" from "production"."document" where "documentnode" = ANY(${documentnodes})""".query(using DocumentRow.read).stream
@@ -119,7 +119,7 @@ class DocumentRepoImpl extends DocumentRepo {
   override def selectByUniqueRowguid(rowguid: TypoUUID): ConnectionIO[Option[DocumentRow]] = {
     sql"""select "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
           from "production"."document"
-          where "rowguid" = ${fromWrite(rowguid)(Write.fromPut(TypoUUID.put))}
+          where "rowguid" = ${fromWrite(rowguid)(new Write.Single(TypoUUID.put))}
        """.query(using DocumentRow.read).option
   }
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
@@ -128,19 +128,19 @@ class DocumentRepoImpl extends DocumentRepo {
   override def update(row: DocumentRow): ConnectionIO[Boolean] = {
     val documentnode = row.documentnode
     sql"""update "production"."document"
-          set "title" = ${fromWrite(row.title)(Write.fromPut(Meta.StringMeta.put))},
-              "owner" = ${fromWrite(row.owner)(Write.fromPut(BusinessentityId.put))}::int4,
-              "folderflag" = ${fromWrite(row.folderflag)(Write.fromPut(Flag.put))}::bool,
-              "filename" = ${fromWrite(row.filename)(Write.fromPut(Meta.StringMeta.put))},
-              "fileextension" = ${fromWrite(row.fileextension)(Write.fromPutOption(Meta.StringMeta.put))},
-              "revision" = ${fromWrite(row.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
-              "changenumber" = ${fromWrite(row.changenumber)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "status" = ${fromWrite(row.status)(Write.fromPut(TypoShort.put))}::int2,
-              "documentsummary" = ${fromWrite(row.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))},
-              "document" = ${fromWrite(row.document)(Write.fromPutOption(TypoBytea.put))}::bytea,
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "documentnode" = ${fromWrite(documentnode)(Write.fromPut(DocumentId.put))}"""
+          set "title" = ${fromWrite(row.title)(new Write.Single(Meta.StringMeta.put))},
+              "owner" = ${fromWrite(row.owner)(new Write.Single(BusinessentityId.put))}::int4,
+              "folderflag" = ${fromWrite(row.folderflag)(new Write.Single(Flag.put))}::bool,
+              "filename" = ${fromWrite(row.filename)(new Write.Single(Meta.StringMeta.put))},
+              "fileextension" = ${fromWrite(row.fileextension)(new Write.SingleOpt(Meta.StringMeta.put))},
+              "revision" = ${fromWrite(row.revision)(new Write.Single(Meta.StringMeta.put))}::bpchar,
+              "changenumber" = ${fromWrite(row.changenumber)(new Write.Single(Meta.IntMeta.put))}::int4,
+              "status" = ${fromWrite(row.status)(new Write.Single(TypoShort.put))}::int2,
+              "documentsummary" = ${fromWrite(row.documentsummary)(new Write.SingleOpt(Meta.StringMeta.put))},
+              "document" = ${fromWrite(row.document)(new Write.SingleOpt(TypoBytea.put))}::bytea,
+              "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "documentnode" = ${fromWrite(documentnode)(new Write.Single(DocumentId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -148,19 +148,19 @@ class DocumentRepoImpl extends DocumentRepo {
   override def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     sql"""insert into "production"."document"("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")
           values (
-            ${fromWrite(unsaved.title)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.owner)(Write.fromPut(BusinessentityId.put))}::int4,
-            ${fromWrite(unsaved.folderflag)(Write.fromPut(Flag.put))}::bool,
-            ${fromWrite(unsaved.filename)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.fileextension)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.revision)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
-            ${fromWrite(unsaved.changenumber)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.status)(Write.fromPut(TypoShort.put))}::int2,
-            ${fromWrite(unsaved.documentsummary)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.document)(Write.fromPutOption(TypoBytea.put))}::bytea,
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.documentnode)(Write.fromPut(DocumentId.put))}
+            ${fromWrite(unsaved.title)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.owner)(new Write.Single(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.folderflag)(new Write.Single(Flag.put))}::bool,
+            ${fromWrite(unsaved.filename)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.fileextension)(new Write.SingleOpt(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.revision)(new Write.Single(Meta.StringMeta.put))}::bpchar,
+            ${fromWrite(unsaved.changenumber)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.status)(new Write.Single(TypoShort.put))}::int2,
+            ${fromWrite(unsaved.documentsummary)(new Write.SingleOpt(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.document)(new Write.SingleOpt(TypoBytea.put))}::bytea,
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.documentnode)(new Write.Single(DocumentId.put))}
           )
           on conflict ("documentnode")
           do update set

@@ -31,7 +31,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     DeleteBuilder(""""production"."productproductphoto"""", ProductproductphotoFields.structure)
   }
   override def deleteById(compositeId: ProductproductphotoId): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."productproductphoto" where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."productproductphoto" where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(new Write.Single(ProductphotoId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductproductphotoId]): ConnectionIO[Int] = {
     val productid = compositeIds.map(_.productid)
@@ -45,21 +45,21 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   }
   override def insert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow] = {
     sql"""insert into "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate")
-          values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4, ${fromWrite(unsaved.primary)(Write.fromPut(Flag.put))}::bool, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4, ${fromWrite(unsaved.productphotoid)(new Write.Single(ProductphotoId.put))}::int4, ${fromWrite(unsaved.primary)(new Write.Single(Flag.put))}::bool, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "productphotoid", "primary", "modifieddate"::text
        """.query(using ProductproductphotoRow.read).unique
   }
   override def insert(unsaved: ProductproductphotoRowUnsaved): ConnectionIO[ProductproductphotoRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
-      Some((Fragment.const0(s""""productphotoid""""), fr"${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4")),
+      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4")),
+      Some((Fragment.const0(s""""productphotoid""""), fr"${fromWrite(unsaved.productphotoid)(new Write.Single(ProductphotoId.put))}::int4")),
       unsaved.primary match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""primary""""), fr"${fromWrite(value: Flag)(Write.fromPut(Flag.put))}::bool"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""primary""""), fr"${fromWrite(value: Flag)(new Write.Single(Flag.put))}::bool"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -91,7 +91,7 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
     sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from "production"."productproductphoto"""".query(using ProductproductphotoRow.read).stream
   }
   override def selectById(compositeId: ProductproductphotoId): ConnectionIO[Option[ProductproductphotoRow]] = {
-    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from "production"."productproductphoto" where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}""".query(using ProductproductphotoRow.read).option
+    sql"""select "productid", "productphotoid", "primary", "modifieddate"::text from "production"."productproductphoto" where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(new Write.Single(ProductphotoId.put))}""".query(using ProductproductphotoRow.read).option
   }
   override def selectByIds(compositeIds: Array[ProductproductphotoId]): Stream[ConnectionIO, ProductproductphotoRow] = {
     val productid = compositeIds.map(_.productid)
@@ -115,9 +115,9 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def update(row: ProductproductphotoRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update "production"."productproductphoto"
-          set "primary" = ${fromWrite(row.primary)(Write.fromPut(Flag.put))}::bool,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(Write.fromPut(ProductphotoId.put))}"""
+          set "primary" = ${fromWrite(row.primary)(new Write.Single(Flag.put))}::bool,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "productphotoid" = ${fromWrite(compositeId.productphotoid)(new Write.Single(ProductphotoId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -125,10 +125,10 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def upsert(unsaved: ProductproductphotoRow): ConnectionIO[ProductproductphotoRow] = {
     sql"""insert into "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate")
           values (
-            ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
-            ${fromWrite(unsaved.productphotoid)(Write.fromPut(ProductphotoId.put))}::int4,
-            ${fromWrite(unsaved.primary)(Write.fromPut(Flag.put))}::bool,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4,
+            ${fromWrite(unsaved.productphotoid)(new Write.Single(ProductphotoId.put))}::int4,
+            ${fromWrite(unsaved.primary)(new Write.Single(Flag.put))}::bool,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("productid", "productphotoid")
           do update set

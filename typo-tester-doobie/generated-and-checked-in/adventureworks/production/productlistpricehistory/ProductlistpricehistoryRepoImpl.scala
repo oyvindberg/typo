@@ -30,7 +30,7 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
     DeleteBuilder(""""production"."productlistpricehistory"""", ProductlistpricehistoryFields.structure)
   }
   override def deleteById(compositeId: ProductlistpricehistoryId): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."productlistpricehistory" where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."productlistpricehistory" where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(new Write.Single(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductlistpricehistoryId]): ConnectionIO[Int] = {
     val productid = compositeIds.map(_.productid)
@@ -44,19 +44,19 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   }
   override def insert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow] = {
     sql"""insert into "production"."productlistpricehistory"("productid", "startdate", "enddate", "listprice", "modifieddate")
-          values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4, ${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.listprice)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text
        """.query(using ProductlistpricehistoryRow.read).unique
   }
   override def insert(unsaved: ProductlistpricehistoryRowUnsaved): ConnectionIO[ProductlistpricehistoryRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
-      Some((Fragment.const0(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const0(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const0(s""""listprice""""), fr"${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4")),
+      Some((Fragment.const0(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""listprice""""), fr"${fromWrite(unsaved.listprice)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -88,7 +88,7 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
     sql"""select "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text from "production"."productlistpricehistory"""".query(using ProductlistpricehistoryRow.read).stream
   }
   override def selectById(compositeId: ProductlistpricehistoryId): ConnectionIO[Option[ProductlistpricehistoryRow]] = {
-    sql"""select "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text from "production"."productlistpricehistory" where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}""".query(using ProductlistpricehistoryRow.read).option
+    sql"""select "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text from "production"."productlistpricehistory" where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(new Write.Single(TypoLocalDateTime.put))}""".query(using ProductlistpricehistoryRow.read).option
   }
   override def selectByIds(compositeIds: Array[ProductlistpricehistoryId]): Stream[ConnectionIO, ProductlistpricehistoryRow] = {
     val productid = compositeIds.map(_.productid)
@@ -112,10 +112,10 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def update(row: ProductlistpricehistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update "production"."productlistpricehistory"
-          set "enddate" = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
-              "listprice" = ${fromWrite(row.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDateTime.put))}"""
+          set "enddate" = ${fromWrite(row.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp,
+              "listprice" = ${fromWrite(row.listprice)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(new Write.Single(TypoLocalDateTime.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -123,11 +123,11 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def upsert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow] = {
     sql"""insert into "production"."productlistpricehistory"("productid", "startdate", "enddate", "listprice", "modifieddate")
           values (
-            ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
-            ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.listprice)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4,
+            ${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.listprice)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("productid", "startdate")
           do update set

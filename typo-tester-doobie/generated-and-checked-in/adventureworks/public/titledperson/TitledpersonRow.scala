@@ -9,14 +9,12 @@ package titledperson
 
 import adventureworks.public.title.TitleId
 import adventureworks.public.title_domain.TitleDomainId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: public.titledperson */
 case class TitledpersonRow(
@@ -30,18 +28,17 @@ case class TitledpersonRow(
 object TitledpersonRow {
   implicit lazy val decoder: Decoder[TitledpersonRow] = Decoder.forProduct3[TitledpersonRow, TitleDomainId, TitleId, String]("title_short", "title", "name")(TitledpersonRow.apply)(TitleDomainId.decoder, TitleId.decoder, Decoder.decodeString)
   implicit lazy val encoder: Encoder[TitledpersonRow] = Encoder.forProduct3[TitledpersonRow, TitleDomainId, TitleId, String]("title_short", "title", "name")(x => (x.titleShort, x.title, x.name))(TitleDomainId.encoder, TitleId.encoder, Encoder.encodeString)
-  implicit lazy val read: Read[TitledpersonRow] = new Read[TitledpersonRow](
-    gets = List(
-      (TitleDomainId.get, Nullability.NoNulls),
-      (TitleId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => TitledpersonRow(
-      titleShort = TitleDomainId.get.unsafeGetNonNullable(rs, i + 0),
-      title = TitleId.get.unsafeGetNonNullable(rs, i + 1),
-      name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[TitledpersonRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(TitleDomainId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TitleId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    TitledpersonRow(
+      titleShort = arr(0).asInstanceOf[TitleDomainId],
+          title = arr(1).asInstanceOf[TitleId],
+          name = arr(2).asInstanceOf[String]
     )
-  )
+  }
   implicit lazy val text: Text[TitledpersonRow] = Text.instance[TitledpersonRow]{ (row, sb) =>
     TitleDomainId.text.unsafeEncode(row.titleShort, sb)
     sb.append(Text.DELIMETER)
@@ -49,20 +46,10 @@ object TitledpersonRow {
     sb.append(Text.DELIMETER)
     Text.stringInstance.unsafeEncode(row.name, sb)
   }
-  implicit lazy val write: Write[TitledpersonRow] = new Write[TitledpersonRow](
-    puts = List((TitleDomainId.put, Nullability.NoNulls),
-                (TitleId.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls)),
-    toList = x => List(x.titleShort, x.title, x.name),
-    unsafeSet = (rs, i, a) => {
-                  TitleDomainId.put.unsafeSetNonNullable(rs, i + 0, a.titleShort)
-                  TitleId.put.unsafeSetNonNullable(rs, i + 1, a.title)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 2, a.name)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     TitleDomainId.put.unsafeUpdateNonNullable(ps, i + 0, a.titleShort)
-                     TitleId.put.unsafeUpdateNonNullable(ps, i + 1, a.title)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.name)
-                   }
+  implicit lazy val write: Write[TitledpersonRow] = new Write.Composite[TitledpersonRow](
+    List(new Write.Single(TitleDomainId.put),
+         new Write.Single(TitleId.put),
+         new Write.Single(Meta.StringMeta.put)),
+    a => List(a.titleShort, a.title, a.name)
   )
 }

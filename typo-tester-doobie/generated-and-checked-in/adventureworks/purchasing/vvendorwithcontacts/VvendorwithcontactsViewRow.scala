@@ -11,12 +11,10 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
 import adventureworks.userdefined.FirstName
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: purchasing.vvendorwithcontacts */
 case class VvendorwithcontactsViewRow(
@@ -49,34 +47,33 @@ case class VvendorwithcontactsViewRow(
 object VvendorwithcontactsViewRow {
   implicit lazy val decoder: Decoder[VvendorwithcontactsViewRow] = Decoder.forProduct12[VvendorwithcontactsViewRow, BusinessentityId, Name, Name, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, Option[/* max 10 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Int]("businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion")(VvendorwithcontactsViewRow.apply)(BusinessentityId.decoder, Name.decoder, Name.decoder, Decoder.decodeOption(Decoder.decodeString), FirstName.decoder, Decoder.decodeOption(Name.decoder), Name.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Phone.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeInt)
   implicit lazy val encoder: Encoder[VvendorwithcontactsViewRow] = Encoder.forProduct12[VvendorwithcontactsViewRow, BusinessentityId, Name, Name, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, Option[/* max 10 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Int]("businessentityid", "name", "contacttype", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion")(x => (x.businessentityid, x.name, x.contacttype, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.phonenumber, x.phonenumbertype, x.emailaddress, x.emailpromotion))(BusinessentityId.encoder, Name.encoder, Name.encoder, Encoder.encodeOption(Encoder.encodeString), FirstName.encoder, Encoder.encodeOption(Name.encoder), Name.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Phone.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeInt)
-  implicit lazy val read: Read[VvendorwithcontactsViewRow] = new Read[VvendorwithcontactsViewRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (/* user-picked */ FirstName.get, Nullability.NoNulls),
-      (Name.get, Nullability.Nullable),
-      (Name.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Phone.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => VvendorwithcontactsViewRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      contacttype = Name.get.unsafeGetNonNullable(rs, i + 2),
-      title = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      firstname = /* user-picked */ FirstName.get.unsafeGetNonNullable(rs, i + 4),
-      middlename = Name.get.unsafeGetNullable(rs, i + 5),
-      lastname = Name.get.unsafeGetNonNullable(rs, i + 6),
-      suffix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
-      phonenumber = Phone.get.unsafeGetNullable(rs, i + 8),
-      phonenumbertype = Name.get.unsafeGetNullable(rs, i + 9),
-      emailaddress = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
-      emailpromotion = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 11)
+  implicit lazy val read: Read[VvendorwithcontactsViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(/* user-picked */ FirstName.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Phone.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Name.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    VvendorwithcontactsViewRow(
+      businessentityid = arr(0).asInstanceOf[BusinessentityId],
+          name = arr(1).asInstanceOf[Name],
+          contacttype = arr(2).asInstanceOf[Name],
+          title = arr(3).asInstanceOf[Option[/* max 8 chars */ String]],
+          firstname = arr(4).asInstanceOf[/* user-picked */ FirstName],
+          middlename = arr(5).asInstanceOf[Option[Name]],
+          lastname = arr(6).asInstanceOf[Name],
+          suffix = arr(7).asInstanceOf[Option[/* max 10 chars */ String]],
+          phonenumber = arr(8).asInstanceOf[Option[Phone]],
+          phonenumbertype = arr(9).asInstanceOf[Option[Name]],
+          emailaddress = arr(10).asInstanceOf[Option[/* max 50 chars */ String]],
+          emailpromotion = arr(11).asInstanceOf[Int]
     )
-  )
+  }
 }

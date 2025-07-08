@@ -32,33 +32,33 @@ class WorkorderRepoImpl extends WorkorderRepo {
     DeleteBuilder(""""production"."workorder"""", WorkorderFields.structure)
   }
   override def deleteById(workorderid: WorkorderId): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."workorder" where "workorderid" = ${fromWrite(workorderid)(Write.fromPut(WorkorderId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."workorder" where "workorderid" = ${fromWrite(workorderid)(new Write.Single(WorkorderId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(workorderids: Array[WorkorderId]): ConnectionIO[Int] = {
     sql"""delete from "production"."workorder" where "workorderid" = ANY(${workorderids})""".update.run
   }
   override def insert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     sql"""insert into "production"."workorder"("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
-          values (${fromWrite(unsaved.workorderid)(Write.fromPut(WorkorderId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.scrappedqty)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.scrapreasonid)(Write.fromPutOption(ScrapreasonId.put))}::int2, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.workorderid)(new Write.Single(WorkorderId.put))}::int4, ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4, ${fromWrite(unsaved.orderqty)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.scrappedqty)(new Write.Single(TypoShort.put))}::int2, ${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.duedate)(new Write.Single(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.scrapreasonid)(new Write.SingleOpt(ScrapreasonId.put))}::int2, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text
        """.query(using WorkorderRow.read).unique
   }
   override def insert(unsaved: WorkorderRowUnsaved): ConnectionIO[WorkorderRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
-      Some((Fragment.const0(s""""orderqty""""), fr"${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int4")),
-      Some((Fragment.const0(s""""scrappedqty""""), fr"${fromWrite(unsaved.scrappedqty)(Write.fromPut(TypoShort.put))}::int2")),
-      Some((Fragment.const0(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const0(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const0(s""""duedate""""), fr"${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const0(s""""scrapreasonid""""), fr"${fromWrite(unsaved.scrapreasonid)(Write.fromPutOption(ScrapreasonId.put))}::int2")),
+      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4")),
+      Some((Fragment.const0(s""""orderqty""""), fr"${fromWrite(unsaved.orderqty)(new Write.Single(Meta.IntMeta.put))}::int4")),
+      Some((Fragment.const0(s""""scrappedqty""""), fr"${fromWrite(unsaved.scrappedqty)(new Write.Single(TypoShort.put))}::int2")),
+      Some((Fragment.const0(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""duedate""""), fr"${fromWrite(unsaved.duedate)(new Write.Single(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""scrapreasonid""""), fr"${fromWrite(unsaved.scrapreasonid)(new Write.SingleOpt(ScrapreasonId.put))}::int2")),
       unsaved.workorderid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""workorderid""""), fr"${fromWrite(value: WorkorderId)(Write.fromPut(WorkorderId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""workorderid""""), fr"${fromWrite(value: WorkorderId)(new Write.Single(WorkorderId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -90,7 +90,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
     sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from "production"."workorder"""".query(using WorkorderRow.read).stream
   }
   override def selectById(workorderid: WorkorderId): ConnectionIO[Option[WorkorderRow]] = {
-    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from "production"."workorder" where "workorderid" = ${fromWrite(workorderid)(Write.fromPut(WorkorderId.put))}""".query(using WorkorderRow.read).option
+    sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from "production"."workorder" where "workorderid" = ${fromWrite(workorderid)(new Write.Single(WorkorderId.put))}""".query(using WorkorderRow.read).option
   }
   override def selectByIds(workorderids: Array[WorkorderId]): Stream[ConnectionIO, WorkorderRow] = {
     sql"""select "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text from "production"."workorder" where "workorderid" = ANY(${workorderids})""".query(using WorkorderRow.read).stream
@@ -107,15 +107,15 @@ class WorkorderRepoImpl extends WorkorderRepo {
   override def update(row: WorkorderRow): ConnectionIO[Boolean] = {
     val workorderid = row.workorderid
     sql"""update "production"."workorder"
-          set "productid" = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
-              "orderqty" = ${fromWrite(row.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "scrappedqty" = ${fromWrite(row.scrappedqty)(Write.fromPut(TypoShort.put))}::int2,
-              "startdate" = ${fromWrite(row.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-              "enddate" = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
-              "duedate" = ${fromWrite(row.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-              "scrapreasonid" = ${fromWrite(row.scrapreasonid)(Write.fromPutOption(ScrapreasonId.put))}::int2,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "workorderid" = ${fromWrite(workorderid)(Write.fromPut(WorkorderId.put))}"""
+          set "productid" = ${fromWrite(row.productid)(new Write.Single(ProductId.put))}::int4,
+              "orderqty" = ${fromWrite(row.orderqty)(new Write.Single(Meta.IntMeta.put))}::int4,
+              "scrappedqty" = ${fromWrite(row.scrappedqty)(new Write.Single(TypoShort.put))}::int2,
+              "startdate" = ${fromWrite(row.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+              "enddate" = ${fromWrite(row.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp,
+              "duedate" = ${fromWrite(row.duedate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+              "scrapreasonid" = ${fromWrite(row.scrapreasonid)(new Write.SingleOpt(ScrapreasonId.put))}::int2,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "workorderid" = ${fromWrite(workorderid)(new Write.Single(WorkorderId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -123,15 +123,15 @@ class WorkorderRepoImpl extends WorkorderRepo {
   override def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     sql"""insert into "production"."workorder"("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")
           values (
-            ${fromWrite(unsaved.workorderid)(Write.fromPut(WorkorderId.put))}::int4,
-            ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
-            ${fromWrite(unsaved.orderqty)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.scrappedqty)(Write.fromPut(TypoShort.put))}::int2,
-            ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.duedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.scrapreasonid)(Write.fromPutOption(ScrapreasonId.put))}::int2,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.workorderid)(new Write.Single(WorkorderId.put))}::int4,
+            ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4,
+            ${fromWrite(unsaved.orderqty)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.scrappedqty)(new Write.Single(TypoShort.put))}::int2,
+            ${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.duedate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.scrapreasonid)(new Write.SingleOpt(ScrapreasonId.put))}::int2,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("workorderid")
           do update set

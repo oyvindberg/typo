@@ -10,14 +10,12 @@ package specialoffer
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: sales.specialoffer
     Sale discounts lookup table.
@@ -62,34 +60,33 @@ case class SpecialofferRow(
 object SpecialofferRow {
   implicit lazy val decoder: Decoder[SpecialofferRow] = Decoder.forProduct11[SpecialofferRow, SpecialofferId, /* max 255 chars */ String, BigDecimal, /* max 50 chars */ String, /* max 50 chars */ String, TypoLocalDateTime, TypoLocalDateTime, Int, Option[Int], TypoUUID, TypoLocalDateTime]("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")(SpecialofferRow.apply)(SpecialofferId.decoder, Decoder.decodeString, Decoder.decodeBigDecimal, Decoder.decodeString, Decoder.decodeString, TypoLocalDateTime.decoder, TypoLocalDateTime.decoder, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeInt), TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SpecialofferRow] = Encoder.forProduct11[SpecialofferRow, SpecialofferId, /* max 255 chars */ String, BigDecimal, /* max 50 chars */ String, /* max 50 chars */ String, TypoLocalDateTime, TypoLocalDateTime, Int, Option[Int], TypoUUID, TypoLocalDateTime]("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")(x => (x.specialofferid, x.description, x.discountpct, x.`type`, x.category, x.startdate, x.enddate, x.minqty, x.maxqty, x.rowguid, x.modifieddate))(SpecialofferId.encoder, Encoder.encodeString, Encoder.encodeBigDecimal, Encoder.encodeString, Encoder.encodeString, TypoLocalDateTime.encoder, TypoLocalDateTime.encoder, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeInt), TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SpecialofferRow] = new Read[SpecialofferRow](
-    gets = List(
-      (SpecialofferId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SpecialofferRow(
-      specialofferid = SpecialofferId.get.unsafeGetNonNullable(rs, i + 0),
-      description = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      discountpct = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 2),
-      `type` = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      category = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
-      startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5),
-      enddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6),
-      minqty = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 7),
-      maxqty = Meta.IntMeta.get.unsafeGetNullable(rs, i + 8),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 9),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 10)
+  implicit lazy val read: Read[SpecialofferRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(SpecialofferId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    SpecialofferRow(
+      specialofferid = arr(0).asInstanceOf[SpecialofferId],
+          description = arr(1).asInstanceOf[/* max 255 chars */ String],
+          discountpct = arr(2).asInstanceOf[BigDecimal],
+          `type` = arr(3).asInstanceOf[/* max 50 chars */ String],
+          category = arr(4).asInstanceOf[/* max 50 chars */ String],
+          startdate = arr(5).asInstanceOf[TypoLocalDateTime],
+          enddate = arr(6).asInstanceOf[TypoLocalDateTime],
+          minqty = arr(7).asInstanceOf[Int],
+          maxqty = arr(8).asInstanceOf[Option[Int]],
+          rowguid = arr(9).asInstanceOf[TypoUUID],
+          modifieddate = arr(10).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[SpecialofferRow] = Text.instance[SpecialofferRow]{ (row, sb) =>
     SpecialofferId.text.unsafeEncode(row.specialofferid, sb)
     sb.append(Text.DELIMETER)
@@ -113,44 +110,18 @@ object SpecialofferRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[SpecialofferRow] = new Write[SpecialofferRow](
-    puts = List((SpecialofferId.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.Nullable),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.specialofferid, x.description, x.discountpct, x.`type`, x.category, x.startdate, x.enddate, x.minqty, x.maxqty, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  SpecialofferId.put.unsafeSetNonNullable(rs, i + 0, a.specialofferid)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.description)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 2, a.discountpct)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 3, a.`type`)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 4, a.category)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.startdate)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 6, a.enddate)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 7, a.minqty)
-                  Meta.IntMeta.put.unsafeSetNullable(rs, i + 8, a.maxqty)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 9, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 10, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     SpecialofferId.put.unsafeUpdateNonNullable(ps, i + 0, a.specialofferid)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.description)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.discountpct)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.`type`)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 4, a.category)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.startdate)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 6, a.enddate)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.minqty)
-                     Meta.IntMeta.put.unsafeUpdateNullable(ps, i + 8, a.maxqty)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 9, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 10, a.modifieddate)
-                   }
+  implicit lazy val write: Write[SpecialofferRow] = new Write.Composite[SpecialofferRow](
+    List(new Write.Single(SpecialofferId.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(TypoLocalDateTime.put),
+         new Write.Single(TypoLocalDateTime.put),
+         new Write.Single(Meta.IntMeta.put),
+         new Write.Single(Meta.IntMeta.put).toOpt,
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.specialofferid, a.description, a.discountpct, a.`type`, a.category, a.startdate, a.enddate, a.minqty, a.maxqty, a.rowguid, a.modifieddate)
   )
 }

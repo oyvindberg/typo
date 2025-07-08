@@ -30,28 +30,28 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     DeleteBuilder(""""humanresources"."jobcandidate"""", JobcandidateFields.structure)
   }
   override def deleteById(jobcandidateid: JobcandidateId): ConnectionIO[Boolean] = {
-    sql"""delete from "humanresources"."jobcandidate" where "jobcandidateid" = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "humanresources"."jobcandidate" where "jobcandidateid" = ${fromWrite(jobcandidateid)(new Write.Single(JobcandidateId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(jobcandidateids: Array[JobcandidateId]): ConnectionIO[Int] = {
     sql"""delete from "humanresources"."jobcandidate" where "jobcandidateid" = ANY(${jobcandidateids})""".update.run
   }
   override def insert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     sql"""insert into "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate")
-          values (${fromWrite(unsaved.jobcandidateid)(Write.fromPut(JobcandidateId.put))}::int4, ${fromWrite(unsaved.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4, ${fromWrite(unsaved.resume)(Write.fromPutOption(TypoXml.put))}::xml, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.jobcandidateid)(new Write.Single(JobcandidateId.put))}::int4, ${fromWrite(unsaved.businessentityid)(new Write.SingleOpt(BusinessentityId.put))}::int4, ${fromWrite(unsaved.resume)(new Write.SingleOpt(TypoXml.put))}::xml, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text
        """.query(using JobcandidateRow.read).unique
   }
   override def insert(unsaved: JobcandidateRowUnsaved): ConnectionIO[JobcandidateRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4")),
-      Some((Fragment.const0(s""""resume""""), fr"${fromWrite(unsaved.resume)(Write.fromPutOption(TypoXml.put))}::xml")),
+      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(new Write.SingleOpt(BusinessentityId.put))}::int4")),
+      Some((Fragment.const0(s""""resume""""), fr"${fromWrite(unsaved.resume)(new Write.SingleOpt(TypoXml.put))}::xml")),
       unsaved.jobcandidateid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""jobcandidateid""""), fr"${fromWrite(value: JobcandidateId)(Write.fromPut(JobcandidateId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""jobcandidateid""""), fr"${fromWrite(value: JobcandidateId)(new Write.Single(JobcandidateId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -83,7 +83,7 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
     sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from "humanresources"."jobcandidate"""".query(using JobcandidateRow.read).stream
   }
   override def selectById(jobcandidateid: JobcandidateId): ConnectionIO[Option[JobcandidateRow]] = {
-    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from "humanresources"."jobcandidate" where "jobcandidateid" = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}""".query(using JobcandidateRow.read).option
+    sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from "humanresources"."jobcandidate" where "jobcandidateid" = ${fromWrite(jobcandidateid)(new Write.Single(JobcandidateId.put))}""".query(using JobcandidateRow.read).option
   }
   override def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow] = {
     sql"""select "jobcandidateid", "businessentityid", "resume", "modifieddate"::text from "humanresources"."jobcandidate" where "jobcandidateid" = ANY(${jobcandidateids})""".query(using JobcandidateRow.read).stream
@@ -100,10 +100,10 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
   override def update(row: JobcandidateRow): ConnectionIO[Boolean] = {
     val jobcandidateid = row.jobcandidateid
     sql"""update "humanresources"."jobcandidate"
-          set "businessentityid" = ${fromWrite(row.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4,
-              "resume" = ${fromWrite(row.resume)(Write.fromPutOption(TypoXml.put))}::xml,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "jobcandidateid" = ${fromWrite(jobcandidateid)(Write.fromPut(JobcandidateId.put))}"""
+          set "businessentityid" = ${fromWrite(row.businessentityid)(new Write.SingleOpt(BusinessentityId.put))}::int4,
+              "resume" = ${fromWrite(row.resume)(new Write.SingleOpt(TypoXml.put))}::xml,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "jobcandidateid" = ${fromWrite(jobcandidateid)(new Write.Single(JobcandidateId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -111,10 +111,10 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
   override def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     sql"""insert into "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate")
           values (
-            ${fromWrite(unsaved.jobcandidateid)(Write.fromPut(JobcandidateId.put))}::int4,
-            ${fromWrite(unsaved.businessentityid)(Write.fromPutOption(BusinessentityId.put))}::int4,
-            ${fromWrite(unsaved.resume)(Write.fromPutOption(TypoXml.put))}::xml,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.jobcandidateid)(new Write.Single(JobcandidateId.put))}::int4,
+            ${fromWrite(unsaved.businessentityid)(new Write.SingleOpt(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.resume)(new Write.SingleOpt(TypoXml.put))}::xml,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("jobcandidateid")
           do update set

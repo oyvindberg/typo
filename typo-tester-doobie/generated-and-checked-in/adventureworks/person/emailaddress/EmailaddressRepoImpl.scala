@@ -31,7 +31,7 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
     DeleteBuilder(""""person"."emailaddress"""", EmailaddressFields.structure)
   }
   override def deleteById(compositeId: EmailaddressId): ConnectionIO[Boolean] = {
-    sql"""delete from "person"."emailaddress" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}""".update.run.map(_ > 0)
+    sql"""delete from "person"."emailaddress" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(new Write.Single(Meta.IntMeta.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[EmailaddressId]): ConnectionIO[Int] = {
     val businessentityid = compositeIds.map(_.businessentityid)
@@ -45,25 +45,25 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
   }
   override def insert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     sql"""insert into "person"."emailaddress"("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.emailaddress)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4, ${fromWrite(unsaved.emailaddressid)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.emailaddress)(new Write.SingleOpt(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
        """.query(using EmailaddressRow.read).unique
   }
   override def insert(unsaved: EmailaddressRowUnsaved): ConnectionIO[EmailaddressRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const0(s""""emailaddress""""), fr"${fromWrite(unsaved.emailaddress)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4")),
+      Some((Fragment.const0(s""""emailaddress""""), fr"${fromWrite(unsaved.emailaddress)(new Write.SingleOpt(Meta.StringMeta.put))}")),
       unsaved.emailaddressid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""emailaddressid""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""emailaddressid""""), fr"${fromWrite(value: Int)(new Write.Single(Meta.IntMeta.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -95,7 +95,7 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
     sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from "person"."emailaddress"""".query(using EmailaddressRow.read).stream
   }
   override def selectById(compositeId: EmailaddressId): ConnectionIO[Option[EmailaddressRow]] = {
-    sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from "person"."emailaddress" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}""".query(using EmailaddressRow.read).option
+    sql"""select "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text from "person"."emailaddress" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(new Write.Single(Meta.IntMeta.put))}""".query(using EmailaddressRow.read).option
   }
   override def selectByIds(compositeIds: Array[EmailaddressId]): Stream[ConnectionIO, EmailaddressRow] = {
     val businessentityid = compositeIds.map(_.businessentityid)
@@ -119,10 +119,10 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
   override def update(row: EmailaddressRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update "person"."emailaddress"
-          set "emailaddress" = ${fromWrite(row.emailaddress)(Write.fromPutOption(Meta.StringMeta.put))},
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}"""
+          set "emailaddress" = ${fromWrite(row.emailaddress)(new Write.SingleOpt(Meta.StringMeta.put))},
+              "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(new Write.Single(Meta.IntMeta.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -130,11 +130,11 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
   override def upsert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     sql"""insert into "person"."emailaddress"("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
-            ${fromWrite(unsaved.emailaddressid)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.emailaddress)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.emailaddressid)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.emailaddress)(new Write.SingleOpt(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("businessentityid", "emailaddressid")
           do update set

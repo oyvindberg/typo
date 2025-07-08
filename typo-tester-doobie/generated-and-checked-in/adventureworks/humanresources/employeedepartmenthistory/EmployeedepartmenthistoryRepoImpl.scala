@@ -32,7 +32,7 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     DeleteBuilder(""""humanresources"."employeedepartmenthistory"""", EmployeedepartmenthistoryFields.structure)
   }
   override def deleteById(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Boolean] = {
-    sql"""delete from "humanresources"."employeedepartmenthistory" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(Write.fromPut(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(Write.fromPut(ShiftId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "humanresources"."employeedepartmenthistory" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(new Write.Single(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(new Write.Single(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(new Write.Single(ShiftId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[EmployeedepartmenthistoryId]): ConnectionIO[Int] = {
     val businessentityid = compositeIds.map(_.businessentityid)
@@ -48,20 +48,20 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   }
   override def insert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow] = {
     sql"""insert into "humanresources"."employeedepartmenthistory"("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int2, ${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int2, ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDate.put))}::date, ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDate.put))}::date, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4, ${fromWrite(unsaved.departmentid)(new Write.Single(DepartmentId.put))}::int2, ${fromWrite(unsaved.shiftid)(new Write.Single(ShiftId.put))}::int2, ${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDate.put))}::date, ${fromWrite(unsaved.enddate)(new Write.SingleOpt(TypoLocalDate.put))}::date, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text
        """.query(using EmployeedepartmenthistoryRow.read).unique
   }
   override def insert(unsaved: EmployeedepartmenthistoryRowUnsaved): ConnectionIO[EmployeedepartmenthistoryRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const0(s""""departmentid""""), fr"${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int2")),
-      Some((Fragment.const0(s""""shiftid""""), fr"${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int2")),
-      Some((Fragment.const0(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDate.put))}::date")),
-      Some((Fragment.const0(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDate.put))}::date")),
+      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4")),
+      Some((Fragment.const0(s""""departmentid""""), fr"${fromWrite(unsaved.departmentid)(new Write.Single(DepartmentId.put))}::int2")),
+      Some((Fragment.const0(s""""shiftid""""), fr"${fromWrite(unsaved.shiftid)(new Write.Single(ShiftId.put))}::int2")),
+      Some((Fragment.const0(s""""startdate""""), fr"${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDate.put))}::date")),
+      Some((Fragment.const0(s""""enddate""""), fr"${fromWrite(unsaved.enddate)(new Write.SingleOpt(TypoLocalDate.put))}::date")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -93,7 +93,7 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
     sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from "humanresources"."employeedepartmenthistory"""".query(using EmployeedepartmenthistoryRow.read).stream
   }
   override def selectById(compositeId: EmployeedepartmenthistoryId): ConnectionIO[Option[EmployeedepartmenthistoryRow]] = {
-    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from "humanresources"."employeedepartmenthistory" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(Write.fromPut(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(Write.fromPut(ShiftId.put))}""".query(using EmployeedepartmenthistoryRow.read).option
+    sql"""select "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text from "humanresources"."employeedepartmenthistory" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(new Write.Single(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(new Write.Single(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(new Write.Single(ShiftId.put))}""".query(using EmployeedepartmenthistoryRow.read).option
   }
   override def selectByIds(compositeIds: Array[EmployeedepartmenthistoryId]): Stream[ConnectionIO, EmployeedepartmenthistoryRow] = {
     val businessentityid = compositeIds.map(_.businessentityid)
@@ -119,9 +119,9 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def update(row: EmployeedepartmenthistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update "humanresources"."employeedepartmenthistory"
-          set "enddate" = ${fromWrite(row.enddate)(Write.fromPutOption(TypoLocalDate.put))}::date,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(Write.fromPut(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(Write.fromPut(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(Write.fromPut(ShiftId.put))}"""
+          set "enddate" = ${fromWrite(row.enddate)(new Write.SingleOpt(TypoLocalDate.put))}::date,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(new Write.Single(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(new Write.Single(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(new Write.Single(ShiftId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -129,12 +129,12 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def upsert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow] = {
     sql"""insert into "humanresources"."employeedepartmenthistory"("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")
           values (
-            ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
-            ${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int2,
-            ${fromWrite(unsaved.shiftid)(Write.fromPut(ShiftId.put))}::int2,
-            ${fromWrite(unsaved.startdate)(Write.fromPut(TypoLocalDate.put))}::date,
-            ${fromWrite(unsaved.enddate)(Write.fromPutOption(TypoLocalDate.put))}::date,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.departmentid)(new Write.Single(DepartmentId.put))}::int2,
+            ${fromWrite(unsaved.shiftid)(new Write.Single(ShiftId.put))}::int2,
+            ${fromWrite(unsaved.startdate)(new Write.Single(TypoLocalDate.put))}::date,
+            ${fromWrite(unsaved.enddate)(new Write.SingleOpt(TypoLocalDate.put))}::date,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("businessentityid", "startdate", "departmentid", "shiftid")
           do update set

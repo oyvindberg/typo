@@ -8,13 +8,11 @@ package public
 package issue142_2
 
 import adventureworks.public.issue142.Issue142Id
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: public.issue142_2
     Primary key: tabellkode */
@@ -28,25 +26,18 @@ case class Issue1422Row(
 object Issue1422Row {
   implicit lazy val decoder: Decoder[Issue1422Row] = Decoder.forProduct1[Issue1422Row, Issue142Id]("tabellkode")(Issue1422Row.apply)(Issue142Id.decoder)
   implicit lazy val encoder: Encoder[Issue1422Row] = Encoder.forProduct1[Issue1422Row, Issue142Id]("tabellkode")(x => (x.tabellkode))(Issue142Id.encoder)
-  implicit lazy val read: Read[Issue1422Row] = new Read[Issue1422Row](
-    gets = List(
-      (Issue142Id.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => Issue1422Row(
-      tabellkode = Issue142Id.get.unsafeGetNonNullable(rs, i + 0)
+  implicit lazy val read: Read[Issue1422Row] = new Read.CompositeOfInstances(Array(
+    new Read.Single(Issue142Id.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    Issue1422Row(
+      tabellkode = arr(0).asInstanceOf[Issue142Id]
     )
-  )
+  }
   implicit lazy val text: Text[Issue1422Row] = Text.instance[Issue1422Row]{ (row, sb) =>
     Issue142Id.text.unsafeEncode(row.tabellkode, sb)
   }
-  implicit lazy val write: Write[Issue1422Row] = new Write[Issue1422Row](
-    puts = List((Issue142Id.put, Nullability.NoNulls)),
-    toList = x => List(x.tabellkode),
-    unsafeSet = (rs, i, a) => {
-                  Issue142Id.put.unsafeSetNonNullable(rs, i + 0, a.tabellkode)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     Issue142Id.put.unsafeUpdateNonNullable(ps, i + 0, a.tabellkode)
-                   }
+  implicit lazy val write: Write[Issue1422Row] = new Write.Composite[Issue1422Row](
+    List(new Write.Single(Issue142Id.put)),
+    a => List(a.tabellkode)
   )
 }

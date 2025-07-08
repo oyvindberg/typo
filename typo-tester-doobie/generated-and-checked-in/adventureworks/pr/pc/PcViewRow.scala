@@ -11,11 +11,9 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pr.pc */
 case class PcViewRow(
@@ -34,20 +32,19 @@ case class PcViewRow(
 object PcViewRow {
   implicit lazy val decoder: Decoder[PcViewRow] = Decoder.forProduct5[PcViewRow, ProductcategoryId, ProductcategoryId, Name, TypoUUID, TypoLocalDateTime]("id", "productcategoryid", "name", "rowguid", "modifieddate")(PcViewRow.apply)(ProductcategoryId.decoder, ProductcategoryId.decoder, Name.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PcViewRow] = Encoder.forProduct5[PcViewRow, ProductcategoryId, ProductcategoryId, Name, TypoUUID, TypoLocalDateTime]("id", "productcategoryid", "name", "rowguid", "modifieddate")(x => (x.id, x.productcategoryid, x.name, x.rowguid, x.modifieddate))(ProductcategoryId.encoder, ProductcategoryId.encoder, Name.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PcViewRow] = new Read[PcViewRow](
-    gets = List(
-      (ProductcategoryId.get, Nullability.NoNulls),
-      (ProductcategoryId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PcViewRow(
-      id = ProductcategoryId.get.unsafeGetNonNullable(rs, i + 0),
-      productcategoryid = ProductcategoryId.get.unsafeGetNonNullable(rs, i + 1),
-      name = Name.get.unsafeGetNonNullable(rs, i + 2),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+  implicit lazy val read: Read[PcViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ProductcategoryId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductcategoryId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    PcViewRow(
+      id = arr(0).asInstanceOf[ProductcategoryId],
+          productcategoryid = arr(1).asInstanceOf[ProductcategoryId],
+          name = arr(2).asInstanceOf[Name],
+          rowguid = arr(3).asInstanceOf[TypoUUID],
+          modifieddate = arr(4).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

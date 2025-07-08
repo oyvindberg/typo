@@ -26,14 +26,14 @@ class Issue1422RepoImpl extends Issue1422Repo {
     DeleteBuilder(""""public"."issue142_2"""", Issue1422Fields.structure)
   }
   override def deleteById(tabellkode: Issue142Id): ConnectionIO[Boolean] = {
-    sql"""delete from "public"."issue142_2" where "tabellkode" = ${fromWrite(tabellkode)(Write.fromPut(Issue142Id.put))}""".update.run.map(_ > 0)
+    sql"""delete from "public"."issue142_2" where "tabellkode" = ${fromWrite(tabellkode)(new Write.Single(Issue142Id.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(tabellkodes: Array[Issue142Id]): ConnectionIO[Int] = {
     sql"""delete from "public"."issue142_2" where "tabellkode" = ANY(${tabellkodes})""".update.run
   }
   override def insert(unsaved: Issue1422Row): ConnectionIO[Issue1422Row] = {
     sql"""insert into "public"."issue142_2"("tabellkode")
-          values (${fromWrite(unsaved.tabellkode)(Write.fromPut(Issue142Id.put))})
+          values (${fromWrite(unsaved.tabellkode)(new Write.Single(Issue142Id.put))})
           returning "tabellkode"
        """.query(using Issue1422Row.read).unique
   }
@@ -47,7 +47,7 @@ class Issue1422RepoImpl extends Issue1422Repo {
     sql"""select "tabellkode" from "public"."issue142_2"""".query(using Issue1422Row.read).stream
   }
   override def selectById(tabellkode: Issue142Id): ConnectionIO[Option[Issue1422Row]] = {
-    sql"""select "tabellkode" from "public"."issue142_2" where "tabellkode" = ${fromWrite(tabellkode)(Write.fromPut(Issue142Id.put))}""".query(using Issue1422Row.read).option
+    sql"""select "tabellkode" from "public"."issue142_2" where "tabellkode" = ${fromWrite(tabellkode)(new Write.Single(Issue142Id.put))}""".query(using Issue1422Row.read).option
   }
   override def selectByIds(tabellkodes: Array[Issue142Id]): Stream[ConnectionIO, Issue1422Row] = {
     sql"""select "tabellkode" from "public"."issue142_2" where "tabellkode" = ANY(${tabellkodes})""".query(using Issue1422Row.read).stream
@@ -64,7 +64,7 @@ class Issue1422RepoImpl extends Issue1422Repo {
   override def upsert(unsaved: Issue1422Row): ConnectionIO[Issue1422Row] = {
     sql"""insert into "public"."issue142_2"("tabellkode")
           values (
-            ${fromWrite(unsaved.tabellkode)(Write.fromPut(Issue142Id.put))}
+            ${fromWrite(unsaved.tabellkode)(new Write.Single(Issue142Id.put))}
           )
           on conflict ("tabellkode")
           do update set "tabellkode" = EXCLUDED."tabellkode"

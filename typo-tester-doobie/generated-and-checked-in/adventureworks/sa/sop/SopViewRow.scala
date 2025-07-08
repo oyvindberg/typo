@@ -11,11 +11,9 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.product.ProductId
 import adventureworks.sales.specialoffer.SpecialofferId
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: sa.sop */
 case class SopViewRow(
@@ -34,20 +32,19 @@ case class SopViewRow(
 object SopViewRow {
   implicit lazy val decoder: Decoder[SopViewRow] = Decoder.forProduct5[SopViewRow, SpecialofferId, SpecialofferId, ProductId, TypoUUID, TypoLocalDateTime]("id", "specialofferid", "productid", "rowguid", "modifieddate")(SopViewRow.apply)(SpecialofferId.decoder, SpecialofferId.decoder, ProductId.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SopViewRow] = Encoder.forProduct5[SopViewRow, SpecialofferId, SpecialofferId, ProductId, TypoUUID, TypoLocalDateTime]("id", "specialofferid", "productid", "rowguid", "modifieddate")(x => (x.id, x.specialofferid, x.productid, x.rowguid, x.modifieddate))(SpecialofferId.encoder, SpecialofferId.encoder, ProductId.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SopViewRow] = new Read[SopViewRow](
-    gets = List(
-      (SpecialofferId.get, Nullability.NoNulls),
-      (SpecialofferId.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SopViewRow(
-      id = SpecialofferId.get.unsafeGetNonNullable(rs, i + 0),
-      specialofferid = SpecialofferId.get.unsafeGetNonNullable(rs, i + 1),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 2),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+  implicit lazy val read: Read[SopViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(SpecialofferId.get).asInstanceOf[Read[Any]],
+      new Read.Single(SpecialofferId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    SopViewRow(
+      id = arr(0).asInstanceOf[SpecialofferId],
+          specialofferid = arr(1).asInstanceOf[SpecialofferId],
+          productid = arr(2).asInstanceOf[ProductId],
+          rowguid = arr(3).asInstanceOf[TypoUUID],
+          modifieddate = arr(4).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

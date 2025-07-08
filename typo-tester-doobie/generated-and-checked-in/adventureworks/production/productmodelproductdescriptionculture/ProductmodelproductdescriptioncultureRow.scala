@@ -12,13 +12,11 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.culture.CultureId
 import adventureworks.production.productdescription.ProductdescriptionId
 import adventureworks.production.productmodel.ProductmodelId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: production.productmodelproductdescriptionculture
     Cross-reference table mapping product descriptions and the language the description is written in.
@@ -47,20 +45,19 @@ object ProductmodelproductdescriptioncultureRow {
     new ProductmodelproductdescriptioncultureRow(compositeId.productmodelid, compositeId.productdescriptionid, compositeId.cultureid, modifieddate)
   implicit lazy val decoder: Decoder[ProductmodelproductdescriptioncultureRow] = Decoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(ProductmodelproductdescriptioncultureRow.apply)(ProductmodelId.decoder, ProductdescriptionId.decoder, CultureId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ProductmodelproductdescriptioncultureRow] = Encoder.forProduct4[ProductmodelproductdescriptioncultureRow, ProductmodelId, ProductdescriptionId, CultureId, TypoLocalDateTime]("productmodelid", "productdescriptionid", "cultureid", "modifieddate")(x => (x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate))(ProductmodelId.encoder, ProductdescriptionId.encoder, CultureId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ProductmodelproductdescriptioncultureRow] = new Read[ProductmodelproductdescriptioncultureRow](
-    gets = List(
-      (ProductmodelId.get, Nullability.NoNulls),
-      (ProductdescriptionId.get, Nullability.NoNulls),
-      (CultureId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ProductmodelproductdescriptioncultureRow(
-      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
-      productdescriptionid = ProductdescriptionId.get.unsafeGetNonNullable(rs, i + 1),
-      cultureid = CultureId.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[ProductmodelproductdescriptioncultureRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ProductmodelId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductdescriptionId.get).asInstanceOf[Read[Any]],
+      new Read.Single(CultureId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    ProductmodelproductdescriptioncultureRow(
+      productmodelid = arr(0).asInstanceOf[ProductmodelId],
+          productdescriptionid = arr(1).asInstanceOf[ProductdescriptionId],
+          cultureid = arr(2).asInstanceOf[CultureId],
+          modifieddate = arr(3).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[ProductmodelproductdescriptioncultureRow] = Text.instance[ProductmodelproductdescriptioncultureRow]{ (row, sb) =>
     ProductmodelId.text.unsafeEncode(row.productmodelid, sb)
     sb.append(Text.DELIMETER)
@@ -70,23 +67,11 @@ object ProductmodelproductdescriptioncultureRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[ProductmodelproductdescriptioncultureRow] = new Write[ProductmodelproductdescriptioncultureRow](
-    puts = List((ProductmodelId.put, Nullability.NoNulls),
-                (ProductdescriptionId.put, Nullability.NoNulls),
-                (CultureId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.productmodelid, x.productdescriptionid, x.cultureid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ProductmodelId.put.unsafeSetNonNullable(rs, i + 0, a.productmodelid)
-                  ProductdescriptionId.put.unsafeSetNonNullable(rs, i + 1, a.productdescriptionid)
-                  CultureId.put.unsafeSetNonNullable(rs, i + 2, a.cultureid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ProductmodelId.put.unsafeUpdateNonNullable(ps, i + 0, a.productmodelid)
-                     ProductdescriptionId.put.unsafeUpdateNonNullable(ps, i + 1, a.productdescriptionid)
-                     CultureId.put.unsafeUpdateNonNullable(ps, i + 2, a.cultureid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
-                   }
+  implicit lazy val write: Write[ProductmodelproductdescriptioncultureRow] = new Write.Composite[ProductmodelproductdescriptioncultureRow](
+    List(new Write.Single(ProductmodelId.put),
+         new Write.Single(ProductdescriptionId.put),
+         new Write.Single(CultureId.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.productmodelid, a.productdescriptionid, a.cultureid, a.modifieddate)
   )
 }

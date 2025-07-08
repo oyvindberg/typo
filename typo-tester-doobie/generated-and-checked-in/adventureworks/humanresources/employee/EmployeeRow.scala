@@ -14,14 +14,12 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Flag
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: humanresources.employee
     Employee information such as salary, department, and title.
@@ -78,42 +76,41 @@ case class EmployeeRow(
 object EmployeeRow {
   implicit lazy val decoder: Decoder[EmployeeRow] = Decoder.forProduct15[EmployeeRow, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Flag, TypoShort, TypoShort, Flag, TypoUUID, TypoLocalDateTime, Option[String]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(EmployeeRow.apply)(BusinessentityId.decoder, Decoder.decodeString, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Decoder.decodeString, Decoder.decodeString, TypoLocalDate.decoder, Flag.decoder, TypoShort.decoder, TypoShort.decoder, Flag.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(Decoder.decodeString))
   implicit lazy val encoder: Encoder[EmployeeRow] = Encoder.forProduct15[EmployeeRow, BusinessentityId, /* max 15 chars */ String, /* max 256 chars */ String, /* max 50 chars */ String, TypoLocalDate, /* bpchar, max 1 chars */ String, /* bpchar, max 1 chars */ String, TypoLocalDate, Flag, TypoShort, TypoShort, Flag, TypoUUID, TypoLocalDateTime, Option[String]]("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")(x => (x.businessentityid, x.nationalidnumber, x.loginid, x.jobtitle, x.birthdate, x.maritalstatus, x.gender, x.hiredate, x.salariedflag, x.vacationhours, x.sickleavehours, x.currentflag, x.rowguid, x.modifieddate, x.organizationnode))(BusinessentityId.encoder, Encoder.encodeString, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Encoder.encodeString, Encoder.encodeString, TypoLocalDate.encoder, Flag.encoder, TypoShort.encoder, TypoShort.encoder, Flag.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(Encoder.encodeString))
-  implicit lazy val read: Read[EmployeeRow] = new Read[EmployeeRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoLocalDate.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoLocalDate.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => EmployeeRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      nationalidnumber = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      loginid = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 2),
-      jobtitle = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      birthdate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 4),
-      maritalstatus = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
-      gender = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 6),
-      hiredate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 7),
-      salariedflag = Flag.get.unsafeGetNonNullable(rs, i + 8),
-      vacationhours = TypoShort.get.unsafeGetNonNullable(rs, i + 9),
-      sickleavehours = TypoShort.get.unsafeGetNonNullable(rs, i + 10),
-      currentflag = Flag.get.unsafeGetNonNullable(rs, i + 11),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 12),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 13),
-      organizationnode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 14)
+  implicit lazy val read: Read[EmployeeRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDate.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDate.get).asInstanceOf[Read[Any]],
+      new Read.Single(Flag.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(Flag.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    EmployeeRow(
+      businessentityid = arr(0).asInstanceOf[BusinessentityId],
+          nationalidnumber = arr(1).asInstanceOf[/* max 15 chars */ String],
+          loginid = arr(2).asInstanceOf[/* max 256 chars */ String],
+          jobtitle = arr(3).asInstanceOf[/* max 50 chars */ String],
+          birthdate = arr(4).asInstanceOf[TypoLocalDate],
+          maritalstatus = arr(5).asInstanceOf[/* bpchar, max 1 chars */ String],
+          gender = arr(6).asInstanceOf[/* bpchar, max 1 chars */ String],
+          hiredate = arr(7).asInstanceOf[TypoLocalDate],
+          salariedflag = arr(8).asInstanceOf[Flag],
+          vacationhours = arr(9).asInstanceOf[TypoShort],
+          sickleavehours = arr(10).asInstanceOf[TypoShort],
+          currentflag = arr(11).asInstanceOf[Flag],
+          rowguid = arr(12).asInstanceOf[TypoUUID],
+          modifieddate = arr(13).asInstanceOf[TypoLocalDateTime],
+          organizationnode = arr(14).asInstanceOf[Option[String]]
     )
-  )
+  }
   implicit lazy val text: Text[EmployeeRow] = Text.instance[EmployeeRow]{ (row, sb) =>
     BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
     sb.append(Text.DELIMETER)
@@ -145,56 +142,22 @@ object EmployeeRow {
     sb.append(Text.DELIMETER)
     Text.option(Text.stringInstance).unsafeEncode(row.organizationnode, sb)
   }
-  implicit lazy val write: Write[EmployeeRow] = new Write[EmployeeRow](
-    puts = List((BusinessentityId.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (TypoLocalDate.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (TypoLocalDate.put, Nullability.NoNulls),
-                (Flag.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (Flag.put, Nullability.NoNulls),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.Nullable)),
-    toList = x => List(x.businessentityid, x.nationalidnumber, x.loginid, x.jobtitle, x.birthdate, x.maritalstatus, x.gender, x.hiredate, x.salariedflag, x.vacationhours, x.sickleavehours, x.currentflag, x.rowguid, x.modifieddate, x.organizationnode),
-    unsafeSet = (rs, i, a) => {
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.nationalidnumber)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 2, a.loginid)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 3, a.jobtitle)
-                  TypoLocalDate.put.unsafeSetNonNullable(rs, i + 4, a.birthdate)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 5, a.maritalstatus)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 6, a.gender)
-                  TypoLocalDate.put.unsafeSetNonNullable(rs, i + 7, a.hiredate)
-                  Flag.put.unsafeSetNonNullable(rs, i + 8, a.salariedflag)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 9, a.vacationhours)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 10, a.sickleavehours)
-                  Flag.put.unsafeSetNonNullable(rs, i + 11, a.currentflag)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 12, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 13, a.modifieddate)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 14, a.organizationnode)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.nationalidnumber)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.loginid)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.jobtitle)
-                     TypoLocalDate.put.unsafeUpdateNonNullable(ps, i + 4, a.birthdate)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.maritalstatus)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.gender)
-                     TypoLocalDate.put.unsafeUpdateNonNullable(ps, i + 7, a.hiredate)
-                     Flag.put.unsafeUpdateNonNullable(ps, i + 8, a.salariedflag)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 9, a.vacationhours)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 10, a.sickleavehours)
-                     Flag.put.unsafeUpdateNonNullable(ps, i + 11, a.currentflag)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 12, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 13, a.modifieddate)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 14, a.organizationnode)
-                   }
+  implicit lazy val write: Write[EmployeeRow] = new Write.Composite[EmployeeRow](
+    List(new Write.Single(BusinessentityId.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(TypoLocalDate.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(TypoLocalDate.put),
+         new Write.Single(Flag.put),
+         new Write.Single(TypoShort.put),
+         new Write.Single(TypoShort.put),
+         new Write.Single(Flag.put),
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put),
+         new Write.Single(Meta.StringMeta.put).toOpt),
+    a => List(a.businessentityid, a.nationalidnumber, a.loginid, a.jobtitle, a.birthdate, a.maritalstatus, a.gender, a.hiredate, a.salariedflag, a.vacationhours, a.sickleavehours, a.currentflag, a.rowguid, a.modifieddate, a.organizationnode)
   )
 }

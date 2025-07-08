@@ -32,7 +32,7 @@ projects:
     extends: template-cross
     sources: ../typo-dsl-shared
   typo-dsl-doobie:
-    dependencies: org.tpolecat::doobie-postgres:1.0.0-RC5
+    dependencies: org.tpolecat::doobie-postgres:1.0.0-RC9
     extends: template-cross
     sources: ../typo-dsl-shared
   typo-dsl-zio-jdbc:

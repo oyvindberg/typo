@@ -14,12 +14,10 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.document.DocumentId
 import adventureworks.public.Flag
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pr.d */
 case class DViewRow(
@@ -54,36 +52,35 @@ case class DViewRow(
 object DViewRow {
   implicit lazy val decoder: Decoder[DViewRow] = Decoder.forProduct13[DViewRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar, max 5 chars */ String, Int, TypoShort, Option[String], Option[TypoBytea], TypoUUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(DViewRow.apply)(Decoder.decodeString, BusinessentityId.decoder, Flag.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Decoder.decodeInt, TypoShort.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoBytea.decoder), TypoUUID.decoder, TypoLocalDateTime.decoder, DocumentId.decoder)
   implicit lazy val encoder: Encoder[DViewRow] = Encoder.forProduct13[DViewRow, /* max 50 chars */ String, BusinessentityId, Flag, /* max 400 chars */ String, Option[/* max 8 chars */ String], /* bpchar, max 5 chars */ String, Int, TypoShort, Option[String], Option[TypoBytea], TypoUUID, TypoLocalDateTime, DocumentId]("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")(x => (x.title, x.owner, x.folderflag, x.filename, x.fileextension, x.revision, x.changenumber, x.status, x.documentsummary, x.document, x.rowguid, x.modifieddate, x.documentnode))(Encoder.encodeString, BusinessentityId.encoder, Flag.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Encoder.encodeInt, TypoShort.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoBytea.encoder), TypoUUID.encoder, TypoLocalDateTime.encoder, DocumentId.encoder)
-  implicit lazy val read: Read[DViewRow] = new Read[DViewRow](
-    gets = List(
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoBytea.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (DocumentId.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => DViewRow(
-      title = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
-      owner = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      folderflag = Flag.get.unsafeGetNonNullable(rs, i + 2),
-      filename = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      fileextension = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      revision = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
-      changenumber = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 6),
-      status = TypoShort.get.unsafeGetNonNullable(rs, i + 7),
-      documentsummary = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      document = TypoBytea.get.unsafeGetNullable(rs, i + 9),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 10),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 11),
-      documentnode = DocumentId.get.unsafeGetNonNullable(rs, i + 12)
+  implicit lazy val read: Read[DViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Flag.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoBytea.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(DocumentId.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    DViewRow(
+      title = arr(0).asInstanceOf[/* max 50 chars */ String],
+          owner = arr(1).asInstanceOf[BusinessentityId],
+          folderflag = arr(2).asInstanceOf[Flag],
+          filename = arr(3).asInstanceOf[/* max 400 chars */ String],
+          fileextension = arr(4).asInstanceOf[Option[/* max 8 chars */ String]],
+          revision = arr(5).asInstanceOf[/* bpchar, max 5 chars */ String],
+          changenumber = arr(6).asInstanceOf[Int],
+          status = arr(7).asInstanceOf[TypoShort],
+          documentsummary = arr(8).asInstanceOf[Option[String]],
+          document = arr(9).asInstanceOf[Option[TypoBytea]],
+          rowguid = arr(10).asInstanceOf[TypoUUID],
+          modifieddate = arr(11).asInstanceOf[TypoLocalDateTime],
+          documentnode = arr(12).asInstanceOf[DocumentId]
     )
-  )
+  }
 }

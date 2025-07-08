@@ -10,11 +10,9 @@ package crc
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.sales.currency.CurrencyId
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: sa.crc */
 case class CrcViewRow(
@@ -29,16 +27,15 @@ case class CrcViewRow(
 object CrcViewRow {
   implicit lazy val decoder: Decoder[CrcViewRow] = Decoder.forProduct3[CrcViewRow, CountryregionId, CurrencyId, TypoLocalDateTime]("countryregioncode", "currencycode", "modifieddate")(CrcViewRow.apply)(CountryregionId.decoder, CurrencyId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[CrcViewRow] = Encoder.forProduct3[CrcViewRow, CountryregionId, CurrencyId, TypoLocalDateTime]("countryregioncode", "currencycode", "modifieddate")(x => (x.countryregioncode, x.currencycode, x.modifieddate))(CountryregionId.encoder, CurrencyId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[CrcViewRow] = new Read[CrcViewRow](
-    gets = List(
-      (CountryregionId.get, Nullability.NoNulls),
-      (CurrencyId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => CrcViewRow(
-      countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 0),
-      currencycode = CurrencyId.get.unsafeGetNonNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[CrcViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(CountryregionId.get).asInstanceOf[Read[Any]],
+      new Read.Single(CurrencyId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    CrcViewRow(
+      countryregioncode = arr(0).asInstanceOf[CountryregionId],
+          currencycode = arr(1).asInstanceOf[CurrencyId],
+          modifieddate = arr(2).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

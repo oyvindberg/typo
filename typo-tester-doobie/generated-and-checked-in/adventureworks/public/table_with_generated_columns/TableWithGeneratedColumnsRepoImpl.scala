@@ -26,20 +26,20 @@ class TableWithGeneratedColumnsRepoImpl extends TableWithGeneratedColumnsRepo {
     DeleteBuilder(""""public"."table-with-generated-columns"""", TableWithGeneratedColumnsFields.structure)
   }
   override def deleteById(name: TableWithGeneratedColumnsId): ConnectionIO[Boolean] = {
-    sql"""delete from "public"."table-with-generated-columns" where "name" = ${fromWrite(name)(Write.fromPut(TableWithGeneratedColumnsId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "public"."table-with-generated-columns" where "name" = ${fromWrite(name)(new Write.Single(TableWithGeneratedColumnsId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(names: Array[TableWithGeneratedColumnsId]): ConnectionIO[Int] = {
     sql"""delete from "public"."table-with-generated-columns" where "name" = ANY(${names})""".update.run
   }
   override def insert(unsaved: TableWithGeneratedColumnsRow): ConnectionIO[TableWithGeneratedColumnsRow] = {
     sql"""insert into "public"."table-with-generated-columns"("name")
-          values (${fromWrite(unsaved.name)(Write.fromPut(TableWithGeneratedColumnsId.put))})
+          values (${fromWrite(unsaved.name)(new Write.Single(TableWithGeneratedColumnsId.put))})
           returning "name", "name-type-always"
        """.query(using TableWithGeneratedColumnsRow.read).unique
   }
   override def insert(unsaved: TableWithGeneratedColumnsRowUnsaved): ConnectionIO[TableWithGeneratedColumnsRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(TableWithGeneratedColumnsId.put))}"))
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(new Write.Single(TableWithGeneratedColumnsId.put))}"))
     ).flatten
     
     val q = if (fs.isEmpty) {
@@ -70,7 +70,7 @@ class TableWithGeneratedColumnsRepoImpl extends TableWithGeneratedColumnsRepo {
     sql"""select "name", "name-type-always" from "public"."table-with-generated-columns"""".query(using TableWithGeneratedColumnsRow.read).stream
   }
   override def selectById(name: TableWithGeneratedColumnsId): ConnectionIO[Option[TableWithGeneratedColumnsRow]] = {
-    sql"""select "name", "name-type-always" from "public"."table-with-generated-columns" where "name" = ${fromWrite(name)(Write.fromPut(TableWithGeneratedColumnsId.put))}""".query(using TableWithGeneratedColumnsRow.read).option
+    sql"""select "name", "name-type-always" from "public"."table-with-generated-columns" where "name" = ${fromWrite(name)(new Write.Single(TableWithGeneratedColumnsId.put))}""".query(using TableWithGeneratedColumnsRow.read).option
   }
   override def selectByIds(names: Array[TableWithGeneratedColumnsId]): Stream[ConnectionIO, TableWithGeneratedColumnsRow] = {
     sql"""select "name", "name-type-always" from "public"."table-with-generated-columns" where "name" = ANY(${names})""".query(using TableWithGeneratedColumnsRow.read).stream
@@ -87,7 +87,7 @@ class TableWithGeneratedColumnsRepoImpl extends TableWithGeneratedColumnsRepo {
   override def upsert(unsaved: TableWithGeneratedColumnsRow): ConnectionIO[TableWithGeneratedColumnsRow] = {
     sql"""insert into "public"."table-with-generated-columns"("name")
           values (
-            ${fromWrite(unsaved.name)(Write.fromPut(TableWithGeneratedColumnsId.put))}
+            ${fromWrite(unsaved.name)(new Write.Single(TableWithGeneratedColumnsId.put))}
           )
           on conflict ("name")
           do update set "name" = EXCLUDED."name"

@@ -10,13 +10,11 @@ package department
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: humanresources.department
     Lookup table containing the departments within the Adventure Works Cycles company.
@@ -40,20 +38,19 @@ case class DepartmentRow(
 object DepartmentRow {
   implicit lazy val decoder: Decoder[DepartmentRow] = Decoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(DepartmentRow.apply)(DepartmentId.decoder, Name.decoder, Name.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[DepartmentRow] = Encoder.forProduct4[DepartmentRow, DepartmentId, Name, Name, TypoLocalDateTime]("departmentid", "name", "groupname", "modifieddate")(x => (x.departmentid, x.name, x.groupname, x.modifieddate))(DepartmentId.encoder, Name.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[DepartmentRow] = new Read[DepartmentRow](
-    gets = List(
-      (DepartmentId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => DepartmentRow(
-      departmentid = DepartmentId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      groupname = Name.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[DepartmentRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(DepartmentId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    DepartmentRow(
+      departmentid = arr(0).asInstanceOf[DepartmentId],
+          name = arr(1).asInstanceOf[Name],
+          groupname = arr(2).asInstanceOf[Name],
+          modifieddate = arr(3).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[DepartmentRow] = Text.instance[DepartmentRow]{ (row, sb) =>
     DepartmentId.text.unsafeEncode(row.departmentid, sb)
     sb.append(Text.DELIMETER)
@@ -63,23 +60,11 @@ object DepartmentRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[DepartmentRow] = new Write[DepartmentRow](
-    puts = List((DepartmentId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.departmentid, x.name, x.groupname, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  DepartmentId.put.unsafeSetNonNullable(rs, i + 0, a.departmentid)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  Name.put.unsafeSetNonNullable(rs, i + 2, a.groupname)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     DepartmentId.put.unsafeUpdateNonNullable(ps, i + 0, a.departmentid)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 2, a.groupname)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.modifieddate)
-                   }
+  implicit lazy val write: Write[DepartmentRow] = new Write.Composite[DepartmentRow](
+    List(new Write.Single(DepartmentId.put),
+         new Write.Single(Name.put),
+         new Write.Single(Name.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.departmentid, a.name, a.groupname, a.modifieddate)
   )
 }

@@ -8,14 +8,12 @@ package hardcoded
 package myschema
 package football_club
 
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: myschema.football_club
     football club
@@ -28,32 +26,23 @@ case class FootballClubRow(
 object FootballClubRow {
   implicit lazy val decoder: Decoder[FootballClubRow] = Decoder.forProduct2[FootballClubRow, FootballClubId, /* max 100 chars */ String]("id", "name")(FootballClubRow.apply)(FootballClubId.decoder, Decoder.decodeString)
   implicit lazy val encoder: Encoder[FootballClubRow] = Encoder.forProduct2[FootballClubRow, FootballClubId, /* max 100 chars */ String]("id", "name")(x => (x.id, x.name))(FootballClubId.encoder, Encoder.encodeString)
-  implicit lazy val read: Read[FootballClubRow] = new Read[FootballClubRow](
-    gets = List(
-      (FootballClubId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => FootballClubRow(
-      id = FootballClubId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1)
+  implicit lazy val read: Read[FootballClubRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(FootballClubId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    FootballClubRow(
+      id = arr(0).asInstanceOf[FootballClubId],
+          name = arr(1).asInstanceOf[/* max 100 chars */ String]
     )
-  )
+  }
   implicit lazy val text: Text[FootballClubRow] = Text.instance[FootballClubRow]{ (row, sb) =>
     FootballClubId.text.unsafeEncode(row.id, sb)
     sb.append(Text.DELIMETER)
     Text.stringInstance.unsafeEncode(row.name, sb)
   }
-  implicit lazy val write: Write[FootballClubRow] = new Write[FootballClubRow](
-    puts = List((FootballClubId.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls)),
-    toList = x => List(x.id, x.name),
-    unsafeSet = (rs, i, a) => {
-                  FootballClubId.put.unsafeSetNonNullable(rs, i + 0, a.id)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     FootballClubId.put.unsafeUpdateNonNullable(ps, i + 0, a.id)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                   }
+  implicit lazy val write: Write[FootballClubRow] = new Write.Composite[FootballClubRow](
+    List(new Write.Single(FootballClubId.put),
+         new Write.Single(Meta.StringMeta.put)),
+    a => List(a.id, a.name)
   )
 }

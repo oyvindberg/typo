@@ -49,9 +49,9 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
     if (inlineImplicits && !forbidInline)
       tpe match {
         case TypesScala.Optional(underlying) =>
-          code"$${$fromWrite($name)($Write.fromPutOption(${lookupPutFor(underlying)}))}"
+          code"$${$fromWrite($name)(new $Write.SingleOpt(${lookupPutFor(underlying)}))}"
         case other =>
-          code"$${$fromWrite($name)($Write.fromPut(${lookupPutFor(other)}))}"
+          code"$${$fromWrite($name)(new $Write.Single(${lookupPutFor(other)}))}"
       }
     else code"$${$name}"
 
@@ -651,7 +651,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = writeName,
           implicitParams = Nil,
           tpe = Write.of(wrapperType),
-          body = code"$Write.fromPut($putName)"
+          body = code"new $Write.Single($putName)"
         )
       ),
       Some(
@@ -660,7 +660,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
           name = readName,
           implicitParams = Nil,
           tpe = Read.of(wrapperType),
-          body = code"$Read.fromGet($getName)"
+          body = code"new $Read.Single($getName)"
         )
       ),
       textSupport.map(_.anyValInstance(wrapperType, underlying))
@@ -782,84 +782,56 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
     val text = textSupport.map(_.rowInstance(tpe, cols))
 
     val read = {
-      val getCols = cols.map { c =>
-        c.tpe match {
-          case TypesScala.Optional(underlying) => code"(${lookupGetFor(underlying)}, $Nullability.Nullable)"
-          case other                           => code"(${lookupGetFor(other)}, $Nullability.NoNulls)"
-        }
-      }
+      val colsList = cols.toList
 
-      val namedParams = cols.zipWithIndex.map { case (c, idx) =>
+      val readInstances = colsList.map { c =>
         c.tpe match {
           case TypesScala.Optional(underlying) =>
-            code"${c.name} = ${lookupGetFor(underlying)}.unsafeGetNullable(rs, i + $idx)"
+            code"new $Read.SingleOpt(${lookupGetFor(underlying)}).asInstanceOf[${Read.of(TypesScala.Any)}]"
           case other =>
-            code"${c.name} = ${lookupGetFor(other)}.unsafeGetNonNullable(rs, i + $idx)"
+            code"new $Read.Single(${lookupGetFor(other)}).asInstanceOf[${Read.of(TypesScala.Any)}]"
         }
       }
 
-      val body =
-        code"""|new ${Read.of(tpe)}(
-               |  gets = ${TypesScala.List}(
-               |    ${getCols.mkCode(",\n")}
-               |  ),
-               |  unsafeGet = (rs: ${TypesJava.ResultSet}, i: ${TypesScala.Int}) => $tpe(
-               |    ${namedParams.mkCode(",\n")}
-               |  )
-               |)
-               |""".stripMargin
+      val constructorArgs = colsList.zipWithIndex
+        .map { case (col, idx) =>
+          code"${col.name} = arr($idx).asInstanceOf[${col.tpe}]"
+        }
+        .mkCode(",\n    ")
+
+      val body = code"""|new $Read.CompositeOfInstances(${TypesScala.Array}(
+                        |  ${readInstances.mkCode(",\n  ")}
+                        |))(using scala.reflect.ClassTag.Any).map { arr =>
+                        |  $tpe(
+                        |    $constructorArgs
+                        |  )
+                        |}""".stripMargin
 
       sc.Given(tparams = Nil, name = readName, implicitParams = Nil, tpe = Read.of(tpe), body = body)
     }
 
     val write = {
       val writeableColumnsWithId = cols.toList.filterNot(_.dbCol.maybeGenerated.exists(_.ALWAYS))
-      val puts = {
-        val all = writeableColumnsWithId.map { c =>
-          c.tpe match {
-            case TypesScala.Optional(underlying) => code"(${lookupPutFor(underlying)}, $Nullability.Nullable)"
-            case other                           => code"(${lookupPutFor(other)}, $Nullability.NoNulls)"
-          }
+
+      val writeInstances = writeableColumnsWithId.map { c =>
+        c.tpe match {
+          case TypesScala.Optional(underlying) =>
+            code"new $Write.Single(${lookupPutFor(underlying)}).toOpt"
+          case other =>
+            code"new $Write.Single(${lookupPutFor(other)})"
         }
-        code"${TypesScala.List}(${all.mkCode(",\n")})"
       }
 
-      val toList = {
-        val all = writeableColumnsWithId.map(c => code"x.${c.name}")
-        code"x => ${TypesScala.List}(${all.mkCode(", ")})"
-      }
-      val unsafeSet = {
-        val all = writeableColumnsWithId.zipWithIndex.map { case (c, i) =>
-          c.tpe match {
-            case TypesScala.Optional(underlying) => code"${lookupPutFor(underlying)}.unsafeSetNullable(rs, i + $i, a.${c.name})"
-            case other                           => code"${lookupPutFor(other)}.unsafeSetNonNullable(rs, i + $i, a.${c.name})"
-          }
-        }
-        code"""|(rs, i, a) => {
-               |  ${all.mkCode("\n")}
-               |}""".stripMargin
-      }
-
-      val unsafeUpdate = {
-        val all = writeableColumnsWithId.zipWithIndex.map { case (c, i) =>
-          c.tpe match {
-            case TypesScala.Optional(underlying) => code"${lookupPutFor(underlying)}.unsafeUpdateNullable(ps, i + $i, a.${c.name})"
-            case other                           => code"${lookupPutFor(other)}.unsafeUpdateNonNullable(ps, i + $i, a.${c.name})"
-          }
-        }
-        code"""|(ps, i, a) => {
-               |  ${all.mkCode("\n")}
-               |}""".stripMargin
+      val deconstruct = {
+        val parts = writeableColumnsWithId.map(c => code"a.${c.name}")
+        code"a => ${TypesScala.List}(${parts.mkCode(", ")})"
       }
 
       val body =
-        code"""|new ${Write.of(tpe)}(
-               |  puts = $puts,
-               |  toList = $toList,
-               |  unsafeSet = $unsafeSet,
-               |  unsafeUpdate = $unsafeUpdate
-               |)
-               |""".stripMargin
+        code"""|new $Write.Composite[$tpe](
+               |  ${TypesScala.List}(${writeInstances.mkCode(",\n")}),
+               |  $deconstruct
+               |)""".stripMargin
 
       sc.Given(tparams = Nil, name = writeName, implicitParams = Nil, tpe = Write.of(tpe), body = body)
     }

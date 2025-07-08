@@ -42,10 +42,10 @@ object TitleDomainId {
   implicit lazy val get: Get[TitleDomainId] = ShortText.get.map(TitleDomainId.apply)
   implicit lazy val ordering: Ordering[TitleDomainId] = Ordering.by(_.value)
   implicit lazy val put: Put[TitleDomainId] = ShortText.put.contramap(_.value)
-  implicit lazy val read: Read[TitleDomainId] = Read.fromGet(get)
+  implicit lazy val read: Read[TitleDomainId] = new Read.Single(get)
   implicit lazy val text: Text[TitleDomainId] = new Text[TitleDomainId] {
     override def unsafeEncode(v: TitleDomainId, sb: StringBuilder) = ShortText.text.unsafeEncode(v.value, sb)
     override def unsafeArrayEncode(v: TitleDomainId, sb: StringBuilder) = ShortText.text.unsafeArrayEncode(v.value, sb)
   }
-  implicit lazy val write: Write[TitleDomainId] = Write.fromPut(put)
+  implicit lazy val write: Write[TitleDomainId] = new Write.Single(put)
 }
