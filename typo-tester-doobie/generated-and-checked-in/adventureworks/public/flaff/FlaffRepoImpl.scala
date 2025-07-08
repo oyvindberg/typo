@@ -26,7 +26,7 @@ class FlaffRepoImpl extends FlaffRepo {
     DeleteBuilder(""""public"."flaff"""", FlaffFields.structure)
   }
   override def deleteById(compositeId: FlaffId): ConnectionIO[Boolean] = {
-    sql"""delete from "public"."flaff" where "code" = ${fromWrite(compositeId.code)(Write.fromPut(ShortText.put))} AND "another_code" = ${fromWrite(compositeId.anotherCode)(Write.fromPut(Meta.StringMeta.put))} AND "some_number" = ${fromWrite(compositeId.someNumber)(Write.fromPut(Meta.IntMeta.put))} AND "specifier" = ${fromWrite(compositeId.specifier)(Write.fromPut(ShortText.put))}""".update.run.map(_ > 0)
+    sql"""delete from "public"."flaff" where "code" = ${fromWrite(compositeId.code)(new Write.Single(ShortText.put))} AND "another_code" = ${fromWrite(compositeId.anotherCode)(new Write.Single(Meta.StringMeta.put))} AND "some_number" = ${fromWrite(compositeId.someNumber)(new Write.Single(Meta.IntMeta.put))} AND "specifier" = ${fromWrite(compositeId.specifier)(new Write.Single(ShortText.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[FlaffId]): ConnectionIO[Int] = {
     val code = compositeIds.map(_.code)
@@ -42,7 +42,7 @@ class FlaffRepoImpl extends FlaffRepo {
   }
   override def insert(unsaved: FlaffRow): ConnectionIO[FlaffRow] = {
     sql"""insert into "public"."flaff"("code", "another_code", "some_number", "specifier", "parentspecifier")
-          values (${fromWrite(unsaved.code)(Write.fromPut(ShortText.put))}::text, ${fromWrite(unsaved.anotherCode)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.someNumber)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.specifier)(Write.fromPut(ShortText.put))}::text, ${fromWrite(unsaved.parentspecifier)(Write.fromPutOption(ShortText.put))}::text)
+          values (${fromWrite(unsaved.code)(new Write.Single(ShortText.put))}::text, ${fromWrite(unsaved.anotherCode)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.someNumber)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.specifier)(new Write.Single(ShortText.put))}::text, ${fromWrite(unsaved.parentspecifier)(new Write.SingleOpt(ShortText.put))}::text)
           returning "code", "another_code", "some_number", "specifier", "parentspecifier"
        """.query(using FlaffRow.read).unique
   }
@@ -56,7 +56,7 @@ class FlaffRepoImpl extends FlaffRepo {
     sql"""select "code", "another_code", "some_number", "specifier", "parentspecifier" from "public"."flaff"""".query(using FlaffRow.read).stream
   }
   override def selectById(compositeId: FlaffId): ConnectionIO[Option[FlaffRow]] = {
-    sql"""select "code", "another_code", "some_number", "specifier", "parentspecifier" from "public"."flaff" where "code" = ${fromWrite(compositeId.code)(Write.fromPut(ShortText.put))} AND "another_code" = ${fromWrite(compositeId.anotherCode)(Write.fromPut(Meta.StringMeta.put))} AND "some_number" = ${fromWrite(compositeId.someNumber)(Write.fromPut(Meta.IntMeta.put))} AND "specifier" = ${fromWrite(compositeId.specifier)(Write.fromPut(ShortText.put))}""".query(using FlaffRow.read).option
+    sql"""select "code", "another_code", "some_number", "specifier", "parentspecifier" from "public"."flaff" where "code" = ${fromWrite(compositeId.code)(new Write.Single(ShortText.put))} AND "another_code" = ${fromWrite(compositeId.anotherCode)(new Write.Single(Meta.StringMeta.put))} AND "some_number" = ${fromWrite(compositeId.someNumber)(new Write.Single(Meta.IntMeta.put))} AND "specifier" = ${fromWrite(compositeId.specifier)(new Write.Single(ShortText.put))}""".query(using FlaffRow.read).option
   }
   override def selectByIds(compositeIds: Array[FlaffId]): Stream[ConnectionIO, FlaffRow] = {
     val code = compositeIds.map(_.code)
@@ -82,8 +82,8 @@ class FlaffRepoImpl extends FlaffRepo {
   override def update(row: FlaffRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update "public"."flaff"
-          set "parentspecifier" = ${fromWrite(row.parentspecifier)(Write.fromPutOption(ShortText.put))}::text
-          where "code" = ${fromWrite(compositeId.code)(Write.fromPut(ShortText.put))} AND "another_code" = ${fromWrite(compositeId.anotherCode)(Write.fromPut(Meta.StringMeta.put))} AND "some_number" = ${fromWrite(compositeId.someNumber)(Write.fromPut(Meta.IntMeta.put))} AND "specifier" = ${fromWrite(compositeId.specifier)(Write.fromPut(ShortText.put))}"""
+          set "parentspecifier" = ${fromWrite(row.parentspecifier)(new Write.SingleOpt(ShortText.put))}::text
+          where "code" = ${fromWrite(compositeId.code)(new Write.Single(ShortText.put))} AND "another_code" = ${fromWrite(compositeId.anotherCode)(new Write.Single(Meta.StringMeta.put))} AND "some_number" = ${fromWrite(compositeId.someNumber)(new Write.Single(Meta.IntMeta.put))} AND "specifier" = ${fromWrite(compositeId.specifier)(new Write.Single(ShortText.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -91,11 +91,11 @@ class FlaffRepoImpl extends FlaffRepo {
   override def upsert(unsaved: FlaffRow): ConnectionIO[FlaffRow] = {
     sql"""insert into "public"."flaff"("code", "another_code", "some_number", "specifier", "parentspecifier")
           values (
-            ${fromWrite(unsaved.code)(Write.fromPut(ShortText.put))}::text,
-            ${fromWrite(unsaved.anotherCode)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.someNumber)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.specifier)(Write.fromPut(ShortText.put))}::text,
-            ${fromWrite(unsaved.parentspecifier)(Write.fromPutOption(ShortText.put))}::text
+            ${fromWrite(unsaved.code)(new Write.Single(ShortText.put))}::text,
+            ${fromWrite(unsaved.anotherCode)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.someNumber)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.specifier)(new Write.Single(ShortText.put))}::text,
+            ${fromWrite(unsaved.parentspecifier)(new Write.SingleOpt(ShortText.put))}::text
           )
           on conflict ("code", "another_code", "some_number", "specifier")
           do update set

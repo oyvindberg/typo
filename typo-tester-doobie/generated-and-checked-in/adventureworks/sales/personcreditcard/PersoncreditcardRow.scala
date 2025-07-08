@@ -11,13 +11,11 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.userdefined.CustomCreditcardId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: sales.personcreditcard
     Cross-reference table mapping people to their credit card information in the CreditCard table.
@@ -43,18 +41,17 @@ object PersoncreditcardRow {
     new PersoncreditcardRow(compositeId.businessentityid, compositeId.creditcardid, modifieddate)
   implicit lazy val decoder: Decoder[PersoncreditcardRow] = Decoder.forProduct3[PersoncreditcardRow, BusinessentityId, /* user-picked */ CustomCreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(PersoncreditcardRow.apply)(BusinessentityId.decoder, CustomCreditcardId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PersoncreditcardRow] = Encoder.forProduct3[PersoncreditcardRow, BusinessentityId, /* user-picked */ CustomCreditcardId, TypoLocalDateTime]("businessentityid", "creditcardid", "modifieddate")(x => (x.businessentityid, x.creditcardid, x.modifieddate))(BusinessentityId.encoder, CustomCreditcardId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PersoncreditcardRow] = new Read[PersoncreditcardRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (/* user-picked */ CustomCreditcardId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PersoncreditcardRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      creditcardid = /* user-picked */ CustomCreditcardId.get.unsafeGetNonNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[PersoncreditcardRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(/* user-picked */ CustomCreditcardId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    PersoncreditcardRow(
+      businessentityid = arr(0).asInstanceOf[BusinessentityId],
+          creditcardid = arr(1).asInstanceOf[/* user-picked */ CustomCreditcardId],
+          modifieddate = arr(2).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[PersoncreditcardRow] = Text.instance[PersoncreditcardRow]{ (row, sb) =>
     BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
     sb.append(Text.DELIMETER)
@@ -62,20 +59,10 @@ object PersoncreditcardRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[PersoncreditcardRow] = new Write[PersoncreditcardRow](
-    puts = List((BusinessentityId.put, Nullability.NoNulls),
-                (/* user-picked */ CustomCreditcardId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.businessentityid, x.creditcardid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
-                  /* user-picked */ CustomCreditcardId.put.unsafeSetNonNullable(rs, i + 1, a.creditcardid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
-                     /* user-picked */ CustomCreditcardId.put.unsafeUpdateNonNullable(ps, i + 1, a.creditcardid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
-                   }
+  implicit lazy val write: Write[PersoncreditcardRow] = new Write.Composite[PersoncreditcardRow](
+    List(new Write.Single(BusinessentityId.put),
+         new Write.Single(/* user-picked */ CustomCreditcardId.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.businessentityid, a.creditcardid, a.modifieddate)
   )
 }

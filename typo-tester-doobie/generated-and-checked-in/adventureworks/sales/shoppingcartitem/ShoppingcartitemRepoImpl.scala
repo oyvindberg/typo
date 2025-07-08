@@ -30,36 +30,36 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     DeleteBuilder(""""sales"."shoppingcartitem"""", ShoppingcartitemFields.structure)
   }
   override def deleteById(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Boolean] = {
-    sql"""delete from "sales"."shoppingcartitem" where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."shoppingcartitem" where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(new Write.Single(ShoppingcartitemId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(shoppingcartitemids: Array[ShoppingcartitemId]): ConnectionIO[Int] = {
     sql"""delete from "sales"."shoppingcartitem" where "shoppingcartitemid" = ANY(${shoppingcartitemids})""".update.run
   }
   override def insert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     sql"""insert into "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
-          values (${fromWrite(unsaved.shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}::int4, ${fromWrite(unsaved.shoppingcartid)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.datecreated)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.shoppingcartitemid)(new Write.Single(ShoppingcartitemId.put))}::int4, ${fromWrite(unsaved.shoppingcartid)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.quantity)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4, ${fromWrite(unsaved.datecreated)(new Write.Single(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text
        """.query(using ShoppingcartitemRow.read).unique
   }
   override def insert(unsaved: ShoppingcartitemRowUnsaved): ConnectionIO[ShoppingcartitemRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""shoppingcartid""""), fr"${fromWrite(unsaved.shoppingcartid)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
+      Some((Fragment.const0(s""""shoppingcartid""""), fr"${fromWrite(unsaved.shoppingcartid)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4")),
       unsaved.shoppingcartitemid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""shoppingcartitemid""""), fr"${fromWrite(value: ShoppingcartitemId)(Write.fromPut(ShoppingcartitemId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""shoppingcartitemid""""), fr"${fromWrite(value: ShoppingcartitemId)(new Write.Single(ShoppingcartitemId.put))}::int4"))
       },
       unsaved.quantity match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""quantity""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""quantity""""), fr"${fromWrite(value: Int)(new Write.Single(Meta.IntMeta.put))}::int4"))
       },
       unsaved.datecreated match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""datecreated""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""datecreated""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -91,7 +91,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
     sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from "sales"."shoppingcartitem"""".query(using ShoppingcartitemRow.read).stream
   }
   override def selectById(shoppingcartitemid: ShoppingcartitemId): ConnectionIO[Option[ShoppingcartitemRow]] = {
-    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from "sales"."shoppingcartitem" where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}""".query(using ShoppingcartitemRow.read).option
+    sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from "sales"."shoppingcartitem" where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(new Write.Single(ShoppingcartitemId.put))}""".query(using ShoppingcartitemRow.read).option
   }
   override def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): Stream[ConnectionIO, ShoppingcartitemRow] = {
     sql"""select "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text from "sales"."shoppingcartitem" where "shoppingcartitemid" = ANY(${shoppingcartitemids})""".query(using ShoppingcartitemRow.read).stream
@@ -108,12 +108,12 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def update(row: ShoppingcartitemRow): ConnectionIO[Boolean] = {
     val shoppingcartitemid = row.shoppingcartitemid
     sql"""update "sales"."shoppingcartitem"
-          set "shoppingcartid" = ${fromWrite(row.shoppingcartid)(Write.fromPut(Meta.StringMeta.put))},
-              "quantity" = ${fromWrite(row.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "productid" = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
-              "datecreated" = ${fromWrite(row.datecreated)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}"""
+          set "shoppingcartid" = ${fromWrite(row.shoppingcartid)(new Write.Single(Meta.StringMeta.put))},
+              "quantity" = ${fromWrite(row.quantity)(new Write.Single(Meta.IntMeta.put))}::int4,
+              "productid" = ${fromWrite(row.productid)(new Write.Single(ProductId.put))}::int4,
+              "datecreated" = ${fromWrite(row.datecreated)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(new Write.Single(ShoppingcartitemId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -121,12 +121,12 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def upsert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     sql"""insert into "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")
           values (
-            ${fromWrite(unsaved.shoppingcartitemid)(Write.fromPut(ShoppingcartitemId.put))}::int4,
-            ${fromWrite(unsaved.shoppingcartid)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
-            ${fromWrite(unsaved.datecreated)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.shoppingcartitemid)(new Write.Single(ShoppingcartitemId.put))}::int4,
+            ${fromWrite(unsaved.shoppingcartid)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.quantity)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4,
+            ${fromWrite(unsaved.datecreated)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("shoppingcartitemid")
           do update set

@@ -12,14 +12,12 @@ import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.stateprovince.StateprovinceId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: person.address
     Street address information for customers, employees, and vendors.
@@ -54,30 +52,29 @@ case class AddressRow(
 object AddressRow {
   implicit lazy val decoder: Decoder[AddressRow] = Decoder.forProduct9[AddressRow, AddressId, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Option[TypoBytea], TypoUUID, TypoLocalDateTime]("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(AddressRow.apply)(AddressId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, StateprovinceId.decoder, Decoder.decodeString, Decoder.decodeOption(TypoBytea.decoder), TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[AddressRow] = Encoder.forProduct9[AddressRow, AddressId, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, StateprovinceId, /* max 15 chars */ String, Option[TypoBytea], TypoUUID, TypoLocalDateTime]("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")(x => (x.addressid, x.addressline1, x.addressline2, x.city, x.stateprovinceid, x.postalcode, x.spatiallocation, x.rowguid, x.modifieddate))(AddressId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, StateprovinceId.encoder, Encoder.encodeString, Encoder.encodeOption(TypoBytea.encoder), TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[AddressRow] = new Read[AddressRow](
-    gets = List(
-      (AddressId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (StateprovinceId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoBytea.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => AddressRow(
-      addressid = AddressId.get.unsafeGetNonNullable(rs, i + 0),
-      addressline1 = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      addressline2 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      city = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      stateprovinceid = StateprovinceId.get.unsafeGetNonNullable(rs, i + 4),
-      postalcode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
-      spatiallocation = TypoBytea.get.unsafeGetNullable(rs, i + 6),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 7),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
+  implicit lazy val read: Read[AddressRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(AddressId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(StateprovinceId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoBytea.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    AddressRow(
+      addressid = arr(0).asInstanceOf[AddressId],
+          addressline1 = arr(1).asInstanceOf[/* max 60 chars */ String],
+          addressline2 = arr(2).asInstanceOf[Option[/* max 60 chars */ String]],
+          city = arr(3).asInstanceOf[/* max 30 chars */ String],
+          stateprovinceid = arr(4).asInstanceOf[StateprovinceId],
+          postalcode = arr(5).asInstanceOf[/* max 15 chars */ String],
+          spatiallocation = arr(6).asInstanceOf[Option[TypoBytea]],
+          rowguid = arr(7).asInstanceOf[TypoUUID],
+          modifieddate = arr(8).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[AddressRow] = Text.instance[AddressRow]{ (row, sb) =>
     AddressId.text.unsafeEncode(row.addressid, sb)
     sb.append(Text.DELIMETER)
@@ -97,38 +94,16 @@ object AddressRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[AddressRow] = new Write[AddressRow](
-    puts = List((AddressId.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (StateprovinceId.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (TypoBytea.put, Nullability.Nullable),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.addressid, x.addressline1, x.addressline2, x.city, x.stateprovinceid, x.postalcode, x.spatiallocation, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  AddressId.put.unsafeSetNonNullable(rs, i + 0, a.addressid)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.addressline1)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 2, a.addressline2)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 3, a.city)
-                  StateprovinceId.put.unsafeSetNonNullable(rs, i + 4, a.stateprovinceid)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 5, a.postalcode)
-                  TypoBytea.put.unsafeSetNullable(rs, i + 6, a.spatiallocation)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 7, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 8, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     AddressId.put.unsafeUpdateNonNullable(ps, i + 0, a.addressid)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.addressline1)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 2, a.addressline2)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.city)
-                     StateprovinceId.put.unsafeUpdateNonNullable(ps, i + 4, a.stateprovinceid)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.postalcode)
-                     TypoBytea.put.unsafeUpdateNullable(ps, i + 6, a.spatiallocation)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 7, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 8, a.modifieddate)
-                   }
+  implicit lazy val write: Write[AddressRow] = new Write.Composite[AddressRow](
+    List(new Write.Single(AddressId.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(Meta.StringMeta.put).toOpt,
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(StateprovinceId.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(TypoBytea.put).toOpt,
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.addressid, a.addressline1, a.addressline2, a.city, a.stateprovinceid, a.postalcode, a.spatiallocation, a.rowguid, a.modifieddate)
   )
 }

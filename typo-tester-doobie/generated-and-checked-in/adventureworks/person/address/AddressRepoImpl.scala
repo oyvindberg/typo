@@ -32,36 +32,36 @@ class AddressRepoImpl extends AddressRepo {
     DeleteBuilder(""""person"."address"""", AddressFields.structure)
   }
   override def deleteById(addressid: AddressId): ConnectionIO[Boolean] = {
-    sql"""delete from "person"."address" where "addressid" = ${fromWrite(addressid)(Write.fromPut(AddressId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "person"."address" where "addressid" = ${fromWrite(addressid)(new Write.Single(AddressId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(addressids: Array[AddressId]): ConnectionIO[Int] = {
     sql"""delete from "person"."address" where "addressid" = ANY(${addressids})""".update.run
   }
   override def insert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     sql"""insert into "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.addressid)(Write.fromPut(AddressId.put))}::int4, ${fromWrite(unsaved.addressline1)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.addressline2)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.city)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4, ${fromWrite(unsaved.postalcode)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.spatiallocation)(Write.fromPutOption(TypoBytea.put))}::bytea, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.addressid)(new Write.Single(AddressId.put))}::int4, ${fromWrite(unsaved.addressline1)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.addressline2)(new Write.SingleOpt(Meta.StringMeta.put))}, ${fromWrite(unsaved.city)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.stateprovinceid)(new Write.Single(StateprovinceId.put))}::int4, ${fromWrite(unsaved.postalcode)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.spatiallocation)(new Write.SingleOpt(TypoBytea.put))}::bytea, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
        """.query(using AddressRow.read).unique
   }
   override def insert(unsaved: AddressRowUnsaved): ConnectionIO[AddressRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""addressline1""""), fr"${fromWrite(unsaved.addressline1)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""addressline2""""), fr"${fromWrite(unsaved.addressline2)(Write.fromPutOption(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""city""""), fr"${fromWrite(unsaved.city)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""stateprovinceid""""), fr"${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4")),
-      Some((Fragment.const0(s""""postalcode""""), fr"${fromWrite(unsaved.postalcode)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""spatiallocation""""), fr"${fromWrite(unsaved.spatiallocation)(Write.fromPutOption(TypoBytea.put))}::bytea")),
+      Some((Fragment.const0(s""""addressline1""""), fr"${fromWrite(unsaved.addressline1)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""addressline2""""), fr"${fromWrite(unsaved.addressline2)(new Write.SingleOpt(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""city""""), fr"${fromWrite(unsaved.city)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""stateprovinceid""""), fr"${fromWrite(unsaved.stateprovinceid)(new Write.Single(StateprovinceId.put))}::int4")),
+      Some((Fragment.const0(s""""postalcode""""), fr"${fromWrite(unsaved.postalcode)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""spatiallocation""""), fr"${fromWrite(unsaved.spatiallocation)(new Write.SingleOpt(TypoBytea.put))}::bytea")),
       unsaved.addressid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""addressid""""), fr"${fromWrite(value: AddressId)(Write.fromPut(AddressId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""addressid""""), fr"${fromWrite(value: AddressId)(new Write.Single(AddressId.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -93,7 +93,7 @@ class AddressRepoImpl extends AddressRepo {
     sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from "person"."address"""".query(using AddressRow.read).stream
   }
   override def selectById(addressid: AddressId): ConnectionIO[Option[AddressRow]] = {
-    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from "person"."address" where "addressid" = ${fromWrite(addressid)(Write.fromPut(AddressId.put))}""".query(using AddressRow.read).option
+    sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from "person"."address" where "addressid" = ${fromWrite(addressid)(new Write.Single(AddressId.put))}""".query(using AddressRow.read).option
   }
   override def selectByIds(addressids: Array[AddressId]): Stream[ConnectionIO, AddressRow] = {
     sql"""select "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text from "person"."address" where "addressid" = ANY(${addressids})""".query(using AddressRow.read).stream
@@ -110,15 +110,15 @@ class AddressRepoImpl extends AddressRepo {
   override def update(row: AddressRow): ConnectionIO[Boolean] = {
     val addressid = row.addressid
     sql"""update "person"."address"
-          set "addressline1" = ${fromWrite(row.addressline1)(Write.fromPut(Meta.StringMeta.put))},
-              "addressline2" = ${fromWrite(row.addressline2)(Write.fromPutOption(Meta.StringMeta.put))},
-              "city" = ${fromWrite(row.city)(Write.fromPut(Meta.StringMeta.put))},
-              "stateprovinceid" = ${fromWrite(row.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4,
-              "postalcode" = ${fromWrite(row.postalcode)(Write.fromPut(Meta.StringMeta.put))},
-              "spatiallocation" = ${fromWrite(row.spatiallocation)(Write.fromPutOption(TypoBytea.put))}::bytea,
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "addressid" = ${fromWrite(addressid)(Write.fromPut(AddressId.put))}"""
+          set "addressline1" = ${fromWrite(row.addressline1)(new Write.Single(Meta.StringMeta.put))},
+              "addressline2" = ${fromWrite(row.addressline2)(new Write.SingleOpt(Meta.StringMeta.put))},
+              "city" = ${fromWrite(row.city)(new Write.Single(Meta.StringMeta.put))},
+              "stateprovinceid" = ${fromWrite(row.stateprovinceid)(new Write.Single(StateprovinceId.put))}::int4,
+              "postalcode" = ${fromWrite(row.postalcode)(new Write.Single(Meta.StringMeta.put))},
+              "spatiallocation" = ${fromWrite(row.spatiallocation)(new Write.SingleOpt(TypoBytea.put))}::bytea,
+              "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "addressid" = ${fromWrite(addressid)(new Write.Single(AddressId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -126,15 +126,15 @@ class AddressRepoImpl extends AddressRepo {
   override def upsert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     sql"""insert into "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.addressid)(Write.fromPut(AddressId.put))}::int4,
-            ${fromWrite(unsaved.addressline1)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.addressline2)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.city)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4,
-            ${fromWrite(unsaved.postalcode)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.spatiallocation)(Write.fromPutOption(TypoBytea.put))}::bytea,
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.addressid)(new Write.Single(AddressId.put))}::int4,
+            ${fromWrite(unsaved.addressline1)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.addressline2)(new Write.SingleOpt(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.city)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.stateprovinceid)(new Write.Single(StateprovinceId.put))}::int4,
+            ${fromWrite(unsaved.postalcode)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.spatiallocation)(new Write.SingleOpt(TypoBytea.put))}::bytea,
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("addressid")
           do update set

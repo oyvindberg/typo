@@ -25,14 +25,14 @@ class TitleDomainRepoImpl extends TitleDomainRepo {
     DeleteBuilder(""""public"."title_domain"""", TitleDomainFields.structure)
   }
   override def deleteById(code: TitleDomainId): ConnectionIO[Boolean] = {
-    sql"""delete from "public"."title_domain" where "code" = ${fromWrite(code)(Write.fromPut(TitleDomainId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "public"."title_domain" where "code" = ${fromWrite(code)(new Write.Single(TitleDomainId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(codes: Array[TitleDomainId]): ConnectionIO[Int] = {
     sql"""delete from "public"."title_domain" where "code" = ANY(${codes})""".update.run
   }
   override def insert(unsaved: TitleDomainRow): ConnectionIO[TitleDomainRow] = {
     sql"""insert into "public"."title_domain"("code")
-          values (${fromWrite(unsaved.code)(Write.fromPut(TitleDomainId.put))}::text)
+          values (${fromWrite(unsaved.code)(new Write.Single(TitleDomainId.put))}::text)
           returning "code"
        """.query(using TitleDomainRow.read).unique
   }
@@ -46,7 +46,7 @@ class TitleDomainRepoImpl extends TitleDomainRepo {
     sql"""select "code" from "public"."title_domain"""".query(using TitleDomainRow.read).stream
   }
   override def selectById(code: TitleDomainId): ConnectionIO[Option[TitleDomainRow]] = {
-    sql"""select "code" from "public"."title_domain" where "code" = ${fromWrite(code)(Write.fromPut(TitleDomainId.put))}""".query(using TitleDomainRow.read).option
+    sql"""select "code" from "public"."title_domain" where "code" = ${fromWrite(code)(new Write.Single(TitleDomainId.put))}""".query(using TitleDomainRow.read).option
   }
   override def selectByIds(codes: Array[TitleDomainId]): Stream[ConnectionIO, TitleDomainRow] = {
     sql"""select "code" from "public"."title_domain" where "code" = ANY(${codes})""".query(using TitleDomainRow.read).stream
@@ -63,7 +63,7 @@ class TitleDomainRepoImpl extends TitleDomainRepo {
   override def upsert(unsaved: TitleDomainRow): ConnectionIO[TitleDomainRow] = {
     sql"""insert into "public"."title_domain"("code")
           values (
-            ${fromWrite(unsaved.code)(Write.fromPut(TitleDomainId.put))}::text
+            ${fromWrite(unsaved.code)(new Write.Single(TitleDomainId.put))}::text
           )
           on conflict ("code")
           do update set "code" = EXCLUDED."code"

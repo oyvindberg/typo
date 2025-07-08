@@ -30,31 +30,31 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     DeleteBuilder(""""production"."productcategory"""", ProductcategoryFields.structure)
   }
   override def deleteById(productcategoryid: ProductcategoryId): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."productcategory" where "productcategoryid" = ${fromWrite(productcategoryid)(Write.fromPut(ProductcategoryId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."productcategory" where "productcategoryid" = ${fromWrite(productcategoryid)(new Write.Single(ProductcategoryId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(productcategoryids: Array[ProductcategoryId]): ConnectionIO[Int] = {
     sql"""delete from "production"."productcategory" where "productcategoryid" = ANY(${productcategoryids})""".update.run
   }
   override def insert(unsaved: ProductcategoryRow): ConnectionIO[ProductcategoryRow] = {
     sql"""insert into "production"."productcategory"("productcategoryid", "name", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.productcategoryid)(Write.fromPut(ProductcategoryId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.productcategoryid)(new Write.Single(ProductcategoryId.put))}::int4, ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "productcategoryid", "name", "rowguid", "modifieddate"::text
        """.query(using ProductcategoryRow.read).unique
   }
   override def insert(unsaved: ProductcategoryRowUnsaved): ConnectionIO[ProductcategoryRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar")),
       unsaved.productcategoryid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""productcategoryid""""), fr"${fromWrite(value: ProductcategoryId)(Write.fromPut(ProductcategoryId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""productcategoryid""""), fr"${fromWrite(value: ProductcategoryId)(new Write.Single(ProductcategoryId.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -86,7 +86,7 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
     sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from "production"."productcategory"""".query(using ProductcategoryRow.read).stream
   }
   override def selectById(productcategoryid: ProductcategoryId): ConnectionIO[Option[ProductcategoryRow]] = {
-    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from "production"."productcategory" where "productcategoryid" = ${fromWrite(productcategoryid)(Write.fromPut(ProductcategoryId.put))}""".query(using ProductcategoryRow.read).option
+    sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from "production"."productcategory" where "productcategoryid" = ${fromWrite(productcategoryid)(new Write.Single(ProductcategoryId.put))}""".query(using ProductcategoryRow.read).option
   }
   override def selectByIds(productcategoryids: Array[ProductcategoryId]): Stream[ConnectionIO, ProductcategoryRow] = {
     sql"""select "productcategoryid", "name", "rowguid", "modifieddate"::text from "production"."productcategory" where "productcategoryid" = ANY(${productcategoryids})""".query(using ProductcategoryRow.read).stream
@@ -103,10 +103,10 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def update(row: ProductcategoryRow): ConnectionIO[Boolean] = {
     val productcategoryid = row.productcategoryid
     sql"""update "production"."productcategory"
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "productcategoryid" = ${fromWrite(productcategoryid)(Write.fromPut(ProductcategoryId.put))}"""
+          set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
+              "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "productcategoryid" = ${fromWrite(productcategoryid)(new Write.Single(ProductcategoryId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -114,10 +114,10 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def upsert(unsaved: ProductcategoryRow): ConnectionIO[ProductcategoryRow] = {
     sql"""insert into "production"."productcategory"("productcategoryid", "name", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.productcategoryid)(Write.fromPut(ProductcategoryId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.productcategoryid)(new Write.Single(ProductcategoryId.put))}::int4,
+            ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar,
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("productcategoryid")
           do update set

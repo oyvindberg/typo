@@ -26,7 +26,7 @@ class OnlyPkColumnsRepoImpl extends OnlyPkColumnsRepo {
     DeleteBuilder(""""public"."only_pk_columns"""", OnlyPkColumnsFields.structure)
   }
   override def deleteById(compositeId: OnlyPkColumnsId): ConnectionIO[Boolean] = {
-    sql"""delete from "public"."only_pk_columns" where "key_column_1" = ${fromWrite(compositeId.keyColumn1)(Write.fromPut(Meta.StringMeta.put))} AND "key_column_2" = ${fromWrite(compositeId.keyColumn2)(Write.fromPut(Meta.IntMeta.put))}""".update.run.map(_ > 0)
+    sql"""delete from "public"."only_pk_columns" where "key_column_1" = ${fromWrite(compositeId.keyColumn1)(new Write.Single(Meta.StringMeta.put))} AND "key_column_2" = ${fromWrite(compositeId.keyColumn2)(new Write.Single(Meta.IntMeta.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[OnlyPkColumnsId]): ConnectionIO[Int] = {
     val keyColumn1 = compositeIds.map(_.keyColumn1)
@@ -40,7 +40,7 @@ class OnlyPkColumnsRepoImpl extends OnlyPkColumnsRepo {
   }
   override def insert(unsaved: OnlyPkColumnsRow): ConnectionIO[OnlyPkColumnsRow] = {
     sql"""insert into "public"."only_pk_columns"("key_column_1", "key_column_2")
-          values (${fromWrite(unsaved.keyColumn1)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.keyColumn2)(Write.fromPut(Meta.IntMeta.put))}::int4)
+          values (${fromWrite(unsaved.keyColumn1)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.keyColumn2)(new Write.Single(Meta.IntMeta.put))}::int4)
           returning "key_column_1", "key_column_2"
        """.query(using OnlyPkColumnsRow.read).unique
   }
@@ -54,7 +54,7 @@ class OnlyPkColumnsRepoImpl extends OnlyPkColumnsRepo {
     sql"""select "key_column_1", "key_column_2" from "public"."only_pk_columns"""".query(using OnlyPkColumnsRow.read).stream
   }
   override def selectById(compositeId: OnlyPkColumnsId): ConnectionIO[Option[OnlyPkColumnsRow]] = {
-    sql"""select "key_column_1", "key_column_2" from "public"."only_pk_columns" where "key_column_1" = ${fromWrite(compositeId.keyColumn1)(Write.fromPut(Meta.StringMeta.put))} AND "key_column_2" = ${fromWrite(compositeId.keyColumn2)(Write.fromPut(Meta.IntMeta.put))}""".query(using OnlyPkColumnsRow.read).option
+    sql"""select "key_column_1", "key_column_2" from "public"."only_pk_columns" where "key_column_1" = ${fromWrite(compositeId.keyColumn1)(new Write.Single(Meta.StringMeta.put))} AND "key_column_2" = ${fromWrite(compositeId.keyColumn2)(new Write.Single(Meta.IntMeta.put))}""".query(using OnlyPkColumnsRow.read).option
   }
   override def selectByIds(compositeIds: Array[OnlyPkColumnsId]): Stream[ConnectionIO, OnlyPkColumnsRow] = {
     val keyColumn1 = compositeIds.map(_.keyColumn1)
@@ -78,8 +78,8 @@ class OnlyPkColumnsRepoImpl extends OnlyPkColumnsRepo {
   override def upsert(unsaved: OnlyPkColumnsRow): ConnectionIO[OnlyPkColumnsRow] = {
     sql"""insert into "public"."only_pk_columns"("key_column_1", "key_column_2")
           values (
-            ${fromWrite(unsaved.keyColumn1)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.keyColumn2)(Write.fromPut(Meta.IntMeta.put))}::int4
+            ${fromWrite(unsaved.keyColumn1)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.keyColumn2)(new Write.Single(Meta.IntMeta.put))}::int4
           )
           on conflict ("key_column_1", "key_column_2")
           do update set "key_column_1" = EXCLUDED."key_column_1"

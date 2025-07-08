@@ -10,14 +10,12 @@ package users
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoInstant
 import adventureworks.customtypes.TypoUnknownCitext
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: public.users
     Primary key: user_id */
@@ -39,26 +37,25 @@ case class UsersRow(
 object UsersRow {
   implicit lazy val decoder: Decoder[UsersRow] = Decoder.forProduct7[UsersRow, UsersId, String, Option[String], TypoUnknownCitext, String, TypoInstant, Option[TypoInstant]]("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")(UsersRow.apply)(UsersId.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), TypoUnknownCitext.decoder, Decoder.decodeString, TypoInstant.decoder, Decoder.decodeOption(TypoInstant.decoder))
   implicit lazy val encoder: Encoder[UsersRow] = Encoder.forProduct7[UsersRow, UsersId, String, Option[String], TypoUnknownCitext, String, TypoInstant, Option[TypoInstant]]("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")(x => (x.userId, x.name, x.lastName, x.email, x.password, x.createdAt, x.verifiedOn))(UsersId.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), TypoUnknownCitext.encoder, Encoder.encodeString, TypoInstant.encoder, Encoder.encodeOption(TypoInstant.encoder))
-  implicit lazy val read: Read[UsersRow] = new Read[UsersRow](
-    gets = List(
-      (UsersId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoUnknownCitext.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoInstant.get, Nullability.NoNulls),
-      (TypoInstant.get, Nullability.Nullable)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => UsersRow(
-      userId = UsersId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      lastName = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      email = TypoUnknownCitext.get.unsafeGetNonNullable(rs, i + 3),
-      password = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 4),
-      createdAt = TypoInstant.get.unsafeGetNonNullable(rs, i + 5),
-      verifiedOn = TypoInstant.get.unsafeGetNullable(rs, i + 6)
+  implicit lazy val read: Read[UsersRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(UsersId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUnknownCitext.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoInstant.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoInstant.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    UsersRow(
+      userId = arr(0).asInstanceOf[UsersId],
+          name = arr(1).asInstanceOf[String],
+          lastName = arr(2).asInstanceOf[Option[String]],
+          email = arr(3).asInstanceOf[TypoUnknownCitext],
+          password = arr(4).asInstanceOf[String],
+          createdAt = arr(5).asInstanceOf[TypoInstant],
+          verifiedOn = arr(6).asInstanceOf[Option[TypoInstant]]
     )
-  )
+  }
   implicit lazy val text: Text[UsersRow] = Text.instance[UsersRow]{ (row, sb) =>
     UsersId.text.unsafeEncode(row.userId, sb)
     sb.append(Text.DELIMETER)
@@ -74,32 +71,14 @@ object UsersRow {
     sb.append(Text.DELIMETER)
     Text.option(TypoInstant.text).unsafeEncode(row.verifiedOn, sb)
   }
-  implicit lazy val write: Write[UsersRow] = new Write[UsersRow](
-    puts = List((UsersId.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (TypoUnknownCitext.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (TypoInstant.put, Nullability.NoNulls),
-                (TypoInstant.put, Nullability.Nullable)),
-    toList = x => List(x.userId, x.name, x.lastName, x.email, x.password, x.createdAt, x.verifiedOn),
-    unsafeSet = (rs, i, a) => {
-                  UsersId.put.unsafeSetNonNullable(rs, i + 0, a.userId)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 2, a.lastName)
-                  TypoUnknownCitext.put.unsafeSetNonNullable(rs, i + 3, a.email)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 4, a.password)
-                  TypoInstant.put.unsafeSetNonNullable(rs, i + 5, a.createdAt)
-                  TypoInstant.put.unsafeSetNullable(rs, i + 6, a.verifiedOn)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     UsersId.put.unsafeUpdateNonNullable(ps, i + 0, a.userId)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 2, a.lastName)
-                     TypoUnknownCitext.put.unsafeUpdateNonNullable(ps, i + 3, a.email)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 4, a.password)
-                     TypoInstant.put.unsafeUpdateNonNullable(ps, i + 5, a.createdAt)
-                     TypoInstant.put.unsafeUpdateNullable(ps, i + 6, a.verifiedOn)
-                   }
+  implicit lazy val write: Write[UsersRow] = new Write.Composite[UsersRow](
+    List(new Write.Single(UsersId.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(Meta.StringMeta.put).toOpt,
+         new Write.Single(TypoUnknownCitext.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(TypoInstant.put),
+         new Write.Single(TypoInstant.put).toOpt),
+    a => List(a.userId, a.name, a.lastName, a.email, a.password, a.createdAt, a.verifiedOn)
   )
 }

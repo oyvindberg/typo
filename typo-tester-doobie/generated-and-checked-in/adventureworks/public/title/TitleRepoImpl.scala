@@ -25,14 +25,14 @@ class TitleRepoImpl extends TitleRepo {
     DeleteBuilder(""""public"."title"""", TitleFields.structure)
   }
   override def deleteById(code: TitleId): ConnectionIO[Boolean] = {
-    sql"""delete from "public"."title" where "code" = ${fromWrite(code)(Write.fromPut(TitleId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "public"."title" where "code" = ${fromWrite(code)(new Write.Single(TitleId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(codes: Array[TitleId]): ConnectionIO[Int] = {
     sql"""delete from "public"."title" where "code" = ANY(${codes})""".update.run
   }
   override def insert(unsaved: TitleRow): ConnectionIO[TitleRow] = {
     sql"""insert into "public"."title"("code")
-          values (${fromWrite(unsaved.code)(Write.fromPut(TitleId.put))})
+          values (${fromWrite(unsaved.code)(new Write.Single(TitleId.put))})
           returning "code"
        """.query(using TitleRow.read).unique
   }
@@ -46,7 +46,7 @@ class TitleRepoImpl extends TitleRepo {
     sql"""select "code" from "public"."title"""".query(using TitleRow.read).stream
   }
   override def selectById(code: TitleId): ConnectionIO[Option[TitleRow]] = {
-    sql"""select "code" from "public"."title" where "code" = ${fromWrite(code)(Write.fromPut(TitleId.put))}""".query(using TitleRow.read).option
+    sql"""select "code" from "public"."title" where "code" = ${fromWrite(code)(new Write.Single(TitleId.put))}""".query(using TitleRow.read).option
   }
   override def selectByIds(codes: Array[TitleId]): Stream[ConnectionIO, TitleRow] = {
     sql"""select "code" from "public"."title" where "code" = ANY(${codes})""".query(using TitleRow.read).stream
@@ -63,7 +63,7 @@ class TitleRepoImpl extends TitleRepo {
   override def upsert(unsaved: TitleRow): ConnectionIO[TitleRow] = {
     sql"""insert into "public"."title"("code")
           values (
-            ${fromWrite(unsaved.code)(Write.fromPut(TitleId.put))}
+            ${fromWrite(unsaved.code)(new Write.Single(TitleId.put))}
           )
           on conflict ("code")
           do update set "code" = EXCLUDED."code"

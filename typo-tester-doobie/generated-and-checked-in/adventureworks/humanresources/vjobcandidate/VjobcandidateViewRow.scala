@@ -10,12 +10,10 @@ package vjobcandidate
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.jobcandidate.JobcandidateId
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: humanresources.vjobcandidate */
 case class VjobcandidateViewRow(
@@ -43,42 +41,41 @@ case class VjobcandidateViewRow(
 object VjobcandidateViewRow {
   implicit lazy val decoder: Decoder[VjobcandidateViewRow] = Decoder.forProduct16[VjobcandidateViewRow, JobcandidateId, Option[BusinessentityId], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 20 chars */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], TypoLocalDateTime]("jobcandidateid", "businessentityid", "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", "Skills", "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", "EMail", "WebSite", "modifieddate")(VjobcandidateViewRow.apply)(JobcandidateId.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[VjobcandidateViewRow] = Encoder.forProduct16[VjobcandidateViewRow, JobcandidateId, Option[BusinessentityId], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[/* max 30 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 100 chars */ String], /* nullability unknown */ Option[/* max 20 chars */ String], /* nullability unknown */ Option[String], /* nullability unknown */ Option[String], TypoLocalDateTime]("jobcandidateid", "businessentityid", "Name.Prefix", "Name.First", "Name.Middle", "Name.Last", "Name.Suffix", "Skills", "Addr.Type", "Addr.Loc.CountryRegion", "Addr.Loc.State", "Addr.Loc.City", "Addr.PostalCode", "EMail", "WebSite", "modifieddate")(x => (x.jobcandidateid, x.businessentityid, x.namePrefix, x.nameFirst, x.nameMiddle, x.nameLast, x.nameSuffix, x.skills, x.addrType, x.addrLocCountryRegion, x.addrLocState, x.addrLocCity, x.addrPostalCode, x.eMail, x.webSite, x.modifieddate))(JobcandidateId.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[VjobcandidateViewRow] = new Read[VjobcandidateViewRow](
-    gets = List(
-      (JobcandidateId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => VjobcandidateViewRow(
-      jobcandidateid = JobcandidateId.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNullable(rs, i + 1),
-      namePrefix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 2),
-      nameFirst = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      nameMiddle = Meta.StringMeta.get.unsafeGetNullable(rs, i + 4),
-      nameLast = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
-      nameSuffix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
-      skills = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
-      addrType = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      addrLocCountryRegion = Meta.StringMeta.get.unsafeGetNullable(rs, i + 9),
-      addrLocState = Meta.StringMeta.get.unsafeGetNullable(rs, i + 10),
-      addrLocCity = Meta.StringMeta.get.unsafeGetNullable(rs, i + 11),
-      addrPostalCode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 12),
-      eMail = Meta.StringMeta.get.unsafeGetNullable(rs, i + 13),
-      webSite = Meta.StringMeta.get.unsafeGetNullable(rs, i + 14),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 15)
+  implicit lazy val read: Read[VjobcandidateViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(JobcandidateId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    VjobcandidateViewRow(
+      jobcandidateid = arr(0).asInstanceOf[JobcandidateId],
+          businessentityid = arr(1).asInstanceOf[Option[BusinessentityId]],
+          namePrefix = arr(2).asInstanceOf[/* nullability unknown */ Option[/* max 30 chars */ String]],
+          nameFirst = arr(3).asInstanceOf[/* nullability unknown */ Option[/* max 30 chars */ String]],
+          nameMiddle = arr(4).asInstanceOf[/* nullability unknown */ Option[/* max 30 chars */ String]],
+          nameLast = arr(5).asInstanceOf[/* nullability unknown */ Option[/* max 30 chars */ String]],
+          nameSuffix = arr(6).asInstanceOf[/* nullability unknown */ Option[/* max 30 chars */ String]],
+          skills = arr(7).asInstanceOf[/* nullability unknown */ Option[String]],
+          addrType = arr(8).asInstanceOf[/* nullability unknown */ Option[/* max 30 chars */ String]],
+          addrLocCountryRegion = arr(9).asInstanceOf[/* nullability unknown */ Option[/* max 100 chars */ String]],
+          addrLocState = arr(10).asInstanceOf[/* nullability unknown */ Option[/* max 100 chars */ String]],
+          addrLocCity = arr(11).asInstanceOf[/* nullability unknown */ Option[/* max 100 chars */ String]],
+          addrPostalCode = arr(12).asInstanceOf[/* nullability unknown */ Option[/* max 20 chars */ String]],
+          eMail = arr(13).asInstanceOf[/* nullability unknown */ Option[String]],
+          webSite = arr(14).asInstanceOf[/* nullability unknown */ Option[String]],
+          modifieddate = arr(15).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

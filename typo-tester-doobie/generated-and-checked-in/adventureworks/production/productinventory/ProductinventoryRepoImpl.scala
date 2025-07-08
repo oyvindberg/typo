@@ -33,7 +33,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     DeleteBuilder(""""production"."productinventory"""", ProductinventoryFields.structure)
   }
   override def deleteById(compositeId: ProductinventoryId): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."productinventory" where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."productinventory" where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(new Write.Single(LocationId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[ProductinventoryId]): ConnectionIO[Int] = {
     val productid = compositeIds.map(_.productid)
@@ -47,27 +47,27 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
   }
   override def insert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow] = {
     sql"""insert into "production"."productinventory"("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int2, ${fromWrite(unsaved.shelf)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.bin)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.quantity)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4, ${fromWrite(unsaved.locationid)(new Write.Single(LocationId.put))}::int2, ${fromWrite(unsaved.shelf)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.bin)(new Write.Single(TypoShort.put))}::int2, ${fromWrite(unsaved.quantity)(new Write.Single(TypoShort.put))}::int2, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
        """.query(using ProductinventoryRow.read).unique
   }
   override def insert(unsaved: ProductinventoryRowUnsaved): ConnectionIO[ProductinventoryRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
-      Some((Fragment.const0(s""""locationid""""), fr"${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int2")),
-      Some((Fragment.const0(s""""shelf""""), fr"${fromWrite(unsaved.shelf)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""bin""""), fr"${fromWrite(unsaved.bin)(Write.fromPut(TypoShort.put))}::int2")),
+      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4")),
+      Some((Fragment.const0(s""""locationid""""), fr"${fromWrite(unsaved.locationid)(new Write.Single(LocationId.put))}::int2")),
+      Some((Fragment.const0(s""""shelf""""), fr"${fromWrite(unsaved.shelf)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""bin""""), fr"${fromWrite(unsaved.bin)(new Write.Single(TypoShort.put))}::int2")),
       unsaved.quantity match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""quantity""""), fr"${fromWrite(value: TypoShort)(Write.fromPut(TypoShort.put))}::int2"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""quantity""""), fr"${fromWrite(value: TypoShort)(new Write.Single(TypoShort.put))}::int2"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -99,7 +99,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
     sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from "production"."productinventory"""".query(using ProductinventoryRow.read).stream
   }
   override def selectById(compositeId: ProductinventoryId): ConnectionIO[Option[ProductinventoryRow]] = {
-    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from "production"."productinventory" where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}""".query(using ProductinventoryRow.read).option
+    sql"""select "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text from "production"."productinventory" where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(new Write.Single(LocationId.put))}""".query(using ProductinventoryRow.read).option
   }
   override def selectByIds(compositeIds: Array[ProductinventoryId]): Stream[ConnectionIO, ProductinventoryRow] = {
     val productid = compositeIds.map(_.productid)
@@ -123,12 +123,12 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def update(row: ProductinventoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update "production"."productinventory"
-          set "shelf" = ${fromWrite(row.shelf)(Write.fromPut(Meta.StringMeta.put))},
-              "bin" = ${fromWrite(row.bin)(Write.fromPut(TypoShort.put))}::int2,
-              "quantity" = ${fromWrite(row.quantity)(Write.fromPut(TypoShort.put))}::int2,
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "productid" = ${fromWrite(compositeId.productid)(Write.fromPut(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(Write.fromPut(LocationId.put))}"""
+          set "shelf" = ${fromWrite(row.shelf)(new Write.Single(Meta.StringMeta.put))},
+              "bin" = ${fromWrite(row.bin)(new Write.Single(TypoShort.put))}::int2,
+              "quantity" = ${fromWrite(row.quantity)(new Write.Single(TypoShort.put))}::int2,
+              "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(new Write.Single(LocationId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -136,13 +136,13 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def upsert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow] = {
     sql"""insert into "production"."productinventory"("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
-            ${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int2,
-            ${fromWrite(unsaved.shelf)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.bin)(Write.fromPut(TypoShort.put))}::int2,
-            ${fromWrite(unsaved.quantity)(Write.fromPut(TypoShort.put))}::int2,
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4,
+            ${fromWrite(unsaved.locationid)(new Write.Single(LocationId.put))}::int2,
+            ${fromWrite(unsaved.shelf)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.bin)(new Write.Single(TypoShort.put))}::int2,
+            ${fromWrite(unsaved.quantity)(new Write.Single(TypoShort.put))}::int2,
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("productid", "locationid")
           do update set

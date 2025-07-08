@@ -47,10 +47,10 @@ object Number {
   implicit lazy val get: Get[Number] = Meta.StringMeta.get.temap(Number.apply)
   implicit lazy val ordering: Ordering[Number] = Ordering.by(_.value)
   implicit lazy val put: Put[Number] = Put.Advanced.one[Number](JdbcType.Other, NonEmptyList.one("myschema.number"), (ps, i, a) => ps.setString(i, a.value), (rs, i, a) => rs.updateString(i, a.value))
-  implicit lazy val read: Read[Number] = Read.fromGet(get)
+  implicit lazy val read: Read[Number] = new Read.Single(get)
   implicit lazy val text: Text[Number] = new Text[Number] {
     override def unsafeEncode(v: Number, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
     override def unsafeArrayEncode(v: Number, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
   }
-  implicit lazy val write: Write[Number] = Write.fromPut(put)
+  implicit lazy val write: Write[Number] = new Write.Single(put)
 }

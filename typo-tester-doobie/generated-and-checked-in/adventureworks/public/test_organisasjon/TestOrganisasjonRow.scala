@@ -7,13 +7,11 @@ package adventureworks
 package public
 package test_organisasjon
 
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: public.test_organisasjon
     Primary key: organisasjonskode */
@@ -26,25 +24,18 @@ case class TestOrganisasjonRow(
 object TestOrganisasjonRow {
   implicit lazy val decoder: Decoder[TestOrganisasjonRow] = Decoder.forProduct1[TestOrganisasjonRow, TestOrganisasjonId]("organisasjonskode")(TestOrganisasjonRow.apply)(TestOrganisasjonId.decoder)
   implicit lazy val encoder: Encoder[TestOrganisasjonRow] = Encoder.forProduct1[TestOrganisasjonRow, TestOrganisasjonId]("organisasjonskode")(x => (x.organisasjonskode))(TestOrganisasjonId.encoder)
-  implicit lazy val read: Read[TestOrganisasjonRow] = new Read[TestOrganisasjonRow](
-    gets = List(
-      (TestOrganisasjonId.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => TestOrganisasjonRow(
-      organisasjonskode = TestOrganisasjonId.get.unsafeGetNonNullable(rs, i + 0)
+  implicit lazy val read: Read[TestOrganisasjonRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(TestOrganisasjonId.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    TestOrganisasjonRow(
+      organisasjonskode = arr(0).asInstanceOf[TestOrganisasjonId]
     )
-  )
+  }
   implicit lazy val text: Text[TestOrganisasjonRow] = Text.instance[TestOrganisasjonRow]{ (row, sb) =>
     TestOrganisasjonId.text.unsafeEncode(row.organisasjonskode, sb)
   }
-  implicit lazy val write: Write[TestOrganisasjonRow] = new Write[TestOrganisasjonRow](
-    puts = List((TestOrganisasjonId.put, Nullability.NoNulls)),
-    toList = x => List(x.organisasjonskode),
-    unsafeSet = (rs, i, a) => {
-                  TestOrganisasjonId.put.unsafeSetNonNullable(rs, i + 0, a.organisasjonskode)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     TestOrganisasjonId.put.unsafeUpdateNonNullable(ps, i + 0, a.organisasjonskode)
-                   }
+  implicit lazy val write: Write[TestOrganisasjonRow] = new Write.Composite[TestOrganisasjonRow](
+    List(new Write.Single(TestOrganisasjonId.put)),
+    a => List(a.organisasjonskode)
   )
 }

@@ -10,14 +10,12 @@ package productcosthistory
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.product.ProductId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: production.productcosthistory
     Changes in the cost of a product over time.
@@ -49,22 +47,21 @@ object ProductcosthistoryRow {
     new ProductcosthistoryRow(compositeId.productid, compositeId.startdate, enddate, standardcost, modifieddate)
   implicit lazy val decoder: Decoder[ProductcosthistoryRow] = Decoder.forProduct5[ProductcosthistoryRow, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, TypoLocalDateTime]("productid", "startdate", "enddate", "standardcost", "modifieddate")(ProductcosthistoryRow.apply)(ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ProductcosthistoryRow] = Encoder.forProduct5[ProductcosthistoryRow, ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], BigDecimal, TypoLocalDateTime]("productid", "startdate", "enddate", "standardcost", "modifieddate")(x => (x.productid, x.startdate, x.enddate, x.standardcost, x.modifieddate))(ProductId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ProductcosthistoryRow] = new Read[ProductcosthistoryRow](
-    gets = List(
-      (ProductId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ProductcosthistoryRow(
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 0),
-      startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 1),
-      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 2),
-      standardcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+  implicit lazy val read: Read[ProductcosthistoryRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    ProductcosthistoryRow(
+      productid = arr(0).asInstanceOf[ProductId],
+          startdate = arr(1).asInstanceOf[TypoLocalDateTime],
+          enddate = arr(2).asInstanceOf[Option[TypoLocalDateTime]],
+          standardcost = arr(3).asInstanceOf[BigDecimal],
+          modifieddate = arr(4).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[ProductcosthistoryRow] = Text.instance[ProductcosthistoryRow]{ (row, sb) =>
     ProductId.text.unsafeEncode(row.productid, sb)
     sb.append(Text.DELIMETER)
@@ -76,26 +73,12 @@ object ProductcosthistoryRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[ProductcosthistoryRow] = new Write[ProductcosthistoryRow](
-    puts = List((ProductId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.Nullable),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.productid, x.startdate, x.enddate, x.standardcost, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ProductId.put.unsafeSetNonNullable(rs, i + 0, a.productid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 1, a.startdate)
-                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 2, a.enddate)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 3, a.standardcost)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ProductId.put.unsafeUpdateNonNullable(ps, i + 0, a.productid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 1, a.startdate)
-                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 2, a.enddate)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.standardcost)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
-                   }
+  implicit lazy val write: Write[ProductcosthistoryRow] = new Write.Composite[ProductcosthistoryRow](
+    List(new Write.Single(ProductId.put),
+         new Write.Single(TypoLocalDateTime.put),
+         new Write.Single(TypoLocalDateTime.put).toOpt,
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.productid, a.startdate, a.enddate, a.standardcost, a.modifieddate)
   )
 }

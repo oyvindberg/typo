@@ -19,8 +19,8 @@ class UpdatePersonReturningSqlRepoImpl extends UpdatePersonReturningSqlRepo {
     val sql =
       sql"""with row as (
               update person.person
-              set firstname = firstname || '-' || ${fromWrite(suffix)(Write.fromPutOption(Meta.StringMeta.put))}
-              where modifieddate < ${fromWrite(cutoff)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp
+              set firstname = firstname || '-' || ${fromWrite(suffix)(new Write.SingleOpt(Meta.StringMeta.put))}
+              where modifieddate < ${fromWrite(cutoff)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp
               returning firstname, modifieddate
             )
             select row."firstname", row."modifieddate"::text

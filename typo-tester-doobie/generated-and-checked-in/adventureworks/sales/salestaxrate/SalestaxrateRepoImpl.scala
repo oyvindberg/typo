@@ -33,37 +33,37 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     DeleteBuilder(""""sales"."salestaxrate"""", SalestaxrateFields.structure)
   }
   override def deleteById(salestaxrateid: SalestaxrateId): ConnectionIO[Boolean] = {
-    sql"""delete from "sales"."salestaxrate" where "salestaxrateid" = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."salestaxrate" where "salestaxrateid" = ${fromWrite(salestaxrateid)(new Write.Single(SalestaxrateId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(salestaxrateids: Array[SalestaxrateId]): ConnectionIO[Int] = {
     sql"""delete from "sales"."salestaxrate" where "salestaxrateid" = ANY(${salestaxrateids})""".update.run
   }
   override def insert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
     sql"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.salestaxrateid)(Write.fromPut(SalestaxrateId.put))}::int4, ${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4, ${fromWrite(unsaved.taxtype)(Write.fromPut(TypoShort.put))}::int2, ${fromWrite(unsaved.taxrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.salestaxrateid)(new Write.Single(SalestaxrateId.put))}::int4, ${fromWrite(unsaved.stateprovinceid)(new Write.Single(StateprovinceId.put))}::int4, ${fromWrite(unsaved.taxtype)(new Write.Single(TypoShort.put))}::int2, ${fromWrite(unsaved.taxrate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
        """.query(using SalestaxrateRow.read).unique
   }
   override def insert(unsaved: SalestaxrateRowUnsaved): ConnectionIO[SalestaxrateRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""stateprovinceid""""), fr"${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4")),
-      Some((Fragment.const0(s""""taxtype""""), fr"${fromWrite(unsaved.taxtype)(Write.fromPut(TypoShort.put))}::int2")),
-      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""stateprovinceid""""), fr"${fromWrite(unsaved.stateprovinceid)(new Write.Single(StateprovinceId.put))}::int4")),
+      Some((Fragment.const0(s""""taxtype""""), fr"${fromWrite(unsaved.taxtype)(new Write.Single(TypoShort.put))}::int2")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar")),
       unsaved.salestaxrateid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""salestaxrateid""""), fr"${fromWrite(value: SalestaxrateId)(Write.fromPut(SalestaxrateId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""salestaxrateid""""), fr"${fromWrite(value: SalestaxrateId)(new Write.Single(SalestaxrateId.put))}::int4"))
       },
       unsaved.taxrate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""taxrate""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""taxrate""""), fr"${fromWrite(value: BigDecimal)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -95,7 +95,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
     sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from "sales"."salestaxrate"""".query(using SalestaxrateRow.read).stream
   }
   override def selectById(salestaxrateid: SalestaxrateId): ConnectionIO[Option[SalestaxrateRow]] = {
-    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from "sales"."salestaxrate" where "salestaxrateid" = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}""".query(using SalestaxrateRow.read).option
+    sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from "sales"."salestaxrate" where "salestaxrateid" = ${fromWrite(salestaxrateid)(new Write.Single(SalestaxrateId.put))}""".query(using SalestaxrateRow.read).option
   }
   override def selectByIds(salestaxrateids: Array[SalestaxrateId]): Stream[ConnectionIO, SalestaxrateRow] = {
     sql"""select "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text from "sales"."salestaxrate" where "salestaxrateid" = ANY(${salestaxrateids})""".query(using SalestaxrateRow.read).stream
@@ -112,13 +112,13 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def update(row: SalestaxrateRow): ConnectionIO[Boolean] = {
     val salestaxrateid = row.salestaxrateid
     sql"""update "sales"."salestaxrate"
-          set "stateprovinceid" = ${fromWrite(row.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4,
-              "taxtype" = ${fromWrite(row.taxtype)(Write.fromPut(TypoShort.put))}::int2,
-              "taxrate" = ${fromWrite(row.taxrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "salestaxrateid" = ${fromWrite(salestaxrateid)(Write.fromPut(SalestaxrateId.put))}"""
+          set "stateprovinceid" = ${fromWrite(row.stateprovinceid)(new Write.Single(StateprovinceId.put))}::int4,
+              "taxtype" = ${fromWrite(row.taxtype)(new Write.Single(TypoShort.put))}::int2,
+              "taxrate" = ${fromWrite(row.taxrate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
+              "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "salestaxrateid" = ${fromWrite(salestaxrateid)(new Write.Single(SalestaxrateId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -126,13 +126,13 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def upsert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
     sql"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.salestaxrateid)(Write.fromPut(SalestaxrateId.put))}::int4,
-            ${fromWrite(unsaved.stateprovinceid)(Write.fromPut(StateprovinceId.put))}::int4,
-            ${fromWrite(unsaved.taxtype)(Write.fromPut(TypoShort.put))}::int2,
-            ${fromWrite(unsaved.taxrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.salestaxrateid)(new Write.Single(SalestaxrateId.put))}::int4,
+            ${fromWrite(unsaved.stateprovinceid)(new Write.Single(StateprovinceId.put))}::int4,
+            ${fromWrite(unsaved.taxtype)(new Write.Single(TypoShort.put))}::int2,
+            ${fromWrite(unsaved.taxrate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar,
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("salestaxrateid")
           do update set

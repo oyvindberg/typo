@@ -31,7 +31,7 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     DeleteBuilder(""""sales"."salespersonquotahistory"""", SalespersonquotahistoryFields.structure)
   }
   override def deleteById(compositeId: SalespersonquotahistoryId): ConnectionIO[Boolean] = {
-    sql"""delete from "sales"."salespersonquotahistory" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(Write.fromPut(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."salespersonquotahistory" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(new Write.Single(TypoLocalDateTime.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[SalespersonquotahistoryId]): ConnectionIO[Int] = {
     val businessentityid = compositeIds.map(_.businessentityid)
@@ -45,22 +45,22 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   }
   override def insert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow] = {
     sql"""insert into "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.quotadate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.salesquota)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4, ${fromWrite(unsaved.quotadate)(new Write.Single(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.salesquota)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
        """.query(using SalespersonquotahistoryRow.read).unique
   }
   override def insert(unsaved: SalespersonquotahistoryRowUnsaved): ConnectionIO[SalespersonquotahistoryRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4")),
-      Some((Fragment.const0(s""""quotadate""""), fr"${fromWrite(unsaved.quotadate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const0(s""""salesquota""""), fr"${fromWrite(unsaved.salesquota)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4")),
+      Some((Fragment.const0(s""""quotadate""""), fr"${fromWrite(unsaved.quotadate)(new Write.Single(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""salesquota""""), fr"${fromWrite(unsaved.salesquota)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric")),
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -92,7 +92,7 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
     sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from "sales"."salespersonquotahistory"""".query(using SalespersonquotahistoryRow.read).stream
   }
   override def selectById(compositeId: SalespersonquotahistoryId): ConnectionIO[Option[SalespersonquotahistoryRow]] = {
-    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from "sales"."salespersonquotahistory" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(Write.fromPut(TypoLocalDateTime.put))}""".query(using SalespersonquotahistoryRow.read).option
+    sql"""select "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text from "sales"."salespersonquotahistory" where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(new Write.Single(TypoLocalDateTime.put))}""".query(using SalespersonquotahistoryRow.read).option
   }
   override def selectByIds(compositeIds: Array[SalespersonquotahistoryId]): Stream[ConnectionIO, SalespersonquotahistoryRow] = {
     val businessentityid = compositeIds.map(_.businessentityid)
@@ -116,10 +116,10 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def update(row: SalespersonquotahistoryRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update "sales"."salespersonquotahistory"
-          set "salesquota" = ${fromWrite(row.salesquota)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(Write.fromPut(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(Write.fromPut(TypoLocalDateTime.put))}"""
+          set "salesquota" = ${fromWrite(row.salesquota)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(new Write.Single(TypoLocalDateTime.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -127,11 +127,11 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def upsert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow] = {
     sql"""insert into "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
-            ${fromWrite(unsaved.quotadate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.salesquota)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.quotadate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.salesquota)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("businessentityid", "quotadate")
           do update set

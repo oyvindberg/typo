@@ -11,12 +11,10 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pr.bom */
 case class BomViewRow(
@@ -45,30 +43,29 @@ case class BomViewRow(
 object BomViewRow {
   implicit lazy val decoder: Decoder[BomViewRow] = Decoder.forProduct10[BomViewRow, Int, Int, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, BigDecimal, TypoLocalDateTime]("id", "billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(BomViewRow.apply)(Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeOption(ProductId.decoder), ProductId.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), UnitmeasureId.decoder, TypoShort.decoder, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[BomViewRow] = Encoder.forProduct10[BomViewRow, Int, Int, Option[ProductId], ProductId, TypoLocalDateTime, Option[TypoLocalDateTime], UnitmeasureId, TypoShort, BigDecimal, TypoLocalDateTime]("id", "billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")(x => (x.id, x.billofmaterialsid, x.productassemblyid, x.componentid, x.startdate, x.enddate, x.unitmeasurecode, x.bomlevel, x.perassemblyqty, x.modifieddate))(Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeOption(ProductId.encoder), ProductId.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), UnitmeasureId.encoder, TypoShort.encoder, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[BomViewRow] = new Read[BomViewRow](
-    gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.Nullable),
-      (ProductId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (UnitmeasureId.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => BomViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
-      billofmaterialsid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1),
-      productassemblyid = ProductId.get.unsafeGetNullable(rs, i + 2),
-      componentid = ProductId.get.unsafeGetNonNullable(rs, i + 3),
-      startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
-      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5),
-      unitmeasurecode = UnitmeasureId.get.unsafeGetNonNullable(rs, i + 6),
-      bomlevel = TypoShort.get.unsafeGetNonNullable(rs, i + 7),
-      perassemblyqty = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 8),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 9)
+  implicit lazy val read: Read[BomViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(UnitmeasureId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    BomViewRow(
+      id = arr(0).asInstanceOf[Int],
+          billofmaterialsid = arr(1).asInstanceOf[Int],
+          productassemblyid = arr(2).asInstanceOf[Option[ProductId]],
+          componentid = arr(3).asInstanceOf[ProductId],
+          startdate = arr(4).asInstanceOf[TypoLocalDateTime],
+          enddate = arr(5).asInstanceOf[Option[TypoLocalDateTime]],
+          unitmeasurecode = arr(6).asInstanceOf[UnitmeasureId],
+          bomlevel = arr(7).asInstanceOf[TypoShort],
+          perassemblyqty = arr(8).asInstanceOf[BigDecimal],
+          modifieddate = arr(9).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

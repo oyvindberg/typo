@@ -8,11 +8,9 @@ package update_person_returning
 
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.userdefined.FirstName
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** SQL file: update_person_returning.sql */
 case class UpdatePersonReturningSqlRow(
@@ -25,14 +23,13 @@ case class UpdatePersonReturningSqlRow(
 object UpdatePersonReturningSqlRow {
   implicit lazy val decoder: Decoder[UpdatePersonReturningSqlRow] = Decoder.forProduct2[UpdatePersonReturningSqlRow, /* user-picked */ FirstName, TypoLocalDateTime]("firstname", "modifieddate")(UpdatePersonReturningSqlRow.apply)(FirstName.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[UpdatePersonReturningSqlRow] = Encoder.forProduct2[UpdatePersonReturningSqlRow, /* user-picked */ FirstName, TypoLocalDateTime]("firstname", "modifieddate")(x => (x.firstname, x.modifieddate))(FirstName.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[UpdatePersonReturningSqlRow] = new Read[UpdatePersonReturningSqlRow](
-    gets = List(
-      (/* user-picked */ FirstName.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => UpdatePersonReturningSqlRow(
-      firstname = /* user-picked */ FirstName.get.unsafeGetNonNullable(rs, i + 0),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 1)
+  implicit lazy val read: Read[UpdatePersonReturningSqlRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(/* user-picked */ FirstName.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    UpdatePersonReturningSqlRow(
+      firstname = arr(0).asInstanceOf[/* user-picked */ FirstName],
+          modifieddate = arr(1).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

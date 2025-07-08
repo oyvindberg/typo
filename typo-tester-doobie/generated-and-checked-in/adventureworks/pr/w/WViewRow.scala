@@ -12,12 +12,10 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
 import adventureworks.production.workorder.WorkorderId
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pr.w */
 case class WViewRow(
@@ -46,30 +44,29 @@ case class WViewRow(
 object WViewRow {
   implicit lazy val decoder: Decoder[WViewRow] = Decoder.forProduct10[WViewRow, WorkorderId, WorkorderId, ProductId, Int, TypoShort, TypoLocalDateTime, Option[TypoLocalDateTime], TypoLocalDateTime, Option[ScrapreasonId], TypoLocalDateTime]("id", "workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")(WViewRow.apply)(WorkorderId.decoder, WorkorderId.decoder, ProductId.decoder, Decoder.decodeInt, TypoShort.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), TypoLocalDateTime.decoder, Decoder.decodeOption(ScrapreasonId.decoder), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[WViewRow] = Encoder.forProduct10[WViewRow, WorkorderId, WorkorderId, ProductId, Int, TypoShort, TypoLocalDateTime, Option[TypoLocalDateTime], TypoLocalDateTime, Option[ScrapreasonId], TypoLocalDateTime]("id", "workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")(x => (x.id, x.workorderid, x.productid, x.orderqty, x.scrappedqty, x.startdate, x.enddate, x.duedate, x.scrapreasonid, x.modifieddate))(WorkorderId.encoder, WorkorderId.encoder, ProductId.encoder, Encoder.encodeInt, TypoShort.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), TypoLocalDateTime.encoder, Encoder.encodeOption(ScrapreasonId.encoder), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[WViewRow] = new Read[WViewRow](
-    gets = List(
-      (WorkorderId.get, Nullability.NoNulls),
-      (WorkorderId.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (ScrapreasonId.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => WViewRow(
-      id = WorkorderId.get.unsafeGetNonNullable(rs, i + 0),
-      workorderid = WorkorderId.get.unsafeGetNonNullable(rs, i + 1),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 2),
-      orderqty = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 3),
-      scrappedqty = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
-      startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5),
-      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 6),
-      duedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7),
-      scrapreasonid = ScrapreasonId.get.unsafeGetNullable(rs, i + 8),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 9)
+  implicit lazy val read: Read[WViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(WorkorderId.get).asInstanceOf[Read[Any]],
+      new Read.Single(WorkorderId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(ScrapreasonId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    WViewRow(
+      id = arr(0).asInstanceOf[WorkorderId],
+          workorderid = arr(1).asInstanceOf[WorkorderId],
+          productid = arr(2).asInstanceOf[ProductId],
+          orderqty = arr(3).asInstanceOf[Int],
+          scrappedqty = arr(4).asInstanceOf[TypoShort],
+          startdate = arr(5).asInstanceOf[TypoLocalDateTime],
+          enddate = arr(6).asInstanceOf[Option[TypoLocalDateTime]],
+          duedate = arr(7).asInstanceOf[TypoLocalDateTime],
+          scrapreasonid = arr(8).asInstanceOf[Option[ScrapreasonId]],
+          modifieddate = arr(9).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

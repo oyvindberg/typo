@@ -46,10 +46,10 @@ object Myenum {
   implicit lazy val get: Get[Myenum] = Meta.StringMeta.get.temap(Myenum.apply)
   implicit lazy val ordering: Ordering[Myenum] = Ordering.by(_.value)
   implicit lazy val put: Put[Myenum] = Put.Advanced.one[Myenum](JdbcType.Other, NonEmptyList.one("public.myenum"), (ps, i, a) => ps.setString(i, a.value), (rs, i, a) => rs.updateString(i, a.value))
-  implicit lazy val read: Read[Myenum] = Read.fromGet(get)
+  implicit lazy val read: Read[Myenum] = new Read.Single(get)
   implicit lazy val text: Text[Myenum] = new Text[Myenum] {
     override def unsafeEncode(v: Myenum, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
     override def unsafeArrayEncode(v: Myenum, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
   }
-  implicit lazy val write: Write[Myenum] = Write.fromPut(put)
+  implicit lazy val write: Write[Myenum] = new Write.Single(put)
 }

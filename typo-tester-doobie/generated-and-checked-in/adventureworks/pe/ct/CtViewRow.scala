@@ -10,11 +10,9 @@ package ct
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.contacttype.ContacttypeId
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pe.ct */
 case class CtViewRow(
@@ -31,18 +29,17 @@ case class CtViewRow(
 object CtViewRow {
   implicit lazy val decoder: Decoder[CtViewRow] = Decoder.forProduct4[CtViewRow, ContacttypeId, ContacttypeId, Name, TypoLocalDateTime]("id", "contacttypeid", "name", "modifieddate")(CtViewRow.apply)(ContacttypeId.decoder, ContacttypeId.decoder, Name.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[CtViewRow] = Encoder.forProduct4[CtViewRow, ContacttypeId, ContacttypeId, Name, TypoLocalDateTime]("id", "contacttypeid", "name", "modifieddate")(x => (x.id, x.contacttypeid, x.name, x.modifieddate))(ContacttypeId.encoder, ContacttypeId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[CtViewRow] = new Read[CtViewRow](
-    gets = List(
-      (ContacttypeId.get, Nullability.NoNulls),
-      (ContacttypeId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => CtViewRow(
-      id = ContacttypeId.get.unsafeGetNonNullable(rs, i + 0),
-      contacttypeid = ContacttypeId.get.unsafeGetNonNullable(rs, i + 1),
-      name = Name.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[CtViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ContacttypeId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ContacttypeId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    CtViewRow(
+      id = arr(0).asInstanceOf[ContacttypeId],
+          contacttypeid = arr(1).asInstanceOf[ContacttypeId],
+          name = arr(2).asInstanceOf[Name],
+          modifieddate = arr(3).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

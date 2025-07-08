@@ -9,12 +9,10 @@ package person_detail
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.userdefined.FirstName
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** SQL file: person_detail.sql */
 case class PersonDetailSqlRow(
@@ -43,30 +41,29 @@ case class PersonDetailSqlRow(
 object PersonDetailSqlRow {
   implicit lazy val decoder: Decoder[PersonDetailSqlRow] = Decoder.forProduct10[PersonDetailSqlRow, BusinessentityId, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, /* max 50 chars */ String, Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[/* max 15 chars */ String], /* user-picked */ String]("businessentityid", "title", "firstname", "middlename", "lastname", "jobtitle", "addressline1", "city", "postalcode", "rowguid")(PersonDetailSqlRow.apply)(BusinessentityId.decoder, Decoder.decodeOption(Decoder.decodeString), FirstName.decoder, Decoder.decodeOption(Name.decoder), Name.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString)
   implicit lazy val encoder: Encoder[PersonDetailSqlRow] = Encoder.forProduct10[PersonDetailSqlRow, BusinessentityId, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, /* max 50 chars */ String, Option[/* max 60 chars */ String], Option[/* max 30 chars */ String], Option[/* max 15 chars */ String], /* user-picked */ String]("businessentityid", "title", "firstname", "middlename", "lastname", "jobtitle", "addressline1", "city", "postalcode", "rowguid")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.jobtitle, x.addressline1, x.city, x.postalcode, x.rowguid))(BusinessentityId.encoder, Encoder.encodeOption(Encoder.encodeString), FirstName.encoder, Encoder.encodeOption(Name.encoder), Name.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString)
-  implicit lazy val read: Read[PersonDetailSqlRow] = new Read[PersonDetailSqlRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (/* user-picked */ FirstName.get, Nullability.NoNulls),
-      (Name.get, Nullability.Nullable),
-      (Name.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PersonDetailSqlRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      title = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
-      firstname = /* user-picked */ FirstName.get.unsafeGetNonNullable(rs, i + 2),
-      middlename = Name.get.unsafeGetNullable(rs, i + 3),
-      lastname = Name.get.unsafeGetNonNullable(rs, i + 4),
-      jobtitle = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 5),
-      addressline1 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 6),
-      city = Meta.StringMeta.get.unsafeGetNullable(rs, i + 7),
-      postalcode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      rowguid = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 9)
+  implicit lazy val read: Read[PersonDetailSqlRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(/* user-picked */ FirstName.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    PersonDetailSqlRow(
+      businessentityid = arr(0).asInstanceOf[BusinessentityId],
+          title = arr(1).asInstanceOf[Option[/* max 8 chars */ String]],
+          firstname = arr(2).asInstanceOf[/* user-picked */ FirstName],
+          middlename = arr(3).asInstanceOf[Option[Name]],
+          lastname = arr(4).asInstanceOf[Name],
+          jobtitle = arr(5).asInstanceOf[/* max 50 chars */ String],
+          addressline1 = arr(6).asInstanceOf[Option[/* max 60 chars */ String]],
+          city = arr(7).asInstanceOf[Option[/* max 30 chars */ String]],
+          postalcode = arr(8).asInstanceOf[Option[/* max 15 chars */ String]],
+          rowguid = arr(9).asInstanceOf[/* user-picked */ String]
     )
-  )
+  }
 }

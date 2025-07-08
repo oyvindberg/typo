@@ -10,11 +10,9 @@ package be
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pe.be */
 case class BeViewRow(
@@ -31,18 +29,17 @@ case class BeViewRow(
 object BeViewRow {
   implicit lazy val decoder: Decoder[BeViewRow] = Decoder.forProduct4[BeViewRow, BusinessentityId, BusinessentityId, TypoUUID, TypoLocalDateTime]("id", "businessentityid", "rowguid", "modifieddate")(BeViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[BeViewRow] = Encoder.forProduct4[BeViewRow, BusinessentityId, BusinessentityId, TypoUUID, TypoLocalDateTime]("id", "businessentityid", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[BeViewRow] = new Read[BeViewRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => BeViewRow(
-      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 2),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3)
+  implicit lazy val read: Read[BeViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    BeViewRow(
+      id = arr(0).asInstanceOf[BusinessentityId],
+          businessentityid = arr(1).asInstanceOf[BusinessentityId],
+          rowguid = arr(2).asInstanceOf[TypoUUID],
+          modifieddate = arr(3).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

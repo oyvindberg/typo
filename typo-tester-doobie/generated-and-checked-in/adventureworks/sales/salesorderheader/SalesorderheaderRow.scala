@@ -21,7 +21,6 @@ import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import adventureworks.userdefined.CustomCreditcardId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
@@ -31,7 +30,6 @@ import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
-import java.sql.ResultSet
 import scala.util.Try
 
 /** Table: sales.salesorderheader
@@ -183,62 +181,61 @@ object SalesorderheaderRow {
       "modifieddate" -> TypoLocalDateTime.encoder.apply(row.modifieddate)
     )
   )
-  implicit lazy val read: Read[SalesorderheaderRow] = new Read[SalesorderheaderRow](
-    gets = List(
-      (SalesorderheaderId.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoShort.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (OrderNumber.get, Nullability.Nullable),
-      (AccountNumber.get, Nullability.Nullable),
-      (CustomerId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.Nullable),
-      (SalesterritoryId.get, Nullability.Nullable),
-      (AddressId.get, Nullability.NoNulls),
-      (AddressId.get, Nullability.NoNulls),
-      (ShipmethodId.get, Nullability.NoNulls),
-      (/* user-picked */ CustomCreditcardId.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (CurrencyrateId.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SalesorderheaderRow(
-      salesorderid = SalesorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
-      revisionnumber = TypoShort.get.unsafeGetNonNullable(rs, i + 1),
-      orderdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2),
-      duedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3),
-      shipdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 4),
-      status = TypoShort.get.unsafeGetNonNullable(rs, i + 5),
-      onlineorderflag = Flag.get.unsafeGetNonNullable(rs, i + 6),
-      purchaseordernumber = OrderNumber.get.unsafeGetNullable(rs, i + 7),
-      accountnumber = AccountNumber.get.unsafeGetNullable(rs, i + 8),
-      customerid = CustomerId.get.unsafeGetNonNullable(rs, i + 9),
-      salespersonid = BusinessentityId.get.unsafeGetNullable(rs, i + 10),
-      territoryid = SalesterritoryId.get.unsafeGetNullable(rs, i + 11),
-      billtoaddressid = AddressId.get.unsafeGetNonNullable(rs, i + 12),
-      shiptoaddressid = AddressId.get.unsafeGetNonNullable(rs, i + 13),
-      shipmethodid = ShipmethodId.get.unsafeGetNonNullable(rs, i + 14),
-      creditcardid = /* user-picked */ CustomCreditcardId.get.unsafeGetNullable(rs, i + 15),
-      creditcardapprovalcode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 16),
-      currencyrateid = CurrencyrateId.get.unsafeGetNullable(rs, i + 17),
-      subtotal = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 18),
-      taxamt = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 19),
-      freight = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 20),
-      totaldue = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 21),
-      comment = Meta.StringMeta.get.unsafeGetNullable(rs, i + 22),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 23),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 24)
+  implicit lazy val read: Read[SalesorderheaderRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(SalesorderheaderId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(Flag.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(OrderNumber.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(AccountNumber.get).asInstanceOf[Read[Any]],
+      new Read.Single(CustomerId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(SalesterritoryId.get).asInstanceOf[Read[Any]],
+      new Read.Single(AddressId.get).asInstanceOf[Read[Any]],
+      new Read.Single(AddressId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ShipmethodId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(/* user-picked */ CustomCreditcardId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(CurrencyrateId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    SalesorderheaderRow(
+      salesorderid = arr(0).asInstanceOf[SalesorderheaderId],
+          revisionnumber = arr(1).asInstanceOf[TypoShort],
+          orderdate = arr(2).asInstanceOf[TypoLocalDateTime],
+          duedate = arr(3).asInstanceOf[TypoLocalDateTime],
+          shipdate = arr(4).asInstanceOf[Option[TypoLocalDateTime]],
+          status = arr(5).asInstanceOf[TypoShort],
+          onlineorderflag = arr(6).asInstanceOf[Flag],
+          purchaseordernumber = arr(7).asInstanceOf[Option[OrderNumber]],
+          accountnumber = arr(8).asInstanceOf[Option[AccountNumber]],
+          customerid = arr(9).asInstanceOf[CustomerId],
+          salespersonid = arr(10).asInstanceOf[Option[BusinessentityId]],
+          territoryid = arr(11).asInstanceOf[Option[SalesterritoryId]],
+          billtoaddressid = arr(12).asInstanceOf[AddressId],
+          shiptoaddressid = arr(13).asInstanceOf[AddressId],
+          shipmethodid = arr(14).asInstanceOf[ShipmethodId],
+          creditcardid = arr(15).asInstanceOf[Option[/* user-picked */ CustomCreditcardId]],
+          creditcardapprovalcode = arr(16).asInstanceOf[Option[/* max 15 chars */ String]],
+          currencyrateid = arr(17).asInstanceOf[Option[CurrencyrateId]],
+          subtotal = arr(18).asInstanceOf[BigDecimal],
+          taxamt = arr(19).asInstanceOf[BigDecimal],
+          freight = arr(20).asInstanceOf[BigDecimal],
+          totaldue = arr(21).asInstanceOf[Option[BigDecimal]],
+          comment = arr(22).asInstanceOf[Option[/* max 128 chars */ String]],
+          rowguid = arr(23).asInstanceOf[TypoUUID],
+          modifieddate = arr(24).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[SalesorderheaderRow] = Text.instance[SalesorderheaderRow]{ (row, sb) =>
     SalesorderheaderId.text.unsafeEncode(row.salesorderid, sb)
     sb.append(Text.DELIMETER)
@@ -290,86 +287,32 @@ object SalesorderheaderRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[SalesorderheaderRow] = new Write[SalesorderheaderRow](
-    puts = List((SalesorderheaderId.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.Nullable),
-                (TypoShort.put, Nullability.NoNulls),
-                (Flag.put, Nullability.NoNulls),
-                (OrderNumber.put, Nullability.Nullable),
-                (AccountNumber.put, Nullability.Nullable),
-                (CustomerId.put, Nullability.NoNulls),
-                (BusinessentityId.put, Nullability.Nullable),
-                (SalesterritoryId.put, Nullability.Nullable),
-                (AddressId.put, Nullability.NoNulls),
-                (AddressId.put, Nullability.NoNulls),
-                (ShipmethodId.put, Nullability.NoNulls),
-                (/* user-picked */ CustomCreditcardId.put, Nullability.Nullable),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (CurrencyrateId.put, Nullability.Nullable),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
-                (Meta.StringMeta.put, Nullability.Nullable),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.salesorderid, x.revisionnumber, x.orderdate, x.duedate, x.shipdate, x.status, x.onlineorderflag, x.purchaseordernumber, x.accountnumber, x.customerid, x.salespersonid, x.territoryid, x.billtoaddressid, x.shiptoaddressid, x.shipmethodid, x.creditcardid, x.creditcardapprovalcode, x.currencyrateid, x.subtotal, x.taxamt, x.freight, x.totaldue, x.comment, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  SalesorderheaderId.put.unsafeSetNonNullable(rs, i + 0, a.salesorderid)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 1, a.revisionnumber)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.orderdate)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 3, a.duedate)
-                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 4, a.shipdate)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 5, a.status)
-                  Flag.put.unsafeSetNonNullable(rs, i + 6, a.onlineorderflag)
-                  OrderNumber.put.unsafeSetNullable(rs, i + 7, a.purchaseordernumber)
-                  AccountNumber.put.unsafeSetNullable(rs, i + 8, a.accountnumber)
-                  CustomerId.put.unsafeSetNonNullable(rs, i + 9, a.customerid)
-                  BusinessentityId.put.unsafeSetNullable(rs, i + 10, a.salespersonid)
-                  SalesterritoryId.put.unsafeSetNullable(rs, i + 11, a.territoryid)
-                  AddressId.put.unsafeSetNonNullable(rs, i + 12, a.billtoaddressid)
-                  AddressId.put.unsafeSetNonNullable(rs, i + 13, a.shiptoaddressid)
-                  ShipmethodId.put.unsafeSetNonNullable(rs, i + 14, a.shipmethodid)
-                  /* user-picked */ CustomCreditcardId.put.unsafeSetNullable(rs, i + 15, a.creditcardid)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 16, a.creditcardapprovalcode)
-                  CurrencyrateId.put.unsafeSetNullable(rs, i + 17, a.currencyrateid)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 18, a.subtotal)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 19, a.taxamt)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 20, a.freight)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 21, a.totaldue)
-                  Meta.StringMeta.put.unsafeSetNullable(rs, i + 22, a.comment)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 23, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 24, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     SalesorderheaderId.put.unsafeUpdateNonNullable(ps, i + 0, a.salesorderid)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 1, a.revisionnumber)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.orderdate)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 3, a.duedate)
-                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 4, a.shipdate)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 5, a.status)
-                     Flag.put.unsafeUpdateNonNullable(ps, i + 6, a.onlineorderflag)
-                     OrderNumber.put.unsafeUpdateNullable(ps, i + 7, a.purchaseordernumber)
-                     AccountNumber.put.unsafeUpdateNullable(ps, i + 8, a.accountnumber)
-                     CustomerId.put.unsafeUpdateNonNullable(ps, i + 9, a.customerid)
-                     BusinessentityId.put.unsafeUpdateNullable(ps, i + 10, a.salespersonid)
-                     SalesterritoryId.put.unsafeUpdateNullable(ps, i + 11, a.territoryid)
-                     AddressId.put.unsafeUpdateNonNullable(ps, i + 12, a.billtoaddressid)
-                     AddressId.put.unsafeUpdateNonNullable(ps, i + 13, a.shiptoaddressid)
-                     ShipmethodId.put.unsafeUpdateNonNullable(ps, i + 14, a.shipmethodid)
-                     /* user-picked */ CustomCreditcardId.put.unsafeUpdateNullable(ps, i + 15, a.creditcardid)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 16, a.creditcardapprovalcode)
-                     CurrencyrateId.put.unsafeUpdateNullable(ps, i + 17, a.currencyrateid)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 18, a.subtotal)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 19, a.taxamt)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 20, a.freight)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 21, a.totaldue)
-                     Meta.StringMeta.put.unsafeUpdateNullable(ps, i + 22, a.comment)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 23, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 24, a.modifieddate)
-                   }
+  implicit lazy val write: Write[SalesorderheaderRow] = new Write.Composite[SalesorderheaderRow](
+    List(new Write.Single(SalesorderheaderId.put),
+         new Write.Single(TypoShort.put),
+         new Write.Single(TypoLocalDateTime.put),
+         new Write.Single(TypoLocalDateTime.put),
+         new Write.Single(TypoLocalDateTime.put).toOpt,
+         new Write.Single(TypoShort.put),
+         new Write.Single(Flag.put),
+         new Write.Single(OrderNumber.put).toOpt,
+         new Write.Single(AccountNumber.put).toOpt,
+         new Write.Single(CustomerId.put),
+         new Write.Single(BusinessentityId.put).toOpt,
+         new Write.Single(SalesterritoryId.put).toOpt,
+         new Write.Single(AddressId.put),
+         new Write.Single(AddressId.put),
+         new Write.Single(ShipmethodId.put),
+         new Write.Single(/* user-picked */ CustomCreditcardId.put).toOpt,
+         new Write.Single(Meta.StringMeta.put).toOpt,
+         new Write.Single(CurrencyrateId.put).toOpt,
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put).toOpt,
+         new Write.Single(Meta.StringMeta.put).toOpt,
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.salesorderid, a.revisionnumber, a.orderdate, a.duedate, a.shipdate, a.status, a.onlineorderflag, a.purchaseordernumber, a.accountnumber, a.customerid, a.salespersonid, a.territoryid, a.billtoaddressid, a.shiptoaddressid, a.shipmethodid, a.creditcardid, a.creditcardapprovalcode, a.currencyrateid, a.subtotal, a.taxamt, a.freight, a.totaldue, a.comment, a.rowguid, a.modifieddate)
   )
 }

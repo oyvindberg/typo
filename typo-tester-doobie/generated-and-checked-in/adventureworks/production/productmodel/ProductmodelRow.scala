@@ -12,13 +12,11 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: production.productmodel
     Product model classification.
@@ -46,24 +44,23 @@ case class ProductmodelRow(
 object ProductmodelRow {
   implicit lazy val decoder: Decoder[ProductmodelRow] = Decoder.forProduct6[ProductmodelRow, ProductmodelId, Name, Option[TypoXml], Option[TypoXml], TypoUUID, TypoLocalDateTime]("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(ProductmodelRow.apply)(ProductmodelId.decoder, Name.decoder, Decoder.decodeOption(TypoXml.decoder), Decoder.decodeOption(TypoXml.decoder), TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ProductmodelRow] = Encoder.forProduct6[ProductmodelRow, ProductmodelId, Name, Option[TypoXml], Option[TypoXml], TypoUUID, TypoLocalDateTime]("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")(x => (x.productmodelid, x.name, x.catalogdescription, x.instructions, x.rowguid, x.modifieddate))(ProductmodelId.encoder, Name.encoder, Encoder.encodeOption(TypoXml.encoder), Encoder.encodeOption(TypoXml.encoder), TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ProductmodelRow] = new Read[ProductmodelRow](
-    gets = List(
-      (ProductmodelId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ProductmodelRow(
-      productmodelid = ProductmodelId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      catalogdescription = TypoXml.get.unsafeGetNullable(rs, i + 2),
-      instructions = TypoXml.get.unsafeGetNullable(rs, i + 3),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[ProductmodelRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ProductmodelId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoXml.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoXml.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    ProductmodelRow(
+      productmodelid = arr(0).asInstanceOf[ProductmodelId],
+          name = arr(1).asInstanceOf[Name],
+          catalogdescription = arr(2).asInstanceOf[Option[TypoXml]],
+          instructions = arr(3).asInstanceOf[Option[TypoXml]],
+          rowguid = arr(4).asInstanceOf[TypoUUID],
+          modifieddate = arr(5).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[ProductmodelRow] = Text.instance[ProductmodelRow]{ (row, sb) =>
     ProductmodelId.text.unsafeEncode(row.productmodelid, sb)
     sb.append(Text.DELIMETER)
@@ -77,29 +74,13 @@ object ProductmodelRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[ProductmodelRow] = new Write[ProductmodelRow](
-    puts = List((ProductmodelId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoXml.put, Nullability.Nullable),
-                (TypoXml.put, Nullability.Nullable),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.productmodelid, x.name, x.catalogdescription, x.instructions, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ProductmodelId.put.unsafeSetNonNullable(rs, i + 0, a.productmodelid)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  TypoXml.put.unsafeSetNullable(rs, i + 2, a.catalogdescription)
-                  TypoXml.put.unsafeSetNullable(rs, i + 3, a.instructions)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 4, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ProductmodelId.put.unsafeUpdateNonNullable(ps, i + 0, a.productmodelid)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     TypoXml.put.unsafeUpdateNullable(ps, i + 2, a.catalogdescription)
-                     TypoXml.put.unsafeUpdateNullable(ps, i + 3, a.instructions)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 4, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
-                   }
+  implicit lazy val write: Write[ProductmodelRow] = new Write.Composite[ProductmodelRow](
+    List(new Write.Single(ProductmodelId.put),
+         new Write.Single(Name.put),
+         new Write.Single(TypoXml.put).toOpt,
+         new Write.Single(TypoXml.put).toOpt,
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.productmodelid, a.name, a.catalogdescription, a.instructions, a.rowguid, a.modifieddate)
   )
 }

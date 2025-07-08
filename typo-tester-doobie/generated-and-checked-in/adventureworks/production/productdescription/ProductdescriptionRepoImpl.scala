@@ -30,31 +30,31 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     DeleteBuilder(""""production"."productdescription"""", ProductdescriptionFields.structure)
   }
   override def deleteById(productdescriptionid: ProductdescriptionId): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."productdescription" where "productdescriptionid" = ${fromWrite(productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."productdescription" where "productdescriptionid" = ${fromWrite(productdescriptionid)(new Write.Single(ProductdescriptionId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(productdescriptionids: Array[ProductdescriptionId]): ConnectionIO[Int] = {
     sql"""delete from "production"."productdescription" where "productdescriptionid" = ANY(${productdescriptionids})""".update.run
   }
   override def insert(unsaved: ProductdescriptionRow): ConnectionIO[ProductdescriptionRow] = {
     sql"""insert into "production"."productdescription"("productdescriptionid", "description", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}::int4, ${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.productdescriptionid)(new Write.Single(ProductdescriptionId.put))}::int4, ${fromWrite(unsaved.description)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "productdescriptionid", "description", "rowguid", "modifieddate"::text
        """.query(using ProductdescriptionRow.read).unique
   }
   override def insert(unsaved: ProductdescriptionRowUnsaved): ConnectionIO[ProductdescriptionRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""description""""), fr"${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""description""""), fr"${fromWrite(unsaved.description)(new Write.Single(Meta.StringMeta.put))}")),
       unsaved.productdescriptionid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""productdescriptionid""""), fr"${fromWrite(value: ProductdescriptionId)(Write.fromPut(ProductdescriptionId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""productdescriptionid""""), fr"${fromWrite(value: ProductdescriptionId)(new Write.Single(ProductdescriptionId.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -86,7 +86,7 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
     sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from "production"."productdescription"""".query(using ProductdescriptionRow.read).stream
   }
   override def selectById(productdescriptionid: ProductdescriptionId): ConnectionIO[Option[ProductdescriptionRow]] = {
-    sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from "production"."productdescription" where "productdescriptionid" = ${fromWrite(productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}""".query(using ProductdescriptionRow.read).option
+    sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from "production"."productdescription" where "productdescriptionid" = ${fromWrite(productdescriptionid)(new Write.Single(ProductdescriptionId.put))}""".query(using ProductdescriptionRow.read).option
   }
   override def selectByIds(productdescriptionids: Array[ProductdescriptionId]): Stream[ConnectionIO, ProductdescriptionRow] = {
     sql"""select "productdescriptionid", "description", "rowguid", "modifieddate"::text from "production"."productdescription" where "productdescriptionid" = ANY(${productdescriptionids})""".query(using ProductdescriptionRow.read).stream
@@ -103,10 +103,10 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def update(row: ProductdescriptionRow): ConnectionIO[Boolean] = {
     val productdescriptionid = row.productdescriptionid
     sql"""update "production"."productdescription"
-          set "description" = ${fromWrite(row.description)(Write.fromPut(Meta.StringMeta.put))},
-              "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "productdescriptionid" = ${fromWrite(productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}"""
+          set "description" = ${fromWrite(row.description)(new Write.Single(Meta.StringMeta.put))},
+              "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "productdescriptionid" = ${fromWrite(productdescriptionid)(new Write.Single(ProductdescriptionId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -114,10 +114,10 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def upsert(unsaved: ProductdescriptionRow): ConnectionIO[ProductdescriptionRow] = {
     sql"""insert into "production"."productdescription"("productdescriptionid", "description", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.productdescriptionid)(Write.fromPut(ProductdescriptionId.put))}::int4,
-            ${fromWrite(unsaved.description)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.productdescriptionid)(new Write.Single(ProductdescriptionId.put))}::int4,
+            ${fromWrite(unsaved.description)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("productdescriptionid")
           do update set

@@ -47,10 +47,10 @@ object Sector {
   implicit lazy val get: Get[Sector] = Meta.StringMeta.get.temap(Sector.apply)
   implicit lazy val ordering: Ordering[Sector] = Ordering.by(_.value)
   implicit lazy val put: Put[Sector] = Put.Advanced.one[Sector](JdbcType.Other, NonEmptyList.one("myschema.sector"), (ps, i, a) => ps.setString(i, a.value), (rs, i, a) => rs.updateString(i, a.value))
-  implicit lazy val read: Read[Sector] = Read.fromGet(get)
+  implicit lazy val read: Read[Sector] = new Read.Single(get)
   implicit lazy val text: Text[Sector] = new Text[Sector] {
     override def unsafeEncode(v: Sector, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
     override def unsafeArrayEncode(v: Sector, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
   }
-  implicit lazy val write: Write[Sector] = Write.fromPut(put)
+  implicit lazy val write: Write[Sector] = new Write.Single(put)
 }

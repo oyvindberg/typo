@@ -29,28 +29,28 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
     DeleteBuilder(""""sales"."salesreason"""", SalesreasonFields.structure)
   }
   override def deleteById(salesreasonid: SalesreasonId): ConnectionIO[Boolean] = {
-    sql"""delete from "sales"."salesreason" where "salesreasonid" = ${fromWrite(salesreasonid)(Write.fromPut(SalesreasonId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."salesreason" where "salesreasonid" = ${fromWrite(salesreasonid)(new Write.Single(SalesreasonId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(salesreasonids: Array[SalesreasonId]): ConnectionIO[Int] = {
     sql"""delete from "sales"."salesreason" where "salesreasonid" = ANY(${salesreasonids})""".update.run
   }
   override def insert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow] = {
     sql"""insert into "sales"."salesreason"("salesreasonid", "name", "reasontype", "modifieddate")
-          values (${fromWrite(unsaved.salesreasonid)(Write.fromPut(SalesreasonId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.reasontype)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.salesreasonid)(new Write.Single(SalesreasonId.put))}::int4, ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar, ${fromWrite(unsaved.reasontype)(new Write.Single(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "salesreasonid", "name", "reasontype", "modifieddate"::text
        """.query(using SalesreasonRow.read).unique
   }
   override def insert(unsaved: SalesreasonRowUnsaved): ConnectionIO[SalesreasonRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
-      Some((Fragment.const0(s""""reasontype""""), fr"${fromWrite(unsaved.reasontype)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""reasontype""""), fr"${fromWrite(unsaved.reasontype)(new Write.Single(Name.put))}::varchar")),
       unsaved.salesreasonid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""salesreasonid""""), fr"${fromWrite(value: SalesreasonId)(Write.fromPut(SalesreasonId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""salesreasonid""""), fr"${fromWrite(value: SalesreasonId)(new Write.Single(SalesreasonId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -82,7 +82,7 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
     sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from "sales"."salesreason"""".query(using SalesreasonRow.read).stream
   }
   override def selectById(salesreasonid: SalesreasonId): ConnectionIO[Option[SalesreasonRow]] = {
-    sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from "sales"."salesreason" where "salesreasonid" = ${fromWrite(salesreasonid)(Write.fromPut(SalesreasonId.put))}""".query(using SalesreasonRow.read).option
+    sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from "sales"."salesreason" where "salesreasonid" = ${fromWrite(salesreasonid)(new Write.Single(SalesreasonId.put))}""".query(using SalesreasonRow.read).option
   }
   override def selectByIds(salesreasonids: Array[SalesreasonId]): Stream[ConnectionIO, SalesreasonRow] = {
     sql"""select "salesreasonid", "name", "reasontype", "modifieddate"::text from "sales"."salesreason" where "salesreasonid" = ANY(${salesreasonids})""".query(using SalesreasonRow.read).stream
@@ -99,10 +99,10 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
   override def update(row: SalesreasonRow): ConnectionIO[Boolean] = {
     val salesreasonid = row.salesreasonid
     sql"""update "sales"."salesreason"
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              "reasontype" = ${fromWrite(row.reasontype)(Write.fromPut(Name.put))}::varchar,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "salesreasonid" = ${fromWrite(salesreasonid)(Write.fromPut(SalesreasonId.put))}"""
+          set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
+              "reasontype" = ${fromWrite(row.reasontype)(new Write.Single(Name.put))}::varchar,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "salesreasonid" = ${fromWrite(salesreasonid)(new Write.Single(SalesreasonId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -110,10 +110,10 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
   override def upsert(unsaved: SalesreasonRow): ConnectionIO[SalesreasonRow] = {
     sql"""insert into "sales"."salesreason"("salesreasonid", "name", "reasontype", "modifieddate")
           values (
-            ${fromWrite(unsaved.salesreasonid)(Write.fromPut(SalesreasonId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
-            ${fromWrite(unsaved.reasontype)(Write.fromPut(Name.put))}::varchar,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.salesreasonid)(new Write.Single(SalesreasonId.put))}::int4,
+            ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar,
+            ${fromWrite(unsaved.reasontype)(new Write.Single(Name.put))}::varchar,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("salesreasonid")
           do update set

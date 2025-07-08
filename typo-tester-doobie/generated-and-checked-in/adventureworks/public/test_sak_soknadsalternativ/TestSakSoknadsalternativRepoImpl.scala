@@ -27,7 +27,7 @@ class TestSakSoknadsalternativRepoImpl extends TestSakSoknadsalternativRepo {
     DeleteBuilder(""""public"."test_sak_soknadsalternativ"""", TestSakSoknadsalternativFields.structure)
   }
   override def deleteById(compositeId: TestSakSoknadsalternativId): ConnectionIO[Boolean] = {
-    sql"""delete from "public"."test_sak_soknadsalternativ" where "organisasjonskode_saksbehandler" = ${fromWrite(compositeId.organisasjonskodeSaksbehandler)(Write.fromPut(Meta.StringMeta.put))} AND "utdanningsmulighet_kode" = ${fromWrite(compositeId.utdanningsmulighetKode)(Write.fromPut(Meta.StringMeta.put))}""".update.run.map(_ > 0)
+    sql"""delete from "public"."test_sak_soknadsalternativ" where "organisasjonskode_saksbehandler" = ${fromWrite(compositeId.organisasjonskodeSaksbehandler)(new Write.Single(Meta.StringMeta.put))} AND "utdanningsmulighet_kode" = ${fromWrite(compositeId.utdanningsmulighetKode)(new Write.Single(Meta.StringMeta.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[TestSakSoknadsalternativId]): ConnectionIO[Int] = {
     val organisasjonskodeSaksbehandler = compositeIds.map(_.organisasjonskodeSaksbehandler)
@@ -41,7 +41,7 @@ class TestSakSoknadsalternativRepoImpl extends TestSakSoknadsalternativRepo {
   }
   override def insert(unsaved: TestSakSoknadsalternativRow): ConnectionIO[TestSakSoknadsalternativRow] = {
     sql"""insert into "public"."test_sak_soknadsalternativ"("organisasjonskode_saksbehandler", "utdanningsmulighet_kode", "organisasjonskode_tilbyder")
-          values (${fromWrite(unsaved.organisasjonskodeSaksbehandler)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.utdanningsmulighetKode)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.organisasjonskodeTilbyder)(Write.fromPut(TestOrganisasjonId.put))})
+          values (${fromWrite(unsaved.organisasjonskodeSaksbehandler)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.utdanningsmulighetKode)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.organisasjonskodeTilbyder)(new Write.Single(TestOrganisasjonId.put))})
           returning "organisasjonskode_saksbehandler", "utdanningsmulighet_kode", "organisasjonskode_tilbyder"
        """.query(using TestSakSoknadsalternativRow.read).unique
   }
@@ -55,7 +55,7 @@ class TestSakSoknadsalternativRepoImpl extends TestSakSoknadsalternativRepo {
     sql"""select "organisasjonskode_saksbehandler", "utdanningsmulighet_kode", "organisasjonskode_tilbyder" from "public"."test_sak_soknadsalternativ"""".query(using TestSakSoknadsalternativRow.read).stream
   }
   override def selectById(compositeId: TestSakSoknadsalternativId): ConnectionIO[Option[TestSakSoknadsalternativRow]] = {
-    sql"""select "organisasjonskode_saksbehandler", "utdanningsmulighet_kode", "organisasjonskode_tilbyder" from "public"."test_sak_soknadsalternativ" where "organisasjonskode_saksbehandler" = ${fromWrite(compositeId.organisasjonskodeSaksbehandler)(Write.fromPut(Meta.StringMeta.put))} AND "utdanningsmulighet_kode" = ${fromWrite(compositeId.utdanningsmulighetKode)(Write.fromPut(Meta.StringMeta.put))}""".query(using TestSakSoknadsalternativRow.read).option
+    sql"""select "organisasjonskode_saksbehandler", "utdanningsmulighet_kode", "organisasjonskode_tilbyder" from "public"."test_sak_soknadsalternativ" where "organisasjonskode_saksbehandler" = ${fromWrite(compositeId.organisasjonskodeSaksbehandler)(new Write.Single(Meta.StringMeta.put))} AND "utdanningsmulighet_kode" = ${fromWrite(compositeId.utdanningsmulighetKode)(new Write.Single(Meta.StringMeta.put))}""".query(using TestSakSoknadsalternativRow.read).option
   }
   override def selectByIds(compositeIds: Array[TestSakSoknadsalternativId]): Stream[ConnectionIO, TestSakSoknadsalternativRow] = {
     val organisasjonskodeSaksbehandler = compositeIds.map(_.organisasjonskodeSaksbehandler)
@@ -79,8 +79,8 @@ class TestSakSoknadsalternativRepoImpl extends TestSakSoknadsalternativRepo {
   override def update(row: TestSakSoknadsalternativRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update "public"."test_sak_soknadsalternativ"
-          set "organisasjonskode_tilbyder" = ${fromWrite(row.organisasjonskodeTilbyder)(Write.fromPut(TestOrganisasjonId.put))}
-          where "organisasjonskode_saksbehandler" = ${fromWrite(compositeId.organisasjonskodeSaksbehandler)(Write.fromPut(Meta.StringMeta.put))} AND "utdanningsmulighet_kode" = ${fromWrite(compositeId.utdanningsmulighetKode)(Write.fromPut(Meta.StringMeta.put))}"""
+          set "organisasjonskode_tilbyder" = ${fromWrite(row.organisasjonskodeTilbyder)(new Write.Single(TestOrganisasjonId.put))}
+          where "organisasjonskode_saksbehandler" = ${fromWrite(compositeId.organisasjonskodeSaksbehandler)(new Write.Single(Meta.StringMeta.put))} AND "utdanningsmulighet_kode" = ${fromWrite(compositeId.utdanningsmulighetKode)(new Write.Single(Meta.StringMeta.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -88,9 +88,9 @@ class TestSakSoknadsalternativRepoImpl extends TestSakSoknadsalternativRepo {
   override def upsert(unsaved: TestSakSoknadsalternativRow): ConnectionIO[TestSakSoknadsalternativRow] = {
     sql"""insert into "public"."test_sak_soknadsalternativ"("organisasjonskode_saksbehandler", "utdanningsmulighet_kode", "organisasjonskode_tilbyder")
           values (
-            ${fromWrite(unsaved.organisasjonskodeSaksbehandler)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.utdanningsmulighetKode)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.organisasjonskodeTilbyder)(Write.fromPut(TestOrganisasjonId.put))}
+            ${fromWrite(unsaved.organisasjonskodeSaksbehandler)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.utdanningsmulighetKode)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.organisasjonskodeTilbyder)(new Write.Single(TestOrganisasjonId.put))}
           )
           on conflict ("organisasjonskode_saksbehandler", "utdanningsmulighet_kode")
           do update set

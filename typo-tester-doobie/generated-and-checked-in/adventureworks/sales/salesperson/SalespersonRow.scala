@@ -12,14 +12,12 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: sales.salesperson
     Sales representative current information.
@@ -63,30 +61,29 @@ case class SalespersonRow(
 object SalespersonRow {
   implicit lazy val decoder: Decoder[SalespersonRow] = Decoder.forProduct9[SalespersonRow, BusinessentityId, Option[SalesterritoryId], Option[BigDecimal], BigDecimal, BigDecimal, BigDecimal, BigDecimal, TypoUUID, TypoLocalDateTime]("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(SalespersonRow.apply)(BusinessentityId.decoder, Decoder.decodeOption(SalesterritoryId.decoder), Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SalespersonRow] = Encoder.forProduct9[SalespersonRow, BusinessentityId, Option[SalesterritoryId], Option[BigDecimal], BigDecimal, BigDecimal, BigDecimal, BigDecimal, TypoUUID, TypoLocalDateTime]("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")(x => (x.businessentityid, x.territoryid, x.salesquota, x.bonus, x.commissionpct, x.salesytd, x.saleslastyear, x.rowguid, x.modifieddate))(BusinessentityId.encoder, Encoder.encodeOption(SalesterritoryId.encoder), Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SalespersonRow] = new Read[SalespersonRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (SalesterritoryId.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SalespersonRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      territoryid = SalesterritoryId.get.unsafeGetNullable(rs, i + 1),
-      salesquota = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 2),
-      bonus = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
-      commissionpct = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 4),
-      salesytd = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 5),
-      saleslastyear = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 6),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 7),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
+  implicit lazy val read: Read[SalespersonRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(SalesterritoryId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    SalespersonRow(
+      businessentityid = arr(0).asInstanceOf[BusinessentityId],
+          territoryid = arr(1).asInstanceOf[Option[SalesterritoryId]],
+          salesquota = arr(2).asInstanceOf[Option[BigDecimal]],
+          bonus = arr(3).asInstanceOf[BigDecimal],
+          commissionpct = arr(4).asInstanceOf[BigDecimal],
+          salesytd = arr(5).asInstanceOf[BigDecimal],
+          saleslastyear = arr(6).asInstanceOf[BigDecimal],
+          rowguid = arr(7).asInstanceOf[TypoUUID],
+          modifieddate = arr(8).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[SalespersonRow] = Text.instance[SalespersonRow]{ (row, sb) =>
     BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
     sb.append(Text.DELIMETER)
@@ -106,38 +103,16 @@ object SalespersonRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[SalespersonRow] = new Write[SalespersonRow](
-    puts = List((BusinessentityId.put, Nullability.NoNulls),
-                (SalesterritoryId.put, Nullability.Nullable),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.businessentityid, x.territoryid, x.salesquota, x.bonus, x.commissionpct, x.salesytd, x.saleslastyear, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
-                  SalesterritoryId.put.unsafeSetNullable(rs, i + 1, a.territoryid)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 2, a.salesquota)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 3, a.bonus)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 4, a.commissionpct)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 5, a.salesytd)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 6, a.saleslastyear)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 7, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 8, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
-                     SalesterritoryId.put.unsafeUpdateNullable(ps, i + 1, a.territoryid)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 2, a.salesquota)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.bonus)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 4, a.commissionpct)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 5, a.salesytd)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.saleslastyear)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 7, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 8, a.modifieddate)
-                   }
+  implicit lazy val write: Write[SalespersonRow] = new Write.Composite[SalespersonRow](
+    List(new Write.Single(BusinessentityId.put),
+         new Write.Single(SalesterritoryId.put).toOpt,
+         new Write.Single(Meta.ScalaBigDecimalMeta.put).toOpt,
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.businessentityid, a.territoryid, a.salesquota, a.bonus, a.commissionpct, a.salesytd, a.saleslastyear, a.rowguid, a.modifieddate)
   )
 }

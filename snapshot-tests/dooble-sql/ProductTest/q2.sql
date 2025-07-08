@@ -1,19 +1,19 @@
 with 
 productionproduct0 as (
-  (select productionproduct0 from "production"."product" productionproduct0 WHERE (productionproduct0).productid  = ANY(?)  AND (length((productionproduct0).name )  > ? )  AND NOT (((productionproduct0).name  || (productionproduct0).color )  LIKE ? )   AND (coalesce(length((productionproduct0).color ) , ? )  > ? )  AND ((productionproduct0).modifieddate  < ?::timestamp ) ) 
+  (select productionproduct0 from "production"."product" productionproduct0 WHERE ((productionproduct0).productid  = ANY(?) ) AND ((length((productionproduct0).name )  > ? ) ) AND (NOT (((productionproduct0).name  || (productionproduct0).color )  LIKE ? )  ) AND ((coalesce(length((productionproduct0).color ) , ? )  > ? ) ) AND (((productionproduct0).modifieddate  < ?::timestamp ) )) 
 ) ,
 productionproductmodel0 as (
-  (select productionproductmodel0 from "production"."productmodel" productionproductmodel0 WHERE NOT ((productionproductmodel0).name  LIKE ? )  ) 
+  (select productionproductmodel0 from "production"."productmodel" productionproductmodel0 WHERE (NOT ((productionproductmodel0).name  LIKE ? )  )) 
 ) ,
 join_cte0 as (
   select productionproduct0, productionproductmodel0
   from productionproduct0
   join productionproductmodel0
   on ((productionproduct0).productmodelid  = (productionproductmodel0).productmodelid ) 
-  WHERE ((productionproductmodel0).productmodelid  > ? )  
+  WHERE (((productionproductmodel0).productmodelid  > ? ) ) 
 ) ,
 productionproductmodel1 as (
-  (select productionproductmodel1 from "production"."productmodel" productionproductmodel1 WHERE NOT ((productionproductmodel1).name  LIKE ? )  ) 
+  (select productionproductmodel1 from "production"."productmodel" productionproductmodel1 WHERE (NOT ((productionproductmodel1).name  LIKE ? )  )) 
 ) ,
 left_join_cte0 as (
   select productionproduct0, productionproductmodel0, productionproductmodel1

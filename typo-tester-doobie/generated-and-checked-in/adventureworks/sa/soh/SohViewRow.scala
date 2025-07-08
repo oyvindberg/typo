@@ -21,7 +21,6 @@ import adventureworks.sales.customer.CustomerId
 import adventureworks.sales.salesorderheader.SalesorderheaderId
 import adventureworks.sales.salesterritory.SalesterritoryId
 import adventureworks.userdefined.CustomCreditcardId
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
@@ -29,7 +28,6 @@ import io.circe.DecodingFailure
 import io.circe.Encoder
 import io.circe.HCursor
 import io.circe.Json
-import java.sql.ResultSet
 import scala.util.Try
 
 /** View: sa.soh */
@@ -155,62 +153,61 @@ object SohViewRow {
       "modifieddate" -> TypoLocalDateTime.encoder.apply(row.modifieddate)
     )
   )
-  implicit lazy val read: Read[SohViewRow] = new Read[SohViewRow](
-    gets = List(
-      (SalesorderheaderId.get, Nullability.NoNulls),
-      (SalesorderheaderId.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoShort.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (OrderNumber.get, Nullability.Nullable),
-      (AccountNumber.get, Nullability.Nullable),
-      (CustomerId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.Nullable),
-      (SalesterritoryId.get, Nullability.Nullable),
-      (AddressId.get, Nullability.NoNulls),
-      (AddressId.get, Nullability.NoNulls),
-      (ShipmethodId.get, Nullability.NoNulls),
-      (/* user-picked */ CustomCreditcardId.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (CurrencyrateId.get, Nullability.Nullable),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SohViewRow(
-      id = SalesorderheaderId.get.unsafeGetNonNullable(rs, i + 0),
-      salesorderid = SalesorderheaderId.get.unsafeGetNonNullable(rs, i + 1),
-      revisionnumber = TypoShort.get.unsafeGetNonNullable(rs, i + 2),
-      orderdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3),
-      duedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
-      shipdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5),
-      status = TypoShort.get.unsafeGetNonNullable(rs, i + 6),
-      onlineorderflag = Flag.get.unsafeGetNonNullable(rs, i + 7),
-      purchaseordernumber = OrderNumber.get.unsafeGetNullable(rs, i + 8),
-      accountnumber = AccountNumber.get.unsafeGetNullable(rs, i + 9),
-      customerid = CustomerId.get.unsafeGetNonNullable(rs, i + 10),
-      salespersonid = BusinessentityId.get.unsafeGetNullable(rs, i + 11),
-      territoryid = SalesterritoryId.get.unsafeGetNullable(rs, i + 12),
-      billtoaddressid = AddressId.get.unsafeGetNonNullable(rs, i + 13),
-      shiptoaddressid = AddressId.get.unsafeGetNonNullable(rs, i + 14),
-      shipmethodid = ShipmethodId.get.unsafeGetNonNullable(rs, i + 15),
-      creditcardid = /* user-picked */ CustomCreditcardId.get.unsafeGetNullable(rs, i + 16),
-      creditcardapprovalcode = Meta.StringMeta.get.unsafeGetNullable(rs, i + 17),
-      currencyrateid = CurrencyrateId.get.unsafeGetNullable(rs, i + 18),
-      subtotal = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 19),
-      taxamt = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 20),
-      freight = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 21),
-      totaldue = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 22),
-      comment = Meta.StringMeta.get.unsafeGetNullable(rs, i + 23),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 24),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 25)
+  implicit lazy val read: Read[SohViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(SalesorderheaderId.get).asInstanceOf[Read[Any]],
+      new Read.Single(SalesorderheaderId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(Flag.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(OrderNumber.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(AccountNumber.get).asInstanceOf[Read[Any]],
+      new Read.Single(CustomerId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(SalesterritoryId.get).asInstanceOf[Read[Any]],
+      new Read.Single(AddressId.get).asInstanceOf[Read[Any]],
+      new Read.Single(AddressId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ShipmethodId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(/* user-picked */ CustomCreditcardId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(CurrencyrateId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    SohViewRow(
+      id = arr(0).asInstanceOf[SalesorderheaderId],
+          salesorderid = arr(1).asInstanceOf[SalesorderheaderId],
+          revisionnumber = arr(2).asInstanceOf[TypoShort],
+          orderdate = arr(3).asInstanceOf[TypoLocalDateTime],
+          duedate = arr(4).asInstanceOf[TypoLocalDateTime],
+          shipdate = arr(5).asInstanceOf[Option[TypoLocalDateTime]],
+          status = arr(6).asInstanceOf[TypoShort],
+          onlineorderflag = arr(7).asInstanceOf[Flag],
+          purchaseordernumber = arr(8).asInstanceOf[Option[OrderNumber]],
+          accountnumber = arr(9).asInstanceOf[Option[AccountNumber]],
+          customerid = arr(10).asInstanceOf[CustomerId],
+          salespersonid = arr(11).asInstanceOf[Option[BusinessentityId]],
+          territoryid = arr(12).asInstanceOf[Option[SalesterritoryId]],
+          billtoaddressid = arr(13).asInstanceOf[AddressId],
+          shiptoaddressid = arr(14).asInstanceOf[AddressId],
+          shipmethodid = arr(15).asInstanceOf[ShipmethodId],
+          creditcardid = arr(16).asInstanceOf[Option[/* user-picked */ CustomCreditcardId]],
+          creditcardapprovalcode = arr(17).asInstanceOf[Option[/* max 15 chars */ String]],
+          currencyrateid = arr(18).asInstanceOf[Option[CurrencyrateId]],
+          subtotal = arr(19).asInstanceOf[BigDecimal],
+          taxamt = arr(20).asInstanceOf[BigDecimal],
+          freight = arr(21).asInstanceOf[BigDecimal],
+          totaldue = arr(22).asInstanceOf[Option[BigDecimal]],
+          comment = arr(23).asInstanceOf[Option[/* max 128 chars */ String]],
+          rowguid = arr(24).asInstanceOf[TypoUUID],
+          modifieddate = arr(25).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

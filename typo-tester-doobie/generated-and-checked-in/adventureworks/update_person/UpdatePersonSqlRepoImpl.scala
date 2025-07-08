@@ -16,7 +16,7 @@ import doobie.util.meta.Meta
 class UpdatePersonSqlRepoImpl extends UpdatePersonSqlRepo {
   override def apply(suffix: String, cutoff: Option[TypoLocalDateTime]): ConnectionIO[Int] = {
     sql"""update person.person
-          set firstname = firstname || '-' || ${fromWrite(suffix)(Write.fromPut(Meta.StringMeta.put))}
-          where modifieddate < ${fromWrite(cutoff)(Write.fromPutOption(TypoLocalDateTime.put))}::timestamp""".update.run
+          set firstname = firstname || '-' || ${fromWrite(suffix)(new Write.Single(Meta.StringMeta.put))}
+          where modifieddate < ${fromWrite(cutoff)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp""".update.run
   }
 }

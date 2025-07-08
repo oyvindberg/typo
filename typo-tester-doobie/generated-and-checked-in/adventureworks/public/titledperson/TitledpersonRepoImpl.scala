@@ -27,7 +27,7 @@ class TitledpersonRepoImpl extends TitledpersonRepo {
   }
   override def insert(unsaved: TitledpersonRow): ConnectionIO[TitledpersonRow] = {
     sql"""insert into "public"."titledperson"("title_short", "title", "name")
-          values (${fromWrite(unsaved.titleShort)(Write.fromPut(TitleDomainId.put))}::text, ${fromWrite(unsaved.title)(Write.fromPut(TitleId.put))}, ${fromWrite(unsaved.name)(Write.fromPut(Meta.StringMeta.put))})
+          values (${fromWrite(unsaved.titleShort)(new Write.Single(TitleDomainId.put))}::text, ${fromWrite(unsaved.title)(new Write.Single(TitleId.put))}, ${fromWrite(unsaved.name)(new Write.Single(Meta.StringMeta.put))})
           returning "title_short", "title", "name"
        """.query(using TitledpersonRow.read).unique
   }

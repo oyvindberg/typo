@@ -7,14 +7,12 @@ package adventureworks
 package public
 package only_pk_columns
 
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: public.only_pk_columns
     Composite primary key: key_column_1, key_column_2 */
@@ -31,32 +29,23 @@ object OnlyPkColumnsRow {
     new OnlyPkColumnsRow(compositeId.keyColumn1, compositeId.keyColumn2)
   implicit lazy val decoder: Decoder[OnlyPkColumnsRow] = Decoder.forProduct2[OnlyPkColumnsRow, String, Int]("key_column_1", "key_column_2")(OnlyPkColumnsRow.apply)(Decoder.decodeString, Decoder.decodeInt)
   implicit lazy val encoder: Encoder[OnlyPkColumnsRow] = Encoder.forProduct2[OnlyPkColumnsRow, String, Int]("key_column_1", "key_column_2")(x => (x.keyColumn1, x.keyColumn2))(Encoder.encodeString, Encoder.encodeInt)
-  implicit lazy val read: Read[OnlyPkColumnsRow] = new Read[OnlyPkColumnsRow](
-    gets = List(
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => OnlyPkColumnsRow(
-      keyColumn1 = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 0),
-      keyColumn2 = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 1)
+  implicit lazy val read: Read[OnlyPkColumnsRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    OnlyPkColumnsRow(
+      keyColumn1 = arr(0).asInstanceOf[String],
+          keyColumn2 = arr(1).asInstanceOf[Int]
     )
-  )
+  }
   implicit lazy val text: Text[OnlyPkColumnsRow] = Text.instance[OnlyPkColumnsRow]{ (row, sb) =>
     Text.stringInstance.unsafeEncode(row.keyColumn1, sb)
     sb.append(Text.DELIMETER)
     Text.intInstance.unsafeEncode(row.keyColumn2, sb)
   }
-  implicit lazy val write: Write[OnlyPkColumnsRow] = new Write[OnlyPkColumnsRow](
-    puts = List((Meta.StringMeta.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.NoNulls)),
-    toList = x => List(x.keyColumn1, x.keyColumn2),
-    unsafeSet = (rs, i, a) => {
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 0, a.keyColumn1)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 1, a.keyColumn2)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 0, a.keyColumn1)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.keyColumn2)
-                   }
+  implicit lazy val write: Write[OnlyPkColumnsRow] = new Write.Composite[OnlyPkColumnsRow](
+    List(new Write.Single(Meta.StringMeta.put),
+         new Write.Single(Meta.IntMeta.put)),
+    a => List(a.keyColumn1, a.keyColumn2)
   )
 }

@@ -29,24 +29,24 @@ class CultureRepoImpl extends CultureRepo {
     DeleteBuilder(""""production"."culture"""", CultureFields.structure)
   }
   override def deleteById(cultureid: CultureId): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."culture" where "cultureid" = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."culture" where "cultureid" = ${fromWrite(cultureid)(new Write.Single(CultureId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(cultureids: Array[CultureId]): ConnectionIO[Int] = {
     sql"""delete from "production"."culture" where "cultureid" = ANY(${cultureids})""".update.run
   }
   override def insert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     sql"""insert into "production"."culture"("cultureid", "name", "modifieddate")
-          values (${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.cultureid)(new Write.Single(CultureId.put))}::bpchar, ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "cultureid", "name", "modifieddate"::text
        """.query(using CultureRow.read).unique
   }
   override def insert(unsaved: CultureRowUnsaved): ConnectionIO[CultureRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""cultureid""""), fr"${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar")),
-      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""cultureid""""), fr"${fromWrite(unsaved.cultureid)(new Write.Single(CultureId.put))}::bpchar")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -78,7 +78,7 @@ class CultureRepoImpl extends CultureRepo {
     sql"""select "cultureid", "name", "modifieddate"::text from "production"."culture"""".query(using CultureRow.read).stream
   }
   override def selectById(cultureid: CultureId): ConnectionIO[Option[CultureRow]] = {
-    sql"""select "cultureid", "name", "modifieddate"::text from "production"."culture" where "cultureid" = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}""".query(using CultureRow.read).option
+    sql"""select "cultureid", "name", "modifieddate"::text from "production"."culture" where "cultureid" = ${fromWrite(cultureid)(new Write.Single(CultureId.put))}""".query(using CultureRow.read).option
   }
   override def selectByIds(cultureids: Array[CultureId]): Stream[ConnectionIO, CultureRow] = {
     sql"""select "cultureid", "name", "modifieddate"::text from "production"."culture" where "cultureid" = ANY(${cultureids})""".query(using CultureRow.read).stream
@@ -95,9 +95,9 @@ class CultureRepoImpl extends CultureRepo {
   override def update(row: CultureRow): ConnectionIO[Boolean] = {
     val cultureid = row.cultureid
     sql"""update "production"."culture"
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "cultureid" = ${fromWrite(cultureid)(Write.fromPut(CultureId.put))}"""
+          set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "cultureid" = ${fromWrite(cultureid)(new Write.Single(CultureId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -105,9 +105,9 @@ class CultureRepoImpl extends CultureRepo {
   override def upsert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     sql"""insert into "production"."culture"("cultureid", "name", "modifieddate")
           values (
-            ${fromWrite(unsaved.cultureid)(Write.fromPut(CultureId.put))}::bpchar,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.cultureid)(new Write.Single(CultureId.put))}::bpchar,
+            ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("cultureid")
           do update set

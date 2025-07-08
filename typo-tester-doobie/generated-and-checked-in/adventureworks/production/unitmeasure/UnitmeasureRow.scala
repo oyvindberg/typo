@@ -10,13 +10,11 @@ package unitmeasure
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: production.unitmeasure
     Unit of measure lookup table.
@@ -37,18 +35,17 @@ case class UnitmeasureRow(
 object UnitmeasureRow {
   implicit lazy val decoder: Decoder[UnitmeasureRow] = Decoder.forProduct3[UnitmeasureRow, UnitmeasureId, Name, TypoLocalDateTime]("unitmeasurecode", "name", "modifieddate")(UnitmeasureRow.apply)(UnitmeasureId.decoder, Name.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[UnitmeasureRow] = Encoder.forProduct3[UnitmeasureRow, UnitmeasureId, Name, TypoLocalDateTime]("unitmeasurecode", "name", "modifieddate")(x => (x.unitmeasurecode, x.name, x.modifieddate))(UnitmeasureId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[UnitmeasureRow] = new Read[UnitmeasureRow](
-    gets = List(
-      (UnitmeasureId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => UnitmeasureRow(
-      unitmeasurecode = UnitmeasureId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[UnitmeasureRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(UnitmeasureId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    UnitmeasureRow(
+      unitmeasurecode = arr(0).asInstanceOf[UnitmeasureId],
+          name = arr(1).asInstanceOf[Name],
+          modifieddate = arr(2).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[UnitmeasureRow] = Text.instance[UnitmeasureRow]{ (row, sb) =>
     UnitmeasureId.text.unsafeEncode(row.unitmeasurecode, sb)
     sb.append(Text.DELIMETER)
@@ -56,20 +53,10 @@ object UnitmeasureRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[UnitmeasureRow] = new Write[UnitmeasureRow](
-    puts = List((UnitmeasureId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.unitmeasurecode, x.name, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  UnitmeasureId.put.unsafeSetNonNullable(rs, i + 0, a.unitmeasurecode)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     UnitmeasureId.put.unsafeUpdateNonNullable(ps, i + 0, a.unitmeasurecode)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
-                   }
+  implicit lazy val write: Write[UnitmeasureRow] = new Write.Composite[UnitmeasureRow](
+    List(new Write.Single(UnitmeasureId.put),
+         new Write.Single(Name.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.unitmeasurecode, a.name, a.modifieddate)
   )
 }

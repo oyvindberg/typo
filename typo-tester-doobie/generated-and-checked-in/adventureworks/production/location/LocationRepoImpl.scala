@@ -30,35 +30,35 @@ class LocationRepoImpl extends LocationRepo {
     DeleteBuilder(""""production"."location"""", LocationFields.structure)
   }
   override def deleteById(locationid: LocationId): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."location" where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."location" where "locationid" = ${fromWrite(locationid)(new Write.Single(LocationId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(locationids: Array[LocationId]): ConnectionIO[Int] = {
     sql"""delete from "production"."location" where "locationid" = ANY(${locationids})""".update.run
   }
   override def insert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     sql"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")
-          values (${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.costrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.availability)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.locationid)(new Write.Single(LocationId.put))}::int4, ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar, ${fromWrite(unsaved.costrate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.availability)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "locationid", "name", "costrate", "availability", "modifieddate"::text
        """.query(using LocationRow.read).unique
   }
   override def insert(unsaved: LocationRowUnsaved): ConnectionIO[LocationRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar")),
       unsaved.locationid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""locationid""""), fr"${fromWrite(value: LocationId)(Write.fromPut(LocationId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""locationid""""), fr"${fromWrite(value: LocationId)(new Write.Single(LocationId.put))}::int4"))
       },
       unsaved.costrate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""costrate""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""costrate""""), fr"${fromWrite(value: BigDecimal)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.availability match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""availability""""), fr"${fromWrite(value: BigDecimal)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""availability""""), fr"${fromWrite(value: BigDecimal)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -90,7 +90,7 @@ class LocationRepoImpl extends LocationRepo {
     sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from "production"."location"""".query(using LocationRow.read).stream
   }
   override def selectById(locationid: LocationId): ConnectionIO[Option[LocationRow]] = {
-    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from "production"."location" where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}""".query(using LocationRow.read).option
+    sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from "production"."location" where "locationid" = ${fromWrite(locationid)(new Write.Single(LocationId.put))}""".query(using LocationRow.read).option
   }
   override def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow] = {
     sql"""select "locationid", "name", "costrate", "availability", "modifieddate"::text from "production"."location" where "locationid" = ANY(${locationids})""".query(using LocationRow.read).stream
@@ -107,11 +107,11 @@ class LocationRepoImpl extends LocationRepo {
   override def update(row: LocationRow): ConnectionIO[Boolean] = {
     val locationid = row.locationid
     sql"""update "production"."location"
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              "costrate" = ${fromWrite(row.costrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "availability" = ${fromWrite(row.availability)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "locationid" = ${fromWrite(locationid)(Write.fromPut(LocationId.put))}"""
+          set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
+              "costrate" = ${fromWrite(row.costrate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "availability" = ${fromWrite(row.availability)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "locationid" = ${fromWrite(locationid)(new Write.Single(LocationId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -119,11 +119,11 @@ class LocationRepoImpl extends LocationRepo {
   override def upsert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     sql"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")
           values (
-            ${fromWrite(unsaved.locationid)(Write.fromPut(LocationId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
-            ${fromWrite(unsaved.costrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.availability)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.locationid)(new Write.Single(LocationId.put))}::int4,
+            ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar,
+            ${fromWrite(unsaved.costrate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.availability)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("locationid")
           do update set

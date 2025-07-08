@@ -31,35 +31,35 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     DeleteBuilder(""""production"."productreview"""", ProductreviewFields.structure)
   }
   override def deleteById(productreviewid: ProductreviewId): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."productreview" where "productreviewid" = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."productreview" where "productreviewid" = ${fromWrite(productreviewid)(new Write.Single(ProductreviewId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(productreviewids: Array[ProductreviewId]): ConnectionIO[Int] = {
     sql"""delete from "production"."productreview" where "productreviewid" = ANY(${productreviewids})""".update.run
   }
   override def insert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
     sql"""insert into "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
-          values (${fromWrite(unsaved.productreviewid)(Write.fromPut(ProductreviewId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.reviewername)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.reviewdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.emailaddress)(Write.fromPut(Meta.StringMeta.put))}, ${fromWrite(unsaved.rating)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.comments)(Write.fromPutOption(Meta.StringMeta.put))}, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.productreviewid)(new Write.Single(ProductreviewId.put))}::int4, ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4, ${fromWrite(unsaved.reviewername)(new Write.Single(Name.put))}::varchar, ${fromWrite(unsaved.reviewdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.emailaddress)(new Write.Single(Meta.StringMeta.put))}, ${fromWrite(unsaved.rating)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.comments)(new Write.SingleOpt(Meta.StringMeta.put))}, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text
        """.query(using ProductreviewRow.read).unique
   }
   override def insert(unsaved: ProductreviewRowUnsaved): ConnectionIO[ProductreviewRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
-      Some((Fragment.const0(s""""reviewername""""), fr"${fromWrite(unsaved.reviewername)(Write.fromPut(Name.put))}::varchar")),
-      Some((Fragment.const0(s""""emailaddress""""), fr"${fromWrite(unsaved.emailaddress)(Write.fromPut(Meta.StringMeta.put))}")),
-      Some((Fragment.const0(s""""rating""""), fr"${fromWrite(unsaved.rating)(Write.fromPut(Meta.IntMeta.put))}::int4")),
-      Some((Fragment.const0(s""""comments""""), fr"${fromWrite(unsaved.comments)(Write.fromPutOption(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4")),
+      Some((Fragment.const0(s""""reviewername""""), fr"${fromWrite(unsaved.reviewername)(new Write.Single(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""emailaddress""""), fr"${fromWrite(unsaved.emailaddress)(new Write.Single(Meta.StringMeta.put))}")),
+      Some((Fragment.const0(s""""rating""""), fr"${fromWrite(unsaved.rating)(new Write.Single(Meta.IntMeta.put))}::int4")),
+      Some((Fragment.const0(s""""comments""""), fr"${fromWrite(unsaved.comments)(new Write.SingleOpt(Meta.StringMeta.put))}")),
       unsaved.productreviewid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""productreviewid""""), fr"${fromWrite(value: ProductreviewId)(Write.fromPut(ProductreviewId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""productreviewid""""), fr"${fromWrite(value: ProductreviewId)(new Write.Single(ProductreviewId.put))}::int4"))
       },
       unsaved.reviewdate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""reviewdate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""reviewdate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -91,7 +91,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
     sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from "production"."productreview"""".query(using ProductreviewRow.read).stream
   }
   override def selectById(productreviewid: ProductreviewId): ConnectionIO[Option[ProductreviewRow]] = {
-    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from "production"."productreview" where "productreviewid" = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}""".query(using ProductreviewRow.read).option
+    sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from "production"."productreview" where "productreviewid" = ${fromWrite(productreviewid)(new Write.Single(ProductreviewId.put))}""".query(using ProductreviewRow.read).option
   }
   override def selectByIds(productreviewids: Array[ProductreviewId]): Stream[ConnectionIO, ProductreviewRow] = {
     sql"""select "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text from "production"."productreview" where "productreviewid" = ANY(${productreviewids})""".query(using ProductreviewRow.read).stream
@@ -108,14 +108,14 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
   override def update(row: ProductreviewRow): ConnectionIO[Boolean] = {
     val productreviewid = row.productreviewid
     sql"""update "production"."productreview"
-          set "productid" = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
-              "reviewername" = ${fromWrite(row.reviewername)(Write.fromPut(Name.put))}::varchar,
-              "reviewdate" = ${fromWrite(row.reviewdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-              "emailaddress" = ${fromWrite(row.emailaddress)(Write.fromPut(Meta.StringMeta.put))},
-              "rating" = ${fromWrite(row.rating)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "comments" = ${fromWrite(row.comments)(Write.fromPutOption(Meta.StringMeta.put))},
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "productreviewid" = ${fromWrite(productreviewid)(Write.fromPut(ProductreviewId.put))}"""
+          set "productid" = ${fromWrite(row.productid)(new Write.Single(ProductId.put))}::int4,
+              "reviewername" = ${fromWrite(row.reviewername)(new Write.Single(Name.put))}::varchar,
+              "reviewdate" = ${fromWrite(row.reviewdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+              "emailaddress" = ${fromWrite(row.emailaddress)(new Write.Single(Meta.StringMeta.put))},
+              "rating" = ${fromWrite(row.rating)(new Write.Single(Meta.IntMeta.put))}::int4,
+              "comments" = ${fromWrite(row.comments)(new Write.SingleOpt(Meta.StringMeta.put))},
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "productreviewid" = ${fromWrite(productreviewid)(new Write.Single(ProductreviewId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -123,14 +123,14 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
   override def upsert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
     sql"""insert into "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")
           values (
-            ${fromWrite(unsaved.productreviewid)(Write.fromPut(ProductreviewId.put))}::int4,
-            ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
-            ${fromWrite(unsaved.reviewername)(Write.fromPut(Name.put))}::varchar,
-            ${fromWrite(unsaved.reviewdate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.emailaddress)(Write.fromPut(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.rating)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.comments)(Write.fromPutOption(Meta.StringMeta.put))},
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.productreviewid)(new Write.Single(ProductreviewId.put))}::int4,
+            ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4,
+            ${fromWrite(unsaved.reviewername)(new Write.Single(Name.put))}::varchar,
+            ${fromWrite(unsaved.reviewdate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.emailaddress)(new Write.Single(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.rating)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.comments)(new Write.SingleOpt(Meta.StringMeta.put))},
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("productreviewid")
           do update set

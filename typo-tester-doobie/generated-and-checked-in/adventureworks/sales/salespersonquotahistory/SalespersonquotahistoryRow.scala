@@ -11,14 +11,12 @@ import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoUUID
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: sales.salespersonquotahistory
     Sales performance tracking.
@@ -48,22 +46,21 @@ object SalespersonquotahistoryRow {
     new SalespersonquotahistoryRow(compositeId.businessentityid, compositeId.quotadate, salesquota, rowguid, modifieddate)
   implicit lazy val decoder: Decoder[SalespersonquotahistoryRow] = Decoder.forProduct5[SalespersonquotahistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, TypoUUID, TypoLocalDateTime]("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(SalespersonquotahistoryRow.apply)(BusinessentityId.decoder, TypoLocalDateTime.decoder, Decoder.decodeBigDecimal, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SalespersonquotahistoryRow] = Encoder.forProduct5[SalespersonquotahistoryRow, BusinessentityId, TypoLocalDateTime, BigDecimal, TypoUUID, TypoLocalDateTime]("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")(x => (x.businessentityid, x.quotadate, x.salesquota, x.rowguid, x.modifieddate))(BusinessentityId.encoder, TypoLocalDateTime.encoder, Encoder.encodeBigDecimal, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SalespersonquotahistoryRow] = new Read[SalespersonquotahistoryRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SalespersonquotahistoryRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      quotadate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 1),
-      salesquota = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 2),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+  implicit lazy val read: Read[SalespersonquotahistoryRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    SalespersonquotahistoryRow(
+      businessentityid = arr(0).asInstanceOf[BusinessentityId],
+          quotadate = arr(1).asInstanceOf[TypoLocalDateTime],
+          salesquota = arr(2).asInstanceOf[BigDecimal],
+          rowguid = arr(3).asInstanceOf[TypoUUID],
+          modifieddate = arr(4).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[SalespersonquotahistoryRow] = Text.instance[SalespersonquotahistoryRow]{ (row, sb) =>
     BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
     sb.append(Text.DELIMETER)
@@ -75,26 +72,12 @@ object SalespersonquotahistoryRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[SalespersonquotahistoryRow] = new Write[SalespersonquotahistoryRow](
-    puts = List((BusinessentityId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.businessentityid, x.quotadate, x.salesquota, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 1, a.quotadate)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 2, a.salesquota)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 3, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 1, a.quotadate)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.salesquota)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 3, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.modifieddate)
-                   }
+  implicit lazy val write: Write[SalespersonquotahistoryRow] = new Write.Composite[SalespersonquotahistoryRow](
+    List(new Write.Single(BusinessentityId.put),
+         new Write.Single(TypoLocalDateTime.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.businessentityid, a.quotadate, a.salesquota, a.rowguid, a.modifieddate)
   )
 }

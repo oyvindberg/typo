@@ -38,10 +38,10 @@ object Issue142Id {
   implicit lazy val get: Get[Issue142Id] = Meta.StringMeta.get.map(Issue142Id.apply)
   implicit lazy val ordering: Ordering[Issue142Id] = Ordering.by(_.value)
   implicit lazy val put: Put[Issue142Id] = Meta.StringMeta.put.contramap(_.value)
-  implicit lazy val read: Read[Issue142Id] = Read.fromGet(get)
+  implicit lazy val read: Read[Issue142Id] = new Read.Single(get)
   implicit lazy val text: Text[Issue142Id] = new Text[Issue142Id] {
     override def unsafeEncode(v: Issue142Id, sb: StringBuilder) = Text.stringInstance.unsafeEncode(v.value, sb)
     override def unsafeArrayEncode(v: Issue142Id, sb: StringBuilder) = Text.stringInstance.unsafeArrayEncode(v.value, sb)
   }
-  implicit lazy val write: Write[Issue142Id] = Write.fromPut(put)
+  implicit lazy val write: Write[Issue142Id] = new Write.Single(put)
 }

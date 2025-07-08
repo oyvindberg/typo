@@ -11,12 +11,10 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.purchasing.purchaseorderheader.PurchaseorderheaderId
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pu.pod */
 case class PodViewRow(
@@ -45,30 +43,29 @@ case class PodViewRow(
 object PodViewRow {
   implicit lazy val decoder: Decoder[PodViewRow] = Decoder.forProduct10[PodViewRow, Int, PurchaseorderheaderId, Int, TypoLocalDateTime, TypoShort, ProductId, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("id", "purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")(PodViewRow.apply)(Decoder.decodeInt, PurchaseorderheaderId.decoder, Decoder.decodeInt, TypoLocalDateTime.decoder, TypoShort.decoder, ProductId.decoder, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, Decoder.decodeBigDecimal, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PodViewRow] = Encoder.forProduct10[PodViewRow, Int, PurchaseorderheaderId, Int, TypoLocalDateTime, TypoShort, ProductId, BigDecimal, BigDecimal, BigDecimal, TypoLocalDateTime]("id", "purchaseorderid", "purchaseorderdetailid", "duedate", "orderqty", "productid", "unitprice", "receivedqty", "rejectedqty", "modifieddate")(x => (x.id, x.purchaseorderid, x.purchaseorderdetailid, x.duedate, x.orderqty, x.productid, x.unitprice, x.receivedqty, x.rejectedqty, x.modifieddate))(Encoder.encodeInt, PurchaseorderheaderId.encoder, Encoder.encodeInt, TypoLocalDateTime.encoder, TypoShort.encoder, ProductId.encoder, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, Encoder.encodeBigDecimal, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PodViewRow] = new Read[PodViewRow](
-    gets = List(
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (PurchaseorderheaderId.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PodViewRow(
-      id = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 0),
-      purchaseorderid = PurchaseorderheaderId.get.unsafeGetNonNullable(rs, i + 1),
-      purchaseorderdetailid = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
-      duedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 3),
-      orderqty = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 5),
-      unitprice = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 6),
-      receivedqty = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 7),
-      rejectedqty = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 8),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 9)
+  implicit lazy val read: Read[PodViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(PurchaseorderheaderId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    PodViewRow(
+      id = arr(0).asInstanceOf[Int],
+          purchaseorderid = arr(1).asInstanceOf[PurchaseorderheaderId],
+          purchaseorderdetailid = arr(2).asInstanceOf[Int],
+          duedate = arr(3).asInstanceOf[TypoLocalDateTime],
+          orderqty = arr(4).asInstanceOf[TypoShort],
+          productid = arr(5).asInstanceOf[ProductId],
+          unitprice = arr(6).asInstanceOf[BigDecimal],
+          receivedqty = arr(7).asInstanceOf[BigDecimal],
+          rejectedqty = arr(8).asInstanceOf[BigDecimal],
+          modifieddate = arr(9).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

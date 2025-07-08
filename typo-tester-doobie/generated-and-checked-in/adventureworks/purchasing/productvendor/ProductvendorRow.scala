@@ -12,14 +12,12 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.production.product.ProductId
 import adventureworks.production.unitmeasure.UnitmeasureId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: purchasing.productvendor
     Cross-reference table mapping vendors with the products they supply.
@@ -68,34 +66,33 @@ object ProductvendorRow {
     new ProductvendorRow(compositeId.productid, compositeId.businessentityid, averageleadtime, standardprice, lastreceiptcost, lastreceiptdate, minorderqty, maxorderqty, onorderqty, unitmeasurecode, modifieddate)
   implicit lazy val decoder: Decoder[ProductvendorRow] = Decoder.forProduct11[ProductvendorRow, ProductId, BusinessentityId, Int, BigDecimal, Option[BigDecimal], Option[TypoLocalDateTime], Int, Int, Option[Int], UnitmeasureId, TypoLocalDateTime]("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")(ProductvendorRow.apply)(ProductId.decoder, BusinessentityId.decoder, Decoder.decodeInt, Decoder.decodeBigDecimal, Decoder.decodeOption(Decoder.decodeBigDecimal), Decoder.decodeOption(TypoLocalDateTime.decoder), Decoder.decodeInt, Decoder.decodeInt, Decoder.decodeOption(Decoder.decodeInt), UnitmeasureId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ProductvendorRow] = Encoder.forProduct11[ProductvendorRow, ProductId, BusinessentityId, Int, BigDecimal, Option[BigDecimal], Option[TypoLocalDateTime], Int, Int, Option[Int], UnitmeasureId, TypoLocalDateTime]("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")(x => (x.productid, x.businessentityid, x.averageleadtime, x.standardprice, x.lastreceiptcost, x.lastreceiptdate, x.minorderqty, x.maxorderqty, x.onorderqty, x.unitmeasurecode, x.modifieddate))(ProductId.encoder, BusinessentityId.encoder, Encoder.encodeInt, Encoder.encodeBigDecimal, Encoder.encodeOption(Encoder.encodeBigDecimal), Encoder.encodeOption(TypoLocalDateTime.encoder), Encoder.encodeInt, Encoder.encodeInt, Encoder.encodeOption(Encoder.encodeInt), UnitmeasureId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ProductvendorRow] = new Read[ProductvendorRow](
-    gets = List(
-      (ProductId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.NoNulls),
-      (Meta.ScalaBigDecimalMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.Nullable),
-      (UnitmeasureId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ProductvendorRow(
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      averageleadtime = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
-      standardprice = Meta.ScalaBigDecimalMeta.get.unsafeGetNonNullable(rs, i + 3),
-      lastreceiptcost = Meta.ScalaBigDecimalMeta.get.unsafeGetNullable(rs, i + 4),
-      lastreceiptdate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5),
-      minorderqty = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 6),
-      maxorderqty = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 7),
-      onorderqty = Meta.IntMeta.get.unsafeGetNullable(rs, i + 8),
-      unitmeasurecode = UnitmeasureId.get.unsafeGetNonNullable(rs, i + 9),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 10)
+  implicit lazy val read: Read[ProductvendorRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.ScalaBigDecimalMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(UnitmeasureId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    ProductvendorRow(
+      productid = arr(0).asInstanceOf[ProductId],
+          businessentityid = arr(1).asInstanceOf[BusinessentityId],
+          averageleadtime = arr(2).asInstanceOf[Int],
+          standardprice = arr(3).asInstanceOf[BigDecimal],
+          lastreceiptcost = arr(4).asInstanceOf[Option[BigDecimal]],
+          lastreceiptdate = arr(5).asInstanceOf[Option[TypoLocalDateTime]],
+          minorderqty = arr(6).asInstanceOf[Int],
+          maxorderqty = arr(7).asInstanceOf[Int],
+          onorderqty = arr(8).asInstanceOf[Option[Int]],
+          unitmeasurecode = arr(9).asInstanceOf[UnitmeasureId],
+          modifieddate = arr(10).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[ProductvendorRow] = Text.instance[ProductvendorRow]{ (row, sb) =>
     ProductId.text.unsafeEncode(row.productid, sb)
     sb.append(Text.DELIMETER)
@@ -119,44 +116,18 @@ object ProductvendorRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[ProductvendorRow] = new Write[ProductvendorRow](
-    puts = List((ProductId.put, Nullability.NoNulls),
-                (BusinessentityId.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.NoNulls),
-                (Meta.ScalaBigDecimalMeta.put, Nullability.Nullable),
-                (TypoLocalDateTime.put, Nullability.Nullable),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.Nullable),
-                (UnitmeasureId.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.productid, x.businessentityid, x.averageleadtime, x.standardprice, x.lastreceiptcost, x.lastreceiptdate, x.minorderqty, x.maxorderqty, x.onorderqty, x.unitmeasurecode, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ProductId.put.unsafeSetNonNullable(rs, i + 0, a.productid)
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 1, a.businessentityid)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 2, a.averageleadtime)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNonNullable(rs, i + 3, a.standardprice)
-                  Meta.ScalaBigDecimalMeta.put.unsafeSetNullable(rs, i + 4, a.lastreceiptcost)
-                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 5, a.lastreceiptdate)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 6, a.minorderqty)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 7, a.maxorderqty)
-                  Meta.IntMeta.put.unsafeSetNullable(rs, i + 8, a.onorderqty)
-                  UnitmeasureId.put.unsafeSetNonNullable(rs, i + 9, a.unitmeasurecode)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 10, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ProductId.put.unsafeUpdateNonNullable(ps, i + 0, a.productid)
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 1, a.businessentityid)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.averageleadtime)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNonNullable(ps, i + 3, a.standardprice)
-                     Meta.ScalaBigDecimalMeta.put.unsafeUpdateNullable(ps, i + 4, a.lastreceiptcost)
-                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 5, a.lastreceiptdate)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 6, a.minorderqty)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 7, a.maxorderqty)
-                     Meta.IntMeta.put.unsafeUpdateNullable(ps, i + 8, a.onorderqty)
-                     UnitmeasureId.put.unsafeUpdateNonNullable(ps, i + 9, a.unitmeasurecode)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 10, a.modifieddate)
-                   }
+  implicit lazy val write: Write[ProductvendorRow] = new Write.Composite[ProductvendorRow](
+    List(new Write.Single(ProductId.put),
+         new Write.Single(BusinessentityId.put),
+         new Write.Single(Meta.IntMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put),
+         new Write.Single(Meta.ScalaBigDecimalMeta.put).toOpt,
+         new Write.Single(TypoLocalDateTime.put).toOpt,
+         new Write.Single(Meta.IntMeta.put),
+         new Write.Single(Meta.IntMeta.put),
+         new Write.Single(Meta.IntMeta.put).toOpt,
+         new Write.Single(UnitmeasureId.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.productid, a.businessentityid, a.averageleadtime, a.standardprice, a.lastreceiptcost, a.lastreceiptdate, a.minorderqty, a.maxorderqty, a.onorderqty, a.unitmeasurecode, a.modifieddate)
   )
 }

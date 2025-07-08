@@ -12,12 +12,10 @@ import adventureworks.customtypes.TypoShort
 import adventureworks.customtypes.TypoUUID
 import adventureworks.production.location.LocationId
 import adventureworks.production.product.ProductId
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pr.pi */
 case class PiViewRow(
@@ -42,26 +40,25 @@ case class PiViewRow(
 object PiViewRow {
   implicit lazy val decoder: Decoder[PiViewRow] = Decoder.forProduct8[PiViewRow, ProductId, ProductId, LocationId, /* max 10 chars */ String, TypoShort, TypoShort, TypoUUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(PiViewRow.apply)(ProductId.decoder, ProductId.decoder, LocationId.decoder, Decoder.decodeString, TypoShort.decoder, TypoShort.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PiViewRow] = Encoder.forProduct8[PiViewRow, ProductId, ProductId, LocationId, /* max 10 chars */ String, TypoShort, TypoShort, TypoUUID, TypoLocalDateTime]("id", "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")(x => (x.id, x.productid, x.locationid, x.shelf, x.bin, x.quantity, x.rowguid, x.modifieddate))(ProductId.encoder, ProductId.encoder, LocationId.encoder, Encoder.encodeString, TypoShort.encoder, TypoShort.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PiViewRow] = new Read[PiViewRow](
-    gets = List(
-      (ProductId.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (LocationId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PiViewRow(
-      id = ProductId.get.unsafeGetNonNullable(rs, i + 0),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
-      locationid = LocationId.get.unsafeGetNonNullable(rs, i + 2),
-      shelf = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 3),
-      bin = TypoShort.get.unsafeGetNonNullable(rs, i + 4),
-      quantity = TypoShort.get.unsafeGetNonNullable(rs, i + 5),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 6),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7)
+  implicit lazy val read: Read[PiViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(LocationId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    PiViewRow(
+      id = arr(0).asInstanceOf[ProductId],
+          productid = arr(1).asInstanceOf[ProductId],
+          locationid = arr(2).asInstanceOf[LocationId],
+          shelf = arr(3).asInstanceOf[/* max 10 chars */ String],
+          bin = arr(4).asInstanceOf[TypoShort],
+          quantity = arr(5).asInstanceOf[TypoShort],
+          rowguid = arr(6).asInstanceOf[TypoUUID],
+          modifieddate = arr(7).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

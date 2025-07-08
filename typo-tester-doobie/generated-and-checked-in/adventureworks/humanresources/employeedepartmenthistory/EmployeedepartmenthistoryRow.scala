@@ -13,13 +13,11 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.humanresources.department.DepartmentId
 import adventureworks.humanresources.shift.ShiftId
 import adventureworks.person.businessentity.BusinessentityId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: humanresources.employeedepartmenthistory
     Employee department transfers.
@@ -54,24 +52,23 @@ object EmployeedepartmenthistoryRow {
     new EmployeedepartmenthistoryRow(compositeId.businessentityid, compositeId.departmentid, compositeId.shiftid, compositeId.startdate, enddate, modifieddate)
   implicit lazy val decoder: Decoder[EmployeedepartmenthistoryRow] = Decoder.forProduct6[EmployeedepartmenthistoryRow, BusinessentityId, DepartmentId, ShiftId, TypoLocalDate, Option[TypoLocalDate], TypoLocalDateTime]("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(EmployeedepartmenthistoryRow.apply)(BusinessentityId.decoder, DepartmentId.decoder, ShiftId.decoder, TypoLocalDate.decoder, Decoder.decodeOption(TypoLocalDate.decoder), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[EmployeedepartmenthistoryRow] = Encoder.forProduct6[EmployeedepartmenthistoryRow, BusinessentityId, DepartmentId, ShiftId, TypoLocalDate, Option[TypoLocalDate], TypoLocalDateTime]("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")(x => (x.businessentityid, x.departmentid, x.shiftid, x.startdate, x.enddate, x.modifieddate))(BusinessentityId.encoder, DepartmentId.encoder, ShiftId.encoder, TypoLocalDate.encoder, Encoder.encodeOption(TypoLocalDate.encoder), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[EmployeedepartmenthistoryRow] = new Read[EmployeedepartmenthistoryRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (DepartmentId.get, Nullability.NoNulls),
-      (ShiftId.get, Nullability.NoNulls),
-      (TypoLocalDate.get, Nullability.NoNulls),
-      (TypoLocalDate.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => EmployeedepartmenthistoryRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      departmentid = DepartmentId.get.unsafeGetNonNullable(rs, i + 1),
-      shiftid = ShiftId.get.unsafeGetNonNullable(rs, i + 2),
-      startdate = TypoLocalDate.get.unsafeGetNonNullable(rs, i + 3),
-      enddate = TypoLocalDate.get.unsafeGetNullable(rs, i + 4),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 5)
+  implicit lazy val read: Read[EmployeedepartmenthistoryRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(DepartmentId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ShiftId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDate.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoLocalDate.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    EmployeedepartmenthistoryRow(
+      businessentityid = arr(0).asInstanceOf[BusinessentityId],
+          departmentid = arr(1).asInstanceOf[DepartmentId],
+          shiftid = arr(2).asInstanceOf[ShiftId],
+          startdate = arr(3).asInstanceOf[TypoLocalDate],
+          enddate = arr(4).asInstanceOf[Option[TypoLocalDate]],
+          modifieddate = arr(5).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[EmployeedepartmenthistoryRow] = Text.instance[EmployeedepartmenthistoryRow]{ (row, sb) =>
     BusinessentityId.text.unsafeEncode(row.businessentityid, sb)
     sb.append(Text.DELIMETER)
@@ -85,29 +82,13 @@ object EmployeedepartmenthistoryRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[EmployeedepartmenthistoryRow] = new Write[EmployeedepartmenthistoryRow](
-    puts = List((BusinessentityId.put, Nullability.NoNulls),
-                (DepartmentId.put, Nullability.NoNulls),
-                (ShiftId.put, Nullability.NoNulls),
-                (TypoLocalDate.put, Nullability.NoNulls),
-                (TypoLocalDate.put, Nullability.Nullable),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.businessentityid, x.departmentid, x.shiftid, x.startdate, x.enddate, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  BusinessentityId.put.unsafeSetNonNullable(rs, i + 0, a.businessentityid)
-                  DepartmentId.put.unsafeSetNonNullable(rs, i + 1, a.departmentid)
-                  ShiftId.put.unsafeSetNonNullable(rs, i + 2, a.shiftid)
-                  TypoLocalDate.put.unsafeSetNonNullable(rs, i + 3, a.startdate)
-                  TypoLocalDate.put.unsafeSetNullable(rs, i + 4, a.enddate)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 5, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     BusinessentityId.put.unsafeUpdateNonNullable(ps, i + 0, a.businessentityid)
-                     DepartmentId.put.unsafeUpdateNonNullable(ps, i + 1, a.departmentid)
-                     ShiftId.put.unsafeUpdateNonNullable(ps, i + 2, a.shiftid)
-                     TypoLocalDate.put.unsafeUpdateNonNullable(ps, i + 3, a.startdate)
-                     TypoLocalDate.put.unsafeUpdateNullable(ps, i + 4, a.enddate)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 5, a.modifieddate)
-                   }
+  implicit lazy val write: Write[EmployeedepartmenthistoryRow] = new Write.Composite[EmployeedepartmenthistoryRow](
+    List(new Write.Single(BusinessentityId.put),
+         new Write.Single(DepartmentId.put),
+         new Write.Single(ShiftId.put),
+         new Write.Single(TypoLocalDate.put),
+         new Write.Single(TypoLocalDate.put).toOpt,
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.businessentityid, a.departmentid, a.shiftid, a.startdate, a.enddate, a.modifieddate)
   )
 }

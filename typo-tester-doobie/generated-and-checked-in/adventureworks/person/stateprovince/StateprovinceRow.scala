@@ -14,14 +14,12 @@ import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Flag
 import adventureworks.public.Name
 import adventureworks.sales.salesterritory.SalesterritoryId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: person.stateprovince
     State and province lookup table.
@@ -56,28 +54,27 @@ case class StateprovinceRow(
 object StateprovinceRow {
   implicit lazy val decoder: Decoder[StateprovinceRow] = Decoder.forProduct8[StateprovinceRow, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, TypoUUID, TypoLocalDateTime]("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(StateprovinceRow.apply)(StateprovinceId.decoder, Decoder.decodeString, CountryregionId.decoder, Flag.decoder, Name.decoder, SalesterritoryId.decoder, TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[StateprovinceRow] = Encoder.forProduct8[StateprovinceRow, StateprovinceId, /* bpchar, max 3 chars */ String, CountryregionId, Flag, Name, SalesterritoryId, TypoUUID, TypoLocalDateTime]("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")(x => (x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate))(StateprovinceId.encoder, Encoder.encodeString, CountryregionId.encoder, Flag.encoder, Name.encoder, SalesterritoryId.encoder, TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[StateprovinceRow] = new Read[StateprovinceRow](
-    gets = List(
-      (StateprovinceId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (CountryregionId.get, Nullability.NoNulls),
-      (Flag.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (SalesterritoryId.get, Nullability.NoNulls),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => StateprovinceRow(
-      stateprovinceid = StateprovinceId.get.unsafeGetNonNullable(rs, i + 0),
-      stateprovincecode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 1),
-      countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 2),
-      isonlystateprovinceflag = Flag.get.unsafeGetNonNullable(rs, i + 3),
-      name = Name.get.unsafeGetNonNullable(rs, i + 4),
-      territoryid = SalesterritoryId.get.unsafeGetNonNullable(rs, i + 5),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 6),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 7)
+  implicit lazy val read: Read[StateprovinceRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(StateprovinceId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(CountryregionId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Flag.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(SalesterritoryId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    StateprovinceRow(
+      stateprovinceid = arr(0).asInstanceOf[StateprovinceId],
+          stateprovincecode = arr(1).asInstanceOf[/* bpchar, max 3 chars */ String],
+          countryregioncode = arr(2).asInstanceOf[CountryregionId],
+          isonlystateprovinceflag = arr(3).asInstanceOf[Flag],
+          name = arr(4).asInstanceOf[Name],
+          territoryid = arr(5).asInstanceOf[SalesterritoryId],
+          rowguid = arr(6).asInstanceOf[TypoUUID],
+          modifieddate = arr(7).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[StateprovinceRow] = Text.instance[StateprovinceRow]{ (row, sb) =>
     StateprovinceId.text.unsafeEncode(row.stateprovinceid, sb)
     sb.append(Text.DELIMETER)
@@ -95,35 +92,15 @@ object StateprovinceRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[StateprovinceRow] = new Write[StateprovinceRow](
-    puts = List((StateprovinceId.put, Nullability.NoNulls),
-                (Meta.StringMeta.put, Nullability.NoNulls),
-                (CountryregionId.put, Nullability.NoNulls),
-                (Flag.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (SalesterritoryId.put, Nullability.NoNulls),
-                (TypoUUID.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.stateprovinceid, x.stateprovincecode, x.countryregioncode, x.isonlystateprovinceflag, x.name, x.territoryid, x.rowguid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  StateprovinceId.put.unsafeSetNonNullable(rs, i + 0, a.stateprovinceid)
-                  Meta.StringMeta.put.unsafeSetNonNullable(rs, i + 1, a.stateprovincecode)
-                  CountryregionId.put.unsafeSetNonNullable(rs, i + 2, a.countryregioncode)
-                  Flag.put.unsafeSetNonNullable(rs, i + 3, a.isonlystateprovinceflag)
-                  Name.put.unsafeSetNonNullable(rs, i + 4, a.name)
-                  SalesterritoryId.put.unsafeSetNonNullable(rs, i + 5, a.territoryid)
-                  TypoUUID.put.unsafeSetNonNullable(rs, i + 6, a.rowguid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 7, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     StateprovinceId.put.unsafeUpdateNonNullable(ps, i + 0, a.stateprovinceid)
-                     Meta.StringMeta.put.unsafeUpdateNonNullable(ps, i + 1, a.stateprovincecode)
-                     CountryregionId.put.unsafeUpdateNonNullable(ps, i + 2, a.countryregioncode)
-                     Flag.put.unsafeUpdateNonNullable(ps, i + 3, a.isonlystateprovinceflag)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 4, a.name)
-                     SalesterritoryId.put.unsafeUpdateNonNullable(ps, i + 5, a.territoryid)
-                     TypoUUID.put.unsafeUpdateNonNullable(ps, i + 6, a.rowguid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 7, a.modifieddate)
-                   }
+  implicit lazy val write: Write[StateprovinceRow] = new Write.Composite[StateprovinceRow](
+    List(new Write.Single(StateprovinceId.put),
+         new Write.Single(Meta.StringMeta.put),
+         new Write.Single(CountryregionId.put),
+         new Write.Single(Flag.put),
+         new Write.Single(Name.put),
+         new Write.Single(SalesterritoryId.put),
+         new Write.Single(TypoUUID.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.stateprovinceid, a.stateprovincecode, a.countryregioncode, a.isonlystateprovinceflag, a.name, a.territoryid, a.rowguid, a.modifieddate)
   )
 }

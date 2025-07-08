@@ -29,14 +29,14 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     DeleteBuilder(""""person"."businessentity"""", BusinessentityFields.structure)
   }
   override def deleteById(businessentityid: BusinessentityId): ConnectionIO[Boolean] = {
-    sql"""delete from "person"."businessentity" where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "person"."businessentity" where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(businessentityids: Array[BusinessentityId]): ConnectionIO[Int] = {
     sql"""delete from "person"."businessentity" where "businessentityid" = ANY(${businessentityids})""".update.run
   }
   override def insert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     sql"""insert into "person"."businessentity"("businessentityid", "rowguid", "modifieddate")
-          values (${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4, ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4, ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "businessentityid", "rowguid", "modifieddate"::text
        """.query(using BusinessentityRow.read).unique
   }
@@ -44,15 +44,15 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     val fs = List(
       unsaved.businessentityid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(value: BusinessentityId)(Write.fromPut(BusinessentityId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""businessentityid""""), fr"${fromWrite(value: BusinessentityId)(new Write.Single(BusinessentityId.put))}::int4"))
       },
       unsaved.rowguid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(Write.fromPut(TypoUUID.put))}::uuid"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""rowguid""""), fr"${fromWrite(value: TypoUUID)(new Write.Single(TypoUUID.put))}::uuid"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -84,7 +84,7 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
     sql"""select "businessentityid", "rowguid", "modifieddate"::text from "person"."businessentity"""".query(using BusinessentityRow.read).stream
   }
   override def selectById(businessentityid: BusinessentityId): ConnectionIO[Option[BusinessentityRow]] = {
-    sql"""select "businessentityid", "rowguid", "modifieddate"::text from "person"."businessentity" where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}""".query(using BusinessentityRow.read).option
+    sql"""select "businessentityid", "rowguid", "modifieddate"::text from "person"."businessentity" where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}""".query(using BusinessentityRow.read).option
   }
   override def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, BusinessentityRow] = {
     sql"""select "businessentityid", "rowguid", "modifieddate"::text from "person"."businessentity" where "businessentityid" = ANY(${businessentityids})""".query(using BusinessentityRow.read).stream
@@ -101,9 +101,9 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
   override def update(row: BusinessentityRow): ConnectionIO[Boolean] = {
     val businessentityid = row.businessentityid
     sql"""update "person"."businessentity"
-          set "rowguid" = ${fromWrite(row.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(businessentityid)(Write.fromPut(BusinessentityId.put))}"""
+          set "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -111,9 +111,9 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
   override def upsert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     sql"""insert into "person"."businessentity"("businessentityid", "rowguid", "modifieddate")
           values (
-            ${fromWrite(unsaved.businessentityid)(Write.fromPut(BusinessentityId.put))}::int4,
-            ${fromWrite(unsaved.rowguid)(Write.fromPut(TypoUUID.put))}::uuid,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.businessentityid)(new Write.Single(BusinessentityId.put))}::int4,
+            ${fromWrite(unsaved.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("businessentityid")
           do update set

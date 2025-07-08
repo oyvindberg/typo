@@ -12,14 +12,12 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.customtypes.TypoShort
 import adventureworks.production.product.ProductId
 import adventureworks.production.scrapreason.ScrapreasonId
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: production.workorder
     Manufacturing work orders.
@@ -59,30 +57,29 @@ case class WorkorderRow(
 object WorkorderRow {
   implicit lazy val decoder: Decoder[WorkorderRow] = Decoder.forProduct9[WorkorderRow, WorkorderId, ProductId, Int, TypoShort, TypoLocalDateTime, Option[TypoLocalDateTime], TypoLocalDateTime, Option[ScrapreasonId], TypoLocalDateTime]("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")(WorkorderRow.apply)(WorkorderId.decoder, ProductId.decoder, Decoder.decodeInt, TypoShort.decoder, TypoLocalDateTime.decoder, Decoder.decodeOption(TypoLocalDateTime.decoder), TypoLocalDateTime.decoder, Decoder.decodeOption(ScrapreasonId.decoder), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[WorkorderRow] = Encoder.forProduct9[WorkorderRow, WorkorderId, ProductId, Int, TypoShort, TypoLocalDateTime, Option[TypoLocalDateTime], TypoLocalDateTime, Option[ScrapreasonId], TypoLocalDateTime]("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")(x => (x.workorderid, x.productid, x.orderqty, x.scrappedqty, x.startdate, x.enddate, x.duedate, x.scrapreasonid, x.modifieddate))(WorkorderId.encoder, ProductId.encoder, Encoder.encodeInt, TypoShort.encoder, TypoLocalDateTime.encoder, Encoder.encodeOption(TypoLocalDateTime.encoder), TypoLocalDateTime.encoder, Encoder.encodeOption(ScrapreasonId.encoder), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[WorkorderRow] = new Read[WorkorderRow](
-    gets = List(
-      (WorkorderId.get, Nullability.NoNulls),
-      (ProductId.get, Nullability.NoNulls),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (TypoShort.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls),
-      (ScrapreasonId.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => WorkorderRow(
-      workorderid = WorkorderId.get.unsafeGetNonNullable(rs, i + 0),
-      productid = ProductId.get.unsafeGetNonNullable(rs, i + 1),
-      orderqty = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 2),
-      scrappedqty = TypoShort.get.unsafeGetNonNullable(rs, i + 3),
-      startdate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4),
-      enddate = TypoLocalDateTime.get.unsafeGetNullable(rs, i + 5),
-      duedate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6),
-      scrapreasonid = ScrapreasonId.get.unsafeGetNullable(rs, i + 7),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 8)
+  implicit lazy val read: Read[WorkorderRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(WorkorderId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoShort.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(ScrapreasonId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    WorkorderRow(
+      workorderid = arr(0).asInstanceOf[WorkorderId],
+          productid = arr(1).asInstanceOf[ProductId],
+          orderqty = arr(2).asInstanceOf[Int],
+          scrappedqty = arr(3).asInstanceOf[TypoShort],
+          startdate = arr(4).asInstanceOf[TypoLocalDateTime],
+          enddate = arr(5).asInstanceOf[Option[TypoLocalDateTime]],
+          duedate = arr(6).asInstanceOf[TypoLocalDateTime],
+          scrapreasonid = arr(7).asInstanceOf[Option[ScrapreasonId]],
+          modifieddate = arr(8).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[WorkorderRow] = Text.instance[WorkorderRow]{ (row, sb) =>
     WorkorderId.text.unsafeEncode(row.workorderid, sb)
     sb.append(Text.DELIMETER)
@@ -102,38 +99,16 @@ object WorkorderRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[WorkorderRow] = new Write[WorkorderRow](
-    puts = List((WorkorderId.put, Nullability.NoNulls),
-                (ProductId.put, Nullability.NoNulls),
-                (Meta.IntMeta.put, Nullability.NoNulls),
-                (TypoShort.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.Nullable),
-                (TypoLocalDateTime.put, Nullability.NoNulls),
-                (ScrapreasonId.put, Nullability.Nullable),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.workorderid, x.productid, x.orderqty, x.scrappedqty, x.startdate, x.enddate, x.duedate, x.scrapreasonid, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  WorkorderId.put.unsafeSetNonNullable(rs, i + 0, a.workorderid)
-                  ProductId.put.unsafeSetNonNullable(rs, i + 1, a.productid)
-                  Meta.IntMeta.put.unsafeSetNonNullable(rs, i + 2, a.orderqty)
-                  TypoShort.put.unsafeSetNonNullable(rs, i + 3, a.scrappedqty)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 4, a.startdate)
-                  TypoLocalDateTime.put.unsafeSetNullable(rs, i + 5, a.enddate)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 6, a.duedate)
-                  ScrapreasonId.put.unsafeSetNullable(rs, i + 7, a.scrapreasonid)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 8, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     WorkorderId.put.unsafeUpdateNonNullable(ps, i + 0, a.workorderid)
-                     ProductId.put.unsafeUpdateNonNullable(ps, i + 1, a.productid)
-                     Meta.IntMeta.put.unsafeUpdateNonNullable(ps, i + 2, a.orderqty)
-                     TypoShort.put.unsafeUpdateNonNullable(ps, i + 3, a.scrappedqty)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 4, a.startdate)
-                     TypoLocalDateTime.put.unsafeUpdateNullable(ps, i + 5, a.enddate)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 6, a.duedate)
-                     ScrapreasonId.put.unsafeUpdateNullable(ps, i + 7, a.scrapreasonid)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 8, a.modifieddate)
-                   }
+  implicit lazy val write: Write[WorkorderRow] = new Write.Composite[WorkorderRow](
+    List(new Write.Single(WorkorderId.put),
+         new Write.Single(ProductId.put),
+         new Write.Single(Meta.IntMeta.put),
+         new Write.Single(TypoShort.put),
+         new Write.Single(TypoLocalDateTime.put),
+         new Write.Single(TypoLocalDateTime.put).toOpt,
+         new Write.Single(TypoLocalDateTime.put),
+         new Write.Single(ScrapreasonId.put).toOpt,
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.workorderid, a.productid, a.orderqty, a.scrappedqty, a.startdate, a.enddate, a.duedate, a.scrapreasonid, a.modifieddate)
   )
 }

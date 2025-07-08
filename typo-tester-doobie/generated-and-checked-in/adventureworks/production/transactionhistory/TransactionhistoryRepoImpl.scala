@@ -30,39 +30,39 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     DeleteBuilder(""""production"."transactionhistory"""", TransactionhistoryFields.structure)
   }
   override def deleteById(transactionid: TransactionhistoryId): ConnectionIO[Boolean] = {
-    sql"""delete from "production"."transactionhistory" where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "production"."transactionhistory" where "transactionid" = ${fromWrite(transactionid)(new Write.Single(TransactionhistoryId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(transactionids: Array[TransactionhistoryId]): ConnectionIO[Int] = {
     sql"""delete from "production"."transactionhistory" where "transactionid" = ANY(${transactionids})""".update.run
   }
   override def insert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     sql"""insert into "production"."transactionhistory"("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
-          values (${fromWrite(unsaved.transactionid)(Write.fromPut(TransactionhistoryId.put))}::int4, ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4, ${fromWrite(unsaved.referenceorderid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.referenceorderlineid)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.transactiondate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.transactiontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.actualcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.transactionid)(new Write.Single(TransactionhistoryId.put))}::int4, ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4, ${fromWrite(unsaved.referenceorderid)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.referenceorderlineid)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.transactiondate)(new Write.Single(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.transactiontype)(new Write.Single(Meta.StringMeta.put))}::bpchar, ${fromWrite(unsaved.quantity)(new Write.Single(Meta.IntMeta.put))}::int4, ${fromWrite(unsaved.actualcost)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text
        """.query(using TransactionhistoryRow.read).unique
   }
   override def insert(unsaved: TransactionhistoryRowUnsaved): ConnectionIO[TransactionhistoryRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4")),
-      Some((Fragment.const0(s""""referenceorderid""""), fr"${fromWrite(unsaved.referenceorderid)(Write.fromPut(Meta.IntMeta.put))}::int4")),
-      Some((Fragment.const0(s""""transactiontype""""), fr"${fromWrite(unsaved.transactiontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar")),
-      Some((Fragment.const0(s""""quantity""""), fr"${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4")),
-      Some((Fragment.const0(s""""actualcost""""), fr"${fromWrite(unsaved.actualcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const0(s""""productid""""), fr"${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4")),
+      Some((Fragment.const0(s""""referenceorderid""""), fr"${fromWrite(unsaved.referenceorderid)(new Write.Single(Meta.IntMeta.put))}::int4")),
+      Some((Fragment.const0(s""""transactiontype""""), fr"${fromWrite(unsaved.transactiontype)(new Write.Single(Meta.StringMeta.put))}::bpchar")),
+      Some((Fragment.const0(s""""quantity""""), fr"${fromWrite(unsaved.quantity)(new Write.Single(Meta.IntMeta.put))}::int4")),
+      Some((Fragment.const0(s""""actualcost""""), fr"${fromWrite(unsaved.actualcost)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric")),
       unsaved.transactionid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""transactionid""""), fr"${fromWrite(value: TransactionhistoryId)(Write.fromPut(TransactionhistoryId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""transactionid""""), fr"${fromWrite(value: TransactionhistoryId)(new Write.Single(TransactionhistoryId.put))}::int4"))
       },
       unsaved.referenceorderlineid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""referenceorderlineid""""), fr"${fromWrite(value: Int)(Write.fromPut(Meta.IntMeta.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""referenceorderlineid""""), fr"${fromWrite(value: Int)(new Write.Single(Meta.IntMeta.put))}::int4"))
       },
       unsaved.transactiondate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""transactiondate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""transactiondate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -94,7 +94,7 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
     sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from "production"."transactionhistory"""".query(using TransactionhistoryRow.read).stream
   }
   override def selectById(transactionid: TransactionhistoryId): ConnectionIO[Option[TransactionhistoryRow]] = {
-    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from "production"."transactionhistory" where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}""".query(using TransactionhistoryRow.read).option
+    sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from "production"."transactionhistory" where "transactionid" = ${fromWrite(transactionid)(new Write.Single(TransactionhistoryId.put))}""".query(using TransactionhistoryRow.read).option
   }
   override def selectByIds(transactionids: Array[TransactionhistoryId]): Stream[ConnectionIO, TransactionhistoryRow] = {
     sql"""select "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text from "production"."transactionhistory" where "transactionid" = ANY(${transactionids})""".query(using TransactionhistoryRow.read).stream
@@ -111,15 +111,15 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def update(row: TransactionhistoryRow): ConnectionIO[Boolean] = {
     val transactionid = row.transactionid
     sql"""update "production"."transactionhistory"
-          set "productid" = ${fromWrite(row.productid)(Write.fromPut(ProductId.put))}::int4,
-              "referenceorderid" = ${fromWrite(row.referenceorderid)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "referenceorderlineid" = ${fromWrite(row.referenceorderlineid)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "transactiondate" = ${fromWrite(row.transactiondate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-              "transactiontype" = ${fromWrite(row.transactiontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
-              "quantity" = ${fromWrite(row.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4,
-              "actualcost" = ${fromWrite(row.actualcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "transactionid" = ${fromWrite(transactionid)(Write.fromPut(TransactionhistoryId.put))}"""
+          set "productid" = ${fromWrite(row.productid)(new Write.Single(ProductId.put))}::int4,
+              "referenceorderid" = ${fromWrite(row.referenceorderid)(new Write.Single(Meta.IntMeta.put))}::int4,
+              "referenceorderlineid" = ${fromWrite(row.referenceorderlineid)(new Write.Single(Meta.IntMeta.put))}::int4,
+              "transactiondate" = ${fromWrite(row.transactiondate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+              "transactiontype" = ${fromWrite(row.transactiontype)(new Write.Single(Meta.StringMeta.put))}::bpchar,
+              "quantity" = ${fromWrite(row.quantity)(new Write.Single(Meta.IntMeta.put))}::int4,
+              "actualcost" = ${fromWrite(row.actualcost)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "transactionid" = ${fromWrite(transactionid)(new Write.Single(TransactionhistoryId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -127,15 +127,15 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def upsert(unsaved: TransactionhistoryRow): ConnectionIO[TransactionhistoryRow] = {
     sql"""insert into "production"."transactionhistory"("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")
           values (
-            ${fromWrite(unsaved.transactionid)(Write.fromPut(TransactionhistoryId.put))}::int4,
-            ${fromWrite(unsaved.productid)(Write.fromPut(ProductId.put))}::int4,
-            ${fromWrite(unsaved.referenceorderid)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.referenceorderlineid)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.transactiondate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.transactiontype)(Write.fromPut(Meta.StringMeta.put))}::bpchar,
-            ${fromWrite(unsaved.quantity)(Write.fromPut(Meta.IntMeta.put))}::int4,
-            ${fromWrite(unsaved.actualcost)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.transactionid)(new Write.Single(TransactionhistoryId.put))}::int4,
+            ${fromWrite(unsaved.productid)(new Write.Single(ProductId.put))}::int4,
+            ${fromWrite(unsaved.referenceorderid)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.referenceorderlineid)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.transactiondate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.transactiontype)(new Write.Single(Meta.StringMeta.put))}::bpchar,
+            ${fromWrite(unsaved.quantity)(new Write.Single(Meta.IntMeta.put))}::int4,
+            ${fromWrite(unsaved.actualcost)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("transactionid")
           do update set

@@ -30,31 +30,31 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
     DeleteBuilder(""""sales"."currencyrate"""", CurrencyrateFields.structure)
   }
   override def deleteById(currencyrateid: CurrencyrateId): ConnectionIO[Boolean] = {
-    sql"""delete from "sales"."currencyrate" where "currencyrateid" = ${fromWrite(currencyrateid)(Write.fromPut(CurrencyrateId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."currencyrate" where "currencyrateid" = ${fromWrite(currencyrateid)(new Write.Single(CurrencyrateId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(currencyrateids: Array[CurrencyrateId]): ConnectionIO[Int] = {
     sql"""delete from "sales"."currencyrate" where "currencyrateid" = ANY(${currencyrateids})""".update.run
   }
   override def insert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow] = {
     sql"""insert into "sales"."currencyrate"("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")
-          values (${fromWrite(unsaved.currencyrateid)(Write.fromPut(CurrencyrateId.put))}::int4, ${fromWrite(unsaved.currencyratedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.fromcurrencycode)(Write.fromPut(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.tocurrencycode)(Write.fromPut(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.averagerate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.endofdayrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.currencyrateid)(new Write.Single(CurrencyrateId.put))}::int4, ${fromWrite(unsaved.currencyratedate)(new Write.Single(TypoLocalDateTime.put))}::timestamp, ${fromWrite(unsaved.fromcurrencycode)(new Write.Single(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.tocurrencycode)(new Write.Single(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.averagerate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.endofdayrate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text
        """.query(using CurrencyrateRow.read).unique
   }
   override def insert(unsaved: CurrencyrateRowUnsaved): ConnectionIO[CurrencyrateRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""currencyratedate""""), fr"${fromWrite(unsaved.currencyratedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp")),
-      Some((Fragment.const0(s""""fromcurrencycode""""), fr"${fromWrite(unsaved.fromcurrencycode)(Write.fromPut(CurrencyId.put))}::bpchar")),
-      Some((Fragment.const0(s""""tocurrencycode""""), fr"${fromWrite(unsaved.tocurrencycode)(Write.fromPut(CurrencyId.put))}::bpchar")),
-      Some((Fragment.const0(s""""averagerate""""), fr"${fromWrite(unsaved.averagerate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
-      Some((Fragment.const0(s""""endofdayrate""""), fr"${fromWrite(unsaved.endofdayrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const0(s""""currencyratedate""""), fr"${fromWrite(unsaved.currencyratedate)(new Write.Single(TypoLocalDateTime.put))}::timestamp")),
+      Some((Fragment.const0(s""""fromcurrencycode""""), fr"${fromWrite(unsaved.fromcurrencycode)(new Write.Single(CurrencyId.put))}::bpchar")),
+      Some((Fragment.const0(s""""tocurrencycode""""), fr"${fromWrite(unsaved.tocurrencycode)(new Write.Single(CurrencyId.put))}::bpchar")),
+      Some((Fragment.const0(s""""averagerate""""), fr"${fromWrite(unsaved.averagerate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric")),
+      Some((Fragment.const0(s""""endofdayrate""""), fr"${fromWrite(unsaved.endofdayrate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric")),
       unsaved.currencyrateid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""currencyrateid""""), fr"${fromWrite(value: CurrencyrateId)(Write.fromPut(CurrencyrateId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""currencyrateid""""), fr"${fromWrite(value: CurrencyrateId)(new Write.Single(CurrencyrateId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -86,7 +86,7 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
     sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from "sales"."currencyrate"""".query(using CurrencyrateRow.read).stream
   }
   override def selectById(currencyrateid: CurrencyrateId): ConnectionIO[Option[CurrencyrateRow]] = {
-    sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from "sales"."currencyrate" where "currencyrateid" = ${fromWrite(currencyrateid)(Write.fromPut(CurrencyrateId.put))}""".query(using CurrencyrateRow.read).option
+    sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from "sales"."currencyrate" where "currencyrateid" = ${fromWrite(currencyrateid)(new Write.Single(CurrencyrateId.put))}""".query(using CurrencyrateRow.read).option
   }
   override def selectByIds(currencyrateids: Array[CurrencyrateId]): Stream[ConnectionIO, CurrencyrateRow] = {
     sql"""select "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text from "sales"."currencyrate" where "currencyrateid" = ANY(${currencyrateids})""".query(using CurrencyrateRow.read).stream
@@ -103,13 +103,13 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def update(row: CurrencyrateRow): ConnectionIO[Boolean] = {
     val currencyrateid = row.currencyrateid
     sql"""update "sales"."currencyrate"
-          set "currencyratedate" = ${fromWrite(row.currencyratedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-              "fromcurrencycode" = ${fromWrite(row.fromcurrencycode)(Write.fromPut(CurrencyId.put))}::bpchar,
-              "tocurrencycode" = ${fromWrite(row.tocurrencycode)(Write.fromPut(CurrencyId.put))}::bpchar,
-              "averagerate" = ${fromWrite(row.averagerate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "endofdayrate" = ${fromWrite(row.endofdayrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "currencyrateid" = ${fromWrite(currencyrateid)(Write.fromPut(CurrencyrateId.put))}"""
+          set "currencyratedate" = ${fromWrite(row.currencyratedate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+              "fromcurrencycode" = ${fromWrite(row.fromcurrencycode)(new Write.Single(CurrencyId.put))}::bpchar,
+              "tocurrencycode" = ${fromWrite(row.tocurrencycode)(new Write.Single(CurrencyId.put))}::bpchar,
+              "averagerate" = ${fromWrite(row.averagerate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "endofdayrate" = ${fromWrite(row.endofdayrate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "currencyrateid" = ${fromWrite(currencyrateid)(new Write.Single(CurrencyrateId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -117,13 +117,13 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def upsert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow] = {
     sql"""insert into "sales"."currencyrate"("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")
           values (
-            ${fromWrite(unsaved.currencyrateid)(Write.fromPut(CurrencyrateId.put))}::int4,
-            ${fromWrite(unsaved.currencyratedate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp,
-            ${fromWrite(unsaved.fromcurrencycode)(Write.fromPut(CurrencyId.put))}::bpchar,
-            ${fromWrite(unsaved.tocurrencycode)(Write.fromPut(CurrencyId.put))}::bpchar,
-            ${fromWrite(unsaved.averagerate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.endofdayrate)(Write.fromPut(Meta.ScalaBigDecimalMeta.put))}::numeric,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.currencyrateid)(new Write.Single(CurrencyrateId.put))}::int4,
+            ${fromWrite(unsaved.currencyratedate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
+            ${fromWrite(unsaved.fromcurrencycode)(new Write.Single(CurrencyId.put))}::bpchar,
+            ${fromWrite(unsaved.tocurrencycode)(new Write.Single(CurrencyId.put))}::bpchar,
+            ${fromWrite(unsaved.averagerate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.endofdayrate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("currencyrateid")
           do update set

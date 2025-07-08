@@ -11,11 +11,9 @@ import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.person.phonenumbertype.PhonenumbertypeId
 import adventureworks.public.Phone
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pe.pp */
 case class PpViewRow(
@@ -34,20 +32,19 @@ case class PpViewRow(
 object PpViewRow {
   implicit lazy val decoder: Decoder[PpViewRow] = Decoder.forProduct5[PpViewRow, BusinessentityId, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(PpViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, Phone.decoder, PhonenumbertypeId.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PpViewRow] = Encoder.forProduct5[PpViewRow, BusinessentityId, BusinessentityId, Phone, PhonenumbertypeId, TypoLocalDateTime]("id", "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")(x => (x.id, x.businessentityid, x.phonenumber, x.phonenumbertypeid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, Phone.encoder, PhonenumbertypeId.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PpViewRow] = new Read[PpViewRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Phone.get, Nullability.NoNulls),
-      (PhonenumbertypeId.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PpViewRow(
-      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      phonenumber = Phone.get.unsafeGetNonNullable(rs, i + 2),
-      phonenumbertypeid = PhonenumbertypeId.get.unsafeGetNonNullable(rs, i + 3),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 4)
+  implicit lazy val read: Read[PpViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Phone.get).asInstanceOf[Read[Any]],
+      new Read.Single(PhonenumbertypeId.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    PpViewRow(
+      id = arr(0).asInstanceOf[BusinessentityId],
+          businessentityid = arr(1).asInstanceOf[BusinessentityId],
+          phonenumber = arr(2).asInstanceOf[Phone],
+          phonenumbertypeid = arr(3).asInstanceOf[PhonenumbertypeId],
+          modifieddate = arr(4).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

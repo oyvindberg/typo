@@ -10,13 +10,11 @@ package contacttype
 import adventureworks.customtypes.Defaulted
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.postgres.Text
 import doobie.util.Read
 import doobie.util.Write
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** Table: person.contacttype
     Lookup table containing the types of business entity contacts.
@@ -38,18 +36,17 @@ case class ContacttypeRow(
 object ContacttypeRow {
   implicit lazy val decoder: Decoder[ContacttypeRow] = Decoder.forProduct3[ContacttypeRow, ContacttypeId, Name, TypoLocalDateTime]("contacttypeid", "name", "modifieddate")(ContacttypeRow.apply)(ContacttypeId.decoder, Name.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[ContacttypeRow] = Encoder.forProduct3[ContacttypeRow, ContacttypeId, Name, TypoLocalDateTime]("contacttypeid", "name", "modifieddate")(x => (x.contacttypeid, x.name, x.modifieddate))(ContacttypeId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[ContacttypeRow] = new Read[ContacttypeRow](
-    gets = List(
-      (ContacttypeId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => ContacttypeRow(
-      contacttypeid = ContacttypeId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[ContacttypeRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ContacttypeId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    ContacttypeRow(
+      contacttypeid = arr(0).asInstanceOf[ContacttypeId],
+          name = arr(1).asInstanceOf[Name],
+          modifieddate = arr(2).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
   implicit lazy val text: Text[ContacttypeRow] = Text.instance[ContacttypeRow]{ (row, sb) =>
     ContacttypeId.text.unsafeEncode(row.contacttypeid, sb)
     sb.append(Text.DELIMETER)
@@ -57,20 +54,10 @@ object ContacttypeRow {
     sb.append(Text.DELIMETER)
     TypoLocalDateTime.text.unsafeEncode(row.modifieddate, sb)
   }
-  implicit lazy val write: Write[ContacttypeRow] = new Write[ContacttypeRow](
-    puts = List((ContacttypeId.put, Nullability.NoNulls),
-                (Name.put, Nullability.NoNulls),
-                (TypoLocalDateTime.put, Nullability.NoNulls)),
-    toList = x => List(x.contacttypeid, x.name, x.modifieddate),
-    unsafeSet = (rs, i, a) => {
-                  ContacttypeId.put.unsafeSetNonNullable(rs, i + 0, a.contacttypeid)
-                  Name.put.unsafeSetNonNullable(rs, i + 1, a.name)
-                  TypoLocalDateTime.put.unsafeSetNonNullable(rs, i + 2, a.modifieddate)
-                },
-    unsafeUpdate = (ps, i, a) => {
-                     ContacttypeId.put.unsafeUpdateNonNullable(ps, i + 0, a.contacttypeid)
-                     Name.put.unsafeUpdateNonNullable(ps, i + 1, a.name)
-                     TypoLocalDateTime.put.unsafeUpdateNonNullable(ps, i + 2, a.modifieddate)
-                   }
+  implicit lazy val write: Write[ContacttypeRow] = new Write.Composite[ContacttypeRow](
+    List(new Write.Single(ContacttypeId.put),
+         new Write.Single(Name.put),
+         new Write.Single(TypoLocalDateTime.put)),
+    a => List(a.contacttypeid, a.name, a.modifieddate)
   )
 }

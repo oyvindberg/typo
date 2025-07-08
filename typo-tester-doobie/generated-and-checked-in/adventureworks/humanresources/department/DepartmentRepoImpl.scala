@@ -29,28 +29,28 @@ class DepartmentRepoImpl extends DepartmentRepo {
     DeleteBuilder(""""humanresources"."department"""", DepartmentFields.structure)
   }
   override def deleteById(departmentid: DepartmentId): ConnectionIO[Boolean] = {
-    sql"""delete from "humanresources"."department" where "departmentid" = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "humanresources"."department" where "departmentid" = ${fromWrite(departmentid)(new Write.Single(DepartmentId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(departmentids: Array[DepartmentId]): ConnectionIO[Int] = {
     sql"""delete from "humanresources"."department" where "departmentid" = ANY(${departmentids})""".update.run
   }
   override def insert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     sql"""insert into "humanresources"."department"("departmentid", "name", "groupname", "modifieddate")
-          values (${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int4, ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.departmentid)(new Write.Single(DepartmentId.put))}::int4, ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar, ${fromWrite(unsaved.groupname)(new Write.Single(Name.put))}::varchar, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "departmentid", "name", "groupname", "modifieddate"::text
        """.query(using DepartmentRow.read).unique
   }
   override def insert(unsaved: DepartmentRowUnsaved): ConnectionIO[DepartmentRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar")),
-      Some((Fragment.const0(s""""groupname""""), fr"${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""name""""), fr"${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar")),
+      Some((Fragment.const0(s""""groupname""""), fr"${fromWrite(unsaved.groupname)(new Write.Single(Name.put))}::varchar")),
       unsaved.departmentid match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""departmentid""""), fr"${fromWrite(value: DepartmentId)(Write.fromPut(DepartmentId.put))}::int4"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""departmentid""""), fr"${fromWrite(value: DepartmentId)(new Write.Single(DepartmentId.put))}::int4"))
       },
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -82,7 +82,7 @@ class DepartmentRepoImpl extends DepartmentRepo {
     sql"""select "departmentid", "name", "groupname", "modifieddate"::text from "humanresources"."department"""".query(using DepartmentRow.read).stream
   }
   override def selectById(departmentid: DepartmentId): ConnectionIO[Option[DepartmentRow]] = {
-    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from "humanresources"."department" where "departmentid" = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}""".query(using DepartmentRow.read).option
+    sql"""select "departmentid", "name", "groupname", "modifieddate"::text from "humanresources"."department" where "departmentid" = ${fromWrite(departmentid)(new Write.Single(DepartmentId.put))}""".query(using DepartmentRow.read).option
   }
   override def selectByIds(departmentids: Array[DepartmentId]): Stream[ConnectionIO, DepartmentRow] = {
     sql"""select "departmentid", "name", "groupname", "modifieddate"::text from "humanresources"."department" where "departmentid" = ANY(${departmentids})""".query(using DepartmentRow.read).stream
@@ -99,10 +99,10 @@ class DepartmentRepoImpl extends DepartmentRepo {
   override def update(row: DepartmentRow): ConnectionIO[Boolean] = {
     val departmentid = row.departmentid
     sql"""update "humanresources"."department"
-          set "name" = ${fromWrite(row.name)(Write.fromPut(Name.put))}::varchar,
-              "groupname" = ${fromWrite(row.groupname)(Write.fromPut(Name.put))}::varchar,
-              "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "departmentid" = ${fromWrite(departmentid)(Write.fromPut(DepartmentId.put))}"""
+          set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
+              "groupname" = ${fromWrite(row.groupname)(new Write.Single(Name.put))}::varchar,
+              "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "departmentid" = ${fromWrite(departmentid)(new Write.Single(DepartmentId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -110,10 +110,10 @@ class DepartmentRepoImpl extends DepartmentRepo {
   override def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     sql"""insert into "humanresources"."department"("departmentid", "name", "groupname", "modifieddate")
           values (
-            ${fromWrite(unsaved.departmentid)(Write.fromPut(DepartmentId.put))}::int4,
-            ${fromWrite(unsaved.name)(Write.fromPut(Name.put))}::varchar,
-            ${fromWrite(unsaved.groupname)(Write.fromPut(Name.put))}::varchar,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.departmentid)(new Write.Single(DepartmentId.put))}::int4,
+            ${fromWrite(unsaved.name)(new Write.Single(Name.put))}::varchar,
+            ${fromWrite(unsaved.groupname)(new Write.Single(Name.put))}::varchar,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("departmentid")
           do update set

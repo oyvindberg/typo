@@ -10,12 +10,10 @@ package pp
 import adventureworks.customtypes.TypoBytea
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.production.productphoto.ProductphotoId
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pr.pp */
 case class PpViewRow(
@@ -38,24 +36,23 @@ case class PpViewRow(
 object PpViewRow {
   implicit lazy val decoder: Decoder[PpViewRow] = Decoder.forProduct7[PpViewRow, ProductphotoId, ProductphotoId, Option[TypoBytea], Option[/* max 50 chars */ String], Option[TypoBytea], Option[/* max 50 chars */ String], TypoLocalDateTime]("id", "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(PpViewRow.apply)(ProductphotoId.decoder, ProductphotoId.decoder, Decoder.decodeOption(TypoBytea.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(TypoBytea.decoder), Decoder.decodeOption(Decoder.decodeString), TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[PpViewRow] = Encoder.forProduct7[PpViewRow, ProductphotoId, ProductphotoId, Option[TypoBytea], Option[/* max 50 chars */ String], Option[TypoBytea], Option[/* max 50 chars */ String], TypoLocalDateTime]("id", "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")(x => (x.id, x.productphotoid, x.thumbnailphoto, x.thumbnailphotofilename, x.largephoto, x.largephotofilename, x.modifieddate))(ProductphotoId.encoder, ProductphotoId.encoder, Encoder.encodeOption(TypoBytea.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(TypoBytea.encoder), Encoder.encodeOption(Encoder.encodeString), TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[PpViewRow] = new Read[PpViewRow](
-    gets = List(
-      (ProductphotoId.get, Nullability.NoNulls),
-      (ProductphotoId.get, Nullability.NoNulls),
-      (TypoBytea.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoBytea.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => PpViewRow(
-      id = ProductphotoId.get.unsafeGetNonNullable(rs, i + 0),
-      productphotoid = ProductphotoId.get.unsafeGetNonNullable(rs, i + 1),
-      thumbnailphoto = TypoBytea.get.unsafeGetNullable(rs, i + 2),
-      thumbnailphotofilename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 3),
-      largephoto = TypoBytea.get.unsafeGetNullable(rs, i + 4),
-      largephotofilename = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+  implicit lazy val read: Read[PpViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(ProductphotoId.get).asInstanceOf[Read[Any]],
+      new Read.Single(ProductphotoId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoBytea.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoBytea.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    PpViewRow(
+      id = arr(0).asInstanceOf[ProductphotoId],
+          productphotoid = arr(1).asInstanceOf[ProductphotoId],
+          thumbnailphoto = arr(2).asInstanceOf[Option[TypoBytea]],
+          thumbnailphotofilename = arr(3).asInstanceOf[Option[/* max 50 chars */ String]],
+          largephoto = arr(4).asInstanceOf[Option[TypoBytea]],
+          largephotofilename = arr(5).asInstanceOf[Option[/* max 50 chars */ String]],
+          modifieddate = arr(6).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

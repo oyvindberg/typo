@@ -12,11 +12,9 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoXml
 import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: sa.s */
 case class SViewRow(
@@ -39,24 +37,23 @@ case class SViewRow(
 object SViewRow {
   implicit lazy val decoder: Decoder[SViewRow] = Decoder.forProduct7[SViewRow, BusinessentityId, BusinessentityId, Name, Option[BusinessentityId], Option[TypoXml], TypoUUID, TypoLocalDateTime]("id", "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")(SViewRow.apply)(BusinessentityId.decoder, BusinessentityId.decoder, Name.decoder, Decoder.decodeOption(BusinessentityId.decoder), Decoder.decodeOption(TypoXml.decoder), TypoUUID.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[SViewRow] = Encoder.forProduct7[SViewRow, BusinessentityId, BusinessentityId, Name, Option[BusinessentityId], Option[TypoXml], TypoUUID, TypoLocalDateTime]("id", "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")(x => (x.id, x.businessentityid, x.name, x.salespersonid, x.demographics, x.rowguid, x.modifieddate))(BusinessentityId.encoder, BusinessentityId.encoder, Name.encoder, Encoder.encodeOption(BusinessentityId.encoder), Encoder.encodeOption(TypoXml.encoder), TypoUUID.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[SViewRow] = new Read[SViewRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (BusinessentityId.get, Nullability.Nullable),
-      (TypoXml.get, Nullability.Nullable),
-      (TypoUUID.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => SViewRow(
-      id = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 1),
-      name = Name.get.unsafeGetNonNullable(rs, i + 2),
-      salespersonid = BusinessentityId.get.unsafeGetNullable(rs, i + 3),
-      demographics = TypoXml.get.unsafeGetNullable(rs, i + 4),
-      rowguid = TypoUUID.get.unsafeGetNonNullable(rs, i + 5),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 6)
+  implicit lazy val read: Read[SViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoXml.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoUUID.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    SViewRow(
+      id = arr(0).asInstanceOf[BusinessentityId],
+          businessentityid = arr(1).asInstanceOf[BusinessentityId],
+          name = arr(2).asInstanceOf[Name],
+          salespersonid = arr(3).asInstanceOf[Option[BusinessentityId]],
+          demographics = arr(4).asInstanceOf[Option[TypoXml]],
+          rowguid = arr(5).asInstanceOf[TypoUUID],
+          modifieddate = arr(6).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }

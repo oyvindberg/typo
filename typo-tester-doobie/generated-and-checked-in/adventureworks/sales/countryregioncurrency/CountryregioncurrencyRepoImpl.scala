@@ -30,7 +30,7 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     DeleteBuilder(""""sales"."countryregioncurrency"""", CountryregioncurrencyFields.structure)
   }
   override def deleteById(compositeId: CountryregioncurrencyId): ConnectionIO[Boolean] = {
-    sql"""delete from "sales"."countryregioncurrency" where "countryregioncode" = ${fromWrite(compositeId.countryregioncode)(Write.fromPut(CountryregionId.put))} AND "currencycode" = ${fromWrite(compositeId.currencycode)(Write.fromPut(CurrencyId.put))}""".update.run.map(_ > 0)
+    sql"""delete from "sales"."countryregioncurrency" where "countryregioncode" = ${fromWrite(compositeId.countryregioncode)(new Write.Single(CountryregionId.put))} AND "currencycode" = ${fromWrite(compositeId.currencycode)(new Write.Single(CurrencyId.put))}""".update.run.map(_ > 0)
   }
   override def deleteByIds(compositeIds: Array[CountryregioncurrencyId]): ConnectionIO[Int] = {
     val countryregioncode = compositeIds.map(_.countryregioncode)
@@ -44,17 +44,17 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   }
   override def insert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow] = {
     sql"""insert into "sales"."countryregioncurrency"("countryregioncode", "currencycode", "modifieddate")
-          values (${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}, ${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp)
+          values (${fromWrite(unsaved.countryregioncode)(new Write.Single(CountryregionId.put))}, ${fromWrite(unsaved.currencycode)(new Write.Single(CurrencyId.put))}::bpchar, ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp)
           returning "countryregioncode", "currencycode", "modifieddate"::text
        """.query(using CountryregioncurrencyRow.read).unique
   }
   override def insert(unsaved: CountryregioncurrencyRowUnsaved): ConnectionIO[CountryregioncurrencyRow] = {
     val fs = List(
-      Some((Fragment.const0(s""""countryregioncode""""), fr"${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))}")),
-      Some((Fragment.const0(s""""currencycode""""), fr"${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar")),
+      Some((Fragment.const0(s""""countryregioncode""""), fr"${fromWrite(unsaved.countryregioncode)(new Write.Single(CountryregionId.put))}")),
+      Some((Fragment.const0(s""""currencycode""""), fr"${fromWrite(unsaved.currencycode)(new Write.Single(CurrencyId.put))}::bpchar")),
       unsaved.modifieddate match {
         case Defaulted.UseDefault => None
-        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(Write.fromPut(TypoLocalDateTime.put))}::timestamp"))
+        case Defaulted.Provided(value) => Some((Fragment.const0(s""""modifieddate""""), fr"${fromWrite(value: TypoLocalDateTime)(new Write.Single(TypoLocalDateTime.put))}::timestamp"))
       }
     ).flatten
     
@@ -86,7 +86,7 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
     sql"""select "countryregioncode", "currencycode", "modifieddate"::text from "sales"."countryregioncurrency"""".query(using CountryregioncurrencyRow.read).stream
   }
   override def selectById(compositeId: CountryregioncurrencyId): ConnectionIO[Option[CountryregioncurrencyRow]] = {
-    sql"""select "countryregioncode", "currencycode", "modifieddate"::text from "sales"."countryregioncurrency" where "countryregioncode" = ${fromWrite(compositeId.countryregioncode)(Write.fromPut(CountryregionId.put))} AND "currencycode" = ${fromWrite(compositeId.currencycode)(Write.fromPut(CurrencyId.put))}""".query(using CountryregioncurrencyRow.read).option
+    sql"""select "countryregioncode", "currencycode", "modifieddate"::text from "sales"."countryregioncurrency" where "countryregioncode" = ${fromWrite(compositeId.countryregioncode)(new Write.Single(CountryregionId.put))} AND "currencycode" = ${fromWrite(compositeId.currencycode)(new Write.Single(CurrencyId.put))}""".query(using CountryregioncurrencyRow.read).option
   }
   override def selectByIds(compositeIds: Array[CountryregioncurrencyId]): Stream[ConnectionIO, CountryregioncurrencyRow] = {
     val countryregioncode = compositeIds.map(_.countryregioncode)
@@ -110,8 +110,8 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def update(row: CountryregioncurrencyRow): ConnectionIO[Boolean] = {
     val compositeId = row.compositeId
     sql"""update "sales"."countryregioncurrency"
-          set "modifieddate" = ${fromWrite(row.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
-          where "countryregioncode" = ${fromWrite(compositeId.countryregioncode)(Write.fromPut(CountryregionId.put))} AND "currencycode" = ${fromWrite(compositeId.currencycode)(Write.fromPut(CurrencyId.put))}"""
+          set "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
+          where "countryregioncode" = ${fromWrite(compositeId.countryregioncode)(new Write.Single(CountryregionId.put))} AND "currencycode" = ${fromWrite(compositeId.currencycode)(new Write.Single(CurrencyId.put))}"""
       .update
       .run
       .map(_ > 0)
@@ -119,9 +119,9 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def upsert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow] = {
     sql"""insert into "sales"."countryregioncurrency"("countryregioncode", "currencycode", "modifieddate")
           values (
-            ${fromWrite(unsaved.countryregioncode)(Write.fromPut(CountryregionId.put))},
-            ${fromWrite(unsaved.currencycode)(Write.fromPut(CurrencyId.put))}::bpchar,
-            ${fromWrite(unsaved.modifieddate)(Write.fromPut(TypoLocalDateTime.put))}::timestamp
+            ${fromWrite(unsaved.countryregioncode)(new Write.Single(CountryregionId.put))},
+            ${fromWrite(unsaved.currencycode)(new Write.Single(CurrencyId.put))}::bpchar,
+            ${fromWrite(unsaved.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
           )
           on conflict ("countryregioncode", "currencycode")
           do update set

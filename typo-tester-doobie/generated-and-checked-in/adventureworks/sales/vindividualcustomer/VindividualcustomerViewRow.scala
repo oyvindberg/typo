@@ -12,12 +12,10 @@ import adventureworks.person.businessentity.BusinessentityId
 import adventureworks.public.Name
 import adventureworks.public.Phone
 import adventureworks.userdefined.FirstName
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import doobie.util.meta.Meta
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: sales.vindividualcustomer */
 case class VindividualcustomerViewRow(
@@ -62,46 +60,45 @@ case class VindividualcustomerViewRow(
 object VindividualcustomerViewRow {
   implicit lazy val decoder: Decoder[VindividualcustomerViewRow] = Decoder.forProduct18[VindividualcustomerViewRow, BusinessentityId, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, Option[/* max 10 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Int, Name, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, Name, /* max 15 chars */ String, Name, Option[TypoXml]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "demographics")(VindividualcustomerViewRow.apply)(BusinessentityId.decoder, Decoder.decodeOption(Decoder.decodeString), FirstName.decoder, Decoder.decodeOption(Name.decoder), Name.decoder, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeOption(Phone.decoder), Decoder.decodeOption(Name.decoder), Decoder.decodeOption(Decoder.decodeString), Decoder.decodeInt, Name.decoder, Decoder.decodeString, Decoder.decodeOption(Decoder.decodeString), Decoder.decodeString, Name.decoder, Decoder.decodeString, Name.decoder, Decoder.decodeOption(TypoXml.decoder))
   implicit lazy val encoder: Encoder[VindividualcustomerViewRow] = Encoder.forProduct18[VindividualcustomerViewRow, BusinessentityId, Option[/* max 8 chars */ String], /* user-picked */ FirstName, Option[Name], Name, Option[/* max 10 chars */ String], Option[Phone], Option[Name], Option[/* max 50 chars */ String], Int, Name, /* max 60 chars */ String, Option[/* max 60 chars */ String], /* max 30 chars */ String, Name, /* max 15 chars */ String, Name, Option[TypoXml]]("businessentityid", "title", "firstname", "middlename", "lastname", "suffix", "phonenumber", "phonenumbertype", "emailaddress", "emailpromotion", "addresstype", "addressline1", "addressline2", "city", "stateprovincename", "postalcode", "countryregionname", "demographics")(x => (x.businessentityid, x.title, x.firstname, x.middlename, x.lastname, x.suffix, x.phonenumber, x.phonenumbertype, x.emailaddress, x.emailpromotion, x.addresstype, x.addressline1, x.addressline2, x.city, x.stateprovincename, x.postalcode, x.countryregionname, x.demographics))(BusinessentityId.encoder, Encoder.encodeOption(Encoder.encodeString), FirstName.encoder, Encoder.encodeOption(Name.encoder), Name.encoder, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeOption(Phone.encoder), Encoder.encodeOption(Name.encoder), Encoder.encodeOption(Encoder.encodeString), Encoder.encodeInt, Name.encoder, Encoder.encodeString, Encoder.encodeOption(Encoder.encodeString), Encoder.encodeString, Name.encoder, Encoder.encodeString, Name.encoder, Encoder.encodeOption(TypoXml.encoder))
-  implicit lazy val read: Read[VindividualcustomerViewRow] = new Read[VindividualcustomerViewRow](
-    gets = List(
-      (BusinessentityId.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (/* user-picked */ FirstName.get, Nullability.NoNulls),
-      (Name.get, Nullability.Nullable),
-      (Name.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Phone.get, Nullability.Nullable),
-      (Name.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.IntMeta.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.Nullable),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (Meta.StringMeta.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoXml.get, Nullability.Nullable)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => VindividualcustomerViewRow(
-      businessentityid = BusinessentityId.get.unsafeGetNonNullable(rs, i + 0),
-      title = Meta.StringMeta.get.unsafeGetNullable(rs, i + 1),
-      firstname = /* user-picked */ FirstName.get.unsafeGetNonNullable(rs, i + 2),
-      middlename = Name.get.unsafeGetNullable(rs, i + 3),
-      lastname = Name.get.unsafeGetNonNullable(rs, i + 4),
-      suffix = Meta.StringMeta.get.unsafeGetNullable(rs, i + 5),
-      phonenumber = Phone.get.unsafeGetNullable(rs, i + 6),
-      phonenumbertype = Name.get.unsafeGetNullable(rs, i + 7),
-      emailaddress = Meta.StringMeta.get.unsafeGetNullable(rs, i + 8),
-      emailpromotion = Meta.IntMeta.get.unsafeGetNonNullable(rs, i + 9),
-      addresstype = Name.get.unsafeGetNonNullable(rs, i + 10),
-      addressline1 = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 11),
-      addressline2 = Meta.StringMeta.get.unsafeGetNullable(rs, i + 12),
-      city = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 13),
-      stateprovincename = Name.get.unsafeGetNonNullable(rs, i + 14),
-      postalcode = Meta.StringMeta.get.unsafeGetNonNullable(rs, i + 15),
-      countryregionname = Name.get.unsafeGetNonNullable(rs, i + 16),
-      demographics = TypoXml.get.unsafeGetNullable(rs, i + 17)
+  implicit lazy val read: Read[VindividualcustomerViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(BusinessentityId.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(/* user-picked */ FirstName.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Phone.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Name.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.IntMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(Meta.StringMeta.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.SingleOpt(TypoXml.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    VindividualcustomerViewRow(
+      businessentityid = arr(0).asInstanceOf[BusinessentityId],
+          title = arr(1).asInstanceOf[Option[/* max 8 chars */ String]],
+          firstname = arr(2).asInstanceOf[/* user-picked */ FirstName],
+          middlename = arr(3).asInstanceOf[Option[Name]],
+          lastname = arr(4).asInstanceOf[Name],
+          suffix = arr(5).asInstanceOf[Option[/* max 10 chars */ String]],
+          phonenumber = arr(6).asInstanceOf[Option[Phone]],
+          phonenumbertype = arr(7).asInstanceOf[Option[Name]],
+          emailaddress = arr(8).asInstanceOf[Option[/* max 50 chars */ String]],
+          emailpromotion = arr(9).asInstanceOf[Int],
+          addresstype = arr(10).asInstanceOf[Name],
+          addressline1 = arr(11).asInstanceOf[/* max 60 chars */ String],
+          addressline2 = arr(12).asInstanceOf[Option[/* max 60 chars */ String]],
+          city = arr(13).asInstanceOf[/* max 30 chars */ String],
+          stateprovincename = arr(14).asInstanceOf[Name],
+          postalcode = arr(15).asInstanceOf[/* max 15 chars */ String],
+          countryregionname = arr(16).asInstanceOf[Name],
+          demographics = arr(17).asInstanceOf[Option[TypoXml]]
     )
-  )
+  }
 }

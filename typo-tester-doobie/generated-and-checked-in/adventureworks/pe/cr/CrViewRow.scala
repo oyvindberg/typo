@@ -10,11 +10,9 @@ package cr
 import adventureworks.customtypes.TypoLocalDateTime
 import adventureworks.person.countryregion.CountryregionId
 import adventureworks.public.Name
-import doobie.enumerated.Nullability
 import doobie.util.Read
 import io.circe.Decoder
 import io.circe.Encoder
-import java.sql.ResultSet
 
 /** View: pe.cr */
 case class CrViewRow(
@@ -29,16 +27,15 @@ case class CrViewRow(
 object CrViewRow {
   implicit lazy val decoder: Decoder[CrViewRow] = Decoder.forProduct3[CrViewRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(CrViewRow.apply)(CountryregionId.decoder, Name.decoder, TypoLocalDateTime.decoder)
   implicit lazy val encoder: Encoder[CrViewRow] = Encoder.forProduct3[CrViewRow, CountryregionId, Name, TypoLocalDateTime]("countryregioncode", "name", "modifieddate")(x => (x.countryregioncode, x.name, x.modifieddate))(CountryregionId.encoder, Name.encoder, TypoLocalDateTime.encoder)
-  implicit lazy val read: Read[CrViewRow] = new Read[CrViewRow](
-    gets = List(
-      (CountryregionId.get, Nullability.NoNulls),
-      (Name.get, Nullability.NoNulls),
-      (TypoLocalDateTime.get, Nullability.NoNulls)
-    ),
-    unsafeGet = (rs: ResultSet, i: Int) => CrViewRow(
-      countryregioncode = CountryregionId.get.unsafeGetNonNullable(rs, i + 0),
-      name = Name.get.unsafeGetNonNullable(rs, i + 1),
-      modifieddate = TypoLocalDateTime.get.unsafeGetNonNullable(rs, i + 2)
+  implicit lazy val read: Read[CrViewRow] = new Read.CompositeOfInstances(Array(
+    new Read.Single(CountryregionId.get).asInstanceOf[Read[Any]],
+      new Read.Single(Name.get).asInstanceOf[Read[Any]],
+      new Read.Single(TypoLocalDateTime.get).asInstanceOf[Read[Any]]
+  ))(using scala.reflect.ClassTag.Any).map { arr =>
+    CrViewRow(
+      countryregioncode = arr(0).asInstanceOf[CountryregionId],
+          name = arr(1).asInstanceOf[Name],
+          modifieddate = arr(2).asInstanceOf[TypoLocalDateTime]
     )
-  )
+  }
 }
