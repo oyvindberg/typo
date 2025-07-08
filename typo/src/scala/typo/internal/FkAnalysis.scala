@@ -96,7 +96,7 @@ object FkAnalysis {
           remainingThisCols.partition(col => candidateFk.thisFk.cols.contains(col.dbName)) match {
             case (consumedNewCols, rest) if consumedNewCols.nonEmpty =>
               val affectedThisCols = reshuffle(candidateFk, thisOriginalColumns)
-              byFk = (candidateFk.thisFk, ColsFromFk(candidateFk.otherId, affectedThisCols)) :: byFk
+              byFk = (candidateFk.thisFk, ColsFromFk(candidateFk.otherId, affectedThisCols, candidateFk)) :: byFk
               remainingThisCols = rest
             case _ => ()
           }
@@ -107,13 +107,24 @@ object FkAnalysis {
   }
 
   /** A composite ID type from another table, and the columns in this table which can be extracted¬ */
-  case class ColsFromFk(otherCompositeId: IdComputed.Composite, thisColumns: List[ComputedColumn]) {
+  case class ColsFromFk(otherCompositeId: IdComputed.Composite, thisColumns: List[ComputedColumn], candidateFk: CandidateFk) {
+
     def param: sc.Param =
       otherCompositeId.param
     def withParamName(name: sc.Ident): ColsFromFk =
-      copy(otherCompositeId = otherCompositeId.copy(paramName = name))
-    lazy val colPairs: List[(ComputedColumn, ComputedColumn)] =
-      otherCompositeId.cols.toList.zip(thisColumns)
+      copy(otherCompositeId = otherCompositeId.copy(paramName = name), candidateFk = candidateFk)
+    lazy val colPairs: List[(ComputedColumn, ComputedColumn)] = {
+      // Map columns correctly based on FK relationship
+      thisColumns.map { thisCol =>
+        // Find the position of this column in the FK's thisFk.cols
+        val indexInFk = candidateFk.thisFk.cols.toList.indexWhere(_ == thisCol.dbName)
+        // Get the corresponding column name in the other table
+        val otherColName = candidateFk.thisFk.otherCols.toList(indexInFk)
+        // Find the corresponding column in the other composite ID
+        val otherCol = otherCompositeId.cols.find(_.dbName == otherColName).get
+        (otherCol, thisCol)
+      }
+    }
     lazy val expr: Map[sc.Ident, sc.Code] =
       colPairs.map { case (fromId, col) => (col.name, code"${param.name}.${fromId.name}") }.toMap
   }
@@ -190,4 +201,5 @@ object FkAnalysis {
     thisOriginalColumns.toList
       .filter(col => candidateFk.thisFk.cols.contains(col.dbName))
       .sortBy(thisCol => candidateFk.thisFk.cols.toList.indexWhere(_ == thisCol.dbCol.name))
+
 }

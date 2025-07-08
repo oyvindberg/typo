@@ -25,7 +25,7 @@ case class TestSakSoknadsalternativId(
 object TestSakSoknadsalternativId {
   def from(TestUtdanningstilbudId: TestUtdanningstilbudId, organisasjonskodeSaksbehandler: String): TestSakSoknadsalternativId = TestSakSoknadsalternativId(
     organisasjonskodeSaksbehandler = organisasjonskodeSaksbehandler,
-    utdanningsmulighetKode = TestUtdanningstilbudId.organisasjonskode
+    utdanningsmulighetKode = TestUtdanningstilbudId.utdanningsmulighetKode
   )
   implicit lazy val ordering: Ordering[TestSakSoknadsalternativId] = Ordering.by(x => (x.organisasjonskodeSaksbehandler, x.utdanningsmulighetKode))
   implicit lazy val reads: Reads[TestSakSoknadsalternativId] = Reads[TestSakSoknadsalternativId](json => JsResult.fromTry(

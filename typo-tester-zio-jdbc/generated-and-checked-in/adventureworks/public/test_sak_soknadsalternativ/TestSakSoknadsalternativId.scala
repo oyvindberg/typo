@@ -21,7 +21,7 @@ case class TestSakSoknadsalternativId(
 object TestSakSoknadsalternativId {
   def from(TestUtdanningstilbudId: TestUtdanningstilbudId, organisasjonskodeSaksbehandler: String): TestSakSoknadsalternativId = TestSakSoknadsalternativId(
     organisasjonskodeSaksbehandler = organisasjonskodeSaksbehandler,
-    utdanningsmulighetKode = TestUtdanningstilbudId.organisasjonskode
+    utdanningsmulighetKode = TestUtdanningstilbudId.utdanningsmulighetKode
   )
   implicit lazy val jsonDecoder: JsonDecoder[TestSakSoknadsalternativId] = JsonDecoder[Json.Obj].mapOrFail { jsonObj =>
     val organisasjonskodeSaksbehandler = jsonObj.get("organisasjonskode_saksbehandler").toRight("Missing field 'organisasjonskode_saksbehandler'").flatMap(_.as(JsonDecoder.string))
