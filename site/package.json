@@ -12,7 +12,8 @@
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "generate-favicon": "node scripts/generate-favicon.js && cd static/img && magick -density 300 -background transparent favicon.svg -resize 32x32 favicon.ico"
   },
   "dependencies": {
     "@docusaurus/core": "^3.2.1",

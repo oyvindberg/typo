@@ -29,80 +29,79 @@ const ScalaCompileTimesChart = ({id, children: csvData}) => {
             return `hsl(${baseHue}, 70%, ${lightness}%)`;
         };
 
-        const updateChart = view => {
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
+        // Clean up any existing chart before creating a new one
+        let existingChart = Chart.getChart(id);
+        if (existingChart) {
+            existingChart.destroy();
+        }
 
-            const chartData = {
-                labels: libraries,
-                datasets: scalaVersions.flatMap(scalaVersion => {
-                    return inlinedImplicits.map(inlined => {
-                        const data = libraries.map(library => {
-                            const rowData = rows.find(
-                                row =>
-                                    row[0] === library &&
-                                    row[1] === scalaVersion &&
-                                    row[2] === inlined
-                            );
-                            return rowData
-                                ? view === 'avg'
-                                    ? parseFloat(rowData[3])
-                                    : parseFloat(rowData[4])
-                                : 0;
-                        });
-                        return {
-                            label: (inlinedImplicits.length === 1) ? scalaVersion : `${scalaVersion} - Inlined: ${inlined}`,
-                            backgroundColor: generateColor(scalaVersion, inlined),
-                            data: data,
-                        };
+        const chartData = {
+            labels: libraries,
+            datasets: scalaVersions.flatMap(scalaVersion => {
+                return inlinedImplicits.map(inlined => {
+                    const data = libraries.map(library => {
+                        const rowData = rows.find(
+                            row =>
+                                row[0] === library &&
+                                row[1] === scalaVersion &&
+                                row[2] === inlined
+                        );
+                        return rowData
+                            ? selectedView === 'avg'
+                                ? parseFloat(rowData[3])
+                                : parseFloat(rowData[4])
+                            : 0;
                     });
-                }).flat(),
-            };
+                    return {
+                        label: (inlinedImplicits.length === 1) ? scalaVersion : `${scalaVersion} - Inlined: ${inlined}`,
+                        backgroundColor: generateColor(scalaVersion, inlined),
+                        data: data,
+                    };
+                });
+            }).flat(),
+        };
 
-            const ctx = document.getElementById(id).getContext('2d');
-            const newChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: chartData,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text:
-                            view === 'avg'
-                                ? 'Average Compile Times (Seconds)'
-                                : 'Minimum Compile Times (Seconds)',
-                    },
-                    scales: {
-                        y:  {
-                            stacked: false,
-                            ticks: {
-                                beginAtZero: true,
-                                // callback: value => value + 's',
-                            },
-                            title: {
-                                display: true,
-                                text: 'Milliseconds',
-                            },
+        const ctx = document.getElementById(id).getContext('2d');
+        const newChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text:
+                        selectedView === 'avg'
+                            ? 'Average Compile Times (Seconds)'
+                            : 'Minimum Compile Times (Seconds)',
+                },
+                scales: {
+                    y:  {
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            // callback: value => value + 's',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Milliseconds',
                         },
                     },
                 },
-            });
-            setChartInstance(newChartInstance);
-        };
+            },
+        });
+        setChartInstance(newChartInstance);
 
-        updateChart(selectedView);
-
+        // Clean up on unmount
         return () => {
-            if (chartInstance) {
-                chartInstance.destroy();
+            if (newChartInstance) {
+                newChartInstance.destroy();
             }
         };
-    }, [selectedView]);
+    }, [selectedView, csvData, id]);
 
     const handleViewChange = event => {
         setSelectedView(event.target.value);

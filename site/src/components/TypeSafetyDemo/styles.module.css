@@ -1,0 +1,168 @@
+.demo {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, var(--ifm-background-color) 0%, var(--ifm-background-surface-color) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.demo::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, var(--ifm-color-primary-lightest) 0%, transparent 70%);
+  opacity: 0.05;
+  animation: rotate 40s linear infinite reverse;
+}
+
+.demoTitle {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  color: var(--ifm-heading-color);
+  animation: fadeIn 0.8s ease-out;
+}
+
+.demoContainer {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 2rem;
+  align-items: start;
+  animation: fadeIn 1s ease-out 0.2s both;
+}
+
+.sqlSide, .scalaSide {
+  animation: slideIn 0.8s ease-out 0.4s both;
+}
+
+.sqlSide {
+  animation-name: slideInLeft;
+}
+
+.scalaSide {
+  animation-name: slideInRight;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.sqlSide h3, .scalaSide h3 {
+  margin-bottom: 1rem;
+  color: var(--ifm-color-primary);
+  font-size: 1.3rem;
+}
+
+.codeWrapper {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--typo-shadow-md);
+  transition: all var(--typo-transition-normal);
+}
+
+.codeWrapper:hover {
+  box-shadow: var(--typo-shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* Override default CodeBlock styles for better integration */
+.codeWrapper :global(.theme-code-block) {
+  margin: 0;
+}
+
+.codeWrapper :global(.theme-code-block pre) {
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 2rem;
+  color: var(--ifm-color-primary);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.arrowText {
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* Syntax highlighting simulation */
+.codeBlock code::selection {
+  background: var(--ifm-color-primary-lighter);
+  color: white;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .demoContainer {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  
+  .arrow {
+    transform: rotate(90deg);
+    margin: -1rem 0;
+  }
+  
+  .arrowText {
+    transform: rotate(-90deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .demoTitle {
+    font-size: 2rem;
+  }
+  
+  .codeBlock {
+    padding: 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] .codeBlock {
+  background: var(--typo-gray-100);
+  border-color: var(--typo-gray-300);
+}
+
+[data-theme='dark'] .demo::before {
+  opacity: 0.03;
+}

@@ -1,0 +1,14 @@
+.logoContainer {
+  display: inline-block;
+  position: relative;
+}
+
+.animatedLogo {
+  width: 100%;
+  height: 100%;
+}
+
+.staticLogo {
+  width: 100%;
+  height: 100%;
+}

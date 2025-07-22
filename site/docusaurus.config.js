@@ -10,6 +10,18 @@ const config = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
+  
+  // Modern browsers prefer SVG favicons
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'icon',
+        type: 'image/svg+xml',
+        href: '/typo/img/favicon.svg',
+      },
+    },
+  ],
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -83,7 +95,7 @@ const config = {
       },
       prism: {
         theme: require("prism-react-renderer").themes.github,
-        darkTheme: require("prism-react-renderer").themes.oceanicNext,
+        darkTheme: require("prism-react-renderer").themes.dracula,
         additionalLanguages: ["java", "scala", "yaml", "sql"],
       },
     }),

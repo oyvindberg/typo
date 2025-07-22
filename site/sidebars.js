@@ -47,10 +47,11 @@ const sidebars = {
         },
         {
             type: "category",
-            label: "Other features",
+            label: "Advanced Features",
             collapsible: true,
             collapsed: false,
             items: [
+                {type: "doc", id: "other-features/dsl-in-depth"},
                 {type: "doc", id: "other-features/streaming-inserts"},
                 {type: "doc", id: "other-features/generate-into-multiple-projects"},
                 {type: "doc", id: "other-features/json"},

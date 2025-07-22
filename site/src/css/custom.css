@@ -4,27 +4,492 @@
  * work well for content-centric websites.
  */
 
-/* You can override the default Infima variables here. */
+/* Import beautiful fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* Elegant purple palette inspired by Felis */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  /* Primary colors - Rich purple */
+  --ifm-color-primary: #8b5cf6;
+  --ifm-color-primary-dark: #7c3aed;
+  --ifm-color-primary-darker: #6d28d9;
+  --ifm-color-primary-darkest: #5b21b6;
+  --ifm-color-primary-light: #a78bfa;
+  --ifm-color-primary-lighter: #c4b5fd;
+  --ifm-color-primary-lightest: #ddd6fe;
+  
+  /* Accent colors - Emerald green */
+  --typo-accent: #10b981;
+  --typo-accent-light: #34d399;
+  --typo-accent-dark: #059669;
+  
+  /* Database grays */
+  --typo-gray-900: #1a1a1a;
+  --typo-gray-800: #2d2d2d;
+  --typo-gray-700: #404040;
+  --typo-gray-600: #525252;
+  --typo-gray-500: #737373;
+  --typo-gray-400: #999999;
+  --typo-gray-300: #bfbfbf;
+  --typo-gray-200: #e6e6e6;
+  --typo-gray-100: #f5f5f5;
+  
+  /* Typography - Beautiful fonts */
+  --ifm-font-family-base: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --ifm-font-family-monospace: "JetBrains Mono", "Fira Code", "Consolas", monospace;
   --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-heading-font-weight: 800;
+  --ifm-font-weight-semibold: 600;
+  --ifm-font-weight-bold: 700;
+  --ifm-line-height-base: 1.65;
+  
+  /* Spacing */
+  --ifm-spacing-horizontal: 1.5rem;
+  --ifm-spacing-vertical: 1.5rem;
+  
+  /* Borders and Shadows */
+  --ifm-global-radius: 8px;
+  --typo-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --typo-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --typo-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --typo-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Transitions */
+  --typo-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --typo-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --typo-transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Code highlighting */
+  --docusaurus-highlighted-code-line-bg: rgba(51, 103, 145, 0.15);
+  
+  /* Gradients */
+  --typo-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --typo-gradient-accent: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+  --typo-gradient-magic: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  
+  /* Background colors */
+  --typo-hero-bg-light: #faf5ff;
+  --typo-hero-bg-dark: #1e1b4b;
+  
+  /* Code block colors */
+  --typo-code-keyword: #8b5cf6;
+  --typo-code-string: #10b981;
+  --typo-code-function: #3b82f6;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+/* Dark mode with elegant contrast */
 [data-theme="dark"] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  /* Primary colors - Lighter purple for dark mode */
+  --ifm-color-primary: #a78bfa;
+  --ifm-color-primary-dark: #9333ea;
+  --ifm-color-primary-darker: #7e22ce;
+  --ifm-color-primary-darkest: #6b21a8;
+  --ifm-color-primary-light: #c4b5fd;
+  --ifm-color-primary-lighter: #ddd6fe;
+  --ifm-color-primary-lightest: #ede9fe;
+  
+  /* Accent colors - Brighter green for dark mode */
+  --typo-accent: #34d399;
+  --typo-accent-light: #6ee7b7;
+  --typo-accent-dark: #10b981;
+  
+  /* Dark mode grays */
+  --typo-gray-900: #f5f5f5;
+  --typo-gray-800: #e6e6e6;
+  --typo-gray-700: #bfbfbf;
+  --typo-gray-600: #999999;
+  --typo-gray-500: #737373;
+  --typo-gray-400: #525252;
+  --typo-gray-300: #404040;
+  --typo-gray-200: #2d2d2d;
+  --typo-gray-100: #1a1a1a;
+  
+  /* Dark mode specific */
+  --ifm-background-color: #0f0f0f;
+  --ifm-background-surface-color: #1a1a1a;
+  --docusaurus-highlighted-code-line-bg: rgba(79, 155, 217, 0.2);
+  
+  /* Dark mode gradients */
+  --typo-gradient-primary: linear-gradient(135deg, #a78bfa 0%, #c4b5fd 100%);
+  --typo-gradient-accent: linear-gradient(135deg, #a78bfa 0%, #34d399 100%);
+  --typo-gradient-magic: linear-gradient(135deg, #c4b5fd 0%, #34d399 100%);
+  
+  /* Enhanced shadows for dark mode */
+  --typo-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --typo-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --typo-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --typo-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+}
+
+/* Global animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--ifm-color-primary), 0 0 10px var(--ifm-color-primary);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--ifm-color-primary), 0 0 30px var(--ifm-color-primary);
+  }
+}
+
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+/* Enhanced typography */
+.hero__title {
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* Subtle sparkle effect for special elements */
+.sparkle {
+  position: relative;
+}
+
+.sparkle::after {
+  content: '✨';
+  position: absolute;
+  top: -0.5em;
+  right: -1.5em;
+  font-size: 0.7em;
+  animation: sparkle 3s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+.hero__subtitle {
+  animation: fadeIn 1s ease-out 0.2s both;
+}
+
+/* Button enhancements */
+.button {
+  position: relative;
+  overflow: hidden;
+  transition: all var(--typo-transition-normal);
+  font-weight: 600;
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.button--primary {
+  background: var(--ifm-color-primary);
+  border: none;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.2);
+  font-weight: 600;
+}
+
+.button--primary:hover {
+  background: var(--ifm-color-primary-dark);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  transform: translateY(-1px);
+}
+
+.button--outline {
+  border: 2px solid var(--ifm-color-primary);
+  background: transparent;
+  color: var(--ifm-color-primary);
+  font-weight: 600;
+}
+
+.button--outline:hover {
+  background: var(--ifm-color-primary);
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Card animations */
+.card {
+  transition: all var(--typo-transition-normal);
+  box-shadow: var(--typo-shadow-md);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--typo-shadow-xl);
+}
+
+/* Navigation enhancements */
+.navbar__link {
+  position: relative;
+  transition: all var(--typo-transition-fast);
+}
+
+.navbar__link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--ifm-color-primary);
+  transition: width var(--typo-transition-normal);
+  border-radius: 2px;
+}
+
+.navbar__link:hover::after,
+.navbar__link--active::after {
+  width: 100%;
+}
+
+/* Code block enhancements */
+.theme-code-block {
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.theme-code-block pre {
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.theme-code-block pre code {
+  font-family: var(--ifm-font-family-monospace);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Feature cards animation */
+.features_src-components-HomepageFeatures-styles-module {
+  animation: fadeIn 0.8s ease-out 0.4s both;
+}
+
+/* Enhanced links */
+a {
+  position: relative;
+  transition: color var(--typo-transition-fast);
+}
+
+article a:not(.hash-link):hover {
+  color: var(--ifm-color-primary-darker);
+}
+
+/* Table enhancements */
+table {
+  animation: fadeIn 0.5s ease-out;
+  box-shadow: var(--typo-shadow-sm);
+  border-radius: var(--ifm-global-radius);
+  overflow: hidden;
+}
+
+table thead {
+  background: var(--typo-gradient-primary);
+  color: white;
+}
+
+[data-theme="dark"] table thead {
+  background: var(--typo-gray-200);
+  color: var(--typo-gray-900);
+}
+
+/* Hero section background animation */
+.hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, var(--ifm-color-primary-lightest) 0%, transparent 70%);
+  opacity: 0.1;
+  animation: rotate 30s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Badge styling */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  color: white;
+  background: var(--typo-gradient-accent);
+  border-radius: 9999px;
+  animation: pulse 2s infinite;
+}
+
+/* Loading animation for async content */
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--ifm-color-primary-lightest);
+  border-radius: 50%;
+  border-top-color: var(--ifm-color-primary);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hover effects for interactive elements */
+.interactive {
+  transition: all var(--typo-transition-normal);
+  cursor: pointer;
+}
+
+.interactive:hover {
+  transform: scale(1.02);
+}
+
+/* Sidebar enhancements */
+.menu__link {
+  transition: all var(--typo-transition-fast);
+  border-left: 3px solid transparent;
+}
+
+.menu__link:hover {
+  background-color: var(--ifm-menu-color-background-hover);
+  border-left-color: var(--ifm-color-primary);
+}
+
+.menu__link--active {
+  border-left-color: var(--ifm-color-primary);
+  font-weight: 600;
+}
+
+/* Footer enhancements */
+.footer {
+  background: linear-gradient(to bottom, var(--ifm-background-surface-color), var(--ifm-background-color));
+}
+
+.footer__links {
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* Navbar logo customization */
+.navbar__logo {
+  height: 2rem;
+  width: 2rem;
+  margin-right: 0.5rem;
+}
+
+.navbar__logo .logoContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+/* Ensure TypoLogo scales properly in navbar */
+.navbar__logo svg {
+  height: 100%;
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 996px) {
+  :root {
+    --ifm-spacing-horizontal: 1rem;
+    --ifm-spacing-vertical: 1rem;
+  }
+}
+
+
+/* Performance fix - disable heavy animations causing high CPU */
+@media screen {
+  /* Disable the heaviest animations only on specific components */
+  .floatingShape,
+  .gridOverlay,
+  .animatedBackground,
+  .magicalWizard *,
+  .wizardContainer * {
+    animation: none \!important;
+    transition: none \!important;
+  }
+  
+  /* Remove performance-heavy filters */
+  .floatingShape,
+  .animatedBackground * {
+    filter: none \!important;
+  }
 }

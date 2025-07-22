@@ -1,0 +1,277 @@
+/* 🧙‍♂️ MAGICAL WIZARD COMPONENT */
+.wizard {
+  display: inline-block;
+  position: relative;
+  margin: 1rem;
+}
+
+.wizardContainer {
+  position: relative;
+  animation: wizardFloat 3s ease-in-out infinite;
+}
+
+.wizardSmall {
+  transform: scale(0.6);
+}
+
+.wizardMedium {
+  transform: scale(1);
+}
+
+.wizardLarge {
+  transform: scale(1.5);
+}
+
+/* Wizard Hat */
+.wizardHat {
+  width: 60px;
+  height: 40px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  position: relative;
+  margin: 0 auto;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.hatStar {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 20px;
+  animation: starTwinkle 2s ease-in-out infinite;
+}
+
+/* Wizard Head */
+.wizardHead {
+  width: 50px;
+  height: 50px;
+  background: #fbbf24;
+  border-radius: 50%;
+  position: relative;
+  margin: -10px auto 0;
+  box-shadow: 0 2px 10px rgba(251, 191, 36, 0.3);
+}
+
+.wizardEyes {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 12px 0;
+}
+
+.eye {
+  width: 8px;
+  height: 8px;
+  background: #334155;
+  border-radius: 50%;
+  position: relative;
+}
+
+.eye::after {
+  content: '';
+  width: 3px;
+  height: 3px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 1px;
+  left: 2px;
+}
+
+.wizardSmile {
+  width: 20px;
+  height: 10px;
+  border: 2px solid #334155;
+  border-top: none;
+  border-radius: 0 0 20px 20px;
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Wizard Body */
+.wizardBody {
+  width: 60px;
+  height: 80px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+  border-radius: 30px 30px 50px 50px;
+  margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+}
+
+/* Wizard Beard */
+.wizardBeard {
+  width: 30px;
+  height: 20px;
+  background: #e2e8f0;
+  border-radius: 0 0 15px 15px;
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.8;
+}
+
+/* Magic Staff */
+.magicStaff {
+  position: absolute;
+  left: -20px;
+  top: 30px;
+}
+
+.staffHandle {
+  width: 4px;
+  height: 60px;
+  background: linear-gradient(to bottom, #fbbf24, #f59e0b);
+  border-radius: 2px;
+  position: relative;
+}
+
+.staffCrystal {
+  width: 12px;
+  height: 18px;
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+  border-radius: 50%;
+  position: absolute;
+  top: -8px;
+  left: -4px;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+  animation: crystalGlow 2s ease-in-out infinite;
+}
+
+/* Magic Sparkles */
+.sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 12px;
+  animation: sparkleFloat 3s ease-in-out infinite;
+}
+
+.sparkle1 {
+  top: 10px;
+  right: 10px;
+  animation-delay: 0s;
+}
+
+.sparkle2 {
+  top: 40px;
+  right: -10px;
+  animation-delay: 1s;
+}
+
+.sparkle3 {
+  top: 70px;
+  right: 5px;
+  animation-delay: 2s;
+}
+
+/* Speech Bubble */
+.speechBubble {
+  position: absolute;
+  top: -40px;
+  right: -80px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 8px 12px;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(10px);
+  animation: speechAppear 4s ease-in-out infinite;
+}
+
+.speechBubble::before {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 20px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid rgba(255, 255, 255, 0.95);
+}
+
+.speechText {
+  font-size: 10px;
+  font-weight: 600;
+  color: #6366f1;
+  white-space: nowrap;
+}
+
+/* Animations */
+@keyframes wizardFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes starTwinkle {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+@keyframes crystalGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(6, 182, 212, 0.8);
+  }
+}
+
+@keyframes sparkleFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-5px) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+@keyframes speechAppear {
+  0%, 70% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  80%, 90% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+
+/* Hover Effects */
+.wizard:hover .wizardContainer {
+  animation-duration: 1s;
+}
+
+.wizard:hover .speechBubble {
+  animation-duration: 2s;
+}
+
+.wizard:hover .sparkle {
+  animation-duration: 1.5s;
+}

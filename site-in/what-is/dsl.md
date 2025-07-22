@@ -68,6 +68,7 @@ There is also a `delete` DSL, similar to `select` and `update`. It has no video 
 
 ## Further reading
 
+- [DSL In-Depth Guide](../other-features/dsl-in-depth.md) for comprehensive coverage of all DSL features with examples
 - [Getting started](../setup.md) for some information about how to set up the DSL.
 - [Limitations](../limitations.md) for a caveat on how PostgreSQL infers nullability. 
 - [Customize sql files](../customization/customize-sql-files.md) for how to override parameter/column names, types and nullability

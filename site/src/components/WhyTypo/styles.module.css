@@ -1,0 +1,136 @@
+.whyTypo {
+  padding: 5rem 0;
+  background: var(--ifm-background-color);
+}
+
+.title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 3rem;
+  color: var(--ifm-heading-color);
+}
+
+.comparisonGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.comparisonItem {
+  background: var(--ifm-card-background-color);
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  transition: all var(--typo-transition-normal);
+}
+
+.comparisonItem:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.08);
+  border-color: var(--ifm-color-primary-lighter);
+}
+
+.comparisonItem h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: var(--ifm-color-primary);
+}
+
+.benefitsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.benefitsList li {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: var(--ifm-font-color-base);
+}
+
+.benefitsList li:last-child {
+  margin-bottom: 0;
+}
+
+.benefitsList strong {
+  color: var(--ifm-heading-color);
+}
+
+.testimonial {
+  background: var(--typo-gradient-primary);
+  border-radius: 16px;
+  padding: 3rem;
+  text-align: center;
+  margin-bottom: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.testimonial::before {
+  content: '"';
+  position: absolute;
+  top: -20px;
+  left: 20px;
+  font-size: 120px;
+  opacity: 0.1;
+  color: white;
+  font-family: serif;
+}
+
+.quote {
+  font-size: 1.5rem;
+  line-height: 1.6;
+  color: white;
+  margin: 0 auto 1rem;
+  max-width: 800px;
+}
+
+.quote strong {
+  font-weight: 800;
+}
+
+.attribution {
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+  margin: 0;
+}
+
+.bottomCTA {
+  text-align: center;
+}
+
+.bottomCTA h3 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.bottomCTA p {
+  font-size: 1.25rem;
+  color: var(--ifm-font-color-secondary);
+  margin-bottom: 2rem;
+}
+
+.ctaButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+@media (max-width: 1200px) {
+  .comparisonGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .ctaButtons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .quote {
+    font-size: 1.25rem;
+  }
+}

@@ -39,6 +39,24 @@ val options = Options(
 | `rewriteDatabase`        | Let's you perform arbitrary rewrites of database schema snapshot. you can add/remove rows, foreign keys and so on.                                                                                            |
 | `openEnums`              | Controls if you want to tag tables ids as [open string enums](../type-safety/open-string-enums.md)                                                                                                            |
 
+## Database Libraries
+
+Typo supports multiple Scala database libraries, each with specific optimizations:
+
+- **Anorm** (`DbLibName.Anorm`) - Lightweight SQL parser for Play Framework
+- **Doobie** (`DbLibName.Doobie`) - Functional JDBC layer for Cats Effect
+- **ZIO-JDBC** (`DbLibName.ZioJdbc`) - Type-safe JDBC wrapper for ZIO
+
+Each library generates code optimized for that specific ecosystem, including appropriate return types, error handling, and integration patterns.
+
+```scala
+val options = Options(
+  pkg = "myapp.db",
+  dbLib = Some(DbLibName.Anorm), // Choose your library
+  // ... other options
+)
+```
+
 ## Development options
 
 | Field Name        | Effect                                                                                                  |

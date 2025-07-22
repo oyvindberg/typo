@@ -109,6 +109,9 @@ scripts:
   generate-docs:
     main: scripts.GenDocumentation
     project: typo-scripts-doc
+  generate-frontpage:
+    main: scripts.GeneratedFrontpage
+    project: typo-scripts
   generate-sources:
     main: scripts.GeneratedSources
     project: typo-scripts
