@@ -251,6 +251,45 @@ npm run serve
 - Check `bleep.yaml` for script configurations
 - Use database introspection tools to verify schema
 
+### Working with Frontpage Code Examples
+
+The website's code examples are generated from real Typo code using the `frontpage` schema in the test database. This ensures that all examples shown on the website are accurate and compile correctly.
+
+**Schema Location**: `init/data/frontpage/` contains:
+- `schema.sql` - Database schema for frontpage examples
+- `*.sql` - SQL files that generate Typo repositories and types
+
+**Generation Process**:
+1. **Modify Schema**: Edit files in `init/data/frontpage/` to change database structure or add new examples
+2. **Restart Database**: Run `docker-compose down && docker-compose up -d` to apply schema changes  
+3. **Generate Code**: Run `bleep run GeneratedFrontpage` to generate fresh Scala code
+4. **Update Website**: Manually copy the generated code from `frontpage-generated/` into website components in `site/src/components/FeatureShowcase/index.js`
+
+**Important Notes**:
+- The `frontpage-generated/` directory is gitignored - we don't check in generated code
+- The frontpage schema uses real PostgreSQL features (domains, enums, foreign keys) to showcase Typo's capabilities
+- Always verify examples compile by running `bleep generate-docs` after updating website code
+- This is the only part of the documentation workflow that requires manual copying of generated code
+- Website logo and favicon can be regenerated using `site/scripts/generate-logo.js` and `npm run generate-favicon`
+
+**Example Workflow**:
+```bash
+# 1. Edit schema 
+vi init/data/frontpage/schema.sql
+
+# 2. Restart database
+docker-compose down && docker-compose up -d  
+
+# 3. Generate fresh code
+bleep run GeneratedFrontpage
+
+# 4. Copy relevant parts to website (manual step)
+# Look in frontpage-generated/ for the code you need
+
+# 5. Verify documentation builds
+bleep generate-docs
+```
+
 ## Troubleshooting
 
 ### Common Issues
