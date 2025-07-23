@@ -26,7 +26,7 @@ object GeneratedAdventureWorks {
       .use { logger =>
         val ds = TypoDataSource.hikari(server = "localhost", port = 6432, databaseName = "Adventureworks", username = "postgres", password = "password")
         val scriptsPath = buildDir.resolve("adventureworks_sql")
-        val selector = Selector.ExcludePostgresInternal
+        val selector = Selector.ExcludePostgresInternal and !Selector.schemas("frontpage")
         val typoLogger = TypoLogger.Console
         val metadb = Await.result(MetaDb.fromDb(typoLogger, ds, selector, schemaMode = SchemaMode.MultiSchema), Duration.Inf)
         val openEnumSelector = Selector.relationNames("title", "title_domain", "issue142")
