@@ -31,13 +31,71 @@ import adventureworks.customtypes.TypoUUID
 import adventureworks.customtypes.TypoUnknownCitext
 import adventureworks.customtypes.TypoVector
 import adventureworks.customtypes.TypoXml
-import adventureworks.humanresources.department.DepartmentId
-import adventureworks.humanresources.department.DepartmentRepoImpl
-import adventureworks.humanresources.department.DepartmentRow
-import adventureworks.humanresources.department.DepartmentRowUnsaved
-import adventureworks.humanresources.employee.EmployeeRepoImpl
-import adventureworks.humanresources.employee.EmployeeRow
-import adventureworks.humanresources.employee.EmployeeRowUnsaved
+import adventureworks.frontpage.Email
+import adventureworks.frontpage.OrderStatus
+import adventureworks.frontpage.UserRole
+import adventureworks.frontpage.UserStatus
+import adventureworks.frontpage.address.AddressId
+import adventureworks.frontpage.address.AddressRepoImpl
+import adventureworks.frontpage.address.AddressRow
+import adventureworks.frontpage.address.AddressRowUnsaved
+import adventureworks.frontpage.category.CategoryId
+import adventureworks.frontpage.category.CategoryRepoImpl
+import adventureworks.frontpage.category.CategoryRow
+import adventureworks.frontpage.category.CategoryRowUnsaved
+import adventureworks.frontpage.company.CompanyId
+import adventureworks.frontpage.company.CompanyRepoImpl
+import adventureworks.frontpage.company.CompanyRow
+import adventureworks.frontpage.company.CompanyRowUnsaved
+import adventureworks.frontpage.customer.CustomerId
+import adventureworks.frontpage.customer.CustomerRepoImpl
+import adventureworks.frontpage.customer.CustomerRow
+import adventureworks.frontpage.customer.CustomerRowUnsaved
+import adventureworks.frontpage.department.DepartmentId
+import adventureworks.frontpage.department.DepartmentRepoImpl
+import adventureworks.frontpage.department.DepartmentRow
+import adventureworks.frontpage.department.DepartmentRowUnsaved
+import adventureworks.frontpage.employee.EmployeeId
+import adventureworks.frontpage.employee.EmployeeRepoImpl
+import adventureworks.frontpage.employee.EmployeeRow
+import adventureworks.frontpage.employee.EmployeeRowUnsaved
+import adventureworks.frontpage.location.LocationId
+import adventureworks.frontpage.location.LocationRepoImpl
+import adventureworks.frontpage.location.LocationRow
+import adventureworks.frontpage.location.LocationRowUnsaved
+import adventureworks.frontpage.order.OrderId
+import adventureworks.frontpage.order.OrderRepoImpl
+import adventureworks.frontpage.order.OrderRow
+import adventureworks.frontpage.order.OrderRowUnsaved
+import adventureworks.frontpage.order_item.OrderItemId
+import adventureworks.frontpage.order_item.OrderItemRepoImpl
+import adventureworks.frontpage.order_item.OrderItemRow
+import adventureworks.frontpage.order_item.OrderItemRowUnsaved
+import adventureworks.frontpage.permission.PermissionId
+import adventureworks.frontpage.permission.PermissionRepoImpl
+import adventureworks.frontpage.permission.PermissionRow
+import adventureworks.frontpage.permission.PermissionRowUnsaved
+import adventureworks.frontpage.person.PersonId
+import adventureworks.frontpage.person.PersonRepoImpl
+import adventureworks.frontpage.person.PersonRow
+import adventureworks.frontpage.person.PersonRowUnsaved
+import adventureworks.frontpage.product.ProductId
+import adventureworks.frontpage.product.ProductRepoImpl
+import adventureworks.frontpage.product.ProductRow
+import adventureworks.frontpage.product.ProductRowUnsaved
+import adventureworks.frontpage.product_category.ProductCategoryRepoImpl
+import adventureworks.frontpage.product_category.ProductCategoryRow
+import adventureworks.frontpage.role.RoleId
+import adventureworks.frontpage.role.RoleRepoImpl
+import adventureworks.frontpage.role.RoleRow
+import adventureworks.frontpage.role.RoleRowUnsaved
+import adventureworks.frontpage.user.UserId
+import adventureworks.frontpage.user.UserRepoImpl
+import adventureworks.frontpage.user.UserRow
+import adventureworks.frontpage.user.UserRowUnsaved
+import adventureworks.frontpage.user_permission.UserPermissionRepoImpl
+import adventureworks.frontpage.user_permission.UserPermissionRow
+import adventureworks.frontpage.user_permission.UserPermissionRowUnsaved
 import adventureworks.humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRepoImpl
 import adventureworks.humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRow
 import adventureworks.humanresources.employeedepartmenthistory.EmployeedepartmenthistoryRowUnsaved
@@ -52,10 +110,6 @@ import adventureworks.humanresources.shift.ShiftId
 import adventureworks.humanresources.shift.ShiftRepoImpl
 import adventureworks.humanresources.shift.ShiftRow
 import adventureworks.humanresources.shift.ShiftRowUnsaved
-import adventureworks.person.address.AddressId
-import adventureworks.person.address.AddressRepoImpl
-import adventureworks.person.address.AddressRow
-import adventureworks.person.address.AddressRowUnsaved
 import adventureworks.person.addresstype.AddresstypeId
 import adventureworks.person.addresstype.AddresstypeRepoImpl
 import adventureworks.person.addresstype.AddresstypeRow
@@ -84,9 +138,6 @@ import adventureworks.person.emailaddress.EmailaddressRowUnsaved
 import adventureworks.person.password.PasswordRepoImpl
 import adventureworks.person.password.PasswordRow
 import adventureworks.person.password.PasswordRowUnsaved
-import adventureworks.person.person.PersonRepoImpl
-import adventureworks.person.person.PersonRow
-import adventureworks.person.person.PersonRowUnsaved
 import adventureworks.person.personphone.PersonphoneRepoImpl
 import adventureworks.person.personphone.PersonphoneRow
 import adventureworks.person.personphone.PersonphoneRowUnsaved
@@ -113,14 +164,6 @@ import adventureworks.production.illustration.IllustrationId
 import adventureworks.production.illustration.IllustrationRepoImpl
 import adventureworks.production.illustration.IllustrationRow
 import adventureworks.production.illustration.IllustrationRowUnsaved
-import adventureworks.production.location.LocationId
-import adventureworks.production.location.LocationRepoImpl
-import adventureworks.production.location.LocationRow
-import adventureworks.production.location.LocationRowUnsaved
-import adventureworks.production.product.ProductId
-import adventureworks.production.product.ProductRepoImpl
-import adventureworks.production.product.ProductRow
-import adventureworks.production.product.ProductRowUnsaved
 import adventureworks.production.productcategory.ProductcategoryId
 import adventureworks.production.productcategory.ProductcategoryRepoImpl
 import adventureworks.production.productcategory.ProductcategoryRow
@@ -267,10 +310,6 @@ import adventureworks.sales.currencyrate.CurrencyrateId
 import adventureworks.sales.currencyrate.CurrencyrateRepoImpl
 import adventureworks.sales.currencyrate.CurrencyrateRow
 import adventureworks.sales.currencyrate.CurrencyrateRowUnsaved
-import adventureworks.sales.customer.CustomerId
-import adventureworks.sales.customer.CustomerRepoImpl
-import adventureworks.sales.customer.CustomerRow
-import adventureworks.sales.customer.CustomerRowUnsaved
 import adventureworks.sales.personcreditcard.PersoncreditcardRepoImpl
 import adventureworks.sales.personcreditcard.PersoncreditcardRow
 import adventureworks.sales.personcreditcard.PersoncreditcardRowUnsaved
@@ -331,11 +370,88 @@ import java.time.ZoneOffset
 import scala.util.Random
 
 class TestInsert(random: Random, domainInsert: TestDomainInsert) {
+  def frontpageAddress(city: String = random.alphanumeric.take(20).mkString,
+                       country: String = random.alphanumeric.take(20).mkString,
+                       id: Defaulted[AddressId] = Defaulted.UseDefault
+                      )(implicit c: Connection): AddressRow = (new AddressRepoImpl).insert(new AddressRowUnsaved(city = city, country = country, id = id))
+  def frontpageCategory(name: String = random.alphanumeric.take(20).mkString, id: Defaulted[CategoryId] = Defaulted.UseDefault)(implicit c: Connection): CategoryRow = (new CategoryRepoImpl).insert(new CategoryRowUnsaved(name = name, id = id))
+  def frontpageCompany(name: String = random.alphanumeric.take(20).mkString, id: Defaulted[CompanyId] = Defaulted.UseDefault)(implicit c: Connection): CompanyRow = (new CompanyRepoImpl).insert(new CompanyRowUnsaved(name = name, id = id))
+  def frontpageCustomer(userId: Option[UserId] = None,
+                        companyName: Option[String] = if (random.nextBoolean()) None else Some(random.alphanumeric.take(20).mkString),
+                        creditLimit: Option[BigDecimal] = if (random.nextBoolean()) None else Some(BigDecimal.decimal(random.nextDouble())),
+                        id: Defaulted[CustomerId] = Defaulted.UseDefault,
+                        verified: Defaulted[Option[Boolean]] = Defaulted.UseDefault
+                       )(implicit c: Connection): CustomerRow = (new CustomerRepoImpl).insert(new CustomerRowUnsaved(userId = userId, companyName = companyName, creditLimit = creditLimit, id = id, verified = verified))
+  def frontpageDepartment(name: String = random.alphanumeric.take(20).mkString,
+                          budget: Option[BigDecimal] = if (random.nextBoolean()) None else Some(BigDecimal.decimal(random.nextDouble())),
+                          companyId: Option[CompanyId] = None,
+                          id: Defaulted[DepartmentId] = Defaulted.UseDefault
+                         )(implicit c: Connection): DepartmentRow = (new DepartmentRepoImpl).insert(new DepartmentRowUnsaved(name = name, budget = budget, companyId = companyId, id = id))
+  def frontpageEmployee(personId: PersonId,
+                        salary: Option[BigDecimal] = if (random.nextBoolean()) None else Some(BigDecimal.decimal(random.nextDouble())),
+                        id: Defaulted[EmployeeId] = Defaulted.UseDefault
+                       )(implicit c: Connection): EmployeeRow = (new EmployeeRepoImpl).insert(new EmployeeRowUnsaved(personId = personId, salary = salary, id = id))
+  def frontpageLocation(name: String = random.alphanumeric.take(20).mkString,
+                        position: Option[TypoPoint] = None,
+                        area: Option[TypoPolygon] = None,
+                        ipRange: Option[TypoInet] = None,
+                        id: Defaulted[LocationId] = Defaulted.UseDefault,
+                        metadata: Defaulted[Option[TypoJsonb]] = Defaulted.UseDefault
+                       )(implicit c: Connection): LocationRow = (new LocationRepoImpl).insert(new LocationRowUnsaved(name = name, position = position, area = area, ipRange = ipRange, id = id, metadata = metadata))
+  def frontpageOrder(userId: Option[UserId] = None,
+                     productId: Option[ProductId] = None,
+                     total: BigDecimal = BigDecimal.decimal(random.nextDouble()),
+                     shippedAt: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
+                     id: Defaulted[OrderId] = Defaulted.UseDefault,
+                     status: Defaulted[Option[OrderStatus]] = Defaulted.UseDefault,
+                     createdAt: Defaulted[Option[TypoLocalDateTime]] = Defaulted.UseDefault
+                    )(implicit c: Connection): OrderRow = (new OrderRepoImpl).insert(new OrderRowUnsaved(userId = userId, productId = productId, total = total, shippedAt = shippedAt, id = id, status = status, createdAt = createdAt))
+  def frontpageOrderItem(orderId: Option[OrderId] = None,
+                         productId: Option[ProductId] = None,
+                         quantity: Int = random.nextInt(),
+                         price: BigDecimal = BigDecimal.decimal(random.nextDouble()),
+                         shippedAt: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
+                         id: Defaulted[OrderItemId] = Defaulted.UseDefault
+                        )(implicit c: Connection): OrderItemRow = (new OrderItemRepoImpl).insert(new OrderItemRowUnsaved(orderId = orderId, productId = productId, quantity = quantity, price = price, shippedAt = shippedAt, id = id))
+  def frontpagePermission(name: String = random.alphanumeric.take(20).mkString, id: Defaulted[PermissionId] = Defaulted.UseDefault)(implicit c: Connection): PermissionRow = (new PermissionRepoImpl).insert(new PermissionRowUnsaved(name = name, id = id))
+  def frontpagePerson(name: String = random.alphanumeric.take(20).mkString,
+                      addressId: Option[AddressId] = None,
+                      id: Defaulted[PersonId] = Defaulted.UseDefault,
+                      createdAt: Defaulted[Option[TypoLocalDateTime]] = Defaulted.UseDefault
+                     )(implicit c: Connection): PersonRow = (new PersonRepoImpl).insert(new PersonRowUnsaved(name = name, addressId = addressId, id = id, createdAt = createdAt))
+  def frontpageProduct(name: String = random.alphanumeric.take(20).mkString,
+                       price: BigDecimal = BigDecimal.decimal(random.nextDouble()),
+                       lastRestocked: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
+                       id: Defaulted[ProductId] = Defaulted.UseDefault,
+                       inStock: Defaulted[Option[Boolean]] = Defaulted.UseDefault,
+                       quantity: Defaulted[Option[Int]] = Defaulted.UseDefault,
+                       lastModified: Defaulted[Option[TypoLocalDateTime]] = Defaulted.UseDefault,
+                       tags: Defaulted[Option[Array[String]]] = Defaulted.UseDefault,
+                       categories: Defaulted[Option[Array[Int]]] = Defaulted.UseDefault,
+                       prices: Defaulted[Option[Array[BigDecimal]]] = Defaulted.UseDefault,
+                       attributes: Defaulted[Option[Array[TypoJsonb]]] = Defaulted.UseDefault
+                      )(implicit c: Connection): ProductRow = (new ProductRepoImpl).insert(new ProductRowUnsaved(name = name, price = price, lastRestocked = lastRestocked, id = id, inStock = inStock, quantity = quantity, lastModified = lastModified, tags = tags, categories = categories, prices = prices, attributes = attributes))
+  def frontpageProductCategory(productId: ProductId, categoryId: CategoryId)(implicit c: Connection): ProductCategoryRow = (new ProductCategoryRepoImpl).insert(new ProductCategoryRow(productId = productId, categoryId = categoryId))
+  def frontpageRole(name: String = random.alphanumeric.take(20).mkString, id: Defaulted[RoleId] = Defaulted.UseDefault)(implicit c: Connection): RoleRow = (new RoleRepoImpl).insert(new RoleRowUnsaved(name = name, id = id))
+  def frontpageUser(email: Email = domainInsert.frontpageEmail(random),
+                    name: String = random.alphanumeric.take(20).mkString,
+                    departmentId: Option[DepartmentId] = None,
+                    managerId: Option[UserId] = None,
+                    id: Defaulted[UserId] = Defaulted.UseDefault,
+                    createdAt: Defaulted[Option[TypoLocalDateTime]] = Defaulted.UseDefault,
+                    status: Defaulted[Option[UserStatus]] = Defaulted.UseDefault,
+                    verified: Defaulted[Option[Boolean]] = Defaulted.UseDefault,
+                    role: Defaulted[Option[UserRole]] = Defaulted.UseDefault
+                   )(implicit c: Connection): UserRow = (new UserRepoImpl).insert(new UserRowUnsaved(email = email, name = name, departmentId = departmentId, managerId = managerId, id = id, createdAt = createdAt, status = status, verified = verified, role = role))
+  def frontpageUserPermission(userId: UserId,
+                              permissionId: PermissionId,
+                              grantedAt: Defaulted[Option[TypoLocalDateTime]] = Defaulted.UseDefault
+                             )(implicit c: Connection): UserPermissionRow = (new UserPermissionRepoImpl).insert(new UserPermissionRowUnsaved(userId = userId, permissionId = permissionId, grantedAt = grantedAt))
   def humanresourcesDepartment(name: Name = domainInsert.publicName(random),
                                groupname: Name = domainInsert.publicName(random),
-                               departmentid: Defaulted[DepartmentId] = Defaulted.UseDefault,
+                               departmentid: Defaulted[adventureworks.humanresources.department.DepartmentId] = Defaulted.UseDefault,
                                modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                              )(implicit c: Connection): DepartmentRow = (new DepartmentRepoImpl).insert(new DepartmentRowUnsaved(name = name, groupname = groupname, departmentid = departmentid, modifieddate = modifieddate))
+                              )(implicit c: Connection): adventureworks.humanresources.department.DepartmentRow = (new adventureworks.humanresources.department.DepartmentRepoImpl).insert(new adventureworks.humanresources.department.DepartmentRowUnsaved(name = name, groupname = groupname, departmentid = departmentid, modifieddate = modifieddate))
   def humanresourcesEmployee(businessentityid: BusinessentityId,
                              birthdate: TypoLocalDate,
                              maritalstatus: /* bpchar, max 1 chars */ String,
@@ -351,9 +467,9 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                              rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                              modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
                              organizationnode: Defaulted[Option[String]] = Defaulted.UseDefault
-                            )(implicit c: Connection): EmployeeRow = (new EmployeeRepoImpl).insert(new EmployeeRowUnsaved(businessentityid = businessentityid, birthdate = birthdate, maritalstatus = maritalstatus, gender = gender, hiredate = hiredate, nationalidnumber = nationalidnumber, loginid = loginid, jobtitle = jobtitle, salariedflag = salariedflag, vacationhours = vacationhours, sickleavehours = sickleavehours, currentflag = currentflag, rowguid = rowguid, modifieddate = modifieddate, organizationnode = organizationnode))
+                            )(implicit c: Connection): adventureworks.humanresources.employee.EmployeeRow = (new adventureworks.humanresources.employee.EmployeeRepoImpl).insert(new adventureworks.humanresources.employee.EmployeeRowUnsaved(businessentityid = businessentityid, birthdate = birthdate, maritalstatus = maritalstatus, gender = gender, hiredate = hiredate, nationalidnumber = nationalidnumber, loginid = loginid, jobtitle = jobtitle, salariedflag = salariedflag, vacationhours = vacationhours, sickleavehours = sickleavehours, currentflag = currentflag, rowguid = rowguid, modifieddate = modifieddate, organizationnode = organizationnode))
   def humanresourcesEmployeedepartmenthistory(businessentityid: BusinessentityId,
-                                              departmentid: DepartmentId,
+                                              departmentid: adventureworks.humanresources.department.DepartmentId,
                                               shiftid: ShiftId,
                                               startdate: TypoLocalDate,
                                               enddate: Option[TypoLocalDate] = None,
@@ -382,10 +498,10 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                     city: /* max 30 chars */ String = random.alphanumeric.take(20).mkString,
                     postalcode: /* max 15 chars */ String = random.alphanumeric.take(15).mkString,
                     spatiallocation: Option[TypoBytea] = None,
-                    addressid: Defaulted[AddressId] = Defaulted.UseDefault,
+                    addressid: Defaulted[adventureworks.person.address.AddressId] = Defaulted.UseDefault,
                     rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                     modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                   )(implicit c: Connection): AddressRow = (new AddressRepoImpl).insert(new AddressRowUnsaved(stateprovinceid = stateprovinceid, addressline1 = addressline1, addressline2 = addressline2, city = city, postalcode = postalcode, spatiallocation = spatiallocation, addressid = addressid, rowguid = rowguid, modifieddate = modifieddate))
+                   )(implicit c: Connection): adventureworks.person.address.AddressRow = (new adventureworks.person.address.AddressRepoImpl).insert(new adventureworks.person.address.AddressRowUnsaved(stateprovinceid = stateprovinceid, addressline1 = addressline1, addressline2 = addressline2, city = city, postalcode = postalcode, spatiallocation = spatiallocation, addressid = addressid, rowguid = rowguid, modifieddate = modifieddate))
   def personAddresstype(name: Name = domainInsert.publicName(random),
                         addresstypeid: Defaulted[AddresstypeId] = Defaulted.UseDefault,
                         rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
@@ -396,7 +512,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                            modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                           )(implicit c: Connection): BusinessentityRow = (new BusinessentityRepoImpl).insert(new BusinessentityRowUnsaved(businessentityid = businessentityid, rowguid = rowguid, modifieddate = modifieddate))
   def personBusinessentityaddress(businessentityid: BusinessentityId,
-                                  addressid: AddressId,
+                                  addressid: adventureworks.person.address.AddressId,
                                   addresstypeid: AddresstypeId,
                                   rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                   modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
@@ -440,7 +556,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                    emailpromotion: Defaulted[Int] = Defaulted.UseDefault,
                    rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                  )(implicit c: Connection): PersonRow = (new PersonRepoImpl).insert(new PersonRowUnsaved(businessentityid = businessentityid, persontype = persontype, firstname = firstname, title = title, middlename = middlename, lastname = lastname, suffix = suffix, additionalcontactinfo = additionalcontactinfo, demographics = demographics, namestyle = namestyle, emailpromotion = emailpromotion, rowguid = rowguid, modifieddate = modifieddate))
+                  )(implicit c: Connection): adventureworks.person.person.PersonRow = (new adventureworks.person.person.PersonRepoImpl).insert(new adventureworks.person.person.PersonRowUnsaved(businessentityid = businessentityid, persontype = persontype, firstname = firstname, title = title, middlename = middlename, lastname = lastname, suffix = suffix, additionalcontactinfo = additionalcontactinfo, demographics = demographics, namestyle = namestyle, emailpromotion = emailpromotion, rowguid = rowguid, modifieddate = modifieddate))
   def personPersonphone(businessentityid: BusinessentityId,
                         phonenumbertypeid: PhonenumbertypeId,
                         phonenumber: Phone = domainInsert.publicPhone(random),
@@ -459,10 +575,10 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                           rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                           modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                          )(implicit c: Connection): StateprovinceRow = (new StateprovinceRepoImpl).insert(new StateprovinceRowUnsaved(countryregioncode = countryregioncode, territoryid = territoryid, stateprovincecode = stateprovincecode, name = name, stateprovinceid = stateprovinceid, isonlystateprovinceflag = isonlystateprovinceflag, rowguid = rowguid, modifieddate = modifieddate))
-  def productionBillofmaterials(componentid: ProductId,
+  def productionBillofmaterials(componentid: adventureworks.production.product.ProductId,
                                 unitmeasurecode: UnitmeasureId,
                                 bomlevel: TypoShort,
-                                productassemblyid: Option[ProductId] = None,
+                                productassemblyid: Option[adventureworks.production.product.ProductId] = None,
                                 enddate: Option[TypoLocalDateTime] = None,
                                 billofmaterialsid: Defaulted[Int] = Defaulted.UseDefault,
                                 startdate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
@@ -492,11 +608,11 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                              modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                             )(implicit c: Connection): IllustrationRow = (new IllustrationRepoImpl).insert(new IllustrationRowUnsaved(diagram = diagram, illustrationid = illustrationid, modifieddate = modifieddate))
   def productionLocation(name: Name = domainInsert.publicName(random),
-                         locationid: Defaulted[LocationId] = Defaulted.UseDefault,
+                         locationid: Defaulted[adventureworks.production.location.LocationId] = Defaulted.UseDefault,
                          costrate: Defaulted[BigDecimal] = Defaulted.UseDefault,
                          availability: Defaulted[BigDecimal] = Defaulted.UseDefault,
                          modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                        )(implicit c: Connection): LocationRow = (new LocationRepoImpl).insert(new LocationRowUnsaved(name = name, locationid = locationid, costrate = costrate, availability = availability, modifieddate = modifieddate))
+                        )(implicit c: Connection): adventureworks.production.location.LocationRow = (new adventureworks.production.location.LocationRepoImpl).insert(new adventureworks.production.location.LocationRowUnsaved(name = name, locationid = locationid, costrate = costrate, availability = availability, modifieddate = modifieddate))
   def productionProduct(safetystocklevel: TypoShort,
                         reorderpoint: TypoShort,
                         standardcost: BigDecimal,
@@ -517,18 +633,18 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                         productmodelid: Option[ProductmodelId] = None,
                         sellenddate: Option[TypoLocalDateTime] = None,
                         discontinueddate: Option[TypoLocalDateTime] = if (random.nextBoolean()) None else Some(TypoLocalDateTime(LocalDateTime.of(LocalDate.ofEpochDay(random.nextInt(30000).toLong), LocalTime.ofSecondOfDay(random.nextInt(24 * 60 * 60).toLong)))),
-                        productid: Defaulted[ProductId] = Defaulted.UseDefault,
+                        productid: Defaulted[adventureworks.production.product.ProductId] = Defaulted.UseDefault,
                         makeflag: Defaulted[Flag] = Defaulted.UseDefault,
                         finishedgoodsflag: Defaulted[Flag] = Defaulted.UseDefault,
                         rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                         modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                       )(implicit c: Connection): ProductRow = (new ProductRepoImpl).insert(new ProductRowUnsaved(safetystocklevel = safetystocklevel, reorderpoint = reorderpoint, standardcost = standardcost, listprice = listprice, daystomanufacture = daystomanufacture, sellstartdate = sellstartdate, name = name, productnumber = productnumber, color = color, size = size, sizeunitmeasurecode = sizeunitmeasurecode, weightunitmeasurecode = weightunitmeasurecode, weight = weight, productline = productline, `class` = `class`, style = style, productsubcategoryid = productsubcategoryid, productmodelid = productmodelid, sellenddate = sellenddate, discontinueddate = discontinueddate, productid = productid, makeflag = makeflag, finishedgoodsflag = finishedgoodsflag, rowguid = rowguid, modifieddate = modifieddate))
+                       )(implicit c: Connection): adventureworks.production.product.ProductRow = (new adventureworks.production.product.ProductRepoImpl).insert(new adventureworks.production.product.ProductRowUnsaved(safetystocklevel = safetystocklevel, reorderpoint = reorderpoint, standardcost = standardcost, listprice = listprice, daystomanufacture = daystomanufacture, sellstartdate = sellstartdate, name = name, productnumber = productnumber, color = color, size = size, sizeunitmeasurecode = sizeunitmeasurecode, weightunitmeasurecode = weightunitmeasurecode, weight = weight, productline = productline, `class` = `class`, style = style, productsubcategoryid = productsubcategoryid, productmodelid = productmodelid, sellenddate = sellenddate, discontinueddate = discontinueddate, productid = productid, makeflag = makeflag, finishedgoodsflag = finishedgoodsflag, rowguid = rowguid, modifieddate = modifieddate))
   def productionProductcategory(name: Name = domainInsert.publicName(random),
                                 productcategoryid: Defaulted[ProductcategoryId] = Defaulted.UseDefault,
                                 rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                 modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                )(implicit c: Connection): ProductcategoryRow = (new ProductcategoryRepoImpl).insert(new ProductcategoryRowUnsaved(name = name, productcategoryid = productcategoryid, rowguid = rowguid, modifieddate = modifieddate))
-  def productionProductcosthistory(productid: ProductId,
+  def productionProductcosthistory(productid: adventureworks.production.product.ProductId,
                                    startdate: TypoLocalDateTime,
                                    standardcost: BigDecimal,
                                    enddate: Option[TypoLocalDateTime] = None,
@@ -539,19 +655,19 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                                    rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                    modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                   )(implicit c: Connection): ProductdescriptionRow = (new ProductdescriptionRepoImpl).insert(new ProductdescriptionRowUnsaved(description = description, productdescriptionid = productdescriptionid, rowguid = rowguid, modifieddate = modifieddate))
-  def productionProductdocument(productid: ProductId,
+  def productionProductdocument(productid: adventureworks.production.product.ProductId,
                                 modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault,
                                 documentnode: Defaulted[DocumentId] = Defaulted.UseDefault
                                )(implicit c: Connection): ProductdocumentRow = (new ProductdocumentRepoImpl).insert(new ProductdocumentRowUnsaved(productid = productid, modifieddate = modifieddate, documentnode = documentnode))
-  def productionProductinventory(productid: ProductId,
-                                 locationid: LocationId,
+  def productionProductinventory(productid: adventureworks.production.product.ProductId,
+                                 locationid: adventureworks.production.location.LocationId,
                                  bin: TypoShort,
                                  shelf: /* max 10 chars */ String = random.alphanumeric.take(10).mkString,
                                  quantity: Defaulted[TypoShort] = Defaulted.UseDefault,
                                  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                 )(implicit c: Connection): ProductinventoryRow = (new ProductinventoryRepoImpl).insert(new ProductinventoryRowUnsaved(productid = productid, locationid = locationid, bin = bin, shelf = shelf, quantity = quantity, rowguid = rowguid, modifieddate = modifieddate))
-  def productionProductlistpricehistory(productid: ProductId,
+  def productionProductlistpricehistory(productid: adventureworks.production.product.ProductId,
                                         startdate: TypoLocalDateTime,
                                         listprice: BigDecimal,
                                         enddate: Option[TypoLocalDateTime] = None,
@@ -580,12 +696,12 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                              productphotoid: Defaulted[ProductphotoId] = Defaulted.UseDefault,
                              modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                             )(implicit c: Connection): ProductphotoRow = (new ProductphotoRepoImpl).insert(new ProductphotoRowUnsaved(thumbnailphoto = thumbnailphoto, thumbnailphotofilename = thumbnailphotofilename, largephoto = largephoto, largephotofilename = largephotofilename, productphotoid = productphotoid, modifieddate = modifieddate))
-  def productionProductproductphoto(productid: ProductId,
+  def productionProductproductphoto(productid: adventureworks.production.product.ProductId,
                                     productphotoid: ProductphotoId,
                                     primary: Defaulted[Flag] = Defaulted.UseDefault,
                                     modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                    )(implicit c: Connection): ProductproductphotoRow = (new ProductproductphotoRepoImpl).insert(new ProductproductphotoRowUnsaved(productid = productid, productphotoid = productphotoid, primary = primary, modifieddate = modifieddate))
-  def productionProductreview(productid: ProductId,
+  def productionProductreview(productid: adventureworks.production.product.ProductId,
                               rating: Int,
                               reviewername: Name = domainInsert.publicName(random),
                               emailaddress: /* max 50 chars */ String = random.alphanumeric.take(20).mkString,
@@ -604,7 +720,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                             scrapreasonid: Defaulted[ScrapreasonId] = Defaulted.UseDefault,
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                            )(implicit c: Connection): ScrapreasonRow = (new ScrapreasonRepoImpl).insert(new ScrapreasonRowUnsaved(name = name, scrapreasonid = scrapreasonid, modifieddate = modifieddate))
-  def productionTransactionhistory(productid: ProductId,
+  def productionTransactionhistory(productid: adventureworks.production.product.ProductId,
                                    transactiontype: /* bpchar, max 1 chars */ String,
                                    referenceorderid: Int = random.nextInt(),
                                    quantity: Int = random.nextInt(),
@@ -628,7 +744,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                             name: Name = domainInsert.publicName(random),
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                            )(implicit c: Connection): UnitmeasureRow = (new UnitmeasureRepoImpl).insert(new UnitmeasureRowUnsaved(unitmeasurecode = unitmeasurecode, name = name, modifieddate = modifieddate))
-  def productionWorkorder(productid: ProductId,
+  def productionWorkorder(productid: adventureworks.production.product.ProductId,
                           orderqty: Int,
                           scrappedqty: TypoShort,
                           startdate: TypoLocalDateTime,
@@ -639,7 +755,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                           modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                          )(implicit c: Connection): WorkorderRow = (new WorkorderRepoImpl).insert(new WorkorderRowUnsaved(productid = productid, orderqty = orderqty, scrappedqty = scrappedqty, startdate = startdate, enddate = enddate, duedate = duedate, scrapreasonid = scrapreasonid, workorderid = workorderid, modifieddate = modifieddate))
   def productionWorkorderrouting(workorderid: WorkorderId,
-                                 locationid: LocationId,
+                                 locationid: adventureworks.production.location.LocationId,
                                  scheduledstartdate: TypoLocalDateTime,
                                  scheduledenddate: TypoLocalDateTime,
                                  plannedcost: BigDecimal,
@@ -821,7 +937,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                   verifiedOn: Option[TypoInstant] = if (random.nextBoolean()) None else Some(TypoInstant(Instant.ofEpochMilli(1000000000000L + random.nextLong(1000000000000L)))),
                   createdAt: Defaulted[TypoInstant] = Defaulted.UseDefault
                  )(implicit c: Connection): UsersRow = (new UsersRepoImpl).insert(new UsersRowUnsaved(email = email, userId = userId, name = name, lastName = lastName, password = password, verifiedOn = verifiedOn, createdAt = createdAt))
-  def purchasingProductvendor(productid: ProductId,
+  def purchasingProductvendor(productid: adventureworks.production.product.ProductId,
                               businessentityid: BusinessentityId,
                               averageleadtime: Int,
                               standardprice: BigDecimal,
@@ -888,10 +1004,10 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
   def salesCustomer(personid: Option[BusinessentityId] = None,
                     storeid: Option[BusinessentityId] = None,
                     territoryid: Option[SalesterritoryId] = None,
-                    customerid: Defaulted[CustomerId] = Defaulted.UseDefault,
+                    customerid: Defaulted[adventureworks.sales.customer.CustomerId] = Defaulted.UseDefault,
                     rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                     modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
-                   )(implicit c: Connection): CustomerRow = (new CustomerRepoImpl).insert(new CustomerRowUnsaved(personid = personid, storeid = storeid, territoryid = territoryid, customerid = customerid, rowguid = rowguid, modifieddate = modifieddate))
+                   )(implicit c: Connection): adventureworks.sales.customer.CustomerRow = (new adventureworks.sales.customer.CustomerRepoImpl).insert(new adventureworks.sales.customer.CustomerRowUnsaved(personid = personid, storeid = storeid, territoryid = territoryid, customerid = customerid, rowguid = rowguid, modifieddate = modifieddate))
   def salesPersoncreditcard(businessentityid: BusinessentityId,
                             creditcardid: /* user-picked */ CustomCreditcardId,
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
@@ -907,9 +1023,9 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                             modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                            )(implicit c: Connection): SalesorderdetailRow = (new SalesorderdetailRepoImpl).insert(new SalesorderdetailRowUnsaved(salesorderid = salesorderid, carriertrackingnumber = carriertrackingnumber, orderqty = orderqty, productid = SpecialofferproductId.productid, specialofferid = SpecialofferproductId.specialofferid, unitprice = unitprice, salesorderdetailid = salesorderdetailid, unitpricediscount = unitpricediscount, rowguid = rowguid, modifieddate = modifieddate))
   def salesSalesorderheader(duedate: TypoLocalDateTime,
-                            customerid: CustomerId,
-                            billtoaddressid: AddressId,
-                            shiptoaddressid: AddressId,
+                            customerid: adventureworks.sales.customer.CustomerId,
+                            billtoaddressid: adventureworks.person.address.AddressId,
+                            shiptoaddressid: adventureworks.person.address.AddressId,
                             shipmethodid: ShipmethodId,
                             shipdate: Option[TypoLocalDateTime] = None,
                             purchaseordernumber: Option[OrderNumber] = if (random.nextBoolean()) None else Some(domainInsert.publicOrderNumber(random)),
@@ -983,7 +1099,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                                  rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                  modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                                 )(implicit c: Connection): SalesterritoryhistoryRow = (new SalesterritoryhistoryRepoImpl).insert(new SalesterritoryhistoryRowUnsaved(businessentityid = businessentityid, territoryid = territoryid, startdate = startdate, enddate = enddate, rowguid = rowguid, modifieddate = modifieddate))
-  def salesShoppingcartitem(productid: ProductId,
+  def salesShoppingcartitem(productid: adventureworks.production.product.ProductId,
                             shoppingcartid: /* max 50 chars */ String = random.alphanumeric.take(20).mkString,
                             shoppingcartitemid: Defaulted[ShoppingcartitemId] = Defaulted.UseDefault,
                             quantity: Defaulted[Int] = Defaulted.UseDefault,
@@ -1003,7 +1119,7 @@ class TestInsert(random: Random, domainInsert: TestDomainInsert) {
                         modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                        )(implicit c: Connection): SpecialofferRow = (new SpecialofferRepoImpl).insert(new SpecialofferRowUnsaved(startdate = startdate, enddate = enddate, description = description, `type` = `type`, category = category, maxqty = maxqty, specialofferid = specialofferid, discountpct = discountpct, minqty = minqty, rowguid = rowguid, modifieddate = modifieddate))
   def salesSpecialofferproduct(specialofferid: SpecialofferId,
-                               productid: ProductId,
+                               productid: adventureworks.production.product.ProductId,
                                rowguid: Defaulted[TypoUUID] = Defaulted.UseDefault,
                                modifieddate: Defaulted[TypoLocalDateTime] = Defaulted.UseDefault
                               )(implicit c: Connection): SpecialofferproductRow = (new SpecialofferproductRepoImpl).insert(new SpecialofferproductRowUnsaved(specialofferid = specialofferid, productid = productid, rowguid = rowguid, modifieddate = modifieddate))

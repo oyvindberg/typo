@@ -5,6 +5,7 @@
  */
 package adventureworks
 
+import adventureworks.frontpage.Email
 import adventureworks.public.AccountNumber
 import adventureworks.public.Flag
 import adventureworks.public.Mydomain
@@ -16,6 +17,10 @@ import adventureworks.public.ShortText
 import scala.util.Random
 
 trait TestDomainInsert {
+  /** Domain `frontpage.email`
+    * Constraint: CHECK ((VALUE ~ '^[^@]+@[^@]+\.[^@]+$'::text))
+    */
+  def frontpageEmail(random: Random): Email
   /** Domain `public.AccountNumber`
     * No constraint
     */
