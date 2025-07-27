@@ -114,14 +114,15 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def update: UpdateBuilder[ProductcategoryFields, ProductcategoryRow] = {
     UpdateBuilder(""""production"."productcategory"""", ProductcategoryFields.structure, ProductcategoryRow.rowParser)
   }
-  override def update(row: ProductcategoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductcategoryRow)(implicit c: Connection): Option[ProductcategoryRow] = {
     val productcategoryid = row.productcategoryid
     SQL"""update "production"."productcategory"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productcategoryid" = ${ParameterValue(productcategoryid, null, ProductcategoryId.toStatement)}
-       """.executeUpdate() > 0
+          returning "productcategoryid", "name", "rowguid", "modifieddate"::text
+       """.executeInsert(ProductcategoryRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductcategoryRow)(implicit c: Connection): ProductcategoryRow = {
     SQL"""insert into "production"."productcategory"("productcategoryid", "name", "rowguid", "modifieddate")

@@ -96,13 +96,16 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
     UpdateBuilder(""""person"."addresstype"""", AddresstypeFields.structure, AddresstypeRow.jdbcDecoder)
   }
-  override def update(row: AddresstypeRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: AddresstypeRow): ZIO[ZConnection, Throwable, Option[AddresstypeRow]] = {
     val addresstypeid = row.addresstypeid
     sql"""update "person"."addresstype"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "addresstypeid" = ${Segment.paramSegment(addresstypeid)(AddresstypeId.setter)}""".update.map(_ > 0)
+          where "addresstypeid" = ${Segment.paramSegment(addresstypeid)(AddresstypeId.setter)}
+          returning "addresstypeid", "name", "rowguid", "modifieddate"::text"""
+      .query(AddresstypeRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: AddresstypeRow): ZIO[ZConnection, Throwable, UpdateResult[AddresstypeRow]] = {
     sql"""insert into "person"."addresstype"("addresstypeid", "name", "rowguid", "modifieddate")

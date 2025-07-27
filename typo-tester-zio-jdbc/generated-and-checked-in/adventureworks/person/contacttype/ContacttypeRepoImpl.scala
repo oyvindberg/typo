@@ -91,12 +91,15 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
     UpdateBuilder(""""person"."contacttype"""", ContacttypeFields.structure, ContacttypeRow.jdbcDecoder)
   }
-  override def update(row: ContacttypeRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ContacttypeRow): ZIO[ZConnection, Throwable, Option[ContacttypeRow]] = {
     val contacttypeid = row.contacttypeid
     sql"""update "person"."contacttype"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "contacttypeid" = ${Segment.paramSegment(contacttypeid)(ContacttypeId.setter)}""".update.map(_ > 0)
+          where "contacttypeid" = ${Segment.paramSegment(contacttypeid)(ContacttypeId.setter)}
+          returning "contacttypeid", "name", "modifieddate"::text"""
+      .query(ContacttypeRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ContacttypeRow): ZIO[ZConnection, Throwable, UpdateResult[ContacttypeRow]] = {
     sql"""insert into "person"."contacttype"("contacttypeid", "name", "modifieddate")

@@ -91,13 +91,10 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilderMock(UpdateParams.empty, PersonFields.structure, map)
   }
-  override def update(row: PersonRow)(implicit c: Connection): Boolean = {
-    map.get(row.id) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.id, row): @nowarn
-        true
-      case None => false
+  override def update(row: PersonRow)(implicit c: Connection): Option[PersonRow] = {
+    map.get(row.id).map { _ =>
+      map.put(row.id, row): @nowarn
+      row
     }
   }
   override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean = {

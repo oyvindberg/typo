@@ -122,13 +122,14 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
     UpdateBuilder(""""person"."businessentityaddress"""", BusinessentityaddressFields.structure, BusinessentityaddressRow.rowParser)
   }
-  override def update(row: BusinessentityaddressRow)(implicit c: Connection): Boolean = {
+  override def update(row: BusinessentityaddressRow)(implicit c: Connection): Option[BusinessentityaddressRow] = {
     val compositeId = row.compositeId
     SQL"""update "person"."businessentityaddress"
           set "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "addressid" = ${ParameterValue(compositeId.addressid, null, AddressId.toStatement)} AND "addresstypeid" = ${ParameterValue(compositeId.addresstypeid, null, AddresstypeId.toStatement)}
-       """.executeUpdate() > 0
+          returning "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text
+       """.executeInsert(BusinessentityaddressRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: BusinessentityaddressRow)(implicit c: Connection): BusinessentityaddressRow = {
     SQL"""insert into "person"."businessentityaddress"("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")

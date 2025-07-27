@@ -100,16 +100,14 @@ class ProductcategoryRepoImpl extends ProductcategoryRepo {
   override def update: UpdateBuilder[ProductcategoryFields, ProductcategoryRow] = {
     UpdateBuilder(""""production"."productcategory"""", ProductcategoryFields.structure, ProductcategoryRow.read)
   }
-  override def update(row: ProductcategoryRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductcategoryRow): ConnectionIO[Option[ProductcategoryRow]] = {
     val productcategoryid = row.productcategoryid
     sql"""update "production"."productcategory"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "productcategoryid" = ${fromWrite(productcategoryid)(new Write.Single(ProductcategoryId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "productcategoryid" = ${fromWrite(productcategoryid)(new Write.Single(ProductcategoryId.put))}
+          returning "productcategoryid", "name", "rowguid", "modifieddate"::text""".query(using ProductcategoryRow.read).option
   }
   override def upsert(unsaved: ProductcategoryRow): ConnectionIO[ProductcategoryRow] = {
     sql"""insert into "production"."productcategory"("productcategoryid", "name", "rowguid", "modifieddate")

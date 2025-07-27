@@ -74,13 +74,10 @@ class EmailaddressRepoMock(toRow: Function1[EmailaddressRowUnsaved, Emailaddress
   override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
     UpdateBuilderMock(UpdateParams.empty, EmailaddressFields.structure, map)
   }
-  override def update(row: EmailaddressRow)(implicit c: Connection): Boolean = {
-    map.get(row.compositeId) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.compositeId, row): @nowarn
-        true
-      case None => false
+  override def update(row: EmailaddressRow)(implicit c: Connection): Option[EmailaddressRow] = {
+    map.get(row.compositeId).map { _ =>
+      map.put(row.compositeId, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow = {

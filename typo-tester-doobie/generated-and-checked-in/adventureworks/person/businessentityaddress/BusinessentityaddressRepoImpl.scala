@@ -116,15 +116,13 @@ class BusinessentityaddressRepoImpl extends BusinessentityaddressRepo {
   override def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow] = {
     UpdateBuilder(""""person"."businessentityaddress"""", BusinessentityaddressFields.structure, BusinessentityaddressRow.read)
   }
-  override def update(row: BusinessentityaddressRow): ConnectionIO[Boolean] = {
+  override def update(row: BusinessentityaddressRow): ConnectionIO[Option[BusinessentityaddressRow]] = {
     val compositeId = row.compositeId
     sql"""update "person"."businessentityaddress"
           set "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "addressid" = ${fromWrite(compositeId.addressid)(new Write.Single(AddressId.put))} AND "addresstypeid" = ${fromWrite(compositeId.addresstypeid)(new Write.Single(AddresstypeId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "addressid" = ${fromWrite(compositeId.addressid)(new Write.Single(AddressId.put))} AND "addresstypeid" = ${fromWrite(compositeId.addresstypeid)(new Write.Single(AddresstypeId.put))}
+          returning "businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate"::text""".query(using BusinessentityaddressRow.read).option
   }
   override def upsert(unsaved: BusinessentityaddressRow): ConnectionIO[BusinessentityaddressRow] = {
     sql"""insert into "person"."businessentityaddress"("businessentityid", "addressid", "addresstypeid", "rowguid", "modifieddate")

@@ -99,7 +99,7 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
   override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
     UpdateBuilder(""""production"."productphoto"""", ProductphotoFields.structure, ProductphotoRow.read)
   }
-  override def update(row: ProductphotoRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductphotoRow): ConnectionIO[Option[ProductphotoRow]] = {
     val productphotoid = row.productphotoid
     sql"""update "production"."productphoto"
           set "thumbnailphoto" = ${fromWrite(row.thumbnailphoto)(new Write.SingleOpt(TypoBytea.put))}::bytea,
@@ -107,10 +107,8 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
               "largephoto" = ${fromWrite(row.largephoto)(new Write.SingleOpt(TypoBytea.put))}::bytea,
               "largephotofilename" = ${fromWrite(row.largephotofilename)(new Write.SingleOpt(Meta.StringMeta.put))},
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "productphotoid" = ${fromWrite(productphotoid)(new Write.Single(ProductphotoId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "productphotoid" = ${fromWrite(productphotoid)(new Write.Single(ProductphotoId.put))}
+          returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text""".query(using ProductphotoRow.read).option
   }
   override def upsert(unsaved: ProductphotoRow): ConnectionIO[ProductphotoRow] = {
     sql"""insert into "production"."productphoto"("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")

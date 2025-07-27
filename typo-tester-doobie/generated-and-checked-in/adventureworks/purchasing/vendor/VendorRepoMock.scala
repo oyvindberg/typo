@@ -89,14 +89,11 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
     UpdateBuilderMock(UpdateParams.empty, VendorFields.structure, map)
   }
-  override def update(row: VendorRow): ConnectionIO[Boolean] = {
+  override def update(row: VendorRow): ConnectionIO[Option[VendorRow]] = {
     delay {
-      map.get(row.businessentityid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.businessentityid, row): @nowarn
-          true
-        case None => false
+      map.get(row.businessentityid).map { _ =>
+        map.put(row.businessentityid, row): @nowarn
+        row
       }
     }
   }

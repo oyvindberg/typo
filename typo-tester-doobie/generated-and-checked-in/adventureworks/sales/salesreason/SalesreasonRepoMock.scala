@@ -88,14 +88,11 @@ class SalesreasonRepoMock(toRow: Function1[SalesreasonRowUnsaved, SalesreasonRow
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
     UpdateBuilderMock(UpdateParams.empty, SalesreasonFields.structure, map)
   }
-  override def update(row: SalesreasonRow): ConnectionIO[Boolean] = {
+  override def update(row: SalesreasonRow): ConnectionIO[Option[SalesreasonRow]] = {
     delay {
-      map.get(row.salesreasonid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.salesreasonid, row): @nowarn
-          true
-        case None => false
+      map.get(row.salesreasonid).map { _ =>
+        map.put(row.salesreasonid, row): @nowarn
+        row
       }
     }
   }

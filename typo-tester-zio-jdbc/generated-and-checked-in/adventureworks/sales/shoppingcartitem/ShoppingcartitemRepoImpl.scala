@@ -101,7 +101,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     UpdateBuilder(""""sales"."shoppingcartitem"""", ShoppingcartitemFields.structure, ShoppingcartitemRow.jdbcDecoder)
   }
-  override def update(row: ShoppingcartitemRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ShoppingcartitemRow): ZIO[ZConnection, Throwable, Option[ShoppingcartitemRow]] = {
     val shoppingcartitemid = row.shoppingcartitemid
     sql"""update "sales"."shoppingcartitem"
           set "shoppingcartid" = ${Segment.paramSegment(row.shoppingcartid)(Setter.stringSetter)},
@@ -109,7 +109,10 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
               "productid" = ${Segment.paramSegment(row.productid)(ProductId.setter)}::int4,
               "datecreated" = ${Segment.paramSegment(row.datecreated)(TypoLocalDateTime.setter)}::timestamp,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(ShoppingcartitemId.setter)}""".update.map(_ > 0)
+          where "shoppingcartitemid" = ${Segment.paramSegment(shoppingcartitemid)(ShoppingcartitemId.setter)}
+          returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text"""
+      .query(ShoppingcartitemRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ShoppingcartitemRow): ZIO[ZConnection, Throwable, UpdateResult[ShoppingcartitemRow]] = {
     sql"""insert into "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")

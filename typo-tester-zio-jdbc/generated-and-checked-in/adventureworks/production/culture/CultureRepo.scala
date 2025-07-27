@@ -30,7 +30,7 @@ trait CultureRepo {
   def selectByIds(cultureids: Array[CultureId]): ZStream[ZConnection, Throwable, CultureRow]
   def selectByIdsTracked(cultureids: Array[CultureId]): ZIO[ZConnection, Throwable, Map[CultureId, CultureRow]]
   def update: UpdateBuilder[CultureFields, CultureRow]
-  def update(row: CultureRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: CultureRow): ZIO[ZConnection, Throwable, Option[CultureRow]]
   def upsert(unsaved: CultureRow): ZIO[ZConnection, Throwable, UpdateResult[CultureRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

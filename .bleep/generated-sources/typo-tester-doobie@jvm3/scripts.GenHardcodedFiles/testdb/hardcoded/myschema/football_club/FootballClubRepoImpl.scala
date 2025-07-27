@@ -74,14 +74,12 @@ class FootballClubRepoImpl extends FootballClubRepo {
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
     UpdateBuilder(""""myschema"."football_club"""", FootballClubFields.structure, FootballClubRow.read)
   }
-  override def update(row: FootballClubRow): ConnectionIO[Boolean] = {
+  override def update(row: FootballClubRow): ConnectionIO[Option[FootballClubRow]] = {
     val id = row.id
     sql"""update "myschema"."football_club"
           set "name" = ${fromWrite(row.name)(new Write.Single(Meta.StringMeta.put))}
-          where "id" = ${fromWrite(id)(new Write.Single(FootballClubId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "id" = ${fromWrite(id)(new Write.Single(FootballClubId.put))}
+          returning "id", "name"""".query(using FootballClubRow.read).option
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ConnectionIO[Boolean] = {
     NonEmptyList.fromList(fieldValues) match {

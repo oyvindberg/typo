@@ -111,12 +111,15 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   override def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
     UpdateBuilder(""""person"."businessentitycontact"""", BusinessentitycontactFields.structure, BusinessentitycontactRow.jdbcDecoder)
   }
-  override def update(row: BusinessentitycontactRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: BusinessentitycontactRow): ZIO[ZConnection, Throwable, Option[BusinessentitycontactRow]] = {
     val compositeId = row.compositeId
     sql"""update "person"."businessentitycontact"
           set "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "personid" = ${Segment.paramSegment(compositeId.personid)(BusinessentityId.setter)} AND "contacttypeid" = ${Segment.paramSegment(compositeId.contacttypeid)(ContacttypeId.setter)}""".update.map(_ > 0)
+          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "personid" = ${Segment.paramSegment(compositeId.personid)(BusinessentityId.setter)} AND "contacttypeid" = ${Segment.paramSegment(compositeId.contacttypeid)(ContacttypeId.setter)}
+          returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text"""
+      .query(BusinessentitycontactRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: BusinessentitycontactRow): ZIO[ZConnection, Throwable, UpdateResult[BusinessentitycontactRow]] = {
     sql"""insert into "person"."businessentitycontact"("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")

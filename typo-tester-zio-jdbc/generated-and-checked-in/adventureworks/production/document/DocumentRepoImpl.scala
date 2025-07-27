@@ -121,7 +121,7 @@ class DocumentRepoImpl extends DocumentRepo {
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
     UpdateBuilder(""""production"."document"""", DocumentFields.structure, DocumentRow.jdbcDecoder)
   }
-  override def update(row: DocumentRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: DocumentRow): ZIO[ZConnection, Throwable, Option[DocumentRow]] = {
     val documentnode = row.documentnode
     sql"""update "production"."document"
           set "title" = ${Segment.paramSegment(row.title)(Setter.stringSetter)},
@@ -136,7 +136,10 @@ class DocumentRepoImpl extends DocumentRepo {
               "document" = ${Segment.paramSegment(row.document)(Setter.optionParamSetter(TypoBytea.setter))}::bytea,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "documentnode" = ${Segment.paramSegment(documentnode)(DocumentId.setter)}""".update.map(_ > 0)
+          where "documentnode" = ${Segment.paramSegment(documentnode)(DocumentId.setter)}
+          returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode""""
+      .query(DocumentRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, UpdateResult[DocumentRow]] = {
     sql"""insert into "production"."document"("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")

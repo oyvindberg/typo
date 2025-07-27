@@ -98,17 +98,15 @@ class ShiftRepoImpl extends ShiftRepo {
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
     UpdateBuilder(""""humanresources"."shift"""", ShiftFields.structure, ShiftRow.read)
   }
-  override def update(row: ShiftRow): ConnectionIO[Boolean] = {
+  override def update(row: ShiftRow): ConnectionIO[Option[ShiftRow]] = {
     val shiftid = row.shiftid
     sql"""update "humanresources"."shift"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "starttime" = ${fromWrite(row.starttime)(new Write.Single(TypoLocalTime.put))}::time,
               "endtime" = ${fromWrite(row.endtime)(new Write.Single(TypoLocalTime.put))}::time,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "shiftid" = ${fromWrite(shiftid)(new Write.Single(ShiftId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "shiftid" = ${fromWrite(shiftid)(new Write.Single(ShiftId.put))}
+          returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text""".query(using ShiftRow.read).option
   }
   override def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow] = {
     sql"""insert into "humanresources"."shift"("shiftid", "name", "starttime", "endtime", "modifieddate")

@@ -117,7 +117,7 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
   override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
     UpdateBuilder(""""purchasing"."productvendor"""", ProductvendorFields.structure, ProductvendorRow.read)
   }
-  override def update(row: ProductvendorRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductvendorRow): ConnectionIO[Option[ProductvendorRow]] = {
     val compositeId = row.compositeId
     sql"""update "purchasing"."productvendor"
           set "averageleadtime" = ${fromWrite(row.averageleadtime)(new Write.Single(Meta.IntMeta.put))}::int4,
@@ -129,10 +129,8 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
               "onorderqty" = ${fromWrite(row.onorderqty)(new Write.SingleOpt(Meta.IntMeta.put))}::int4,
               "unitmeasurecode" = ${fromWrite(row.unitmeasurecode)(new Write.Single(UnitmeasureId.put))}::bpchar,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))}
+          returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text""".query(using ProductvendorRow.read).option
   }
   override def upsert(unsaved: ProductvendorRow): ConnectionIO[ProductvendorRow] = {
     sql"""insert into "purchasing"."productvendor"("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")

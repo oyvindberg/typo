@@ -92,13 +92,16 @@ class SalesreasonRepoImpl extends SalesreasonRepo {
   override def update: UpdateBuilder[SalesreasonFields, SalesreasonRow] = {
     UpdateBuilder(""""sales"."salesreason"""", SalesreasonFields.structure, SalesreasonRow.jdbcDecoder)
   }
-  override def update(row: SalesreasonRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: SalesreasonRow): ZIO[ZConnection, Throwable, Option[SalesreasonRow]] = {
     val salesreasonid = row.salesreasonid
     sql"""update "sales"."salesreason"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "reasontype" = ${Segment.paramSegment(row.reasontype)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "salesreasonid" = ${Segment.paramSegment(salesreasonid)(SalesreasonId.setter)}""".update.map(_ > 0)
+          where "salesreasonid" = ${Segment.paramSegment(salesreasonid)(SalesreasonId.setter)}
+          returning "salesreasonid", "name", "reasontype", "modifieddate"::text"""
+      .query(SalesreasonRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: SalesreasonRow): ZIO[ZConnection, Throwable, UpdateResult[SalesreasonRow]] = {
     sql"""insert into "sales"."salesreason"("salesreasonid", "name", "reasontype", "modifieddate")

@@ -106,13 +106,14 @@ class CultureRepoImpl extends CultureRepo {
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
     UpdateBuilder(""""production"."culture"""", CultureFields.structure, CultureRow.rowParser)
   }
-  override def update(row: CultureRow)(implicit c: Connection): Boolean = {
+  override def update(row: CultureRow)(implicit c: Connection): Option[CultureRow] = {
     val cultureid = row.cultureid
     SQL"""update "production"."culture"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "cultureid" = ${ParameterValue(cultureid, null, CultureId.toStatement)}
-       """.executeUpdate() > 0
+          returning "cultureid", "name", "modifieddate"::text
+       """.executeInsert(CultureRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: CultureRow)(implicit c: Connection): CultureRow = {
     SQL"""insert into "production"."culture"("cultureid", "name", "modifieddate")

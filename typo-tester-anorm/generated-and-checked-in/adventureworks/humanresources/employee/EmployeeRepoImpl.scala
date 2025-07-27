@@ -142,7 +142,7 @@ class EmployeeRepoImpl extends EmployeeRepo {
   override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
     UpdateBuilder(""""humanresources"."employee"""", EmployeeFields.structure, EmployeeRow.rowParser)
   }
-  override def update(row: EmployeeRow)(implicit c: Connection): Boolean = {
+  override def update(row: EmployeeRow)(implicit c: Connection): Option[EmployeeRow] = {
     val businessentityid = row.businessentityid
     SQL"""update "humanresources"."employee"
           set "nationalidnumber" = ${ParameterValue(row.nationalidnumber, null, ToStatement.stringToStatement)},
@@ -160,7 +160,8 @@ class EmployeeRepoImpl extends EmployeeRepo {
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp,
               "organizationnode" = ${ParameterValue(row.organizationnode, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))}
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
-       """.executeUpdate() > 0
+          returning "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode"
+       """.executeInsert(EmployeeRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: EmployeeRow)(implicit c: Connection): EmployeeRow = {
     SQL"""insert into "humanresources"."employee"("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")

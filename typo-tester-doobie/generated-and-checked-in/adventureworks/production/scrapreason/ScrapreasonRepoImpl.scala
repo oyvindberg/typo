@@ -95,15 +95,13 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
     UpdateBuilder(""""production"."scrapreason"""", ScrapreasonFields.structure, ScrapreasonRow.read)
   }
-  override def update(row: ScrapreasonRow): ConnectionIO[Boolean] = {
+  override def update(row: ScrapreasonRow): ConnectionIO[Option[ScrapreasonRow]] = {
     val scrapreasonid = row.scrapreasonid
     sql"""update "production"."scrapreason"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "scrapreasonid" = ${fromWrite(scrapreasonid)(new Write.Single(ScrapreasonId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "scrapreasonid" = ${fromWrite(scrapreasonid)(new Write.Single(ScrapreasonId.put))}
+          returning "scrapreasonid", "name", "modifieddate"::text""".query(using ScrapreasonRow.read).option
   }
   override def upsert(unsaved: ScrapreasonRow): ConnectionIO[ScrapreasonRow] = {
     sql"""insert into "production"."scrapreason"("scrapreasonid", "name", "modifieddate")

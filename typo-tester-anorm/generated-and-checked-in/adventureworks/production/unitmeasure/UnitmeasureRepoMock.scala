@@ -74,13 +74,10 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
     UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields.structure, map)
   }
-  override def update(row: UnitmeasureRow)(implicit c: Connection): Boolean = {
-    map.get(row.unitmeasurecode) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.unitmeasurecode, row): @nowarn
-        true
-      case None => false
+  override def update(row: UnitmeasureRow)(implicit c: Connection): Option[UnitmeasureRow] = {
+    map.get(row.unitmeasurecode).map { _ =>
+      map.put(row.unitmeasurecode, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: UnitmeasureRow)(implicit c: Connection): UnitmeasureRow = {

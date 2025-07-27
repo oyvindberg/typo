@@ -88,14 +88,11 @@ class SalesorderdetailRepoMock(toRow: Function1[SalesorderdetailRowUnsaved, Sale
   override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
     UpdateBuilderMock(UpdateParams.empty, SalesorderdetailFields.structure, map)
   }
-  override def update(row: SalesorderdetailRow): ConnectionIO[Boolean] = {
+  override def update(row: SalesorderdetailRow): ConnectionIO[Option[SalesorderdetailRow]] = {
     delay {
-      map.get(row.compositeId) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.compositeId, row): @nowarn
-          true
-        case None => false
+      map.get(row.compositeId).map { _ =>
+        map.put(row.compositeId, row): @nowarn
+        row
       }
     }
   }

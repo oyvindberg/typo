@@ -88,14 +88,11 @@ class TransactionhistoryRepoMock(toRow: Function1[TransactionhistoryRowUnsaved, 
   override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
     UpdateBuilderMock(UpdateParams.empty, TransactionhistoryFields.structure, map)
   }
-  override def update(row: TransactionhistoryRow): ConnectionIO[Boolean] = {
+  override def update(row: TransactionhistoryRow): ConnectionIO[Option[TransactionhistoryRow]] = {
     delay {
-      map.get(row.transactionid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.transactionid, row): @nowarn
-          true
-        case None => false
+      map.get(row.transactionid).map { _ =>
+        map.put(row.transactionid, row): @nowarn
+        row
       }
     }
   }

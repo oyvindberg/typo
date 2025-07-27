@@ -123,7 +123,7 @@ class VendorRepoImpl extends VendorRepo {
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
     UpdateBuilder(""""purchasing"."vendor"""", VendorFields.structure, VendorRow.rowParser)
   }
-  override def update(row: VendorRow)(implicit c: Connection): Boolean = {
+  override def update(row: VendorRow)(implicit c: Connection): Option[VendorRow] = {
     val businessentityid = row.businessentityid
     SQL"""update "purchasing"."vendor"
           set "accountnumber" = ${ParameterValue(row.accountnumber, null, AccountNumber.toStatement)}::varchar,
@@ -134,7 +134,8 @@ class VendorRepoImpl extends VendorRepo {
               "purchasingwebserviceurl" = ${ParameterValue(row.purchasingwebserviceurl, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
-       """.executeUpdate() > 0
+          returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text
+       """.executeInsert(VendorRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {
     SQL"""insert into "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")

@@ -113,12 +113,13 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     UpdateBuilder(""""sales"."countryregioncurrency"""", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.rowParser)
   }
-  override def update(row: CountryregioncurrencyRow)(implicit c: Connection): Boolean = {
+  override def update(row: CountryregioncurrencyRow)(implicit c: Connection): Option[CountryregioncurrencyRow] = {
     val compositeId = row.compositeId
     SQL"""update "sales"."countryregioncurrency"
           set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "countryregioncode" = ${ParameterValue(compositeId.countryregioncode, null, CountryregionId.toStatement)} AND "currencycode" = ${ParameterValue(compositeId.currencycode, null, CurrencyId.toStatement)}
-       """.executeUpdate() > 0
+          returning "countryregioncode", "currencycode", "modifieddate"::text
+       """.executeInsert(CountryregioncurrencyRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: CountryregioncurrencyRow)(implicit c: Connection): CountryregioncurrencyRow = {
     SQL"""insert into "sales"."countryregioncurrency"("countryregioncode", "currencycode", "modifieddate")

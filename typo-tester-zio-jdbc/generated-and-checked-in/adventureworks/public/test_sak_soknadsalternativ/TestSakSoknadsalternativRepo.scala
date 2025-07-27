@@ -27,7 +27,7 @@ trait TestSakSoknadsalternativRepo {
   def selectByIds(compositeIds: Array[TestSakSoknadsalternativId]): ZStream[ZConnection, Throwable, TestSakSoknadsalternativRow]
   def selectByIdsTracked(compositeIds: Array[TestSakSoknadsalternativId]): ZIO[ZConnection, Throwable, Map[TestSakSoknadsalternativId, TestSakSoknadsalternativRow]]
   def update: UpdateBuilder[TestSakSoknadsalternativFields, TestSakSoknadsalternativRow]
-  def update(row: TestSakSoknadsalternativRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: TestSakSoknadsalternativRow): ZIO[ZConnection, Throwable, Option[TestSakSoknadsalternativRow]]
   def upsert(unsaved: TestSakSoknadsalternativRow): ZIO[ZConnection, Throwable, UpdateResult[TestSakSoknadsalternativRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

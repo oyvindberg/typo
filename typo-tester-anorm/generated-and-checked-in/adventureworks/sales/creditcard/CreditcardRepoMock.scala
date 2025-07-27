@@ -76,13 +76,10 @@ class CreditcardRepoMock(toRow: Function1[CreditcardRowUnsaved, CreditcardRow],
   override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
     UpdateBuilderMock(UpdateParams.empty, CreditcardFields.structure, map)
   }
-  override def update(row: CreditcardRow)(implicit c: Connection): Boolean = {
-    map.get(row.creditcardid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.creditcardid, row): @nowarn
-        true
-      case None => false
+  override def update(row: CreditcardRow)(implicit c: Connection): Option[CreditcardRow] = {
+    map.get(row.creditcardid).map { _ =>
+      map.put(row.creditcardid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: CreditcardRow)(implicit c: Connection): CreditcardRow = {

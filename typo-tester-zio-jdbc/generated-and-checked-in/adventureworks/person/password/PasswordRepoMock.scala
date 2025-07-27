@@ -88,14 +88,11 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
     UpdateBuilderMock(UpdateParams.empty, PasswordFields.structure, map)
   }
-  override def update(row: PasswordRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: PasswordRow): ZIO[ZConnection, Throwable, Option[PasswordRow]] = {
     ZIO.succeed {
-      map.get(row.businessentityid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.businessentityid, row): @nowarn
-          true
-        case None => false
+      map.get(row.businessentityid).map { _ =>
+        map.put(row.businessentityid, row): @nowarn
+        row
       }
     }
   }

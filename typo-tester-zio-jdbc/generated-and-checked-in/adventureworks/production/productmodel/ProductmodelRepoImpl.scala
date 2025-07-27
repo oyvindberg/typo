@@ -100,7 +100,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
   override def update: UpdateBuilder[ProductmodelFields, ProductmodelRow] = {
     UpdateBuilder(""""production"."productmodel"""", ProductmodelFields.structure, ProductmodelRow.jdbcDecoder)
   }
-  override def update(row: ProductmodelRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ProductmodelRow): ZIO[ZConnection, Throwable, Option[ProductmodelRow]] = {
     val productmodelid = row.productmodelid
     sql"""update "production"."productmodel"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
@@ -108,7 +108,10 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
               "instructions" = ${Segment.paramSegment(row.instructions)(Setter.optionParamSetter(TypoXml.setter))}::xml,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "productmodelid" = ${Segment.paramSegment(productmodelid)(ProductmodelId.setter)}""".update.map(_ > 0)
+          where "productmodelid" = ${Segment.paramSegment(productmodelid)(ProductmodelId.setter)}
+          returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text"""
+      .query(ProductmodelRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ProductmodelRow): ZIO[ZConnection, Throwable, UpdateResult[ProductmodelRow]] = {
     sql"""insert into "production"."productmodel"("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")

@@ -31,7 +31,7 @@ trait PersonRepo {
   def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, PersonRow]
   def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, PersonRow]]
   def update: UpdateBuilder[PersonFields, PersonRow]
-  def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: PersonRow): ZIO[ZConnection, Throwable, Option[PersonRow]]
   def upsert(unsaved: PersonRow): ZIO[ZConnection, Throwable, UpdateResult[PersonRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

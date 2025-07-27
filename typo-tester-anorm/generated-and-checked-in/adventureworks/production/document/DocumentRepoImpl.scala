@@ -141,7 +141,7 @@ class DocumentRepoImpl extends DocumentRepo {
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
     UpdateBuilder(""""production"."document"""", DocumentFields.structure, DocumentRow.rowParser)
   }
-  override def update(row: DocumentRow)(implicit c: Connection): Boolean = {
+  override def update(row: DocumentRow)(implicit c: Connection): Option[DocumentRow] = {
     val documentnode = row.documentnode
     SQL"""update "production"."document"
           set "title" = ${ParameterValue(row.title, null, ToStatement.stringToStatement)},
@@ -157,7 +157,8 @@ class DocumentRepoImpl extends DocumentRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "documentnode" = ${ParameterValue(documentnode, null, DocumentId.toStatement)}
-       """.executeUpdate() > 0
+          returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"
+       """.executeInsert(DocumentRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: DocumentRow)(implicit c: Connection): DocumentRow = {
     SQL"""insert into "production"."document"("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")

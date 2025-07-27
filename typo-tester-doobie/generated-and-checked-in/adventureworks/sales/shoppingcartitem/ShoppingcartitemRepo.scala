@@ -28,7 +28,7 @@ trait ShoppingcartitemRepo {
   def selectByIds(shoppingcartitemids: Array[ShoppingcartitemId]): Stream[ConnectionIO, ShoppingcartitemRow]
   def selectByIdsTracked(shoppingcartitemids: Array[ShoppingcartitemId]): ConnectionIO[Map[ShoppingcartitemId, ShoppingcartitemRow]]
   def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow]
-  def update(row: ShoppingcartitemRow): ConnectionIO[Boolean]
+  def update(row: ShoppingcartitemRow): ConnectionIO[Option[ShoppingcartitemRow]]
   def upsert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow]
   def upsertBatch(unsaved: List[ShoppingcartitemRow]): Stream[ConnectionIO, ShoppingcartitemRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

@@ -87,14 +87,11 @@ class CurrencyrateRepoMock(toRow: Function1[CurrencyrateRowUnsaved, Currencyrate
   override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
     UpdateBuilderMock(UpdateParams.empty, CurrencyrateFields.structure, map)
   }
-  override def update(row: CurrencyrateRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: CurrencyrateRow): ZIO[ZConnection, Throwable, Option[CurrencyrateRow]] = {
     ZIO.succeed {
-      map.get(row.currencyrateid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.currencyrateid, row): @nowarn
-          true
-        case None => false
+      map.get(row.currencyrateid).map { _ =>
+        map.put(row.currencyrateid, row): @nowarn
+        row
       }
     }
   }

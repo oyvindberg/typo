@@ -123,7 +123,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
     UpdateBuilder(""""sales"."salestaxrate"""", SalestaxrateFields.structure, SalestaxrateRow.rowParser)
   }
-  override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {
+  override def update(row: SalestaxrateRow)(implicit c: Connection): Option[SalestaxrateRow] = {
     val salestaxrateid = row.salestaxrateid
     SQL"""update "sales"."salestaxrate"
           set "stateprovinceid" = ${ParameterValue(row.stateprovinceid, null, StateprovinceId.toStatement)}::int4,
@@ -133,7 +133,8 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "salestaxrateid" = ${ParameterValue(salestaxrateid, null, SalestaxrateId.toStatement)}
-       """.executeUpdate() > 0
+          returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text
+       """.executeInsert(SalestaxrateRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {
     SQL"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")

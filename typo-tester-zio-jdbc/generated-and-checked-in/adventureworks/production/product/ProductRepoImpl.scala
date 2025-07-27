@@ -129,7 +129,7 @@ class ProductRepoImpl extends ProductRepo {
   override def update: UpdateBuilder[ProductFields, ProductRow] = {
     UpdateBuilder(""""production"."product"""", ProductFields.structure, ProductRow.jdbcDecoder)
   }
-  override def update(row: ProductRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ProductRow): ZIO[ZConnection, Throwable, Option[ProductRow]] = {
     val productid = row.productid
     sql"""update "production"."product"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
@@ -156,7 +156,10 @@ class ProductRepoImpl extends ProductRepo {
               "discontinueddate" = ${Segment.paramSegment(row.discontinueddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}""".update.map(_ > 0)
+          where "productid" = ${Segment.paramSegment(productid)(ProductId.setter)}
+          returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text"""
+      .query(ProductRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ProductRow): ZIO[ZConnection, Throwable, UpdateResult[ProductRow]] = {
     sql"""insert into "production"."product"("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")

@@ -95,15 +95,13 @@ class ContacttypeRepoImpl extends ContacttypeRepo {
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
     UpdateBuilder(""""person"."contacttype"""", ContacttypeFields.structure, ContacttypeRow.read)
   }
-  override def update(row: ContacttypeRow): ConnectionIO[Boolean] = {
+  override def update(row: ContacttypeRow): ConnectionIO[Option[ContacttypeRow]] = {
     val contacttypeid = row.contacttypeid
     sql"""update "person"."contacttype"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "contacttypeid" = ${fromWrite(contacttypeid)(new Write.Single(ContacttypeId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "contacttypeid" = ${fromWrite(contacttypeid)(new Write.Single(ContacttypeId.put))}
+          returning "contacttypeid", "name", "modifieddate"::text""".query(using ContacttypeRow.read).option
   }
   override def upsert(unsaved: ContacttypeRow): ConnectionIO[ContacttypeRow] = {
     sql"""insert into "person"."contacttype"("contacttypeid", "name", "modifieddate")

@@ -116,16 +116,14 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
   override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
     UpdateBuilder(""""person"."emailaddress"""", EmailaddressFields.structure, EmailaddressRow.read)
   }
-  override def update(row: EmailaddressRow): ConnectionIO[Boolean] = {
+  override def update(row: EmailaddressRow): ConnectionIO[Option[EmailaddressRow]] = {
     val compositeId = row.compositeId
     sql"""update "person"."emailaddress"
           set "emailaddress" = ${fromWrite(row.emailaddress)(new Write.SingleOpt(Meta.StringMeta.put))},
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(new Write.Single(Meta.IntMeta.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "emailaddressid" = ${fromWrite(compositeId.emailaddressid)(new Write.Single(Meta.IntMeta.put))}
+          returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text""".query(using EmailaddressRow.read).option
   }
   override def upsert(unsaved: EmailaddressRow): ConnectionIO[EmailaddressRow] = {
     sql"""insert into "person"."emailaddress"("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")

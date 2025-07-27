@@ -114,12 +114,13 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     UpdateBuilder(""""sales"."personcreditcard"""", PersoncreditcardFields.structure, PersoncreditcardRow.rowParser)
   }
-  override def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean = {
+  override def update(row: PersoncreditcardRow)(implicit c: Connection): Option[PersoncreditcardRow] = {
     val compositeId = row.compositeId
     SQL"""update "sales"."personcreditcard"
           set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "creditcardid" = ${ParameterValue(compositeId.creditcardid, null, /* user-picked */ CustomCreditcardId.toStatement)}
-       """.executeUpdate() > 0
+          returning "businessentityid", "creditcardid", "modifieddate"::text
+       """.executeInsert(PersoncreditcardRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow = {
     SQL"""insert into "sales"."personcreditcard"("businessentityid", "creditcardid", "modifieddate")

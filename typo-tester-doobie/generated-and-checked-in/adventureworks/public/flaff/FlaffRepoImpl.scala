@@ -79,14 +79,12 @@ class FlaffRepoImpl extends FlaffRepo {
   override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
     UpdateBuilder(""""public"."flaff"""", FlaffFields.structure, FlaffRow.read)
   }
-  override def update(row: FlaffRow): ConnectionIO[Boolean] = {
+  override def update(row: FlaffRow): ConnectionIO[Option[FlaffRow]] = {
     val compositeId = row.compositeId
     sql"""update "public"."flaff"
           set "parentspecifier" = ${fromWrite(row.parentspecifier)(new Write.SingleOpt(ShortText.put))}::text
-          where "code" = ${fromWrite(compositeId.code)(new Write.Single(ShortText.put))} AND "another_code" = ${fromWrite(compositeId.anotherCode)(new Write.Single(Meta.StringMeta.put))} AND "some_number" = ${fromWrite(compositeId.someNumber)(new Write.Single(Meta.IntMeta.put))} AND "specifier" = ${fromWrite(compositeId.specifier)(new Write.Single(ShortText.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "code" = ${fromWrite(compositeId.code)(new Write.Single(ShortText.put))} AND "another_code" = ${fromWrite(compositeId.anotherCode)(new Write.Single(Meta.StringMeta.put))} AND "some_number" = ${fromWrite(compositeId.someNumber)(new Write.Single(Meta.IntMeta.put))} AND "specifier" = ${fromWrite(compositeId.specifier)(new Write.Single(ShortText.put))}
+          returning "code", "another_code", "some_number", "specifier", "parentspecifier"""".query(using FlaffRow.read).option
   }
   override def upsert(unsaved: FlaffRow): ConnectionIO[FlaffRow] = {
     sql"""insert into "public"."flaff"("code", "another_code", "some_number", "specifier", "parentspecifier")

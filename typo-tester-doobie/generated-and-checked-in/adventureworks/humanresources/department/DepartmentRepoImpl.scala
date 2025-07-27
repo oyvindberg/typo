@@ -96,16 +96,14 @@ class DepartmentRepoImpl extends DepartmentRepo {
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
     UpdateBuilder(""""humanresources"."department"""", DepartmentFields.structure, DepartmentRow.read)
   }
-  override def update(row: DepartmentRow): ConnectionIO[Boolean] = {
+  override def update(row: DepartmentRow): ConnectionIO[Option[DepartmentRow]] = {
     val departmentid = row.departmentid
     sql"""update "humanresources"."department"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "groupname" = ${fromWrite(row.groupname)(new Write.Single(Name.put))}::varchar,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "departmentid" = ${fromWrite(departmentid)(new Write.Single(DepartmentId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "departmentid" = ${fromWrite(departmentid)(new Write.Single(DepartmentId.put))}
+          returning "departmentid", "name", "groupname", "modifieddate"::text""".query(using DepartmentRow.read).option
   }
   override def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow] = {
     sql"""insert into "humanresources"."department"("departmentid", "name", "groupname", "modifieddate")

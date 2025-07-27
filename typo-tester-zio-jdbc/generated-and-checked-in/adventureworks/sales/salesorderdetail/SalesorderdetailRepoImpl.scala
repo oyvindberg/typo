@@ -123,7 +123,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
     UpdateBuilder(""""sales"."salesorderdetail"""", SalesorderdetailFields.structure, SalesorderdetailRow.jdbcDecoder)
   }
-  override def update(row: SalesorderdetailRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: SalesorderdetailRow): ZIO[ZConnection, Throwable, Option[SalesorderdetailRow]] = {
     val compositeId = row.compositeId
     sql"""update "sales"."salesorderdetail"
           set "carriertrackingnumber" = ${Segment.paramSegment(row.carriertrackingnumber)(Setter.optionParamSetter(Setter.stringSetter))},
@@ -134,7 +134,10 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
               "unitpricediscount" = ${Segment.paramSegment(row.unitpricediscount)(Setter.bigDecimalScalaSetter)}::numeric,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}""".update.map(_ > 0)
+          where "salesorderid" = ${Segment.paramSegment(compositeId.salesorderid)(SalesorderheaderId.setter)} AND "salesorderdetailid" = ${Segment.paramSegment(compositeId.salesorderdetailid)(Setter.intSetter)}
+          returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text"""
+      .query(SalesorderdetailRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: SalesorderdetailRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderdetailRow]] = {
     sql"""insert into "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")

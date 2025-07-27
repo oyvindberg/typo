@@ -120,7 +120,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     UpdateBuilder(""""production"."workorderrouting"""", WorkorderroutingFields.structure, WorkorderroutingRow.read)
   }
-  override def update(row: WorkorderroutingRow): ConnectionIO[Boolean] = {
+  override def update(row: WorkorderroutingRow): ConnectionIO[Option[WorkorderroutingRow]] = {
     val compositeId = row.compositeId
     sql"""update "production"."workorderrouting"
           set "locationid" = ${fromWrite(row.locationid)(new Write.Single(LocationId.put))}::int2,
@@ -132,10 +132,8 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
               "plannedcost" = ${fromWrite(row.plannedcost)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "actualcost" = ${fromWrite(row.actualcost)(new Write.SingleOpt(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "workorderid" = ${fromWrite(compositeId.workorderid)(new Write.Single(WorkorderId.put))} AND "productid" = ${fromWrite(compositeId.productid)(new Write.Single(Meta.IntMeta.put))} AND "operationsequence" = ${fromWrite(compositeId.operationsequence)(new Write.Single(TypoShort.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "workorderid" = ${fromWrite(compositeId.workorderid)(new Write.Single(WorkorderId.put))} AND "productid" = ${fromWrite(compositeId.productid)(new Write.Single(Meta.IntMeta.put))} AND "operationsequence" = ${fromWrite(compositeId.operationsequence)(new Write.Single(TypoShort.put))}
+          returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text""".query(using WorkorderroutingRow.read).option
   }
   override def upsert(unsaved: WorkorderroutingRow): ConnectionIO[WorkorderroutingRow] = {
     sql"""insert into "production"."workorderrouting"("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")

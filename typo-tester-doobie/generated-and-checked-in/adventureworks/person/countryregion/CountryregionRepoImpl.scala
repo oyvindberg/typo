@@ -92,15 +92,13 @@ class CountryregionRepoImpl extends CountryregionRepo {
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
     UpdateBuilder(""""person"."countryregion"""", CountryregionFields.structure, CountryregionRow.read)
   }
-  override def update(row: CountryregionRow): ConnectionIO[Boolean] = {
+  override def update(row: CountryregionRow): ConnectionIO[Option[CountryregionRow]] = {
     val countryregioncode = row.countryregioncode
     sql"""update "person"."countryregion"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "countryregioncode" = ${fromWrite(countryregioncode)(new Write.Single(CountryregionId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "countryregioncode" = ${fromWrite(countryregioncode)(new Write.Single(CountryregionId.put))}
+          returning "countryregioncode", "name", "modifieddate"::text""".query(using CountryregionRow.read).option
   }
   override def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow] = {
     sql"""insert into "person"."countryregion"("countryregioncode", "name", "modifieddate")

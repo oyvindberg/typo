@@ -27,7 +27,7 @@ trait IdentityTestRepo {
   def selectByIds(names: Array[IdentityTestId])(implicit c: Connection): List[IdentityTestRow]
   def selectByIdsTracked(names: Array[IdentityTestId])(implicit c: Connection): Map[IdentityTestId, IdentityTestRow]
   def update: UpdateBuilder[IdentityTestFields, IdentityTestRow]
-  def update(row: IdentityTestRow)(implicit c: Connection): Boolean
+  def update(row: IdentityTestRow)(implicit c: Connection): Option[IdentityTestRow]
   def upsert(unsaved: IdentityTestRow)(implicit c: Connection): IdentityTestRow
   def upsertBatch(unsaved: Iterable[IdentityTestRow])(implicit c: Connection): List[IdentityTestRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

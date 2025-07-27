@@ -215,7 +215,7 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
         Right(code"def $name(${id.param}, $varargs): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}")
       case RepoMethod.Update(_, _, _, param, _) =>
-        Right(code"def $name($param): ${ZIO.of(ZConnection, Throwable, TypesScala.Boolean)}")
+        Right(code"def $name($param): ${ZIO.of(ZConnection, Throwable, TypesScala.Option.of(param.tpe))}")
       case RepoMethod.Insert(_, _, unsavedParam, rowType, _) =>
         Right(code"def $name($unsavedParam): ${ZIO.of(ZConnection, Throwable, rowType)}")
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
@@ -357,14 +357,17 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
       case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
         code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.quotedValue)}, $fieldsType.structure, ${lookupJdbcDecoder(rowType)})"
 
-      case RepoMethod.Update(relName, _, id, param, writeableCols) =>
+      case RepoMethod.Update(relName, cols, id, param, writeableCols) =>
         val sql = SQL(
           code"""update $relName
                 |set ${writeableCols.map { col => code"${col.dbName} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${SqlCast.toPgCode(col)}" }.mkCode(",\n")}
-                |where ${matchId(id)}""".stripMargin
+                |where ${matchId(id)}
+                |returning ${dbNames(cols, isRead = true)}""".stripMargin
         )
         code"""|val ${id.paramName} = ${param.name}.${id.paramName}
-               |$sql.update.map(_ > 0)"""
+               |$sql
+               |  .query(${lookupJdbcDecoder(param.tpe)})
+               |  .selectOne"""
 
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
         val cases0 = unsaved.restCols.map { col =>
@@ -585,12 +588,9 @@ class DbLibZioJdbc(pkg: sc.QIdent, inlineImplicits: Boolean, dslEnabled: Boolean
                |}""".stripMargin
       case RepoMethod.Update(_, _, _, param, _) =>
         code"""$ZIO.succeed {
-              |  map.get(${param.name}.${id.paramName}) match {
-              |    case ${TypesScala.Some}(`${param.name}`) => false
-              |    case ${TypesScala.Some}(_) =>
-              |      map.put(${param.name}.${id.paramName}, ${param.name}): @${TypesScala.nowarn}
-              |      true
-              |    case ${TypesScala.None} => false
+              |  map.get(${param.name}.${id.paramName}).map { _ =>
+              |    map.put(${param.name}.${id.paramName}, ${param.name}): @${TypesScala.nowarn}
+              |    ${param.name}
               |  }
               |}""".stripMargin
       case RepoMethod.Insert(_, _, unsavedParam, _, _) =>

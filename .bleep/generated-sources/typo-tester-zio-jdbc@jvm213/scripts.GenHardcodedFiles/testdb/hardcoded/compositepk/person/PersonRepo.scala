@@ -29,7 +29,7 @@ trait PersonRepo {
   def selectByFieldValues(fieldValues: List[PersonFieldOrIdValue[?]]): ZStream[ZConnection, Throwable, PersonRow]
   def selectById(compositeId: PersonId): ZIO[ZConnection, Throwable, Option[PersonRow]]
   def update: UpdateBuilder[PersonFields, PersonRow]
-  def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: PersonRow): ZIO[ZConnection, Throwable, Option[PersonRow]]
   def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: PersonRow): ZIO[ZConnection, Throwable, UpdateResult[PersonRow]]
   // Not implementable for zio-jdbc: upsertBatch

@@ -100,7 +100,7 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
     UpdateBuilder(""""sales"."currencyrate"""", CurrencyrateFields.structure, CurrencyrateRow.read)
   }
-  override def update(row: CurrencyrateRow): ConnectionIO[Boolean] = {
+  override def update(row: CurrencyrateRow): ConnectionIO[Option[CurrencyrateRow]] = {
     val currencyrateid = row.currencyrateid
     sql"""update "sales"."currencyrate"
           set "currencyratedate" = ${fromWrite(row.currencyratedate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
@@ -109,10 +109,8 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
               "averagerate" = ${fromWrite(row.averagerate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "endofdayrate" = ${fromWrite(row.endofdayrate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "currencyrateid" = ${fromWrite(currencyrateid)(new Write.Single(CurrencyrateId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "currencyrateid" = ${fromWrite(currencyrateid)(new Write.Single(CurrencyrateId.put))}
+          returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text""".query(using CurrencyrateRow.read).option
   }
   override def upsert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow] = {
     sql"""insert into "sales"."currencyrate"("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")

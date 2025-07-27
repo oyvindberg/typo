@@ -88,14 +88,11 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
     UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure, map)
   }
-  override def update(row: ShiftRow): ConnectionIO[Boolean] = {
+  override def update(row: ShiftRow): ConnectionIO[Option[ShiftRow]] = {
     delay {
-      map.get(row.shiftid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.shiftid, row): @nowarn
-          true
-        case None => false
+      map.get(row.shiftid).map { _ =>
+        map.put(row.shiftid, row): @nowarn
+        row
       }
     }
   }

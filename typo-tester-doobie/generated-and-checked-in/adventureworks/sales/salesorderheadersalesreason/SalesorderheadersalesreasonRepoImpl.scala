@@ -107,14 +107,12 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
   override def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
     UpdateBuilder(""""sales"."salesorderheadersalesreason"""", SalesorderheadersalesreasonFields.structure, SalesorderheadersalesreasonRow.read)
   }
-  override def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Boolean] = {
+  override def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Option[SalesorderheadersalesreasonRow]] = {
     val compositeId = row.compositeId
     sql"""update "sales"."salesorderheadersalesreason"
           set "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "salesorderid" = ${fromWrite(compositeId.salesorderid)(new Write.Single(SalesorderheaderId.put))} AND "salesreasonid" = ${fromWrite(compositeId.salesreasonid)(new Write.Single(SalesreasonId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "salesorderid" = ${fromWrite(compositeId.salesorderid)(new Write.Single(SalesorderheaderId.put))} AND "salesreasonid" = ${fromWrite(compositeId.salesreasonid)(new Write.Single(SalesreasonId.put))}
+          returning "salesorderid", "salesreasonid", "modifieddate"::text""".query(using SalesorderheadersalesreasonRow.read).option
   }
   override def upsert(unsaved: SalesorderheadersalesreasonRow): ConnectionIO[SalesorderheadersalesreasonRow] = {
     sql"""insert into "sales"."salesorderheadersalesreason"("salesorderid", "salesreasonid", "modifieddate")

@@ -100,7 +100,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
     UpdateBuilder(""""production"."workorder"""", WorkorderFields.structure, WorkorderRow.jdbcDecoder)
   }
-  override def update(row: WorkorderRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: WorkorderRow): ZIO[ZConnection, Throwable, Option[WorkorderRow]] = {
     val workorderid = row.workorderid
     sql"""update "production"."workorder"
           set "productid" = ${Segment.paramSegment(row.productid)(ProductId.setter)}::int4,
@@ -111,7 +111,10 @@ class WorkorderRepoImpl extends WorkorderRepo {
               "duedate" = ${Segment.paramSegment(row.duedate)(TypoLocalDateTime.setter)}::timestamp,
               "scrapreasonid" = ${Segment.paramSegment(row.scrapreasonid)(Setter.optionParamSetter(ScrapreasonId.setter))}::int2,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "workorderid" = ${Segment.paramSegment(workorderid)(WorkorderId.setter)}""".update.map(_ > 0)
+          where "workorderid" = ${Segment.paramSegment(workorderid)(WorkorderId.setter)}
+          returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text"""
+      .query(WorkorderRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: WorkorderRow): ZIO[ZConnection, Throwable, UpdateResult[WorkorderRow]] = {
     sql"""insert into "production"."workorder"("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")

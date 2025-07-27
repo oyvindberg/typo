@@ -30,7 +30,7 @@ trait CreditcardRepo {
   def selectByIds(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): Stream[ConnectionIO, CreditcardRow]
   def selectByIdsTracked(creditcardids: Array[/* user-picked */ CustomCreditcardId])(implicit puts0: Put[Array[/* user-picked */ CustomCreditcardId]]): ConnectionIO[Map[/* user-picked */ CustomCreditcardId, CreditcardRow]]
   def update: UpdateBuilder[CreditcardFields, CreditcardRow]
-  def update(row: CreditcardRow): ConnectionIO[Boolean]
+  def update(row: CreditcardRow): ConnectionIO[Option[CreditcardRow]]
   def upsert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow]
   def upsertBatch(unsaved: List[CreditcardRow]): Stream[ConnectionIO, CreditcardRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

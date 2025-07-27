@@ -30,7 +30,7 @@ trait WorkorderroutingRepo {
   def selectByIds(compositeIds: Array[WorkorderroutingId]): ZStream[ZConnection, Throwable, WorkorderroutingRow]
   def selectByIdsTracked(compositeIds: Array[WorkorderroutingId]): ZIO[ZConnection, Throwable, Map[WorkorderroutingId, WorkorderroutingRow]]
   def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow]
-  def update(row: WorkorderroutingRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: WorkorderroutingRow): ZIO[ZConnection, Throwable, Option[WorkorderroutingRow]]
   def upsert(unsaved: WorkorderroutingRow): ZIO[ZConnection, Throwable, UpdateResult[WorkorderroutingRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

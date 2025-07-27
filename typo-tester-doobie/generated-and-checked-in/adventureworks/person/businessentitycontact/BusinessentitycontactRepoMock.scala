@@ -88,14 +88,11 @@ class BusinessentitycontactRepoMock(toRow: Function1[BusinessentitycontactRowUns
   override def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
     UpdateBuilderMock(UpdateParams.empty, BusinessentitycontactFields.structure, map)
   }
-  override def update(row: BusinessentitycontactRow): ConnectionIO[Boolean] = {
+  override def update(row: BusinessentitycontactRow): ConnectionIO[Option[BusinessentitycontactRow]] = {
     delay {
-      map.get(row.compositeId) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.compositeId, row): @nowarn
-          true
-        case None => false
+      map.get(row.compositeId).map { _ =>
+        map.put(row.compositeId, row): @nowarn
+        row
       }
     }
   }

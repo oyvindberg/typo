@@ -218,7 +218,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
         Right(code"def $name(${id.param}, $varargs)(implicit c: ${TypesJava.Connection}): ${TypesScala.Boolean}")
       case RepoMethod.Update(_, _, _, param, _) =>
-        Right(code"def $name($param)(implicit c: ${TypesJava.Connection}): ${TypesScala.Boolean}")
+        Right(code"def $name($param)(implicit c: ${TypesJava.Connection}): ${TypesScala.Option.of(param.tpe)}")
       case RepoMethod.Insert(_, _, unsavedParam, rowType, _) =>
         Right(code"def $name($unsavedParam)(implicit c: ${TypesJava.Connection}): $rowType")
       case RepoMethod.InsertStreaming(_, rowType, _) =>
@@ -381,7 +381,7 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
               |      .executeUpdate() > 0
               |}
               |""".stripMargin
-      case RepoMethod.Update(relName, _, id, param, writeableColumnsNotId) =>
+      case RepoMethod.Update(relName, cols, id, param, writeableColumnsNotId) =>
         val sql = SQL {
           val setCols = writeableColumnsNotId.map { col =>
             code"${col.dbName.code} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${SqlCast.toPgCode(col)}"
@@ -389,10 +389,11 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
           code"""|update $relName
                  |set ${setCols.mkCode(",\n")}
                  |where ${matchId(id)}
+                 |returning ${dbNames(cols, isRead = true)}
                  |""".stripMargin
         }
         code"""|val ${id.paramName} = ${param.name}.${id.paramName}
-               |$sql.executeUpdate() > 0"""
+               |$sql.executeInsert(${rowParserFor(param.tpe)}.singleOpt)"""
 
       case RepoMethod.Insert(relName, cols, unsavedParam, rowType, writeableColumnsWithId) =>
         val values = writeableColumnsWithId.map { c =>
@@ -657,13 +658,10 @@ class DbLibAnorm(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDefa
       case RepoMethod.UpdateBuilder(_, fieldsType, _) =>
         code"${sc.Type.dsl.UpdateBuilderMock}(${sc.Type.dsl.UpdateParams}.empty, $fieldsType.structure, map)"
       case RepoMethod.Update(_, _, _, param, _) =>
-        code"""map.get(${param.name}.${id.paramName}) match {
-              |  case ${TypesScala.Some}(`${param.name}`) => false
-              |  case ${TypesScala.Some}(_) =>
-              |    map.put(${param.name}.${id.paramName}, ${param.name}): @${TypesScala.nowarn}
-              |    true
-              |  case ${TypesScala.None} => false
-              |}""".stripMargin
+        code"""|map.get(${param.name}.${id.paramName}).map { _ =>
+               |  map.put(${param.name}.${id.paramName}, ${param.name}): @${TypesScala.nowarn}
+               |  ${param.name}
+               |}""".stripMargin
       case RepoMethod.Insert(_, _, unsavedParam, _, _) =>
         code"""|val _ = if (map.contains(${unsavedParam.name}.${id.paramName}))
                |  sys.error(s"id $${${unsavedParam.name}.${id.paramName}} already exists")

@@ -104,17 +104,15 @@ class LocationRepoImpl extends LocationRepo {
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
     UpdateBuilder(""""production"."location"""", LocationFields.structure, LocationRow.read)
   }
-  override def update(row: LocationRow): ConnectionIO[Boolean] = {
+  override def update(row: LocationRow): ConnectionIO[Option[LocationRow]] = {
     val locationid = row.locationid
     sql"""update "production"."location"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "costrate" = ${fromWrite(row.costrate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "availability" = ${fromWrite(row.availability)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "locationid" = ${fromWrite(locationid)(new Write.Single(LocationId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "locationid" = ${fromWrite(locationid)(new Write.Single(LocationId.put))}
+          returning "locationid", "name", "costrate", "availability", "modifieddate"::text""".query(using LocationRow.read).option
   }
   override def upsert(unsaved: LocationRow): ConnectionIO[LocationRow] = {
     sql"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")

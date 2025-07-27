@@ -116,7 +116,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
   override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
     UpdateBuilder(""""sales"."salesperson"""", SalespersonFields.structure, SalespersonRow.read)
   }
-  override def update(row: SalespersonRow): ConnectionIO[Boolean] = {
+  override def update(row: SalespersonRow): ConnectionIO[Option[SalespersonRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "sales"."salesperson"
           set "territoryid" = ${fromWrite(row.territoryid)(new Write.SingleOpt(SalesterritoryId.put))}::int4,
@@ -127,10 +127,8 @@ class SalespersonRepoImpl extends SalespersonRepo {
               "saleslastyear" = ${fromWrite(row.saleslastyear)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}
+          returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text""".query(using SalespersonRow.read).option
   }
   override def upsert(unsaved: SalespersonRow): ConnectionIO[SalespersonRow] = {
     sql"""insert into "sales"."salesperson"("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")

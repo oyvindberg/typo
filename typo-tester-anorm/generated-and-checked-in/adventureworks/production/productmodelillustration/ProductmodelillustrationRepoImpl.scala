@@ -113,12 +113,13 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
     UpdateBuilder(""""production"."productmodelillustration"""", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.rowParser)
   }
-  override def update(row: ProductmodelillustrationRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductmodelillustrationRow)(implicit c: Connection): Option[ProductmodelillustrationRow] = {
     val compositeId = row.compositeId
     SQL"""update "production"."productmodelillustration"
           set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "illustrationid" = ${ParameterValue(compositeId.illustrationid, null, IllustrationId.toStatement)}
-       """.executeUpdate() > 0
+          returning "productmodelid", "illustrationid", "modifieddate"::text
+       """.executeInsert(ProductmodelillustrationRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductmodelillustrationRow)(implicit c: Connection): ProductmodelillustrationRow = {
     SQL"""insert into "production"."productmodelillustration"("productmodelid", "illustrationid", "modifieddate")

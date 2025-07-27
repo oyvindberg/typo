@@ -103,11 +103,14 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     UpdateBuilder(""""sales"."countryregioncurrency"""", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.jdbcDecoder)
   }
-  override def update(row: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, Option[CountryregioncurrencyRow]] = {
     val compositeId = row.compositeId
     sql"""update "sales"."countryregioncurrency"
           set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "countryregioncode" = ${Segment.paramSegment(compositeId.countryregioncode)(CountryregionId.setter)} AND "currencycode" = ${Segment.paramSegment(compositeId.currencycode)(CurrencyId.setter)}""".update.map(_ > 0)
+          where "countryregioncode" = ${Segment.paramSegment(compositeId.countryregioncode)(CountryregionId.setter)} AND "currencycode" = ${Segment.paramSegment(compositeId.currencycode)(CurrencyId.setter)}
+          returning "countryregioncode", "currencycode", "modifieddate"::text"""
+      .query(CountryregioncurrencyRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: CountryregioncurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CountryregioncurrencyRow]] = {
     sql"""insert into "sales"."countryregioncurrency"("countryregioncode", "currencycode", "modifieddate")

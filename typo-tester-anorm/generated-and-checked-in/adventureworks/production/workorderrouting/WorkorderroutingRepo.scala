@@ -27,7 +27,7 @@ trait WorkorderroutingRepo {
   def selectByIds(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): List[WorkorderroutingRow]
   def selectByIdsTracked(compositeIds: Array[WorkorderroutingId])(implicit c: Connection): Map[WorkorderroutingId, WorkorderroutingRow]
   def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow]
-  def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean
+  def update(row: WorkorderroutingRow)(implicit c: Connection): Option[WorkorderroutingRow]
   def upsert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow
   def upsertBatch(unsaved: Iterable[WorkorderroutingRow])(implicit c: Connection): List[WorkorderroutingRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

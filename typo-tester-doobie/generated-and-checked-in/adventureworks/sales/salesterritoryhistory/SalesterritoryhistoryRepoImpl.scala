@@ -116,16 +116,14 @@ class SalesterritoryhistoryRepoImpl extends SalesterritoryhistoryRepo {
   override def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
     UpdateBuilder(""""sales"."salesterritoryhistory"""", SalesterritoryhistoryFields.structure, SalesterritoryhistoryRow.read)
   }
-  override def update(row: SalesterritoryhistoryRow): ConnectionIO[Boolean] = {
+  override def update(row: SalesterritoryhistoryRow): ConnectionIO[Option[SalesterritoryhistoryRow]] = {
     val compositeId = row.compositeId
     sql"""update "sales"."salesterritoryhistory"
           set "enddate" = ${fromWrite(row.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(new Write.Single(TypoLocalDateTime.put))} AND "territoryid" = ${fromWrite(compositeId.territoryid)(new Write.Single(SalesterritoryId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(new Write.Single(TypoLocalDateTime.put))} AND "territoryid" = ${fromWrite(compositeId.territoryid)(new Write.Single(SalesterritoryId.put))}
+          returning "businessentityid", "territoryid", "startdate"::text, "enddate"::text, "rowguid", "modifieddate"::text""".query(using SalesterritoryhistoryRow.read).option
   }
   override def upsert(unsaved: SalesterritoryhistoryRow): ConnectionIO[SalesterritoryhistoryRow] = {
     sql"""insert into "sales"."salesterritoryhistory"("businessentityid", "territoryid", "startdate", "enddate", "rowguid", "modifieddate")

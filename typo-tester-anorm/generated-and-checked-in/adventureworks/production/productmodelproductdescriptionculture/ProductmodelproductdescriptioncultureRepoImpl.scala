@@ -117,12 +117,13 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
   override def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
     UpdateBuilder(""""production"."productmodelproductdescriptionculture"""", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.rowParser)
   }
-  override def update(row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): Option[ProductmodelproductdescriptioncultureRow] = {
     val compositeId = row.compositeId
     SQL"""update "production"."productmodelproductdescriptionculture"
           set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productmodelid" = ${ParameterValue(compositeId.productmodelid, null, ProductmodelId.toStatement)} AND "productdescriptionid" = ${ParameterValue(compositeId.productdescriptionid, null, ProductdescriptionId.toStatement)} AND "cultureid" = ${ParameterValue(compositeId.cultureid, null, CultureId.toStatement)}
-       """.executeUpdate() > 0
+          returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text
+       """.executeInsert(ProductmodelproductdescriptioncultureRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductmodelproductdescriptioncultureRow)(implicit c: Connection): ProductmodelproductdescriptioncultureRow = {
     SQL"""insert into "production"."productmodelproductdescriptionculture"("productmodelid", "productdescriptionid", "cultureid", "modifieddate")

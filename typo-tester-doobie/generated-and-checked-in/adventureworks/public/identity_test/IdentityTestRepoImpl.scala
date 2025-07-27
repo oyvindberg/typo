@@ -90,14 +90,12 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
     UpdateBuilder(""""public"."identity-test"""", IdentityTestFields.structure, IdentityTestRow.read)
   }
-  override def update(row: IdentityTestRow): ConnectionIO[Boolean] = {
+  override def update(row: IdentityTestRow): ConnectionIO[Option[IdentityTestRow]] = {
     val name = row.name
     sql"""update "public"."identity-test"
           set "default_generated" = ${fromWrite(row.defaultGenerated)(new Write.Single(Meta.IntMeta.put))}::int4
-          where "name" = ${fromWrite(name)(new Write.Single(IdentityTestId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "name" = ${fromWrite(name)(new Write.Single(IdentityTestId.put))}
+          returning "always_generated", "default_generated", "name"""".query(using IdentityTestRow.read).option
   }
   override def upsert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow] = {
     sql"""insert into "public"."identity-test"("default_generated", "name")

@@ -88,12 +88,15 @@ class CountryregionRepoImpl extends CountryregionRepo {
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
     UpdateBuilder(""""person"."countryregion"""", CountryregionFields.structure, CountryregionRow.jdbcDecoder)
   }
-  override def update(row: CountryregionRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: CountryregionRow): ZIO[ZConnection, Throwable, Option[CountryregionRow]] = {
     val countryregioncode = row.countryregioncode
     sql"""update "person"."countryregion"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(CountryregionId.setter)}""".update.map(_ > 0)
+          where "countryregioncode" = ${Segment.paramSegment(countryregioncode)(CountryregionId.setter)}
+          returning "countryregioncode", "name", "modifieddate"::text"""
+      .query(CountryregionRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: CountryregionRow): ZIO[ZConnection, Throwable, UpdateResult[CountryregionRow]] = {
     sql"""insert into "person"."countryregion"("countryregioncode", "name", "modifieddate")

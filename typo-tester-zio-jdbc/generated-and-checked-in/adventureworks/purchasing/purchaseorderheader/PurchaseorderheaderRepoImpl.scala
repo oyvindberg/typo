@@ -121,7 +121,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
     UpdateBuilder(""""purchasing"."purchaseorderheader"""", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.jdbcDecoder)
   }
-  override def update(row: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, Option[PurchaseorderheaderRow]] = {
     val purchaseorderid = row.purchaseorderid
     sql"""update "purchasing"."purchaseorderheader"
           set "revisionnumber" = ${Segment.paramSegment(row.revisionnumber)(TypoShort.setter)}::int2,
@@ -135,7 +135,10 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
               "taxamt" = ${Segment.paramSegment(row.taxamt)(Setter.bigDecimalScalaSetter)}::numeric,
               "freight" = ${Segment.paramSegment(row.freight)(Setter.bigDecimalScalaSetter)}::numeric,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(PurchaseorderheaderId.setter)}""".update.map(_ > 0)
+          where "purchaseorderid" = ${Segment.paramSegment(purchaseorderid)(PurchaseorderheaderId.setter)}
+          returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text"""
+      .query(PurchaseorderheaderRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: PurchaseorderheaderRow): ZIO[ZConnection, Throwable, UpdateResult[PurchaseorderheaderRow]] = {
     sql"""insert into "purchasing"."purchaseorderheader"("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")

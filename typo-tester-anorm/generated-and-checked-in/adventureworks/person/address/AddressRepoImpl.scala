@@ -122,7 +122,7 @@ class AddressRepoImpl extends AddressRepo {
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
     UpdateBuilder(""""person"."address"""", AddressFields.structure, AddressRow.rowParser)
   }
-  override def update(row: AddressRow)(implicit c: Connection): Boolean = {
+  override def update(row: AddressRow)(implicit c: Connection): Option[AddressRow] = {
     val addressid = row.addressid
     SQL"""update "person"."address"
           set "addressline1" = ${ParameterValue(row.addressline1, null, ToStatement.stringToStatement)},
@@ -134,7 +134,8 @@ class AddressRepoImpl extends AddressRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "addressid" = ${ParameterValue(addressid, null, AddressId.toStatement)}
-       """.executeUpdate() > 0
+          returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text
+       """.executeInsert(AddressRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: AddressRow)(implicit c: Connection): AddressRow = {
     SQL"""insert into "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")

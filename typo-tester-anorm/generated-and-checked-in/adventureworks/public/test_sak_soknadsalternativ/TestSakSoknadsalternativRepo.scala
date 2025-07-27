@@ -24,7 +24,7 @@ trait TestSakSoknadsalternativRepo {
   def selectByIds(compositeIds: Array[TestSakSoknadsalternativId])(implicit c: Connection): List[TestSakSoknadsalternativRow]
   def selectByIdsTracked(compositeIds: Array[TestSakSoknadsalternativId])(implicit c: Connection): Map[TestSakSoknadsalternativId, TestSakSoknadsalternativRow]
   def update: UpdateBuilder[TestSakSoknadsalternativFields, TestSakSoknadsalternativRow]
-  def update(row: TestSakSoknadsalternativRow)(implicit c: Connection): Boolean
+  def update(row: TestSakSoknadsalternativRow)(implicit c: Connection): Option[TestSakSoknadsalternativRow]
   def upsert(unsaved: TestSakSoknadsalternativRow)(implicit c: Connection): TestSakSoknadsalternativRow
   def upsertBatch(unsaved: Iterable[TestSakSoknadsalternativRow])(implicit c: Connection): List[TestSakSoknadsalternativRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

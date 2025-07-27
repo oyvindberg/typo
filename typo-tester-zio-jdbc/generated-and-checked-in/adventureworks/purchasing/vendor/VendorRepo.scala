@@ -31,7 +31,7 @@ trait VendorRepo {
   def selectByIds(businessentityids: Array[BusinessentityId]): ZStream[ZConnection, Throwable, VendorRow]
   def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ZIO[ZConnection, Throwable, Map[BusinessentityId, VendorRow]]
   def update: UpdateBuilder[VendorFields, VendorRow]
-  def update(row: VendorRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: VendorRow): ZIO[ZConnection, Throwable, Option[VendorRow]]
   def upsert(unsaved: VendorRow): ZIO[ZConnection, Throwable, UpdateResult[VendorRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

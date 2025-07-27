@@ -124,7 +124,7 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
   override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
     UpdateBuilder(""""purchasing"."productvendor"""", ProductvendorFields.structure, ProductvendorRow.rowParser)
   }
-  override def update(row: ProductvendorRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductvendorRow)(implicit c: Connection): Option[ProductvendorRow] = {
     val compositeId = row.compositeId
     SQL"""update "purchasing"."productvendor"
           set "averageleadtime" = ${ParameterValue(row.averageleadtime, null, ToStatement.intToStatement)}::int4,
@@ -137,7 +137,8 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
               "unitmeasurecode" = ${ParameterValue(row.unitmeasurecode, null, UnitmeasureId.toStatement)}::bpchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)}
-       """.executeUpdate() > 0
+          returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text
+       """.executeInsert(ProductvendorRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductvendorRow)(implicit c: Connection): ProductvendorRow = {
     SQL"""insert into "purchasing"."productvendor"("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")

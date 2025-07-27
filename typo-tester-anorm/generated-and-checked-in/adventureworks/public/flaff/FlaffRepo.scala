@@ -24,7 +24,7 @@ trait FlaffRepo {
   def selectByIds(compositeIds: Array[FlaffId])(implicit c: Connection): List[FlaffRow]
   def selectByIdsTracked(compositeIds: Array[FlaffId])(implicit c: Connection): Map[FlaffId, FlaffRow]
   def update: UpdateBuilder[FlaffFields, FlaffRow]
-  def update(row: FlaffRow)(implicit c: Connection): Boolean
+  def update(row: FlaffRow)(implicit c: Connection): Option[FlaffRow]
   def upsert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow
   def upsertBatch(unsaved: Iterable[FlaffRow])(implicit c: Connection): List[FlaffRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

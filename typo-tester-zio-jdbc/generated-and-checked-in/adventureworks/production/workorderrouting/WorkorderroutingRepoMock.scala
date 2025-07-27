@@ -87,14 +87,11 @@ class WorkorderroutingRepoMock(toRow: Function1[WorkorderroutingRowUnsaved, Work
   override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     UpdateBuilderMock(UpdateParams.empty, WorkorderroutingFields.structure, map)
   }
-  override def update(row: WorkorderroutingRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: WorkorderroutingRow): ZIO[ZConnection, Throwable, Option[WorkorderroutingRow]] = {
     ZIO.succeed {
-      map.get(row.compositeId) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.compositeId, row): @nowarn
-          true
-        case None => false
+      map.get(row.compositeId).map { _ =>
+        map.put(row.compositeId, row): @nowarn
+        row
       }
     }
   }

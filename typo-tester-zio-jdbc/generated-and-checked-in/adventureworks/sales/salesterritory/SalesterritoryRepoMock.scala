@@ -87,14 +87,11 @@ class SalesterritoryRepoMock(toRow: Function1[SalesterritoryRowUnsaved, Salester
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
     UpdateBuilderMock(UpdateParams.empty, SalesterritoryFields.structure, map)
   }
-  override def update(row: SalesterritoryRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: SalesterritoryRow): ZIO[ZConnection, Throwable, Option[SalesterritoryRow]] = {
     ZIO.succeed {
-      map.get(row.territoryid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.territoryid, row): @nowarn
-          true
-        case None => false
+      map.get(row.territoryid).map { _ =>
+        map.put(row.territoryid, row): @nowarn
+        row
       }
     }
   }

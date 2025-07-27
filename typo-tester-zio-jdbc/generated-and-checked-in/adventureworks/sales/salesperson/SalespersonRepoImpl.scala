@@ -112,7 +112,7 @@ class SalespersonRepoImpl extends SalespersonRepo {
   override def update: UpdateBuilder[SalespersonFields, SalespersonRow] = {
     UpdateBuilder(""""sales"."salesperson"""", SalespersonFields.structure, SalespersonRow.jdbcDecoder)
   }
-  override def update(row: SalespersonRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: SalespersonRow): ZIO[ZConnection, Throwable, Option[SalespersonRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "sales"."salesperson"
           set "territoryid" = ${Segment.paramSegment(row.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4,
@@ -123,7 +123,10 @@ class SalespersonRepoImpl extends SalespersonRepo {
               "saleslastyear" = ${Segment.paramSegment(row.saleslastyear)(Setter.bigDecimalScalaSetter)}::numeric,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
+          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}
+          returning "businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate"::text"""
+      .query(SalespersonRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: SalespersonRow): ZIO[ZConnection, Throwable, UpdateResult[SalespersonRow]] = {
     sql"""insert into "sales"."salesperson"("businessentityid", "territoryid", "salesquota", "bonus", "commissionpct", "salesytd", "saleslastyear", "rowguid", "modifieddate")

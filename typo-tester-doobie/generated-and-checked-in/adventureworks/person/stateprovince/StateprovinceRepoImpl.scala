@@ -111,7 +111,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
     UpdateBuilder(""""person"."stateprovince"""", StateprovinceFields.structure, StateprovinceRow.read)
   }
-  override def update(row: StateprovinceRow): ConnectionIO[Boolean] = {
+  override def update(row: StateprovinceRow): ConnectionIO[Option[StateprovinceRow]] = {
     val stateprovinceid = row.stateprovinceid
     sql"""update "person"."stateprovince"
           set "stateprovincecode" = ${fromWrite(row.stateprovincecode)(new Write.Single(Meta.StringMeta.put))}::bpchar,
@@ -121,10 +121,8 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
               "territoryid" = ${fromWrite(row.territoryid)(new Write.Single(SalesterritoryId.put))}::int4,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "stateprovinceid" = ${fromWrite(stateprovinceid)(new Write.Single(StateprovinceId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "stateprovinceid" = ${fromWrite(stateprovinceid)(new Write.Single(StateprovinceId.put))}
+          returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text""".query(using StateprovinceRow.read).option
   }
   override def upsert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow] = {
     sql"""insert into "person"."stateprovince"("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")

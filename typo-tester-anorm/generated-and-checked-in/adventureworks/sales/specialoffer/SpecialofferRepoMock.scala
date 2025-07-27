@@ -74,13 +74,10 @@ class SpecialofferRepoMock(toRow: Function1[SpecialofferRowUnsaved, Specialoffer
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
     UpdateBuilderMock(UpdateParams.empty, SpecialofferFields.structure, map)
   }
-  override def update(row: SpecialofferRow)(implicit c: Connection): Boolean = {
-    map.get(row.specialofferid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.specialofferid, row): @nowarn
-        true
-      case None => false
+  override def update(row: SpecialofferRow)(implicit c: Connection): Option[SpecialofferRow] = {
+    map.get(row.specialofferid).map { _ =>
+      map.put(row.specialofferid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: SpecialofferRow)(implicit c: Connection): SpecialofferRow = {

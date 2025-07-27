@@ -31,7 +31,7 @@ package object generated {
         case "VARCHAR" => "text[]"
         case other => s"${other}[]"
       }
-    
+  
     override def jdbcType: scala.Int = java.sql.Types.ARRAY
   }
 }

@@ -127,7 +127,7 @@ class EmployeeRepoImpl extends EmployeeRepo {
   override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
     UpdateBuilder(""""humanresources"."employee"""", EmployeeFields.structure, EmployeeRow.read)
   }
-  override def update(row: EmployeeRow): ConnectionIO[Boolean] = {
+  override def update(row: EmployeeRow): ConnectionIO[Option[EmployeeRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "humanresources"."employee"
           set "nationalidnumber" = ${fromWrite(row.nationalidnumber)(new Write.Single(Meta.StringMeta.put))},
@@ -144,10 +144,8 @@ class EmployeeRepoImpl extends EmployeeRepo {
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
               "organizationnode" = ${fromWrite(row.organizationnode)(new Write.SingleOpt(Meta.StringMeta.put))}
-          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}
+          returning "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode"""".query(using EmployeeRow.read).option
   }
   override def upsert(unsaved: EmployeeRow): ConnectionIO[EmployeeRow] = {
     sql"""insert into "humanresources"."employee"("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")

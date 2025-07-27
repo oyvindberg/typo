@@ -92,14 +92,11 @@ class UsersRepoMock(toRow: Function1[UsersRowUnsaved, UsersRow],
   override def update: UpdateBuilder[UsersFields, UsersRow] = {
     UpdateBuilderMock(UpdateParams.empty, UsersFields.structure, map)
   }
-  override def update(row: UsersRow): ConnectionIO[Boolean] = {
+  override def update(row: UsersRow): ConnectionIO[Option[UsersRow]] = {
     delay {
-      map.get(row.userId) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.userId, row): @nowarn
-          true
-        case None => false
+      map.get(row.userId).map { _ =>
+        map.put(row.userId, row): @nowarn
+        row
       }
     }
   }

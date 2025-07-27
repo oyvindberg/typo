@@ -109,13 +109,16 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
     UpdateBuilder(""""sales"."salespersonquotahistory"""", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.jdbcDecoder)
   }
-  override def update(row: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, Option[SalespersonquotahistoryRow]] = {
     val compositeId = row.compositeId
     sql"""update "sales"."salespersonquotahistory"
           set "salesquota" = ${Segment.paramSegment(row.salesquota)(Setter.bigDecimalScalaSetter)}::numeric,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "quotadate" = ${Segment.paramSegment(compositeId.quotadate)(TypoLocalDateTime.setter)}""".update.map(_ > 0)
+          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "quotadate" = ${Segment.paramSegment(compositeId.quotadate)(TypoLocalDateTime.setter)}
+          returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text"""
+      .query(SalespersonquotahistoryRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: SalespersonquotahistoryRow): ZIO[ZConnection, Throwable, UpdateResult[SalespersonquotahistoryRow]] = {
     sql"""insert into "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")

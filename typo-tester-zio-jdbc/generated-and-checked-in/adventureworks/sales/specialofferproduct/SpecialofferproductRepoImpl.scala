@@ -108,12 +108,15 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
     UpdateBuilder(""""sales"."specialofferproduct"""", SpecialofferproductFields.structure, SpecialofferproductRow.jdbcDecoder)
   }
-  override def update(row: SpecialofferproductRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: SpecialofferproductRow): ZIO[ZConnection, Throwable, Option[SpecialofferproductRow]] = {
     val compositeId = row.compositeId
     sql"""update "sales"."specialofferproduct"
           set "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "specialofferid" = ${Segment.paramSegment(compositeId.specialofferid)(SpecialofferId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)}""".update.map(_ > 0)
+          where "specialofferid" = ${Segment.paramSegment(compositeId.specialofferid)(SpecialofferId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)}
+          returning "specialofferid", "productid", "rowguid", "modifieddate"::text"""
+      .query(SpecialofferproductRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: SpecialofferproductRow): ZIO[ZConnection, Throwable, UpdateResult[SpecialofferproductRow]] = {
     sql"""insert into "sales"."specialofferproduct"("specialofferid", "productid", "rowguid", "modifieddate")

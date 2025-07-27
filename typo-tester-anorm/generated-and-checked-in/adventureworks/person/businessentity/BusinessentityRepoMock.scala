@@ -74,13 +74,10 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
   override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
     UpdateBuilderMock(UpdateParams.empty, BusinessentityFields.structure, map)
   }
-  override def update(row: BusinessentityRow)(implicit c: Connection): Boolean = {
-    map.get(row.businessentityid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.businessentityid, row): @nowarn
-        true
-      case None => false
+  override def update(row: BusinessentityRow)(implicit c: Connection): Option[BusinessentityRow] = {
+    map.get(row.businessentityid).map { _ =>
+      map.put(row.businessentityid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: BusinessentityRow)(implicit c: Connection): BusinessentityRow = {

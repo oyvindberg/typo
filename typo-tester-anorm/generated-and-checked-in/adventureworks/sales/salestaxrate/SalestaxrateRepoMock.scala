@@ -74,13 +74,10 @@ class SalestaxrateRepoMock(toRow: Function1[SalestaxrateRowUnsaved, Salestaxrate
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
     UpdateBuilderMock(UpdateParams.empty, SalestaxrateFields.structure, map)
   }
-  override def update(row: SalestaxrateRow)(implicit c: Connection): Boolean = {
-    map.get(row.salestaxrateid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.salestaxrateid, row): @nowarn
-        true
-      case None => false
+  override def update(row: SalestaxrateRow)(implicit c: Connection): Option[SalestaxrateRow] = {
+    map.get(row.salestaxrateid).map { _ =>
+      map.put(row.salestaxrateid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: SalestaxrateRow)(implicit c: Connection): SalestaxrateRow = {

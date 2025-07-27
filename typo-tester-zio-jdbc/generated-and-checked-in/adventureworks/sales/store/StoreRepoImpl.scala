@@ -98,7 +98,7 @@ class StoreRepoImpl extends StoreRepo {
   override def update: UpdateBuilder[StoreFields, StoreRow] = {
     UpdateBuilder(""""sales"."store"""", StoreFields.structure, StoreRow.jdbcDecoder)
   }
-  override def update(row: StoreRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: StoreRow): ZIO[ZConnection, Throwable, Option[StoreRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "sales"."store"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
@@ -106,7 +106,10 @@ class StoreRepoImpl extends StoreRepo {
               "demographics" = ${Segment.paramSegment(row.demographics)(Setter.optionParamSetter(TypoXml.setter))}::xml,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
+          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}
+          returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text"""
+      .query(StoreRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: StoreRow): ZIO[ZConnection, Throwable, UpdateResult[StoreRow]] = {
     sql"""insert into "sales"."store"("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")

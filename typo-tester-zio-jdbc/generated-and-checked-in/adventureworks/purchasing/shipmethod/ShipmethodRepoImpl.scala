@@ -105,7 +105,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
     UpdateBuilder(""""purchasing"."shipmethod"""", ShipmethodFields.structure, ShipmethodRow.jdbcDecoder)
   }
-  override def update(row: ShipmethodRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ShipmethodRow): ZIO[ZConnection, Throwable, Option[ShipmethodRow]] = {
     val shipmethodid = row.shipmethodid
     sql"""update "purchasing"."shipmethod"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
@@ -113,7 +113,10 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
               "shiprate" = ${Segment.paramSegment(row.shiprate)(Setter.bigDecimalScalaSetter)}::numeric,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(ShipmethodId.setter)}""".update.map(_ > 0)
+          where "shipmethodid" = ${Segment.paramSegment(shipmethodid)(ShipmethodId.setter)}
+          returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text"""
+      .query(ShipmethodRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, UpdateResult[ShipmethodRow]] = {
     sql"""insert into "purchasing"."shipmethod"("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")

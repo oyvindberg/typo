@@ -123,7 +123,7 @@ class EmployeeRepoImpl extends EmployeeRepo {
   override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
     UpdateBuilder(""""humanresources"."employee"""", EmployeeFields.structure, EmployeeRow.jdbcDecoder)
   }
-  override def update(row: EmployeeRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: EmployeeRow): ZIO[ZConnection, Throwable, Option[EmployeeRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "humanresources"."employee"
           set "nationalidnumber" = ${Segment.paramSegment(row.nationalidnumber)(Setter.stringSetter)},
@@ -140,7 +140,10 @@ class EmployeeRepoImpl extends EmployeeRepo {
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp,
               "organizationnode" = ${Segment.paramSegment(row.organizationnode)(Setter.optionParamSetter(Setter.stringSetter))}
-          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
+          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}
+          returning "businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate"::text, "maritalstatus", "gender", "hiredate"::text, "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate"::text, "organizationnode""""
+      .query(EmployeeRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: EmployeeRow): ZIO[ZConnection, Throwable, UpdateResult[EmployeeRow]] = {
     sql"""insert into "humanresources"."employee"("businessentityid", "nationalidnumber", "loginid", "jobtitle", "birthdate", "maritalstatus", "gender", "hiredate", "salariedflag", "vacationhours", "sickleavehours", "currentflag", "rowguid", "modifieddate", "organizationnode")

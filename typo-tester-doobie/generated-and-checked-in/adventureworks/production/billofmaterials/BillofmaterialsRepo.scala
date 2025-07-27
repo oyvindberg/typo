@@ -28,7 +28,7 @@ trait BillofmaterialsRepo {
   def selectByIds(billofmaterialsids: Array[Int]): Stream[ConnectionIO, BillofmaterialsRow]
   def selectByIdsTracked(billofmaterialsids: Array[Int]): ConnectionIO[Map[Int, BillofmaterialsRow]]
   def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow]
-  def update(row: BillofmaterialsRow): ConnectionIO[Boolean]
+  def update(row: BillofmaterialsRow): ConnectionIO[Option[BillofmaterialsRow]]
   def upsert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow]
   def upsertBatch(unsaved: List[BillofmaterialsRow]): Stream[ConnectionIO, BillofmaterialsRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

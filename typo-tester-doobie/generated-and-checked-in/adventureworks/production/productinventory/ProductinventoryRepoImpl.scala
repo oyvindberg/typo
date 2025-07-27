@@ -120,7 +120,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
     UpdateBuilder(""""production"."productinventory"""", ProductinventoryFields.structure, ProductinventoryRow.read)
   }
-  override def update(row: ProductinventoryRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductinventoryRow): ConnectionIO[Option[ProductinventoryRow]] = {
     val compositeId = row.compositeId
     sql"""update "production"."productinventory"
           set "shelf" = ${fromWrite(row.shelf)(new Write.Single(Meta.StringMeta.put))},
@@ -128,10 +128,8 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
               "quantity" = ${fromWrite(row.quantity)(new Write.Single(TypoShort.put))}::int2,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(new Write.Single(LocationId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "locationid" = ${fromWrite(compositeId.locationid)(new Write.Single(LocationId.put))}
+          returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text""".query(using ProductinventoryRow.read).option
   }
   override def upsert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow] = {
     sql"""insert into "production"."productinventory"("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")

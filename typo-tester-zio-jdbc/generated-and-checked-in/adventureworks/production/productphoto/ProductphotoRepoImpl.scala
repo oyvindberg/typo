@@ -95,7 +95,7 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
   override def update: UpdateBuilder[ProductphotoFields, ProductphotoRow] = {
     UpdateBuilder(""""production"."productphoto"""", ProductphotoFields.structure, ProductphotoRow.jdbcDecoder)
   }
-  override def update(row: ProductphotoRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ProductphotoRow): ZIO[ZConnection, Throwable, Option[ProductphotoRow]] = {
     val productphotoid = row.productphotoid
     sql"""update "production"."productphoto"
           set "thumbnailphoto" = ${Segment.paramSegment(row.thumbnailphoto)(Setter.optionParamSetter(TypoBytea.setter))}::bytea,
@@ -103,7 +103,10 @@ class ProductphotoRepoImpl extends ProductphotoRepo {
               "largephoto" = ${Segment.paramSegment(row.largephoto)(Setter.optionParamSetter(TypoBytea.setter))}::bytea,
               "largephotofilename" = ${Segment.paramSegment(row.largephotofilename)(Setter.optionParamSetter(Setter.stringSetter))},
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "productphotoid" = ${Segment.paramSegment(productphotoid)(ProductphotoId.setter)}""".update.map(_ > 0)
+          where "productphotoid" = ${Segment.paramSegment(productphotoid)(ProductphotoId.setter)}
+          returning "productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate"::text"""
+      .query(ProductphotoRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ProductphotoRow): ZIO[ZConnection, Throwable, UpdateResult[ProductphotoRow]] = {
     sql"""insert into "production"."productphoto"("productphotoid", "thumbnailphoto", "thumbnailphotofilename", "largephoto", "largephotofilename", "modifieddate")

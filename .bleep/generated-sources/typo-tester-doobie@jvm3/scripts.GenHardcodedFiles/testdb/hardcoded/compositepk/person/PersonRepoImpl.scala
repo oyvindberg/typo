@@ -96,14 +96,12 @@ class PersonRepoImpl extends PersonRepo {
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder(""""compositepk"."person"""", PersonFields.structure, PersonRow.read)
   }
-  override def update(row: PersonRow): ConnectionIO[Boolean] = {
+  override def update(row: PersonRow): ConnectionIO[Option[PersonRow]] = {
     val compositeId = row.compositeId
     sql"""update "compositepk"."person"
           set "name" = ${fromWrite(row.name)(new Write.SingleOpt(Meta.StringMeta.put))}
-          where "one" = ${fromWrite(compositeId.one)(new Write.Single(Meta.LongMeta.put))} AND "two" = ${fromWrite(compositeId.two)(new Write.SingleOpt(Meta.StringMeta.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "one" = ${fromWrite(compositeId.one)(new Write.Single(Meta.LongMeta.put))} AND "two" = ${fromWrite(compositeId.two)(new Write.SingleOpt(Meta.StringMeta.put))}
+          returning "one", "two", "name"""".query(using PersonRow.read).option
   }
   override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]]): ConnectionIO[Boolean] = {
     NonEmptyList.fromList(fieldValues) match {

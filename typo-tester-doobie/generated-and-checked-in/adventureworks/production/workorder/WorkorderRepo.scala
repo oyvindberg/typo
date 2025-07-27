@@ -28,7 +28,7 @@ trait WorkorderRepo {
   def selectByIds(workorderids: Array[WorkorderId]): Stream[ConnectionIO, WorkorderRow]
   def selectByIdsTracked(workorderids: Array[WorkorderId]): ConnectionIO[Map[WorkorderId, WorkorderRow]]
   def update: UpdateBuilder[WorkorderFields, WorkorderRow]
-  def update(row: WorkorderRow): ConnectionIO[Boolean]
+  def update(row: WorkorderRow): ConnectionIO[Option[WorkorderRow]]
   def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow]
   def upsertBatch(unsaved: List[WorkorderRow]): Stream[ConnectionIO, WorkorderRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

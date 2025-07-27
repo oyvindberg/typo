@@ -105,7 +105,7 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
   override def update: UpdateBuilder[ShoppingcartitemFields, ShoppingcartitemRow] = {
     UpdateBuilder(""""sales"."shoppingcartitem"""", ShoppingcartitemFields.structure, ShoppingcartitemRow.read)
   }
-  override def update(row: ShoppingcartitemRow): ConnectionIO[Boolean] = {
+  override def update(row: ShoppingcartitemRow): ConnectionIO[Option[ShoppingcartitemRow]] = {
     val shoppingcartitemid = row.shoppingcartitemid
     sql"""update "sales"."shoppingcartitem"
           set "shoppingcartid" = ${fromWrite(row.shoppingcartid)(new Write.Single(Meta.StringMeta.put))},
@@ -113,10 +113,8 @@ class ShoppingcartitemRepoImpl extends ShoppingcartitemRepo {
               "productid" = ${fromWrite(row.productid)(new Write.Single(ProductId.put))}::int4,
               "datecreated" = ${fromWrite(row.datecreated)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(new Write.Single(ShoppingcartitemId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "shoppingcartitemid" = ${fromWrite(shoppingcartitemid)(new Write.Single(ShoppingcartitemId.put))}
+          returning "shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated"::text, "modifieddate"::text""".query(using ShoppingcartitemRow.read).option
   }
   override def upsert(unsaved: ShoppingcartitemRow): ConnectionIO[ShoppingcartitemRow] = {
     sql"""insert into "sales"."shoppingcartitem"("shoppingcartitemid", "shoppingcartid", "quantity", "productid", "datecreated", "modifieddate")

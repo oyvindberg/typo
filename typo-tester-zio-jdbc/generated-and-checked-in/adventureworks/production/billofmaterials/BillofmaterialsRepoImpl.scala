@@ -106,7 +106,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     UpdateBuilder(""""production"."billofmaterials"""", BillofmaterialsFields.structure, BillofmaterialsRow.jdbcDecoder)
   }
-  override def update(row: BillofmaterialsRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: BillofmaterialsRow): ZIO[ZConnection, Throwable, Option[BillofmaterialsRow]] = {
     val billofmaterialsid = row.billofmaterialsid
     sql"""update "production"."billofmaterials"
           set "productassemblyid" = ${Segment.paramSegment(row.productassemblyid)(Setter.optionParamSetter(ProductId.setter))}::int4,
@@ -117,7 +117,10 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
               "bomlevel" = ${Segment.paramSegment(row.bomlevel)(TypoShort.setter)}::int2,
               "perassemblyqty" = ${Segment.paramSegment(row.perassemblyqty)(Setter.bigDecimalScalaSetter)}::numeric,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "billofmaterialsid" = ${Segment.paramSegment(billofmaterialsid)(Setter.intSetter)}""".update.map(_ > 0)
+          where "billofmaterialsid" = ${Segment.paramSegment(billofmaterialsid)(Setter.intSetter)}
+          returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text"""
+      .query(BillofmaterialsRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: BillofmaterialsRow): ZIO[ZConnection, Throwable, UpdateResult[BillofmaterialsRow]] = {
     sql"""insert into "production"."billofmaterials"("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")

@@ -27,7 +27,7 @@ trait IllustrationRepo {
   def selectByIds(illustrationids: Array[IllustrationId])(implicit c: Connection): List[IllustrationRow]
   def selectByIdsTracked(illustrationids: Array[IllustrationId])(implicit c: Connection): Map[IllustrationId, IllustrationRow]
   def update: UpdateBuilder[IllustrationFields, IllustrationRow]
-  def update(row: IllustrationRow)(implicit c: Connection): Boolean
+  def update(row: IllustrationRow)(implicit c: Connection): Option[IllustrationRow]
   def upsert(unsaved: IllustrationRow)(implicit c: Connection): IllustrationRow
   def upsertBatch(unsaved: Iterable[IllustrationRow])(implicit c: Connection): List[IllustrationRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

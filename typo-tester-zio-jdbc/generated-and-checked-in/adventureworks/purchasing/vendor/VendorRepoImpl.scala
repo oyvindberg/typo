@@ -104,7 +104,7 @@ class VendorRepoImpl extends VendorRepo {
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
     UpdateBuilder(""""purchasing"."vendor"""", VendorFields.structure, VendorRow.jdbcDecoder)
   }
-  override def update(row: VendorRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: VendorRow): ZIO[ZConnection, Throwable, Option[VendorRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "purchasing"."vendor"
           set "accountnumber" = ${Segment.paramSegment(row.accountnumber)(AccountNumber.setter)}::varchar,
@@ -114,7 +114,10 @@ class VendorRepoImpl extends VendorRepo {
               "activeflag" = ${Segment.paramSegment(row.activeflag)(Flag.setter)}::bool,
               "purchasingwebserviceurl" = ${Segment.paramSegment(row.purchasingwebserviceurl)(Setter.optionParamSetter(Setter.stringSetter))},
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
+          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}
+          returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text"""
+      .query(VendorRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: VendorRow): ZIO[ZConnection, Throwable, UpdateResult[VendorRow]] = {
     sql"""insert into "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")

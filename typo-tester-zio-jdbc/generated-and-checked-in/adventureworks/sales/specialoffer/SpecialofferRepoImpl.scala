@@ -109,7 +109,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
     UpdateBuilder(""""sales"."specialoffer"""", SpecialofferFields.structure, SpecialofferRow.jdbcDecoder)
   }
-  override def update(row: SpecialofferRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: SpecialofferRow): ZIO[ZConnection, Throwable, Option[SpecialofferRow]] = {
     val specialofferid = row.specialofferid
     sql"""update "sales"."specialoffer"
           set "description" = ${Segment.paramSegment(row.description)(Setter.stringSetter)},
@@ -122,7 +122,10 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
               "maxqty" = ${Segment.paramSegment(row.maxqty)(Setter.optionParamSetter(Setter.intSetter))}::int4,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "specialofferid" = ${Segment.paramSegment(specialofferid)(SpecialofferId.setter)}""".update.map(_ > 0)
+          where "specialofferid" = ${Segment.paramSegment(specialofferid)(SpecialofferId.setter)}
+          returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text"""
+      .query(SpecialofferRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: SpecialofferRow): ZIO[ZConnection, Throwable, UpdateResult[SpecialofferRow]] = {
     sql"""insert into "sales"."specialoffer"("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")

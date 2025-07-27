@@ -130,7 +130,7 @@ class PersonRepoImpl extends PersonRepo {
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder(""""myschema"."person"""", PersonFields.structure, PersonRow.read)
   }
-  override def update(row: PersonRow): ConnectionIO[Boolean] = {
+  override def update(row: PersonRow): ConnectionIO[Option[PersonRow]] = {
     val id = row.id
     sql"""update "myschema"."person"
           set "favourite_football_club_id" = ${fromWrite(row.favouriteFootballClubId)(new Write.Single(FootballClubId.put))},
@@ -143,10 +143,8 @@ class PersonRepoImpl extends PersonRepo {
               "marital_status_id" = ${fromWrite(row.maritalStatusId)(new Write.Single(MaritalStatusId.put))},
               "work_email" = ${fromWrite(row.workEmail)(new Write.SingleOpt(Meta.StringMeta.put))},
               "favorite_number" = ${fromWrite(row.favoriteNumber)(new Write.Single(Number.put))}::myschema.number
-          where "id" = ${fromWrite(id)(new Write.Single(PersonId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "id" = ${fromWrite(id)(new Write.Single(PersonId.put))}
+          returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"""".query(using PersonRow.read).option
   }
   override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]]): ConnectionIO[Boolean] = {
     NonEmptyList.fromList(fieldValues) match {

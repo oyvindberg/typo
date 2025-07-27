@@ -28,7 +28,7 @@ trait LocationRepo {
   def selectByIds(locationids: Array[LocationId]): Stream[ConnectionIO, LocationRow]
   def selectByIdsTracked(locationids: Array[LocationId]): ConnectionIO[Map[LocationId, LocationRow]]
   def update: UpdateBuilder[LocationFields, LocationRow]
-  def update(row: LocationRow): ConnectionIO[Boolean]
+  def update(row: LocationRow): ConnectionIO[Option[LocationRow]]
   def upsert(unsaved: LocationRow): ConnectionIO[LocationRow]
   def upsertBatch(unsaved: List[LocationRow]): Stream[ConnectionIO, LocationRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

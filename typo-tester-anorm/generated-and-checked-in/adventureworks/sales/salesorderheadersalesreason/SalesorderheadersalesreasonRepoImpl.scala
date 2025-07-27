@@ -113,12 +113,13 @@ class SalesorderheadersalesreasonRepoImpl extends SalesorderheadersalesreasonRep
   override def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
     UpdateBuilder(""""sales"."salesorderheadersalesreason"""", SalesorderheadersalesreasonFields.structure, SalesorderheadersalesreasonRow.rowParser)
   }
-  override def update(row: SalesorderheadersalesreasonRow)(implicit c: Connection): Boolean = {
+  override def update(row: SalesorderheadersalesreasonRow)(implicit c: Connection): Option[SalesorderheadersalesreasonRow] = {
     val compositeId = row.compositeId
     SQL"""update "sales"."salesorderheadersalesreason"
           set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "salesorderid" = ${ParameterValue(compositeId.salesorderid, null, SalesorderheaderId.toStatement)} AND "salesreasonid" = ${ParameterValue(compositeId.salesreasonid, null, SalesreasonId.toStatement)}
-       """.executeUpdate() > 0
+          returning "salesorderid", "salesreasonid", "modifieddate"::text
+       """.executeInsert(SalesorderheadersalesreasonRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: SalesorderheadersalesreasonRow)(implicit c: Connection): SalesorderheadersalesreasonRow = {
     SQL"""insert into "sales"."salesorderheadersalesreason"("salesorderid", "salesreasonid", "modifieddate")

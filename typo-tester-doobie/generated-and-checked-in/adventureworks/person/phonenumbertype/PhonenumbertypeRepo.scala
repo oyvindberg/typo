@@ -28,7 +28,7 @@ trait PhonenumbertypeRepo {
   def selectByIds(phonenumbertypeids: Array[PhonenumbertypeId]): Stream[ConnectionIO, PhonenumbertypeRow]
   def selectByIdsTracked(phonenumbertypeids: Array[PhonenumbertypeId]): ConnectionIO[Map[PhonenumbertypeId, PhonenumbertypeRow]]
   def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow]
-  def update(row: PhonenumbertypeRow): ConnectionIO[Boolean]
+  def update(row: PhonenumbertypeRow): ConnectionIO[Option[PhonenumbertypeRow]]
   def upsert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow]
   def upsertBatch(unsaved: List[PhonenumbertypeRow]): Stream[ConnectionIO, PhonenumbertypeRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

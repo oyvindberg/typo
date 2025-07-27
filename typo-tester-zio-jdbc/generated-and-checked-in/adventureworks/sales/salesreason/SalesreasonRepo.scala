@@ -30,7 +30,7 @@ trait SalesreasonRepo {
   def selectByIds(salesreasonids: Array[SalesreasonId]): ZStream[ZConnection, Throwable, SalesreasonRow]
   def selectByIdsTracked(salesreasonids: Array[SalesreasonId]): ZIO[ZConnection, Throwable, Map[SalesreasonId, SalesreasonRow]]
   def update: UpdateBuilder[SalesreasonFields, SalesreasonRow]
-  def update(row: SalesreasonRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: SalesreasonRow): ZIO[ZConnection, Throwable, Option[SalesreasonRow]]
   def upsert(unsaved: SalesreasonRow): ZIO[ZConnection, Throwable, UpdateResult[SalesreasonRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

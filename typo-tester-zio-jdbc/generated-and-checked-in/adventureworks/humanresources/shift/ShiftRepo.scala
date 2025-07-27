@@ -30,7 +30,7 @@ trait ShiftRepo {
   def selectByIds(shiftids: Array[ShiftId]): ZStream[ZConnection, Throwable, ShiftRow]
   def selectByIdsTracked(shiftids: Array[ShiftId]): ZIO[ZConnection, Throwable, Map[ShiftId, ShiftRow]]
   def update: UpdateBuilder[ShiftFields, ShiftRow]
-  def update(row: ShiftRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: ShiftRow): ZIO[ZConnection, Throwable, Option[ShiftRow]]
   def upsert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, UpdateResult[ShiftRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

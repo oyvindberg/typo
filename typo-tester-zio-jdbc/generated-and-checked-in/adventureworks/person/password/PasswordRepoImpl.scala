@@ -95,14 +95,17 @@ class PasswordRepoImpl extends PasswordRepo {
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
     UpdateBuilder(""""person"."password"""", PasswordFields.structure, PasswordRow.jdbcDecoder)
   }
-  override def update(row: PasswordRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: PasswordRow): ZIO[ZConnection, Throwable, Option[PasswordRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "person"."password"
           set "passwordhash" = ${Segment.paramSegment(row.passwordhash)(Setter.stringSetter)},
               "passwordsalt" = ${Segment.paramSegment(row.passwordsalt)(Setter.stringSetter)},
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
+          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}
+          returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text"""
+      .query(PasswordRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: PasswordRow): ZIO[ZConnection, Throwable, UpdateResult[PasswordRow]] = {
     sql"""insert into "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")

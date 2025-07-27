@@ -91,14 +91,11 @@ class DocumentRepoMock(toRow: Function1[DocumentRowUnsaved, DocumentRow],
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
     UpdateBuilderMock(UpdateParams.empty, DocumentFields.structure, map)
   }
-  override def update(row: DocumentRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: DocumentRow): ZIO[ZConnection, Throwable, Option[DocumentRow]] = {
     ZIO.succeed {
-      map.get(row.documentnode) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.documentnode, row): @nowarn
-          true
-        case None => false
+      map.get(row.documentnode).map { _ =>
+        map.put(row.documentnode, row): @nowarn
+        row
       }
     }
   }

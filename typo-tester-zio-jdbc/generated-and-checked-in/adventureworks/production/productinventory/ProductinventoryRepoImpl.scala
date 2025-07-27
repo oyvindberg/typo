@@ -116,7 +116,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
     UpdateBuilder(""""production"."productinventory"""", ProductinventoryFields.structure, ProductinventoryRow.jdbcDecoder)
   }
-  override def update(row: ProductinventoryRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ProductinventoryRow): ZIO[ZConnection, Throwable, Option[ProductinventoryRow]] = {
     val compositeId = row.compositeId
     sql"""update "production"."productinventory"
           set "shelf" = ${Segment.paramSegment(row.shelf)(Setter.stringSetter)},
@@ -124,7 +124,10 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
               "quantity" = ${Segment.paramSegment(row.quantity)(TypoShort.setter)}::int2,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(LocationId.setter)}""".update.map(_ > 0)
+          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "locationid" = ${Segment.paramSegment(compositeId.locationid)(LocationId.setter)}
+          returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text"""
+      .query(ProductinventoryRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ProductinventoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductinventoryRow]] = {
     sql"""insert into "production"."productinventory"("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")

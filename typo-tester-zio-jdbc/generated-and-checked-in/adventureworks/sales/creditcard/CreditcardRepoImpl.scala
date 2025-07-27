@@ -97,7 +97,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
   override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
     UpdateBuilder(""""sales"."creditcard"""", CreditcardFields.structure, CreditcardRow.jdbcDecoder)
   }
-  override def update(row: CreditcardRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: CreditcardRow): ZIO[ZConnection, Throwable, Option[CreditcardRow]] = {
     val creditcardid = row.creditcardid
     sql"""update "sales"."creditcard"
           set "cardtype" = ${Segment.paramSegment(row.cardtype)(Setter.stringSetter)},
@@ -105,7 +105,10 @@ class CreditcardRepoImpl extends CreditcardRepo {
               "expmonth" = ${Segment.paramSegment(row.expmonth)(TypoShort.setter)}::int2,
               "expyear" = ${Segment.paramSegment(row.expyear)(TypoShort.setter)}::int2,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "creditcardid" = ${Segment.paramSegment(creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".update.map(_ > 0)
+          where "creditcardid" = ${Segment.paramSegment(creditcardid)(/* user-picked */ CustomCreditcardId.setter)}
+          returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text"""
+      .query(CreditcardRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: CreditcardRow): ZIO[ZConnection, Throwable, UpdateResult[CreditcardRow]] = {
     sql"""insert into "sales"."creditcard"("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")

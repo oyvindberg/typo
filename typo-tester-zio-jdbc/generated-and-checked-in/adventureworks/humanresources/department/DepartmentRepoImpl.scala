@@ -92,13 +92,16 @@ class DepartmentRepoImpl extends DepartmentRepo {
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
     UpdateBuilder(""""humanresources"."department"""", DepartmentFields.structure, DepartmentRow.jdbcDecoder)
   }
-  override def update(row: DepartmentRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: DepartmentRow): ZIO[ZConnection, Throwable, Option[DepartmentRow]] = {
     val departmentid = row.departmentid
     sql"""update "humanresources"."department"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "groupname" = ${Segment.paramSegment(row.groupname)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "departmentid" = ${Segment.paramSegment(departmentid)(DepartmentId.setter)}""".update.map(_ > 0)
+          where "departmentid" = ${Segment.paramSegment(departmentid)(DepartmentId.setter)}
+          returning "departmentid", "name", "groupname", "modifieddate"::text"""
+      .query(DepartmentRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: DepartmentRow): ZIO[ZConnection, Throwable, UpdateResult[DepartmentRow]] = {
     sql"""insert into "humanresources"."department"("departmentid", "name", "groupname", "modifieddate")

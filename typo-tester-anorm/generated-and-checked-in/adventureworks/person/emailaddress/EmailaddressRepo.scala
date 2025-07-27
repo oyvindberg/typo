@@ -27,7 +27,7 @@ trait EmailaddressRepo {
   def selectByIds(compositeIds: Array[EmailaddressId])(implicit c: Connection): List[EmailaddressRow]
   def selectByIdsTracked(compositeIds: Array[EmailaddressId])(implicit c: Connection): Map[EmailaddressId, EmailaddressRow]
   def update: UpdateBuilder[EmailaddressFields, EmailaddressRow]
-  def update(row: EmailaddressRow)(implicit c: Connection): Boolean
+  def update(row: EmailaddressRow)(implicit c: Connection): Option[EmailaddressRow]
   def upsert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow
   def upsertBatch(unsaved: Iterable[EmailaddressRow])(implicit c: Connection): List[EmailaddressRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

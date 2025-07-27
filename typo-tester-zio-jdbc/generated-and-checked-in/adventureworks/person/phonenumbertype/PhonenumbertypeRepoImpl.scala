@@ -91,12 +91,15 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     UpdateBuilder(""""person"."phonenumbertype"""", PhonenumbertypeFields.structure, PhonenumbertypeRow.jdbcDecoder)
   }
-  override def update(row: PhonenumbertypeRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: PhonenumbertypeRow): ZIO[ZConnection, Throwable, Option[PhonenumbertypeRow]] = {
     val phonenumbertypeid = row.phonenumbertypeid
     sql"""update "person"."phonenumbertype"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "phonenumbertypeid" = ${Segment.paramSegment(phonenumbertypeid)(PhonenumbertypeId.setter)}""".update.map(_ > 0)
+          where "phonenumbertypeid" = ${Segment.paramSegment(phonenumbertypeid)(PhonenumbertypeId.setter)}
+          returning "phonenumbertypeid", "name", "modifieddate"::text"""
+      .query(PhonenumbertypeRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: PhonenumbertypeRow): ZIO[ZConnection, Throwable, UpdateResult[PhonenumbertypeRow]] = {
     sql"""insert into "person"."phonenumbertype"("phonenumbertypeid", "name", "modifieddate")

@@ -88,12 +88,15 @@ class CurrencyRepoImpl extends CurrencyRepo {
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
     UpdateBuilder(""""sales"."currency"""", CurrencyFields.structure, CurrencyRow.jdbcDecoder)
   }
-  override def update(row: CurrencyRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: CurrencyRow): ZIO[ZConnection, Throwable, Option[CurrencyRow]] = {
     val currencycode = row.currencycode
     sql"""update "sales"."currency"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}""".update.map(_ > 0)
+          where "currencycode" = ${Segment.paramSegment(currencycode)(CurrencyId.setter)}
+          returning "currencycode", "name", "modifieddate"::text"""
+      .query(CurrencyRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: CurrencyRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyRow]] = {
     sql"""insert into "sales"."currency"("currencycode", "name", "modifieddate")

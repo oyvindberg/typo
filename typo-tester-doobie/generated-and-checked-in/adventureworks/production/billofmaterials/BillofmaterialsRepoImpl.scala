@@ -110,7 +110,7 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     UpdateBuilder(""""production"."billofmaterials"""", BillofmaterialsFields.structure, BillofmaterialsRow.read)
   }
-  override def update(row: BillofmaterialsRow): ConnectionIO[Boolean] = {
+  override def update(row: BillofmaterialsRow): ConnectionIO[Option[BillofmaterialsRow]] = {
     val billofmaterialsid = row.billofmaterialsid
     sql"""update "production"."billofmaterials"
           set "productassemblyid" = ${fromWrite(row.productassemblyid)(new Write.SingleOpt(ProductId.put))}::int4,
@@ -121,10 +121,8 @@ class BillofmaterialsRepoImpl extends BillofmaterialsRepo {
               "bomlevel" = ${fromWrite(row.bomlevel)(new Write.Single(TypoShort.put))}::int2,
               "perassemblyqty" = ${fromWrite(row.perassemblyqty)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(new Write.Single(Meta.IntMeta.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "billofmaterialsid" = ${fromWrite(billofmaterialsid)(new Write.Single(Meta.IntMeta.put))}
+          returning "billofmaterialsid", "productassemblyid", "componentid", "startdate"::text, "enddate"::text, "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate"::text""".query(using BillofmaterialsRow.read).option
   }
   override def upsert(unsaved: BillofmaterialsRow): ConnectionIO[BillofmaterialsRow] = {
     sql"""insert into "production"."billofmaterials"("billofmaterialsid", "productassemblyid", "componentid", "startdate", "enddate", "unitmeasurecode", "bomlevel", "perassemblyqty", "modifieddate")

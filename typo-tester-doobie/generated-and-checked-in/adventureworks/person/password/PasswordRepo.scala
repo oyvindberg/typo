@@ -29,7 +29,7 @@ trait PasswordRepo {
   def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, PasswordRow]
   def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, PasswordRow]]
   def update: UpdateBuilder[PasswordFields, PasswordRow]
-  def update(row: PasswordRow): ConnectionIO[Boolean]
+  def update(row: PasswordRow): ConnectionIO[Option[PasswordRow]]
   def upsert(unsaved: PasswordRow): ConnectionIO[PasswordRow]
   def upsertBatch(unsaved: List[PasswordRow]): Stream[ConnectionIO, PasswordRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

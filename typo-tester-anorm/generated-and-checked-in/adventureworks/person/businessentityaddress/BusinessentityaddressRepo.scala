@@ -27,7 +27,7 @@ trait BusinessentityaddressRepo {
   def selectByIds(compositeIds: Array[BusinessentityaddressId])(implicit c: Connection): List[BusinessentityaddressRow]
   def selectByIdsTracked(compositeIds: Array[BusinessentityaddressId])(implicit c: Connection): Map[BusinessentityaddressId, BusinessentityaddressRow]
   def update: UpdateBuilder[BusinessentityaddressFields, BusinessentityaddressRow]
-  def update(row: BusinessentityaddressRow)(implicit c: Connection): Boolean
+  def update(row: BusinessentityaddressRow)(implicit c: Connection): Option[BusinessentityaddressRow]
   def upsert(unsaved: BusinessentityaddressRow)(implicit c: Connection): BusinessentityaddressRow
   def upsertBatch(unsaved: Iterable[BusinessentityaddressRow])(implicit c: Connection): List[BusinessentityaddressRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

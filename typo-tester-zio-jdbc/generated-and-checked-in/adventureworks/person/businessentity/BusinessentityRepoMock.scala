@@ -87,14 +87,11 @@ class BusinessentityRepoMock(toRow: Function1[BusinessentityRowUnsaved, Business
   override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
     UpdateBuilderMock(UpdateParams.empty, BusinessentityFields.structure, map)
   }
-  override def update(row: BusinessentityRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: BusinessentityRow): ZIO[ZConnection, Throwable, Option[BusinessentityRow]] = {
     ZIO.succeed {
-      map.get(row.businessentityid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.businessentityid, row): @nowarn
-          true
-        case None => false
+      map.get(row.businessentityid).map { _ =>
+        map.put(row.businessentityid, row): @nowarn
+        row
       }
     }
   }

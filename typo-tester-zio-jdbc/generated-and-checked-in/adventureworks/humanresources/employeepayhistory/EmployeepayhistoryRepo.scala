@@ -30,7 +30,7 @@ trait EmployeepayhistoryRepo {
   def selectByIds(compositeIds: Array[EmployeepayhistoryId]): ZStream[ZConnection, Throwable, EmployeepayhistoryRow]
   def selectByIdsTracked(compositeIds: Array[EmployeepayhistoryId]): ZIO[ZConnection, Throwable, Map[EmployeepayhistoryId, EmployeepayhistoryRow]]
   def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
-  def update(row: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, Option[EmployeepayhistoryRow]]
   def upsert(unsaved: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[EmployeepayhistoryRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

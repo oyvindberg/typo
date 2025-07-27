@@ -28,7 +28,7 @@ trait ShiftRepo {
   def selectByIds(shiftids: Array[ShiftId]): Stream[ConnectionIO, ShiftRow]
   def selectByIdsTracked(shiftids: Array[ShiftId]): ConnectionIO[Map[ShiftId, ShiftRow]]
   def update: UpdateBuilder[ShiftFields, ShiftRow]
-  def update(row: ShiftRow): ConnectionIO[Boolean]
+  def update(row: ShiftRow): ConnectionIO[Option[ShiftRow]]
   def upsert(unsaved: ShiftRow): ConnectionIO[ShiftRow]
   def upsertBatch(unsaved: List[ShiftRow]): Stream[ConnectionIO, ShiftRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

@@ -107,14 +107,12 @@ class CountryregioncurrencyRepoImpl extends CountryregioncurrencyRepo {
   override def update: UpdateBuilder[CountryregioncurrencyFields, CountryregioncurrencyRow] = {
     UpdateBuilder(""""sales"."countryregioncurrency"""", CountryregioncurrencyFields.structure, CountryregioncurrencyRow.read)
   }
-  override def update(row: CountryregioncurrencyRow): ConnectionIO[Boolean] = {
+  override def update(row: CountryregioncurrencyRow): ConnectionIO[Option[CountryregioncurrencyRow]] = {
     val compositeId = row.compositeId
     sql"""update "sales"."countryregioncurrency"
           set "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "countryregioncode" = ${fromWrite(compositeId.countryregioncode)(new Write.Single(CountryregionId.put))} AND "currencycode" = ${fromWrite(compositeId.currencycode)(new Write.Single(CurrencyId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "countryregioncode" = ${fromWrite(compositeId.countryregioncode)(new Write.Single(CountryregionId.put))} AND "currencycode" = ${fromWrite(compositeId.currencycode)(new Write.Single(CurrencyId.put))}
+          returning "countryregioncode", "currencycode", "modifieddate"::text""".query(using CountryregioncurrencyRow.read).option
   }
   override def upsert(unsaved: CountryregioncurrencyRow): ConnectionIO[CountryregioncurrencyRow] = {
     sql"""insert into "sales"."countryregioncurrency"("countryregioncode", "currencycode", "modifieddate")

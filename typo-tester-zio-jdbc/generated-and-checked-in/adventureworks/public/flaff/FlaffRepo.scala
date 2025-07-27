@@ -27,7 +27,7 @@ trait FlaffRepo {
   def selectByIds(compositeIds: Array[FlaffId]): ZStream[ZConnection, Throwable, FlaffRow]
   def selectByIdsTracked(compositeIds: Array[FlaffId]): ZIO[ZConnection, Throwable, Map[FlaffId, FlaffRow]]
   def update: UpdateBuilder[FlaffFields, FlaffRow]
-  def update(row: FlaffRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: FlaffRow): ZIO[ZConnection, Throwable, Option[FlaffRow]]
   def upsert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, UpdateResult[FlaffRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

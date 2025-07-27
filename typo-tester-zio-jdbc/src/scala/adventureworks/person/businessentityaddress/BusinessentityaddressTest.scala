@@ -93,7 +93,11 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
         _ <- ZIO.succeed(assert(saved1 === saved2))
         // check field values
         newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
-        _ <- businessentityaddressRepo.update(saved1.copy(modifieddate = newModifiedDate))
+        updatedOpt <- businessentityaddressRepo.update(saved1.copy(modifieddate = newModifiedDate))
+        _ <- ZIO.succeed {
+          assert(updatedOpt.isDefined)
+          assert(updatedOpt.get.modifieddate == newModifiedDate)
+        }
         saved3 <- businessentityaddressRepo.selectAll.runCollect.map(_.toList).map {
           case List(x) => x
           case other   => throw new MatchError(other)

@@ -110,14 +110,12 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
     UpdateBuilder(""""production"."productdocument"""", ProductdocumentFields.structure, ProductdocumentRow.read)
   }
-  override def update(row: ProductdocumentRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductdocumentRow): ConnectionIO[Option[ProductdocumentRow]] = {
     val compositeId = row.compositeId
     sql"""update "production"."productdocument"
           set "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "documentnode" = ${fromWrite(compositeId.documentnode)(new Write.Single(DocumentId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "documentnode" = ${fromWrite(compositeId.documentnode)(new Write.Single(DocumentId.put))}
+          returning "productid", "modifieddate"::text, "documentnode"""".query(using ProductdocumentRow.read).option
   }
   override def upsert(unsaved: ProductdocumentRow): ConnectionIO[ProductdocumentRow] = {
     sql"""insert into "production"."productdocument"("productid", "modifieddate", "documentnode")

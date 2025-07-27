@@ -127,7 +127,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
     UpdateBuilder(""""sales"."salesorderdetail"""", SalesorderdetailFields.structure, SalesorderdetailRow.read)
   }
-  override def update(row: SalesorderdetailRow): ConnectionIO[Boolean] = {
+  override def update(row: SalesorderdetailRow): ConnectionIO[Option[SalesorderdetailRow]] = {
     val compositeId = row.compositeId
     sql"""update "sales"."salesorderdetail"
           set "carriertrackingnumber" = ${fromWrite(row.carriertrackingnumber)(new Write.SingleOpt(Meta.StringMeta.put))},
@@ -138,10 +138,8 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
               "unitpricediscount" = ${fromWrite(row.unitpricediscount)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "salesorderid" = ${fromWrite(compositeId.salesorderid)(new Write.Single(SalesorderheaderId.put))} AND "salesorderdetailid" = ${fromWrite(compositeId.salesorderdetailid)(new Write.Single(Meta.IntMeta.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "salesorderid" = ${fromWrite(compositeId.salesorderid)(new Write.Single(SalesorderheaderId.put))} AND "salesorderdetailid" = ${fromWrite(compositeId.salesorderdetailid)(new Write.Single(Meta.IntMeta.put))}
+          returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text""".query(using SalesorderdetailRow.read).option
   }
   override def upsert(unsaved: SalesorderdetailRow): ConnectionIO[SalesorderdetailRow] = {
     sql"""insert into "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")

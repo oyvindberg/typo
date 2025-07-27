@@ -29,7 +29,7 @@ trait PersoncreditcardRepo {
   def selectByIds(compositeIds: Array[PersoncreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): List[PersoncreditcardRow]
   def selectByIdsTracked(compositeIds: Array[PersoncreditcardId])(implicit c: Connection, toStatement0: ToStatement[Array[/* user-picked */ CustomCreditcardId]]): Map[PersoncreditcardId, PersoncreditcardRow]
   def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow]
-  def update(row: PersoncreditcardRow)(implicit c: Connection): Boolean
+  def update(row: PersoncreditcardRow)(implicit c: Connection): Option[PersoncreditcardRow]
   def upsert(unsaved: PersoncreditcardRow)(implicit c: Connection): PersoncreditcardRow
   def upsertBatch(unsaved: Iterable[PersoncreditcardRow])(implicit c: Connection): List[PersoncreditcardRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

@@ -88,14 +88,11 @@ class DepartmentRepoMock(toRow: Function1[DepartmentRowUnsaved, DepartmentRow],
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
     UpdateBuilderMock(UpdateParams.empty, DepartmentFields.structure, map)
   }
-  override def update(row: DepartmentRow): ConnectionIO[Boolean] = {
+  override def update(row: DepartmentRow): ConnectionIO[Option[DepartmentRow]] = {
     delay {
-      map.get(row.departmentid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.departmentid, row): @nowarn
-          true
-        case None => false
+      map.get(row.departmentid).map { _ =>
+        map.put(row.departmentid, row): @nowarn
+        row
       }
     }
   }

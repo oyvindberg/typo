@@ -109,7 +109,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
     UpdateBuilder(""""sales"."salestaxrate"""", SalestaxrateFields.structure, SalestaxrateRow.read)
   }
-  override def update(row: SalestaxrateRow): ConnectionIO[Boolean] = {
+  override def update(row: SalestaxrateRow): ConnectionIO[Option[SalestaxrateRow]] = {
     val salestaxrateid = row.salestaxrateid
     sql"""update "sales"."salestaxrate"
           set "stateprovinceid" = ${fromWrite(row.stateprovinceid)(new Write.Single(StateprovinceId.put))}::int4,
@@ -118,10 +118,8 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
               "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "salestaxrateid" = ${fromWrite(salestaxrateid)(new Write.Single(SalestaxrateId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "salestaxrateid" = ${fromWrite(salestaxrateid)(new Write.Single(SalestaxrateId.put))}
+          returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text""".query(using SalestaxrateRow.read).option
   }
   override def upsert(unsaved: SalestaxrateRow): ConnectionIO[SalestaxrateRow] = {
     sql"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")

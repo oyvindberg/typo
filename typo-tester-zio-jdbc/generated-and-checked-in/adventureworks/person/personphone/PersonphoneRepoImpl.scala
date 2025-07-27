@@ -107,11 +107,14 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
     UpdateBuilder(""""person"."personphone"""", PersonphoneFields.structure, PersonphoneRow.jdbcDecoder)
   }
-  override def update(row: PersonphoneRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: PersonphoneRow): ZIO[ZConnection, Throwable, Option[PersonphoneRow]] = {
     val compositeId = row.compositeId
     sql"""update "person"."personphone"
           set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Phone.setter)} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(PhonenumbertypeId.setter)}""".update.map(_ > 0)
+          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "phonenumber" = ${Segment.paramSegment(compositeId.phonenumber)(Phone.setter)} AND "phonenumbertypeid" = ${Segment.paramSegment(compositeId.phonenumbertypeid)(PhonenumbertypeId.setter)}
+          returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text"""
+      .query(PersonphoneRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: PersonphoneRow): ZIO[ZConnection, Throwable, UpdateResult[PersonphoneRow]] = {
     sql"""insert into "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")

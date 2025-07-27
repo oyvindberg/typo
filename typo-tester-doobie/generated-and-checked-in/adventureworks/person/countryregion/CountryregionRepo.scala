@@ -28,7 +28,7 @@ trait CountryregionRepo {
   def selectByIds(countryregioncodes: Array[CountryregionId]): Stream[ConnectionIO, CountryregionRow]
   def selectByIdsTracked(countryregioncodes: Array[CountryregionId]): ConnectionIO[Map[CountryregionId, CountryregionRow]]
   def update: UpdateBuilder[CountryregionFields, CountryregionRow]
-  def update(row: CountryregionRow): ConnectionIO[Boolean]
+  def update(row: CountryregionRow): ConnectionIO[Option[CountryregionRow]]
   def upsert(unsaved: CountryregionRow): ConnectionIO[CountryregionRow]
   def upsertBatch(unsaved: List[CountryregionRow]): Stream[ConnectionIO, CountryregionRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

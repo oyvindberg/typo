@@ -102,17 +102,15 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
     UpdateBuilder(""""production"."productsubcategory"""", ProductsubcategoryFields.structure, ProductsubcategoryRow.read)
   }
-  override def update(row: ProductsubcategoryRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductsubcategoryRow): ConnectionIO[Option[ProductsubcategoryRow]] = {
     val productsubcategoryid = row.productsubcategoryid
     sql"""update "production"."productsubcategory"
           set "productcategoryid" = ${fromWrite(row.productcategoryid)(new Write.Single(ProductcategoryId.put))}::int4,
               "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "productsubcategoryid" = ${fromWrite(productsubcategoryid)(new Write.Single(ProductsubcategoryId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "productsubcategoryid" = ${fromWrite(productsubcategoryid)(new Write.Single(ProductsubcategoryId.put))}
+          returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text""".query(using ProductsubcategoryRow.read).option
   }
   override def upsert(unsaved: ProductsubcategoryRow): ConnectionIO[ProductsubcategoryRow] = {
     sql"""insert into "production"."productsubcategory"("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")

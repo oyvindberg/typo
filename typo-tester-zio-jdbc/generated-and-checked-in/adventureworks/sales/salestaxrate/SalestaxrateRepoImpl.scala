@@ -105,7 +105,7 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
   override def update: UpdateBuilder[SalestaxrateFields, SalestaxrateRow] = {
     UpdateBuilder(""""sales"."salestaxrate"""", SalestaxrateFields.structure, SalestaxrateRow.jdbcDecoder)
   }
-  override def update(row: SalestaxrateRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: SalestaxrateRow): ZIO[ZConnection, Throwable, Option[SalestaxrateRow]] = {
     val salestaxrateid = row.salestaxrateid
     sql"""update "sales"."salestaxrate"
           set "stateprovinceid" = ${Segment.paramSegment(row.stateprovinceid)(StateprovinceId.setter)}::int4,
@@ -114,7 +114,10 @@ class SalestaxrateRepoImpl extends SalestaxrateRepo {
               "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}""".update.map(_ > 0)
+          where "salestaxrateid" = ${Segment.paramSegment(salestaxrateid)(SalestaxrateId.setter)}
+          returning "salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate"::text"""
+      .query(SalestaxrateRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: SalestaxrateRow): ZIO[ZConnection, Throwable, UpdateResult[SalestaxrateRow]] = {
     sql"""insert into "sales"."salestaxrate"("salestaxrateid", "stateprovinceid", "taxtype", "taxrate", "name", "rowguid", "modifieddate")

@@ -15,8 +15,8 @@ import java.sql.Connection
 
 class PgPreparedStatementsViewRepoImpl extends PgPreparedStatementsViewRepo {
   override def selectAll(implicit c: Connection): List[PgPreparedStatementsViewRow] = {
-    SQL"""select "name", "statement", "prepare_time"::text, "parameter_types", "from_sql"
-          from pg_catalog.pg_prepared_statements
+    SQL"""select "name", "statement", "prepare_time"::text, "parameter_types", "result_types", "from_sql", "generic_plans", "custom_plans"
+          from "pg_catalog"."pg_prepared_statements"
        """.as(PgPreparedStatementsViewRow.rowParser(1).*)
   }
 }

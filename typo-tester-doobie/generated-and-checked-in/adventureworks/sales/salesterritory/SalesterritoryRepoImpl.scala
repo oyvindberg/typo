@@ -120,7 +120,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
     UpdateBuilder(""""sales"."salesterritory"""", SalesterritoryFields.structure, SalesterritoryRow.read)
   }
-  override def update(row: SalesterritoryRow): ConnectionIO[Boolean] = {
+  override def update(row: SalesterritoryRow): ConnectionIO[Option[SalesterritoryRow]] = {
     val territoryid = row.territoryid
     sql"""update "sales"."salesterritory"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
@@ -132,10 +132,8 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
               "costlastyear" = ${fromWrite(row.costlastyear)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "territoryid" = ${fromWrite(territoryid)(new Write.Single(SalesterritoryId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "territoryid" = ${fromWrite(territoryid)(new Write.Single(SalesterritoryId.put))}
+          returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text""".query(using SalesterritoryRow.read).option
   }
   override def upsert(unsaved: SalesterritoryRow): ConnectionIO[SalesterritoryRow] = {
     sql"""insert into "sales"."salesterritory"("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")

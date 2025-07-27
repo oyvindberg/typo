@@ -28,7 +28,7 @@ trait ShipmethodRepo {
   def selectByIds(shipmethodids: Array[ShipmethodId]): Stream[ConnectionIO, ShipmethodRow]
   def selectByIdsTracked(shipmethodids: Array[ShipmethodId]): ConnectionIO[Map[ShipmethodId, ShipmethodRow]]
   def update: UpdateBuilder[ShipmethodFields, ShipmethodRow]
-  def update(row: ShipmethodRow): ConnectionIO[Boolean]
+  def update(row: ShipmethodRow): ConnectionIO[Option[ShipmethodRow]]
   def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow]
   def upsertBatch(unsaved: List[ShipmethodRow]): Stream[ConnectionIO, ShipmethodRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

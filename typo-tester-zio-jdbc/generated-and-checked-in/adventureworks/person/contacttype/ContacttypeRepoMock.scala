@@ -87,14 +87,11 @@ class ContacttypeRepoMock(toRow: Function1[ContacttypeRowUnsaved, ContacttypeRow
   override def update: UpdateBuilder[ContacttypeFields, ContacttypeRow] = {
     UpdateBuilderMock(UpdateParams.empty, ContacttypeFields.structure, map)
   }
-  override def update(row: ContacttypeRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ContacttypeRow): ZIO[ZConnection, Throwable, Option[ContacttypeRow]] = {
     ZIO.succeed {
-      map.get(row.contacttypeid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.contacttypeid, row): @nowarn
-          true
-        case None => false
+      map.get(row.contacttypeid).map { _ =>
+        map.put(row.contacttypeid, row): @nowarn
+        row
       }
     }
   }

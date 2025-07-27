@@ -113,16 +113,14 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
     UpdateBuilder(""""sales"."salespersonquotahistory"""", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.read)
   }
-  override def update(row: SalespersonquotahistoryRow): ConnectionIO[Boolean] = {
+  override def update(row: SalespersonquotahistoryRow): ConnectionIO[Option[SalespersonquotahistoryRow]] = {
     val compositeId = row.compositeId
     sql"""update "sales"."salespersonquotahistory"
           set "salesquota" = ${fromWrite(row.salesquota)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(new Write.Single(TypoLocalDateTime.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "quotadate" = ${fromWrite(compositeId.quotadate)(new Write.Single(TypoLocalDateTime.put))}
+          returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text""".query(using SalespersonquotahistoryRow.read).option
   }
   override def upsert(unsaved: SalespersonquotahistoryRow): ConnectionIO[SalespersonquotahistoryRow] = {
     sql"""insert into "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")

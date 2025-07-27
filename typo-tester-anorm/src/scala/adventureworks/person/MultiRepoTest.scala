@@ -33,7 +33,7 @@ class PersonWithAddressesRepo(
    */
   def syncAddresses(pa: PersonWithAddresses)(implicit c: Connection): List[BusinessentityaddressRow] = {
     // update person
-    personRepo.update(pa.person): @nowarn
+    personRepo.update(pa.person)
     // update stored addresses
     pa.addresses.toList.foreach { case (_, address) => addressRepo.update(address) }
 

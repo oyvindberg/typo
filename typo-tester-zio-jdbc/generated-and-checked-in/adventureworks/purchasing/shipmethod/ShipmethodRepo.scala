@@ -30,7 +30,7 @@ trait ShipmethodRepo {
   def selectByIds(shipmethodids: Array[ShipmethodId]): ZStream[ZConnection, Throwable, ShipmethodRow]
   def selectByIdsTracked(shipmethodids: Array[ShipmethodId]): ZIO[ZConnection, Throwable, Map[ShipmethodId, ShipmethodRow]]
   def update: UpdateBuilder[ShipmethodFields, ShipmethodRow]
-  def update(row: ShipmethodRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: ShipmethodRow): ZIO[ZConnection, Throwable, Option[ShipmethodRow]]
   def upsert(unsaved: ShipmethodRow): ZIO[ZConnection, Throwable, UpdateResult[ShipmethodRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */
