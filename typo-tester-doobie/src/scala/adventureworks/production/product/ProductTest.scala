@@ -9,6 +9,7 @@ import adventureworks.public.{Flag, Name}
 import adventureworks.{SnapshotTest, withConnection}
 import doobie.free.connection.delay
 import org.scalatest.Assertion
+import scala.annotation.nowarn
 
 import java.time.LocalDateTime
 
@@ -83,7 +84,7 @@ class ProductTest extends SnapshotTest {
         newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
         updatedOpt1 <- productRepo.update(saved1.copy(modifieddate = newModifiedDate))
         _ <- delay {
-          assert(updatedOpt1.isDefined)
+          assert(updatedOpt1.isDefined): @nowarn
           assert(updatedOpt1.get.modifieddate == newModifiedDate)
         }
         saved3 <- productRepo.selectAll.compile.toList.map {
@@ -93,7 +94,7 @@ class ProductTest extends SnapshotTest {
         _ <- delay(assert(saved3.modifieddate == newModifiedDate))
         updatedOpt2 <- productRepo.update(saved3.copy(size = None))
         _ <- delay {
-          assert(updatedOpt2.isDefined)
+          assert(updatedOpt2.isDefined): @nowarn
           assert(updatedOpt2.get.size.isEmpty)
         }
         query0 = productRepo.select

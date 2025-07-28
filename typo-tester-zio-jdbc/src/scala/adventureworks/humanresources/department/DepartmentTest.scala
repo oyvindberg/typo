@@ -6,6 +6,7 @@ import adventureworks.withConnection
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 import zio.ZIO
+import scala.annotation.nowarn
 
 class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val departmentRepo = new DepartmentRepoImpl
@@ -26,7 +27,7 @@ class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
         // check field values
         updatedOpt <- departmentRepo.update(saved1.copy(name = Name("baz")))
         _ <- ZIO.succeed {
-          assert(updatedOpt.isDefined)
+          assert(updatedOpt.isDefined): @nowarn
           assert(updatedOpt.get.name == Name("baz"))
         }
         saved3 <- departmentRepo.selectAll.runLast

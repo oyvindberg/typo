@@ -119,15 +119,15 @@ class ProductTest extends SnapshotTest {
       // check field values
       val newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
       val updatedOpt1 = productRepo.update(saved1.copy(modifieddate = newModifiedDate))
-      assert(updatedOpt1.isDefined)
-      assert(updatedOpt1.get.modifieddate == newModifiedDate)
+      assert(updatedOpt1.isDefined): @nowarn
+      assert(updatedOpt1.get.modifieddate == newModifiedDate): @nowarn
 
       val List(saved3) = productRepo.selectAll: @unchecked
       assert(saved3.modifieddate == newModifiedDate): @nowarn
 
       val updatedOpt2 = productRepo.update(saved3.copy(size = None))
-      assert(updatedOpt2.isDefined)
-      assert(updatedOpt2.get.size.isEmpty)
+      assert(updatedOpt2.isDefined): @nowarn
+      assert(updatedOpt2.get.size.isEmpty): @nowarn
 
       val query0 = productRepo.select
         .joinFk(_.fkProductmodel)(projectModelRepo.select)

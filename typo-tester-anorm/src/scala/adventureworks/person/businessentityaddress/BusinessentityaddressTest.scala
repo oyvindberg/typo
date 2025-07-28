@@ -85,8 +85,8 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
       // check field values
       val newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
       val updatedOpt = businessentityaddressRepo.update(saved1.copy(modifieddate = newModifiedDate))
-      assert(updatedOpt.isDefined)
-      assert(updatedOpt.get.modifieddate == newModifiedDate)
+      assert(updatedOpt.isDefined): @nowarn
+      assert(updatedOpt.get.modifieddate == newModifiedDate): @nowarn
 
       val List(saved3) = businessentityaddressRepo.selectAll: @unchecked
       assert(saved3.modifieddate == newModifiedDate): @nowarn
