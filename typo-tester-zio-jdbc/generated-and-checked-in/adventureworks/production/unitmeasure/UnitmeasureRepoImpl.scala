@@ -88,12 +88,15 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
     UpdateBuilder(""""production"."unitmeasure"""", UnitmeasureFields.structure, UnitmeasureRow.jdbcDecoder)
   }
-  override def update(row: UnitmeasureRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: UnitmeasureRow): ZIO[ZConnection, Throwable, Option[UnitmeasureRow]] = {
     val unitmeasurecode = row.unitmeasurecode
     sql"""update "production"."unitmeasure"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "unitmeasurecode" = ${Segment.paramSegment(unitmeasurecode)(UnitmeasureId.setter)}""".update.map(_ > 0)
+          where "unitmeasurecode" = ${Segment.paramSegment(unitmeasurecode)(UnitmeasureId.setter)}
+          returning "unitmeasurecode", "name", "modifieddate"::text"""
+      .query(UnitmeasureRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: UnitmeasureRow): ZIO[ZConnection, Throwable, UpdateResult[UnitmeasureRow]] = {
     sql"""insert into "production"."unitmeasure"("unitmeasurecode", "name", "modifieddate")

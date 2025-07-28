@@ -88,14 +88,11 @@ class CultureRepoMock(toRow: Function1[CultureRowUnsaved, CultureRow],
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
     UpdateBuilderMock(UpdateParams.empty, CultureFields.structure, map)
   }
-  override def update(row: CultureRow): ConnectionIO[Boolean] = {
+  override def update(row: CultureRow): ConnectionIO[Option[CultureRow]] = {
     delay {
-      map.get(row.cultureid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.cultureid, row): @nowarn
-          true
-        case None => false
+      map.get(row.cultureid).map { _ =>
+        map.put(row.cultureid, row): @nowarn
+        row
       }
     }
   }

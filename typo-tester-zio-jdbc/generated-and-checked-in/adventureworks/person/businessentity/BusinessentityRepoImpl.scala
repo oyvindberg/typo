@@ -94,12 +94,15 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
   override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
     UpdateBuilder(""""person"."businessentity"""", BusinessentityFields.structure, BusinessentityRow.jdbcDecoder)
   }
-  override def update(row: BusinessentityRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: BusinessentityRow): ZIO[ZConnection, Throwable, Option[BusinessentityRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "person"."businessentity"
           set "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
+          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}
+          returning "businessentityid", "rowguid", "modifieddate"::text"""
+      .query(BusinessentityRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: BusinessentityRow): ZIO[ZConnection, Throwable, UpdateResult[BusinessentityRow]] = {
     sql"""insert into "person"."businessentity"("businessentityid", "rowguid", "modifieddate")

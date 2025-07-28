@@ -111,14 +111,12 @@ class PersonphoneRepoImpl extends PersonphoneRepo {
   override def update: UpdateBuilder[PersonphoneFields, PersonphoneRow] = {
     UpdateBuilder(""""person"."personphone"""", PersonphoneFields.structure, PersonphoneRow.read)
   }
-  override def update(row: PersonphoneRow): ConnectionIO[Boolean] = {
+  override def update(row: PersonphoneRow): ConnectionIO[Option[PersonphoneRow]] = {
     val compositeId = row.compositeId
     sql"""update "person"."personphone"
           set "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(new Write.Single(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(new Write.Single(PhonenumbertypeId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "phonenumber" = ${fromWrite(compositeId.phonenumber)(new Write.Single(Phone.put))} AND "phonenumbertypeid" = ${fromWrite(compositeId.phonenumbertypeid)(new Write.Single(PhonenumbertypeId.put))}
+          returning "businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate"::text""".query(using PersonphoneRow.read).option
   }
   override def upsert(unsaved: PersonphoneRow): ConnectionIO[PersonphoneRow] = {
     sql"""insert into "person"."personphone"("businessentityid", "phonenumber", "phonenumbertypeid", "modifieddate")

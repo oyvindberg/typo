@@ -87,14 +87,11 @@ class SalesorderheadersalesreasonRepoMock(toRow: Function1[Salesorderheadersales
   override def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow] = {
     UpdateBuilderMock(UpdateParams.empty, SalesorderheadersalesreasonFields.structure, map)
   }
-  override def update(row: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: SalesorderheadersalesreasonRow): ZIO[ZConnection, Throwable, Option[SalesorderheadersalesreasonRow]] = {
     ZIO.succeed {
-      map.get(row.compositeId) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.compositeId, row): @nowarn
-          true
-        case None => false
+      map.get(row.compositeId).map { _ =>
+        map.put(row.compositeId, row): @nowarn
+        row
       }
     }
   }

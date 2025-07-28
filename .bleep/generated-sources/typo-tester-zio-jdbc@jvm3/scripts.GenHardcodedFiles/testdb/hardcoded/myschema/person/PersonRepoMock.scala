@@ -106,14 +106,11 @@ class PersonRepoMock(toRow: Function1[PersonRowUnsaved, PersonRow],
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilderMock(UpdateParams.empty, PersonFields.structure, map)
   }
-  override def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: PersonRow): ZIO[ZConnection, Throwable, Option[PersonRow]] = {
     ZIO.succeed {
-      map.get(row.id) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.id, row): @nowarn
-          true
-        case None => false
+      map.get(row.id).map { _ =>
+        map.put(row.id, row): @nowarn
+        row
       }
     }
   }

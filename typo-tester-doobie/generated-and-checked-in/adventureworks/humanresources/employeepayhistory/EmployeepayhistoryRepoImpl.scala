@@ -110,16 +110,14 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     UpdateBuilder(""""humanresources"."employeepayhistory"""", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.read)
   }
-  override def update(row: EmployeepayhistoryRow): ConnectionIO[Boolean] = {
+  override def update(row: EmployeepayhistoryRow): ConnectionIO[Option[EmployeepayhistoryRow]] = {
     val compositeId = row.compositeId
     sql"""update "humanresources"."employeepayhistory"
           set "rate" = ${fromWrite(row.rate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "payfrequency" = ${fromWrite(row.payfrequency)(new Write.Single(TypoShort.put))}::int2,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "ratechangedate" = ${fromWrite(compositeId.ratechangedate)(new Write.Single(TypoLocalDateTime.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "ratechangedate" = ${fromWrite(compositeId.ratechangedate)(new Write.Single(TypoLocalDateTime.put))}
+          returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text""".query(using EmployeepayhistoryRow.read).option
   }
   override def upsert(unsaved: EmployeepayhistoryRow): ConnectionIO[EmployeepayhistoryRow] = {
     sql"""insert into "humanresources"."employeepayhistory"("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")

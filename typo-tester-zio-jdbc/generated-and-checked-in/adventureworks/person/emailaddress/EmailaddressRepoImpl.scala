@@ -112,13 +112,16 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
   override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
     UpdateBuilder(""""person"."emailaddress"""", EmailaddressFields.structure, EmailaddressRow.jdbcDecoder)
   }
-  override def update(row: EmailaddressRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: EmailaddressRow): ZIO[ZConnection, Throwable, Option[EmailaddressRow]] = {
     val compositeId = row.compositeId
     sql"""update "person"."emailaddress"
           set "emailaddress" = ${Segment.paramSegment(row.emailaddress)(Setter.optionParamSetter(Setter.stringSetter))},
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "emailaddressid" = ${Segment.paramSegment(compositeId.emailaddressid)(Setter.intSetter)}""".update.map(_ > 0)
+          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "emailaddressid" = ${Segment.paramSegment(compositeId.emailaddressid)(Setter.intSetter)}
+          returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text"""
+      .query(EmailaddressRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: EmailaddressRow): ZIO[ZConnection, Throwable, UpdateResult[EmailaddressRow]] = {
     sql"""insert into "person"."emailaddress"("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")

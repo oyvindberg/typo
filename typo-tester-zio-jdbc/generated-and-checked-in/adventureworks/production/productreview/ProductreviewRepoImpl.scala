@@ -101,7 +101,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
   override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
     UpdateBuilder(""""production"."productreview"""", ProductreviewFields.structure, ProductreviewRow.jdbcDecoder)
   }
-  override def update(row: ProductreviewRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ProductreviewRow): ZIO[ZConnection, Throwable, Option[ProductreviewRow]] = {
     val productreviewid = row.productreviewid
     sql"""update "production"."productreview"
           set "productid" = ${Segment.paramSegment(row.productid)(ProductId.setter)}::int4,
@@ -111,7 +111,10 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
               "rating" = ${Segment.paramSegment(row.rating)(Setter.intSetter)}::int4,
               "comments" = ${Segment.paramSegment(row.comments)(Setter.optionParamSetter(Setter.stringSetter))},
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "productreviewid" = ${Segment.paramSegment(productreviewid)(ProductreviewId.setter)}""".update.map(_ > 0)
+          where "productreviewid" = ${Segment.paramSegment(productreviewid)(ProductreviewId.setter)}
+          returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text"""
+      .query(ProductreviewRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ProductreviewRow): ZIO[ZConnection, Throwable, UpdateResult[ProductreviewRow]] = {
     sql"""insert into "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")

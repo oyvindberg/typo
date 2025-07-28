@@ -75,13 +75,10 @@ class PasswordRepoMock(toRow: Function1[PasswordRowUnsaved, PasswordRow],
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
     UpdateBuilderMock(UpdateParams.empty, PasswordFields.structure, map)
   }
-  override def update(row: PasswordRow)(implicit c: Connection): Boolean = {
-    map.get(row.businessentityid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.businessentityid, row): @nowarn
-        true
-      case None => false
+  override def update(row: PasswordRow)(implicit c: Connection): Option[PasswordRow] = {
+    map.get(row.businessentityid).map { _ =>
+      map.put(row.businessentityid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: PasswordRow)(implicit c: Connection): PasswordRow = {

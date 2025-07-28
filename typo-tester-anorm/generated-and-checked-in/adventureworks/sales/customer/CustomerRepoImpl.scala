@@ -118,7 +118,7 @@ class CustomerRepoImpl extends CustomerRepo {
   override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
     UpdateBuilder(""""sales"."customer"""", CustomerFields.structure, CustomerRow.rowParser)
   }
-  override def update(row: CustomerRow)(implicit c: Connection): Boolean = {
+  override def update(row: CustomerRow)(implicit c: Connection): Option[CustomerRow] = {
     val customerid = row.customerid
     SQL"""update "sales"."customer"
           set "personid" = ${ParameterValue(row.personid, null, ToStatement.optionToStatement(BusinessentityId.toStatement, BusinessentityId.parameterMetadata))}::int4,
@@ -127,7 +127,8 @@ class CustomerRepoImpl extends CustomerRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "customerid" = ${ParameterValue(customerid, null, CustomerId.toStatement)}
-       """.executeUpdate() > 0
+          returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text
+       """.executeInsert(CustomerRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: CustomerRow)(implicit c: Connection): CustomerRow = {
     SQL"""insert into "sales"."customer"("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")

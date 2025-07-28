@@ -153,7 +153,7 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     UpdateBuilder(""""sales"."salesorderheader"""", SalesorderheaderFields.structure, SalesorderheaderRow.read)
   }
-  override def update(row: SalesorderheaderRow): ConnectionIO[Boolean] = {
+  override def update(row: SalesorderheaderRow): ConnectionIO[Option[SalesorderheaderRow]] = {
     val salesorderid = row.salesorderid
     sql"""update "sales"."salesorderheader"
           set "revisionnumber" = ${fromWrite(row.revisionnumber)(new Write.Single(TypoShort.put))}::int2,
@@ -180,10 +180,8 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
               "comment" = ${fromWrite(row.comment)(new Write.SingleOpt(Meta.StringMeta.put))},
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "salesorderid" = ${fromWrite(salesorderid)(new Write.Single(SalesorderheaderId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "salesorderid" = ${fromWrite(salesorderid)(new Write.Single(SalesorderheaderId.put))}
+          returning "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text""".query(using SalesorderheaderRow.read).option
   }
   override def upsert(unsaved: SalesorderheaderRow): ConnectionIO[SalesorderheaderRow] = {
     sql"""insert into "sales"."salesorderheader"("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")

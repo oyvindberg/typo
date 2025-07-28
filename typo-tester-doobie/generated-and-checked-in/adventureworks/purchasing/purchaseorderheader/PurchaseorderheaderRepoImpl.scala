@@ -125,7 +125,7 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
     UpdateBuilder(""""purchasing"."purchaseorderheader"""", PurchaseorderheaderFields.structure, PurchaseorderheaderRow.read)
   }
-  override def update(row: PurchaseorderheaderRow): ConnectionIO[Boolean] = {
+  override def update(row: PurchaseorderheaderRow): ConnectionIO[Option[PurchaseorderheaderRow]] = {
     val purchaseorderid = row.purchaseorderid
     sql"""update "purchasing"."purchaseorderheader"
           set "revisionnumber" = ${fromWrite(row.revisionnumber)(new Write.Single(TypoShort.put))}::int2,
@@ -139,10 +139,8 @@ class PurchaseorderheaderRepoImpl extends PurchaseorderheaderRepo {
               "taxamt" = ${fromWrite(row.taxamt)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "freight" = ${fromWrite(row.freight)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "purchaseorderid" = ${fromWrite(purchaseorderid)(new Write.Single(PurchaseorderheaderId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "purchaseorderid" = ${fromWrite(purchaseorderid)(new Write.Single(PurchaseorderheaderId.put))}
+          returning "purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate"::text, "shipdate"::text, "subtotal", "taxamt", "freight", "modifieddate"::text""".query(using PurchaseorderheaderRow.read).option
   }
   override def upsert(unsaved: PurchaseorderheaderRow): ConnectionIO[PurchaseorderheaderRow] = {
     sql"""insert into "purchasing"."purchaseorderheader"("purchaseorderid", "revisionnumber", "status", "employeeid", "vendorid", "shipmethodid", "orderdate", "shipdate", "subtotal", "taxamt", "freight", "modifieddate")

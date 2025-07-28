@@ -118,7 +118,7 @@ class LocationRepoImpl extends LocationRepo {
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
     UpdateBuilder(""""production"."location"""", LocationFields.structure, LocationRow.rowParser)
   }
-  override def update(row: LocationRow)(implicit c: Connection): Boolean = {
+  override def update(row: LocationRow)(implicit c: Connection): Option[LocationRow] = {
     val locationid = row.locationid
     SQL"""update "production"."location"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
@@ -126,7 +126,8 @@ class LocationRepoImpl extends LocationRepo {
               "availability" = ${ParameterValue(row.availability, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "locationid" = ${ParameterValue(locationid, null, LocationId.toStatement)}
-       """.executeUpdate() > 0
+          returning "locationid", "name", "costrate", "availability", "modifieddate"::text
+       """.executeInsert(LocationRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: LocationRow)(implicit c: Connection): LocationRow = {
     SQL"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")

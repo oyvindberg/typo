@@ -97,16 +97,14 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
     UpdateBuilder(""""humanresources"."jobcandidate"""", JobcandidateFields.structure, JobcandidateRow.read)
   }
-  override def update(row: JobcandidateRow): ConnectionIO[Boolean] = {
+  override def update(row: JobcandidateRow): ConnectionIO[Option[JobcandidateRow]] = {
     val jobcandidateid = row.jobcandidateid
     sql"""update "humanresources"."jobcandidate"
           set "businessentityid" = ${fromWrite(row.businessentityid)(new Write.SingleOpt(BusinessentityId.put))}::int4,
               "resume" = ${fromWrite(row.resume)(new Write.SingleOpt(TypoXml.put))}::xml,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "jobcandidateid" = ${fromWrite(jobcandidateid)(new Write.Single(JobcandidateId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "jobcandidateid" = ${fromWrite(jobcandidateid)(new Write.Single(JobcandidateId.put))}
+          returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text""".query(using JobcandidateRow.read).option
   }
   override def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow] = {
     sql"""insert into "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate")

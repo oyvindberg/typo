@@ -106,11 +106,14 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
     UpdateBuilder(""""production"."productdocument"""", ProductdocumentFields.structure, ProductdocumentRow.jdbcDecoder)
   }
-  override def update(row: ProductdocumentRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ProductdocumentRow): ZIO[ZConnection, Throwable, Option[ProductdocumentRow]] = {
     val compositeId = row.compositeId
     sql"""update "production"."productdocument"
           set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}""".update.map(_ > 0)
+          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "documentnode" = ${Segment.paramSegment(compositeId.documentnode)(DocumentId.setter)}
+          returning "productid", "modifieddate"::text, "documentnode""""
+      .query(ProductdocumentRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ProductdocumentRow): ZIO[ZConnection, Throwable, UpdateResult[ProductdocumentRow]] = {
     sql"""insert into "production"."productdocument"("productid", "modifieddate", "documentnode")

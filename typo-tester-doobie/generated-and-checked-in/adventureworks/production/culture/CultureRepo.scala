@@ -28,7 +28,7 @@ trait CultureRepo {
   def selectByIds(cultureids: Array[CultureId]): Stream[ConnectionIO, CultureRow]
   def selectByIdsTracked(cultureids: Array[CultureId]): ConnectionIO[Map[CultureId, CultureRow]]
   def update: UpdateBuilder[CultureFields, CultureRow]
-  def update(row: CultureRow): ConnectionIO[Boolean]
+  def update(row: CultureRow): ConnectionIO[Option[CultureRow]]
   def upsert(unsaved: CultureRow): ConnectionIO[CultureRow]
   def upsertBatch(unsaved: List[CultureRow]): Stream[ConnectionIO, CultureRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

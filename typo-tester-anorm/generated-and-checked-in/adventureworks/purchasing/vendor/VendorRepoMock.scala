@@ -75,13 +75,10 @@ class VendorRepoMock(toRow: Function1[VendorRowUnsaved, VendorRow],
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
     UpdateBuilderMock(UpdateParams.empty, VendorFields.structure, map)
   }
-  override def update(row: VendorRow)(implicit c: Connection): Boolean = {
-    map.get(row.businessentityid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.businessentityid, row): @nowarn
-        true
-      case None => false
+  override def update(row: VendorRow)(implicit c: Connection): Option[VendorRow] = {
+    map.get(row.businessentityid).map { _ =>
+      map.put(row.businessentityid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: VendorRow)(implicit c: Connection): VendorRow = {

@@ -88,12 +88,15 @@ class CultureRepoImpl extends CultureRepo {
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
     UpdateBuilder(""""production"."culture"""", CultureFields.structure, CultureRow.jdbcDecoder)
   }
-  override def update(row: CultureRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: CultureRow): ZIO[ZConnection, Throwable, Option[CultureRow]] = {
     val cultureid = row.cultureid
     sql"""update "production"."culture"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "cultureid" = ${Segment.paramSegment(cultureid)(CultureId.setter)}""".update.map(_ > 0)
+          where "cultureid" = ${Segment.paramSegment(cultureid)(CultureId.setter)}
+          returning "cultureid", "name", "modifieddate"::text"""
+      .query(CultureRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: CultureRow): ZIO[ZConnection, Throwable, UpdateResult[CultureRow]] = {
     sql"""insert into "production"."culture"("cultureid", "name", "modifieddate")

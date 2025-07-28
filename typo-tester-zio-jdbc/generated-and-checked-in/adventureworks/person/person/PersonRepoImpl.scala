@@ -113,7 +113,7 @@ class PersonRepoImpl extends PersonRepo {
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder(""""person"."person"""", PersonFields.structure, PersonRow.jdbcDecoder)
   }
-  override def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: PersonRow): ZIO[ZConnection, Throwable, Option[PersonRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "person"."person"
           set "persontype" = ${Segment.paramSegment(row.persontype)(Setter.stringSetter)}::bpchar,
@@ -128,7 +128,10 @@ class PersonRepoImpl extends PersonRepo {
               "demographics" = ${Segment.paramSegment(row.demographics)(Setter.optionParamSetter(TypoXml.setter))}::xml,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
+          where "businessentityid" = ${Segment.paramSegment(businessentityid)(BusinessentityId.setter)}
+          returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text"""
+      .query(PersonRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: PersonRow): ZIO[ZConnection, Throwable, UpdateResult[PersonRow]] = {
     sql"""insert into "person"."person"("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")

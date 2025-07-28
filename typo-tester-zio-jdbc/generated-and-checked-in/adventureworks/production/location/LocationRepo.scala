@@ -30,7 +30,7 @@ trait LocationRepo {
   def selectByIds(locationids: Array[LocationId]): ZStream[ZConnection, Throwable, LocationRow]
   def selectByIdsTracked(locationids: Array[LocationId]): ZIO[ZConnection, Throwable, Map[LocationId, LocationRow]]
   def update: UpdateBuilder[LocationFields, LocationRow]
-  def update(row: LocationRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: LocationRow): ZIO[ZConnection, Throwable, Option[LocationRow]]
   def upsert(unsaved: LocationRow): ZIO[ZConnection, Throwable, UpdateResult[LocationRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

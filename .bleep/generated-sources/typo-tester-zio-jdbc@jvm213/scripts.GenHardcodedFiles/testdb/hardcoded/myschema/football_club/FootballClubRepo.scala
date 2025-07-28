@@ -29,7 +29,7 @@ trait FootballClubRepo {
   def selectByIds(ids: Array[FootballClubId]): ZStream[ZConnection, Throwable, FootballClubRow]
   def selectByIdsTracked(ids: Array[FootballClubId]): ZIO[ZConnection, Throwable, Map[FootballClubId, FootballClubRow]]
   def update: UpdateBuilder[FootballClubFields, FootballClubRow]
-  def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Option[FootballClubRow]]
   def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean]
   def upsert(unsaved: FootballClubRow): ZIO[ZConnection, Throwable, UpdateResult[FootballClubRow]]
   // Not implementable for zio-jdbc: upsertBatch

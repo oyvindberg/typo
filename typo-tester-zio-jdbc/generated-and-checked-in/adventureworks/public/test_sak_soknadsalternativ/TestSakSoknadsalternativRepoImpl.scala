@@ -74,11 +74,14 @@ class TestSakSoknadsalternativRepoImpl extends TestSakSoknadsalternativRepo {
   override def update: UpdateBuilder[TestSakSoknadsalternativFields, TestSakSoknadsalternativRow] = {
     UpdateBuilder(""""public"."test_sak_soknadsalternativ"""", TestSakSoknadsalternativFields.structure, TestSakSoknadsalternativRow.jdbcDecoder)
   }
-  override def update(row: TestSakSoknadsalternativRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: TestSakSoknadsalternativRow): ZIO[ZConnection, Throwable, Option[TestSakSoknadsalternativRow]] = {
     val compositeId = row.compositeId
     sql"""update "public"."test_sak_soknadsalternativ"
           set "organisasjonskode_tilbyder" = ${Segment.paramSegment(row.organisasjonskodeTilbyder)(TestOrganisasjonId.setter)}
-          where "organisasjonskode_saksbehandler" = ${Segment.paramSegment(compositeId.organisasjonskodeSaksbehandler)(Setter.stringSetter)} AND "utdanningsmulighet_kode" = ${Segment.paramSegment(compositeId.utdanningsmulighetKode)(Setter.stringSetter)}""".update.map(_ > 0)
+          where "organisasjonskode_saksbehandler" = ${Segment.paramSegment(compositeId.organisasjonskodeSaksbehandler)(Setter.stringSetter)} AND "utdanningsmulighet_kode" = ${Segment.paramSegment(compositeId.utdanningsmulighetKode)(Setter.stringSetter)}
+          returning "organisasjonskode_saksbehandler", "utdanningsmulighet_kode", "organisasjonskode_tilbyder""""
+      .query(TestSakSoknadsalternativRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: TestSakSoknadsalternativRow): ZIO[ZConnection, Throwable, UpdateResult[TestSakSoknadsalternativRow]] = {
     sql"""insert into "public"."test_sak_soknadsalternativ"("organisasjonskode_saksbehandler", "utdanningsmulighet_kode", "organisasjonskode_tilbyder")

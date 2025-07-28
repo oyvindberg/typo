@@ -104,7 +104,7 @@ class WorkorderRepoImpl extends WorkorderRepo {
   override def update: UpdateBuilder[WorkorderFields, WorkorderRow] = {
     UpdateBuilder(""""production"."workorder"""", WorkorderFields.structure, WorkorderRow.read)
   }
-  override def update(row: WorkorderRow): ConnectionIO[Boolean] = {
+  override def update(row: WorkorderRow): ConnectionIO[Option[WorkorderRow]] = {
     val workorderid = row.workorderid
     sql"""update "production"."workorder"
           set "productid" = ${fromWrite(row.productid)(new Write.Single(ProductId.put))}::int4,
@@ -115,10 +115,8 @@ class WorkorderRepoImpl extends WorkorderRepo {
               "duedate" = ${fromWrite(row.duedate)(new Write.Single(TypoLocalDateTime.put))}::timestamp,
               "scrapreasonid" = ${fromWrite(row.scrapreasonid)(new Write.SingleOpt(ScrapreasonId.put))}::int2,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "workorderid" = ${fromWrite(workorderid)(new Write.Single(WorkorderId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "workorderid" = ${fromWrite(workorderid)(new Write.Single(WorkorderId.put))}
+          returning "workorderid", "productid", "orderqty", "scrappedqty", "startdate"::text, "enddate"::text, "duedate"::text, "scrapreasonid", "modifieddate"::text""".query(using WorkorderRow.read).option
   }
   override def upsert(unsaved: WorkorderRow): ConnectionIO[WorkorderRow] = {
     sql"""insert into "production"."workorder"("workorderid", "productid", "orderqty", "scrappedqty", "startdate", "enddate", "duedate", "scrapreasonid", "modifieddate")

@@ -28,7 +28,7 @@ trait CustomerRepo {
   def selectByIds(customerids: Array[CustomerId]): Stream[ConnectionIO, CustomerRow]
   def selectByIdsTracked(customerids: Array[CustomerId]): ConnectionIO[Map[CustomerId, CustomerRow]]
   def update: UpdateBuilder[CustomerFields, CustomerRow]
-  def update(row: CustomerRow): ConnectionIO[Boolean]
+  def update(row: CustomerRow): ConnectionIO[Option[CustomerRow]]
   def upsert(unsaved: CustomerRow): ConnectionIO[CustomerRow]
   def upsertBatch(unsaved: List[CustomerRow]): Stream[ConnectionIO, CustomerRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

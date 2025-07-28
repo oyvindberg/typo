@@ -115,15 +115,13 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   override def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
     UpdateBuilder(""""person"."businessentitycontact"""", BusinessentitycontactFields.structure, BusinessentitycontactRow.read)
   }
-  override def update(row: BusinessentitycontactRow): ConnectionIO[Boolean] = {
+  override def update(row: BusinessentitycontactRow): ConnectionIO[Option[BusinessentitycontactRow]] = {
     val compositeId = row.compositeId
     sql"""update "person"."businessentitycontact"
           set "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "personid" = ${fromWrite(compositeId.personid)(new Write.Single(BusinessentityId.put))} AND "contacttypeid" = ${fromWrite(compositeId.contacttypeid)(new Write.Single(ContacttypeId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "personid" = ${fromWrite(compositeId.personid)(new Write.Single(BusinessentityId.put))} AND "contacttypeid" = ${fromWrite(compositeId.contacttypeid)(new Write.Single(ContacttypeId.put))}
+          returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text""".query(using BusinessentitycontactRow.read).option
   }
   override def upsert(unsaved: BusinessentitycontactRow): ConnectionIO[BusinessentitycontactRow] = {
     sql"""insert into "person"."businessentitycontact"("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")

@@ -103,7 +103,7 @@ class UsersRepoImpl extends UsersRepo {
   override def update: UpdateBuilder[UsersFields, UsersRow] = {
     UpdateBuilder(""""public"."users"""", UsersFields.structure, UsersRow.read)
   }
-  override def update(row: UsersRow): ConnectionIO[Boolean] = {
+  override def update(row: UsersRow): ConnectionIO[Option[UsersRow]] = {
     val userId = row.userId
     sql"""update "public"."users"
           set "name" = ${fromWrite(row.name)(new Write.Single(Meta.StringMeta.put))},
@@ -112,10 +112,8 @@ class UsersRepoImpl extends UsersRepo {
               "password" = ${fromWrite(row.password)(new Write.Single(Meta.StringMeta.put))},
               "created_at" = ${fromWrite(row.createdAt)(new Write.Single(TypoInstant.put))}::timestamptz,
               "verified_on" = ${fromWrite(row.verifiedOn)(new Write.SingleOpt(TypoInstant.put))}::timestamptz
-          where "user_id" = ${fromWrite(userId)(new Write.Single(UsersId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "user_id" = ${fromWrite(userId)(new Write.Single(UsersId.put))}
+          returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text""".query(using UsersRow.read).option
   }
   override def upsert(unsaved: UsersRow): ConnectionIO[UsersRow] = {
     sql"""insert into "public"."users"("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")

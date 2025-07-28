@@ -100,7 +100,7 @@ class CustomerRepoImpl extends CustomerRepo {
   override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
     UpdateBuilder(""""sales"."customer"""", CustomerFields.structure, CustomerRow.jdbcDecoder)
   }
-  override def update(row: CustomerRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: CustomerRow): ZIO[ZConnection, Throwable, Option[CustomerRow]] = {
     val customerid = row.customerid
     sql"""update "sales"."customer"
           set "personid" = ${Segment.paramSegment(row.personid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4,
@@ -108,7 +108,10 @@ class CustomerRepoImpl extends CustomerRepo {
               "territoryid" = ${Segment.paramSegment(row.territoryid)(Setter.optionParamSetter(SalesterritoryId.setter))}::int4,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "customerid" = ${Segment.paramSegment(customerid)(CustomerId.setter)}""".update.map(_ > 0)
+          where "customerid" = ${Segment.paramSegment(customerid)(CustomerId.setter)}
+          returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text"""
+      .query(CustomerRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: CustomerRow): ZIO[ZConnection, Throwable, UpdateResult[CustomerRow]] = {
     sql"""insert into "sales"."customer"("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")

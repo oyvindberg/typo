@@ -28,7 +28,7 @@ trait EmployeedepartmenthistoryRepo {
   def selectByIds(compositeIds: Array[EmployeedepartmenthistoryId]): Stream[ConnectionIO, EmployeedepartmenthistoryRow]
   def selectByIdsTracked(compositeIds: Array[EmployeedepartmenthistoryId]): ConnectionIO[Map[EmployeedepartmenthistoryId, EmployeedepartmenthistoryRow]]
   def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow]
-  def update(row: EmployeedepartmenthistoryRow): ConnectionIO[Boolean]
+  def update(row: EmployeedepartmenthistoryRow): ConnectionIO[Option[EmployeedepartmenthistoryRow]]
   def upsert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow]
   def upsertBatch(unsaved: List[EmployeedepartmenthistoryRow]): Stream[ConnectionIO, EmployeedepartmenthistoryRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

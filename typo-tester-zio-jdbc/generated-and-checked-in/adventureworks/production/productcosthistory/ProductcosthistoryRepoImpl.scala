@@ -105,13 +105,16 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     UpdateBuilder(""""production"."productcosthistory"""", ProductcosthistoryFields.structure, ProductcosthistoryRow.jdbcDecoder)
   }
-  override def update(row: ProductcosthistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ProductcosthistoryRow): ZIO[ZConnection, Throwable, Option[ProductcosthistoryRow]] = {
     val compositeId = row.compositeId
     sql"""update "production"."productcosthistory"
           set "enddate" = ${Segment.paramSegment(row.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
               "standardcost" = ${Segment.paramSegment(row.standardcost)(Setter.bigDecimalScalaSetter)}::numeric,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".update.map(_ > 0)
+          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}
+          returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text"""
+      .query(ProductcosthistoryRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ProductcosthistoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductcosthistoryRow]] = {
     sql"""insert into "production"."productcosthistory"("productid", "startdate", "enddate", "standardcost", "modifieddate")

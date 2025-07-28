@@ -29,7 +29,7 @@ trait VendorRepo {
   def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, VendorRow]
   def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, VendorRow]]
   def update: UpdateBuilder[VendorFields, VendorRow]
-  def update(row: VendorRow): ConnectionIO[Boolean]
+  def update(row: VendorRow): ConnectionIO[Option[VendorRow]]
   def upsert(unsaved: VendorRow): ConnectionIO[VendorRow]
   def upsertBatch(unsaved: List[VendorRow]): Stream[ConnectionIO, VendorRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

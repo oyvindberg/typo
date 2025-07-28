@@ -107,7 +107,7 @@ class AddressRepoImpl extends AddressRepo {
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
     UpdateBuilder(""""person"."address"""", AddressFields.structure, AddressRow.read)
   }
-  override def update(row: AddressRow): ConnectionIO[Boolean] = {
+  override def update(row: AddressRow): ConnectionIO[Option[AddressRow]] = {
     val addressid = row.addressid
     sql"""update "person"."address"
           set "addressline1" = ${fromWrite(row.addressline1)(new Write.Single(Meta.StringMeta.put))},
@@ -118,10 +118,8 @@ class AddressRepoImpl extends AddressRepo {
               "spatiallocation" = ${fromWrite(row.spatiallocation)(new Write.SingleOpt(TypoBytea.put))}::bytea,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "addressid" = ${fromWrite(addressid)(new Write.Single(AddressId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "addressid" = ${fromWrite(addressid)(new Write.Single(AddressId.put))}
+          returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text""".query(using AddressRow.read).option
   }
   override def upsert(unsaved: AddressRow): ConnectionIO[AddressRow] = {
     sql"""insert into "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")

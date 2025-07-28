@@ -30,7 +30,7 @@ trait CurrencyrateRepo {
   def selectByIds(currencyrateids: Array[CurrencyrateId]): ZStream[ZConnection, Throwable, CurrencyrateRow]
   def selectByIdsTracked(currencyrateids: Array[CurrencyrateId]): ZIO[ZConnection, Throwable, Map[CurrencyrateId, CurrencyrateRow]]
   def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow]
-  def update(row: CurrencyrateRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: CurrencyrateRow): ZIO[ZConnection, Throwable, Option[CurrencyrateRow]]
   def upsert(unsaved: CurrencyrateRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyrateRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

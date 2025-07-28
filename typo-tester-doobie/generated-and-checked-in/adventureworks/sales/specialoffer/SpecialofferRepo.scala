@@ -28,7 +28,7 @@ trait SpecialofferRepo {
   def selectByIds(specialofferids: Array[SpecialofferId]): Stream[ConnectionIO, SpecialofferRow]
   def selectByIdsTracked(specialofferids: Array[SpecialofferId]): ConnectionIO[Map[SpecialofferId, SpecialofferRow]]
   def update: UpdateBuilder[SpecialofferFields, SpecialofferRow]
-  def update(row: SpecialofferRow): ConnectionIO[Boolean]
+  def update(row: SpecialofferRow): ConnectionIO[Option[SpecialofferRow]]
   def upsert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow]
   def upsertBatch(unsaved: List[SpecialofferRow]): Stream[ConnectionIO, SpecialofferRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

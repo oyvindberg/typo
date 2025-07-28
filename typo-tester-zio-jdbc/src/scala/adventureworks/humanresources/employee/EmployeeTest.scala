@@ -10,6 +10,7 @@ import adventureworks.userdefined.FirstName
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
 import zio.ZIO
+import scala.annotation.nowarn
 
 import java.time.LocalDate
 
@@ -96,7 +97,11 @@ class EmployeeTest extends AnyFunSuite with TypeCheckedTripleEquals {
         saved2 = unsaved.toRow(???, ???, ???, ???, ???, ???, ???)
         _ <- ZIO.succeed(assert(saved1 === saved2))
         // check field values
-        _ <- employeeRepo.update(saved1.copy(gender = "M"))
+        updatedOpt <- employeeRepo.update(saved1.copy(gender = "M"))
+        _ <- ZIO.succeed {
+          assert(updatedOpt.isDefined): @nowarn
+          assert(updatedOpt.get.gender == "M")
+        }
         saved3_1 <- employeeRepo.selectAll.runLast
         saved3_2 <- employeeRepo.selectByIds(Array(saved1.businessentityid, BusinessentityId(22))).runLast
         _ <- ZIO.succeed(assert(saved3_1 == saved3_2))

@@ -87,14 +87,11 @@ class AddressRepoMock(toRow: Function1[AddressRowUnsaved, AddressRow],
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
     UpdateBuilderMock(UpdateParams.empty, AddressFields.structure, map)
   }
-  override def update(row: AddressRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: AddressRow): ZIO[ZConnection, Throwable, Option[AddressRow]] = {
     ZIO.succeed {
-      map.get(row.addressid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.addressid, row): @nowarn
-          true
-        case None => false
+      map.get(row.addressid).map { _ =>
+        map.put(row.addressid, row): @nowarn
+        row
       }
     }
   }

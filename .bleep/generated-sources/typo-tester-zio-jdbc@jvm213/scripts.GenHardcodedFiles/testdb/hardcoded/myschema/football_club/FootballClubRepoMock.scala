@@ -82,14 +82,11 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
     UpdateBuilderMock(UpdateParams.empty, FootballClubFields.structure, map)
   }
-  override def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Option[FootballClubRow]] = {
     ZIO.succeed {
-      map.get(row.id) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.id, row): @nowarn
-          true
-        case None => false
+      map.get(row.id).map { _ =>
+        map.put(row.id, row): @nowarn
+        row
       }
     }
   }

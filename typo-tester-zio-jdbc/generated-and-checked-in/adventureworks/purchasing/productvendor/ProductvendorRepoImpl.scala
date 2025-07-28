@@ -113,7 +113,7 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
   override def update: UpdateBuilder[ProductvendorFields, ProductvendorRow] = {
     UpdateBuilder(""""purchasing"."productvendor"""", ProductvendorFields.structure, ProductvendorRow.jdbcDecoder)
   }
-  override def update(row: ProductvendorRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ProductvendorRow): ZIO[ZConnection, Throwable, Option[ProductvendorRow]] = {
     val compositeId = row.compositeId
     sql"""update "purchasing"."productvendor"
           set "averageleadtime" = ${Segment.paramSegment(row.averageleadtime)(Setter.intSetter)}::int4,
@@ -125,7 +125,10 @@ class ProductvendorRepoImpl extends ProductvendorRepo {
               "onorderqty" = ${Segment.paramSegment(row.onorderqty)(Setter.optionParamSetter(Setter.intSetter))}::int4,
               "unitmeasurecode" = ${Segment.paramSegment(row.unitmeasurecode)(UnitmeasureId.setter)}::bpchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)}""".update.map(_ > 0)
+          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)}
+          returning "productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate"::text, "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate"::text"""
+      .query(ProductvendorRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ProductvendorRow): ZIO[ZConnection, Throwable, UpdateResult[ProductvendorRow]] = {
     sql"""insert into "purchasing"."productvendor"("productid", "businessentityid", "averageleadtime", "standardprice", "lastreceiptcost", "lastreceiptdate", "minorderqty", "maxorderqty", "onorderqty", "unitmeasurecode", "modifieddate")

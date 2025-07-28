@@ -18,7 +18,7 @@ import typo.generated.customtypes.TypoAclItem
 
 class PgNamespaceRepoImpl extends PgNamespaceRepo {
   override def insert(unsaved: PgNamespaceRow)(implicit c: Connection): PgNamespaceRow = {
-    SQL"""insert into pg_catalog.pg_namespace("oid", "nspname", "nspowner", "nspacl")
+    SQL"""insert into "pg_catalog"."pg_namespace"("oid", "nspname", "nspowner", "nspacl")
           values (${ParameterValue(unsaved.oid, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.nspname, null, ToStatement.stringToStatement)}::name, ${ParameterValue(unsaved.nspowner, null, ToStatement.longToStatement)}::oid, ${ParameterValue(unsaved.nspacl, null, ToStatement.optionToStatement(TypoAclItem.arrayToStatement, typo.generated.arrayParameterMetaData(TypoAclItem.parameterMetadata)))}::aclitem[])
           returning "oid", "nspname", "nspowner", "nspacl"
        """
@@ -26,11 +26,11 @@ class PgNamespaceRepoImpl extends PgNamespaceRepo {
     
   }
   override def insertStreaming(unsaved: Iterator[PgNamespaceRow], batchSize: Int = 10000)(implicit c: Connection): Long = {
-    streamingInsert(s"""COPY pg_catalog.pg_namespace("oid", "nspname", "nspowner", "nspacl") FROM STDIN""", batchSize, unsaved)(PgNamespaceRow.text, c)
+    streamingInsert(s"""COPY "pg_catalog"."pg_namespace"("oid", "nspname", "nspowner", "nspacl") FROM STDIN""", batchSize, unsaved)(PgNamespaceRow.text, c)
   }
   override def selectAll(implicit c: Connection): List[PgNamespaceRow] = {
     SQL"""select "oid", "nspname", "nspowner", "nspacl"
-          from pg_catalog.pg_namespace
+          from "pg_catalog"."pg_namespace"
        """.as(PgNamespaceRow.rowParser(1).*)
   }
 }

@@ -30,7 +30,7 @@ trait UsersRepo {
   def selectByIdsTracked(userIds: Array[UsersId]): ConnectionIO[Map[UsersId, UsersRow]]
   def selectByUniqueEmail(email: TypoUnknownCitext): ConnectionIO[Option[UsersRow]]
   def update: UpdateBuilder[UsersFields, UsersRow]
-  def update(row: UsersRow): ConnectionIO[Boolean]
+  def update(row: UsersRow): ConnectionIO[Option[UsersRow]]
   def upsert(unsaved: UsersRow): ConnectionIO[UsersRow]
   def upsertBatch(unsaved: List[UsersRow]): Stream[ConnectionIO, UsersRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

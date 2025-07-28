@@ -32,7 +32,7 @@ trait UsersRepo {
   def selectByIdsTracked(userIds: Array[UsersId]): ZIO[ZConnection, Throwable, Map[UsersId, UsersRow]]
   def selectByUniqueEmail(email: TypoUnknownCitext): ZIO[ZConnection, Throwable, Option[UsersRow]]
   def update: UpdateBuilder[UsersFields, UsersRow]
-  def update(row: UsersRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: UsersRow): ZIO[ZConnection, Throwable, Option[UsersRow]]
   def upsert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UpdateResult[UsersRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

@@ -128,7 +128,7 @@ class PersonRepoImpl extends PersonRepo {
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder(""""myschema"."person"""", PersonFields.structure, PersonRow.jdbcDecoder)
   }
-  override def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: PersonRow): ZIO[ZConnection, Throwable, Option[PersonRow]] = {
     val id = row.id
     sql"""update "myschema"."person"
           set "favourite_football_club_id" = ${Segment.paramSegment(row.favouriteFootballClubId)(FootballClubId.setter)},
@@ -141,7 +141,10 @@ class PersonRepoImpl extends PersonRepo {
               "marital_status_id" = ${Segment.paramSegment(row.maritalStatusId)(MaritalStatusId.setter)},
               "work_email" = ${Segment.paramSegment(row.workEmail)(Setter.optionParamSetter(Setter.stringSetter))},
               "favorite_number" = ${Segment.paramSegment(row.favoriteNumber)(Number.setter)}::myschema.number
-          where "id" = ${Segment.paramSegment(id)(PersonId.setter)}""".update.map(_ > 0)
+          where "id" = ${Segment.paramSegment(id)(PersonId.setter)}
+          returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number""""
+      .query(PersonRow.jdbcDecoder)
+      .selectOne
   }
   override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean] = {
     NonEmptyChunk.fromIterableOption(fieldValues) match {

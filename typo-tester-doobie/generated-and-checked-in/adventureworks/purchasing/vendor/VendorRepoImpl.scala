@@ -108,7 +108,7 @@ class VendorRepoImpl extends VendorRepo {
   override def update: UpdateBuilder[VendorFields, VendorRow] = {
     UpdateBuilder(""""purchasing"."vendor"""", VendorFields.structure, VendorRow.read)
   }
-  override def update(row: VendorRow): ConnectionIO[Boolean] = {
+  override def update(row: VendorRow): ConnectionIO[Option[VendorRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "purchasing"."vendor"
           set "accountnumber" = ${fromWrite(row.accountnumber)(new Write.Single(AccountNumber.put))}::varchar,
@@ -118,10 +118,8 @@ class VendorRepoImpl extends VendorRepo {
               "activeflag" = ${fromWrite(row.activeflag)(new Write.Single(Flag.put))}::bool,
               "purchasingwebserviceurl" = ${fromWrite(row.purchasingwebserviceurl)(new Write.SingleOpt(Meta.StringMeta.put))},
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}
+          returning "businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate"::text""".query(using VendorRow.read).option
   }
   override def upsert(unsaved: VendorRow): ConnectionIO[VendorRow] = {
     sql"""insert into "purchasing"."vendor"("businessentityid", "accountnumber", "name", "creditrating", "preferredvendorstatus", "activeflag", "purchasingwebserviceurl", "modifieddate")

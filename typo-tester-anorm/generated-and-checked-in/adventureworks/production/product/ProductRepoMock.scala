@@ -74,13 +74,10 @@ class ProductRepoMock(toRow: Function1[ProductRowUnsaved, ProductRow],
   override def update: UpdateBuilder[ProductFields, ProductRow] = {
     UpdateBuilderMock(UpdateParams.empty, ProductFields.structure, map)
   }
-  override def update(row: ProductRow)(implicit c: Connection): Boolean = {
-    map.get(row.productid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.productid, row): @nowarn
-        true
-      case None => false
+  override def update(row: ProductRow)(implicit c: Connection): Option[ProductRow] = {
+    map.get(row.productid).map { _ =>
+      map.put(row.productid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: ProductRow)(implicit c: Connection): ProductRow = {

@@ -28,7 +28,7 @@ trait ProductinventoryRepo {
   def selectByIds(compositeIds: Array[ProductinventoryId]): Stream[ConnectionIO, ProductinventoryRow]
   def selectByIdsTracked(compositeIds: Array[ProductinventoryId]): ConnectionIO[Map[ProductinventoryId, ProductinventoryRow]]
   def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow]
-  def update(row: ProductinventoryRow): ConnectionIO[Boolean]
+  def update(row: ProductinventoryRow): ConnectionIO[Option[ProductinventoryRow]]
   def upsert(unsaved: ProductinventoryRow): ConnectionIO[ProductinventoryRow]
   def upsertBatch(unsaved: List[ProductinventoryRow]): Stream[ConnectionIO, ProductinventoryRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

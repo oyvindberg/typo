@@ -101,7 +101,7 @@ class CreditcardRepoImpl extends CreditcardRepo {
   override def update: UpdateBuilder[CreditcardFields, CreditcardRow] = {
     UpdateBuilder(""""sales"."creditcard"""", CreditcardFields.structure, CreditcardRow.read)
   }
-  override def update(row: CreditcardRow): ConnectionIO[Boolean] = {
+  override def update(row: CreditcardRow): ConnectionIO[Option[CreditcardRow]] = {
     val creditcardid = row.creditcardid
     sql"""update "sales"."creditcard"
           set "cardtype" = ${fromWrite(row.cardtype)(new Write.Single(Meta.StringMeta.put))},
@@ -109,10 +109,8 @@ class CreditcardRepoImpl extends CreditcardRepo {
               "expmonth" = ${fromWrite(row.expmonth)(new Write.Single(TypoShort.put))}::int2,
               "expyear" = ${fromWrite(row.expyear)(new Write.Single(TypoShort.put))}::int2,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "creditcardid" = ${fromWrite(creditcardid)(new Write.Single(/* user-picked */ CustomCreditcardId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "creditcardid" = ${fromWrite(creditcardid)(new Write.Single(/* user-picked */ CustomCreditcardId.put))}
+          returning "creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate"::text""".query(using CreditcardRow.read).option
   }
   override def upsert(unsaved: CreditcardRow): ConnectionIO[CreditcardRow] = {
     sql"""insert into "sales"."creditcard"("creditcardid", "cardtype", "cardnumber", "expmonth", "expyear", "modifieddate")

@@ -98,14 +98,17 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
     UpdateBuilder(""""production"."productsubcategory"""", ProductsubcategoryFields.structure, ProductsubcategoryRow.jdbcDecoder)
   }
-  override def update(row: ProductsubcategoryRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ProductsubcategoryRow): ZIO[ZConnection, Throwable, Option[ProductsubcategoryRow]] = {
     val productsubcategoryid = row.productsubcategoryid
     sql"""update "production"."productsubcategory"
           set "productcategoryid" = ${Segment.paramSegment(row.productcategoryid)(ProductcategoryId.setter)}::int4,
               "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "productsubcategoryid" = ${Segment.paramSegment(productsubcategoryid)(ProductsubcategoryId.setter)}""".update.map(_ > 0)
+          where "productsubcategoryid" = ${Segment.paramSegment(productsubcategoryid)(ProductsubcategoryId.setter)}
+          returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text"""
+      .query(ProductsubcategoryRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ProductsubcategoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductsubcategoryRow]] = {
     sql"""insert into "production"."productsubcategory"("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")

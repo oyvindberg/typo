@@ -119,7 +119,7 @@ class UsersRepoImpl extends UsersRepo {
   override def update: UpdateBuilder[UsersFields, UsersRow] = {
     UpdateBuilder(""""public"."users"""", UsersFields.structure, UsersRow.rowParser)
   }
-  override def update(row: UsersRow)(implicit c: Connection): Boolean = {
+  override def update(row: UsersRow)(implicit c: Connection): Option[UsersRow] = {
     val userId = row.userId
     SQL"""update "public"."users"
           set "name" = ${ParameterValue(row.name, null, ToStatement.stringToStatement)},
@@ -129,7 +129,8 @@ class UsersRepoImpl extends UsersRepo {
               "created_at" = ${ParameterValue(row.createdAt, null, TypoInstant.toStatement)}::timestamptz,
               "verified_on" = ${ParameterValue(row.verifiedOn, null, ToStatement.optionToStatement(TypoInstant.toStatement, TypoInstant.parameterMetadata))}::timestamptz
           where "user_id" = ${ParameterValue(userId, null, UsersId.toStatement)}
-       """.executeUpdate() > 0
+          returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text
+       """.executeInsert(UsersRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: UsersRow)(implicit c: Connection): UsersRow = {
     SQL"""insert into "public"."users"("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")

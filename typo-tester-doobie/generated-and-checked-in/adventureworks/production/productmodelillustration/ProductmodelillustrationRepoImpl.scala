@@ -107,14 +107,12 @@ class ProductmodelillustrationRepoImpl extends ProductmodelillustrationRepo {
   override def update: UpdateBuilder[ProductmodelillustrationFields, ProductmodelillustrationRow] = {
     UpdateBuilder(""""production"."productmodelillustration"""", ProductmodelillustrationFields.structure, ProductmodelillustrationRow.read)
   }
-  override def update(row: ProductmodelillustrationRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductmodelillustrationRow): ConnectionIO[Option[ProductmodelillustrationRow]] = {
     val compositeId = row.compositeId
     sql"""update "production"."productmodelillustration"
           set "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "productmodelid" = ${fromWrite(compositeId.productmodelid)(new Write.Single(ProductmodelId.put))} AND "illustrationid" = ${fromWrite(compositeId.illustrationid)(new Write.Single(IllustrationId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "productmodelid" = ${fromWrite(compositeId.productmodelid)(new Write.Single(ProductmodelId.put))} AND "illustrationid" = ${fromWrite(compositeId.illustrationid)(new Write.Single(IllustrationId.put))}
+          returning "productmodelid", "illustrationid", "modifieddate"::text""".query(using ProductmodelillustrationRow.read).option
   }
   override def upsert(unsaved: ProductmodelillustrationRow): ConnectionIO[ProductmodelillustrationRow] = {
     sql"""insert into "production"."productmodelillustration"("productmodelid", "illustrationid", "modifieddate")

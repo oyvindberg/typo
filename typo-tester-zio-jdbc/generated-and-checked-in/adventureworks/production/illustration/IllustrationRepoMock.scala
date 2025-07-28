@@ -87,14 +87,11 @@ class IllustrationRepoMock(toRow: Function1[IllustrationRowUnsaved, Illustration
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
     UpdateBuilderMock(UpdateParams.empty, IllustrationFields.structure, map)
   }
-  override def update(row: IllustrationRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: IllustrationRow): ZIO[ZConnection, Throwable, Option[IllustrationRow]] = {
     ZIO.succeed {
-      map.get(row.illustrationid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.illustrationid, row): @nowarn
-          true
-        case None => false
+      map.get(row.illustrationid).map { _ =>
+        map.put(row.illustrationid, row): @nowarn
+        row
       }
     }
   }

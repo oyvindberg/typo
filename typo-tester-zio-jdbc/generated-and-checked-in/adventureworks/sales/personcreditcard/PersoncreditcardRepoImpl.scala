@@ -104,11 +104,14 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     UpdateBuilder(""""sales"."personcreditcard"""", PersoncreditcardFields.structure, PersoncreditcardRow.jdbcDecoder)
   }
-  override def update(row: PersoncreditcardRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: PersoncreditcardRow): ZIO[ZConnection, Throwable, Option[PersoncreditcardRow]] = {
     val compositeId = row.compositeId
     sql"""update "sales"."personcreditcard"
           set "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "creditcardid" = ${Segment.paramSegment(compositeId.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}""".update.map(_ > 0)
+          where "businessentityid" = ${Segment.paramSegment(compositeId.businessentityid)(BusinessentityId.setter)} AND "creditcardid" = ${Segment.paramSegment(compositeId.creditcardid)(/* user-picked */ CustomCreditcardId.setter)}
+          returning "businessentityid", "creditcardid", "modifieddate"::text"""
+      .query(PersoncreditcardRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: PersoncreditcardRow): ZIO[ZConnection, Throwable, UpdateResult[PersoncreditcardRow]] = {
     sql"""insert into "sales"."personcreditcard"("businessentityid", "creditcardid", "modifieddate")

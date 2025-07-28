@@ -112,15 +112,13 @@ class SpecialofferproductRepoImpl extends SpecialofferproductRepo {
   override def update: UpdateBuilder[SpecialofferproductFields, SpecialofferproductRow] = {
     UpdateBuilder(""""sales"."specialofferproduct"""", SpecialofferproductFields.structure, SpecialofferproductRow.read)
   }
-  override def update(row: SpecialofferproductRow): ConnectionIO[Boolean] = {
+  override def update(row: SpecialofferproductRow): ConnectionIO[Option[SpecialofferproductRow]] = {
     val compositeId = row.compositeId
     sql"""update "sales"."specialofferproduct"
           set "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "specialofferid" = ${fromWrite(compositeId.specialofferid)(new Write.Single(SpecialofferId.put))} AND "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "specialofferid" = ${fromWrite(compositeId.specialofferid)(new Write.Single(SpecialofferId.put))} AND "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))}
+          returning "specialofferid", "productid", "rowguid", "modifieddate"::text""".query(using SpecialofferproductRow.read).option
   }
   override def upsert(unsaved: SpecialofferproductRow): ConnectionIO[SpecialofferproductRow] = {
     sql"""insert into "sales"."specialofferproduct"("specialofferid", "productid", "rowguid", "modifieddate")

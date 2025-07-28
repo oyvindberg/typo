@@ -87,14 +87,11 @@ class ProductproductphotoRepoMock(toRow: Function1[ProductproductphotoRowUnsaved
   override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
     UpdateBuilderMock(UpdateParams.empty, ProductproductphotoFields.structure, map)
   }
-  override def update(row: ProductproductphotoRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ProductproductphotoRow): ZIO[ZConnection, Throwable, Option[ProductproductphotoRow]] = {
     ZIO.succeed {
-      map.get(row.compositeId) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.compositeId, row): @nowarn
-          true
-        case None => false
+      map.get(row.compositeId).map { _ =>
+        map.put(row.compositeId, row): @nowarn
+        row
       }
     }
   }

@@ -106,13 +106,14 @@ class CurrencyRepoImpl extends CurrencyRepo {
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
     UpdateBuilder(""""sales"."currency"""", CurrencyFields.structure, CurrencyRow.rowParser)
   }
-  override def update(row: CurrencyRow)(implicit c: Connection): Boolean = {
+  override def update(row: CurrencyRow)(implicit c: Connection): Option[CurrencyRow] = {
     val currencycode = row.currencycode
     SQL"""update "sales"."currency"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "currencycode" = ${ParameterValue(currencycode, null, CurrencyId.toStatement)}
-       """.executeUpdate() > 0
+          returning "currencycode", "name", "modifieddate"::text
+       """.executeInsert(CurrencyRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {
     SQL"""insert into "sales"."currency"("currencycode", "name", "modifieddate")

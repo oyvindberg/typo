@@ -99,17 +99,15 @@ class PasswordRepoImpl extends PasswordRepo {
   override def update: UpdateBuilder[PasswordFields, PasswordRow] = {
     UpdateBuilder(""""person"."password"""", PasswordFields.structure, PasswordRow.read)
   }
-  override def update(row: PasswordRow): ConnectionIO[Boolean] = {
+  override def update(row: PasswordRow): ConnectionIO[Option[PasswordRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "person"."password"
           set "passwordhash" = ${fromWrite(row.passwordhash)(new Write.Single(Meta.StringMeta.put))},
               "passwordsalt" = ${fromWrite(row.passwordsalt)(new Write.Single(Meta.StringMeta.put))},
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}
+          returning "businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate"::text""".query(using PasswordRow.read).option
   }
   override def upsert(unsaved: PasswordRow): ConnectionIO[PasswordRow] = {
     sql"""insert into "person"."password"("businessentityid", "passwordhash", "passwordsalt", "rowguid", "modifieddate")

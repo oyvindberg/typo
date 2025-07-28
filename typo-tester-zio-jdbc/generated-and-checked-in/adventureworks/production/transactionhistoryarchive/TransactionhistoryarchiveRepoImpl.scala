@@ -100,7 +100,7 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
     UpdateBuilder(""""production"."transactionhistoryarchive"""", TransactionhistoryarchiveFields.structure, TransactionhistoryarchiveRow.jdbcDecoder)
   }
-  override def update(row: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, Option[TransactionhistoryarchiveRow]] = {
     val transactionid = row.transactionid
     sql"""update "production"."transactionhistoryarchive"
           set "productid" = ${Segment.paramSegment(row.productid)(Setter.intSetter)}::int4,
@@ -111,7 +111,10 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
               "quantity" = ${Segment.paramSegment(row.quantity)(Setter.intSetter)}::int4,
               "actualcost" = ${Segment.paramSegment(row.actualcost)(Setter.bigDecimalScalaSetter)}::numeric,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryarchiveId.setter)}""".update.map(_ > 0)
+          where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryarchiveId.setter)}
+          returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text"""
+      .query(TransactionhistoryarchiveRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, UpdateResult[TransactionhistoryarchiveRow]] = {
     sql"""insert into "production"."transactionhistoryarchive"("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")

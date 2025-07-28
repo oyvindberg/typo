@@ -12,6 +12,7 @@ import adventureworks.withConnection
 import doobie.free.connection.delay
 import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.funsuite.AnyFunSuite
+import scala.annotation.nowarn
 
 class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals {
   val businessentityaddressRepo = new BusinessentityaddressRepoImpl
@@ -93,7 +94,11 @@ class BusinessentityaddressTest extends AnyFunSuite with TypeCheckedTripleEquals
         _ <- delay(assert(saved1 === saved2))
         // check field values
         newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
-        _ <- businessentityaddressRepo.update(saved1.copy(modifieddate = newModifiedDate))
+        updatedOpt <- businessentityaddressRepo.update(saved1.copy(modifieddate = newModifiedDate))
+        _ <- delay {
+          assert(updatedOpt.isDefined): @nowarn
+          assert(updatedOpt.get.modifieddate == newModifiedDate)
+        }
         saved3 <- businessentityaddressRepo.selectAll.compile.toList.map {
           case List(x) => x
           case other   => throw new MatchError(other)

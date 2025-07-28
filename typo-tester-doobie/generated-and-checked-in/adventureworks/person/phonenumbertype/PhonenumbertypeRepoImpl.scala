@@ -95,15 +95,13 @@ class PhonenumbertypeRepoImpl extends PhonenumbertypeRepo {
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     UpdateBuilder(""""person"."phonenumbertype"""", PhonenumbertypeFields.structure, PhonenumbertypeRow.read)
   }
-  override def update(row: PhonenumbertypeRow): ConnectionIO[Boolean] = {
+  override def update(row: PhonenumbertypeRow): ConnectionIO[Option[PhonenumbertypeRow]] = {
     val phonenumbertypeid = row.phonenumbertypeid
     sql"""update "person"."phonenumbertype"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "phonenumbertypeid" = ${fromWrite(phonenumbertypeid)(new Write.Single(PhonenumbertypeId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "phonenumbertypeid" = ${fromWrite(phonenumbertypeid)(new Write.Single(PhonenumbertypeId.put))}
+          returning "phonenumbertypeid", "name", "modifieddate"::text""".query(using PhonenumbertypeRow.read).option
   }
   override def upsert(unsaved: PhonenumbertypeRow): ConnectionIO[PhonenumbertypeRow] = {
     sql"""insert into "person"."phonenumbertype"("phonenumbertypeid", "name", "modifieddate")

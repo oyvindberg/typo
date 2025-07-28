@@ -30,7 +30,7 @@ trait PersonRepo {
   def selectByIds(ids: Array[PersonId]): Stream[ConnectionIO, PersonRow]
   def selectByIdsTracked(ids: Array[PersonId]): ConnectionIO[Map[PersonId, PersonRow]]
   def update: UpdateBuilder[PersonFields, PersonRow]
-  def update(row: PersonRow): ConnectionIO[Boolean]
+  def update(row: PersonRow): ConnectionIO[Option[PersonRow]]
   def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]]): ConnectionIO[Boolean]
   def upsert(unsaved: PersonRow): ConnectionIO[PersonRow]
   def upsertBatch(unsaved: List[PersonRow]): Stream[ConnectionIO, PersonRow]

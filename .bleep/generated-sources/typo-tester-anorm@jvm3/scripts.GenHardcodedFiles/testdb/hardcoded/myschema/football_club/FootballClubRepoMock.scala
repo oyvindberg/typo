@@ -69,13 +69,10 @@ class FootballClubRepoMock(map: scala.collection.mutable.Map[FootballClubId, Foo
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
     UpdateBuilderMock(UpdateParams.empty, FootballClubFields.structure, map)
   }
-  override def update(row: FootballClubRow)(implicit c: Connection): Boolean = {
-    map.get(row.id) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.id, row): @nowarn
-        true
-      case None => false
+  override def update(row: FootballClubRow)(implicit c: Connection): Option[FootballClubRow] = {
+    map.get(row.id).map { _ =>
+      map.put(row.id, row): @nowarn
+      row
     }
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]])(implicit c: Connection): Boolean = {

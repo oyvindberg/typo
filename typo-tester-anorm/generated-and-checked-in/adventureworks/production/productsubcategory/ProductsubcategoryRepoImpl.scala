@@ -116,7 +116,7 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
   override def update: UpdateBuilder[ProductsubcategoryFields, ProductsubcategoryRow] = {
     UpdateBuilder(""""production"."productsubcategory"""", ProductsubcategoryFields.structure, ProductsubcategoryRow.rowParser)
   }
-  override def update(row: ProductsubcategoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductsubcategoryRow)(implicit c: Connection): Option[ProductsubcategoryRow] = {
     val productsubcategoryid = row.productsubcategoryid
     SQL"""update "production"."productsubcategory"
           set "productcategoryid" = ${ParameterValue(row.productcategoryid, null, ProductcategoryId.toStatement)}::int4,
@@ -124,7 +124,8 @@ class ProductsubcategoryRepoImpl extends ProductsubcategoryRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productsubcategoryid" = ${ParameterValue(productsubcategoryid, null, ProductsubcategoryId.toStatement)}
-       """.executeUpdate() > 0
+          returning "productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate"::text
+       """.executeInsert(ProductsubcategoryRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductsubcategoryRow)(implicit c: Connection): ProductsubcategoryRow = {
     SQL"""insert into "production"."productsubcategory"("productsubcategoryid", "productcategoryid", "name", "rowguid", "modifieddate")

@@ -28,7 +28,7 @@ trait StateprovinceRepo {
   def selectByIds(stateprovinceids: Array[StateprovinceId]): Stream[ConnectionIO, StateprovinceRow]
   def selectByIdsTracked(stateprovinceids: Array[StateprovinceId]): ConnectionIO[Map[StateprovinceId, StateprovinceRow]]
   def update: UpdateBuilder[StateprovinceFields, StateprovinceRow]
-  def update(row: StateprovinceRow): ConnectionIO[Boolean]
+  def update(row: StateprovinceRow): ConnectionIO[Option[StateprovinceRow]]
   def upsert(unsaved: StateprovinceRow): ConnectionIO[StateprovinceRow]
   def upsertBatch(unsaved: List[StateprovinceRow]): Stream[ConnectionIO, StateprovinceRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

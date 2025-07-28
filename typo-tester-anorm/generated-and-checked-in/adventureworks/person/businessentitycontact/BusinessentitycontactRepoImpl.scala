@@ -121,13 +121,14 @@ class BusinessentitycontactRepoImpl extends BusinessentitycontactRepo {
   override def update: UpdateBuilder[BusinessentitycontactFields, BusinessentitycontactRow] = {
     UpdateBuilder(""""person"."businessentitycontact"""", BusinessentitycontactFields.structure, BusinessentitycontactRow.rowParser)
   }
-  override def update(row: BusinessentitycontactRow)(implicit c: Connection): Boolean = {
+  override def update(row: BusinessentitycontactRow)(implicit c: Connection): Option[BusinessentitycontactRow] = {
     val compositeId = row.compositeId
     SQL"""update "person"."businessentitycontact"
           set "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "personid" = ${ParameterValue(compositeId.personid, null, BusinessentityId.toStatement)} AND "contacttypeid" = ${ParameterValue(compositeId.contacttypeid, null, ContacttypeId.toStatement)}
-       """.executeUpdate() > 0
+          returning "businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate"::text
+       """.executeInsert(BusinessentitycontactRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: BusinessentitycontactRow)(implicit c: Connection): BusinessentitycontactRow = {
     SQL"""insert into "person"."businessentitycontact"("businessentityid", "personid", "contacttypeid", "rowguid", "modifieddate")

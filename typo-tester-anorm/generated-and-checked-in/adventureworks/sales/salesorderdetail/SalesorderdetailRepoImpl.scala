@@ -134,7 +134,7 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
   override def update: UpdateBuilder[SalesorderdetailFields, SalesorderdetailRow] = {
     UpdateBuilder(""""sales"."salesorderdetail"""", SalesorderdetailFields.structure, SalesorderdetailRow.rowParser)
   }
-  override def update(row: SalesorderdetailRow)(implicit c: Connection): Boolean = {
+  override def update(row: SalesorderdetailRow)(implicit c: Connection): Option[SalesorderdetailRow] = {
     val compositeId = row.compositeId
     SQL"""update "sales"."salesorderdetail"
           set "carriertrackingnumber" = ${ParameterValue(row.carriertrackingnumber, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
@@ -146,7 +146,8 @@ class SalesorderdetailRepoImpl extends SalesorderdetailRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "salesorderid" = ${ParameterValue(compositeId.salesorderid, null, SalesorderheaderId.toStatement)} AND "salesorderdetailid" = ${ParameterValue(compositeId.salesorderdetailid, null, ToStatement.intToStatement)}
-       """.executeUpdate() > 0
+          returning "salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate"::text
+       """.executeInsert(SalesorderdetailRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: SalesorderdetailRow)(implicit c: Connection): SalesorderdetailRow = {
     SQL"""insert into "sales"."salesorderdetail"("salesorderid", "salesorderdetailid", "carriertrackingnumber", "orderqty", "productid", "specialofferid", "unitprice", "unitpricediscount", "rowguid", "modifieddate")

@@ -100,14 +100,17 @@ class LocationRepoImpl extends LocationRepo {
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
     UpdateBuilder(""""production"."location"""", LocationFields.structure, LocationRow.jdbcDecoder)
   }
-  override def update(row: LocationRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: LocationRow): ZIO[ZConnection, Throwable, Option[LocationRow]] = {
     val locationid = row.locationid
     sql"""update "production"."location"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "costrate" = ${Segment.paramSegment(row.costrate)(Setter.bigDecimalScalaSetter)}::numeric,
               "availability" = ${Segment.paramSegment(row.availability)(Setter.bigDecimalScalaSetter)}::numeric,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "locationid" = ${Segment.paramSegment(locationid)(LocationId.setter)}""".update.map(_ > 0)
+          where "locationid" = ${Segment.paramSegment(locationid)(LocationId.setter)}
+          returning "locationid", "name", "costrate", "availability", "modifieddate"::text"""
+      .query(LocationRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: LocationRow): ZIO[ZConnection, Throwable, UpdateResult[LocationRow]] = {
     sql"""insert into "production"."location"("locationid", "name", "costrate", "availability", "modifieddate")

@@ -88,14 +88,11 @@ class IdentityTestRepoMock(toRow: Function1[IdentityTestRowUnsaved, IdentityTest
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
     UpdateBuilderMock(UpdateParams.empty, IdentityTestFields.structure, map)
   }
-  override def update(row: IdentityTestRow): ConnectionIO[Boolean] = {
+  override def update(row: IdentityTestRow): ConnectionIO[Option[IdentityTestRow]] = {
     delay {
-      map.get(row.name) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.name, row): @nowarn
-          true
-        case None => false
+      map.get(row.name).map { _ =>
+        map.put(row.name, row): @nowarn
+        row
       }
     }
   }

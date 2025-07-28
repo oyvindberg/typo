@@ -126,7 +126,7 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
   override def update: UpdateBuilder[ProductinventoryFields, ProductinventoryRow] = {
     UpdateBuilder(""""production"."productinventory"""", ProductinventoryFields.structure, ProductinventoryRow.rowParser)
   }
-  override def update(row: ProductinventoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductinventoryRow)(implicit c: Connection): Option[ProductinventoryRow] = {
     val compositeId = row.compositeId
     SQL"""update "production"."productinventory"
           set "shelf" = ${ParameterValue(row.shelf, null, ToStatement.stringToStatement)},
@@ -135,7 +135,8 @@ class ProductinventoryRepoImpl extends ProductinventoryRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "locationid" = ${ParameterValue(compositeId.locationid, null, LocationId.toStatement)}
-       """.executeUpdate() > 0
+          returning "productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate"::text
+       """.executeInsert(ProductinventoryRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductinventoryRow)(implicit c: Connection): ProductinventoryRow = {
     SQL"""insert into "production"."productinventory"("productid", "locationid", "shelf", "bin", "quantity", "rowguid", "modifieddate")

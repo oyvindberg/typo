@@ -116,7 +116,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
     UpdateBuilder(""""sales"."salesterritory"""", SalesterritoryFields.structure, SalesterritoryRow.jdbcDecoder)
   }
-  override def update(row: SalesterritoryRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: SalesterritoryRow): ZIO[ZConnection, Throwable, Option[SalesterritoryRow]] = {
     val territoryid = row.territoryid
     sql"""update "sales"."salesterritory"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
@@ -128,7 +128,10 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
               "costlastyear" = ${Segment.paramSegment(row.costlastyear)(Setter.bigDecimalScalaSetter)}::numeric,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "territoryid" = ${Segment.paramSegment(territoryid)(SalesterritoryId.setter)}""".update.map(_ > 0)
+          where "territoryid" = ${Segment.paramSegment(territoryid)(SalesterritoryId.setter)}
+          returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text"""
+      .query(SalesterritoryRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: SalesterritoryRow): ZIO[ZConnection, Throwable, UpdateResult[SalesterritoryRow]] = {
     sql"""insert into "sales"."salesterritory"("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")

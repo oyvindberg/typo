@@ -28,7 +28,7 @@ trait CurrencyrateRepo {
   def selectByIds(currencyrateids: Array[CurrencyrateId]): Stream[ConnectionIO, CurrencyrateRow]
   def selectByIdsTracked(currencyrateids: Array[CurrencyrateId]): ConnectionIO[Map[CurrencyrateId, CurrencyrateRow]]
   def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow]
-  def update(row: CurrencyrateRow): ConnectionIO[Boolean]
+  def update(row: CurrencyrateRow): ConnectionIO[Option[CurrencyrateRow]]
   def upsert(unsaved: CurrencyrateRow): ConnectionIO[CurrencyrateRow]
   def upsertBatch(unsaved: List[CurrencyrateRow]): Stream[ConnectionIO, CurrencyrateRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

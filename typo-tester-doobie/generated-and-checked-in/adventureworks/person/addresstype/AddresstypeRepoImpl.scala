@@ -100,16 +100,14 @@ class AddresstypeRepoImpl extends AddresstypeRepo {
   override def update: UpdateBuilder[AddresstypeFields, AddresstypeRow] = {
     UpdateBuilder(""""person"."addresstype"""", AddresstypeFields.structure, AddresstypeRow.read)
   }
-  override def update(row: AddresstypeRow): ConnectionIO[Boolean] = {
+  override def update(row: AddresstypeRow): ConnectionIO[Option[AddresstypeRow]] = {
     val addresstypeid = row.addresstypeid
     sql"""update "person"."addresstype"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "addresstypeid" = ${fromWrite(addresstypeid)(new Write.Single(AddresstypeId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "addresstypeid" = ${fromWrite(addresstypeid)(new Write.Single(AddresstypeId.put))}
+          returning "addresstypeid", "name", "rowguid", "modifieddate"::text""".query(using AddresstypeRow.read).option
   }
   override def upsert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow] = {
     sql"""insert into "person"."addresstype"("addresstypeid", "name", "rowguid", "modifieddate")

@@ -88,14 +88,11 @@ class PurchaseorderheaderRepoMock(toRow: Function1[PurchaseorderheaderRowUnsaved
   override def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow] = {
     UpdateBuilderMock(UpdateParams.empty, PurchaseorderheaderFields.structure, map)
   }
-  override def update(row: PurchaseorderheaderRow): ConnectionIO[Boolean] = {
+  override def update(row: PurchaseorderheaderRow): ConnectionIO[Option[PurchaseorderheaderRow]] = {
     delay {
-      map.get(row.purchaseorderid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.purchaseorderid, row): @nowarn
-          true
-        case None => false
+      map.get(row.purchaseorderid).map { _ =>
+        map.put(row.purchaseorderid, row): @nowarn
+        row
       }
     }
   }

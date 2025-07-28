@@ -149,7 +149,7 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
   override def update: UpdateBuilder[SalesorderheaderFields, SalesorderheaderRow] = {
     UpdateBuilder(""""sales"."salesorderheader"""", SalesorderheaderFields.structure, SalesorderheaderRow.jdbcDecoder)
   }
-  override def update(row: SalesorderheaderRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: SalesorderheaderRow): ZIO[ZConnection, Throwable, Option[SalesorderheaderRow]] = {
     val salesorderid = row.salesorderid
     sql"""update "sales"."salesorderheader"
           set "revisionnumber" = ${Segment.paramSegment(row.revisionnumber)(TypoShort.setter)}::int2,
@@ -176,7 +176,10 @@ class SalesorderheaderRepoImpl extends SalesorderheaderRepo {
               "comment" = ${Segment.paramSegment(row.comment)(Setter.optionParamSetter(Setter.stringSetter))},
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "salesorderid" = ${Segment.paramSegment(salesorderid)(SalesorderheaderId.setter)}""".update.map(_ > 0)
+          where "salesorderid" = ${Segment.paramSegment(salesorderid)(SalesorderheaderId.setter)}
+          returning "salesorderid", "revisionnumber", "orderdate"::text, "duedate"::text, "shipdate"::text, "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate"::text"""
+      .query(SalesorderheaderRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: SalesorderheaderRow): ZIO[ZConnection, Throwable, UpdateResult[SalesorderheaderRow]] = {
     sql"""insert into "sales"."salesorderheader"("salesorderid", "revisionnumber", "orderdate", "duedate", "shipdate", "status", "onlineorderflag", "purchaseordernumber", "accountnumber", "customerid", "salespersonid", "territoryid", "billtoaddressid", "shiptoaddressid", "shipmethodid", "creditcardid", "creditcardapprovalcode", "currencyrateid", "subtotal", "taxamt", "freight", "totaldue", "comment", "rowguid", "modifieddate")

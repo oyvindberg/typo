@@ -103,7 +103,7 @@ class AddressRepoImpl extends AddressRepo {
   override def update: UpdateBuilder[AddressFields, AddressRow] = {
     UpdateBuilder(""""person"."address"""", AddressFields.structure, AddressRow.jdbcDecoder)
   }
-  override def update(row: AddressRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: AddressRow): ZIO[ZConnection, Throwable, Option[AddressRow]] = {
     val addressid = row.addressid
     sql"""update "person"."address"
           set "addressline1" = ${Segment.paramSegment(row.addressline1)(Setter.stringSetter)},
@@ -114,7 +114,10 @@ class AddressRepoImpl extends AddressRepo {
               "spatiallocation" = ${Segment.paramSegment(row.spatiallocation)(Setter.optionParamSetter(TypoBytea.setter))}::bytea,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}""".update.map(_ > 0)
+          where "addressid" = ${Segment.paramSegment(addressid)(AddressId.setter)}
+          returning "addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate"::text"""
+      .query(AddressRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: AddressRow): ZIO[ZConnection, Throwable, UpdateResult[AddressRow]] = {
     sql"""insert into "person"."address"("addressid", "addressline1", "addressline2", "city", "stateprovinceid", "postalcode", "spatiallocation", "rowguid", "modifieddate")

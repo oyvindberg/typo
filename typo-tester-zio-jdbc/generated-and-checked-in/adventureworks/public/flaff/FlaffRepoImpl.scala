@@ -77,11 +77,14 @@ class FlaffRepoImpl extends FlaffRepo {
   override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
     UpdateBuilder(""""public"."flaff"""", FlaffFields.structure, FlaffRow.jdbcDecoder)
   }
-  override def update(row: FlaffRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: FlaffRow): ZIO[ZConnection, Throwable, Option[FlaffRow]] = {
     val compositeId = row.compositeId
     sql"""update "public"."flaff"
           set "parentspecifier" = ${Segment.paramSegment(row.parentspecifier)(Setter.optionParamSetter(ShortText.setter))}::text
-          where "code" = ${Segment.paramSegment(compositeId.code)(ShortText.setter)} AND "another_code" = ${Segment.paramSegment(compositeId.anotherCode)(Setter.stringSetter)} AND "some_number" = ${Segment.paramSegment(compositeId.someNumber)(Setter.intSetter)} AND "specifier" = ${Segment.paramSegment(compositeId.specifier)(ShortText.setter)}""".update.map(_ > 0)
+          where "code" = ${Segment.paramSegment(compositeId.code)(ShortText.setter)} AND "another_code" = ${Segment.paramSegment(compositeId.anotherCode)(Setter.stringSetter)} AND "some_number" = ${Segment.paramSegment(compositeId.someNumber)(Setter.intSetter)} AND "specifier" = ${Segment.paramSegment(compositeId.specifier)(ShortText.setter)}
+          returning "code", "another_code", "some_number", "specifier", "parentspecifier""""
+      .query(FlaffRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: FlaffRow): ZIO[ZConnection, Throwable, UpdateResult[FlaffRow]] = {
     sql"""insert into "public"."flaff"("code", "another_code", "some_number", "specifier", "parentspecifier")

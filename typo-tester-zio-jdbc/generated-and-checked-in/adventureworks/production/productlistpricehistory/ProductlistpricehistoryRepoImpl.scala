@@ -105,13 +105,16 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
     UpdateBuilder(""""production"."productlistpricehistory"""", ProductlistpricehistoryFields.structure, ProductlistpricehistoryRow.jdbcDecoder)
   }
-  override def update(row: ProductlistpricehistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ProductlistpricehistoryRow): ZIO[ZConnection, Throwable, Option[ProductlistpricehistoryRow]] = {
     val compositeId = row.compositeId
     sql"""update "production"."productlistpricehistory"
           set "enddate" = ${Segment.paramSegment(row.enddate)(Setter.optionParamSetter(TypoLocalDateTime.setter))}::timestamp,
               "listprice" = ${Segment.paramSegment(row.listprice)(Setter.bigDecimalScalaSetter)}::numeric,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}""".update.map(_ > 0)
+          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "startdate" = ${Segment.paramSegment(compositeId.startdate)(TypoLocalDateTime.setter)}
+          returning "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text"""
+      .query(ProductlistpricehistoryRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ProductlistpricehistoryRow): ZIO[ZConnection, Throwable, UpdateResult[ProductlistpricehistoryRow]] = {
     sql"""insert into "production"."productlistpricehistory"("productid", "startdate", "enddate", "listprice", "modifieddate")

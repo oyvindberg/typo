@@ -99,7 +99,7 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       case RepoMethod.UpdateFieldValues(_, id, varargs, _, _, _) =>
         Right(code"def $name(${id.param}, $varargs): ${ConnectionIO.of(TypesScala.Boolean)}")
       case RepoMethod.Update(_, _, _, param, _) =>
-        Right(code"def $name($param): ${ConnectionIO.of(TypesScala.Boolean)}")
+        Right(code"def $name($param): ${ConnectionIO.of(TypesScala.Option.of(param.tpe))}")
       case RepoMethod.Insert(_, _, unsavedParam, rowType, _) =>
         Right(code"def $name($unsavedParam): ${ConnectionIO.of(rowType)}")
       case RepoMethod.InsertUnsaved(_, _, _, unsavedParam, _, rowType) =>
@@ -237,17 +237,15 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
       case RepoMethod.UpdateBuilder(relName, fieldsType, rowType) =>
         code"${sc.Type.dsl.UpdateBuilder}(${sc.StrLit(relName.quotedValue)}, $fieldsType.structure, $rowType.read)"
 
-      case RepoMethod.Update(relName, _, id, param, writeableCols) =>
+      case RepoMethod.Update(relName, cols, id, param, writeableCols) =>
         val sql = SQL(
           code"""update $relName
                 |set ${writeableCols.map { col => code"${col.dbName.code} = ${runtimeInterpolateValue(code"${param.name}.${col.name}", col.tpe)}${SqlCast.toPgCode(col)}" }.mkCode(",\n")}
-                |where ${matchId(id)}""".stripMargin
+                |where ${matchId(id)}
+                |returning ${dbNames(cols, isRead = true)}""".stripMargin
         )
         code"""|val ${id.paramName} = ${param.name}.${id.paramName}
-               |$sql
-               |  .update
-               |  .run
-               |  .map(_ > 0)"""
+               |${query(sql, param.tpe)}.option"""
 
       case RepoMethod.InsertUnsaved(relName, cols, unsaved, unsavedParam, default, rowType) =>
         val cases0 = unsaved.restCols.map { col =>
@@ -510,12 +508,9 @@ class DbLibDoobie(pkg: sc.QIdent, inlineImplicits: Boolean, default: ComputedDef
                |}""".stripMargin
       case RepoMethod.Update(_, _, _, param, _) =>
         code"""$delayCIO {
-              |  map.get(${param.name}.${id.paramName}) match {
-              |    case ${TypesScala.Some}(`${param.name}`) => false
-              |    case ${TypesScala.Some}(_) =>
-              |      map.put(${param.name}.${id.paramName}, ${param.name}): @${TypesScala.nowarn}
-              |      true
-              |    case ${TypesScala.None} => false
+              |  map.get(${param.name}.${id.paramName}).map { _ =>
+              |    map.put(${param.name}.${id.paramName}, ${param.name}): @${TypesScala.nowarn}
+              |    ${param.name}
               |  }
               |}""".stripMargin
       case RepoMethod.Insert(_, _, unsavedParam, _, _) =>

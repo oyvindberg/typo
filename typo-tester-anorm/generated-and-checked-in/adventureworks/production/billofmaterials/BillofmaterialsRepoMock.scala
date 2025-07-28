@@ -74,13 +74,10 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields.structure, map)
   }
-  override def update(row: BillofmaterialsRow)(implicit c: Connection): Boolean = {
-    map.get(row.billofmaterialsid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.billofmaterialsid, row): @nowarn
-        true
-      case None => false
+  override def update(row: BillofmaterialsRow)(implicit c: Connection): Option[BillofmaterialsRow] = {
+    map.get(row.billofmaterialsid).map { _ =>
+      map.put(row.billofmaterialsid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: BillofmaterialsRow)(implicit c: Connection): BillofmaterialsRow = {

@@ -94,13 +94,16 @@ class JobcandidateRepoImpl extends JobcandidateRepo {
   override def update: UpdateBuilder[JobcandidateFields, JobcandidateRow] = {
     UpdateBuilder(""""humanresources"."jobcandidate"""", JobcandidateFields.structure, JobcandidateRow.jdbcDecoder)
   }
-  override def update(row: JobcandidateRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: JobcandidateRow): ZIO[ZConnection, Throwable, Option[JobcandidateRow]] = {
     val jobcandidateid = row.jobcandidateid
     sql"""update "humanresources"."jobcandidate"
           set "businessentityid" = ${Segment.paramSegment(row.businessentityid)(Setter.optionParamSetter(BusinessentityId.setter))}::int4,
               "resume" = ${Segment.paramSegment(row.resume)(Setter.optionParamSetter(TypoXml.setter))}::xml,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}""".update.map(_ > 0)
+          where "jobcandidateid" = ${Segment.paramSegment(jobcandidateid)(JobcandidateId.setter)}
+          returning "jobcandidateid", "businessentityid", "resume", "modifieddate"::text"""
+      .query(JobcandidateRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: JobcandidateRow): ZIO[ZConnection, Throwable, UpdateResult[JobcandidateRow]] = {
     sql"""insert into "humanresources"."jobcandidate"("jobcandidateid", "businessentityid", "resume", "modifieddate")

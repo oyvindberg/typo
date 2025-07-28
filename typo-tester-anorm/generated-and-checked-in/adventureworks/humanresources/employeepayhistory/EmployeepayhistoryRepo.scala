@@ -27,7 +27,7 @@ trait EmployeepayhistoryRepo {
   def selectByIds(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): List[EmployeepayhistoryRow]
   def selectByIdsTracked(compositeIds: Array[EmployeepayhistoryId])(implicit c: Connection): Map[EmployeepayhistoryId, EmployeepayhistoryRow]
   def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow]
-  def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean
+  def update(row: EmployeepayhistoryRow)(implicit c: Connection): Option[EmployeepayhistoryRow]
   def upsert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow
   def upsertBatch(unsaved: Iterable[EmployeepayhistoryRow])(implicit c: Connection): List[EmployeepayhistoryRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

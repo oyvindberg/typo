@@ -72,14 +72,11 @@ class TestSakSoknadsalternativRepoMock(map: scala.collection.mutable.Map[TestSak
   override def update: UpdateBuilder[TestSakSoknadsalternativFields, TestSakSoknadsalternativRow] = {
     UpdateBuilderMock(UpdateParams.empty, TestSakSoknadsalternativFields.structure, map)
   }
-  override def update(row: TestSakSoknadsalternativRow): ConnectionIO[Boolean] = {
+  override def update(row: TestSakSoknadsalternativRow): ConnectionIO[Option[TestSakSoknadsalternativRow]] = {
     delay {
-      map.get(row.compositeId) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.compositeId, row): @nowarn
-          true
-        case None => false
+      map.get(row.compositeId).map { _ =>
+        map.put(row.compositeId, row): @nowarn
+        row
       }
     }
   }

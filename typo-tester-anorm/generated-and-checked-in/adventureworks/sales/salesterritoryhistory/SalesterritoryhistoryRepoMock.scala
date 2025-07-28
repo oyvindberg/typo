@@ -74,13 +74,10 @@ class SalesterritoryhistoryRepoMock(toRow: Function1[SalesterritoryhistoryRowUns
   override def update: UpdateBuilder[SalesterritoryhistoryFields, SalesterritoryhistoryRow] = {
     UpdateBuilderMock(UpdateParams.empty, SalesterritoryhistoryFields.structure, map)
   }
-  override def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Boolean = {
-    map.get(row.compositeId) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.compositeId, row): @nowarn
-        true
-      case None => false
+  override def update(row: SalesterritoryhistoryRow)(implicit c: Connection): Option[SalesterritoryhistoryRow] = {
+    map.get(row.compositeId).map { _ =>
+      map.put(row.compositeId, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: SalesterritoryhistoryRow)(implicit c: Connection): SalesterritoryhistoryRow = {

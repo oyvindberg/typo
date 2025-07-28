@@ -117,7 +117,7 @@ class PersonRepoImpl extends PersonRepo {
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder(""""person"."person"""", PersonFields.structure, PersonRow.read)
   }
-  override def update(row: PersonRow): ConnectionIO[Boolean] = {
+  override def update(row: PersonRow): ConnectionIO[Option[PersonRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "person"."person"
           set "persontype" = ${fromWrite(row.persontype)(new Write.Single(Meta.StringMeta.put))}::bpchar,
@@ -132,10 +132,8 @@ class PersonRepoImpl extends PersonRepo {
               "demographics" = ${fromWrite(row.demographics)(new Write.SingleOpt(TypoXml.put))}::xml,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}
+          returning "businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate"::text""".query(using PersonRow.read).option
   }
   override def upsert(unsaved: PersonRow): ConnectionIO[PersonRow] = {
     sql"""insert into "person"."person"("businessentityid", "persontype", "namestyle", "title", "firstname", "middlename", "lastname", "suffix", "emailpromotion", "additionalcontactinfo", "demographics", "rowguid", "modifieddate")

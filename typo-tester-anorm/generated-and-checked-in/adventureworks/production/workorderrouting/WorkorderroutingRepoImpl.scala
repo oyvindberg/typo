@@ -127,7 +127,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     UpdateBuilder(""""production"."workorderrouting"""", WorkorderroutingFields.structure, WorkorderroutingRow.rowParser)
   }
-  override def update(row: WorkorderroutingRow)(implicit c: Connection): Boolean = {
+  override def update(row: WorkorderroutingRow)(implicit c: Connection): Option[WorkorderroutingRow] = {
     val compositeId = row.compositeId
     SQL"""update "production"."workorderrouting"
           set "locationid" = ${ParameterValue(row.locationid, null, LocationId.toStatement)}::int2,
@@ -140,7 +140,8 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
               "actualcost" = ${ParameterValue(row.actualcost, null, ToStatement.optionToStatement(ToStatement.scalaBigDecimalToStatement, ParameterMetaData.BigDecimalParameterMetaData))}::numeric,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "workorderid" = ${ParameterValue(compositeId.workorderid, null, WorkorderId.toStatement)} AND "productid" = ${ParameterValue(compositeId.productid, null, ToStatement.intToStatement)} AND "operationsequence" = ${ParameterValue(compositeId.operationsequence, null, TypoShort.toStatement)}
-       """.executeUpdate() > 0
+          returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text
+       """.executeInsert(WorkorderroutingRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: WorkorderroutingRow)(implicit c: Connection): WorkorderroutingRow = {
     SQL"""insert into "production"."workorderrouting"("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")

@@ -30,7 +30,7 @@ trait DocumentRepo {
   def selectByIdsTracked(documentnodes: Array[DocumentId]): ConnectionIO[Map[DocumentId, DocumentRow]]
   def selectByUniqueRowguid(rowguid: TypoUUID): ConnectionIO[Option[DocumentRow]]
   def update: UpdateBuilder[DocumentFields, DocumentRow]
-  def update(row: DocumentRow): ConnectionIO[Boolean]
+  def update(row: DocumentRow): ConnectionIO[Option[DocumentRow]]
   def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow]
   def upsertBatch(unsaved: List[DocumentRow]): Stream[ConnectionIO, DocumentRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

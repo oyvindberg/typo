@@ -133,7 +133,7 @@ class ProductRepoImpl extends ProductRepo {
   override def update: UpdateBuilder[ProductFields, ProductRow] = {
     UpdateBuilder(""""production"."product"""", ProductFields.structure, ProductRow.read)
   }
-  override def update(row: ProductRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductRow): ConnectionIO[Option[ProductRow]] = {
     val productid = row.productid
     sql"""update "production"."product"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
@@ -160,10 +160,8 @@ class ProductRepoImpl extends ProductRepo {
               "discontinueddate" = ${fromWrite(row.discontinueddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "productid" = ${fromWrite(productid)(new Write.Single(ProductId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "productid" = ${fromWrite(productid)(new Write.Single(ProductId.put))}
+          returning "productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate"::text, "sellenddate"::text, "discontinueddate"::text, "rowguid", "modifieddate"::text""".query(using ProductRow.read).option
   }
   override def upsert(unsaved: ProductRow): ConnectionIO[ProductRow] = {
     sql"""insert into "production"."product"("productid", "name", "productnumber", "makeflag", "finishedgoodsflag", "color", "safetystocklevel", "reorderpoint", "standardcost", "listprice", "size", "sizeunitmeasurecode", "weightunitmeasurecode", "weight", "daystomanufacture", "productline", "class", "style", "productsubcategoryid", "productmodelid", "sellstartdate", "sellenddate", "discontinueddate", "rowguid", "modifieddate")

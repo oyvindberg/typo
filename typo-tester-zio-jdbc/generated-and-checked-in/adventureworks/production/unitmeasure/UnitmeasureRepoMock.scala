@@ -87,14 +87,11 @@ class UnitmeasureRepoMock(toRow: Function1[UnitmeasureRowUnsaved, UnitmeasureRow
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
     UpdateBuilderMock(UpdateParams.empty, UnitmeasureFields.structure, map)
   }
-  override def update(row: UnitmeasureRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: UnitmeasureRow): ZIO[ZConnection, Throwable, Option[UnitmeasureRow]] = {
     ZIO.succeed {
-      map.get(row.unitmeasurecode) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.unitmeasurecode, row): @nowarn
-          true
-        case None => false
+      map.get(row.unitmeasurecode).map { _ =>
+        map.put(row.unitmeasurecode, row): @nowarn
+        row
       }
     }
   }

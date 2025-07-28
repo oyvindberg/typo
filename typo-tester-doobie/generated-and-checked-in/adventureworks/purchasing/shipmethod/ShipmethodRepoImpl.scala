@@ -109,7 +109,7 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
     UpdateBuilder(""""purchasing"."shipmethod"""", ShipmethodFields.structure, ShipmethodRow.read)
   }
-  override def update(row: ShipmethodRow): ConnectionIO[Boolean] = {
+  override def update(row: ShipmethodRow): ConnectionIO[Option[ShipmethodRow]] = {
     val shipmethodid = row.shipmethodid
     sql"""update "purchasing"."shipmethod"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
@@ -117,10 +117,8 @@ class ShipmethodRepoImpl extends ShipmethodRepo {
               "shiprate" = ${fromWrite(row.shiprate)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "shipmethodid" = ${fromWrite(shipmethodid)(new Write.Single(ShipmethodId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "shipmethodid" = ${fromWrite(shipmethodid)(new Write.Single(ShipmethodId.put))}
+          returning "shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate"::text""".query(using ShipmethodRow.read).option
   }
   override def upsert(unsaved: ShipmethodRow): ConnectionIO[ShipmethodRow] = {
     sql"""insert into "purchasing"."shipmethod"("shipmethodid", "name", "shipbase", "shiprate", "rowguid", "modifieddate")

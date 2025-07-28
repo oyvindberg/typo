@@ -104,7 +104,7 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
   override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
     UpdateBuilder(""""production"."transactionhistoryarchive"""", TransactionhistoryarchiveFields.structure, TransactionhistoryarchiveRow.read)
   }
-  override def update(row: TransactionhistoryarchiveRow): ConnectionIO[Boolean] = {
+  override def update(row: TransactionhistoryarchiveRow): ConnectionIO[Option[TransactionhistoryarchiveRow]] = {
     val transactionid = row.transactionid
     sql"""update "production"."transactionhistoryarchive"
           set "productid" = ${fromWrite(row.productid)(new Write.Single(Meta.IntMeta.put))}::int4,
@@ -115,10 +115,8 @@ class TransactionhistoryarchiveRepoImpl extends TransactionhistoryarchiveRepo {
               "quantity" = ${fromWrite(row.quantity)(new Write.Single(Meta.IntMeta.put))}::int4,
               "actualcost" = ${fromWrite(row.actualcost)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "transactionid" = ${fromWrite(transactionid)(new Write.Single(TransactionhistoryarchiveId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "transactionid" = ${fromWrite(transactionid)(new Write.Single(TransactionhistoryarchiveId.put))}
+          returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text""".query(using TransactionhistoryarchiveRow.read).option
   }
   override def upsert(unsaved: TransactionhistoryarchiveRow): ConnectionIO[TransactionhistoryarchiveRow] = {
     sql"""insert into "production"."transactionhistoryarchive"("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")

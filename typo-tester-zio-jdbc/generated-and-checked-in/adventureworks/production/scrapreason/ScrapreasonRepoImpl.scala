@@ -91,12 +91,15 @@ class ScrapreasonRepoImpl extends ScrapreasonRepo {
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
     UpdateBuilder(""""production"."scrapreason"""", ScrapreasonFields.structure, ScrapreasonRow.jdbcDecoder)
   }
-  override def update(row: ScrapreasonRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ScrapreasonRow): ZIO[ZConnection, Throwable, Option[ScrapreasonRow]] = {
     val scrapreasonid = row.scrapreasonid
     sql"""update "production"."scrapreason"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "scrapreasonid" = ${Segment.paramSegment(scrapreasonid)(ScrapreasonId.setter)}""".update.map(_ > 0)
+          where "scrapreasonid" = ${Segment.paramSegment(scrapreasonid)(ScrapreasonId.setter)}
+          returning "scrapreasonid", "name", "modifieddate"::text"""
+      .query(ScrapreasonRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ScrapreasonRow): ZIO[ZConnection, Throwable, UpdateResult[ScrapreasonRow]] = {
     sql"""insert into "production"."scrapreason"("scrapreasonid", "name", "modifieddate")

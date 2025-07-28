@@ -96,7 +96,7 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
   override def update: UpdateBuilder[CurrencyrateFields, CurrencyrateRow] = {
     UpdateBuilder(""""sales"."currencyrate"""", CurrencyrateFields.structure, CurrencyrateRow.jdbcDecoder)
   }
-  override def update(row: CurrencyrateRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: CurrencyrateRow): ZIO[ZConnection, Throwable, Option[CurrencyrateRow]] = {
     val currencyrateid = row.currencyrateid
     sql"""update "sales"."currencyrate"
           set "currencyratedate" = ${Segment.paramSegment(row.currencyratedate)(TypoLocalDateTime.setter)}::timestamp,
@@ -105,7 +105,10 @@ class CurrencyrateRepoImpl extends CurrencyrateRepo {
               "averagerate" = ${Segment.paramSegment(row.averagerate)(Setter.bigDecimalScalaSetter)}::numeric,
               "endofdayrate" = ${Segment.paramSegment(row.endofdayrate)(Setter.bigDecimalScalaSetter)}::numeric,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "currencyrateid" = ${Segment.paramSegment(currencyrateid)(CurrencyrateId.setter)}""".update.map(_ > 0)
+          where "currencyrateid" = ${Segment.paramSegment(currencyrateid)(CurrencyrateId.setter)}
+          returning "currencyrateid", "currencyratedate"::text, "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate"::text"""
+      .query(CurrencyrateRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: CurrencyrateRow): ZIO[ZConnection, Throwable, UpdateResult[CurrencyrateRow]] = {
     sql"""insert into "sales"."currencyrate"("currencyrateid", "currencyratedate", "fromcurrencycode", "tocurrencycode", "averagerate", "endofdayrate", "modifieddate")

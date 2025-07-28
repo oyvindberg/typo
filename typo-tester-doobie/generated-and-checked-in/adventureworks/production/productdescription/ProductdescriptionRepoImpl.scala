@@ -100,16 +100,14 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
     UpdateBuilder(""""production"."productdescription"""", ProductdescriptionFields.structure, ProductdescriptionRow.read)
   }
-  override def update(row: ProductdescriptionRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductdescriptionRow): ConnectionIO[Option[ProductdescriptionRow]] = {
     val productdescriptionid = row.productdescriptionid
     sql"""update "production"."productdescription"
           set "description" = ${fromWrite(row.description)(new Write.Single(Meta.StringMeta.put))},
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "productdescriptionid" = ${fromWrite(productdescriptionid)(new Write.Single(ProductdescriptionId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "productdescriptionid" = ${fromWrite(productdescriptionid)(new Write.Single(ProductdescriptionId.put))}
+          returning "productdescriptionid", "description", "rowguid", "modifieddate"::text""".query(using ProductdescriptionRow.read).option
   }
   override def upsert(unsaved: ProductdescriptionRow): ConnectionIO[ProductdescriptionRow] = {
     sql"""insert into "production"."productdescription"("productdescriptionid", "description", "rowguid", "modifieddate")

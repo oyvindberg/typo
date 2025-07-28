@@ -116,12 +116,13 @@ class ProductdocumentRepoImpl extends ProductdocumentRepo {
   override def update: UpdateBuilder[ProductdocumentFields, ProductdocumentRow] = {
     UpdateBuilder(""""production"."productdocument"""", ProductdocumentFields.structure, ProductdocumentRow.rowParser)
   }
-  override def update(row: ProductdocumentRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductdocumentRow)(implicit c: Connection): Option[ProductdocumentRow] = {
     val compositeId = row.compositeId
     SQL"""update "production"."productdocument"
           set "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "documentnode" = ${ParameterValue(compositeId.documentnode, null, DocumentId.toStatement)}
-       """.executeUpdate() > 0
+          returning "productid", "modifieddate"::text, "documentnode"
+       """.executeInsert(ProductdocumentRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductdocumentRow)(implicit c: Connection): ProductdocumentRow = {
     SQL"""insert into "production"."productdocument"("productid", "modifieddate", "documentnode")

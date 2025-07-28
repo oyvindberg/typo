@@ -87,14 +87,11 @@ class BillofmaterialsRepoMock(toRow: Function1[BillofmaterialsRowUnsaved, Billof
   override def update: UpdateBuilder[BillofmaterialsFields, BillofmaterialsRow] = {
     UpdateBuilderMock(UpdateParams.empty, BillofmaterialsFields.structure, map)
   }
-  override def update(row: BillofmaterialsRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: BillofmaterialsRow): ZIO[ZConnection, Throwable, Option[BillofmaterialsRow]] = {
     ZIO.succeed {
-      map.get(row.billofmaterialsid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.billofmaterialsid, row): @nowarn
-          true
-        case None => false
+      map.get(row.billofmaterialsid).map { _ =>
+        map.put(row.billofmaterialsid, row): @nowarn
+        row
       }
     }
   }

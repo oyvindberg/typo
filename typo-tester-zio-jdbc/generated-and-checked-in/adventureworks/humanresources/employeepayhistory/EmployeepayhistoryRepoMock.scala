@@ -87,14 +87,11 @@ class EmployeepayhistoryRepoMock(toRow: Function1[EmployeepayhistoryRowUnsaved, 
   override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     UpdateBuilderMock(UpdateParams.empty, EmployeepayhistoryFields.structure, map)
   }
-  override def update(row: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: EmployeepayhistoryRow): ZIO[ZConnection, Throwable, Option[EmployeepayhistoryRow]] = {
     ZIO.succeed {
-      map.get(row.compositeId) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.compositeId, row): @nowarn
-          true
-        case None => false
+      map.get(row.compositeId).map { _ =>
+        map.put(row.compositeId, row): @nowarn
+        row
       }
     }
   }

@@ -89,14 +89,11 @@ class PersoncreditcardRepoMock(toRow: Function1[PersoncreditcardRowUnsaved, Pers
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     UpdateBuilderMock(UpdateParams.empty, PersoncreditcardFields.structure, map)
   }
-  override def update(row: PersoncreditcardRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: PersoncreditcardRow): ZIO[ZConnection, Throwable, Option[PersoncreditcardRow]] = {
     ZIO.succeed {
-      map.get(row.compositeId) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.compositeId, row): @nowarn
-          true
-        case None => false
+      map.get(row.compositeId).map { _ =>
+        map.put(row.compositeId, row): @nowarn
+        row
       }
     }
   }

@@ -9,6 +9,7 @@ import adventureworks.public.{Flag, Name}
 import adventureworks.{SnapshotTest, withConnection}
 import org.scalatest.Assertion
 import zio.{Chunk, ZIO}
+import scala.annotation.nowarn
 
 import java.time.LocalDateTime
 
@@ -81,13 +82,21 @@ class ProductTest extends SnapshotTest {
 
         // check field values
         newModifiedDate = TypoLocalDateTime(saved1.modifieddate.value.minusDays(1))
-        _ <- productRepo.update(saved1.copy(modifieddate = newModifiedDate))
+        updatedOpt1 <- productRepo.update(saved1.copy(modifieddate = newModifiedDate))
+        _ <- ZIO.succeed {
+          assert(updatedOpt1.isDefined): @nowarn
+          assert(updatedOpt1.get.modifieddate == newModifiedDate)
+        }
         saved3 <- productRepo.selectAll.runCollect.map(_.toList).map {
           case List(x) => x
           case other   => throw new MatchError(other)
         }
         _ <- ZIO.succeed(assert(saved3.modifieddate == newModifiedDate))
-        _ <- productRepo.update(saved3.copy(size = None)).map(res => assert(res))
+        updatedOpt2 <- productRepo.update(saved3.copy(size = None))
+        _ <- ZIO.succeed {
+          assert(updatedOpt2.isDefined): @nowarn
+          assert(updatedOpt2.get.size.isEmpty)
+        }
         query0 = productRepo.select
           .joinFk(_.fkProductmodel)(projectModelRepo.select)
           .joinFk(_._1.fkProductsubcategory)(productsubcategoryRepo.select)

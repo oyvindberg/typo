@@ -92,15 +92,13 @@ class CultureRepoImpl extends CultureRepo {
   override def update: UpdateBuilder[CultureFields, CultureRow] = {
     UpdateBuilder(""""production"."culture"""", CultureFields.structure, CultureRow.read)
   }
-  override def update(row: CultureRow): ConnectionIO[Boolean] = {
+  override def update(row: CultureRow): ConnectionIO[Option[CultureRow]] = {
     val cultureid = row.cultureid
     sql"""update "production"."culture"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "cultureid" = ${fromWrite(cultureid)(new Write.Single(CultureId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "cultureid" = ${fromWrite(cultureid)(new Write.Single(CultureId.put))}
+          returning "cultureid", "name", "modifieddate"::text""".query(using CultureRow.read).option
   }
   override def upsert(unsaved: CultureRow): ConnectionIO[CultureRow] = {
     sql"""insert into "production"."culture"("cultureid", "name", "modifieddate")

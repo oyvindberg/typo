@@ -79,12 +79,13 @@ class TestSakSoknadsalternativRepoImpl extends TestSakSoknadsalternativRepo {
   override def update: UpdateBuilder[TestSakSoknadsalternativFields, TestSakSoknadsalternativRow] = {
     UpdateBuilder(""""public"."test_sak_soknadsalternativ"""", TestSakSoknadsalternativFields.structure, TestSakSoknadsalternativRow.rowParser)
   }
-  override def update(row: TestSakSoknadsalternativRow)(implicit c: Connection): Boolean = {
+  override def update(row: TestSakSoknadsalternativRow)(implicit c: Connection): Option[TestSakSoknadsalternativRow] = {
     val compositeId = row.compositeId
     SQL"""update "public"."test_sak_soknadsalternativ"
           set "organisasjonskode_tilbyder" = ${ParameterValue(row.organisasjonskodeTilbyder, null, TestOrganisasjonId.toStatement)}
           where "organisasjonskode_saksbehandler" = ${ParameterValue(compositeId.organisasjonskodeSaksbehandler, null, ToStatement.stringToStatement)} AND "utdanningsmulighet_kode" = ${ParameterValue(compositeId.utdanningsmulighetKode, null, ToStatement.stringToStatement)}
-       """.executeUpdate() > 0
+          returning "organisasjonskode_saksbehandler", "utdanningsmulighet_kode", "organisasjonskode_tilbyder"
+       """.executeInsert(TestSakSoknadsalternativRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: TestSakSoknadsalternativRow)(implicit c: Connection): TestSakSoknadsalternativRow = {
     SQL"""insert into "public"."test_sak_soknadsalternativ"("organisasjonskode_saksbehandler", "utdanningsmulighet_kode", "organisasjonskode_tilbyder")

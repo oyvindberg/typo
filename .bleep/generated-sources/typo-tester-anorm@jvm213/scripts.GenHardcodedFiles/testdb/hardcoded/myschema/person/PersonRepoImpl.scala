@@ -151,7 +151,7 @@ class PersonRepoImpl extends PersonRepo {
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder(""""myschema"."person"""", PersonFields.structure, PersonRow.rowParser)
   }
-  override def update(row: PersonRow)(implicit c: Connection): Boolean = {
+  override def update(row: PersonRow)(implicit c: Connection): Option[PersonRow] = {
     val id = row.id
     SQL"""update "myschema"."person"
           set "favourite_football_club_id" = ${ParameterValue(row.favouriteFootballClubId, null, FootballClubId.toStatement)},
@@ -165,7 +165,8 @@ class PersonRepoImpl extends PersonRepo {
               "work_email" = ${ParameterValue(row.workEmail, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
               "favorite_number" = ${ParameterValue(row.favoriteNumber, null, Number.toStatement)}::myschema.number
           where "id" = ${ParameterValue(id, null, PersonId.toStatement)}
-       """.executeUpdate() > 0
+          returning "id", "favourite_football_club_id", "name", "nick_name", "blog_url", "email", "phone", "likes_pizza", "marital_status_id", "work_email", "sector", "favorite_number"
+       """.executeInsert(PersonRow.rowParser(1).singleOpt)
   }
   override def updateFieldValues(id: PersonId, fieldValues: List[PersonFieldValue[?]])(implicit c: Connection): Boolean = {
     fieldValues match {

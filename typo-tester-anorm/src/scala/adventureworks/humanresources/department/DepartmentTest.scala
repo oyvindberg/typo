@@ -26,7 +26,10 @@ class DepartmentTest extends AnyFunSuite with TypeCheckedTripleEquals {
       assert(saved1 === saved2): @nowarn
 
       // check field values
-      departmentRepoI.update(saved1.copy(name = Name("baz"))): @nowarn
+      val updatedOpt = departmentRepoI.update(saved1.copy(name = Name("baz")))
+      assert(updatedOpt.isDefined): @nowarn
+      assert(updatedOpt.get.name == Name("baz")): @nowarn
+
       val List(saved3) = departmentRepoI.selectAll: @unchecked
       assert(saved3.name == Name("baz")): @nowarn
 

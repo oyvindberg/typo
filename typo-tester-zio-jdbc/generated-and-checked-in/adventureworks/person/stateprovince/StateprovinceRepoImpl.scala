@@ -107,7 +107,7 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
   override def update: UpdateBuilder[StateprovinceFields, StateprovinceRow] = {
     UpdateBuilder(""""person"."stateprovince"""", StateprovinceFields.structure, StateprovinceRow.jdbcDecoder)
   }
-  override def update(row: StateprovinceRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: StateprovinceRow): ZIO[ZConnection, Throwable, Option[StateprovinceRow]] = {
     val stateprovinceid = row.stateprovinceid
     sql"""update "person"."stateprovince"
           set "stateprovincecode" = ${Segment.paramSegment(row.stateprovincecode)(Setter.stringSetter)}::bpchar,
@@ -117,7 +117,10 @@ class StateprovinceRepoImpl extends StateprovinceRepo {
               "territoryid" = ${Segment.paramSegment(row.territoryid)(SalesterritoryId.setter)}::int4,
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}""".update.map(_ > 0)
+          where "stateprovinceid" = ${Segment.paramSegment(stateprovinceid)(StateprovinceId.setter)}
+          returning "stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate"::text"""
+      .query(StateprovinceRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: StateprovinceRow): ZIO[ZConnection, Throwable, UpdateResult[StateprovinceRow]] = {
     sql"""insert into "person"."stateprovince"("stateprovinceid", "stateprovincecode", "countryregioncode", "isonlystateprovinceflag", "name", "territoryid", "rowguid", "modifieddate")

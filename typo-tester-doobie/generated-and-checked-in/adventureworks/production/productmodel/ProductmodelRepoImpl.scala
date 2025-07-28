@@ -103,7 +103,7 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
   override def update: UpdateBuilder[ProductmodelFields, ProductmodelRow] = {
     UpdateBuilder(""""production"."productmodel"""", ProductmodelFields.structure, ProductmodelRow.read)
   }
-  override def update(row: ProductmodelRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductmodelRow): ConnectionIO[Option[ProductmodelRow]] = {
     val productmodelid = row.productmodelid
     sql"""update "production"."productmodel"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
@@ -111,10 +111,8 @@ class ProductmodelRepoImpl extends ProductmodelRepo {
               "instructions" = ${fromWrite(row.instructions)(new Write.SingleOpt(TypoXml.put))}::xml,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "productmodelid" = ${fromWrite(productmodelid)(new Write.Single(ProductmodelId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "productmodelid" = ${fromWrite(productmodelid)(new Write.Single(ProductmodelId.put))}
+          returning "productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate"::text""".query(using ProductmodelRow.read).option
   }
   override def upsert(unsaved: ProductmodelRow): ConnectionIO[ProductmodelRow] = {
     sql"""insert into "production"."productmodel"("productmodelid", "name", "catalogdescription", "instructions", "rowguid", "modifieddate")

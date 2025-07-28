@@ -116,7 +116,7 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
   override def update: UpdateBuilder[WorkorderroutingFields, WorkorderroutingRow] = {
     UpdateBuilder(""""production"."workorderrouting"""", WorkorderroutingFields.structure, WorkorderroutingRow.jdbcDecoder)
   }
-  override def update(row: WorkorderroutingRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: WorkorderroutingRow): ZIO[ZConnection, Throwable, Option[WorkorderroutingRow]] = {
     val compositeId = row.compositeId
     sql"""update "production"."workorderrouting"
           set "locationid" = ${Segment.paramSegment(row.locationid)(LocationId.setter)}::int2,
@@ -128,7 +128,10 @@ class WorkorderroutingRepoImpl extends WorkorderroutingRepo {
               "plannedcost" = ${Segment.paramSegment(row.plannedcost)(Setter.bigDecimalScalaSetter)}::numeric,
               "actualcost" = ${Segment.paramSegment(row.actualcost)(Setter.optionParamSetter(Setter.bigDecimalScalaSetter))}::numeric,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(WorkorderId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(TypoShort.setter)}""".update.map(_ > 0)
+          where "workorderid" = ${Segment.paramSegment(compositeId.workorderid)(WorkorderId.setter)} AND "productid" = ${Segment.paramSegment(compositeId.productid)(Setter.intSetter)} AND "operationsequence" = ${Segment.paramSegment(compositeId.operationsequence)(TypoShort.setter)}
+          returning "workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate"::text, "scheduledenddate"::text, "actualstartdate"::text, "actualenddate"::text, "actualresourcehrs", "plannedcost", "actualcost", "modifieddate"::text"""
+      .query(WorkorderroutingRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: WorkorderroutingRow): ZIO[ZConnection, Throwable, UpdateResult[WorkorderroutingRow]] = {
     sql"""insert into "production"."workorderrouting"("workorderid", "productid", "operationsequence", "locationid", "scheduledstartdate", "scheduledenddate", "actualstartdate", "actualenddate", "actualresourcehrs", "plannedcost", "actualcost", "modifieddate")

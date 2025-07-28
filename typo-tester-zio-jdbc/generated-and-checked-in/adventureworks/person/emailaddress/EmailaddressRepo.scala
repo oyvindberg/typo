@@ -30,7 +30,7 @@ trait EmailaddressRepo {
   def selectByIds(compositeIds: Array[EmailaddressId]): ZStream[ZConnection, Throwable, EmailaddressRow]
   def selectByIdsTracked(compositeIds: Array[EmailaddressId]): ZIO[ZConnection, Throwable, Map[EmailaddressId, EmailaddressRow]]
   def update: UpdateBuilder[EmailaddressFields, EmailaddressRow]
-  def update(row: EmailaddressRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: EmailaddressRow): ZIO[ZConnection, Throwable, Option[EmailaddressRow]]
   def upsert(unsaved: EmailaddressRow): ZIO[ZConnection, Throwable, UpdateResult[EmailaddressRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

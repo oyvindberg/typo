@@ -87,14 +87,11 @@ class CountryregionRepoMock(toRow: Function1[CountryregionRowUnsaved, Countryreg
   override def update: UpdateBuilder[CountryregionFields, CountryregionRow] = {
     UpdateBuilderMock(UpdateParams.empty, CountryregionFields.structure, map)
   }
-  override def update(row: CountryregionRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: CountryregionRow): ZIO[ZConnection, Throwable, Option[CountryregionRow]] = {
     ZIO.succeed {
-      map.get(row.countryregioncode) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.countryregioncode, row): @nowarn
-          true
-        case None => false
+      map.get(row.countryregioncode).map { _ =>
+        map.put(row.countryregioncode, row): @nowarn
+        row
       }
     }
   }

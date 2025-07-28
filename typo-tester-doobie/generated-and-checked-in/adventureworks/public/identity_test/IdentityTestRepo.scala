@@ -28,7 +28,7 @@ trait IdentityTestRepo {
   def selectByIds(names: Array[IdentityTestId]): Stream[ConnectionIO, IdentityTestRow]
   def selectByIdsTracked(names: Array[IdentityTestId]): ConnectionIO[Map[IdentityTestId, IdentityTestRow]]
   def update: UpdateBuilder[IdentityTestFields, IdentityTestRow]
-  def update(row: IdentityTestRow): ConnectionIO[Boolean]
+  def update(row: IdentityTestRow): ConnectionIO[Option[IdentityTestRow]]
   def upsert(unsaved: IdentityTestRow): ConnectionIO[IdentityTestRow]
   def upsertBatch(unsaved: List[IdentityTestRow]): Stream[ConnectionIO, IdentityTestRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

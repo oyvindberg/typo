@@ -86,11 +86,14 @@ class IdentityTestRepoImpl extends IdentityTestRepo {
   override def update: UpdateBuilder[IdentityTestFields, IdentityTestRow] = {
     UpdateBuilder(""""public"."identity-test"""", IdentityTestFields.structure, IdentityTestRow.jdbcDecoder)
   }
-  override def update(row: IdentityTestRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: IdentityTestRow): ZIO[ZConnection, Throwable, Option[IdentityTestRow]] = {
     val name = row.name
     sql"""update "public"."identity-test"
           set "default_generated" = ${Segment.paramSegment(row.defaultGenerated)(Setter.intSetter)}::int4
-          where "name" = ${Segment.paramSegment(name)(IdentityTestId.setter)}""".update.map(_ > 0)
+          where "name" = ${Segment.paramSegment(name)(IdentityTestId.setter)}
+          returning "always_generated", "default_generated", "name""""
+      .query(IdentityTestRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: IdentityTestRow): ZIO[ZConnection, Throwable, UpdateResult[IdentityTestRow]] = {
     sql"""insert into "public"."identity-test"("default_generated", "name")

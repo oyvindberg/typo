@@ -74,13 +74,10 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
   override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
     UpdateBuilderMock(UpdateParams.empty, TransactionhistoryarchiveFields.structure, map)
   }
-  override def update(row: TransactionhistoryarchiveRow)(implicit c: Connection): Boolean = {
-    map.get(row.transactionid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.transactionid, row): @nowarn
-        true
-      case None => false
+  override def update(row: TransactionhistoryarchiveRow)(implicit c: Connection): Option[TransactionhistoryarchiveRow] = {
+    map.get(row.transactionid).map { _ =>
+      map.put(row.transactionid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: TransactionhistoryarchiveRow)(implicit c: Connection): TransactionhistoryarchiveRow = {

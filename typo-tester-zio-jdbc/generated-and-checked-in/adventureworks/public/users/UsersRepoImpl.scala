@@ -99,7 +99,7 @@ class UsersRepoImpl extends UsersRepo {
   override def update: UpdateBuilder[UsersFields, UsersRow] = {
     UpdateBuilder(""""public"."users"""", UsersFields.structure, UsersRow.jdbcDecoder)
   }
-  override def update(row: UsersRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: UsersRow): ZIO[ZConnection, Throwable, Option[UsersRow]] = {
     val userId = row.userId
     sql"""update "public"."users"
           set "name" = ${Segment.paramSegment(row.name)(Setter.stringSetter)},
@@ -108,7 +108,10 @@ class UsersRepoImpl extends UsersRepo {
               "password" = ${Segment.paramSegment(row.password)(Setter.stringSetter)},
               "created_at" = ${Segment.paramSegment(row.createdAt)(TypoInstant.setter)}::timestamptz,
               "verified_on" = ${Segment.paramSegment(row.verifiedOn)(Setter.optionParamSetter(TypoInstant.setter))}::timestamptz
-          where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}""".update.map(_ > 0)
+          where "user_id" = ${Segment.paramSegment(userId)(UsersId.setter)}
+          returning "user_id", "name", "last_name", "email"::text, "password", "created_at"::text, "verified_on"::text"""
+      .query(UsersRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: UsersRow): ZIO[ZConnection, Throwable, UpdateResult[UsersRow]] = {
     sql"""insert into "public"."users"("user_id", "name", "last_name", "email", "password", "created_at", "verified_on")

@@ -28,7 +28,7 @@ trait DepartmentRepo {
   def selectByIds(departmentids: Array[DepartmentId]): Stream[ConnectionIO, DepartmentRow]
   def selectByIdsTracked(departmentids: Array[DepartmentId]): ConnectionIO[Map[DepartmentId, DepartmentRow]]
   def update: UpdateBuilder[DepartmentFields, DepartmentRow]
-  def update(row: DepartmentRow): ConnectionIO[Boolean]
+  def update(row: DepartmentRow): ConnectionIO[Option[DepartmentRow]]
   def upsert(unsaved: DepartmentRow): ConnectionIO[DepartmentRow]
   def upsertBatch(unsaved: List[DepartmentRow]): Stream[ConnectionIO, DepartmentRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

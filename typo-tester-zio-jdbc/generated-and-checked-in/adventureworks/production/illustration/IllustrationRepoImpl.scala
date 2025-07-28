@@ -92,12 +92,15 @@ class IllustrationRepoImpl extends IllustrationRepo {
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
     UpdateBuilder(""""production"."illustration"""", IllustrationFields.structure, IllustrationRow.jdbcDecoder)
   }
-  override def update(row: IllustrationRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: IllustrationRow): ZIO[ZConnection, Throwable, Option[IllustrationRow]] = {
     val illustrationid = row.illustrationid
     sql"""update "production"."illustration"
           set "diagram" = ${Segment.paramSegment(row.diagram)(Setter.optionParamSetter(TypoXml.setter))}::xml,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "illustrationid" = ${Segment.paramSegment(illustrationid)(IllustrationId.setter)}""".update.map(_ > 0)
+          where "illustrationid" = ${Segment.paramSegment(illustrationid)(IllustrationId.setter)}
+          returning "illustrationid", "diagram", "modifieddate"::text"""
+      .query(IllustrationRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: IllustrationRow): ZIO[ZConnection, Throwable, UpdateResult[IllustrationRow]] = {
     sql"""insert into "production"."illustration"("illustrationid", "diagram", "modifieddate")

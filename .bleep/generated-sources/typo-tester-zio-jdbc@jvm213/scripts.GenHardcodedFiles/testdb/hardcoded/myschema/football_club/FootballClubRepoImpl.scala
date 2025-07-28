@@ -75,11 +75,14 @@ class FootballClubRepoImpl extends FootballClubRepo {
   override def update: UpdateBuilder[FootballClubFields, FootballClubRow] = {
     UpdateBuilder(""""myschema"."football_club"""", FootballClubFields.structure, FootballClubRow.jdbcDecoder)
   }
-  override def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: FootballClubRow): ZIO[ZConnection, Throwable, Option[FootballClubRow]] = {
     val id = row.id
     sql"""update "myschema"."football_club"
           set "name" = ${Segment.paramSegment(row.name)(Setter.stringSetter)}
-          where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}""".update.map(_ > 0)
+          where "id" = ${Segment.paramSegment(id)(FootballClubId.setter)}
+          returning "id", "name""""
+      .query(FootballClubRow.jdbcDecoder)
+      .selectOne
   }
   override def updateFieldValues(id: FootballClubId, fieldValues: List[FootballClubFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean] = {
     NonEmptyChunk.fromIterableOption(fieldValues) match {

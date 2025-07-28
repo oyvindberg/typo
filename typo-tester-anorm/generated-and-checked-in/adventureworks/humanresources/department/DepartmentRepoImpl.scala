@@ -110,14 +110,15 @@ class DepartmentRepoImpl extends DepartmentRepo {
   override def update: UpdateBuilder[DepartmentFields, DepartmentRow] = {
     UpdateBuilder(""""humanresources"."department"""", DepartmentFields.structure, DepartmentRow.rowParser)
   }
-  override def update(row: DepartmentRow)(implicit c: Connection): Boolean = {
+  override def update(row: DepartmentRow)(implicit c: Connection): Option[DepartmentRow] = {
     val departmentid = row.departmentid
     SQL"""update "humanresources"."department"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
               "groupname" = ${ParameterValue(row.groupname, null, Name.toStatement)}::varchar,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "departmentid" = ${ParameterValue(departmentid, null, DepartmentId.toStatement)}
-       """.executeUpdate() > 0
+          returning "departmentid", "name", "groupname", "modifieddate"::text
+       """.executeInsert(DepartmentRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: DepartmentRow)(implicit c: Connection): DepartmentRow = {
     SQL"""insert into "humanresources"."department"("departmentid", "name", "groupname", "modifieddate")

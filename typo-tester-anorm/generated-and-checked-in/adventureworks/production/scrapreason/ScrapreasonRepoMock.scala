@@ -74,13 +74,10 @@ class ScrapreasonRepoMock(toRow: Function1[ScrapreasonRowUnsaved, ScrapreasonRow
   override def update: UpdateBuilder[ScrapreasonFields, ScrapreasonRow] = {
     UpdateBuilderMock(UpdateParams.empty, ScrapreasonFields.structure, map)
   }
-  override def update(row: ScrapreasonRow)(implicit c: Connection): Boolean = {
-    map.get(row.scrapreasonid) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.scrapreasonid, row): @nowarn
-        true
-      case None => false
+  override def update(row: ScrapreasonRow)(implicit c: Connection): Option[ScrapreasonRow] = {
+    map.get(row.scrapreasonid).map { _ =>
+      map.put(row.scrapreasonid, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: ScrapreasonRow)(implicit c: Connection): ScrapreasonRow = {

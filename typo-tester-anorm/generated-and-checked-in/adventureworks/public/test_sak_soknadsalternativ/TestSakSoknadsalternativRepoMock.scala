@@ -62,13 +62,10 @@ class TestSakSoknadsalternativRepoMock(map: scala.collection.mutable.Map[TestSak
   override def update: UpdateBuilder[TestSakSoknadsalternativFields, TestSakSoknadsalternativRow] = {
     UpdateBuilderMock(UpdateParams.empty, TestSakSoknadsalternativFields.structure, map)
   }
-  override def update(row: TestSakSoknadsalternativRow)(implicit c: Connection): Boolean = {
-    map.get(row.compositeId) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.compositeId, row): @nowarn
-        true
-      case None => false
+  override def update(row: TestSakSoknadsalternativRow)(implicit c: Connection): Option[TestSakSoknadsalternativRow] = {
+    map.get(row.compositeId).map { _ =>
+      map.put(row.compositeId, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: TestSakSoknadsalternativRow)(implicit c: Connection): TestSakSoknadsalternativRow = {

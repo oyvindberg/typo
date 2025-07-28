@@ -119,14 +119,15 @@ class SalespersonquotahistoryRepoImpl extends SalespersonquotahistoryRepo {
   override def update: UpdateBuilder[SalespersonquotahistoryFields, SalespersonquotahistoryRow] = {
     UpdateBuilder(""""sales"."salespersonquotahistory"""", SalespersonquotahistoryFields.structure, SalespersonquotahistoryRow.rowParser)
   }
-  override def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: SalespersonquotahistoryRow)(implicit c: Connection): Option[SalespersonquotahistoryRow] = {
     val compositeId = row.compositeId
     SQL"""update "sales"."salespersonquotahistory"
           set "salesquota" = ${ParameterValue(row.salesquota, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "quotadate" = ${ParameterValue(compositeId.quotadate, null, TypoLocalDateTime.toStatement)}
-       """.executeUpdate() > 0
+          returning "businessentityid", "quotadate"::text, "salesquota", "rowguid", "modifieddate"::text
+       """.executeInsert(SalespersonquotahistoryRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: SalespersonquotahistoryRow)(implicit c: Connection): SalespersonquotahistoryRow = {
     SQL"""insert into "sales"."salespersonquotahistory"("businessentityid", "quotadate", "salesquota", "rowguid", "modifieddate")

@@ -101,7 +101,7 @@ class StoreRepoImpl extends StoreRepo {
   override def update: UpdateBuilder[StoreFields, StoreRow] = {
     UpdateBuilder(""""sales"."store"""", StoreFields.structure, StoreRow.read)
   }
-  override def update(row: StoreRow): ConnectionIO[Boolean] = {
+  override def update(row: StoreRow): ConnectionIO[Option[StoreRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "sales"."store"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
@@ -109,10 +109,8 @@ class StoreRepoImpl extends StoreRepo {
               "demographics" = ${fromWrite(row.demographics)(new Write.SingleOpt(TypoXml.put))}::xml,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}
+          returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text""".query(using StoreRow.read).option
   }
   override def upsert(unsaved: StoreRow): ConnectionIO[StoreRow] = {
     sql"""insert into "sales"."store"("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")

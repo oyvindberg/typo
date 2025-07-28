@@ -105,7 +105,7 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
   override def update: UpdateBuilder[ProductreviewFields, ProductreviewRow] = {
     UpdateBuilder(""""production"."productreview"""", ProductreviewFields.structure, ProductreviewRow.read)
   }
-  override def update(row: ProductreviewRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductreviewRow): ConnectionIO[Option[ProductreviewRow]] = {
     val productreviewid = row.productreviewid
     sql"""update "production"."productreview"
           set "productid" = ${fromWrite(row.productid)(new Write.Single(ProductId.put))}::int4,
@@ -115,10 +115,8 @@ class ProductreviewRepoImpl extends ProductreviewRepo {
               "rating" = ${fromWrite(row.rating)(new Write.Single(Meta.IntMeta.put))}::int4,
               "comments" = ${fromWrite(row.comments)(new Write.SingleOpt(Meta.StringMeta.put))},
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "productreviewid" = ${fromWrite(productreviewid)(new Write.Single(ProductreviewId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "productreviewid" = ${fromWrite(productreviewid)(new Write.Single(ProductreviewId.put))}
+          returning "productreviewid", "productid", "reviewername", "reviewdate"::text, "emailaddress", "rating", "comments", "modifieddate"::text""".query(using ProductreviewRow.read).option
   }
   override def upsert(unsaved: ProductreviewRow): ConnectionIO[ProductreviewRow] = {
     sql"""insert into "production"."productreview"("productreviewid", "productid", "reviewername", "reviewdate", "emailaddress", "rating", "comments", "modifieddate")

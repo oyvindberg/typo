@@ -87,14 +87,11 @@ class ShiftRepoMock(toRow: Function1[ShiftRowUnsaved, ShiftRow],
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
     UpdateBuilderMock(UpdateParams.empty, ShiftFields.structure, map)
   }
-  override def update(row: ShiftRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ShiftRow): ZIO[ZConnection, Throwable, Option[ShiftRow]] = {
     ZIO.succeed {
-      map.get(row.shiftid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.shiftid, row): @nowarn
-          true
-        case None => false
+      map.get(row.shiftid).map { _ =>
+        map.put(row.shiftid, row): @nowarn
+        row
       }
     }
   }

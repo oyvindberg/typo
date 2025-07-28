@@ -94,11 +94,14 @@ class PersonRepoImpl extends PersonRepo {
   override def update: UpdateBuilder[PersonFields, PersonRow] = {
     UpdateBuilder(""""compositepk"."person"""", PersonFields.structure, PersonRow.jdbcDecoder)
   }
-  override def update(row: PersonRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: PersonRow): ZIO[ZConnection, Throwable, Option[PersonRow]] = {
     val compositeId = row.compositeId
     sql"""update "compositepk"."person"
           set "name" = ${Segment.paramSegment(row.name)(Setter.optionParamSetter(Setter.stringSetter))}
-          where "one" = ${Segment.paramSegment(compositeId.one)(Setter.longSetter)} AND "two" = ${Segment.paramSegment(compositeId.two)(Setter.optionParamSetter(Setter.stringSetter))}""".update.map(_ > 0)
+          where "one" = ${Segment.paramSegment(compositeId.one)(Setter.longSetter)} AND "two" = ${Segment.paramSegment(compositeId.two)(Setter.optionParamSetter(Setter.stringSetter))}
+          returning "one", "two", "name""""
+      .query(PersonRow.jdbcDecoder)
+      .selectOne
   }
   override def updateFieldValues(compositeId: PersonId, fieldValues: List[PersonFieldValue[?]]): ZIO[ZConnection, Throwable, Boolean] = {
     NonEmptyChunk.fromIterableOption(fieldValues) match {

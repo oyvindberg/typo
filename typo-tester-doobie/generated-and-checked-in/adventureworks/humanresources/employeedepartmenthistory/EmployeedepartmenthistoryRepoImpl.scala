@@ -116,15 +116,13 @@ class EmployeedepartmenthistoryRepoImpl extends EmployeedepartmenthistoryRepo {
   override def update: UpdateBuilder[EmployeedepartmenthistoryFields, EmployeedepartmenthistoryRow] = {
     UpdateBuilder(""""humanresources"."employeedepartmenthistory"""", EmployeedepartmenthistoryFields.structure, EmployeedepartmenthistoryRow.read)
   }
-  override def update(row: EmployeedepartmenthistoryRow): ConnectionIO[Boolean] = {
+  override def update(row: EmployeedepartmenthistoryRow): ConnectionIO[Option[EmployeedepartmenthistoryRow]] = {
     val compositeId = row.compositeId
     sql"""update "humanresources"."employeedepartmenthistory"
           set "enddate" = ${fromWrite(row.enddate)(new Write.SingleOpt(TypoLocalDate.put))}::date,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(new Write.Single(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(new Write.Single(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(new Write.Single(ShiftId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(new Write.Single(TypoLocalDate.put))} AND "departmentid" = ${fromWrite(compositeId.departmentid)(new Write.Single(DepartmentId.put))} AND "shiftid" = ${fromWrite(compositeId.shiftid)(new Write.Single(ShiftId.put))}
+          returning "businessentityid", "departmentid", "shiftid", "startdate"::text, "enddate"::text, "modifieddate"::text""".query(using EmployeedepartmenthistoryRow.read).option
   }
   override def upsert(unsaved: EmployeedepartmenthistoryRow): ConnectionIO[EmployeedepartmenthistoryRow] = {
     sql"""insert into "humanresources"."employeedepartmenthistory"("businessentityid", "departmentid", "shiftid", "startdate", "enddate", "modifieddate")

@@ -116,14 +116,15 @@ class EmployeepayhistoryRepoImpl extends EmployeepayhistoryRepo {
   override def update: UpdateBuilder[EmployeepayhistoryFields, EmployeepayhistoryRow] = {
     UpdateBuilder(""""humanresources"."employeepayhistory"""", EmployeepayhistoryFields.structure, EmployeepayhistoryRow.rowParser)
   }
-  override def update(row: EmployeepayhistoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: EmployeepayhistoryRow)(implicit c: Connection): Option[EmployeepayhistoryRow] = {
     val compositeId = row.compositeId
     SQL"""update "humanresources"."employeepayhistory"
           set "rate" = ${ParameterValue(row.rate, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "payfrequency" = ${ParameterValue(row.payfrequency, null, TypoShort.toStatement)}::int2,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "ratechangedate" = ${ParameterValue(compositeId.ratechangedate, null, TypoLocalDateTime.toStatement)}
-       """.executeUpdate() > 0
+          returning "businessentityid", "ratechangedate"::text, "rate", "payfrequency", "modifieddate"::text
+       """.executeInsert(EmployeepayhistoryRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: EmployeepayhistoryRow)(implicit c: Connection): EmployeepayhistoryRow = {
     SQL"""insert into "humanresources"."employeepayhistory"("businessentityid", "ratechangedate", "rate", "payfrequency", "modifieddate")

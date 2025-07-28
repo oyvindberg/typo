@@ -28,7 +28,7 @@ trait SalesorderheadersalesreasonRepo {
   def selectByIds(compositeIds: Array[SalesorderheadersalesreasonId]): Stream[ConnectionIO, SalesorderheadersalesreasonRow]
   def selectByIdsTracked(compositeIds: Array[SalesorderheadersalesreasonId]): ConnectionIO[Map[SalesorderheadersalesreasonId, SalesorderheadersalesreasonRow]]
   def update: UpdateBuilder[SalesorderheadersalesreasonFields, SalesorderheadersalesreasonRow]
-  def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Boolean]
+  def update(row: SalesorderheadersalesreasonRow): ConnectionIO[Option[SalesorderheadersalesreasonRow]]
   def upsert(unsaved: SalesorderheadersalesreasonRow): ConnectionIO[SalesorderheadersalesreasonRow]
   def upsertBatch(unsaved: List[SalesorderheadersalesreasonRow]): Stream[ConnectionIO, SalesorderheadersalesreasonRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

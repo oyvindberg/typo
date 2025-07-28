@@ -95,15 +95,13 @@ class IllustrationRepoImpl extends IllustrationRepo {
   override def update: UpdateBuilder[IllustrationFields, IllustrationRow] = {
     UpdateBuilder(""""production"."illustration"""", IllustrationFields.structure, IllustrationRow.read)
   }
-  override def update(row: IllustrationRow): ConnectionIO[Boolean] = {
+  override def update(row: IllustrationRow): ConnectionIO[Option[IllustrationRow]] = {
     val illustrationid = row.illustrationid
     sql"""update "production"."illustration"
           set "diagram" = ${fromWrite(row.diagram)(new Write.SingleOpt(TypoXml.put))}::xml,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "illustrationid" = ${fromWrite(illustrationid)(new Write.Single(IllustrationId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "illustrationid" = ${fromWrite(illustrationid)(new Write.Single(IllustrationId.put))}
+          returning "illustrationid", "diagram", "modifieddate"::text""".query(using IllustrationRow.read).option
   }
   override def upsert(unsaved: IllustrationRow): ConnectionIO[IllustrationRow] = {
     sql"""insert into "production"."illustration"("illustrationid", "diagram", "modifieddate")

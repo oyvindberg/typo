@@ -104,7 +104,7 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
   override def update: UpdateBuilder[TransactionhistoryFields, TransactionhistoryRow] = {
     UpdateBuilder(""""production"."transactionhistory"""", TransactionhistoryFields.structure, TransactionhistoryRow.jdbcDecoder)
   }
-  override def update(row: TransactionhistoryRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: TransactionhistoryRow): ZIO[ZConnection, Throwable, Option[TransactionhistoryRow]] = {
     val transactionid = row.transactionid
     sql"""update "production"."transactionhistory"
           set "productid" = ${Segment.paramSegment(row.productid)(ProductId.setter)}::int4,
@@ -115,7 +115,10 @@ class TransactionhistoryRepoImpl extends TransactionhistoryRepo {
               "quantity" = ${Segment.paramSegment(row.quantity)(Setter.intSetter)}::int4,
               "actualcost" = ${Segment.paramSegment(row.actualcost)(Setter.bigDecimalScalaSetter)}::numeric,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryId.setter)}""".update.map(_ > 0)
+          where "transactionid" = ${Segment.paramSegment(transactionid)(TransactionhistoryId.setter)}
+          returning "transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate"::text, "transactiontype", "quantity", "actualcost", "modifieddate"::text"""
+      .query(TransactionhistoryRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: TransactionhistoryRow): ZIO[ZConnection, Throwable, UpdateResult[TransactionhistoryRow]] = {
     sql"""insert into "production"."transactionhistory"("transactionid", "productid", "referenceorderid", "referenceorderlineid", "transactiondate", "transactiontype", "quantity", "actualcost", "modifieddate")

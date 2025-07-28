@@ -116,7 +116,7 @@ class StoreRepoImpl extends StoreRepo {
   override def update: UpdateBuilder[StoreFields, StoreRow] = {
     UpdateBuilder(""""sales"."store"""", StoreFields.structure, StoreRow.rowParser)
   }
-  override def update(row: StoreRow)(implicit c: Connection): Boolean = {
+  override def update(row: StoreRow)(implicit c: Connection): Option[StoreRow] = {
     val businessentityid = row.businessentityid
     SQL"""update "sales"."store"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
@@ -125,7 +125,8 @@ class StoreRepoImpl extends StoreRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(businessentityid, null, BusinessentityId.toStatement)}
-       """.executeUpdate() > 0
+          returning "businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate"::text
+       """.executeInsert(StoreRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: StoreRow)(implicit c: Connection): StoreRow = {
     SQL"""insert into "sales"."store"("businessentityid", "name", "salespersonid", "demographics", "rowguid", "modifieddate")

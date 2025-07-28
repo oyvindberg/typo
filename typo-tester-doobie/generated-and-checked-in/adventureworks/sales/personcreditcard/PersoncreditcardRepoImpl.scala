@@ -108,14 +108,12 @@ class PersoncreditcardRepoImpl extends PersoncreditcardRepo {
   override def update: UpdateBuilder[PersoncreditcardFields, PersoncreditcardRow] = {
     UpdateBuilder(""""sales"."personcreditcard"""", PersoncreditcardFields.structure, PersoncreditcardRow.read)
   }
-  override def update(row: PersoncreditcardRow): ConnectionIO[Boolean] = {
+  override def update(row: PersoncreditcardRow): ConnectionIO[Option[PersoncreditcardRow]] = {
     val compositeId = row.compositeId
     sql"""update "sales"."personcreditcard"
           set "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "creditcardid" = ${fromWrite(compositeId.creditcardid)(new Write.Single(/* user-picked */ CustomCreditcardId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(compositeId.businessentityid)(new Write.Single(BusinessentityId.put))} AND "creditcardid" = ${fromWrite(compositeId.creditcardid)(new Write.Single(/* user-picked */ CustomCreditcardId.put))}
+          returning "businessentityid", "creditcardid", "modifieddate"::text""".query(using PersoncreditcardRow.read).option
   }
   override def upsert(unsaved: PersoncreditcardRow): ConnectionIO[PersoncreditcardRow] = {
     sql"""insert into "sales"."personcreditcard"("businessentityid", "creditcardid", "modifieddate")

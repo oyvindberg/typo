@@ -76,14 +76,12 @@ class TestSakSoknadsalternativRepoImpl extends TestSakSoknadsalternativRepo {
   override def update: UpdateBuilder[TestSakSoknadsalternativFields, TestSakSoknadsalternativRow] = {
     UpdateBuilder(""""public"."test_sak_soknadsalternativ"""", TestSakSoknadsalternativFields.structure, TestSakSoknadsalternativRow.read)
   }
-  override def update(row: TestSakSoknadsalternativRow): ConnectionIO[Boolean] = {
+  override def update(row: TestSakSoknadsalternativRow): ConnectionIO[Option[TestSakSoknadsalternativRow]] = {
     val compositeId = row.compositeId
     sql"""update "public"."test_sak_soknadsalternativ"
           set "organisasjonskode_tilbyder" = ${fromWrite(row.organisasjonskodeTilbyder)(new Write.Single(TestOrganisasjonId.put))}
-          where "organisasjonskode_saksbehandler" = ${fromWrite(compositeId.organisasjonskodeSaksbehandler)(new Write.Single(Meta.StringMeta.put))} AND "utdanningsmulighet_kode" = ${fromWrite(compositeId.utdanningsmulighetKode)(new Write.Single(Meta.StringMeta.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "organisasjonskode_saksbehandler" = ${fromWrite(compositeId.organisasjonskodeSaksbehandler)(new Write.Single(Meta.StringMeta.put))} AND "utdanningsmulighet_kode" = ${fromWrite(compositeId.utdanningsmulighetKode)(new Write.Single(Meta.StringMeta.put))}
+          returning "organisasjonskode_saksbehandler", "utdanningsmulighet_kode", "organisasjonskode_tilbyder"""".query(using TestSakSoknadsalternativRow.read).option
   }
   override def upsert(unsaved: TestSakSoknadsalternativRow): ConnectionIO[TestSakSoknadsalternativRow] = {
     sql"""insert into "public"."test_sak_soknadsalternativ"("organisasjonskode_saksbehandler", "utdanningsmulighet_kode", "organisasjonskode_tilbyder")

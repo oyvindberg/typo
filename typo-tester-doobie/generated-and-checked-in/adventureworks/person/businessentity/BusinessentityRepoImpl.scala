@@ -98,15 +98,13 @@ class BusinessentityRepoImpl extends BusinessentityRepo {
   override def update: UpdateBuilder[BusinessentityFields, BusinessentityRow] = {
     UpdateBuilder(""""person"."businessentity"""", BusinessentityFields.structure, BusinessentityRow.read)
   }
-  override def update(row: BusinessentityRow): ConnectionIO[Boolean] = {
+  override def update(row: BusinessentityRow): ConnectionIO[Option[BusinessentityRow]] = {
     val businessentityid = row.businessentityid
     sql"""update "person"."businessentity"
           set "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "businessentityid" = ${fromWrite(businessentityid)(new Write.Single(BusinessentityId.put))}
+          returning "businessentityid", "rowguid", "modifieddate"::text""".query(using BusinessentityRow.read).option
   }
   override def upsert(unsaved: BusinessentityRow): ConnectionIO[BusinessentityRow] = {
     sql"""insert into "person"."businessentity"("businessentityid", "rowguid", "modifieddate")

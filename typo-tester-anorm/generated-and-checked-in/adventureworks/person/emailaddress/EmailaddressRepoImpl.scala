@@ -123,14 +123,15 @@ class EmailaddressRepoImpl extends EmailaddressRepo {
   override def update: UpdateBuilder[EmailaddressFields, EmailaddressRow] = {
     UpdateBuilder(""""person"."emailaddress"""", EmailaddressFields.structure, EmailaddressRow.rowParser)
   }
-  override def update(row: EmailaddressRow)(implicit c: Connection): Boolean = {
+  override def update(row: EmailaddressRow)(implicit c: Connection): Option[EmailaddressRow] = {
     val compositeId = row.compositeId
     SQL"""update "person"."emailaddress"
           set "emailaddress" = ${ParameterValue(row.emailaddress, null, ToStatement.optionToStatement(ToStatement.stringToStatement, ParameterMetaData.StringParameterMetaData))},
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "businessentityid" = ${ParameterValue(compositeId.businessentityid, null, BusinessentityId.toStatement)} AND "emailaddressid" = ${ParameterValue(compositeId.emailaddressid, null, ToStatement.intToStatement)}
-       """.executeUpdate() > 0
+          returning "businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate"::text
+       """.executeInsert(EmailaddressRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: EmailaddressRow)(implicit c: Connection): EmailaddressRow = {
     SQL"""insert into "person"."emailaddress"("businessentityid", "emailaddressid", "emailaddress", "rowguid", "modifieddate")

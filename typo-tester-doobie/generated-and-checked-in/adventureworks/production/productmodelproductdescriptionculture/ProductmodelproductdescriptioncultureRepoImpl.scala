@@ -111,14 +111,12 @@ class ProductmodelproductdescriptioncultureRepoImpl extends Productmodelproductd
   override def update: UpdateBuilder[ProductmodelproductdescriptioncultureFields, ProductmodelproductdescriptioncultureRow] = {
     UpdateBuilder(""""production"."productmodelproductdescriptionculture"""", ProductmodelproductdescriptioncultureFields.structure, ProductmodelproductdescriptioncultureRow.read)
   }
-  override def update(row: ProductmodelproductdescriptioncultureRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductmodelproductdescriptioncultureRow): ConnectionIO[Option[ProductmodelproductdescriptioncultureRow]] = {
     val compositeId = row.compositeId
     sql"""update "production"."productmodelproductdescriptionculture"
           set "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "productmodelid" = ${fromWrite(compositeId.productmodelid)(new Write.Single(ProductmodelId.put))} AND "productdescriptionid" = ${fromWrite(compositeId.productdescriptionid)(new Write.Single(ProductdescriptionId.put))} AND "cultureid" = ${fromWrite(compositeId.cultureid)(new Write.Single(CultureId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "productmodelid" = ${fromWrite(compositeId.productmodelid)(new Write.Single(ProductmodelId.put))} AND "productdescriptionid" = ${fromWrite(compositeId.productdescriptionid)(new Write.Single(ProductdescriptionId.put))} AND "cultureid" = ${fromWrite(compositeId.cultureid)(new Write.Single(CultureId.put))}
+          returning "productmodelid", "productdescriptionid", "cultureid", "modifieddate"::text""".query(using ProductmodelproductdescriptioncultureRow.read).option
   }
   override def upsert(unsaved: ProductmodelproductdescriptioncultureRow): ConnectionIO[ProductmodelproductdescriptioncultureRow] = {
     sql"""insert into "production"."productmodelproductdescriptionculture"("productmodelid", "productdescriptionid", "cultureid", "modifieddate")

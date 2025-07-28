@@ -88,14 +88,11 @@ class LocationRepoMock(toRow: Function1[LocationRowUnsaved, LocationRow],
   override def update: UpdateBuilder[LocationFields, LocationRow] = {
     UpdateBuilderMock(UpdateParams.empty, LocationFields.structure, map)
   }
-  override def update(row: LocationRow): ConnectionIO[Boolean] = {
+  override def update(row: LocationRow): ConnectionIO[Option[LocationRow]] = {
     delay {
-      map.get(row.locationid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.locationid, row): @nowarn
-          true
-        case None => false
+      map.get(row.locationid).map { _ =>
+        map.put(row.locationid, row): @nowarn
+        row
       }
     }
   }

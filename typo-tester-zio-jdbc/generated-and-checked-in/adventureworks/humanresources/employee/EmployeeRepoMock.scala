@@ -88,14 +88,11 @@ class EmployeeRepoMock(toRow: Function1[EmployeeRowUnsaved, EmployeeRow],
   override def update: UpdateBuilder[EmployeeFields, EmployeeRow] = {
     UpdateBuilderMock(UpdateParams.empty, EmployeeFields.structure, map)
   }
-  override def update(row: EmployeeRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: EmployeeRow): ZIO[ZConnection, Throwable, Option[EmployeeRow]] = {
     ZIO.succeed {
-      map.get(row.businessentityid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.businessentityid, row): @nowarn
-          true
-        case None => false
+      map.get(row.businessentityid).map { _ =>
+        map.put(row.businessentityid, row): @nowarn
+        row
       }
     }
   }

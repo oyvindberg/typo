@@ -108,12 +108,15 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
     UpdateBuilder(""""production"."productproductphoto"""", ProductproductphotoFields.structure, ProductproductphotoRow.jdbcDecoder)
   }
-  override def update(row: ProductproductphotoRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ProductproductphotoRow): ZIO[ZConnection, Throwable, Option[ProductproductphotoRow]] = {
     val compositeId = row.compositeId
     sql"""update "production"."productproductphoto"
           set "primary" = ${Segment.paramSegment(row.primary)(Flag.setter)}::bool,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "productphotoid" = ${Segment.paramSegment(compositeId.productphotoid)(ProductphotoId.setter)}""".update.map(_ > 0)
+          where "productid" = ${Segment.paramSegment(compositeId.productid)(ProductId.setter)} AND "productphotoid" = ${Segment.paramSegment(compositeId.productphotoid)(ProductphotoId.setter)}
+          returning "productid", "productphotoid", "primary", "modifieddate"::text"""
+      .query(ProductproductphotoRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ProductproductphotoRow): ZIO[ZConnection, Throwable, UpdateResult[ProductproductphotoRow]] = {
     sql"""insert into "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate")

@@ -88,14 +88,11 @@ class ProductcosthistoryRepoMock(toRow: Function1[ProductcosthistoryRowUnsaved, 
   override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     UpdateBuilderMock(UpdateParams.empty, ProductcosthistoryFields.structure, map)
   }
-  override def update(row: ProductcosthistoryRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductcosthistoryRow): ConnectionIO[Option[ProductcosthistoryRow]] = {
     delay {
-      map.get(row.compositeId) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.compositeId, row): @nowarn
-          true
-        case None => false
+      map.get(row.compositeId).map { _ =>
+        map.put(row.compositeId, row): @nowarn
+        row
       }
     }
   }

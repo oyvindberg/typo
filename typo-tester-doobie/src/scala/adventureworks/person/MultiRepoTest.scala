@@ -29,7 +29,7 @@ case class PersonWithAddressesRepo(
       // update person
       _ <- personRepo.upsert(pa.person)
       // update stored addresses
-      _ <- pa.addresses.values.toList.traverse { address => addressRepo.update(address) }
+      _ <- pa.addresses.values.toList.traverse { address => addressRepo.update(address).map(_ => ()) }
       // addresses are stored in `PersonWithAddress` by a `Name` which means what type of address it is.
       // this address type is stored in addresstypeRepo.
       // In order for foreign keys to align, we need to translate from names to ids, and create rows as necessary

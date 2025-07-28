@@ -115,14 +115,15 @@ class ProductcosthistoryRepoImpl extends ProductcosthistoryRepo {
   override def update: UpdateBuilder[ProductcosthistoryFields, ProductcosthistoryRow] = {
     UpdateBuilder(""""production"."productcosthistory"""", ProductcosthistoryFields.structure, ProductcosthistoryRow.rowParser)
   }
-  override def update(row: ProductcosthistoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductcosthistoryRow)(implicit c: Connection): Option[ProductcosthistoryRow] = {
     val compositeId = row.compositeId
     SQL"""update "production"."productcosthistory"
           set "enddate" = ${ParameterValue(row.enddate, null, ToStatement.optionToStatement(TypoLocalDateTime.toStatement, TypoLocalDateTime.parameterMetadata))}::timestamp,
               "standardcost" = ${ParameterValue(row.standardcost, null, ToStatement.scalaBigDecimalToStatement)}::numeric,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "startdate" = ${ParameterValue(compositeId.startdate, null, TypoLocalDateTime.toStatement)}
-       """.executeUpdate() > 0
+          returning "productid", "startdate"::text, "enddate"::text, "standardcost", "modifieddate"::text
+       """.executeInsert(ProductcosthistoryRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductcosthistoryRow)(implicit c: Connection): ProductcosthistoryRow = {
     SQL"""insert into "production"."productcosthistory"("productid", "startdate", "enddate", "standardcost", "modifieddate")

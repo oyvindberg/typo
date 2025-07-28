@@ -125,7 +125,7 @@ class DocumentRepoImpl extends DocumentRepo {
   override def update: UpdateBuilder[DocumentFields, DocumentRow] = {
     UpdateBuilder(""""production"."document"""", DocumentFields.structure, DocumentRow.read)
   }
-  override def update(row: DocumentRow): ConnectionIO[Boolean] = {
+  override def update(row: DocumentRow): ConnectionIO[Option[DocumentRow]] = {
     val documentnode = row.documentnode
     sql"""update "production"."document"
           set "title" = ${fromWrite(row.title)(new Write.Single(Meta.StringMeta.put))},
@@ -140,10 +140,8 @@ class DocumentRepoImpl extends DocumentRepo {
               "document" = ${fromWrite(row.document)(new Write.SingleOpt(TypoBytea.put))}::bytea,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "documentnode" = ${fromWrite(documentnode)(new Write.Single(DocumentId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "documentnode" = ${fromWrite(documentnode)(new Write.Single(DocumentId.put))}
+          returning "title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate"::text, "documentnode"""".query(using DocumentRow.read).option
   }
   override def upsert(unsaved: DocumentRow): ConnectionIO[DocumentRow] = {
     sql"""insert into "production"."document"("title", "owner", "folderflag", "filename", "fileextension", "revision", "changenumber", "status", "documentsummary", "document", "rowguid", "modifieddate", "documentnode")

@@ -82,12 +82,13 @@ class FlaffRepoImpl extends FlaffRepo {
   override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
     UpdateBuilder(""""public"."flaff"""", FlaffFields.structure, FlaffRow.rowParser)
   }
-  override def update(row: FlaffRow)(implicit c: Connection): Boolean = {
+  override def update(row: FlaffRow)(implicit c: Connection): Option[FlaffRow] = {
     val compositeId = row.compositeId
     SQL"""update "public"."flaff"
           set "parentspecifier" = ${ParameterValue(row.parentspecifier, null, ToStatement.optionToStatement(ShortText.toStatement, ShortText.parameterMetadata))}::text
           where "code" = ${ParameterValue(compositeId.code, null, ShortText.toStatement)} AND "another_code" = ${ParameterValue(compositeId.anotherCode, null, ToStatement.stringToStatement)} AND "some_number" = ${ParameterValue(compositeId.someNumber, null, ToStatement.intToStatement)} AND "specifier" = ${ParameterValue(compositeId.specifier, null, ShortText.toStatement)}
-       """.executeUpdate() > 0
+          returning "code", "another_code", "some_number", "specifier", "parentspecifier"
+       """.executeInsert(FlaffRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: FlaffRow)(implicit c: Connection): FlaffRow = {
     SQL"""insert into "public"."flaff"("code", "another_code", "some_number", "specifier", "parentspecifier")

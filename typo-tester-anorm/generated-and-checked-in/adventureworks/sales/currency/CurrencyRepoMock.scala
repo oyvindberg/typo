@@ -74,13 +74,10 @@ class CurrencyRepoMock(toRow: Function1[CurrencyRowUnsaved, CurrencyRow],
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
     UpdateBuilderMock(UpdateParams.empty, CurrencyFields.structure, map)
   }
-  override def update(row: CurrencyRow)(implicit c: Connection): Boolean = {
-    map.get(row.currencycode) match {
-      case Some(`row`) => false
-      case Some(_) =>
-        map.put(row.currencycode, row): @nowarn
-        true
-      case None => false
+  override def update(row: CurrencyRow)(implicit c: Connection): Option[CurrencyRow] = {
+    map.get(row.currencycode).map { _ =>
+      map.put(row.currencycode, row): @nowarn
+      row
     }
   }
   override def upsert(unsaved: CurrencyRow)(implicit c: Connection): CurrencyRow = {

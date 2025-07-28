@@ -28,7 +28,7 @@ trait JobcandidateRepo {
   def selectByIds(jobcandidateids: Array[JobcandidateId]): Stream[ConnectionIO, JobcandidateRow]
   def selectByIdsTracked(jobcandidateids: Array[JobcandidateId]): ConnectionIO[Map[JobcandidateId, JobcandidateRow]]
   def update: UpdateBuilder[JobcandidateFields, JobcandidateRow]
-  def update(row: JobcandidateRow): ConnectionIO[Boolean]
+  def update(row: JobcandidateRow): ConnectionIO[Option[JobcandidateRow]]
   def upsert(unsaved: JobcandidateRow): ConnectionIO[JobcandidateRow]
   def upsertBatch(unsaved: List[JobcandidateRow]): Stream[ConnectionIO, JobcandidateRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

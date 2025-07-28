@@ -88,14 +88,11 @@ class PhonenumbertypeRepoMock(toRow: Function1[PhonenumbertypeRowUnsaved, Phonen
   override def update: UpdateBuilder[PhonenumbertypeFields, PhonenumbertypeRow] = {
     UpdateBuilderMock(UpdateParams.empty, PhonenumbertypeFields.structure, map)
   }
-  override def update(row: PhonenumbertypeRow): ConnectionIO[Boolean] = {
+  override def update(row: PhonenumbertypeRow): ConnectionIO[Option[PhonenumbertypeRow]] = {
     delay {
-      map.get(row.phonenumbertypeid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.phonenumbertypeid, row): @nowarn
-          true
-        case None => false
+      map.get(row.phonenumbertypeid).map { _ =>
+        map.put(row.phonenumbertypeid, row): @nowarn
+        row
       }
     }
   }

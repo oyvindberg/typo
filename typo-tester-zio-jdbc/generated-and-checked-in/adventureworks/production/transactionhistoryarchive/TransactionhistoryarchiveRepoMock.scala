@@ -87,14 +87,11 @@ class TransactionhistoryarchiveRepoMock(toRow: Function1[Transactionhistoryarchi
   override def update: UpdateBuilder[TransactionhistoryarchiveFields, TransactionhistoryarchiveRow] = {
     UpdateBuilderMock(UpdateParams.empty, TransactionhistoryarchiveFields.structure, map)
   }
-  override def update(row: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: TransactionhistoryarchiveRow): ZIO[ZConnection, Throwable, Option[TransactionhistoryarchiveRow]] = {
     ZIO.succeed {
-      map.get(row.transactionid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.transactionid, row): @nowarn
-          true
-        case None => false
+      map.get(row.transactionid).map { _ =>
+        map.put(row.transactionid, row): @nowarn
+        row
       }
     }
   }

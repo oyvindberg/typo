@@ -88,14 +88,11 @@ class ShipmethodRepoMock(toRow: Function1[ShipmethodRowUnsaved, ShipmethodRow],
   override def update: UpdateBuilder[ShipmethodFields, ShipmethodRow] = {
     UpdateBuilderMock(UpdateParams.empty, ShipmethodFields.structure, map)
   }
-  override def update(row: ShipmethodRow): ConnectionIO[Boolean] = {
+  override def update(row: ShipmethodRow): ConnectionIO[Option[ShipmethodRow]] = {
     delay {
-      map.get(row.shipmethodid) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.shipmethodid, row): @nowarn
-          true
-        case None => false
+      map.get(row.shipmethodid).map { _ =>
+        map.put(row.shipmethodid, row): @nowarn
+        row
       }
     }
   }

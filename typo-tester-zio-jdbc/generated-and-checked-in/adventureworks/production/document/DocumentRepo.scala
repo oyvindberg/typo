@@ -32,7 +32,7 @@ trait DocumentRepo {
   def selectByIdsTracked(documentnodes: Array[DocumentId]): ZIO[ZConnection, Throwable, Map[DocumentId, DocumentRow]]
   def selectByUniqueRowguid(rowguid: TypoUUID): ZIO[ZConnection, Throwable, Option[DocumentRow]]
   def update: UpdateBuilder[DocumentFields, DocumentRow]
-  def update(row: DocumentRow): ZIO[ZConnection, Throwable, Boolean]
+  def update(row: DocumentRow): ZIO[ZConnection, Throwable, Option[DocumentRow]]
   def upsert(unsaved: DocumentRow): ZIO[ZConnection, Throwable, UpdateResult[DocumentRow]]
   // Not implementable for zio-jdbc: upsertBatch
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

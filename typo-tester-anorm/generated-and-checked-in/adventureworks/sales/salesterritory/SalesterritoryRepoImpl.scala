@@ -134,7 +134,7 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
   override def update: UpdateBuilder[SalesterritoryFields, SalesterritoryRow] = {
     UpdateBuilder(""""sales"."salesterritory"""", SalesterritoryFields.structure, SalesterritoryRow.rowParser)
   }
-  override def update(row: SalesterritoryRow)(implicit c: Connection): Boolean = {
+  override def update(row: SalesterritoryRow)(implicit c: Connection): Option[SalesterritoryRow] = {
     val territoryid = row.territoryid
     SQL"""update "sales"."salesterritory"
           set "name" = ${ParameterValue(row.name, null, Name.toStatement)}::varchar,
@@ -147,7 +147,8 @@ class SalesterritoryRepoImpl extends SalesterritoryRepo {
               "rowguid" = ${ParameterValue(row.rowguid, null, TypoUUID.toStatement)}::uuid,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "territoryid" = ${ParameterValue(territoryid, null, SalesterritoryId.toStatement)}
-       """.executeUpdate() > 0
+          returning "territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate"::text
+       """.executeInsert(SalesterritoryRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: SalesterritoryRow)(implicit c: Connection): SalesterritoryRow = {
     SQL"""insert into "sales"."salesterritory"("territoryid", "name", "countryregioncode", "group", "salesytd", "saleslastyear", "costytd", "costlastyear", "rowguid", "modifieddate")

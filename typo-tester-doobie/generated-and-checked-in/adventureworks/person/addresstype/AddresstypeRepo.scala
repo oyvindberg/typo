@@ -28,7 +28,7 @@ trait AddresstypeRepo {
   def selectByIds(addresstypeids: Array[AddresstypeId]): Stream[ConnectionIO, AddresstypeRow]
   def selectByIdsTracked(addresstypeids: Array[AddresstypeId]): ConnectionIO[Map[AddresstypeId, AddresstypeRow]]
   def update: UpdateBuilder[AddresstypeFields, AddresstypeRow]
-  def update(row: AddresstypeRow): ConnectionIO[Boolean]
+  def update(row: AddresstypeRow): ConnectionIO[Option[AddresstypeRow]]
   def upsert(unsaved: AddresstypeRow): ConnectionIO[AddresstypeRow]
   def upsertBatch(unsaved: List[AddresstypeRow]): Stream[ConnectionIO, AddresstypeRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

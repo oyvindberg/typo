@@ -92,15 +92,13 @@ class UnitmeasureRepoImpl extends UnitmeasureRepo {
   override def update: UpdateBuilder[UnitmeasureFields, UnitmeasureRow] = {
     UpdateBuilder(""""production"."unitmeasure"""", UnitmeasureFields.structure, UnitmeasureRow.read)
   }
-  override def update(row: UnitmeasureRow): ConnectionIO[Boolean] = {
+  override def update(row: UnitmeasureRow): ConnectionIO[Option[UnitmeasureRow]] = {
     val unitmeasurecode = row.unitmeasurecode
     sql"""update "production"."unitmeasure"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "unitmeasurecode" = ${fromWrite(unitmeasurecode)(new Write.Single(UnitmeasureId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "unitmeasurecode" = ${fromWrite(unitmeasurecode)(new Write.Single(UnitmeasureId.put))}
+          returning "unitmeasurecode", "name", "modifieddate"::text""".query(using UnitmeasureRow.read).option
   }
   override def upsert(unsaved: UnitmeasureRow): ConnectionIO[UnitmeasureRow] = {
     sql"""insert into "production"."unitmeasure"("unitmeasurecode", "name", "modifieddate")

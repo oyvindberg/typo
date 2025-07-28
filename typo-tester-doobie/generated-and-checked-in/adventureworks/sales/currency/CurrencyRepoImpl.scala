@@ -92,15 +92,13 @@ class CurrencyRepoImpl extends CurrencyRepo {
   override def update: UpdateBuilder[CurrencyFields, CurrencyRow] = {
     UpdateBuilder(""""sales"."currency"""", CurrencyFields.structure, CurrencyRow.read)
   }
-  override def update(row: CurrencyRow): ConnectionIO[Boolean] = {
+  override def update(row: CurrencyRow): ConnectionIO[Option[CurrencyRow]] = {
     val currencycode = row.currencycode
     sql"""update "sales"."currency"
           set "name" = ${fromWrite(row.name)(new Write.Single(Name.put))}::varchar,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "currencycode" = ${fromWrite(currencycode)(new Write.Single(CurrencyId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "currencycode" = ${fromWrite(currencycode)(new Write.Single(CurrencyId.put))}
+          returning "currencycode", "name", "modifieddate"::text""".query(using CurrencyRow.read).option
   }
   override def upsert(unsaved: CurrencyRow): ConnectionIO[CurrencyRow] = {
     sql"""insert into "sales"."currency"("currencycode", "name", "modifieddate")

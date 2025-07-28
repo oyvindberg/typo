@@ -72,14 +72,11 @@ class FlaffRepoMock(map: scala.collection.mutable.Map[FlaffId, FlaffRow] = scala
   override def update: UpdateBuilder[FlaffFields, FlaffRow] = {
     UpdateBuilderMock(UpdateParams.empty, FlaffFields.structure, map)
   }
-  override def update(row: FlaffRow): ConnectionIO[Boolean] = {
+  override def update(row: FlaffRow): ConnectionIO[Option[FlaffRow]] = {
     delay {
-      map.get(row.compositeId) match {
-        case Some(`row`) => false
-        case Some(_) =>
-          map.put(row.compositeId, row): @nowarn
-          true
-        case None => false
+      map.get(row.compositeId).map { _ =>
+        map.put(row.compositeId, row): @nowarn
+        row
       }
     }
   }

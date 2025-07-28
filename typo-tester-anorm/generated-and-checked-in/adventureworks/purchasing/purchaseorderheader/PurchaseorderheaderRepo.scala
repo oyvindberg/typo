@@ -27,7 +27,7 @@ trait PurchaseorderheaderRepo {
   def selectByIds(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): List[PurchaseorderheaderRow]
   def selectByIdsTracked(purchaseorderids: Array[PurchaseorderheaderId])(implicit c: Connection): Map[PurchaseorderheaderId, PurchaseorderheaderRow]
   def update: UpdateBuilder[PurchaseorderheaderFields, PurchaseorderheaderRow]
-  def update(row: PurchaseorderheaderRow)(implicit c: Connection): Boolean
+  def update(row: PurchaseorderheaderRow)(implicit c: Connection): Option[PurchaseorderheaderRow]
   def upsert(unsaved: PurchaseorderheaderRow)(implicit c: Connection): PurchaseorderheaderRow
   def upsertBatch(unsaved: Iterable[PurchaseorderheaderRow])(implicit c: Connection): List[PurchaseorderheaderRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

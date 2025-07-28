@@ -118,13 +118,14 @@ class ProductproductphotoRepoImpl extends ProductproductphotoRepo {
   override def update: UpdateBuilder[ProductproductphotoFields, ProductproductphotoRow] = {
     UpdateBuilder(""""production"."productproductphoto"""", ProductproductphotoFields.structure, ProductproductphotoRow.rowParser)
   }
-  override def update(row: ProductproductphotoRow)(implicit c: Connection): Boolean = {
+  override def update(row: ProductproductphotoRow)(implicit c: Connection): Option[ProductproductphotoRow] = {
     val compositeId = row.compositeId
     SQL"""update "production"."productproductphoto"
           set "primary" = ${ParameterValue(row.primary, null, Flag.toStatement)}::bool,
               "modifieddate" = ${ParameterValue(row.modifieddate, null, TypoLocalDateTime.toStatement)}::timestamp
           where "productid" = ${ParameterValue(compositeId.productid, null, ProductId.toStatement)} AND "productphotoid" = ${ParameterValue(compositeId.productphotoid, null, ProductphotoId.toStatement)}
-       """.executeUpdate() > 0
+          returning "productid", "productphotoid", "primary", "modifieddate"::text
+       """.executeInsert(ProductproductphotoRow.rowParser(1).singleOpt)
   }
   override def upsert(unsaved: ProductproductphotoRow)(implicit c: Connection): ProductproductphotoRow = {
     SQL"""insert into "production"."productproductphoto"("productid", "productphotoid", "primary", "modifieddate")

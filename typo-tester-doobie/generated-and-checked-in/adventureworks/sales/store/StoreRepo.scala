@@ -29,7 +29,7 @@ trait StoreRepo {
   def selectByIds(businessentityids: Array[BusinessentityId]): Stream[ConnectionIO, StoreRow]
   def selectByIdsTracked(businessentityids: Array[BusinessentityId]): ConnectionIO[Map[BusinessentityId, StoreRow]]
   def update: UpdateBuilder[StoreFields, StoreRow]
-  def update(row: StoreRow): ConnectionIO[Boolean]
+  def update(row: StoreRow): ConnectionIO[Option[StoreRow]]
   def upsert(unsaved: StoreRow): ConnectionIO[StoreRow]
   def upsertBatch(unsaved: List[StoreRow]): Stream[ConnectionIO, StoreRow]
   /* NOTE: this functionality is not safe if you use auto-commit mode! it runs 3 SQL statements */

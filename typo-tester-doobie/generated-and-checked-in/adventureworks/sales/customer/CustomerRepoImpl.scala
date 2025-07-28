@@ -103,7 +103,7 @@ class CustomerRepoImpl extends CustomerRepo {
   override def update: UpdateBuilder[CustomerFields, CustomerRow] = {
     UpdateBuilder(""""sales"."customer"""", CustomerFields.structure, CustomerRow.read)
   }
-  override def update(row: CustomerRow): ConnectionIO[Boolean] = {
+  override def update(row: CustomerRow): ConnectionIO[Option[CustomerRow]] = {
     val customerid = row.customerid
     sql"""update "sales"."customer"
           set "personid" = ${fromWrite(row.personid)(new Write.SingleOpt(BusinessentityId.put))}::int4,
@@ -111,10 +111,8 @@ class CustomerRepoImpl extends CustomerRepo {
               "territoryid" = ${fromWrite(row.territoryid)(new Write.SingleOpt(SalesterritoryId.put))}::int4,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "customerid" = ${fromWrite(customerid)(new Write.Single(CustomerId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "customerid" = ${fromWrite(customerid)(new Write.Single(CustomerId.put))}
+          returning "customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate"::text""".query(using CustomerRow.read).option
   }
   override def upsert(unsaved: CustomerRow): ConnectionIO[CustomerRow] = {
     sql"""insert into "sales"."customer"("customerid", "personid", "storeid", "territoryid", "rowguid", "modifieddate")

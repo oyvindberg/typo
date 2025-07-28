@@ -96,13 +96,16 @@ class ProductdescriptionRepoImpl extends ProductdescriptionRepo {
   override def update: UpdateBuilder[ProductdescriptionFields, ProductdescriptionRow] = {
     UpdateBuilder(""""production"."productdescription"""", ProductdescriptionFields.structure, ProductdescriptionRow.jdbcDecoder)
   }
-  override def update(row: ProductdescriptionRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ProductdescriptionRow): ZIO[ZConnection, Throwable, Option[ProductdescriptionRow]] = {
     val productdescriptionid = row.productdescriptionid
     sql"""update "production"."productdescription"
           set "description" = ${Segment.paramSegment(row.description)(Setter.stringSetter)},
               "rowguid" = ${Segment.paramSegment(row.rowguid)(TypoUUID.setter)}::uuid,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "productdescriptionid" = ${Segment.paramSegment(productdescriptionid)(ProductdescriptionId.setter)}""".update.map(_ > 0)
+          where "productdescriptionid" = ${Segment.paramSegment(productdescriptionid)(ProductdescriptionId.setter)}
+          returning "productdescriptionid", "description", "rowguid", "modifieddate"::text"""
+      .query(ProductdescriptionRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ProductdescriptionRow): ZIO[ZConnection, Throwable, UpdateResult[ProductdescriptionRow]] = {
     sql"""insert into "production"."productdescription"("productdescriptionid", "description", "rowguid", "modifieddate")

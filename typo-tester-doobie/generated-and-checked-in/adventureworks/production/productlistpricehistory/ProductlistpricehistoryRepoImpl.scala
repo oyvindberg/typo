@@ -109,16 +109,14 @@ class ProductlistpricehistoryRepoImpl extends ProductlistpricehistoryRepo {
   override def update: UpdateBuilder[ProductlistpricehistoryFields, ProductlistpricehistoryRow] = {
     UpdateBuilder(""""production"."productlistpricehistory"""", ProductlistpricehistoryFields.structure, ProductlistpricehistoryRow.read)
   }
-  override def update(row: ProductlistpricehistoryRow): ConnectionIO[Boolean] = {
+  override def update(row: ProductlistpricehistoryRow): ConnectionIO[Option[ProductlistpricehistoryRow]] = {
     val compositeId = row.compositeId
     sql"""update "production"."productlistpricehistory"
           set "enddate" = ${fromWrite(row.enddate)(new Write.SingleOpt(TypoLocalDateTime.put))}::timestamp,
               "listprice" = ${fromWrite(row.listprice)(new Write.Single(Meta.ScalaBigDecimalMeta.put))}::numeric,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(new Write.Single(TypoLocalDateTime.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "productid" = ${fromWrite(compositeId.productid)(new Write.Single(ProductId.put))} AND "startdate" = ${fromWrite(compositeId.startdate)(new Write.Single(TypoLocalDateTime.put))}
+          returning "productid", "startdate"::text, "enddate"::text, "listprice", "modifieddate"::text""".query(using ProductlistpricehistoryRow.read).option
   }
   override def upsert(unsaved: ProductlistpricehistoryRow): ConnectionIO[ProductlistpricehistoryRow] = {
     sql"""insert into "production"."productlistpricehistory"("productid", "startdate", "enddate", "listprice", "modifieddate")

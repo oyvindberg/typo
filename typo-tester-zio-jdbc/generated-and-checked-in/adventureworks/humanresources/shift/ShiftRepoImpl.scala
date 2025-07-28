@@ -94,14 +94,17 @@ class ShiftRepoImpl extends ShiftRepo {
   override def update: UpdateBuilder[ShiftFields, ShiftRow] = {
     UpdateBuilder(""""humanresources"."shift"""", ShiftFields.structure, ShiftRow.jdbcDecoder)
   }
-  override def update(row: ShiftRow): ZIO[ZConnection, Throwable, Boolean] = {
+  override def update(row: ShiftRow): ZIO[ZConnection, Throwable, Option[ShiftRow]] = {
     val shiftid = row.shiftid
     sql"""update "humanresources"."shift"
           set "name" = ${Segment.paramSegment(row.name)(Name.setter)}::varchar,
               "starttime" = ${Segment.paramSegment(row.starttime)(TypoLocalTime.setter)}::time,
               "endtime" = ${Segment.paramSegment(row.endtime)(TypoLocalTime.setter)}::time,
               "modifieddate" = ${Segment.paramSegment(row.modifieddate)(TypoLocalDateTime.setter)}::timestamp
-          where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}""".update.map(_ > 0)
+          where "shiftid" = ${Segment.paramSegment(shiftid)(ShiftId.setter)}
+          returning "shiftid", "name", "starttime"::text, "endtime"::text, "modifieddate"::text"""
+      .query(ShiftRow.jdbcDecoder)
+      .selectOne
   }
   override def upsert(unsaved: ShiftRow): ZIO[ZConnection, Throwable, UpdateResult[ShiftRow]] = {
     sql"""insert into "humanresources"."shift"("shiftid", "name", "starttime", "endtime", "modifieddate")

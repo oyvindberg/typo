@@ -113,7 +113,7 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
   override def update: UpdateBuilder[SpecialofferFields, SpecialofferRow] = {
     UpdateBuilder(""""sales"."specialoffer"""", SpecialofferFields.structure, SpecialofferRow.read)
   }
-  override def update(row: SpecialofferRow): ConnectionIO[Boolean] = {
+  override def update(row: SpecialofferRow): ConnectionIO[Option[SpecialofferRow]] = {
     val specialofferid = row.specialofferid
     sql"""update "sales"."specialoffer"
           set "description" = ${fromWrite(row.description)(new Write.Single(Meta.StringMeta.put))},
@@ -126,10 +126,8 @@ class SpecialofferRepoImpl extends SpecialofferRepo {
               "maxqty" = ${fromWrite(row.maxqty)(new Write.SingleOpt(Meta.IntMeta.put))}::int4,
               "rowguid" = ${fromWrite(row.rowguid)(new Write.Single(TypoUUID.put))}::uuid,
               "modifieddate" = ${fromWrite(row.modifieddate)(new Write.Single(TypoLocalDateTime.put))}::timestamp
-          where "specialofferid" = ${fromWrite(specialofferid)(new Write.Single(SpecialofferId.put))}"""
-      .update
-      .run
-      .map(_ > 0)
+          where "specialofferid" = ${fromWrite(specialofferid)(new Write.Single(SpecialofferId.put))}
+          returning "specialofferid", "description", "discountpct", "type", "category", "startdate"::text, "enddate"::text, "minqty", "maxqty", "rowguid", "modifieddate"::text""".query(using SpecialofferRow.read).option
   }
   override def upsert(unsaved: SpecialofferRow): ConnectionIO[SpecialofferRow] = {
     sql"""insert into "sales"."specialoffer"("specialofferid", "description", "discountpct", "type", "category", "startdate", "enddate", "minqty", "maxqty", "rowguid", "modifieddate")
